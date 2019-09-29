@@ -174,7 +174,12 @@ struct TypeInstance
           node.syntax-error(
               user "too many parameters given for type",
               user self.type-data.name)
-        if sub-type.type-data.is-primitive
+        if self.type-data is glob.type-pointer
+          if not sub-type.type-data.is-primitive
+            node.syntax-error(
+                user "non primitive pointed type",
+                user sub-type.type-data.name)
+        else-if sub-type.type-data.is-primitive
           node.syntax-error(
               user "unsupported primitive parameter type",
               user sub-type.type-data.name)
@@ -432,3 +437,10 @@ struct TypeInstance
       for parameter in self.parameters.iter()
         parameter.replace-type-parameters(
             user actual-params, copy replace-bases)
+        
+  func write-cname()
+    if self.type-data is glob.type-pointer
+      self.parameters.first.item.write-cname()
+      write(user "*")
+    else
+      self.type-data.write-cname()

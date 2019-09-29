@@ -155,7 +155,7 @@ class FieldExpression(Expression)
   
   func dynamic write-dynamic-safe()
     if self.is-complex-field
-      self.result-type.type-data.write-cname()
+      self.result-type.write-cname()
       write(user "_dynamic")
     else
       base.write-dynamic()

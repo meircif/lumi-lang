@@ -555,7 +555,7 @@ class DeclarationArgument(Argument)
     
     else
       ; `type`[*][*] `name`
-      self.variable.type-instance.type-data.write-cname()
+      self.variable.type-instance.write-cname()
       if not self.variable.type-instance.type-data.is-primitive
         write(user "*")
       self.write-name-param(user _, user _)
@@ -567,7 +567,7 @@ class DeclarationArgument(Argument)
     if self.variable.type-instance.type-data.is-dynamic and not self.is-native
       ; , `type`_Dynamic*[*] `name`_Dynamic
       write(user ", ")
-      self.variable.type-instance.type-data.write-cname()
+      self.variable.type-instance.write-cname()
       self.write-name-param(user "_Dynamic*", user "_Dynamic")
   
   func inst write-name-param(user String prefix, user String suffix)

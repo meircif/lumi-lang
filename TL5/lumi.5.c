@@ -59,6 +59,7 @@ typedef size_t cdef_M_Size;
 typedef float cdef_M_Float;
 typedef double cdef_M_Double;
 typedef long double cdef_M_LongDouble;
+typedef void* cdef_M_VoidPointer;
 
 typedef void (*Dynamic_Del)(void*);
 

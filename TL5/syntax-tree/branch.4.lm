@@ -256,10 +256,10 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       write(user "_del(")
     else-if variable.type-instance.type-data is glob.type-array
       write(user "ARRAY_DEL(")
-      data-type.type-data.write-cname()
+      data-type.write-cname()
       write(user ", ")
     else
-      data-type.type-data.write-cname()
+      data-type.write-cname()
       write(user "_Del(")
     if parent-type?
       write(user "self->")
@@ -284,7 +284,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     write-spaces(copy INDENTATION-SPACES)
     if variable.type-instance.type-data is glob.type-array
       write(user "ARRAY_DEL(")
-      data-type.type-data.write-cname()
+      data-type.write-cname()
       write(user ", ")
       if parent-type?
         write(user "self->")
@@ -300,7 +300,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
         sequence-type := sequence-type.parameters.first.item
       write(user ")\n")
     else
-      data-type.type-data.write-cname()
+      data-type.write-cname()
       write(user "_Del(")
       if parent-type?
         write(user "&(self->")

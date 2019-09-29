@@ -96,6 +96,7 @@ struct Global
   user TypeData type-module
   user TypeData type-file
   user TypeData type-sys
+  user TypeData type-pointer
   
   ~~~ referenced built-in functions ~~~
   user SyntaxTreeFunction string-copy-function
@@ -226,8 +227,14 @@ struct Global
     self.add-cint-type(user cdef-module, user "Float")
     self.add-cint-type(user cdef-module, user "Double")
     self.add-cint-type(user cdef-module, user "LongDouble")
+    user TypeData void-pointer
+    self.add-cdef-type(user cdef-module, user "VoidPointer")->(
+        user void-pointer)
+    self.add-cdef-type(user cdef-module, user "Pointer")->(
+        user self.type-pointer)
+    self.type-pointer.parameters := List{String}()
+    self.type-pointer.parameters.add(owner string-new-copy(user "Pointed"))
     self.root.modules.add(owner cdef-module)
-    
     user SyntaxTreeFunction function
     
     ; Int
@@ -466,10 +473,12 @@ struct Global
         user type-data)
   
   func add-cint-type(user ModuleMembers cdef-module, user String name)
-    user TypeData type-data
+    self.add-cdef-type(user cdef-module, user name).is-int-like := true
+  
+  func add-cdef-type(user ModuleMembers cdef-module, user String name)->(
+      user TypeData type-data)
     self.add-builtin-type(user cdef-module, user name, copy true)->(
         user type-data)
-    type-data.is-int-like := true
     type-data.my-module := cdef-module
   
   func add-builtin-type(

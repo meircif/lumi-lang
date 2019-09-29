@@ -179,7 +179,7 @@ class InitExpression(ModuleTypeExpression)
       ; INIT_NEW(`line`, `cleanup`, `aux-variable`, `type`, 1)
       self.write-macro-init(user "INIT_NEW", user self.aux-variable)
       write(user ", ")
-      self.result-type.type-data.write-cname()
+      self.result-type.write-cname()
       write(user ", 1);\n")
   
   func inst write-new-array-init()
@@ -205,7 +205,7 @@ class InitExpression(ModuleTypeExpression)
     else-if data-type.type-data is glob.type-func
       data-type.arguments.write-pointer(user _)
     else
-      data-type.type-data.write-cname()
+      data-type.write-cname()
     write(user ", ")
     self.result-type.length.write()
     write(user ", ")

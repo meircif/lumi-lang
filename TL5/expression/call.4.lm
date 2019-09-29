@@ -409,7 +409,7 @@ class CallArgument(Argument)
         write(user "NULL")
       else
         write(user "&")
-        self.value.result-type.type-data.write-cname()
+        self.value.result-type.write-cname()
         write(user "_dynamic")
   
   func dynamic write-postactions()

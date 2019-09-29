@@ -8866,4 +8866,12 @@ cdef_M_Char c_char = 0;
     ut_M_i = c_double;
     c_long_double = ut_M_i;
     ut_M_i = c_long_double;
+/// @ t1
+cdef_M_VoidPointer p_void = 0;
+    cdef_M_Char* p_char = 0;
+    cdef_M_Uint* p_uint = 0;
+    cdef_M_Int** pp_int = 0;
+    cdef_M_Char*** ppp_char = 0;
+/// @ te0
+non primitive pointed type "String"
 /// @

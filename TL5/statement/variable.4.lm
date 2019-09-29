@@ -181,7 +181,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     if self.type-instance.type-data is glob.type-func
       self.type-instance.arguments.write-pointer(user self.name)
     else
-      self.type-instance.type-data.write-cname()
+      self.type-instance.write-cname()
       if not self.type-instance.type-data.is-primitive and
           not (self.parent-type? and access-is-only-var(copy self.access))
         write(user "*")
@@ -222,7 +222,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     else-if data-type.type-data is glob.type-func
       data-type.arguments.write-pointer-start()
     else
-      data-type.type-data.write-cname()
+      data-type.write-cname()
     if not is-new-var
       write(user "*")
     if data-type.type-data is-not glob.type-func
@@ -316,7 +316,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   
   func inst write-var()
     ; `type` `name`_Var = {...};
-    self.type-instance.type-data.write-cname()
+    self.type-instance.write-cname()
     write(user " ")
     self.write-cname()
     write(user "_Var = {")
@@ -351,7 +351,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   func inst write-dynamic()
     ; `type`_Dynamic* `name`_Dynamic[ = `type`_dynamic];
     self.write-spaces()
-    self.type-instance.type-data.write-cname()
+    self.type-instance.write-cname()
     write(user "_Dynamic* ")
     self.write-cname()
     write(user "_Dynamic")
@@ -359,7 +359,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       write(user " = ")
       if self.is-create
         write(user "&")
-        self.type-instance.type-data.write-cname()
+        self.type-instance.write-cname()
         write(user "_dynamic")
       else
         write(user "NULL")

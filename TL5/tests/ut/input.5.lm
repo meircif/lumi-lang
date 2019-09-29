@@ -3896,4 +3896,12 @@ c-double := i
 i := c-double
 c-long-double := i
 i := c-long-double
+; @ c t1
+var cdef.VoidPointer p-void
+var cdef.Pointer{cdef.Char} p-char
+var cdef.Pointer{cdef.Uint} p-uint
+var cdef.Pointer{cdef.Pointer{cdef.Int}} pp-int
+var cdef.Pointer{cdef.Pointer{cdef.Pointer{cdef.Char}}} ppp-char
+; @ ec te0
+var cdef.Pointer{String} error
 ; @

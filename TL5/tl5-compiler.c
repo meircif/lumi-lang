@@ -1369,6 +1369,9 @@ struct tl5_compiler_M_Global {
   tl5_compiler_M_TypeData* type_sys;
   Ref_Manager* type_sys_Refman;
   tl5_compiler_M_TypeData_Dynamic* type_sys_Dynamic;
+  tl5_compiler_M_TypeData* type_pointer;
+  Ref_Manager* type_pointer_Refman;
+  tl5_compiler_M_TypeData_Dynamic* type_pointer_Dynamic;
   tl5_compiler_M_SyntaxTreeFunction* string_copy_function;
   Ref_Manager* string_copy_function_Refman;
   tl5_compiler_M_SyntaxTreeFunction_Dynamic* string_copy_function_Dynamic;
@@ -3100,6 +3103,8 @@ Returncode tl5_compiler_M_Global_add_global_type(tl5_compiler_M_Global* self, Re
 
 Returncode tl5_compiler_M_Global_add_cint_type(tl5_compiler_M_Global* self, Ref_Manager* self_Refman, tl5_compiler_M_ModuleMembers* cdef_module, Ref_Manager* cdef_module_Refman, String* name, Ref_Manager* name_Refman);
 
+Returncode tl5_compiler_M_Global_add_cdef_type(tl5_compiler_M_Global* self, Ref_Manager* self_Refman, tl5_compiler_M_ModuleMembers* cdef_module, Ref_Manager* cdef_module_Refman, String* name, Ref_Manager* name_Refman, tl5_compiler_M_TypeData** type_data, Ref_Manager** type_data_Refman, tl5_compiler_M_TypeData_Dynamic** type_data_Dynamic);
+
 Returncode tl5_compiler_M_Global_add_builtin_type(tl5_compiler_M_Global* self, Ref_Manager* self_Refman, tl5_compiler_M_ModuleMembers* module, Ref_Manager* module_Refman, String* name, Ref_Manager* name_Refman, Bool is_primitive, tl5_compiler_M_TypeData** type_data, Ref_Manager** type_data_Refman, tl5_compiler_M_TypeData_Dynamic** type_data_Dynamic);
 
 Returncode tl5_compiler_M_Global_add_builtin_global_variable(tl5_compiler_M_Global* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeData* variable_type, Ref_Manager* variable_type_Refman, tl5_compiler_M_TypeData_Dynamic* variable_type_Dynamic, String* name, Ref_Manager* name_Refman);
@@ -3301,6 +3306,8 @@ Returncode tl5_compiler_M_TypeInstance_new_replace_params(tl5_compiler_M_TypeIns
 Returncode tl5_compiler_M_TypeInstance_new_replace_params_extended(tl5_compiler_M_TypeInstance* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeInstance* actual_params, Ref_Manager* actual_params_Refman, Bool replace_bases, tl5_compiler_M_TypeInstance** type_instance, Ref_Manager** type_instance_Refman);
 
 Returncode tl5_compiler_M_TypeInstance_replace_type_parameters(tl5_compiler_M_TypeInstance* self, Ref_Manager* self_Refman, tl5_compiler_M_TypeInstance* actual_params, Ref_Manager* actual_params_Refman, Bool replace_bases);
+
+Returncode tl5_compiler_M_TypeInstance_write_cname(tl5_compiler_M_TypeInstance* self, Ref_Manager* self_Refman);
 
 void tl5_compiler_M_TypeInstance_Del(tl5_compiler_M_TypeInstance* self);
 
@@ -7562,8 +7569,7 @@ Returncode tl5_compiler_M_AssignExpression_write_assign_dynamic(tl5_compiler_M_A
     CHECK(192)
     CHECK_REF(193, self, self_Refman)
     CHECK_REF(193, self->value, self->value_Refman)
-    CHECK_REF(193, self->value->result_type, self->value->result_type_Refman)
-    LUMI_err = tl5_compiler_M_TypeData_write_cname(self->value->result_type->type_data, self->value->result_type->type_data_Refman, self->value->result_type->type_data_Dynamic);
+    LUMI_err = tl5_compiler_M_TypeInstance_write_cname(self->value->result_type, self->value->result_type_Refman);
     CHECK(193)
     INIT_STRING_CONST(194, aux_String_2, "_dynamic");
     LUMI_err = tl5_compiler_M_write(aux_String_2, aux_String_2_Refman);
@@ -7772,8 +7778,7 @@ Returncode tl5_compiler_M_AssignExpression_write_left_delete(tl5_compiler_M_Assi
           INIT_STRING_CONST(234, aux_String_8, "ARRAY_DEL(");
           LUMI_err = tl5_compiler_M_write(aux_String_8, aux_String_8_Refman);
           CHECK(234)
-          CHECK_REF(235, data_type, data_type_Refman)
-          LUMI_err = tl5_compiler_M_TypeData_write_cname(data_type->type_data, data_type->type_data_Refman, data_type->type_data_Dynamic);
+          LUMI_err = tl5_compiler_M_TypeInstance_write_cname(data_type, data_type_Refman);
           CHECK(235)
           INIT_STRING_CONST(236, aux_String_9, ", ");
           LUMI_err = tl5_compiler_M_write(aux_String_9, aux_String_9_Refman);
@@ -10674,8 +10679,7 @@ Returncode tl5_compiler_M_CallArgument_write(tl5_compiler_M_CallArgument* self, 
           CHECK(411)
           CHECK_REF(412, self, self_Refman)
           CHECK_REF(412, self->value, self->value_Refman)
-          CHECK_REF(412, self->value->result_type, self->value->result_type_Refman)
-          LUMI_err = tl5_compiler_M_TypeData_write_cname(self->value->result_type->type_data, self->value->result_type->type_data_Refman, self->value->result_type->type_data_Dynamic);
+          LUMI_err = tl5_compiler_M_TypeInstance_write_cname(self->value->result_type, self->value->result_type_Refman);
           CHECK(412)
           INIT_STRING_CONST(413, aux_String_38, "_dynamic");
           LUMI_err = tl5_compiler_M_write(aux_String_38, aux_String_38_Refman);
@@ -13880,8 +13884,7 @@ Returncode tl5_compiler_M_FieldExpression_write_dynamic_safe(tl5_compiler_M_Fiel
   CHECK_REF(157, self, self_Refman)
   if (self->_base.is_complex_field) {
     CHECK_REF(158, self, self_Refman)
-    CHECK_REF(158, self->_base.result_type, self->_base.result_type_Refman)
-    LUMI_err = tl5_compiler_M_TypeData_write_cname(self->_base.result_type->type_data, self->_base.result_type->type_data_Refman, self->_base.result_type->type_data_Dynamic);
+    LUMI_err = tl5_compiler_M_TypeInstance_write_cname(self->_base.result_type, self->_base.result_type_Refman);
     CHECK(158)
     INIT_STRING_CONST(159, aux_String_0, "_dynamic");
     LUMI_err = tl5_compiler_M_write(aux_String_0, aux_String_0_Refman);
@@ -16402,8 +16405,7 @@ Returncode tl5_compiler_M_InitExpression_write_new_init(tl5_compiler_M_InitExpre
         LUMI_err = tl5_compiler_M_write(aux_String_4, aux_String_4_Refman);
         CHECK(181)
         CHECK_REF(182, self, self_Refman)
-        CHECK_REF(182, self->_base._base.result_type, self->_base._base.result_type_Refman)
-        LUMI_err = tl5_compiler_M_TypeData_write_cname(self->_base._base.result_type->type_data, self->_base._base.result_type->type_data_Refman, self->_base._base.result_type->type_data_Dynamic);
+        LUMI_err = tl5_compiler_M_TypeInstance_write_cname(self->_base._base.result_type, self->_base._base.result_type_Refman);
         CHECK(182)
         INIT_STRING_CONST(183, aux_String_5, ", 1);\n");
         LUMI_err = tl5_compiler_M_write(aux_String_5, aux_String_5_Refman);
@@ -16537,8 +16539,7 @@ Returncode tl5_compiler_M_InitExpression_write_new_array_init(tl5_compiler_M_Ini
         CHECK(206)
       }
       else {
-        CHECK_REF(208, data_type, data_type_Refman)
-        LUMI_err = tl5_compiler_M_TypeData_write_cname(data_type->type_data, data_type->type_data_Refman, data_type->type_data_Dynamic);
+        LUMI_err = tl5_compiler_M_TypeInstance_write_cname(data_type, data_type_Refman);
         CHECK(208)
       }
     }
@@ -18945,8 +18946,7 @@ Returncode tl5_compiler_M_SliceExpression_write_dynamic(tl5_compiler_M_SliceExpr
   LUMI_err = tl5_compiler_M_write(aux_String_0, aux_String_0_Refman);
   CHECK(360)
   CHECK_REF(361, self, self_Refman)
-  CHECK_REF(361, self->_base.result_type, self->_base.result_type_Refman)
-  LUMI_err = tl5_compiler_M_TypeData_write_cname(self->_base.result_type->type_data, self->_base.result_type->type_data_Refman, self->_base.result_type->type_data_Dynamic);
+  LUMI_err = tl5_compiler_M_TypeInstance_write_cname(self->_base.result_type, self->_base.result_type_Refman);
   CHECK(361)
   INIT_STRING_CONST(362, aux_String_1, "_dynamic");
   LUMI_err = tl5_compiler_M_write(aux_String_1, aux_String_1_Refman);
@@ -20242,8 +20242,7 @@ Returncode tl5_compiler_M_TypeCastExpression_write_safe(tl5_compiler_M_TypeCastE
   LUMI_err = tl5_compiler_M_write(aux_String_0, aux_String_0_Refman);
   CHECK(61)
   CHECK_REF(62, self, self_Refman)
-  CHECK_REF(62, self->_base._base.result_type, self->_base._base.result_type_Refman)
-  LUMI_err = tl5_compiler_M_TypeData_write_cname(self->_base._base.result_type->type_data, self->_base._base.result_type->type_data_Refman, self->_base._base.result_type->type_data_Dynamic);
+  LUMI_err = tl5_compiler_M_TypeInstance_write_cname(self->_base._base.result_type, self->_base._base.result_type_Refman);
   CHECK(62)
   INIT_STRING_CONST(63, aux_String_1, "*)(");
   LUMI_err = tl5_compiler_M_write(aux_String_1, aux_String_1_Refman);
@@ -20299,8 +20298,7 @@ Returncode tl5_compiler_M_TypeCastExpression_write_dynamic_cast(tl5_compiler_M_T
   LUMI_err = tl5_compiler_M_write(aux_String_0, aux_String_0_Refman);
   CHECK(71)
   CHECK_REF(72, self, self_Refman)
-  CHECK_REF(72, self->_base._base.result_type, self->_base._base.result_type_Refman)
-  LUMI_err = tl5_compiler_M_TypeData_write_cname(self->_base._base.result_type->type_data, self->_base._base.result_type->type_data_Refman, self->_base._base.result_type->type_data_Dynamic);
+  LUMI_err = tl5_compiler_M_TypeInstance_write_cname(self->_base._base.result_type, self->_base._base.result_type_Refman);
   CHECK(72)
   INIT_STRING_CONST(73, aux_String_1, "_Dynamic*)(");
   LUMI_err = tl5_compiler_M_write(aux_String_1, aux_String_1_Refman);
@@ -21858,16 +21856,14 @@ Returncode tl5_compiler_M_SyntaxTreeBranch_write_owner_reference_cleanup(tl5_com
           INIT_STRING_CONST(258, aux_String_17, "ARRAY_DEL(");
           LUMI_err = tl5_compiler_M_write(aux_String_17, aux_String_17_Refman);
           CHECK(258)
-          CHECK_REF(259, data_type, data_type_Refman)
-          LUMI_err = tl5_compiler_M_TypeData_write_cname(data_type->type_data, data_type->type_data_Refman, data_type->type_data_Dynamic);
+          LUMI_err = tl5_compiler_M_TypeInstance_write_cname(data_type, data_type_Refman);
           CHECK(259)
           INIT_STRING_CONST(260, aux_String_18, ", ");
           LUMI_err = tl5_compiler_M_write(aux_String_18, aux_String_18_Refman);
           CHECK(260)
         }
         else {
-          CHECK_REF(262, data_type, data_type_Refman)
-          LUMI_err = tl5_compiler_M_TypeData_write_cname(data_type->type_data, data_type->type_data_Refman, data_type->type_data_Dynamic);
+          LUMI_err = tl5_compiler_M_TypeInstance_write_cname(data_type, data_type_Refman);
           CHECK(262)
           INIT_STRING_CONST(263, aux_String_19, "_Del(");
           LUMI_err = tl5_compiler_M_write(aux_String_19, aux_String_19_Refman);
@@ -22005,8 +22001,7 @@ Returncode tl5_compiler_M_SyntaxTreeBranch_write_var_cleanup(tl5_compiler_M_Synt
     INIT_STRING_CONST(286, aux_String_0, "ARRAY_DEL(");
     LUMI_err = tl5_compiler_M_write(aux_String_0, aux_String_0_Refman);
     CHECK(286)
-    CHECK_REF(287, data_type, data_type_Refman)
-    LUMI_err = tl5_compiler_M_TypeData_write_cname(data_type->type_data, data_type->type_data_Refman, data_type->type_data_Dynamic);
+    LUMI_err = tl5_compiler_M_TypeInstance_write_cname(data_type, data_type_Refman);
     CHECK(287)
     INIT_STRING_CONST(288, aux_String_1, ", ");
     LUMI_err = tl5_compiler_M_write(aux_String_1, aux_String_1_Refman);
@@ -22059,8 +22054,7 @@ Returncode tl5_compiler_M_SyntaxTreeBranch_write_var_cleanup(tl5_compiler_M_Synt
     CHECK(301)
   }
   else {
-      CHECK_REF(303, data_type, data_type_Refman)
-      LUMI_err = tl5_compiler_M_TypeData_write_cname(data_type->type_data, data_type->type_data_Refman, data_type->type_data_Dynamic);
+      LUMI_err = tl5_compiler_M_TypeInstance_write_cname(data_type, data_type_Refman);
       CHECK(303)
       INIT_STRING_CONST(304, aux_String_6, "_Del(");
       LUMI_err = tl5_compiler_M_write(aux_String_6, aux_String_6_Refman);
@@ -28216,33 +28210,33 @@ Returncode tl5_compiler_M_Global_new(tl5_compiler_M_Global* self, Ref_Manager* s
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   tl5_compiler_M_glob = self;
-  CHECK_REF(105, self, self_Refman)
-  LUMI_err = tl5_compiler_M_GlobalNodes_new(&(self->builtins), self_Refman, &tl5_compiler_M_GlobalNodes_dynamic);
-  CHECK(105)
   CHECK_REF(106, self, self_Refman)
-  LUMI_err = tl5_compiler_M_SyntaxTreeRoot_new(&(self->root), self_Refman, &tl5_compiler_M_SyntaxTreeRoot_dynamic);
+  LUMI_err = tl5_compiler_M_GlobalNodes_new(&(self->builtins), self_Refman, &tl5_compiler_M_GlobalNodes_dynamic);
   CHECK(106)
-  INIT_NEW(107, aux_String_0, LUMI_new_string(1024));
+  CHECK_REF(107, self, self_Refman)
+  LUMI_err = tl5_compiler_M_SyntaxTreeRoot_new(&(self->root), self_Refman, &tl5_compiler_M_SyntaxTreeRoot_dynamic);
+  CHECK(107)
+  INIT_NEW(108, aux_String_0, LUMI_new_string(1024));
   aux_String_1 = aux_String_0;
   aux_String_1_Refman = aux_String_0_Refman;
   aux_String_0 = NULL;
   aux_String_0_Refman = NULL;
-  CHECK_REF(107, self, self_Refman)
+  CHECK_REF(108, self, self_Refman)
   String_Del(self->input_buffer);
   LUMI_owner_dec_ref(self->input_buffer_Refman);
   self->input_buffer_Refman = aux_String_1_Refman;
   self->input_buffer = aux_String_1;
   aux_String_1 = NULL;
   aux_String_1_Refman = NULL;
-  CHECK_REF(108, self, self_Refman)
+  CHECK_REF(109, self, self_Refman)
   LUMI_err = tl5_compiler_M_ModuleMembers_new(&(self->global_module), self_Refman, NULL, NULL);
-  CHECK(108)
-  LUMI_err = tl5_compiler_M_Global_init_operator_map(self, self_Refman);
   CHECK(109)
-  LUMI_err = tl5_compiler_M_Global_init_access_names(self, self_Refman);
+  LUMI_err = tl5_compiler_M_Global_init_operator_map(self, self_Refman);
   CHECK(110)
-  LUMI_err = tl5_compiler_M_Global_init_builtin_types(self, self_Refman);
+  LUMI_err = tl5_compiler_M_Global_init_access_names(self, self_Refman);
   CHECK(111)
+  LUMI_err = tl5_compiler_M_Global_init_builtin_types(self, self_Refman);
+  CHECK(112)
 LUMI_cleanup:
   String_Del(aux_String_1);
   LUMI_owner_dec_ref(aux_String_1_Refman);
@@ -28290,72 +28284,72 @@ Returncode tl5_compiler_M_Global_init_access_names(tl5_compiler_M_Global* self, 
   String* aux_String_8 = NULL;
   Ref_Manager* aux_String_8_Refman = NULL;
   LUMI_inc_ref(self_Refman);
-  INIT_NEW(114, aux_Array_0, LUMI_new_string_array(tl5_compiler_M_Access_length, 16));
+  INIT_NEW(115, aux_Array_0, LUMI_new_string_array(tl5_compiler_M_Access_length, 16));
   aux_Array_1 = aux_Array_0;
   aux_Array_1_Refman = aux_Array_0_Refman;
   aux_Array_0 = NULL;
   aux_Array_0_Refman = NULL;
-  CHECK_REF(114, self, self_Refman)
+  CHECK_REF(115, self, self_Refman)
   ARRAY_DEL(String, self->access_names)
   LUMI_owner_dec_ref(self->access_names_Refman);
   self->access_names_Refman = aux_Array_1_Refman;
   self->access_names = aux_Array_1;
   aux_Array_1 = NULL;
   aux_Array_1_Refman = NULL;
-  CHECK_REF(115, self, self_Refman)
-  CHECK_REF(115, self->access_names, self->access_names_Refman)
-  if ((tl5_compiler_M_Access_UNDEFINED) < 0 || (tl5_compiler_M_Access_UNDEFINED) >= (self->access_names)->length) RAISE(115, slice_index)
-  INIT_STRING_CONST(115, aux_String_0, "{undefined}");
-  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_UNDEFINED, self->access_names_Refman, aux_String_0, aux_String_0_Refman);
-  CHECK(115)
   CHECK_REF(116, self, self_Refman)
   CHECK_REF(116, self->access_names, self->access_names_Refman)
-  if ((tl5_compiler_M_Access_VAR) < 0 || (tl5_compiler_M_Access_VAR) >= (self->access_names)->length) RAISE(116, slice_index)
-  INIT_STRING_CONST(116, aux_String_1, "var");
-  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_VAR, self->access_names_Refman, aux_String_1, aux_String_1_Refman);
+  if ((tl5_compiler_M_Access_UNDEFINED) < 0 || (tl5_compiler_M_Access_UNDEFINED) >= (self->access_names)->length) RAISE(116, slice_index)
+  INIT_STRING_CONST(116, aux_String_0, "{undefined}");
+  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_UNDEFINED, self->access_names_Refman, aux_String_0, aux_String_0_Refman);
   CHECK(116)
   CHECK_REF(117, self, self_Refman)
   CHECK_REF(117, self->access_names, self->access_names_Refman)
-  if ((tl5_compiler_M_Access_COPY) < 0 || (tl5_compiler_M_Access_COPY) >= (self->access_names)->length) RAISE(117, slice_index)
-  INIT_STRING_CONST(117, aux_String_2, "copy");
-  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_COPY, self->access_names_Refman, aux_String_2, aux_String_2_Refman);
+  if ((tl5_compiler_M_Access_VAR) < 0 || (tl5_compiler_M_Access_VAR) >= (self->access_names)->length) RAISE(117, slice_index)
+  INIT_STRING_CONST(117, aux_String_1, "var");
+  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_VAR, self->access_names_Refman, aux_String_1, aux_String_1_Refman);
   CHECK(117)
   CHECK_REF(118, self, self_Refman)
   CHECK_REF(118, self->access_names, self->access_names_Refman)
-  if ((tl5_compiler_M_Access_OWNER) < 0 || (tl5_compiler_M_Access_OWNER) >= (self->access_names)->length) RAISE(118, slice_index)
-  INIT_STRING_CONST(118, aux_String_3, "owner");
-  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_OWNER, self->access_names_Refman, aux_String_3, aux_String_3_Refman);
+  if ((tl5_compiler_M_Access_COPY) < 0 || (tl5_compiler_M_Access_COPY) >= (self->access_names)->length) RAISE(118, slice_index)
+  INIT_STRING_CONST(118, aux_String_2, "copy");
+  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_COPY, self->access_names_Refman, aux_String_2, aux_String_2_Refman);
   CHECK(118)
   CHECK_REF(119, self, self_Refman)
   CHECK_REF(119, self->access_names, self->access_names_Refman)
-  if ((tl5_compiler_M_Access_USER) < 0 || (tl5_compiler_M_Access_USER) >= (self->access_names)->length) RAISE(119, slice_index)
-  INIT_STRING_CONST(119, aux_String_4, "user");
-  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_USER, self->access_names_Refman, aux_String_4, aux_String_4_Refman);
+  if ((tl5_compiler_M_Access_OWNER) < 0 || (tl5_compiler_M_Access_OWNER) >= (self->access_names)->length) RAISE(119, slice_index)
+  INIT_STRING_CONST(119, aux_String_3, "owner");
+  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_OWNER, self->access_names_Refman, aux_String_3, aux_String_3_Refman);
   CHECK(119)
   CHECK_REF(120, self, self_Refman)
   CHECK_REF(120, self->access_names, self->access_names_Refman)
-  if ((tl5_compiler_M_Access_STRONG) < 0 || (tl5_compiler_M_Access_STRONG) >= (self->access_names)->length) RAISE(120, slice_index)
-  INIT_STRING_CONST(120, aux_String_5, "strong");
-  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_STRONG, self->access_names_Refman, aux_String_5, aux_String_5_Refman);
+  if ((tl5_compiler_M_Access_USER) < 0 || (tl5_compiler_M_Access_USER) >= (self->access_names)->length) RAISE(120, slice_index)
+  INIT_STRING_CONST(120, aux_String_4, "user");
+  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_USER, self->access_names_Refman, aux_String_4, aux_String_4_Refman);
   CHECK(120)
   CHECK_REF(121, self, self_Refman)
   CHECK_REF(121, self->access_names, self->access_names_Refman)
-  if ((tl5_compiler_M_Access_WEAK) < 0 || (tl5_compiler_M_Access_WEAK) >= (self->access_names)->length) RAISE(121, slice_index)
-  INIT_STRING_CONST(121, aux_String_6, "weak");
-  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_WEAK, self->access_names_Refman, aux_String_6, aux_String_6_Refman);
+  if ((tl5_compiler_M_Access_STRONG) < 0 || (tl5_compiler_M_Access_STRONG) >= (self->access_names)->length) RAISE(121, slice_index)
+  INIT_STRING_CONST(121, aux_String_5, "strong");
+  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_STRONG, self->access_names_Refman, aux_String_5, aux_String_5_Refman);
   CHECK(121)
   CHECK_REF(122, self, self_Refman)
   CHECK_REF(122, self->access_names, self->access_names_Refman)
-  if ((tl5_compiler_M_Access_S_VAR) < 0 || (tl5_compiler_M_Access_S_VAR) >= (self->access_names)->length) RAISE(122, slice_index)
-  INIT_STRING_CONST(122, aux_String_7, "s-var");
-  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_S_VAR, self->access_names_Refman, aux_String_7, aux_String_7_Refman);
+  if ((tl5_compiler_M_Access_WEAK) < 0 || (tl5_compiler_M_Access_WEAK) >= (self->access_names)->length) RAISE(122, slice_index)
+  INIT_STRING_CONST(122, aux_String_6, "weak");
+  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_WEAK, self->access_names_Refman, aux_String_6, aux_String_6_Refman);
   CHECK(122)
   CHECK_REF(123, self, self_Refman)
   CHECK_REF(123, self->access_names, self->access_names_Refman)
-  if ((tl5_compiler_M_Access_SHARED) < 0 || (tl5_compiler_M_Access_SHARED) >= (self->access_names)->length) RAISE(123, slice_index)
-  INIT_STRING_CONST(123, aux_String_8, "shared");
-  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_SHARED, self->access_names_Refman, aux_String_8, aux_String_8_Refman);
+  if ((tl5_compiler_M_Access_S_VAR) < 0 || (tl5_compiler_M_Access_S_VAR) >= (self->access_names)->length) RAISE(123, slice_index)
+  INIT_STRING_CONST(123, aux_String_7, "s-var");
+  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_S_VAR, self->access_names_Refman, aux_String_7, aux_String_7_Refman);
   CHECK(123)
+  CHECK_REF(124, self, self_Refman)
+  CHECK_REF(124, self->access_names, self->access_names_Refman)
+  if ((tl5_compiler_M_Access_SHARED) < 0 || (tl5_compiler_M_Access_SHARED) >= (self->access_names)->length) RAISE(124, slice_index)
+  INIT_STRING_CONST(124, aux_String_8, "shared");
+  LUMI_err = String_new(((String*)((self->access_names)->values)) + tl5_compiler_M_Access_SHARED, self->access_names_Refman, aux_String_8, aux_String_8_Refman);
+  CHECK(124)
 LUMI_cleanup:
   LUMI_var_dec_ref(aux_String_8_Refman);
   LUMI_var_dec_ref(aux_String_7_Refman);
@@ -28477,80 +28471,80 @@ Returncode tl5_compiler_M_Global_init_operator_map(tl5_compiler_M_Global* self, 
   String* aux_String_31 = NULL;
   Ref_Manager* aux_String_31_Refman = NULL;
   LUMI_inc_ref(self_Refman);
-  INIT_STRING_CONST(127, aux_String_0, "+");
+  INIT_STRING_CONST(128, aux_String_0, "+");
   LUMI_err = tl5_compiler_M_Global_add_operator_copy(self, self_Refman, aux_String_0, aux_String_0_Refman, 0, 0, tl5_compiler_M_addition_operator_factory);
-  CHECK(126)
-  INIT_STRING_CONST(129, aux_String_1, "-");
+  CHECK(127)
+  INIT_STRING_CONST(130, aux_String_1, "-");
   LUMI_err = tl5_compiler_M_Global_add_operator_copy(self, self_Refman, aux_String_1, aux_String_1_Refman, 0, 0, tl5_compiler_M_subtraction_operator_factory);
-  CHECK(128)
-  INIT_STRING_CONST(131, aux_String_2, "*");
+  CHECK(129)
+  INIT_STRING_CONST(132, aux_String_2, "*");
   LUMI_err = tl5_compiler_M_Global_add_operator_copy(self, self_Refman, aux_String_2, aux_String_2_Refman, 0, 1, tl5_compiler_M_multiplication_operator_factory);
-  CHECK(130)
-  INIT_STRING_CONST(133, aux_String_3, "div");
-  INIT_STRING_CONST(133, aux_String_4, "/");
+  CHECK(131)
+  INIT_STRING_CONST(134, aux_String_3, "div");
+  INIT_STRING_CONST(134, aux_String_4, "/");
   LUMI_err = tl5_compiler_M_Global_add_operator(self, self_Refman, aux_String_3, aux_String_3_Refman, aux_String_4, aux_String_4_Refman, 0, 1, tl5_compiler_M_division_operator_factory);
-  CHECK(132)
-  INIT_STRING_CONST(135, aux_String_5, "mod");
-  INIT_STRING_CONST(135, aux_String_6, "%");
+  CHECK(133)
+  INIT_STRING_CONST(136, aux_String_5, "mod");
+  INIT_STRING_CONST(136, aux_String_6, "%");
   LUMI_err = tl5_compiler_M_Global_add_operator(self, self_Refman, aux_String_5, aux_String_5_Refman, aux_String_6, aux_String_6_Refman, 0, 1, tl5_compiler_M_modulo_operator_factory);
-  CHECK(134)
-  INIT_STRING_CONST(137, aux_String_7, "=");
-  INIT_STRING_CONST(137, aux_String_8, "==");
+  CHECK(135)
+  INIT_STRING_CONST(138, aux_String_7, "=");
+  INIT_STRING_CONST(138, aux_String_8, "==");
   LUMI_err = tl5_compiler_M_Global_add_operator(self, self_Refman, aux_String_7, aux_String_7_Refman, aux_String_8, aux_String_8_Refman, 1, 0, tl5_compiler_M_equalizer_operator_factory);
-  CHECK(136)
-  INIT_STRING_CONST(139, aux_String_9, "<>");
-  INIT_STRING_CONST(139, aux_String_10, "!=");
+  CHECK(137)
+  INIT_STRING_CONST(140, aux_String_9, "<>");
+  INIT_STRING_CONST(140, aux_String_10, "!=");
   LUMI_err = tl5_compiler_M_Global_add_operator(self, self_Refman, aux_String_9, aux_String_9_Refman, aux_String_10, aux_String_10_Refman, 1, 0, tl5_compiler_M_equalizer_operator_factory);
-  CHECK(138)
-  INIT_STRING_CONST(141, aux_String_11, ">");
+  CHECK(139)
+  INIT_STRING_CONST(142, aux_String_11, ">");
   LUMI_err = tl5_compiler_M_Global_add_operator_copy(self, self_Refman, aux_String_11, aux_String_11_Refman, 1, 0, tl5_compiler_M_relational_operator_factory);
-  CHECK(140)
-  INIT_STRING_CONST(143, aux_String_12, "<");
+  CHECK(141)
+  INIT_STRING_CONST(144, aux_String_12, "<");
   LUMI_err = tl5_compiler_M_Global_add_operator_copy(self, self_Refman, aux_String_12, aux_String_12_Refman, 1, 0, tl5_compiler_M_relational_operator_factory);
-  CHECK(142)
-  INIT_STRING_CONST(145, aux_String_13, ">=");
+  CHECK(143)
+  INIT_STRING_CONST(146, aux_String_13, ">=");
   LUMI_err = tl5_compiler_M_Global_add_operator_copy(self, self_Refman, aux_String_13, aux_String_13_Refman, 1, 0, tl5_compiler_M_relational_operator_factory);
-  CHECK(144)
-  INIT_STRING_CONST(147, aux_String_14, "<=");
+  CHECK(145)
+  INIT_STRING_CONST(148, aux_String_14, "<=");
   LUMI_err = tl5_compiler_M_Global_add_operator_copy(self, self_Refman, aux_String_14, aux_String_14_Refman, 1, 0, tl5_compiler_M_relational_operator_factory);
-  CHECK(146)
-  INIT_STRING_CONST(149, aux_String_15, "is");
-  INIT_STRING_CONST(149, aux_String_16, "==");
+  CHECK(147)
+  INIT_STRING_CONST(150, aux_String_15, "is");
+  INIT_STRING_CONST(150, aux_String_16, "==");
   LUMI_err = tl5_compiler_M_Global_add_operator(self, self_Refman, aux_String_15, aux_String_15_Refman, aux_String_16, aux_String_16_Refman, 1, 0, tl5_compiler_M_identity_operator_factory);
-  CHECK(148)
-  INIT_STRING_CONST(151, aux_String_17, "is-not");
-  INIT_STRING_CONST(151, aux_String_18, "!=");
+  CHECK(149)
+  INIT_STRING_CONST(152, aux_String_17, "is-not");
+  INIT_STRING_CONST(152, aux_String_18, "!=");
   LUMI_err = tl5_compiler_M_Global_add_operator(self, self_Refman, aux_String_17, aux_String_17_Refman, aux_String_18, aux_String_18_Refman, 1, 0, tl5_compiler_M_identity_operator_factory);
-  CHECK(150)
-  INIT_STRING_CONST(153, aux_String_19, "not");
-  INIT_STRING_CONST(153, aux_String_20, "!");
+  CHECK(151)
+  INIT_STRING_CONST(154, aux_String_19, "not");
+  INIT_STRING_CONST(154, aux_String_20, "!");
   LUMI_err = tl5_compiler_M_Global_add_operator(self, self_Refman, aux_String_19, aux_String_19_Refman, aux_String_20, aux_String_20_Refman, 2, 0, tl5_compiler_M_non_binary_operator_factory);
-  CHECK(152)
-  INIT_STRING_CONST(155, aux_String_21, "or");
-  INIT_STRING_CONST(155, aux_String_22, "||");
+  CHECK(153)
+  INIT_STRING_CONST(156, aux_String_21, "or");
+  INIT_STRING_CONST(156, aux_String_22, "||");
   LUMI_err = tl5_compiler_M_Global_add_operator(self, self_Refman, aux_String_21, aux_String_21_Refman, aux_String_22, aux_String_22_Refman, 3, 0, tl5_compiler_M_logical_operator_factory);
-  CHECK(154)
-  INIT_STRING_CONST(157, aux_String_23, "and");
-  INIT_STRING_CONST(157, aux_String_24, "&&");
+  CHECK(155)
+  INIT_STRING_CONST(158, aux_String_23, "and");
+  INIT_STRING_CONST(158, aux_String_24, "&&");
   LUMI_err = tl5_compiler_M_Global_add_operator(self, self_Refman, aux_String_23, aux_String_23_Refman, aux_String_24, aux_String_24_Refman, 3, 1, tl5_compiler_M_logical_operator_factory);
-  CHECK(156)
-  INIT_STRING_CONST(159, aux_String_25, ":=");
-  INIT_STRING_CONST(159, aux_String_26, "=");
+  CHECK(157)
+  INIT_STRING_CONST(160, aux_String_25, ":=");
+  INIT_STRING_CONST(160, aux_String_26, "=");
   LUMI_err = tl5_compiler_M_Global_add_operator(self, self_Refman, aux_String_25, aux_String_25_Refman, aux_String_26, aux_String_26_Refman, 4, 0, tl5_compiler_M_assign_operator_factory);
-  CHECK(158)
-  INIT_STRING_CONST(161, aux_String_27, "+=");
+  CHECK(159)
+  INIT_STRING_CONST(162, aux_String_27, "+=");
   LUMI_err = tl5_compiler_M_Global_add_operator_copy(self, self_Refman, aux_String_27, aux_String_27_Refman, 4, 1, tl5_compiler_M_arithmetic_assign_operator_factory);
-  CHECK(160)
-  INIT_STRING_CONST(163, aux_String_28, "-=");
+  CHECK(161)
+  INIT_STRING_CONST(164, aux_String_28, "-=");
   LUMI_err = tl5_compiler_M_Global_add_operator_copy(self, self_Refman, aux_String_28, aux_String_28_Refman, 4, 2, tl5_compiler_M_arithmetic_assign_operator_factory);
-  CHECK(162)
-  INIT_STRING_CONST(165, aux_String_29, "*=");
+  CHECK(163)
+  INIT_STRING_CONST(166, aux_String_29, "*=");
   LUMI_err = tl5_compiler_M_Global_add_operator_copy(self, self_Refman, aux_String_29, aux_String_29_Refman, 4, 3, tl5_compiler_M_arithmetic_assign_operator_factory);
-  CHECK(164)
-  INIT_STRING_CONST(167, aux_String_30, ":=:");
-  INIT_STRING_CONST(167, aux_String_31, "SWITCH");
+  CHECK(165)
+  INIT_STRING_CONST(168, aux_String_30, ":=:");
+  INIT_STRING_CONST(168, aux_String_31, "SWITCH");
   LUMI_err = tl5_compiler_M_Global_add_operator(self, self_Refman, aux_String_30, aux_String_30_Refman, aux_String_31, aux_String_31_Refman, 4, 4, tl5_compiler_M_swap_operator_factory);
-  CHECK(166)
+  CHECK(167)
 LUMI_cleanup:
   LUMI_var_dec_ref(aux_String_31_Refman);
   LUMI_var_dec_ref(aux_String_30_Refman);
@@ -28599,18 +28593,18 @@ Returncode tl5_compiler_M_Global_add_operator(tl5_compiler_M_Global* self, Ref_M
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(c_name_Refman);
-  INIT_NEW(176, operator, LUMI_alloc(sizeof(tl5_compiler_M_Operator)));
+  INIT_NEW(177, operator, LUMI_alloc(sizeof(tl5_compiler_M_Operator)));
   LUMI_err = tl5_compiler_M_Operator_init(operator, operator_Refman, name, name_Refman, c_name, c_name_Refman, order, group_index, factory);
-  CHECK(177)
-  CHECK_REF(179, self, self_Refman)
-  CHECK_REF(179, operator, operator_Refman)
-  LUMI_err = tl5_compiler_M_NameMap_add(&(self->operator_map), self_Refman, operator->name, operator->name_Refman, operator, operator_Refman, &tl5_compiler_M_Operator_dynamic);
-  CHECK(179)
+  CHECK(178)
   CHECK_REF(180, self, self_Refman)
+  CHECK_REF(180, operator, operator_Refman)
+  LUMI_err = tl5_compiler_M_NameMap_add(&(self->operator_map), self_Refman, operator->name, operator->name_Refman, operator, operator_Refman, &tl5_compiler_M_Operator_dynamic);
+  CHECK(180)
+  CHECK_REF(181, self, self_Refman)
   LUMI_err = tl5_compiler_M_List_add(&(self->operators), self_Refman, operator, operator_Refman, &tl5_compiler_M_Operator_dynamic);
   operator = NULL;
   operator_Refman = NULL;
-  CHECK(180)
+  CHECK(181)
 LUMI_cleanup:
   tl5_compiler_M_Operator_Del(operator);
   LUMI_owner_dec_ref(operator_Refman);
@@ -28629,7 +28623,7 @@ Returncode tl5_compiler_M_Global_add_operator_copy(tl5_compiler_M_Global* self, 
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_err = tl5_compiler_M_Global_add_operator(self, self_Refman, name, name_Refman, name, name_Refman, order, group_index, factory);
-  CHECK(188)
+  CHECK(189)
 LUMI_cleanup:
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(self_Refman);
@@ -28644,6 +28638,9 @@ Returncode tl5_compiler_M_Global_init_builtin_types(tl5_compiler_M_Global* self,
   Returncode LUMI_err = OK;
   tl5_compiler_M_ModuleMembers* cdef_module = NULL;
   Ref_Manager* cdef_module_Refman = NULL;
+  tl5_compiler_M_TypeData* void_pointer = NULL;
+  Ref_Manager* void_pointer_Refman = NULL;
+  tl5_compiler_M_TypeData_Dynamic* void_pointer_Dynamic = NULL;
   tl5_compiler_M_SyntaxTreeFunction* function = NULL;
   Ref_Manager* function_Refman = NULL;
   tl5_compiler_M_SyntaxTreeFunction_Dynamic* function_Dynamic = NULL;
@@ -28734,10 +28731,13 @@ Returncode tl5_compiler_M_Global_init_builtin_types(tl5_compiler_M_Global* self,
   String aux_String_28_Var = {0};
   String* aux_String_28 = NULL;
   Ref_Manager* aux_String_28_Refman = NULL;
+  tl5_compiler_M_List* aux_List_0 = NULL;
+  Ref_Manager* aux_List_0_Refman = NULL;
+  tl5_compiler_M_List* aux_List_1 = NULL;
+  Ref_Manager* aux_List_1_Refman = NULL;
   String aux_String_29_Var = {0};
   String* aux_String_29 = NULL;
   Ref_Manager* aux_String_29_Refman = NULL;
-  String aux_String_30_Var = {0};
   String* aux_String_30 = NULL;
   Ref_Manager* aux_String_30_Refman = NULL;
   String aux_String_31_Var = {0};
@@ -28944,172 +28944,213 @@ Returncode tl5_compiler_M_Global_init_builtin_types(tl5_compiler_M_Global* self,
   String aux_String_98_Var = {0};
   String* aux_String_98 = NULL;
   Ref_Manager* aux_String_98_Refman = NULL;
+  String aux_String_99_Var = {0};
+  String* aux_String_99 = NULL;
+  Ref_Manager* aux_String_99_Refman = NULL;
+  String aux_String_100_Var = {0};
+  String* aux_String_100 = NULL;
+  Ref_Manager* aux_String_100_Refman = NULL;
+  String aux_String_101_Var = {0};
+  String* aux_String_101 = NULL;
+  Ref_Manager* aux_String_101_Refman = NULL;
+  String aux_String_102_Var = {0};
+  String* aux_String_102 = NULL;
+  Ref_Manager* aux_String_102_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
   LUMI_inc_ref(self_Refman);
-  INIT_STRING_CONST(192, aux_String_0, "Char");
-  CHECK_REF(192, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_0, aux_String_0_Refman, true, &(self->type_char), &(self->type_char_Refman), &(self->type_char_Dynamic));
-  CHECK(192)
+  INIT_STRING_CONST(193, aux_String_0, "Char");
   CHECK_REF(193, self, self_Refman)
-  CHECK_REF(193, self->type_char, self->type_char_Refman)
-  self->type_char->is_int_like = true;
-  INIT_STRING_CONST(194, aux_String_1, "Bool");
+  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_0, aux_String_0_Refman, true, &(self->type_char), &(self->type_char_Refman), &(self->type_char_Dynamic));
+  CHECK(193)
   CHECK_REF(194, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_1, aux_String_1_Refman, true, &(self->type_bool), &(self->type_bool_Refman), &(self->type_bool_Dynamic));
-  CHECK(194)
-  INIT_STRING_CONST(195, aux_String_2, "Int");
+  CHECK_REF(194, self->type_char, self->type_char_Refman)
+  self->type_char->is_int_like = true;
+  INIT_STRING_CONST(195, aux_String_1, "Bool");
   CHECK_REF(195, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_2, aux_String_2_Refman, true, &(self->type_int), &(self->type_int_Refman), &(self->type_int_Dynamic));
+  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_1, aux_String_1_Refman, true, &(self->type_bool), &(self->type_bool_Refman), &(self->type_bool_Dynamic));
   CHECK(195)
+  INIT_STRING_CONST(196, aux_String_2, "Int");
   CHECK_REF(196, self, self_Refman)
-  CHECK_REF(196, self->type_int, self->type_int_Refman)
+  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_2, aux_String_2_Refman, true, &(self->type_int), &(self->type_int_Refman), &(self->type_int_Dynamic));
+  CHECK(196)
+  CHECK_REF(197, self, self_Refman)
+  CHECK_REF(197, self->type_int, self->type_int_Refman)
   self->type_int->is_int_like = true;
-  INIT_STRING_CONST(197, aux_String_3, "Empty Symbol");
-  CHECK_REF(198, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_3, aux_String_3_Refman, false, &(self->type_empty), &(self->type_empty_Refman), &(self->type_empty_Dynamic));
-  CHECK(197)
-  INIT_STRING_CONST(199, aux_String_4, "Func");
+  INIT_STRING_CONST(198, aux_String_3, "Empty Symbol");
   CHECK_REF(199, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_4, aux_String_4_Refman, true, &(self->type_func), &(self->type_func_Refman), &(self->type_func_Dynamic));
-  CHECK(199)
-  INIT_STRING_CONST(200, aux_String_5, "Ref");
+  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_3, aux_String_3_Refman, false, &(self->type_empty), &(self->type_empty_Refman), &(self->type_empty_Dynamic));
+  CHECK(198)
+  INIT_STRING_CONST(200, aux_String_4, "Func");
   CHECK_REF(200, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_5, aux_String_5_Refman, true, &(self->type_ref), &(self->type_ref_Refman), &(self->type_ref_Dynamic));
+  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_4, aux_String_4_Refman, true, &(self->type_func), &(self->type_func_Refman), &(self->type_func_Dynamic));
   CHECK(200)
-  INIT_STRING_CONST(201, aux_String_6, "String");
+  INIT_STRING_CONST(201, aux_String_5, "Ref");
   CHECK_REF(201, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_6, aux_String_6_Refman, false, &(self->type_string), &(self->type_string_Refman), &(self->type_string_Dynamic));
+  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_5, aux_String_5_Refman, true, &(self->type_ref), &(self->type_ref_Refman), &(self->type_ref_Dynamic));
   CHECK(201)
-  INIT_STRING_CONST(202, aux_String_7, "Array");
+  INIT_STRING_CONST(202, aux_String_6, "String");
   CHECK_REF(202, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_7, aux_String_7_Refman, false, &(self->type_array), &(self->type_array_Refman), &(self->type_array_Dynamic));
+  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_6, aux_String_6_Refman, false, &(self->type_string), &(self->type_string_Refman), &(self->type_string_Dynamic));
   CHECK(202)
-  INIT_STRING_CONST(203, aux_String_8, "Type Name");
+  INIT_STRING_CONST(203, aux_String_7, "Array");
   CHECK_REF(203, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_8, aux_String_8_Refman, false, &(self->type_type), &(self->type_type_Refman), &(self->type_type_Dynamic));
+  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_7, aux_String_7_Refman, false, &(self->type_array), &(self->type_array_Refman), &(self->type_array_Dynamic));
   CHECK(203)
-  INIT_STRING_CONST(204, aux_String_9, "Base Symbol");
+  INIT_STRING_CONST(204, aux_String_8, "Type Name");
   CHECK_REF(204, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_9, aux_String_9_Refman, false, &(self->type_base), &(self->type_base_Refman), &(self->type_base_Dynamic));
+  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_8, aux_String_8_Refman, false, &(self->type_type), &(self->type_type_Refman), &(self->type_type_Dynamic));
   CHECK(204)
-  INIT_STRING_CONST(205, aux_String_10, "Generic Type");
-  CHECK_REF(206, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_10, aux_String_10_Refman, false, &(self->type_generic), &(self->type_generic_Refman), &(self->type_generic_Dynamic));
+  INIT_STRING_CONST(205, aux_String_9, "Base Symbol");
+  CHECK_REF(205, self, self_Refman)
+  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_9, aux_String_9_Refman, false, &(self->type_base), &(self->type_base_Refman), &(self->type_base_Dynamic));
   CHECK(205)
+  INIT_STRING_CONST(206, aux_String_10, "Generic Type");
   CHECK_REF(207, self, self_Refman)
-  CHECK_REF(207, self->type_generic, self->type_generic_Refman)
+  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_10, aux_String_10_Refman, false, &(self->type_generic), &(self->type_generic_Refman), &(self->type_generic_Dynamic));
+  CHECK(206)
+  CHECK_REF(208, self, self_Refman)
+  CHECK_REF(208, self->type_generic, self->type_generic_Refman)
   self->type_generic->is_dynamic = true;
-  INIT_STRING_CONST(208, aux_String_11, "Module Name");
-  CHECK_REF(209, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_11, aux_String_11_Refman, false, &(self->type_module), &(self->type_module_Refman), &(self->type_module_Dynamic));
-  CHECK(208)
-  INIT_STRING_CONST(210, aux_String_12, "File");
+  INIT_STRING_CONST(209, aux_String_11, "Module Name");
   CHECK_REF(210, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_12, aux_String_12_Refman, false, &(self->type_file), &(self->type_file_Refman), &(self->type_file_Dynamic));
-  CHECK(210)
+  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_11, aux_String_11_Refman, false, &(self->type_module), &(self->type_module_Refman), &(self->type_module_Dynamic));
+  CHECK(209)
+  INIT_STRING_CONST(211, aux_String_12, "File");
   CHECK_REF(211, self, self_Refman)
-  CHECK_REF(211, self->type_file, self->type_file_Refman)
-  self->type_file->create_disallowed = true;
-  INIT_STRING_CONST(212, aux_String_13, "Sys");
+  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_12, aux_String_12_Refman, false, &(self->type_file), &(self->type_file_Refman), &(self->type_file_Dynamic));
+  CHECK(211)
   CHECK_REF(212, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_13, aux_String_13_Refman, false, &(self->type_sys), &(self->type_sys_Refman), &(self->type_sys_Dynamic));
-  CHECK(212)
+  CHECK_REF(212, self->type_file, self->type_file_Refman)
+  self->type_file->create_disallowed = true;
+  INIT_STRING_CONST(213, aux_String_13, "Sys");
   CHECK_REF(213, self, self_Refman)
-  CHECK_REF(213, self->type_sys, self->type_sys_Refman)
+  LUMI_err = tl5_compiler_M_Global_add_global_type(self, self_Refman, aux_String_13, aux_String_13_Refman, false, &(self->type_sys), &(self->type_sys_Refman), &(self->type_sys_Dynamic));
+  CHECK(213)
+  CHECK_REF(214, self, self_Refman)
+  CHECK_REF(214, self->type_sys, self->type_sys_Refman)
   self->type_sys->create_disallowed = true;
-  INIT_STRING_CONST(216, aux_String_14, "cdef");
-  INIT_NEW(216, cdef_module, LUMI_alloc(sizeof(tl5_compiler_M_ModuleMembers)));
+  INIT_STRING_CONST(217, aux_String_14, "cdef");
+  INIT_NEW(217, cdef_module, LUMI_alloc(sizeof(tl5_compiler_M_ModuleMembers)));
   LUMI_err = tl5_compiler_M_ModuleMembers_new(cdef_module, cdef_module_Refman, aux_String_14, aux_String_14_Refman);
-  CHECK(216)
-  INIT_STRING_CONST(217, aux_String_15, "Char");
-  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_15, aux_String_15_Refman);
   CHECK(217)
-  INIT_STRING_CONST(218, aux_String_16, "Uchar");
-  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_16, aux_String_16_Refman);
+  INIT_STRING_CONST(218, aux_String_15, "Char");
+  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_15, aux_String_15_Refman);
   CHECK(218)
-  INIT_STRING_CONST(219, aux_String_17, "Short");
-  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_17, aux_String_17_Refman);
+  INIT_STRING_CONST(219, aux_String_16, "Uchar");
+  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_16, aux_String_16_Refman);
   CHECK(219)
-  INIT_STRING_CONST(220, aux_String_18, "Ushort");
-  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_18, aux_String_18_Refman);
+  INIT_STRING_CONST(220, aux_String_17, "Short");
+  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_17, aux_String_17_Refman);
   CHECK(220)
-  INIT_STRING_CONST(221, aux_String_19, "Int");
-  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_19, aux_String_19_Refman);
+  INIT_STRING_CONST(221, aux_String_18, "Ushort");
+  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_18, aux_String_18_Refman);
   CHECK(221)
-  INIT_STRING_CONST(222, aux_String_20, "Uint");
-  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_20, aux_String_20_Refman);
+  INIT_STRING_CONST(222, aux_String_19, "Int");
+  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_19, aux_String_19_Refman);
   CHECK(222)
-  INIT_STRING_CONST(223, aux_String_21, "Long");
-  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_21, aux_String_21_Refman);
+  INIT_STRING_CONST(223, aux_String_20, "Uint");
+  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_20, aux_String_20_Refman);
   CHECK(223)
-  INIT_STRING_CONST(224, aux_String_22, "Ulong");
-  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_22, aux_String_22_Refman);
+  INIT_STRING_CONST(224, aux_String_21, "Long");
+  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_21, aux_String_21_Refman);
   CHECK(224)
-  INIT_STRING_CONST(225, aux_String_23, "Size");
-  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_23, aux_String_23_Refman);
+  INIT_STRING_CONST(225, aux_String_22, "Ulong");
+  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_22, aux_String_22_Refman);
   CHECK(225)
-  INIT_STRING_CONST(226, aux_String_24, "Float");
-  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_24, aux_String_24_Refman);
+  INIT_STRING_CONST(226, aux_String_23, "Size");
+  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_23, aux_String_23_Refman);
   CHECK(226)
-  INIT_STRING_CONST(227, aux_String_25, "Double");
-  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_25, aux_String_25_Refman);
+  INIT_STRING_CONST(227, aux_String_24, "Float");
+  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_24, aux_String_24_Refman);
   CHECK(227)
-  INIT_STRING_CONST(228, aux_String_26, "LongDouble");
-  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_26, aux_String_26_Refman);
+  INIT_STRING_CONST(228, aux_String_25, "Double");
+  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_25, aux_String_25_Refman);
   CHECK(228)
-  CHECK_REF(229, self, self_Refman)
+  INIT_STRING_CONST(229, aux_String_26, "LongDouble");
+  LUMI_err = tl5_compiler_M_Global_add_cint_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_26, aux_String_26_Refman);
+  CHECK(229)
+  INIT_STRING_CONST(231, aux_String_27, "VoidPointer");
+  LUMI_err = tl5_compiler_M_Global_add_cdef_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_27, aux_String_27_Refman, &(void_pointer), &(void_pointer_Refman), &(void_pointer_Dynamic));
+  CHECK(231)
+  INIT_STRING_CONST(233, aux_String_28, "Pointer");
+  CHECK_REF(234, self, self_Refman)
+  LUMI_err = tl5_compiler_M_Global_add_cdef_type(self, self_Refman, cdef_module, cdef_module_Refman, aux_String_28, aux_String_28_Refman, &(self->type_pointer), &(self->type_pointer_Refman), &(self->type_pointer_Dynamic));
+  CHECK(233)
+  INIT_NEW(235, aux_List_0, LUMI_alloc(sizeof(tl5_compiler_M_List)));
+  aux_List_1 = aux_List_0;
+  aux_List_1_Refman = aux_List_0_Refman;
+  aux_List_0 = NULL;
+  aux_List_0_Refman = NULL;
+  CHECK_REF(235, self, self_Refman)
+  CHECK_REF(235, self->type_pointer, self->type_pointer_Refman)
+  tl5_compiler_M_List_Del(self->type_pointer->parameters);
+  LUMI_owner_dec_ref(self->type_pointer->parameters_Refman);
+  self->type_pointer->parameters_Refman = aux_List_1_Refman;
+  self->type_pointer->parameters = aux_List_1;
+  aux_List_1 = NULL;
+  aux_List_1_Refman = NULL;
+  CHECK_REF(236, self, self_Refman)
+  CHECK_REF(236, self->type_pointer, self->type_pointer_Refman)
+  INIT_STRING_CONST(236, aux_String_29, "Pointed");
+  LUMI_err = tl5_compiler_M_string_new_copy(aux_String_29, aux_String_29_Refman, &(aux_String_30), &(aux_String_30_Refman));
+  CHECK(236)
+  LUMI_err = tl5_compiler_M_List_add(self->type_pointer->parameters, self->type_pointer->parameters_Refman, aux_String_30, aux_String_30_Refman, &String_dynamic);
+  aux_String_30 = NULL;
+  aux_String_30_Refman = NULL;
+  CHECK(236)
+  CHECK_REF(237, self, self_Refman)
   LUMI_err = tl5_compiler_M_List_add(&(self->root.modules), self_Refman, cdef_module, cdef_module_Refman, &tl5_compiler_M_ModuleMembers_dynamic);
   cdef_module = NULL;
   cdef_module_Refman = NULL;
-  CHECK(229)
-  CHECK_REF(235, self, self_Refman)
-  INIT_STRING_CONST(235, aux_String_27, "str");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_27, aux_String_27_Refman, true, tl5_compiler_M_Access_COPY, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(234)
-  CHECK_REF(238, self, self_Refman)
-  INIT_STRING_CONST(238, aux_String_28, "str");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_USER, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_28, aux_String_28_Refman);
   CHECK(237)
-  CHECK_REF(241, self, self_Refman)
-  INIT_STRING_CONST(241, aux_String_29, "true");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_global_variable(self, self_Refman, self->type_bool, self->type_bool_Refman, self->type_bool_Dynamic, aux_String_29, aux_String_29_Refman);
-  CHECK(241)
   CHECK_REF(242, self, self_Refman)
-  INIT_STRING_CONST(242, aux_String_30, "false");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_global_variable(self, self_Refman, self->type_bool, self->type_bool_Refman, self->type_bool_Dynamic, aux_String_30, aux_String_30_Refman);
-  CHECK(242)
+  INIT_STRING_CONST(242, aux_String_31, "str");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_31, aux_String_31_Refman, true, tl5_compiler_M_Access_COPY, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(241)
+  CHECK_REF(245, self, self_Refman)
+  INIT_STRING_CONST(245, aux_String_32, "str");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_USER, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_32, aux_String_32_Refman);
+  CHECK(244)
   CHECK_REF(248, self, self_Refman)
-  INIT_STRING_CONST(248, aux_String_31, "length");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_array, self->type_array_Refman, self->type_array_Dynamic, aux_String_31, aux_String_31_Refman, false, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(247)
-  CHECK_REF(251, self, self_Refman)
-  INIT_STRING_CONST(251, aux_String_32, "length");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_32, aux_String_32_Refman);
-  CHECK(250)
-  CHECK_REF(259, self, self_Refman)
-  INIT_STRING_CONST(259, aux_String_33, "length");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_33, aux_String_33_Refman, false, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(258)
-  CHECK_REF(262, self, self_Refman)
-  INIT_STRING_CONST(262, aux_String_34, "length");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_34, aux_String_34_Refman);
-  CHECK(261)
-  CHECK_REF(265, self, self_Refman)
-  INIT_STRING_CONST(266, aux_String_35, "max-length");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_35, aux_String_35_Refman, false, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(264)
-  CHECK_REF(271, self, self_Refman)
-  INIT_STRING_CONST(271, aux_String_36, "max-length");
+  INIT_STRING_CONST(248, aux_String_33, "true");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_global_variable(self, self_Refman, self->type_bool, self->type_bool_Refman, self->type_bool_Dynamic, aux_String_33, aux_String_33_Refman);
+  CHECK(248)
+  CHECK_REF(249, self, self_Refman)
+  INIT_STRING_CONST(249, aux_String_34, "false");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_global_variable(self, self_Refman, self->type_bool, self->type_bool_Refman, self->type_bool_Dynamic, aux_String_34, aux_String_34_Refman);
+  CHECK(249)
+  CHECK_REF(255, self, self_Refman)
+  INIT_STRING_CONST(255, aux_String_35, "length");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_array, self->type_array_Refman, self->type_array_Dynamic, aux_String_35, aux_String_35_Refman, false, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(254)
+  CHECK_REF(258, self, self_Refman)
+  INIT_STRING_CONST(258, aux_String_36, "length");
   LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_36, aux_String_36_Refman);
-  CHECK(270)
-  CHECK_REF(274, self, self_Refman)
-  INIT_STRING_CONST(274, aux_String_37, "copy");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_37, aux_String_37_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(273)
-  INIT_STRING_CONST(277, aux_String_38, "other");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_char_array_argument(self, self_Refman, function, function_Refman, function_Dynamic, false, tl5_compiler_M_Access_USER, aux_String_38, aux_String_38_Refman);
-  CHECK(276)
+  CHECK(257)
+  CHECK_REF(266, self, self_Refman)
+  INIT_STRING_CONST(266, aux_String_37, "length");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_37, aux_String_37_Refman, false, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(265)
+  CHECK_REF(269, self, self_Refman)
+  INIT_STRING_CONST(269, aux_String_38, "length");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_38, aux_String_38_Refman);
+  CHECK(268)
+  CHECK_REF(272, self, self_Refman)
+  INIT_STRING_CONST(273, aux_String_39, "max-length");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_39, aux_String_39_Refman, false, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(271)
   CHECK_REF(278, self, self_Refman)
+  INIT_STRING_CONST(278, aux_String_40, "max-length");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_40, aux_String_40_Refman);
+  CHECK(277)
+  CHECK_REF(281, self, self_Refman)
+  INIT_STRING_CONST(281, aux_String_41, "copy");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_41, aux_String_41_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(280)
+  INIT_STRING_CONST(284, aux_String_42, "other");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_char_array_argument(self, self_Refman, function, function_Refman, function_Dynamic, false, tl5_compiler_M_Access_USER, aux_String_42, aux_String_42_Refman);
+  CHECK(283)
+  CHECK_REF(285, self, self_Refman)
   aux_Ref_Manager = self->string_copy_function_Refman;
   self->string_copy_function_Refman = function_Refman;
   self->string_copy_function_Dynamic = function_Dynamic;
@@ -29117,243 +29158,247 @@ Returncode tl5_compiler_M_Global_init_builtin_types(tl5_compiler_M_Global* self,
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   self->string_copy_function = function;
-  CHECK_REF(281, self, self_Refman)
-  INIT_STRING_CONST(281, aux_String_39, "clear");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_39, aux_String_39_Refman, false, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(280)
-  CHECK_REF(285, self, self_Refman)
-  INIT_STRING_CONST(285, aux_String_40, "equal");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_40, aux_String_40_Refman, false, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(284)
-  INIT_STRING_CONST(288, aux_String_41, "pattern");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_char_array_argument(self, self_Refman, function, function_Refman, function_Dynamic, false, tl5_compiler_M_Access_USER, aux_String_41, aux_String_41_Refman);
+  CHECK_REF(288, self, self_Refman)
+  INIT_STRING_CONST(288, aux_String_43, "clear");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_43, aux_String_43_Refman, false, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
   CHECK(287)
-  CHECK_REF(290, self, self_Refman)
-  INIT_STRING_CONST(290, aux_String_42, "equal");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_bool, self->type_bool_Refman, self->type_bool_Dynamic, aux_String_42, aux_String_42_Refman);
-  CHECK(289)
-  CHECK_REF(293, self, self_Refman)
-  INIT_STRING_CONST(293, aux_String_43, "get");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_43, aux_String_43_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(292)
-  CHECK_REF(296, self, self_Refman)
-  INIT_STRING_CONST(296, aux_String_44, "index");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_COPY, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_44, aux_String_44_Refman);
-  CHECK(295)
-  CHECK_REF(298, self, self_Refman)
-  INIT_STRING_CONST(298, aux_String_45, "ch");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_char, self->type_char_Refman, self->type_char_Dynamic, aux_String_45, aux_String_45_Refman);
-  CHECK(297)
-  CHECK_REF(301, self, self_Refman)
-  INIT_STRING_CONST(301, aux_String_46, "set");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_46, aux_String_46_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(300)
-  CHECK_REF(304, self, self_Refman)
-  INIT_STRING_CONST(304, aux_String_47, "index");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_COPY, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_47, aux_String_47_Refman);
-  CHECK(303)
-  CHECK_REF(306, self, self_Refman)
-  INIT_STRING_CONST(306, aux_String_48, "ch");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_COPY, self->type_char, self->type_char_Refman, self->type_char_Dynamic, aux_String_48, aux_String_48_Refman);
-  CHECK(305)
-  CHECK_REF(309, self, self_Refman)
-  INIT_STRING_CONST(309, aux_String_49, "append");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_49, aux_String_49_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(308)
-  CHECK_REF(312, self, self_Refman)
-  INIT_STRING_CONST(312, aux_String_50, "ch");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_COPY, self->type_char, self->type_char_Refman, self->type_char_Dynamic, aux_String_50, aux_String_50_Refman);
-  CHECK(311)
-  CHECK_REF(315, self, self_Refman)
-  INIT_STRING_CONST(315, aux_String_51, "concat");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_51, aux_String_51_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(314)
-  INIT_STRING_CONST(318, aux_String_52, "other");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_char_array_argument(self, self_Refman, function, function_Refman, function_Dynamic, false, tl5_compiler_M_Access_USER, aux_String_52, aux_String_52_Refman);
-  CHECK(317)
-  CHECK_REF(321, self, self_Refman)
-  INIT_STRING_CONST(322, aux_String_53, "concat-int");
+  CHECK_REF(292, self, self_Refman)
+  INIT_STRING_CONST(292, aux_String_44, "equal");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_44, aux_String_44_Refman, false, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(291)
+  INIT_STRING_CONST(295, aux_String_45, "pattern");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_char_array_argument(self, self_Refman, function, function_Refman, function_Dynamic, false, tl5_compiler_M_Access_USER, aux_String_45, aux_String_45_Refman);
+  CHECK(294)
+  CHECK_REF(297, self, self_Refman)
+  INIT_STRING_CONST(297, aux_String_46, "equal");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_bool, self->type_bool_Refman, self->type_bool_Dynamic, aux_String_46, aux_String_46_Refman);
+  CHECK(296)
+  CHECK_REF(300, self, self_Refman)
+  INIT_STRING_CONST(300, aux_String_47, "get");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_47, aux_String_47_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(299)
+  CHECK_REF(303, self, self_Refman)
+  INIT_STRING_CONST(303, aux_String_48, "index");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_COPY, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_48, aux_String_48_Refman);
+  CHECK(302)
+  CHECK_REF(305, self, self_Refman)
+  INIT_STRING_CONST(305, aux_String_49, "ch");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_char, self->type_char_Refman, self->type_char_Dynamic, aux_String_49, aux_String_49_Refman);
+  CHECK(304)
+  CHECK_REF(308, self, self_Refman)
+  INIT_STRING_CONST(308, aux_String_50, "set");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_50, aux_String_50_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(307)
+  CHECK_REF(311, self, self_Refman)
+  INIT_STRING_CONST(311, aux_String_51, "index");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_COPY, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_51, aux_String_51_Refman);
+  CHECK(310)
+  CHECK_REF(313, self, self_Refman)
+  INIT_STRING_CONST(313, aux_String_52, "ch");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_COPY, self->type_char, self->type_char_Refman, self->type_char_Dynamic, aux_String_52, aux_String_52_Refman);
+  CHECK(312)
+  CHECK_REF(316, self, self_Refman)
+  INIT_STRING_CONST(316, aux_String_53, "append");
   LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_53, aux_String_53_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(320)
-  CHECK_REF(327, self, self_Refman)
-  INIT_STRING_CONST(327, aux_String_54, "number");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_COPY, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_54, aux_String_54_Refman);
-  CHECK(326)
-  CHECK_REF(330, self, self_Refman)
-  INIT_STRING_CONST(330, aux_String_55, "find");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_55, aux_String_55_Refman, false, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(329)
-  INIT_STRING_CONST(333, aux_String_56, "pattern");
+  CHECK(315)
+  CHECK_REF(319, self, self_Refman)
+  INIT_STRING_CONST(319, aux_String_54, "ch");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_COPY, self->type_char, self->type_char_Refman, self->type_char_Dynamic, aux_String_54, aux_String_54_Refman);
+  CHECK(318)
+  CHECK_REF(322, self, self_Refman)
+  INIT_STRING_CONST(322, aux_String_55, "concat");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_55, aux_String_55_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(321)
+  INIT_STRING_CONST(325, aux_String_56, "other");
   LUMI_err = tl5_compiler_M_Global_add_builtin_char_array_argument(self, self_Refman, function, function_Refman, function_Dynamic, false, tl5_compiler_M_Access_USER, aux_String_56, aux_String_56_Refman);
-  CHECK(332)
-  CHECK_REF(335, self, self_Refman)
-  INIT_STRING_CONST(335, aux_String_57, "index");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_57, aux_String_57_Refman);
-  CHECK(334)
-  CHECK_REF(338, self, self_Refman)
-  INIT_STRING_CONST(338, aux_String_58, "has");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_58, aux_String_58_Refman, false, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(337)
-  CHECK_REF(341, self, self_Refman)
-  INIT_STRING_CONST(341, aux_String_59, "ch");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_COPY, self->type_char, self->type_char_Refman, self->type_char_Dynamic, aux_String_59, aux_String_59_Refman);
-  CHECK(340)
-  CHECK_REF(343, self, self_Refman)
-  INIT_STRING_CONST(343, aux_String_60, "equal");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_bool, self->type_bool_Refman, self->type_bool_Dynamic, aux_String_60, aux_String_60_Refman);
-  CHECK(342)
-  INIT_STRING_CONST(346, aux_String_61, "file-open-read");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_global_function(self, self_Refman, aux_String_61, aux_String_61_Refman, true, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(346)
-  CHECK_REF(349, self, self_Refman)
-  INIT_STRING_CONST(349, aux_String_62, "name");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_USER, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_62, aux_String_62_Refman);
-  CHECK(348)
-  CHECK_REF(351, self, self_Refman)
-  INIT_STRING_CONST(351, aux_String_63, "file");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_OWNER, self->type_file, self->type_file_Refman, self->type_file_Dynamic, aux_String_63, aux_String_63_Refman);
-  CHECK(350)
-  INIT_STRING_CONST(353, aux_String_64, "file-open-write");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_global_function(self, self_Refman, aux_String_64, aux_String_64_Refman, true, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(324)
+  CHECK_REF(328, self, self_Refman)
+  INIT_STRING_CONST(329, aux_String_57, "concat-int");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_57, aux_String_57_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(327)
+  CHECK_REF(334, self, self_Refman)
+  INIT_STRING_CONST(334, aux_String_58, "number");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_COPY, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_58, aux_String_58_Refman);
+  CHECK(333)
+  CHECK_REF(337, self, self_Refman)
+  INIT_STRING_CONST(337, aux_String_59, "find");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_59, aux_String_59_Refman, false, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(336)
+  INIT_STRING_CONST(340, aux_String_60, "pattern");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_char_array_argument(self, self_Refman, function, function_Refman, function_Dynamic, false, tl5_compiler_M_Access_USER, aux_String_60, aux_String_60_Refman);
+  CHECK(339)
+  CHECK_REF(342, self, self_Refman)
+  INIT_STRING_CONST(342, aux_String_61, "index");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_61, aux_String_61_Refman);
+  CHECK(341)
+  CHECK_REF(345, self, self_Refman)
+  INIT_STRING_CONST(345, aux_String_62, "has");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_62, aux_String_62_Refman, false, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(344)
+  CHECK_REF(348, self, self_Refman)
+  INIT_STRING_CONST(348, aux_String_63, "ch");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_COPY, self->type_char, self->type_char_Refman, self->type_char_Dynamic, aux_String_63, aux_String_63_Refman);
+  CHECK(347)
+  CHECK_REF(350, self, self_Refman)
+  INIT_STRING_CONST(350, aux_String_64, "equal");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_bool, self->type_bool_Refman, self->type_bool_Dynamic, aux_String_64, aux_String_64_Refman);
+  CHECK(349)
+  INIT_STRING_CONST(353, aux_String_65, "file-open-read");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_global_function(self, self_Refman, aux_String_65, aux_String_65_Refman, true, &(function), &(function_Refman), &(function_Dynamic));
   CHECK(353)
   CHECK_REF(356, self, self_Refman)
-  INIT_STRING_CONST(356, aux_String_65, "name");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_USER, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_65, aux_String_65_Refman);
+  INIT_STRING_CONST(356, aux_String_66, "name");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_USER, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_66, aux_String_66_Refman);
   CHECK(355)
   CHECK_REF(358, self, self_Refman)
-  INIT_STRING_CONST(358, aux_String_66, "file");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_OWNER, self->type_file, self->type_file_Refman, self->type_file_Dynamic, aux_String_66, aux_String_66_Refman);
+  INIT_STRING_CONST(358, aux_String_67, "file");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_OWNER, self->type_file, self->type_file_Refman, self->type_file_Dynamic, aux_String_67, aux_String_67_Refman);
   CHECK(357)
-  INIT_STRING_CONST(360, aux_String_67, "file-close");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_global_function(self, self_Refman, aux_String_67, aux_String_67_Refman, true, &(function), &(function_Refman), &(function_Dynamic));
+  INIT_STRING_CONST(360, aux_String_68, "file-open-write");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_global_function(self, self_Refman, aux_String_68, aux_String_68_Refman, true, &(function), &(function_Refman), &(function_Dynamic));
   CHECK(360)
   CHECK_REF(363, self, self_Refman)
-  INIT_STRING_CONST(363, aux_String_68, "file");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_OWNER, self->type_file, self->type_file_Refman, self->type_file_Dynamic, aux_String_68, aux_String_68_Refman);
+  INIT_STRING_CONST(363, aux_String_69, "name");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_USER, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_69, aux_String_69_Refman);
   CHECK(362)
-  CHECK_REF(366, self, self_Refman)
-  INIT_STRING_CONST(366, aux_String_69, "getc");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_file, self->type_file_Refman, self->type_file_Dynamic, aux_String_69, aux_String_69_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(365)
-  CHECK_REF(369, self, self_Refman)
-  INIT_STRING_CONST(369, aux_String_70, "ch");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_char, self->type_char_Refman, self->type_char_Dynamic, aux_String_70, aux_String_70_Refman);
-  CHECK(368)
-  CHECK_REF(371, self, self_Refman)
-  INIT_STRING_CONST(371, aux_String_71, "is-eof");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_bool, self->type_bool_Refman, self->type_bool_Dynamic, aux_String_71, aux_String_71_Refman);
-  CHECK(370)
-  CHECK_REF(374, self, self_Refman)
-  INIT_STRING_CONST(374, aux_String_72, "putc");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_file, self->type_file_Refman, self->type_file_Dynamic, aux_String_72, aux_String_72_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(373)
-  CHECK_REF(377, self, self_Refman)
-  INIT_STRING_CONST(377, aux_String_73, "ch");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_COPY, self->type_char, self->type_char_Refman, self->type_char_Dynamic, aux_String_73, aux_String_73_Refman);
-  CHECK(376)
-  CHECK_REF(380, self, self_Refman)
-  INIT_STRING_CONST(380, aux_String_74, "write");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_file, self->type_file_Refman, self->type_file_Dynamic, aux_String_74, aux_String_74_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(379)
-  INIT_STRING_CONST(383, aux_String_75, "text");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_char_array_argument(self, self_Refman, function, function_Refman, function_Dynamic, false, tl5_compiler_M_Access_USER, aux_String_75, aux_String_75_Refman);
-  CHECK(382)
+  CHECK_REF(365, self, self_Refman)
+  INIT_STRING_CONST(365, aux_String_70, "file");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_OWNER, self->type_file, self->type_file_Refman, self->type_file_Dynamic, aux_String_70, aux_String_70_Refman);
+  CHECK(364)
+  INIT_STRING_CONST(367, aux_String_71, "file-close");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_global_function(self, self_Refman, aux_String_71, aux_String_71_Refman, true, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(367)
+  CHECK_REF(370, self, self_Refman)
+  INIT_STRING_CONST(370, aux_String_72, "file");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_OWNER, self->type_file, self->type_file_Refman, self->type_file_Dynamic, aux_String_72, aux_String_72_Refman);
+  CHECK(369)
+  CHECK_REF(373, self, self_Refman)
+  INIT_STRING_CONST(373, aux_String_73, "getc");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_file, self->type_file_Refman, self->type_file_Dynamic, aux_String_73, aux_String_73_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(372)
+  CHECK_REF(376, self, self_Refman)
+  INIT_STRING_CONST(376, aux_String_74, "ch");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_char, self->type_char_Refman, self->type_char_Dynamic, aux_String_74, aux_String_74_Refman);
+  CHECK(375)
+  CHECK_REF(378, self, self_Refman)
+  INIT_STRING_CONST(378, aux_String_75, "is-eof");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_bool, self->type_bool_Refman, self->type_bool_Dynamic, aux_String_75, aux_String_75_Refman);
+  CHECK(377)
+  CHECK_REF(381, self, self_Refman)
+  INIT_STRING_CONST(381, aux_String_76, "putc");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_file, self->type_file_Refman, self->type_file_Dynamic, aux_String_76, aux_String_76_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(380)
+  CHECK_REF(384, self, self_Refman)
+  INIT_STRING_CONST(384, aux_String_77, "ch");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_COPY, self->type_char, self->type_char_Refman, self->type_char_Dynamic, aux_String_77, aux_String_77_Refman);
+  CHECK(383)
   CHECK_REF(387, self, self_Refman)
-  INIT_STRING_CONST(388, aux_String_76, "argv");
-  CHECK_REF(389, self, self_Refman)
-  CHECK_REF(390, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_builtin_field(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_76, aux_String_76_Refman, self->type_array, self->type_array_Refman, self->type_array_Dynamic, self->type_string, self->type_string_Refman, self->type_string_Dynamic);
+  INIT_STRING_CONST(387, aux_String_78, "write");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_file, self->type_file_Refman, self->type_file_Dynamic, aux_String_78, aux_String_78_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
   CHECK(386)
-  CHECK_REF(393, self, self_Refman)
-  INIT_STRING_CONST(394, aux_String_77, "stdout");
-  CHECK_REF(395, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_builtin_field(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_77, aux_String_77_Refman, self->type_file, self->type_file_Refman, self->type_file_Dynamic, NULL, NULL, NULL);
-  CHECK(392)
-  CHECK_REF(399, self, self_Refman)
-  INIT_STRING_CONST(400, aux_String_78, "stdin");
-  CHECK_REF(401, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_builtin_field(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_78, aux_String_78_Refman, self->type_file, self->type_file_Refman, self->type_file_Dynamic, NULL, NULL, NULL);
-  CHECK(398)
-  CHECK_REF(405, self, self_Refman)
-  INIT_STRING_CONST(406, aux_String_79, "stderr");
-  CHECK_REF(407, self, self_Refman)
-  LUMI_err = tl5_compiler_M_Global_add_builtin_field(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_79, aux_String_79_Refman, self->type_file, self->type_file_Refman, self->type_file_Dynamic, NULL, NULL, NULL);
-  CHECK(404)
-  CHECK_REF(411, self, self_Refman)
-  INIT_STRING_CONST(411, aux_String_80, "print");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_80, aux_String_80_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(410)
-  INIT_STRING_CONST(414, aux_String_81, "text");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_char_array_argument(self, self_Refman, function, function_Refman, function_Dynamic, false, tl5_compiler_M_Access_USER, aux_String_81, aux_String_81_Refman);
-  CHECK(413)
-  CHECK_REF(417, self, self_Refman)
-  INIT_STRING_CONST(417, aux_String_82, "println");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_82, aux_String_82_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(416)
-  INIT_STRING_CONST(420, aux_String_83, "text");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_char_array_argument(self, self_Refman, function, function_Refman, function_Dynamic, false, tl5_compiler_M_Access_USER, aux_String_83, aux_String_83_Refman);
-  CHECK(419)
-  CHECK_REF(423, self, self_Refman)
-  INIT_STRING_CONST(423, aux_String_84, "getchar");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_84, aux_String_84_Refman, false, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(422)
-  CHECK_REF(426, self, self_Refman)
-  INIT_STRING_CONST(426, aux_String_85, "ch");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_char, self->type_char_Refman, self->type_char_Dynamic, aux_String_85, aux_String_85_Refman);
-  CHECK(425)
-  CHECK_REF(428, self, self_Refman)
-  INIT_STRING_CONST(428, aux_String_86, "is-eof");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_bool, self->type_bool_Refman, self->type_bool_Dynamic, aux_String_86, aux_String_86_Refman);
-  CHECK(427)
-  CHECK_REF(431, self, self_Refman)
-  INIT_STRING_CONST(431, aux_String_87, "getline");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_87, aux_String_87_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(430)
-  CHECK_REF(434, self, self_Refman)
-  INIT_STRING_CONST(434, aux_String_88, "line");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_USER, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_88, aux_String_88_Refman);
-  CHECK(433)
-  CHECK_REF(437, self, self_Refman)
-  INIT_STRING_CONST(437, aux_String_89, "exit");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_89, aux_String_89_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(436)
-  CHECK_REF(440, self, self_Refman)
-  INIT_STRING_CONST(440, aux_String_90, "status");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_COPY, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_90, aux_String_90_Refman);
-  CHECK(439)
-  CHECK_REF(443, self, self_Refman)
-  INIT_STRING_CONST(443, aux_String_91, "system");
+  INIT_STRING_CONST(390, aux_String_79, "text");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_char_array_argument(self, self_Refman, function, function_Refman, function_Dynamic, false, tl5_compiler_M_Access_USER, aux_String_79, aux_String_79_Refman);
+  CHECK(389)
+  CHECK_REF(394, self, self_Refman)
+  INIT_STRING_CONST(395, aux_String_80, "argv");
+  CHECK_REF(396, self, self_Refman)
+  CHECK_REF(397, self, self_Refman)
+  LUMI_err = tl5_compiler_M_Global_add_builtin_field(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_80, aux_String_80_Refman, self->type_array, self->type_array_Refman, self->type_array_Dynamic, self->type_string, self->type_string_Refman, self->type_string_Dynamic);
+  CHECK(393)
+  CHECK_REF(400, self, self_Refman)
+  INIT_STRING_CONST(401, aux_String_81, "stdout");
+  CHECK_REF(402, self, self_Refman)
+  LUMI_err = tl5_compiler_M_Global_add_builtin_field(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_81, aux_String_81_Refman, self->type_file, self->type_file_Refman, self->type_file_Dynamic, NULL, NULL, NULL);
+  CHECK(399)
+  CHECK_REF(406, self, self_Refman)
+  INIT_STRING_CONST(407, aux_String_82, "stdin");
+  CHECK_REF(408, self, self_Refman)
+  LUMI_err = tl5_compiler_M_Global_add_builtin_field(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_82, aux_String_82_Refman, self->type_file, self->type_file_Refman, self->type_file_Dynamic, NULL, NULL, NULL);
+  CHECK(405)
+  CHECK_REF(412, self, self_Refman)
+  INIT_STRING_CONST(413, aux_String_83, "stderr");
+  CHECK_REF(414, self, self_Refman)
+  LUMI_err = tl5_compiler_M_Global_add_builtin_field(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_83, aux_String_83_Refman, self->type_file, self->type_file_Refman, self->type_file_Dynamic, NULL, NULL, NULL);
+  CHECK(411)
+  CHECK_REF(418, self, self_Refman)
+  INIT_STRING_CONST(418, aux_String_84, "print");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_84, aux_String_84_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(417)
+  INIT_STRING_CONST(421, aux_String_85, "text");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_char_array_argument(self, self_Refman, function, function_Refman, function_Dynamic, false, tl5_compiler_M_Access_USER, aux_String_85, aux_String_85_Refman);
+  CHECK(420)
+  CHECK_REF(424, self, self_Refman)
+  INIT_STRING_CONST(424, aux_String_86, "println");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_86, aux_String_86_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(423)
+  INIT_STRING_CONST(427, aux_String_87, "text");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_char_array_argument(self, self_Refman, function, function_Refman, function_Dynamic, false, tl5_compiler_M_Access_USER, aux_String_87, aux_String_87_Refman);
+  CHECK(426)
+  CHECK_REF(430, self, self_Refman)
+  INIT_STRING_CONST(430, aux_String_88, "getchar");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_88, aux_String_88_Refman, false, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(429)
+  CHECK_REF(433, self, self_Refman)
+  INIT_STRING_CONST(433, aux_String_89, "ch");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_char, self->type_char_Refman, self->type_char_Dynamic, aux_String_89, aux_String_89_Refman);
+  CHECK(432)
+  CHECK_REF(435, self, self_Refman)
+  INIT_STRING_CONST(435, aux_String_90, "is-eof");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_bool, self->type_bool_Refman, self->type_bool_Dynamic, aux_String_90, aux_String_90_Refman);
+  CHECK(434)
+  CHECK_REF(438, self, self_Refman)
+  INIT_STRING_CONST(438, aux_String_91, "getline");
   LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_91, aux_String_91_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(442)
-  CHECK_REF(446, self, self_Refman)
-  INIT_STRING_CONST(446, aux_String_92, "command");
+  CHECK(437)
+  CHECK_REF(441, self, self_Refman)
+  INIT_STRING_CONST(441, aux_String_92, "line");
   LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_USER, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_92, aux_String_92_Refman);
-  CHECK(445)
-  CHECK_REF(448, self, self_Refman)
-  INIT_STRING_CONST(448, aux_String_93, "status");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_93, aux_String_93_Refman);
-  CHECK(447)
-  CHECK_REF(451, self, self_Refman)
-  INIT_STRING_CONST(451, aux_String_94, "getenv");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_94, aux_String_94_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
-  CHECK(450)
-  CHECK_REF(454, self, self_Refman)
-  INIT_STRING_CONST(454, aux_String_95, "name");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_USER, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_95, aux_String_95_Refman);
-  CHECK(453)
-  CHECK_REF(456, self, self_Refman)
-  INIT_STRING_CONST(456, aux_String_96, "value");
+  CHECK(440)
+  CHECK_REF(444, self, self_Refman)
+  INIT_STRING_CONST(444, aux_String_93, "exit");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_93, aux_String_93_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(443)
+  CHECK_REF(447, self, self_Refman)
+  INIT_STRING_CONST(447, aux_String_94, "status");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_COPY, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_94, aux_String_94_Refman);
+  CHECK(446)
+  CHECK_REF(450, self, self_Refman)
+  INIT_STRING_CONST(450, aux_String_95, "system");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_95, aux_String_95_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
+  CHECK(449)
+  CHECK_REF(453, self, self_Refman)
+  INIT_STRING_CONST(453, aux_String_96, "command");
   LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_USER, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_96, aux_String_96_Refman);
-  CHECK(455)
+  CHECK(452)
+  CHECK_REF(455, self, self_Refman)
+  INIT_STRING_CONST(455, aux_String_97, "status");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_int, self->type_int_Refman, self->type_int_Dynamic, aux_String_97, aux_String_97_Refman);
+  CHECK(454)
   CHECK_REF(458, self, self_Refman)
-  INIT_STRING_CONST(458, aux_String_97, "exists");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_bool, self->type_bool_Refman, self->type_bool_Dynamic, aux_String_97, aux_String_97_Refman);
+  INIT_STRING_CONST(458, aux_String_98, "getenv");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_98, aux_String_98_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
   CHECK(457)
-  CHECK_REF(460, self, self_Refman)
-  INIT_STRING_CONST(460, aux_String_98, "sys");
-  LUMI_err = tl5_compiler_M_Global_add_builtin_global_variable(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_98, aux_String_98_Refman);
+  CHECK_REF(461, self, self_Refman)
+  INIT_STRING_CONST(461, aux_String_99, "name");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_USER, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_99, aux_String_99_Refman);
   CHECK(460)
+  CHECK_REF(463, self, self_Refman)
+  INIT_STRING_CONST(463, aux_String_100, "value");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_USER, self->type_string, self->type_string_Refman, self->type_string_Dynamic, aux_String_100, aux_String_100_Refman);
+  CHECK(462)
+  CHECK_REF(465, self, self_Refman)
+  INIT_STRING_CONST(465, aux_String_101, "exists");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_output(self, self_Refman, function, function_Refman, function_Dynamic, tl5_compiler_M_Access_VAR, self->type_bool, self->type_bool_Refman, self->type_bool_Dynamic, aux_String_101, aux_String_101_Refman);
+  CHECK(464)
+  CHECK_REF(467, self, self_Refman)
+  INIT_STRING_CONST(467, aux_String_102, "sys");
+  LUMI_err = tl5_compiler_M_Global_add_builtin_global_variable(self, self_Refman, self->type_sys, self->type_sys_Refman, self->type_sys_Dynamic, aux_String_102, aux_String_102_Refman);
+  CHECK(467)
 LUMI_cleanup:
+  LUMI_var_dec_ref(aux_String_102_Refman);
+  LUMI_var_dec_ref(aux_String_101_Refman);
+  LUMI_var_dec_ref(aux_String_100_Refman);
+  LUMI_var_dec_ref(aux_String_99_Refman);
   LUMI_var_dec_ref(aux_String_98_Refman);
   LUMI_var_dec_ref(aux_String_97_Refman);
   LUMI_var_dec_ref(aux_String_96_Refman);
@@ -29422,8 +29467,13 @@ LUMI_cleanup:
   LUMI_var_dec_ref(aux_String_33_Refman);
   LUMI_var_dec_ref(aux_String_32_Refman);
   LUMI_var_dec_ref(aux_String_31_Refman);
-  LUMI_var_dec_ref(aux_String_30_Refman);
+  String_Del(aux_String_30);
+  LUMI_owner_dec_ref(aux_String_30_Refman);
   LUMI_var_dec_ref(aux_String_29_Refman);
+  tl5_compiler_M_List_Del(aux_List_1);
+  LUMI_owner_dec_ref(aux_List_1_Refman);
+  tl5_compiler_M_List_Del(aux_List_0);
+  LUMI_owner_dec_ref(aux_List_0_Refman);
   LUMI_var_dec_ref(aux_String_28_Refman);
   LUMI_var_dec_ref(aux_String_27_Refman);
   LUMI_var_dec_ref(aux_String_26_Refman);
@@ -29454,6 +29504,7 @@ LUMI_cleanup:
   LUMI_var_dec_ref(aux_String_1_Refman);
   LUMI_var_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(function_Refman);
+  LUMI_dec_ref(void_pointer_Refman);
   tl5_compiler_M_ModuleMembers_Del(cdef_module);
   LUMI_owner_dec_ref(cdef_module_Refman);
   LUMI_dec_ref(self_Refman);
@@ -29468,9 +29519,9 @@ Returncode tl5_compiler_M_Global_add_global_type(tl5_compiler_M_Global* self, Re
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
-  CHECK_REF(465, self, self_Refman)
+  CHECK_REF(472, self, self_Refman)
   LUMI_err = tl5_compiler_M_Global_add_builtin_type(self, self_Refman, &(self->global_module), self_Refman, name, name_Refman, is_primitive, &(*type_data), &(*type_data_Refman), &(*type_data_Dynamic));
-  CHECK(464)
+  CHECK(471)
 LUMI_cleanup:
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(self_Refman);
@@ -29483,26 +29534,44 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "Global.add-cint-type"
 Returncode tl5_compiler_M_Global_add_cint_type(tl5_compiler_M_Global* self, Ref_Manager* self_Refman, tl5_compiler_M_ModuleMembers* cdef_module, Ref_Manager* cdef_module_Refman, String* name, Ref_Manager* name_Refman) {
   Returncode LUMI_err = OK;
-  tl5_compiler_M_TypeData* type_data = NULL;
-  Ref_Manager* type_data_Refman = NULL;
-  tl5_compiler_M_TypeData_Dynamic* type_data_Dynamic = NULL;
+  tl5_compiler_M_TypeData* aux_TypeData_0 = NULL;
+  Ref_Manager* aux_TypeData_0_Refman = NULL;
+  tl5_compiler_M_TypeData_Dynamic* aux_TypeData_0_Dynamic = NULL;
+  LUMI_inc_ref(self_Refman);
+  LUMI_inc_ref(cdef_module_Refman);
+  LUMI_inc_ref(name_Refman);
+  LUMI_err = tl5_compiler_M_Global_add_cdef_type(self, self_Refman, cdef_module, cdef_module_Refman, name, name_Refman, &(aux_TypeData_0), &(aux_TypeData_0_Refman), &(aux_TypeData_0_Dynamic));
+  CHECK(476)
+  CHECK_REF(476, aux_TypeData_0, aux_TypeData_0_Refman)
+  aux_TypeData_0->is_int_like = true;
+LUMI_cleanup:
+  LUMI_dec_ref(aux_TypeData_0_Refman);
+  LUMI_dec_ref(name_Refman);
+  LUMI_dec_ref(cdef_module_Refman);
+  LUMI_dec_ref(self_Refman);
+  return LUMI_err;
+}
+#undef LUMI_FILE_NAME
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FILE_NAME "TL5/global/global.4.lm"
+#define LUMI_FUNC_NAME "Global.add-cdef-type"
+Returncode tl5_compiler_M_Global_add_cdef_type(tl5_compiler_M_Global* self, Ref_Manager* self_Refman, tl5_compiler_M_ModuleMembers* cdef_module, Ref_Manager* cdef_module_Refman, String* name, Ref_Manager* name_Refman, tl5_compiler_M_TypeData** type_data, Ref_Manager** type_data_Refman, tl5_compiler_M_TypeData_Dynamic** type_data_Dynamic) {
+  Returncode LUMI_err = OK;
   Ref_Manager* aux_Ref_Manager = NULL;
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(cdef_module_Refman);
   LUMI_inc_ref(name_Refman);
-  LUMI_err = tl5_compiler_M_Global_add_builtin_type(self, self_Refman, cdef_module, cdef_module_Refman, name, name_Refman, true, &(type_data), &(type_data_Refman), &(type_data_Dynamic));
-  CHECK(470)
-  CHECK_REF(472, type_data, type_data_Refman)
-  type_data->is_int_like = true;
-  CHECK_REF(473, type_data, type_data_Refman)
-  aux_Ref_Manager = type_data->my_module_Refman;
-  type_data->my_module_Refman = cdef_module_Refman;
-  LUMI_inc_ref(type_data->my_module_Refman);
+  LUMI_err = tl5_compiler_M_Global_add_builtin_type(self, self_Refman, cdef_module, cdef_module_Refman, name, name_Refman, true, &(*type_data), &(*type_data_Refman), &(*type_data_Dynamic));
+  CHECK(480)
+  CHECK_REF(482, *type_data, (*type_data_Refman))
+  aux_Ref_Manager = (*type_data)->my_module_Refman;
+  (*type_data)->my_module_Refman = cdef_module_Refman;
+  LUMI_inc_ref((*type_data)->my_module_Refman);
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
-  type_data->my_module = cdef_module;
+  (*type_data)->my_module = cdef_module;
 LUMI_cleanup:
-  LUMI_dec_ref(type_data_Refman);
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(cdef_module_Refman);
   LUMI_dec_ref(self_Refman);
@@ -29522,7 +29591,7 @@ Returncode tl5_compiler_M_Global_add_builtin_type(tl5_compiler_M_Global* self, R
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(module_Refman);
   LUMI_inc_ref(name_Refman);
-  INIT_NEW(480, new_type, LUMI_alloc(sizeof(tl5_compiler_M_TypeData)));
+  INIT_NEW(489, new_type, LUMI_alloc(sizeof(tl5_compiler_M_TypeData)));
   aux_Ref_Manager = *type_data_Refman;
   *type_data_Refman = new_type_Refman;
   *type_data_Dynamic = new_type_Dynamic;
@@ -29530,23 +29599,23 @@ Returncode tl5_compiler_M_Global_add_builtin_type(tl5_compiler_M_Global* self, R
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   *type_data = new_type;
-  CHECK_REF(482, new_type, new_type_Refman)
+  CHECK_REF(491, new_type, new_type_Refman)
   LUMI_err = tl5_compiler_M_string_new_copy(name, name_Refman, &(new_type->name), &(new_type->name_Refman));
-  CHECK(482)
-  CHECK_REF(483, new_type, new_type_Refman)
+  CHECK(491)
+  CHECK_REF(492, new_type, new_type_Refman)
   new_type->is_primitive = is_primitive;
-  CHECK_REF(484, new_type, new_type_Refman)
+  CHECK_REF(493, new_type, new_type_Refman)
   new_type->is_ordered = true;
-  CHECK_REF(485, module, module_Refman)
-  CHECK_REF(485, new_type, new_type_Refman)
+  CHECK_REF(494, module, module_Refman)
+  CHECK_REF(494, new_type, new_type_Refman)
   LUMI_err = tl5_compiler_M_NameMap_add(&(module->type_map), module_Refman, new_type->name, new_type->name_Refman, new_type, new_type_Refman, (void*)new_type_Dynamic);
-  CHECK(485)
-  CHECK_REF(486, self, self_Refman)
+  CHECK(494)
+  CHECK_REF(495, self, self_Refman)
   LUMI_err = tl5_compiler_M_List_add(self->builtins.types, self->builtins.types_Refman, new_type, new_type_Refman, (void*)new_type_Dynamic);
   new_type = NULL;
   new_type_Refman = NULL;
   new_type_Dynamic = NULL;
-  CHECK(486)
+  CHECK(495)
 LUMI_cleanup:
   if (new_type_Dynamic != NULL) new_type_Dynamic->_base._base._base._del(new_type);
   LUMI_owner_dec_ref(new_type_Refman);
@@ -29568,19 +29637,19 @@ Returncode tl5_compiler_M_Global_add_builtin_global_variable(tl5_compiler_M_Glob
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(variable_type_Refman);
   LUMI_inc_ref(name_Refman);
-  CHECK_REF(491, self, self_Refman)
+  CHECK_REF(500, self, self_Refman)
   LUMI_err = tl5_compiler_M_Global_add_builtin_variable(self, self_Refman, name, name_Refman, variable_type, variable_type_Refman, variable_type_Dynamic, NULL, NULL, NULL, NULL, NULL, NULL, &(self->builtins._base._base), self_Refman, &(tl5_compiler_M_GlobalNodes_dynamic._base._base));
-  CHECK(490)
-  CHECK_REF(492, self, self_Refman)
-  CHECK_REF(492, self->builtins._base._base.variables.last, self->builtins._base._base.variables.last_Refman)
+  CHECK(499)
+  CHECK_REF(501, self, self_Refman)
+  CHECK_REF(501, self->builtins._base._base.variables.last, self->builtins._base._base.variables.last_Refman)
   variable = self->builtins._base._base.variables.last->item;
   variable_Refman = self->builtins._base._base.variables.last->item_Refman;
   LUMI_inc_ref(variable_Refman);
   variable_Dynamic = ((tl5_compiler_M_SyntaxTreeVariable_Dynamic*)(self->builtins._base._base.variables.last->item_Dynamic));
-  CHECK_REF(493, self, self_Refman)
-  CHECK_REF(493, variable, variable_Refman)
+  CHECK_REF(502, self, self_Refman)
+  CHECK_REF(502, variable, variable_Refman)
   LUMI_err = tl5_compiler_M_NameMap_add(&(self->global_module.variable_map), self_Refman, variable->name, variable->name_Refman, variable, variable_Refman, (void*)variable_Dynamic);
-  CHECK(493)
+  CHECK(502)
 LUMI_cleanup:
   LUMI_dec_ref(variable_Refman);
   LUMI_dec_ref(name_Refman);
@@ -29601,7 +29670,7 @@ Returncode tl5_compiler_M_Global_add_builtin_field(tl5_compiler_M_Global* self, 
   LUMI_inc_ref(field_type_Refman);
   LUMI_inc_ref(field_subtype_Refman);
   LUMI_err = tl5_compiler_M_Global_add_builtin_variable(self, self_Refman, name, name_Refman, field_type, field_type_Refman, field_type_Dynamic, field_subtype, field_subtype_Refman, field_subtype_Dynamic, builtin_type, builtin_type_Refman, builtin_type_Dynamic, &(builtin_type->_base._base), builtin_type_Refman, &(builtin_type_Dynamic->_base._base));
-  CHECK(500)
+  CHECK(509)
 LUMI_cleanup:
   LUMI_dec_ref(field_subtype_Refman);
   LUMI_dec_ref(field_type_Refman);
@@ -29627,30 +29696,30 @@ Returncode tl5_compiler_M_Global_add_builtin_variable(tl5_compiler_M_Global* sel
   LUMI_inc_ref(variable_subtype_Refman);
   LUMI_inc_ref(parent_type_Refman);
   LUMI_inc_ref(branch_Refman);
-  INIT_NEW(513, variable, LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeVariable)));
+  INIT_NEW(522, variable, LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeVariable)));
   LUMI_err = tl5_compiler_M_SyntaxTreeCode_new(&(variable->_base), variable_Refman, &(variable_Dynamic->_base), NULL, NULL, NULL);
-  CHECK(513)
-  CHECK_REF(514, variable, variable_Refman)
+  CHECK(522)
+  CHECK_REF(523, variable, variable_Refman)
   LUMI_err = tl5_compiler_M_string_new_copy(name, name_Refman, &(variable->name), &(variable->name_Refman));
-  CHECK(514)
-  CHECK_REF(515, variable_type, variable_type_Refman)
+  CHECK(523)
+  CHECK_REF(524, variable_type, variable_type_Refman)
   if (variable_type->is_primitive) {
-    CHECK_REF(516, variable, variable_Refman)
+    CHECK_REF(525, variable, variable_Refman)
     variable->access = tl5_compiler_M_Access_VAR;
   }
   else {
-      CHECK_REF(518, variable, variable_Refman)
+      CHECK_REF(527, variable, variable_Refman)
       variable->access = tl5_compiler_M_Access_STRONG;
     }
-  CHECK_REF(519, variable, variable_Refman)
+  CHECK_REF(528, variable, variable_Refman)
   LUMI_err = tl5_compiler_M_TypeData_new_type_instance(variable_type, variable_type_Refman, variable_type_Dynamic, &(variable->type_instance), &(variable->type_instance_Refman));
-  CHECK(519)
+  CHECK(528)
   if (variable_subtype != NULL && variable_subtype_Refman->value != NULL) {
-    CHECK_REF(521, variable, variable_Refman)
+    CHECK_REF(530, variable, variable_Refman)
     LUMI_err = tl5_compiler_M_TypeInstance_add_subtype_copy(variable->type_instance, variable->type_instance_Refman, variable_subtype, variable_subtype_Refman, variable_subtype_Dynamic);
-    CHECK(521)
+    CHECK(530)
   }
-  CHECK_REF(522, variable, variable_Refman)
+  CHECK_REF(531, variable, variable_Refman)
   aux_Ref_Manager = variable->parent_type_Refman;
   variable->parent_type_Refman = parent_type_Refman;
   variable->parent_type_Dynamic = parent_type_Dynamic;
@@ -29658,12 +29727,12 @@ Returncode tl5_compiler_M_Global_add_builtin_variable(tl5_compiler_M_Global* sel
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   variable->parent_type = parent_type;
-  CHECK_REF(523, branch, branch_Refman)
+  CHECK_REF(532, branch, branch_Refman)
   LUMI_err = tl5_compiler_M_List_add(&(branch->variables), branch_Refman, variable, variable_Refman, (void*)variable_Dynamic);
   variable = NULL;
   variable_Refman = NULL;
   variable_Dynamic = NULL;
-  CHECK(523)
+  CHECK(532)
 LUMI_cleanup:
   if (variable_Dynamic != NULL) variable_Dynamic->_base._base._del(variable);
   LUMI_owner_dec_ref(variable_Refman);
@@ -29684,13 +29753,13 @@ Returncode tl5_compiler_M_Global_add_builtin_global_function(tl5_compiler_M_Glob
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
-  CHECK_REF(528, self, self_Refman)
+  CHECK_REF(537, self, self_Refman)
   LUMI_err = tl5_compiler_M_Global_add_builtin_function(self, self_Refman, name, name_Refman, has_error, NULL, NULL, NULL, &(self->builtins._base), self_Refman, &(tl5_compiler_M_GlobalNodes_dynamic._base), &(*function), &(*function_Refman), &(*function_Dynamic));
-  CHECK(527)
-  CHECK_REF(529, self, self_Refman)
-  CHECK_REF(529, *function, (*function_Refman))
+  CHECK(536)
+  CHECK_REF(538, self, self_Refman)
+  CHECK_REF(538, *function, (*function_Refman))
   LUMI_err = tl5_compiler_M_NameMap_add(&(self->global_module.function_map), self_Refman, (*function)->name, (*function)->name_Refman, *function, *function_Refman, (void*)*function_Dynamic);
-  CHECK(529)
+  CHECK(538)
 LUMI_cleanup:
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(self_Refman);
@@ -29715,24 +29784,24 @@ Returncode tl5_compiler_M_Global_add_builtin_method(tl5_compiler_M_Global* self,
   LUMI_inc_ref(builtin_type_Refman);
   LUMI_inc_ref(name_Refman);
   LUMI_err = tl5_compiler_M_Global_add_builtin_function(self, self_Refman, name, name_Refman, has_error, builtin_type, builtin_type_Refman, builtin_type_Dynamic, &(builtin_type->_base), builtin_type_Refman, &(builtin_type_Dynamic->_base), &(*function), &(*function_Refman), &(*function_Dynamic));
-  CHECK(537)
-  INIT_STRING_CONST(541, aux_String_0, "self");
+  CHECK(546)
+  INIT_STRING_CONST(550, aux_String_0, "self");
   LUMI_err = tl5_compiler_M_Global_add_builtin_parameter(self, self_Refman, *function, *function_Refman, *function_Dynamic, access, builtin_type, builtin_type_Refman, builtin_type_Dynamic, aux_String_0, aux_String_0_Refman);
-  CHECK(540)
-  CHECK_REF(542, *function, (*function_Refman))
-  CHECK_REF(542, (*function)->arguments.parameters.first, (*function)->arguments.parameters.first_Refman)
+  CHECK(549)
+  CHECK_REF(551, *function, (*function_Refman))
+  CHECK_REF(551, (*function)->arguments.parameters.first, (*function)->arguments.parameters.first_Refman)
   self_param = (*function)->arguments.parameters.first->item;
   self_param_Refman = (*function)->arguments.parameters.first->item_Refman;
   LUMI_inc_ref(self_param_Refman);
   self_param_Dynamic = ((tl5_compiler_M_Argument_Dynamic*)((*function)->arguments.parameters.first->item_Dynamic));
-  CHECK_REF(543, self_param, self_param_Refman)
-  CHECK_REF(543, *function, (*function_Refman))
+  CHECK_REF(552, self_param, self_param_Refman)
+  CHECK_REF(552, *function, (*function_Refman))
   (*function)->self_access = self_param->access;
-  if (self_param_Dynamic == NULL) RAISE(544, empty_object)
+  if (self_param_Dynamic == NULL) RAISE(553, empty_object)
   LUMI_err = self_param_Dynamic->get_type_instance(self_param, self_param_Refman, self_param_Dynamic, &(aux_TypeInstance_0), &(aux_TypeInstance_0_Refman));
-  CHECK(544)
-  CHECK_REF(544, aux_TypeInstance_0, aux_TypeInstance_0_Refman)
-  CHECK_REF(544, *function, (*function_Refman))
+  CHECK(553)
+  CHECK_REF(553, aux_TypeInstance_0, aux_TypeInstance_0_Refman)
+  CHECK_REF(553, *function, (*function_Refman))
   (*function)->self_conditional = aux_TypeInstance_0->conditional;
 LUMI_cleanup:
   LUMI_dec_ref(aux_TypeInstance_0_Refman);
@@ -29758,10 +29827,10 @@ Returncode tl5_compiler_M_Global_add_builtin_function(tl5_compiler_M_Global* sel
   LUMI_inc_ref(name_Refman);
   LUMI_inc_ref(parent_type_Refman);
   LUMI_inc_ref(namespace_Refman);
-  INIT_NEW(552, function, LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeFunction)));
+  INIT_NEW(561, function, LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeFunction)));
   LUMI_err = tl5_compiler_M_SyntaxTreeFunction_new(function, function_Refman, function_Dynamic);
-  CHECK(552)
-  CHECK_REF(553, function, function_Refman)
+  CHECK(561)
+  CHECK_REF(562, function, function_Refman)
   function->arguments.has_error = has_error;
   aux_Ref_Manager = *out_function_Refman;
   *out_function_Refman = function_Refman;
@@ -29770,10 +29839,10 @@ Returncode tl5_compiler_M_Global_add_builtin_function(tl5_compiler_M_Global* sel
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   *out_function = function;
-  CHECK_REF(555, function, function_Refman)
+  CHECK_REF(564, function, function_Refman)
   LUMI_err = tl5_compiler_M_string_new_copy(name, name_Refman, &(function->name), &(function->name_Refman));
-  CHECK(555)
-  CHECK_REF(556, function, function_Refman)
+  CHECK(564)
+  CHECK_REF(565, function, function_Refman)
   aux_Ref_Manager = function->parent_type_Refman;
   function->parent_type_Refman = parent_type_Refman;
   function->parent_type_Dynamic = parent_type_Dynamic;
@@ -29781,15 +29850,15 @@ Returncode tl5_compiler_M_Global_add_builtin_function(tl5_compiler_M_Global* sel
   LUMI_dec_ref(aux_Ref_Manager);
   aux_Ref_Manager = NULL;
   function->parent_type = parent_type;
-  CHECK_REF(557, function, function_Refman)
+  CHECK_REF(566, function, function_Refman)
   LUMI_err = tl5_compiler_M_DeleteGroupBuilder_done(function->delete_group_builder, function->delete_group_builder_Refman);
-  CHECK(557)
-  CHECK_REF(558, namespace, namespace_Refman)
+  CHECK(566)
+  CHECK_REF(567, namespace, namespace_Refman)
   LUMI_err = tl5_compiler_M_List_add(&(namespace->functions), namespace_Refman, function, function_Refman, (void*)function_Dynamic);
   function = NULL;
   function_Refman = NULL;
   function_Dynamic = NULL;
-  CHECK(558)
+  CHECK(567)
 LUMI_cleanup:
   if (function_Dynamic != NULL) function_Dynamic->_base._base._base._del(function);
   LUMI_owner_dec_ref(function_Refman);
@@ -29810,9 +29879,9 @@ Returncode tl5_compiler_M_Global_add_builtin_parameter(tl5_compiler_M_Global* se
   LUMI_inc_ref(function_Refman);
   LUMI_inc_ref(parameter_type_Refman);
   LUMI_inc_ref(name_Refman);
-  CHECK_REF(567, function, function_Refman)
+  CHECK_REF(576, function, function_Refman)
   LUMI_err = tl5_compiler_M_Global_add_builtin_argument(self, self_Refman, function, function_Refman, function_Dynamic, &(function->arguments.parameters), function_Refman, false, access, parameter_type, parameter_type_Refman, parameter_type_Dynamic, NULL, NULL, NULL, name, name_Refman);
-  CHECK(565)
+  CHECK(574)
 LUMI_cleanup:
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(parameter_type_Refman);
@@ -29830,11 +29899,11 @@ Returncode tl5_compiler_M_Global_add_builtin_char_array_argument(tl5_compiler_M_
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(function_Refman);
   LUMI_inc_ref(name_Refman);
-  CHECK_REF(581, function, function_Refman)
-  CHECK_REF(584, self, self_Refman)
-  CHECK_REF(585, self, self_Refman)
+  CHECK_REF(590, function, function_Refman)
+  CHECK_REF(593, self, self_Refman)
+  CHECK_REF(594, self, self_Refman)
   LUMI_err = tl5_compiler_M_Global_add_builtin_argument(self, self_Refman, function, function_Refman, function_Dynamic, &(function->arguments.parameters), function_Refman, is_output, access, self->type_array, self->type_array_Refman, self->type_array_Dynamic, self->type_char, self->type_char_Refman, self->type_char_Dynamic, name, name_Refman);
-  CHECK(579)
+  CHECK(588)
 LUMI_cleanup:
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(function_Refman);
@@ -29852,9 +29921,9 @@ Returncode tl5_compiler_M_Global_add_builtin_output(tl5_compiler_M_Global* self,
   LUMI_inc_ref(function_Refman);
   LUMI_inc_ref(output_type_Refman);
   LUMI_inc_ref(name_Refman);
-  CHECK_REF(595, function, function_Refman)
+  CHECK_REF(604, function, function_Refman)
   LUMI_err = tl5_compiler_M_Global_add_builtin_argument(self, self_Refman, function, function_Refman, function_Dynamic, &(function->arguments.outputs), function_Refman, true, access, output_type, output_type_Refman, output_type_Dynamic, NULL, NULL, NULL, name, name_Refman);
-  CHECK(593)
+  CHECK(602)
 LUMI_cleanup:
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(output_type_Refman);
@@ -29890,23 +29959,23 @@ Returncode tl5_compiler_M_Global_add_builtin_argument(tl5_compiler_M_Global* sel
   LUMI_inc_ref(argument_type_Refman);
   LUMI_inc_ref(argument_subtype_Refman);
   LUMI_inc_ref(name_Refman);
-  INIT_NEW(610, argument, LUMI_alloc(sizeof(tl5_compiler_M_DeclarationArgument)));
+  INIT_NEW(619, argument, LUMI_alloc(sizeof(tl5_compiler_M_DeclarationArgument)));
   LUMI_err = tl5_compiler_M_Argument_new(&(argument->_base), argument_Refman, &(argument_Dynamic->_base));
-  CHECK(610)
-  CHECK_REF(611, argument, argument_Refman)
+  CHECK(619)
+  CHECK_REF(620, argument, argument_Refman)
   argument->_base.access = access;
-  CHECK_REF(612, argument, argument_Refman)
+  CHECK_REF(621, argument, argument_Refman)
   argument->_base.is_output = is_output;
-  INIT_NEW(613, aux_SyntaxTreeVariable_0, LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeVariable)));
+  INIT_NEW(622, aux_SyntaxTreeVariable_0, LUMI_alloc(sizeof(tl5_compiler_M_SyntaxTreeVariable)));
   LUMI_err = tl5_compiler_M_SyntaxTreeCode_new(&(aux_SyntaxTreeVariable_0->_base), aux_SyntaxTreeVariable_0_Refman, &(aux_SyntaxTreeVariable_0_Dynamic->_base), NULL, NULL, NULL);
-  CHECK(613)
+  CHECK(622)
   aux_SyntaxTreeVariable_1 = aux_SyntaxTreeVariable_0;
   aux_SyntaxTreeVariable_1_Refman = aux_SyntaxTreeVariable_0_Refman;
   aux_SyntaxTreeVariable_1_Dynamic = aux_SyntaxTreeVariable_0_Dynamic;
   aux_SyntaxTreeVariable_0 = NULL;
   aux_SyntaxTreeVariable_0_Refman = NULL;
   aux_SyntaxTreeVariable_0_Dynamic = NULL;
-  CHECK_REF(613, argument, argument_Refman)
+  CHECK_REF(622, argument, argument_Refman)
   if (argument->variable_Dynamic != NULL) argument->variable_Dynamic->_base._base._del(argument->variable);
   LUMI_owner_dec_ref(argument->variable_Refman);
   argument->variable_Refman = aux_SyntaxTreeVariable_1_Refman;
@@ -29915,61 +29984,61 @@ Returncode tl5_compiler_M_Global_add_builtin_argument(tl5_compiler_M_Global* sel
   aux_SyntaxTreeVariable_1 = NULL;
   aux_SyntaxTreeVariable_1_Refman = NULL;
   aux_SyntaxTreeVariable_1_Dynamic = NULL;
-  CHECK_REF(614, argument, argument_Refman)
-  CHECK_REF(614, argument->variable, argument->variable_Refman)
+  CHECK_REF(623, argument, argument_Refman)
+  CHECK_REF(623, argument->variable, argument->variable_Refman)
   LUMI_err = tl5_compiler_M_string_new_copy(name, name_Refman, &(argument->variable->name), &(argument->variable->name_Refman));
-  CHECK(614)
-  CHECK_REF(615, argument, argument_Refman)
-  CHECK_REF(615, argument->variable, argument->variable_Refman)
+  CHECK(623)
+  CHECK_REF(624, argument, argument_Refman)
+  CHECK_REF(624, argument->variable, argument->variable_Refman)
   argument->variable->access = access;
-  CHECK_REF(617, argument, argument_Refman)
-  CHECK_REF(617, argument->variable, argument->variable_Refman)
+  CHECK_REF(626, argument, argument_Refman)
+  CHECK_REF(626, argument->variable, argument->variable_Refman)
   LUMI_err = tl5_compiler_M_TypeData_new_type_instance(argument_type, argument_type_Refman, argument_type_Dynamic, &(argument->variable->type_instance), &(argument->variable->type_instance_Refman));
-  CHECK(616)
+  CHECK(625)
   if (argument_subtype != NULL && argument_subtype_Refman->value != NULL) {
-    INIT_NEW(619, aux_List_0, LUMI_alloc(sizeof(tl5_compiler_M_List)));
+    INIT_NEW(628, aux_List_0, LUMI_alloc(sizeof(tl5_compiler_M_List)));
     aux_List_1 = aux_List_0;
     aux_List_1_Refman = aux_List_0_Refman;
     aux_List_0 = NULL;
     aux_List_0_Refman = NULL;
-    CHECK_REF(619, argument, argument_Refman)
-    CHECK_REF(619, argument->variable, argument->variable_Refman)
-    CHECK_REF(619, argument->variable->type_instance, argument->variable->type_instance_Refman)
+    CHECK_REF(628, argument, argument_Refman)
+    CHECK_REF(628, argument->variable, argument->variable_Refman)
+    CHECK_REF(628, argument->variable->type_instance, argument->variable->type_instance_Refman)
     tl5_compiler_M_List_Del(argument->variable->type_instance->parameters);
     LUMI_owner_dec_ref(argument->variable->type_instance->parameters_Refman);
     argument->variable->type_instance->parameters_Refman = aux_List_1_Refman;
     argument->variable->type_instance->parameters = aux_List_1;
     aux_List_1 = NULL;
     aux_List_1_Refman = NULL;
-    CHECK_REF(620, argument, argument_Refman)
-    CHECK_REF(620, argument->variable, argument->variable_Refman)
-    CHECK_REF(620, argument->variable->type_instance, argument->variable->type_instance_Refman)
+    CHECK_REF(629, argument, argument_Refman)
+    CHECK_REF(629, argument->variable, argument->variable_Refman)
+    CHECK_REF(629, argument->variable->type_instance, argument->variable->type_instance_Refman)
     LUMI_err = tl5_compiler_M_TypeData_new_type_instance(argument_subtype, argument_subtype_Refman, argument_subtype_Dynamic, &(aux_TypeInstance_0), &(aux_TypeInstance_0_Refman));
-    CHECK(620)
+    CHECK(629)
     LUMI_err = tl5_compiler_M_List_add(argument->variable->type_instance->parameters, argument->variable->type_instance->parameters_Refman, aux_TypeInstance_0, aux_TypeInstance_0_Refman, &tl5_compiler_M_TypeInstance_dynamic);
     aux_TypeInstance_0 = NULL;
     aux_TypeInstance_0_Refman = NULL;
-    CHECK(620)
+    CHECK(629)
   }
-  CHECK_REF(622, argument_type, argument_type_Refman)
+  CHECK_REF(631, argument_type, argument_type_Refman)
   if (is_output && (! argument_type->is_primitive)) {
-    CHECK_REF(623, argument, argument_Refman)
-    CHECK_REF(623, argument->variable, argument->variable_Refman)
-    CHECK_REF(623, argument->variable->type_instance, argument->variable->type_instance_Refman)
+    CHECK_REF(632, argument, argument_Refman)
+    CHECK_REF(632, argument->variable, argument->variable_Refman)
+    CHECK_REF(632, argument->variable->type_instance, argument->variable->type_instance_Refman)
     argument->variable->type_instance->conditional = true;
   }
   if ((access == tl5_compiler_M_Access_OWNER) || (access == tl5_compiler_M_Access_STRONG)) {
-    CHECK_REF(625, function, function_Refman)
-    CHECK_REF(625, argument, argument_Refman)
-    CHECK_REF(625, argument->variable, argument->variable_Refman)
+    CHECK_REF(634, function, function_Refman)
+    CHECK_REF(634, argument, argument_Refman)
+    CHECK_REF(634, argument->variable, argument->variable_Refman)
     LUMI_err = tl5_compiler_M_DeleteGroup_add_deleting(function->delete_group, function->delete_group_Refman, argument->variable->type_instance, argument->variable->type_instance_Refman);
-    CHECK(625)
+    CHECK(634)
   }
   LUMI_err = tl5_compiler_M_List_add(argument_list, argument_list_Refman, &(argument->_base), argument_Refman, (void*)&(argument_Dynamic->_base));
   argument = NULL;
   argument_Refman = NULL;
   argument_Dynamic = NULL;
-  CHECK(626)
+  CHECK(635)
 LUMI_cleanup:
   tl5_compiler_M_TypeInstance_Del(aux_TypeInstance_0);
   LUMI_owner_dec_ref(aux_TypeInstance_0_Refman);
@@ -30000,19 +30069,19 @@ Returncode tl5_compiler_M_Global_find_type(tl5_compiler_M_Global* self, Ref_Mana
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
-  CHECK_REF(629, self, self_Refman)
+  CHECK_REF(638, self, self_Refman)
   if (self->current_module != NULL && self->current_module_Refman->value != NULL) {
-    CHECK_REF(630, self, self_Refman)
-    CHECK_REF(630, self->current_module, self->current_module_Refman)
+    CHECK_REF(639, self, self_Refman)
+    CHECK_REF(639, self->current_module, self->current_module_Refman)
     LUMI_err = tl5_compiler_M_NameMap_find(&(self->current_module->type_map), self->current_module_Refman, name, name_Refman, (void*)&(*type_data), &(*type_data_Refman), (void*)&(*type_data_Dynamic));
-    CHECK(630)
+    CHECK(639)
     if ((*type_data) != NULL && (*type_data_Refman)->value != NULL) {
       goto LUMI_cleanup;
     }
   }
-  CHECK_REF(632, self, self_Refman)
+  CHECK_REF(641, self, self_Refman)
   LUMI_err = tl5_compiler_M_NameMap_find(&(self->global_module.type_map), self_Refman, name, name_Refman, (void*)&(*type_data), &(*type_data_Refman), (void*)&(*type_data_Dynamic));
-  CHECK(632)
+  CHECK(641)
 LUMI_cleanup:
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(self_Refman);
@@ -30027,16 +30096,16 @@ Returncode tl5_compiler_M_Global_find_variable(tl5_compiler_M_Global* self, Ref_
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
-  CHECK_REF(635, self, self_Refman)
-  CHECK_REF(635, self->current_module, self->current_module_Refman)
+  CHECK_REF(644, self, self_Refman)
+  CHECK_REF(644, self->current_module, self->current_module_Refman)
   LUMI_err = tl5_compiler_M_NameMap_find(&(self->current_module->variable_map), self->current_module_Refman, name, name_Refman, (void*)&(*variable), &(*variable_Refman), (void*)&(*variable_Dynamic));
-  CHECK(635)
+  CHECK(644)
   if ((*variable) != NULL && (*variable_Refman)->value != NULL) {
     goto LUMI_cleanup;
   }
-  CHECK_REF(637, self, self_Refman)
+  CHECK_REF(646, self, self_Refman)
   LUMI_err = tl5_compiler_M_NameMap_find(&(self->global_module.variable_map), self_Refman, name, name_Refman, (void*)&(*variable), &(*variable_Refman), (void*)&(*variable_Dynamic));
-  CHECK(637)
+  CHECK(646)
 LUMI_cleanup:
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(self_Refman);
@@ -30051,16 +30120,16 @@ Returncode tl5_compiler_M_Global_find_function(tl5_compiler_M_Global* self, Ref_
   Returncode LUMI_err = OK;
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(name_Refman);
-  CHECK_REF(640, self, self_Refman)
-  CHECK_REF(640, self->current_module, self->current_module_Refman)
+  CHECK_REF(649, self, self_Refman)
+  CHECK_REF(649, self->current_module, self->current_module_Refman)
   LUMI_err = tl5_compiler_M_NameMap_find(&(self->current_module->function_map), self->current_module_Refman, name, name_Refman, (void*)&(*function), &(*function_Refman), (void*)&(*function_Dynamic));
-  CHECK(640)
+  CHECK(649)
   if ((*function) != NULL && (*function_Refman)->value != NULL) {
     goto LUMI_cleanup;
   }
-  CHECK_REF(642, self, self_Refman)
+  CHECK_REF(651, self, self_Refman)
   LUMI_err = tl5_compiler_M_NameMap_find(&(self->global_module.function_map), self_Refman, name, name_Refman, (void*)&(*function), &(*function_Refman), (void*)&(*function_Dynamic));
-  CHECK(642)
+  CHECK(651)
 LUMI_cleanup:
   LUMI_dec_ref(name_Refman);
   LUMI_dec_ref(self_Refman);
@@ -30072,6 +30141,7 @@ LUMI_cleanup:
 void tl5_compiler_M_Global_Del(tl5_compiler_M_Global* self) {
   if (self == NULL) return;
   LUMI_dec_ref(self->string_copy_function_Refman);
+  LUMI_dec_ref(self->type_pointer_Refman);
   LUMI_dec_ref(self->type_sys_Refman);
   LUMI_dec_ref(self->type_file_Refman);
   LUMI_dec_ref(self->type_module_Refman);
@@ -33245,13 +33315,16 @@ Returncode tl5_compiler_M_TypeInstance_check_parameters(tl5_compiler_M_TypeInsta
   String aux_String_7_Var = {0};
   String* aux_String_7 = NULL;
   Ref_Manager* aux_String_7_Refman = NULL;
-  Bool aux_Bool_1 = 0;
   String aux_String_8_Var = {0};
   String* aux_String_8 = NULL;
   Ref_Manager* aux_String_8_Refman = NULL;
+  Bool aux_Bool_1 = 0;
   String aux_String_9_Var = {0};
   String* aux_String_9 = NULL;
   Ref_Manager* aux_String_9_Refman = NULL;
+  String aux_String_10_Var = {0};
+  String* aux_String_10 = NULL;
+  Ref_Manager* aux_String_10_Refman = NULL;
   Ref_Manager* aux_Ref_Manager = NULL;
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(node_Refman);
@@ -33332,31 +33405,46 @@ Returncode tl5_compiler_M_TypeInstance_check_parameters(tl5_compiler_M_TypeInsta
         LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error(node, node_Refman, node_Dynamic, aux_String_4, aux_String_4_Refman, self->type_data->name, self->type_data->name_Refman);
         CHECK(174)
       }
-      CHECK_REF(177, sub_type, sub_type_Refman)
-      CHECK_REF(177, sub_type->type_data, sub_type->type_data_Refman)
-      if (sub_type->type_data->is_primitive) {
-        INIT_STRING_CONST(179, aux_String_5, "unsupported primitive parameter type");
-        CHECK_REF(180, sub_type, sub_type_Refman)
-        CHECK_REF(180, sub_type->type_data, sub_type->type_data_Refman)
-        LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error(node, node_Refman, node_Dynamic, aux_String_5, aux_String_5_Refman, sub_type->type_data->name, sub_type->type_data->name_Refman);
-        CHECK(178)
+      CHECK_REF(177, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+      CHECK_REF(177, self, self_Refman)
+      if ((void*)self->type_data == tl5_compiler_M_glob->type_pointer) {
+        CHECK_REF(178, sub_type, sub_type_Refman)
+        CHECK_REF(178, sub_type->type_data, sub_type->type_data_Refman)
+        if (! sub_type->type_data->is_primitive) {
+          INIT_STRING_CONST(180, aux_String_5, "non primitive pointed type");
+          CHECK_REF(181, sub_type, sub_type_Refman)
+          CHECK_REF(181, sub_type->type_data, sub_type->type_data_Refman)
+          LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error(node, node_Refman, node_Dynamic, aux_String_5, aux_String_5_Refman, sub_type->type_data->name, sub_type->type_data->name_Refman);
+          CHECK(179)
+        }
       }
-      CHECK_REF(181, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-      CHECK_REF(181, sub_type, sub_type_Refman)
+      else {
+          CHECK_REF(182, sub_type, sub_type_Refman)
+          CHECK_REF(182, sub_type->type_data, sub_type->type_data_Refman)
+          if (sub_type->type_data->is_primitive) {
+            INIT_STRING_CONST(184, aux_String_6, "unsupported primitive parameter type");
+            CHECK_REF(185, sub_type, sub_type_Refman)
+            CHECK_REF(185, sub_type->type_data, sub_type->type_data_Refman)
+            LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error(node, node_Refman, node_Dynamic, aux_String_6, aux_String_6_Refman, sub_type->type_data->name, sub_type->type_data->name_Refman);
+            CHECK(183)
+          }
+        }
+      CHECK_REF(186, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+      CHECK_REF(186, sub_type, sub_type_Refman)
       if ((void*)sub_type->type_data == tl5_compiler_M_glob->type_array) {
-        INIT_STRING_CONST(182, aux_String_6, "array as parameter type is unsupported");
-        LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(node, node_Refman, node_Dynamic, aux_String_6, aux_String_6_Refman);
-        CHECK(182)
-      }
-      CHECK_REF(183, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-      CHECK_REF(183, sub_type, sub_type_Refman)
-      if ((void*)sub_type->type_data == tl5_compiler_M_glob->type_string) {
-        INIT_STRING_CONST(184, aux_String_7, "string as parameter type is unsupported");
+        INIT_STRING_CONST(187, aux_String_7, "array as parameter type is unsupported");
         LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(node, node_Refman, node_Dynamic, aux_String_7, aux_String_7_Refman);
-        CHECK(184)
+        CHECK(187)
+      }
+      CHECK_REF(188, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+      CHECK_REF(188, sub_type, sub_type_Refman)
+      if ((void*)sub_type->type_data == tl5_compiler_M_glob->type_string) {
+        INIT_STRING_CONST(189, aux_String_8, "string as parameter type is unsupported");
+        LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(node, node_Refman, node_Dynamic, aux_String_8, aux_String_8_Refman);
+        CHECK(189)
       }
       LUMI_err = tl5_compiler_M_ListIterator_next(param_iter, param_iter_Refman);
-      CHECK(185)
+      CHECK(190)
       LUMI_err = tl5_compiler_M_ListIterator_next(aux_ListIterator_1, aux_ListIterator_1_Refman);
           CHECK(172)
         }
@@ -33367,27 +33455,28 @@ Returncode tl5_compiler_M_TypeInstance_check_parameters(tl5_compiler_M_TypeInsta
         aux_Ref_Manager = NULL;
         aux_ListIterator_1 = NULL;
         LUMI_err = tl5_compiler_M_ListIterator_has(param_iter, param_iter_Refman, &(aux_Bool_1));
-        CHECK(186)
+        CHECK(191)
         if (aux_Bool_1) {
-      INIT_STRING_CONST(188, aux_String_8, "too few parameter given for type");
-      CHECK_REF(188, self, self_Refman)
-      CHECK_REF(188, self->type_data, self->type_data_Refman)
-      LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error(node, node_Refman, node_Dynamic, aux_String_8, aux_String_8_Refman, self->type_data->name, self->type_data->name_Refman);
-      CHECK(187)
+      INIT_STRING_CONST(193, aux_String_9, "too few parameter given for type");
+      CHECK_REF(193, self, self_Refman)
+      CHECK_REF(193, self->type_data, self->type_data_Refman)
+      LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error(node, node_Refman, node_Dynamic, aux_String_9, aux_String_9_Refman, self->type_data->name, self->type_data->name_Refman);
+      CHECK(192)
     }
       }
       else {
-        CHECK_REF(189, self, self_Refman)
-        CHECK_REF(189, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-        CHECK_REF(189, self, self_Refman)
+        CHECK_REF(194, self, self_Refman)
+        CHECK_REF(194, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+        CHECK_REF(194, self, self_Refman)
         if (((void*)self->type_data == tl5_compiler_M_glob->type_func) && (! (self->arguments != NULL && self->arguments_Refman->value != NULL))) {
-          INIT_STRING_CONST(190, aux_String_9, "missing arguments in function type");
-          LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(node, node_Refman, node_Dynamic, aux_String_9, aux_String_9_Refman);
-          CHECK(190)
+          INIT_STRING_CONST(195, aux_String_10, "missing arguments in function type");
+          LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(node, node_Refman, node_Dynamic, aux_String_10, aux_String_10_Refman);
+          CHECK(195)
         }
       }
     }
 LUMI_cleanup:
+  LUMI_var_dec_ref(aux_String_10_Refman);
   LUMI_var_dec_ref(aux_String_9_Refman);
   LUMI_var_dec_ref(aux_String_8_Refman);
   LUMI_var_dec_ref(aux_String_7_Refman);
@@ -33423,7 +33512,7 @@ Returncode tl5_compiler_M_TypeInstance_can_be_assigned_to(tl5_compiler_M_TypeIns
 #undef RETURN_ERROR
 #define RETURN_ERROR break
     LUMI_err = tl5_compiler_M_TypeInstance_check_assign_to(self, self_Refman, tl5_compiler_M_Access_VAR, target, target_Refman, tl5_compiler_M_Access_VAR, NULL, NULL, NULL, &(aux_Int_0));
-    CHECK(195)
+    CHECK(200)
     *can = true;
 
 #undef RETURN_ERROR
@@ -33455,28 +33544,28 @@ Returncode tl5_compiler_M_TypeInstance_check_assign_from(tl5_compiler_M_TypeInst
   tl5_compiler_M_Expression_Dynamic* aux_Expression_0_Dynamic = NULL;
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(node_Refman);
-  CHECK_REF(201, *value, (*value_Refman))
+  CHECK_REF(206, *value, (*value_Refman))
   if (((*value)->access == tl5_compiler_M_Access_OWNER) && (access == tl5_compiler_M_Access_STRONG)) {
-    INIT_STRING_CONST(202, aux_String_0, "ignoring initialization error check");
+    INIT_STRING_CONST(207, aux_String_0, "ignoring initialization error check");
     LUMI_err = tl5_compiler_M_Expression_check_error_propagated(*value, *value_Refman, *value_Dynamic, aux_String_0, aux_String_0_Refman);
-    CHECK(202)
+    CHECK(207)
   }
-  CHECK_REF(204, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-  CHECK_REF(204, self, self_Refman)
-  CHECK_REF(204, self, self_Refman)
+  CHECK_REF(209, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+  CHECK_REF(209, self, self_Refman)
+  CHECK_REF(209, self, self_Refman)
   LUMI_err = tl5_compiler_M_SyntaxTreeNode_check_expression_errors(node, node_Refman, node_Dynamic, (! self->conditional) && ((void*)self->type_data != tl5_compiler_M_glob->type_ref), access != tl5_compiler_M_Access_WEAK, &(*value), &(*value_Refman), &(*value_Dynamic));
-  CHECK(203)
-  CHECK_REF(208, *value, (*value_Refman))
-  CHECK_REF(209, *value, (*value_Refman))
-  LUMI_err = tl5_compiler_M_TypeInstance_check_assign_to((*value)->result_type, (*value)->result_type_Refman, (*value)->access, self, self_Refman, access, node, node_Refman, node_Dynamic, &(bases));
   CHECK(208)
+  CHECK_REF(213, *value, (*value_Refman))
+  CHECK_REF(214, *value, (*value_Refman))
+  LUMI_err = tl5_compiler_M_TypeInstance_check_assign_to((*value)->result_type, (*value)->result_type_Refman, (*value)->access, self, self_Refman, access, node, node_Refman, node_Dynamic, &(bases));
+  CHECK(213)
   if (bases > 0) {
-    INIT_NEW(211, aux_UpCastExpression_0, LUMI_alloc(sizeof(tl5_compiler_M_UpCastExpression)));
+    INIT_NEW(216, aux_UpCastExpression_0, LUMI_alloc(sizeof(tl5_compiler_M_UpCastExpression)));
     LUMI_err = tl5_compiler_M_UpCastExpression_new(aux_UpCastExpression_0, aux_UpCastExpression_0_Refman, aux_UpCastExpression_0_Dynamic, *value, *value_Refman, *value_Dynamic, bases);
     *value = NULL;
     *value_Refman = NULL;
     *value_Dynamic = NULL;
-    CHECK(211)
+    CHECK(216)
     aux_Expression_0 = &(aux_UpCastExpression_0->_base._base);
     aux_Expression_0_Refman = aux_UpCastExpression_0_Refman;
     aux_Expression_0_Dynamic = &(aux_UpCastExpression_0_Dynamic->_base._base);
@@ -33572,145 +33661,145 @@ Returncode tl5_compiler_M_TypeInstance_check_assign_to(tl5_compiler_M_TypeInstan
   LUMI_inc_ref(node_Refman);
   *bases = 0;
   if (! (self != NULL && self_Refman->value != NULL)) {
-    TEST_ASSERT(221, node != NULL && node_Refman->value != NULL)
-    INIT_STRING_CONST(222, aux_String_0, "cannot assign void expression");
+    TEST_ASSERT(226, node != NULL && node_Refman->value != NULL)
+    INIT_STRING_CONST(227, aux_String_0, "cannot assign void expression");
     LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(node, node_Refman, node_Dynamic, aux_String_0, aux_String_0_Refman);
-    CHECK(222)
+    CHECK(227)
   }
-  CHECK_REF(225, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-  CHECK_REF(225, target, target_Refman)
-  CHECK_REF(224, target, target_Refman)
-  CHECK_REF(224, target->type_data, target->type_data_Refman)
-  CHECK_REF(223, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-  CHECK_REF(223, self, self_Refman)
+  CHECK_REF(230, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+  CHECK_REF(230, target, target_Refman)
+  CHECK_REF(229, target, target_Refman)
+  CHECK_REF(229, target->type_data, target->type_data_Refman)
+  CHECK_REF(228, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+  CHECK_REF(228, self, self_Refman)
   if (((void*)self->type_data == tl5_compiler_M_glob->type_empty) && ((! target->type_data->is_primitive) || ((void*)target->type_data == tl5_compiler_M_glob->type_func))) {
-    CHECK_REF(226, target, target_Refman)
+    CHECK_REF(231, target, target_Refman)
     if (! target->conditional) {
-      TEST_ASSERT(227, node != NULL && node_Refman->value != NULL)
-      INIT_STRING_CONST(229, aux_String_1, "assigning empty into non-conditional type");
-      CHECK_REF(230, target, target_Refman)
-      CHECK_REF(230, target->type_data, target->type_data_Refman)
+      TEST_ASSERT(232, node != NULL && node_Refman->value != NULL)
+      INIT_STRING_CONST(234, aux_String_1, "assigning empty into non-conditional type");
+      CHECK_REF(235, target, target_Refman)
+      CHECK_REF(235, target->type_data, target->type_data_Refman)
       LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error(node, node_Refman, node_Dynamic, aux_String_1, aux_String_1_Refman, target->type_data->name, target->type_data->name_Refman);
-      CHECK(228)
+      CHECK(233)
     }
     goto LUMI_cleanup;
   }
-  CHECK_REF(232, self, self_Refman)
-  CHECK_REF(232, self->type_data, self->type_data_Refman)
-  CHECK_REF(232, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-  CHECK_REF(232, target, target_Refman)
+  CHECK_REF(237, self, self_Refman)
+  CHECK_REF(237, self->type_data, self->type_data_Refman)
+  CHECK_REF(237, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+  CHECK_REF(237, target, target_Refman)
   if (((void*)target->type_data == tl5_compiler_M_glob->type_ref) && (! self->type_data->is_primitive)) {
     goto LUMI_cleanup;
   }
   LUMI_err = tl5_compiler_M_access_is_owner(target_access, &(aux_Bool_0));
-  CHECK(234)
+  CHECK(239)
   if (aux_Bool_0) {
     LUMI_err = tl5_compiler_M_access_is_owner(self_access, &(aux_Bool_1));
-    CHECK(235)
+    CHECK(240)
     if (! aux_Bool_1) {
-      TEST_ASSERT(236, node != NULL && node_Refman->value != NULL)
-      INIT_STRING_CONST(238, aux_String_2, "assigning into an owner a non-owner access");
-      CHECK_REF(239, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-      CHECK_REF(239, tl5_compiler_M_glob->access_names, tl5_compiler_M_glob->access_names_Refman)
-      if ((self_access) < 0 || (self_access) >= (tl5_compiler_M_glob->access_names)->length) RAISE(239, slice_index)
+      TEST_ASSERT(241, node != NULL && node_Refman->value != NULL)
+      INIT_STRING_CONST(243, aux_String_2, "assigning into an owner a non-owner access");
+      CHECK_REF(244, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+      CHECK_REF(244, tl5_compiler_M_glob->access_names, tl5_compiler_M_glob->access_names_Refman)
+      if ((self_access) < 0 || (self_access) >= (tl5_compiler_M_glob->access_names)->length) RAISE(244, slice_index)
       LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error(node, node_Refman, node_Dynamic, aux_String_2, aux_String_2_Refman, ((String*)((tl5_compiler_M_glob->access_names)->values)) + self_access, tl5_compiler_M_glob->access_names_Refman);
-      CHECK(237)
+      CHECK(242)
     }
-    CHECK_REF(243, target, target_Refman)
-    CHECK_REF(243, target->type_data, target->type_data_Refman)
-    CHECK_REF(242, target, target_Refman)
-    CHECK_REF(242, target->type_data, target->type_data_Refman)
-    CHECK_REF(241, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-    CHECK_REF(241, self, self_Refman)
-    CHECK_REF(240, target, target_Refman)
-    CHECK_REF(240, self, self_Refman)
+    CHECK_REF(248, target, target_Refman)
+    CHECK_REF(248, target->type_data, target->type_data_Refman)
+    CHECK_REF(247, target, target_Refman)
+    CHECK_REF(247, target->type_data, target->type_data_Refman)
+    CHECK_REF(246, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+    CHECK_REF(246, self, self_Refman)
+    CHECK_REF(245, target, target_Refman)
+    CHECK_REF(245, self, self_Refman)
     if (((((void*)self->type_data != target->type_data) && ((void*)self->type_data != tl5_compiler_M_glob->type_empty)) && (! target->type_data->is_primitive)) && (! target->type_data->is_dynamic)) {
-      TEST_ASSERT(244, node != NULL && node_Refman->value != NULL)
-      INIT_STRING_CONST(246, aux_String_3, "passing ownership of type");
-      CHECK_REF(247, self, self_Refman)
-      CHECK_REF(247, self->type_data, self->type_data_Refman)
-      INIT_STRING_CONST(248, aux_String_4, "into static type");
-      CHECK_REF(249, target, target_Refman)
-      CHECK_REF(249, target->type_data, target->type_data_Refman)
-      LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error2(node, node_Refman, node_Dynamic, aux_String_3, aux_String_3_Refman, self->type_data->name, self->type_data->name_Refman, aux_String_4, aux_String_4_Refman, target->type_data->name, target->type_data->name_Refman);
-      CHECK(245)
-    }
-    CHECK_REF(250, self, self_Refman)
-    if (self->reference_path != NULL && self->reference_path_Refman->value != NULL) {
+      TEST_ASSERT(249, node != NULL && node_Refman->value != NULL)
+      INIT_STRING_CONST(251, aux_String_3, "passing ownership of type");
       CHECK_REF(252, self, self_Refman)
+      CHECK_REF(252, self->type_data, self->type_data_Refman)
+      INIT_STRING_CONST(253, aux_String_4, "into static type");
+      CHECK_REF(254, target, target_Refman)
+      CHECK_REF(254, target->type_data, target->type_data_Refman)
+      LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error2(node, node_Refman, node_Dynamic, aux_String_3, aux_String_3_Refman, self->type_data->name, self->type_data->name_Refman, aux_String_4, aux_String_4_Refman, target->type_data->name, target->type_data->name_Refman);
+      CHECK(250)
+    }
+    CHECK_REF(255, self, self_Refman)
+    if (self->reference_path != NULL && self->reference_path_Refman->value != NULL) {
+      CHECK_REF(257, self, self_Refman)
       LUMI_err = tl5_compiler_M_ReferencePath_is_conditional(self->reference_path, self->reference_path_Refman, &(aux_Bool_2));
-      CHECK(251)
-      CHECK_REF(251, self, self_Refman)
-      CHECK_REF(251, self->reference_path, self->reference_path_Refman)
+      CHECK(256)
+      CHECK_REF(256, self, self_Refman)
+      CHECK_REF(256, self->reference_path, self->reference_path_Refman)
       if ((self->reference_path->field != NULL && self->reference_path->field_Refman->value != NULL) && (! aux_Bool_2)) {
-        TEST_ASSERT(253, node != NULL && node_Refman->value != NULL)
-        INIT_STRING_CONST(255, aux_String_5, "cannot move non-conditional owner field");
-        CHECK_REF(256, self, self_Refman)
+        TEST_ASSERT(258, node != NULL && node_Refman->value != NULL)
+        INIT_STRING_CONST(260, aux_String_5, "cannot move non-conditional owner field");
+        CHECK_REF(261, self, self_Refman)
         LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error_ref(node, node_Refman, node_Dynamic, aux_String_5, aux_String_5_Refman, self->reference_path, self->reference_path_Refman);
-        CHECK(254)
+        CHECK(259)
       }
     }
   }
   LUMI_err = tl5_compiler_M_access_is_user(self_access, &(aux_Bool_3));
-  CHECK(257)
+  CHECK(262)
   LUMI_err = tl5_compiler_M_access_is_only_var(target_access, &(aux_Bool_4));
-  CHECK(257)
+  CHECK(262)
   if ((aux_Bool_4 && aux_Bool_3) || ((target_access == tl5_compiler_M_Access_S_VAR) && (self_access == tl5_compiler_M_Access_VAR))) {
-    TEST_ASSERT(260, node != NULL && node_Refman->value != NULL)
-    INIT_STRING_CONST(262, aux_String_6, "cannot assign value with access");
-    CHECK_REF(263, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-    CHECK_REF(263, tl5_compiler_M_glob->access_names, tl5_compiler_M_glob->access_names_Refman)
-    if ((self_access) < 0 || (self_access) >= (tl5_compiler_M_glob->access_names)->length) RAISE(263, slice_index)
-    INIT_STRING_CONST(264, aux_String_7, "into value with access");
-    CHECK_REF(265, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-    CHECK_REF(265, tl5_compiler_M_glob->access_names, tl5_compiler_M_glob->access_names_Refman)
-    if ((target_access) < 0 || (target_access) >= (tl5_compiler_M_glob->access_names)->length) RAISE(265, slice_index)
-    LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error2(node, node_Refman, node_Dynamic, aux_String_6, aux_String_6_Refman, ((String*)((tl5_compiler_M_glob->access_names)->values)) + self_access, tl5_compiler_M_glob->access_names_Refman, aux_String_7, aux_String_7_Refman, ((String*)((tl5_compiler_M_glob->access_names)->values)) + target_access, tl5_compiler_M_glob->access_names_Refman);
-    CHECK(261)
-  }
-  LUMI_err = tl5_compiler_M_access_has_refman(self_access, &(aux_Bool_5));
-  CHECK(266)
-  if ((target_access == tl5_compiler_M_Access_WEAK) && (! aux_Bool_5)) {
-    TEST_ASSERT(267, node != NULL && node_Refman->value != NULL)
-    INIT_STRING_CONST(269, aux_String_8, "assigning into a weak reference an illegal access");
+    TEST_ASSERT(265, node != NULL && node_Refman->value != NULL)
+    INIT_STRING_CONST(267, aux_String_6, "cannot assign value with access");
+    CHECK_REF(268, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+    CHECK_REF(268, tl5_compiler_M_glob->access_names, tl5_compiler_M_glob->access_names_Refman)
+    if ((self_access) < 0 || (self_access) >= (tl5_compiler_M_glob->access_names)->length) RAISE(268, slice_index)
+    INIT_STRING_CONST(269, aux_String_7, "into value with access");
     CHECK_REF(270, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
     CHECK_REF(270, tl5_compiler_M_glob->access_names, tl5_compiler_M_glob->access_names_Refman)
-    if ((self_access) < 0 || (self_access) >= (tl5_compiler_M_glob->access_names)->length) RAISE(270, slice_index)
-    LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error(node, node_Refman, node_Dynamic, aux_String_8, aux_String_8_Refman, ((String*)((tl5_compiler_M_glob->access_names)->values)) + self_access, tl5_compiler_M_glob->access_names_Refman);
-    CHECK(268)
+    if ((target_access) < 0 || (target_access) >= (tl5_compiler_M_glob->access_names)->length) RAISE(270, slice_index)
+    LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error2(node, node_Refman, node_Dynamic, aux_String_6, aux_String_6_Refman, ((String*)((tl5_compiler_M_glob->access_names)->values)) + self_access, tl5_compiler_M_glob->access_names_Refman, aux_String_7, aux_String_7_Refman, ((String*)((tl5_compiler_M_glob->access_names)->values)) + target_access, tl5_compiler_M_glob->access_names_Refman);
+    CHECK(266)
   }
-  CHECK_REF(272, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-  CHECK_REF(272, target, target_Refman)
-  CHECK_REF(271, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-  CHECK_REF(271, self, self_Refman)
-  if (((void*)self->type_data == tl5_compiler_M_glob->type_generic) && ((void*)target->type_data == tl5_compiler_M_glob->type_generic)) {
-    CHECK_REF(273, self, self_Refman)
-    CHECK_REF(273, target, target_Refman)
-    LUMI_err = String_equal(self->name, self->name_Refman, target->name, target->name_Refman, &(aux_Bool_6));
+  LUMI_err = tl5_compiler_M_access_has_refman(self_access, &(aux_Bool_5));
+  CHECK(271)
+  if ((target_access == tl5_compiler_M_Access_WEAK) && (! aux_Bool_5)) {
+    TEST_ASSERT(272, node != NULL && node_Refman->value != NULL)
+    INIT_STRING_CONST(274, aux_String_8, "assigning into a weak reference an illegal access");
+    CHECK_REF(275, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+    CHECK_REF(275, tl5_compiler_M_glob->access_names, tl5_compiler_M_glob->access_names_Refman)
+    if ((self_access) < 0 || (self_access) >= (tl5_compiler_M_glob->access_names)->length) RAISE(275, slice_index)
+    LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error(node, node_Refman, node_Dynamic, aux_String_8, aux_String_8_Refman, ((String*)((tl5_compiler_M_glob->access_names)->values)) + self_access, tl5_compiler_M_glob->access_names_Refman);
     CHECK(273)
+  }
+  CHECK_REF(277, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+  CHECK_REF(277, target, target_Refman)
+  CHECK_REF(276, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+  CHECK_REF(276, self, self_Refman)
+  if (((void*)self->type_data == tl5_compiler_M_glob->type_generic) && ((void*)target->type_data == tl5_compiler_M_glob->type_generic)) {
+    CHECK_REF(278, self, self_Refman)
+    CHECK_REF(278, target, target_Refman)
+    LUMI_err = String_equal(self->name, self->name_Refman, target->name, target->name_Refman, &(aux_Bool_6));
+    CHECK(278)
     if (! aux_Bool_6) {
-      TEST_ASSERT(274, node != NULL && node_Refman->value != NULL)
-      INIT_STRING_CONST(276, aux_String_9, "cannot assign generic subtype");
-      CHECK_REF(277, self, self_Refman)
-      INIT_STRING_CONST(278, aux_String_10, "into different generic subtype");
-      CHECK_REF(279, target, target_Refman)
+      TEST_ASSERT(279, node != NULL && node_Refman->value != NULL)
+      INIT_STRING_CONST(281, aux_String_9, "cannot assign generic subtype");
+      CHECK_REF(282, self, self_Refman)
+      INIT_STRING_CONST(283, aux_String_10, "into different generic subtype");
+      CHECK_REF(284, target, target_Refman)
       LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error2(node, node_Refman, node_Dynamic, aux_String_9, aux_String_9_Refman, self->name, self->name_Refman, aux_String_10, aux_String_10_Refman, target->name, target->name_Refman);
-      CHECK(275)
+      CHECK(280)
     }
   }
   LUMI_err = tl5_compiler_M_access_is_owner(target_access, &(aux_Bool_7));
-  CHECK(280)
-  CHECK_REF(281, target, target_Refman)
-  CHECK_REF(281, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-  CHECK_REF(281, target, target_Refman)
-  CHECK_REF(280, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-  CHECK_REF(280, self, self_Refman)
+  CHECK(285)
+  CHECK_REF(286, target, target_Refman)
+  CHECK_REF(286, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+  CHECK_REF(286, target, target_Refman)
+  CHECK_REF(285, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+  CHECK_REF(285, self, self_Refman)
   if (((((void*)self->type_data == tl5_compiler_M_glob->type_string) && ((void*)target->type_data == tl5_compiler_M_glob->type_array)) && (target->parameters != NULL && target->parameters_Refman->value != NULL)) && (! aux_Bool_7)) {
-    CHECK_REF(283, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-    CHECK_REF(283, target, target_Refman)
-    CHECK_REF(283, target->parameters, target->parameters_Refman)
-    CHECK_REF(283, target->parameters->first, target->parameters->first_Refman)
-    CHECK_REF(283, target->parameters->first->item, target->parameters->first->item_Refman)
+    CHECK_REF(288, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+    CHECK_REF(288, target, target_Refman)
+    CHECK_REF(288, target->parameters, target->parameters_Refman)
+    CHECK_REF(288, target->parameters->first, target->parameters->first_Refman)
+    CHECK_REF(288, target->parameters->first->item, target->parameters->first->item_Refman)
     if ((void*)((tl5_compiler_M_TypeInstance*)(target->parameters->first->item))->type_data == tl5_compiler_M_glob->type_char) {
       goto LUMI_cleanup;
     }
@@ -33719,32 +33808,32 @@ Returncode tl5_compiler_M_TypeInstance_check_assign_to(tl5_compiler_M_TypeInstan
   self_type_instance_Refman = self_Refman;
   LUMI_inc_ref(self_type_instance_Refman);
   while (true) {
-    CHECK_REF(288, target, target_Refman)
-    CHECK_REF(288, self_type_instance, self_type_instance_Refman)
+    CHECK_REF(293, target, target_Refman)
+    CHECK_REF(293, self_type_instance, self_type_instance_Refman)
     LUMI_err = tl5_compiler_M_TypeData_is_same(target->type_data, target->type_data_Refman, target->type_data_Dynamic, self_type_instance->type_data, self_type_instance->type_data_Refman, self_type_instance->type_data_Dynamic, &(aux_Bool_8));
-    CHECK(288)
+    CHECK(293)
     if (!(! aux_Bool_8)) break;
-    CHECK_REF(289, self_type_instance, self_type_instance_Refman)
-    CHECK_REF(289, self_type_instance->type_data, self_type_instance->type_data_Refman)
+    CHECK_REF(294, self_type_instance, self_type_instance_Refman)
+    CHECK_REF(294, self_type_instance->type_data, self_type_instance->type_data_Refman)
     if (! (self_type_instance->type_data->base_type != NULL && self_type_instance->type_data->base_type_Refman->value != NULL)) {
-      TEST_ASSERT(290, node != NULL && node_Refman->value != NULL)
-      INIT_STRING_CONST(292, aux_String_11, "cannot assign");
-      CHECK_REF(293, self, self_Refman)
-      CHECK_REF(293, self->type_data, self->type_data_Refman)
-      INIT_STRING_CONST(294, aux_String_12, "into");
-      CHECK_REF(295, target, target_Refman)
-      CHECK_REF(295, target->type_data, target->type_data_Refman)
+      TEST_ASSERT(295, node != NULL && node_Refman->value != NULL)
+      INIT_STRING_CONST(297, aux_String_11, "cannot assign");
+      CHECK_REF(298, self, self_Refman)
+      CHECK_REF(298, self->type_data, self->type_data_Refman)
+      INIT_STRING_CONST(299, aux_String_12, "into");
+      CHECK_REF(300, target, target_Refman)
+      CHECK_REF(300, target->type_data, target->type_data_Refman)
       LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error2(node, node_Refman, node_Dynamic, aux_String_11, aux_String_11_Refman, self->type_data->name, self->type_data->name_Refman, aux_String_12, aux_String_12_Refman, target->type_data->name, target->type_data->name_Refman);
-      CHECK(291)
+      CHECK(296)
     }
     prev_base_type_instance = base_type_instance;
     prev_base_type_instance_Refman = base_type_instance_Refman;
     base_type_instance = NULL;
     base_type_instance_Refman = NULL;
-    CHECK_REF(297, self_type_instance, self_type_instance_Refman)
-    CHECK_REF(297, self_type_instance->type_data, self_type_instance->type_data_Refman)
+    CHECK_REF(302, self_type_instance, self_type_instance_Refman)
+    CHECK_REF(302, self_type_instance->type_data, self_type_instance->type_data_Refman)
     LUMI_err = tl5_compiler_M_TypeInstance_new_replace_params_extended(self_type_instance->type_data->base_type, self_type_instance->type_data->base_type_Refman, self_type_instance, self_type_instance_Refman, false, &(base_type_instance), &(base_type_instance_Refman));
-    CHECK(297)
+    CHECK(302)
     aux_Ref_Manager = self_type_instance_Refman;
     self_type_instance_Refman = base_type_instance_Refman;
     LUMI_inc_ref(self_type_instance_Refman);
@@ -33753,34 +33842,34 @@ Returncode tl5_compiler_M_TypeInstance_check_assign_to(tl5_compiler_M_TypeInstan
     self_type_instance = base_type_instance;
     *bases += 1;
   }
-  CHECK_REF(301, target, target_Refman)
-  CHECK_REF(301, self, self_Refman)
+  CHECK_REF(306, target, target_Refman)
+  CHECK_REF(306, self, self_Refman)
   if (self->conditional && (! target->conditional)) {
-    TEST_ASSERT(302, node != NULL && node_Refman->value != NULL)
-    INIT_STRING_CONST(304, aux_String_13, "assigning conditional into non-conditional type");
-    CHECK_REF(305, target, target_Refman)
-    CHECK_REF(305, target->type_data, target->type_data_Refman)
+    TEST_ASSERT(307, node != NULL && node_Refman->value != NULL)
+    INIT_STRING_CONST(309, aux_String_13, "assigning conditional into non-conditional type");
+    CHECK_REF(310, target, target_Refman)
+    CHECK_REF(310, target->type_data, target->type_data_Refman)
     LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error(node, node_Refman, node_Dynamic, aux_String_13, aux_String_13_Refman, target->type_data->name, target->type_data->name_Refman);
-    CHECK(303)
-  }
-  CHECK_REF(307, self, self_Refman)
-  if (self->arguments != NULL && self->arguments_Refman->value != NULL) {
-    CHECK_REF(308, self, self_Refman)
-    CHECK_REF(308, target, target_Refman)
-    LUMI_err = tl5_compiler_M_FunctionArguments_check_same_as(self->arguments, self->arguments_Refman, self->arguments_Dynamic, target->arguments, target->arguments_Refman, target->arguments_Dynamic, node != NULL && node_Refman->value != NULL);
     CHECK(308)
   }
-  CHECK_REF(310, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-  CHECK_REF(310, target, target_Refman)
-  CHECK_REF(310, target, target_Refman)
-  CHECK_REF(310, target->type_data, target->type_data_Refman)
+  CHECK_REF(312, self, self_Refman)
+  if (self->arguments != NULL && self->arguments_Refman->value != NULL) {
+    CHECK_REF(313, self, self_Refman)
+    CHECK_REF(313, target, target_Refman)
+    LUMI_err = tl5_compiler_M_FunctionArguments_check_same_as(self->arguments, self->arguments_Refman, self->arguments_Dynamic, target->arguments, target->arguments_Refman, target->arguments_Dynamic, node != NULL && node_Refman->value != NULL);
+    CHECK(313)
+  }
+  CHECK_REF(315, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+  CHECK_REF(315, target, target_Refman)
+  CHECK_REF(315, target, target_Refman)
+  CHECK_REF(315, target->type_data, target->type_data_Refman)
   if (target->type_data->is_primitive || ((void*)target->type_data == tl5_compiler_M_glob->type_array)) {
     LUMI_err = tl5_compiler_M_TypeInstance_check_sub_equal(self_type_instance, self_type_instance_Refman, target, target_Refman, node, node_Refman, node_Dynamic);
-    CHECK(311)
+    CHECK(316)
   }
   else {
       LUMI_err = tl5_compiler_M_TypeInstance_check_sub_assign_to(self_type_instance, self_type_instance_Refman, target, target_Refman, node, node_Refman, node_Dynamic);
-      CHECK(313)
+      CHECK(318)
     }
 LUMI_cleanup:
   LUMI_var_dec_ref(aux_String_13_Refman);
@@ -33833,21 +33922,21 @@ Returncode tl5_compiler_M_TypeInstance_check_sub_assign_to(tl5_compiler_M_TypeIn
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(target_Refman);
   LUMI_inc_ref(node_Refman);
-  CHECK_REF(317, target, target_Refman)
+  CHECK_REF(322, target, target_Refman)
   if (! (target->parameters != NULL && target->parameters_Refman->value != NULL)) {
     goto LUMI_cleanup;
   }
-  CHECK_REF(319, target, target_Refman)
-  INIT_VAR(319, target_iter)
+  CHECK_REF(324, target, target_Refman)
+  INIT_VAR(324, target_iter)
   LUMI_err = tl5_compiler_M_ListIterator_new(target_iter, target_iter_Refman, target->parameters, target->parameters_Refman);
-  CHECK(319)
+  CHECK(324)
   LUMI_err = tl5_compiler_M_ListIterator_get(target_iter, target_iter_Refman, (void*)&(aux_TypeInstance_0), &(aux_TypeInstance_0_Refman), &dynamic_Void);
-  CHECK(320)
+  CHECK(325)
   LUMI_err = tl5_compiler_M_TypeInstance_check_has_subytpe(self, self_Refman, aux_TypeInstance_0, aux_TypeInstance_0_Refman, node, node_Refman, node_Dynamic);
-  CHECK(320)
-  CHECK_REF(321, self, self_Refman)
+  CHECK(325)
+  CHECK_REF(326, self, self_Refman)
   LUMI_err = tl5_compiler_M_List_iter(self->parameters, self->parameters_Refman, &(aux_ListIterator_0), &(aux_ListIterator_0_Refman));
-  CHECK(321)
+  CHECK(326)
   aux_Ref_Manager = aux_ListIterator_1_Refman;
   aux_ListIterator_1_Refman = aux_ListIterator_0_Refman;
   LUMI_inc_ref(aux_ListIterator_1_Refman);
@@ -33857,21 +33946,21 @@ Returncode tl5_compiler_M_TypeInstance_check_sub_assign_to(tl5_compiler_M_TypeIn
   while (true) {
     Bool my_sub_type_Has = false;
     LUMI_err = tl5_compiler_M_ListIterator_has(aux_ListIterator_1, aux_ListIterator_1_Refman, &(my_sub_type_Has));
-    CHECK(321)
+    CHECK(326)
     if (!my_sub_type_Has) break;
     LUMI_err = tl5_compiler_M_ListIterator_get(aux_ListIterator_1, aux_ListIterator_1_Refman, (void*)&(my_sub_type), &(my_sub_type_Refman), &dynamic_Void);
-    CHECK(321)
+    CHECK(326)
     LUMI_err = tl5_compiler_M_ListIterator_has(target_iter, target_iter_Refman, &(aux_Bool_0));
-    CHECK(322)
+    CHECK(327)
     if (!(aux_Bool_0)) break;
     LUMI_err = tl5_compiler_M_ListIterator_get(target_iter, target_iter_Refman, (void*)&(aux_TypeInstance_1), &(aux_TypeInstance_1_Refman), &dynamic_Void);
-    CHECK(323)
-    LUMI_err = tl5_compiler_M_TypeInstance_check_assign_to(my_sub_type, my_sub_type_Refman, tl5_compiler_M_Access_VAR, aux_TypeInstance_1, aux_TypeInstance_1_Refman, tl5_compiler_M_Access_VAR, node, node_Refman, node_Dynamic, &(aux_Int_0));
-    CHECK(323)
-    LUMI_err = tl5_compiler_M_ListIterator_next(target_iter, target_iter_Refman);
     CHECK(328)
+    LUMI_err = tl5_compiler_M_TypeInstance_check_assign_to(my_sub_type, my_sub_type_Refman, tl5_compiler_M_Access_VAR, aux_TypeInstance_1, aux_TypeInstance_1_Refman, tl5_compiler_M_Access_VAR, node, node_Refman, node_Dynamic, &(aux_Int_0));
+    CHECK(328)
+    LUMI_err = tl5_compiler_M_ListIterator_next(target_iter, target_iter_Refman);
+    CHECK(333)
     LUMI_err = tl5_compiler_M_ListIterator_next(aux_ListIterator_1, aux_ListIterator_1_Refman);
-    CHECK(321)
+    CHECK(326)
   }
   aux_Ref_Manager = aux_ListIterator_1_Refman;
   aux_ListIterator_1_Refman = NULL;
@@ -33908,17 +33997,17 @@ Returncode tl5_compiler_M_TypeInstance_check_has_subytpe(tl5_compiler_M_TypeInst
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(target_sub_type_Refman);
   LUMI_inc_ref(node_Refman);
-  CHECK_REF(332, self, self_Refman)
+  CHECK_REF(337, self, self_Refman)
   if (! (self->parameters != NULL && self->parameters_Refman->value != NULL)) {
-    TEST_ASSERT(333, node != NULL && node_Refman->value != NULL)
-    INIT_STRING_CONST(335, aux_String_0, "cannot assign type");
-    CHECK_REF(336, self, self_Refman)
-    CHECK_REF(336, self->type_data, self->type_data_Refman)
-    INIT_STRING_CONST(337, aux_String_1, "with no parameter into same type with parameter");
-    CHECK_REF(338, target_sub_type, target_sub_type_Refman)
-    CHECK_REF(338, target_sub_type->type_data, target_sub_type->type_data_Refman)
+    TEST_ASSERT(338, node != NULL && node_Refman->value != NULL)
+    INIT_STRING_CONST(340, aux_String_0, "cannot assign type");
+    CHECK_REF(341, self, self_Refman)
+    CHECK_REF(341, self->type_data, self->type_data_Refman)
+    INIT_STRING_CONST(342, aux_String_1, "with no parameter into same type with parameter");
+    CHECK_REF(343, target_sub_type, target_sub_type_Refman)
+    CHECK_REF(343, target_sub_type->type_data, target_sub_type->type_data_Refman)
     LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error2(node, node_Refman, node_Dynamic, aux_String_0, aux_String_0_Refman, self->type_data->name, self->type_data->name_Refman, aux_String_1, aux_String_1_Refman, target_sub_type->type_data->name, target_sub_type->type_data->name_Refman);
-    CHECK(334)
+    CHECK(339)
   }
 LUMI_cleanup:
   LUMI_var_dec_ref(aux_String_1_Refman);
@@ -33947,31 +34036,31 @@ Returncode tl5_compiler_M_TypeInstance_check_equal(tl5_compiler_M_TypeInstance* 
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(other_Refman);
   LUMI_inc_ref(node_Refman);
-  CHECK_REF(341, other, other_Refman)
-  CHECK_REF(341, self, self_Refman)
+  CHECK_REF(346, other, other_Refman)
+  CHECK_REF(346, self, self_Refman)
   if ((void*)self->type_data != other->type_data) {
-    TEST_ASSERT(342, node != NULL && node_Refman->value != NULL)
-    INIT_STRING_CONST(344, aux_String_0, "non matching types");
-    CHECK_REF(345, self, self_Refman)
-    CHECK_REF(345, self->type_data, self->type_data_Refman)
-    INIT_STRING_CONST(346, aux_String_1, "and");
-    CHECK_REF(347, other, other_Refman)
-    CHECK_REF(347, other->type_data, other->type_data_Refman)
+    TEST_ASSERT(347, node != NULL && node_Refman->value != NULL)
+    INIT_STRING_CONST(349, aux_String_0, "non matching types");
+    CHECK_REF(350, self, self_Refman)
+    CHECK_REF(350, self->type_data, self->type_data_Refman)
+    INIT_STRING_CONST(351, aux_String_1, "and");
+    CHECK_REF(352, other, other_Refman)
+    CHECK_REF(352, other->type_data, other->type_data_Refman)
     LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error2(node, node_Refman, node_Dynamic, aux_String_0, aux_String_0_Refman, self->type_data->name, self->type_data->name_Refman, aux_String_1, aux_String_1_Refman, other->type_data->name, other->type_data->name_Refman);
-    CHECK(343)
+    CHECK(348)
   }
-  CHECK_REF(348, other, other_Refman)
-  CHECK_REF(348, self, self_Refman)
+  CHECK_REF(353, other, other_Refman)
+  CHECK_REF(353, self, self_Refman)
   if (self->conditional != other->conditional) {
-    TEST_ASSERT(349, node != NULL && node_Refman->value != NULL)
-    INIT_STRING_CONST(351, aux_String_2, "conditionals not matching in type");
-    CHECK_REF(351, self, self_Refman)
-    CHECK_REF(351, self->type_data, self->type_data_Refman)
+    TEST_ASSERT(354, node != NULL && node_Refman->value != NULL)
+    INIT_STRING_CONST(356, aux_String_2, "conditionals not matching in type");
+    CHECK_REF(356, self, self_Refman)
+    CHECK_REF(356, self->type_data, self->type_data_Refman)
     LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error(node, node_Refman, node_Dynamic, aux_String_2, aux_String_2_Refman, self->type_data->name, self->type_data->name_Refman);
-    CHECK(350)
+    CHECK(355)
   }
   LUMI_err = tl5_compiler_M_TypeInstance_check_sub_equal(self, self_Refman, other, other_Refman, node, node_Refman, node_Dynamic);
-  CHECK(352)
+  CHECK(357)
 LUMI_cleanup:
   LUMI_var_dec_ref(aux_String_2_Refman);
   LUMI_var_dec_ref(aux_String_1_Refman);
@@ -34012,21 +34101,21 @@ Returncode tl5_compiler_M_TypeInstance_check_sub_equal(tl5_compiler_M_TypeInstan
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(target_Refman);
   LUMI_inc_ref(node_Refman);
-  CHECK_REF(355, target, target_Refman)
+  CHECK_REF(360, target, target_Refman)
   if (! (target->parameters != NULL && target->parameters_Refman->value != NULL)) {
     goto LUMI_cleanup;
   }
-  CHECK_REF(357, target, target_Refman)
-  INIT_VAR(357, target_iter)
+  CHECK_REF(362, target, target_Refman)
+  INIT_VAR(362, target_iter)
   LUMI_err = tl5_compiler_M_ListIterator_new(target_iter, target_iter_Refman, target->parameters, target->parameters_Refman);
-  CHECK(357)
+  CHECK(362)
   LUMI_err = tl5_compiler_M_ListIterator_get(target_iter, target_iter_Refman, (void*)&(aux_TypeInstance_0), &(aux_TypeInstance_0_Refman), &dynamic_Void);
-  CHECK(358)
+  CHECK(363)
   LUMI_err = tl5_compiler_M_TypeInstance_check_has_subytpe(self, self_Refman, aux_TypeInstance_0, aux_TypeInstance_0_Refman, node, node_Refman, node_Dynamic);
-  CHECK(358)
-  CHECK_REF(359, self, self_Refman)
+  CHECK(363)
+  CHECK_REF(364, self, self_Refman)
   LUMI_err = tl5_compiler_M_List_iter(self->parameters, self->parameters_Refman, &(aux_ListIterator_0), &(aux_ListIterator_0_Refman));
-  CHECK(359)
+  CHECK(364)
   aux_Ref_Manager = aux_ListIterator_1_Refman;
   aux_ListIterator_1_Refman = aux_ListIterator_0_Refman;
   LUMI_inc_ref(aux_ListIterator_1_Refman);
@@ -34036,34 +34125,34 @@ Returncode tl5_compiler_M_TypeInstance_check_sub_equal(tl5_compiler_M_TypeInstan
   while (true) {
     Bool my_sub_type_Has = false;
     LUMI_err = tl5_compiler_M_ListIterator_has(aux_ListIterator_1, aux_ListIterator_1_Refman, &(my_sub_type_Has));
-    CHECK(359)
+    CHECK(364)
     if (!my_sub_type_Has) break;
     LUMI_err = tl5_compiler_M_ListIterator_get(aux_ListIterator_1, aux_ListIterator_1_Refman, (void*)&(my_sub_type), &(my_sub_type_Refman), &dynamic_Void);
-    CHECK(359)
+    CHECK(364)
     LUMI_err = tl5_compiler_M_ListIterator_has(target_iter, target_iter_Refman, &(aux_Bool_0));
-    CHECK(360)
+    CHECK(365)
     if (!(aux_Bool_0)) break;
     LUMI_err = tl5_compiler_M_ListIterator_get(target_iter, target_iter_Refman, (void*)&(target_sub_type), &(target_sub_type_Refman), &dynamic_Void);
-    CHECK(362)
-    CHECK_REF(363, target_sub_type, target_sub_type_Refman)
-    CHECK_REF(363, my_sub_type, my_sub_type_Refman)
+    CHECK(367)
+    CHECK_REF(368, target_sub_type, target_sub_type_Refman)
+    CHECK_REF(368, my_sub_type, my_sub_type_Refman)
     if ((void*)my_sub_type->type_data != target_sub_type->type_data) {
-      TEST_ASSERT(364, node != NULL && node_Refman->value != NULL)
-      INIT_STRING_CONST(366, aux_String_0, "non matching subtypes");
-      CHECK_REF(367, my_sub_type, my_sub_type_Refman)
-      CHECK_REF(367, my_sub_type->type_data, my_sub_type->type_data_Refman)
-      INIT_STRING_CONST(368, aux_String_1, "and");
-      CHECK_REF(369, target_sub_type, target_sub_type_Refman)
-      CHECK_REF(369, target_sub_type->type_data, target_sub_type->type_data_Refman)
+      TEST_ASSERT(369, node != NULL && node_Refman->value != NULL)
+      INIT_STRING_CONST(371, aux_String_0, "non matching subtypes");
+      CHECK_REF(372, my_sub_type, my_sub_type_Refman)
+      CHECK_REF(372, my_sub_type->type_data, my_sub_type->type_data_Refman)
+      INIT_STRING_CONST(373, aux_String_1, "and");
+      CHECK_REF(374, target_sub_type, target_sub_type_Refman)
+      CHECK_REF(374, target_sub_type->type_data, target_sub_type->type_data_Refman)
       LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error2(node, node_Refman, node_Dynamic, aux_String_0, aux_String_0_Refman, my_sub_type->type_data->name, my_sub_type->type_data->name_Refman, aux_String_1, aux_String_1_Refman, target_sub_type->type_data->name, target_sub_type->type_data->name_Refman);
-      CHECK(365)
+      CHECK(370)
     }
     LUMI_err = tl5_compiler_M_TypeInstance_check_sub_equal(my_sub_type, my_sub_type_Refman, target_sub_type, target_sub_type_Refman, node, node_Refman, node_Dynamic);
-    CHECK(370)
+    CHECK(375)
     LUMI_err = tl5_compiler_M_ListIterator_next(target_iter, target_iter_Refman);
-    CHECK(371)
+    CHECK(376)
     LUMI_err = tl5_compiler_M_ListIterator_next(aux_ListIterator_1, aux_ListIterator_1_Refman);
-    CHECK(359)
+    CHECK(364)
   }
   aux_Ref_Manager = aux_ListIterator_1_Refman;
   aux_ListIterator_1_Refman = NULL;
@@ -34101,34 +34190,34 @@ Returncode tl5_compiler_M_TypeInstance_check_sequence(tl5_compiler_M_TypeInstanc
   Ref_Manager* aux_String_1_Refman = NULL;
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(node_Refman);
-  CHECK_REF(375, self, self_Refman)
-  CHECK_REF(375, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-  CHECK_REF(375, self, self_Refman)
-  CHECK_REF(374, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-  CHECK_REF(374, self, self_Refman)
+  CHECK_REF(380, self, self_Refman)
+  CHECK_REF(380, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+  CHECK_REF(380, self, self_Refman)
+  CHECK_REF(379, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+  CHECK_REF(379, self, self_Refman)
   if ((((void*)self->type_data == tl5_compiler_M_glob->type_array) || ((void*)self->type_data == tl5_compiler_M_glob->type_string)) && (! (self->length != NULL && self->length_Refman->value != NULL))) {
-    TEST_ASSERT(376, node != NULL && node_Refman->value != NULL)
-    INIT_STRING_CONST(377, aux_String_0, "missing length for sequence");
+    TEST_ASSERT(381, node != NULL && node_Refman->value != NULL)
+    INIT_STRING_CONST(382, aux_String_0, "missing length for sequence");
     LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(node, node_Refman, node_Dynamic, aux_String_0, aux_String_0_Refman);
-    CHECK(377)
+    CHECK(382)
   }
-  CHECK_REF(378, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-  CHECK_REF(378, self, self_Refman)
+  CHECK_REF(383, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+  CHECK_REF(383, self, self_Refman)
   if ((void*)self->type_data == tl5_compiler_M_glob->type_array) {
-    CHECK_REF(380, self, self_Refman)
-    CHECK_REF(380, self->parameters, self->parameters_Refman)
-    CHECK_REF(380, self->parameters->first, self->parameters->first_Refman)
-    CHECK_REF(380, self->parameters->first->item, self->parameters->first->item_Refman)
-    CHECK_REF(379, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-    CHECK_REF(379, self, self_Refman)
-    CHECK_REF(379, self->parameters, self->parameters_Refman)
-    CHECK_REF(379, self->parameters->first, self->parameters->first_Refman)
-    CHECK_REF(379, self->parameters->first->item, self->parameters->first->item_Refman)
+    CHECK_REF(385, self, self_Refman)
+    CHECK_REF(385, self->parameters, self->parameters_Refman)
+    CHECK_REF(385, self->parameters->first, self->parameters->first_Refman)
+    CHECK_REF(385, self->parameters->first->item, self->parameters->first->item_Refman)
+    CHECK_REF(384, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+    CHECK_REF(384, self, self_Refman)
+    CHECK_REF(384, self->parameters, self->parameters_Refman)
+    CHECK_REF(384, self->parameters->first, self->parameters->first_Refman)
+    CHECK_REF(384, self->parameters->first->item, self->parameters->first->item_Refman)
     if (((void*)((tl5_compiler_M_TypeInstance*)(self->parameters->first->item))->type_data == tl5_compiler_M_glob->type_string) && (! (((tl5_compiler_M_TypeInstance*)(self->parameters->first->item))->length != NULL && ((tl5_compiler_M_TypeInstance*)(self->parameters->first->item))->length_Refman->value != NULL))) {
-      TEST_ASSERT(381, node != NULL && node_Refman->value != NULL)
-      INIT_STRING_CONST(382, aux_String_1, "missing length for sequence");
+      TEST_ASSERT(386, node != NULL && node_Refman->value != NULL)
+      INIT_STRING_CONST(387, aux_String_1, "missing length for sequence");
       LUMI_err = tl5_compiler_M_SyntaxTreeNode_syntax_error_msg(node, node_Refman, node_Dynamic, aux_String_1, aux_String_1_Refman);
-      CHECK(382)
+      CHECK(387)
     }
   }
 LUMI_cleanup:
@@ -34155,24 +34244,24 @@ Returncode tl5_compiler_M_TypeInstance_get_array_data_type_depth(tl5_compiler_M_
   *data_type = self;
   *depth = 0;
   while (true) {
-    CHECK_REF(388, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-    CHECK_REF(388, *data_type, (*data_type_Refman))
+    CHECK_REF(393, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+    CHECK_REF(393, *data_type, (*data_type_Refman))
     if (!((void*)(*data_type)->type_data == tl5_compiler_M_glob->type_array)) break;
-    CHECK_REF(389, *data_type, (*data_type_Refman))
+    CHECK_REF(394, *data_type, (*data_type_Refman))
     if (!((*data_type)->parameters != NULL && (*data_type)->parameters_Refman->value != NULL)) break;
-    CHECK_REF(390, *data_type, (*data_type_Refman))
-    CHECK_REF(390, (*data_type)->parameters, (*data_type)->parameters_Refman)
-    CHECK_REF(390, (*data_type)->parameters->first, (*data_type)->parameters->first_Refman)
+    CHECK_REF(395, *data_type, (*data_type_Refman))
+    CHECK_REF(395, (*data_type)->parameters, (*data_type)->parameters_Refman)
+    CHECK_REF(395, (*data_type)->parameters->first, (*data_type)->parameters->first_Refman)
     aux_Ref_Manager = *data_type_Refman;
     *data_type_Refman = (*data_type)->parameters->first->item_Refman;
     LUMI_inc_ref(*data_type_Refman);
     LUMI_dec_ref(aux_Ref_Manager);
     aux_Ref_Manager = NULL;
     *data_type = (*data_type)->parameters->first->item;
-    CHECK_REF(392, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-    CHECK_REF(392, *data_type, (*data_type_Refman))
-    CHECK_REF(391, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-    CHECK_REF(391, *data_type, (*data_type_Refman))
+    CHECK_REF(397, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+    CHECK_REF(397, *data_type, (*data_type_Refman))
+    CHECK_REF(396, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+    CHECK_REF(396, *data_type, (*data_type_Refman))
     if (!(((void*)(*data_type)->type_data == tl5_compiler_M_glob->type_array) || ((void*)(*data_type)->type_data == tl5_compiler_M_glob->type_string))) break;
     *depth += 1;
   }
@@ -34190,7 +34279,7 @@ Returncode tl5_compiler_M_TypeInstance_new_replace_params(tl5_compiler_M_TypeIns
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(actual_params_Refman);
   LUMI_err = tl5_compiler_M_TypeInstance_new_replace_params_extended(self, self_Refman, actual_params, actual_params_Refman, true, &(*type_instance), &(*type_instance_Refman));
-  CHECK(399)
+  CHECK(404)
 LUMI_cleanup:
   LUMI_dec_ref(actual_params_Refman);
   LUMI_dec_ref(self_Refman);
@@ -34206,10 +34295,10 @@ Returncode tl5_compiler_M_TypeInstance_new_replace_params_extended(tl5_compiler_
   LUMI_inc_ref(self_Refman);
   LUMI_inc_ref(actual_params_Refman);
   LUMI_err = tl5_compiler_M_TypeInstance_copy_new(self, self_Refman, &(*type_instance), &(*type_instance_Refman));
-  CHECK(405)
+  CHECK(410)
   if ((*type_instance) != NULL && (*type_instance_Refman)->value != NULL) {
     LUMI_err = tl5_compiler_M_TypeInstance_replace_type_parameters(*type_instance, *type_instance_Refman, actual_params, actual_params_Refman, replace_bases);
-    CHECK(407)
+    CHECK(412)
   }
 LUMI_cleanup:
   LUMI_dec_ref(actual_params_Refman);
@@ -34251,30 +34340,30 @@ Returncode tl5_compiler_M_TypeInstance_replace_type_parameters(tl5_compiler_M_Ty
   if (! (actual_params != NULL && actual_params_Refman->value != NULL)) {
     goto LUMI_cleanup;
   }
-  CHECK_REF(414, actual_params, actual_params_Refman)
-  CHECK_REF(414, actual_params->type_data, actual_params->type_data_Refman)
-  if (replace_bases && (actual_params->type_data->base_type != NULL && actual_params->type_data->base_type_Refman->value != NULL)) {
-    CHECK_REF(416, actual_params, actual_params_Refman)
-    CHECK_REF(416, actual_params->type_data, actual_params->type_data_Refman)
-    LUMI_err = tl5_compiler_M_TypeInstance_new_replace_params_extended(actual_params->type_data->base_type, actual_params->type_data->base_type_Refman, actual_params, actual_params_Refman, false, &(base_type), &(base_type_Refman));
-    CHECK(416)
-    LUMI_err = tl5_compiler_M_TypeInstance_replace_type_parameters(self, self_Refman, base_type, base_type_Refman, true);
-    CHECK(418)
-  }
-  CHECK_REF(420, actual_params, actual_params_Refman)
-  CHECK_REF(420, actual_params->type_data, actual_params->type_data_Refman)
   CHECK_REF(419, actual_params, actual_params_Refman)
-  CHECK_REF(419, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
-  CHECK_REF(419, self, self_Refman)
-  if ((((void*)self->type_data == tl5_compiler_M_glob->type_generic) && (actual_params->parameters != NULL && actual_params->parameters_Refman->value != NULL)) && (actual_params->type_data->parameters != NULL && actual_params->type_data->parameters_Refman->value != NULL)) {
-    CHECK_REF(422, actual_params, actual_params_Refman)
-    CHECK_REF(422, actual_params->type_data, actual_params->type_data_Refman)
-    INIT_VAR(421, dec_iter)
-    LUMI_err = tl5_compiler_M_ListIterator_new(dec_iter, dec_iter_Refman, actual_params->type_data->parameters, actual_params->type_data->parameters_Refman);
+  CHECK_REF(419, actual_params->type_data, actual_params->type_data_Refman)
+  if (replace_bases && (actual_params->type_data->base_type != NULL && actual_params->type_data->base_type_Refman->value != NULL)) {
+    CHECK_REF(421, actual_params, actual_params_Refman)
+    CHECK_REF(421, actual_params->type_data, actual_params->type_data_Refman)
+    LUMI_err = tl5_compiler_M_TypeInstance_new_replace_params_extended(actual_params->type_data->base_type, actual_params->type_data->base_type_Refman, actual_params, actual_params_Refman, false, &(base_type), &(base_type_Refman));
     CHECK(421)
-    CHECK_REF(423, actual_params, actual_params_Refman)
-    LUMI_err = tl5_compiler_M_List_iter(actual_params->parameters, actual_params->parameters_Refman, &(aux_ListIterator_0), &(aux_ListIterator_0_Refman));
+    LUMI_err = tl5_compiler_M_TypeInstance_replace_type_parameters(self, self_Refman, base_type, base_type_Refman, true);
     CHECK(423)
+  }
+  CHECK_REF(425, actual_params, actual_params_Refman)
+  CHECK_REF(425, actual_params->type_data, actual_params->type_data_Refman)
+  CHECK_REF(424, actual_params, actual_params_Refman)
+  CHECK_REF(424, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+  CHECK_REF(424, self, self_Refman)
+  if ((((void*)self->type_data == tl5_compiler_M_glob->type_generic) && (actual_params->parameters != NULL && actual_params->parameters_Refman->value != NULL)) && (actual_params->type_data->parameters != NULL && actual_params->type_data->parameters_Refman->value != NULL)) {
+    CHECK_REF(427, actual_params, actual_params_Refman)
+    CHECK_REF(427, actual_params->type_data, actual_params->type_data_Refman)
+    INIT_VAR(426, dec_iter)
+    LUMI_err = tl5_compiler_M_ListIterator_new(dec_iter, dec_iter_Refman, actual_params->type_data->parameters, actual_params->type_data->parameters_Refman);
+    CHECK(426)
+    CHECK_REF(428, actual_params, actual_params_Refman)
+    LUMI_err = tl5_compiler_M_List_iter(actual_params->parameters, actual_params->parameters_Refman, &(aux_ListIterator_0), &(aux_ListIterator_0_Refman));
+    CHECK(428)
     aux_Ref_Manager = aux_ListIterator_1_Refman;
     aux_ListIterator_1_Refman = aux_ListIterator_0_Refman;
     LUMI_inc_ref(aux_ListIterator_1_Refman);
@@ -34284,31 +34373,31 @@ Returncode tl5_compiler_M_TypeInstance_replace_type_parameters(tl5_compiler_M_Ty
     while (true) {
       Bool inst_param_Has = false;
       LUMI_err = tl5_compiler_M_ListIterator_has(aux_ListIterator_1, aux_ListIterator_1_Refman, &(inst_param_Has));
-      CHECK(423)
+      CHECK(428)
       if (!inst_param_Has) break;
       LUMI_err = tl5_compiler_M_ListIterator_get(aux_ListIterator_1, aux_ListIterator_1_Refman, (void*)&(inst_param), &(inst_param_Refman), &dynamic_Void);
-      CHECK(423)
+      CHECK(428)
       LUMI_err = tl5_compiler_M_ListIterator_has(dec_iter, dec_iter_Refman, &(aux_Bool_0));
-      CHECK(424)
+      CHECK(429)
       if (!(aux_Bool_0)) break;
       LUMI_err = tl5_compiler_M_ListIterator_get(dec_iter, dec_iter_Refman, (void*)&(aux_String_0), &(aux_String_0_Refman), &dynamic_Void);
-      CHECK(425)
-      CHECK_REF(425, self, self_Refman)
+      CHECK(430)
+      CHECK_REF(430, self, self_Refman)
       LUMI_err = String_equal(aux_String_0, aux_String_0_Refman, self->name, self->name_Refman, &(aux_Bool_1));
-      CHECK(425)
+      CHECK(430)
       if (aux_Bool_1) {
-        CHECK_REF(426, self, self_Refman)
+        CHECK_REF(431, self, self_Refman)
         conditional = self->conditional;
         LUMI_err = tl5_compiler_M_TypeInstance_copy(inst_param, inst_param_Refman, self, self_Refman);
-        CHECK(427)
-        CHECK_REF(428, self, self_Refman)
+        CHECK(432)
+        CHECK_REF(433, self, self_Refman)
         self->conditional = conditional;
         break;
       }
       LUMI_err = tl5_compiler_M_ListIterator_next(dec_iter, dec_iter_Refman);
-      CHECK(430)
+      CHECK(435)
       LUMI_err = tl5_compiler_M_ListIterator_next(aux_ListIterator_1, aux_ListIterator_1_Refman);
-      CHECK(423)
+      CHECK(428)
     }
     aux_Ref_Manager = aux_ListIterator_1_Refman;
     aux_ListIterator_1_Refman = NULL;
@@ -34317,11 +34406,11 @@ Returncode tl5_compiler_M_TypeInstance_replace_type_parameters(tl5_compiler_M_Ty
     aux_Ref_Manager = NULL;
     aux_ListIterator_1 = NULL;
   }
-  CHECK_REF(431, self, self_Refman)
+  CHECK_REF(436, self, self_Refman)
   if (self->parameters != NULL && self->parameters_Refman->value != NULL) {
-    CHECK_REF(432, self, self_Refman)
+    CHECK_REF(437, self, self_Refman)
     LUMI_err = tl5_compiler_M_List_iter(self->parameters, self->parameters_Refman, &(aux_ListIterator_2), &(aux_ListIterator_2_Refman));
-    CHECK(432)
+    CHECK(437)
     aux_Ref_Manager = aux_ListIterator_3_Refman;
     aux_ListIterator_3_Refman = aux_ListIterator_2_Refman;
     LUMI_inc_ref(aux_ListIterator_3_Refman);
@@ -34331,14 +34420,14 @@ Returncode tl5_compiler_M_TypeInstance_replace_type_parameters(tl5_compiler_M_Ty
     while (true) {
       Bool parameter_Has = false;
       LUMI_err = tl5_compiler_M_ListIterator_has(aux_ListIterator_3, aux_ListIterator_3_Refman, &(parameter_Has));
-      CHECK(432)
+      CHECK(437)
       if (!parameter_Has) break;
       LUMI_err = tl5_compiler_M_ListIterator_get(aux_ListIterator_3, aux_ListIterator_3_Refman, (void*)&(parameter), &(parameter_Refman), &dynamic_Void);
-      CHECK(432)
+      CHECK(437)
       LUMI_err = tl5_compiler_M_TypeInstance_replace_type_parameters(parameter, parameter_Refman, actual_params, actual_params_Refman, replace_bases);
-      CHECK(433)
+      CHECK(438)
       LUMI_err = tl5_compiler_M_ListIterator_next(aux_ListIterator_3, aux_ListIterator_3_Refman);
-      CHECK(432)
+      CHECK(437)
     }
     aux_Ref_Manager = aux_ListIterator_3_Refman;
     aux_ListIterator_3_Refman = NULL;
@@ -34361,6 +34450,39 @@ LUMI_cleanup:
   tl5_compiler_M_TypeInstance_Del(base_type);
   LUMI_owner_dec_ref(base_type_Refman);
   LUMI_dec_ref(actual_params_Refman);
+  LUMI_dec_ref(self_Refman);
+  return LUMI_err;
+}
+#undef LUMI_FILE_NAME
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FILE_NAME "TL5/global/type-instance.4.lm"
+#define LUMI_FUNC_NAME "TypeInstance.write-cname"
+Returncode tl5_compiler_M_TypeInstance_write_cname(tl5_compiler_M_TypeInstance* self, Ref_Manager* self_Refman) {
+  Returncode LUMI_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  LUMI_inc_ref(self_Refman);
+  CHECK_REF(442, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
+  CHECK_REF(442, self, self_Refman)
+  if ((void*)self->type_data == tl5_compiler_M_glob->type_pointer) {
+    CHECK_REF(443, self, self_Refman)
+    CHECK_REF(443, self->parameters, self->parameters_Refman)
+    CHECK_REF(443, self->parameters->first, self->parameters->first_Refman)
+    LUMI_err = tl5_compiler_M_TypeInstance_write_cname(self->parameters->first->item, self->parameters->first->item_Refman);
+    CHECK(443)
+    INIT_STRING_CONST(444, aux_String_0, "*");
+    LUMI_err = tl5_compiler_M_write(aux_String_0, aux_String_0_Refman);
+    CHECK(444)
+  }
+  else {
+      CHECK_REF(446, self, self_Refman)
+      LUMI_err = tl5_compiler_M_TypeData_write_cname(self->type_data, self->type_data_Refman, self->type_data_Dynamic);
+      CHECK(446)
+    }
+LUMI_cleanup:
+  LUMI_var_dec_ref(aux_String_0_Refman);
   LUMI_dec_ref(self_Refman);
   return LUMI_err;
 }
@@ -39323,8 +39445,7 @@ Returncode tl5_compiler_M_DeclarationArgument_write(tl5_compiler_M_DeclarationAr
       else {
         CHECK_REF(558, self, self_Refman)
         CHECK_REF(558, self->variable, self->variable_Refman)
-        CHECK_REF(558, self->variable->type_instance, self->variable->type_instance_Refman)
-        LUMI_err = tl5_compiler_M_TypeData_write_cname(self->variable->type_instance->type_data, self->variable->type_instance->type_data_Refman, self->variable->type_instance->type_data_Dynamic);
+        LUMI_err = tl5_compiler_M_TypeInstance_write_cname(self->variable->type_instance, self->variable->type_instance_Refman);
         CHECK(558)
         CHECK_REF(559, self, self_Refman)
         CHECK_REF(559, self->variable, self->variable_Refman)
@@ -39360,8 +39481,7 @@ Returncode tl5_compiler_M_DeclarationArgument_write(tl5_compiler_M_DeclarationAr
     CHECK(569)
     CHECK_REF(570, self, self_Refman)
     CHECK_REF(570, self->variable, self->variable_Refman)
-    CHECK_REF(570, self->variable->type_instance, self->variable->type_instance_Refman)
-    LUMI_err = tl5_compiler_M_TypeData_write_cname(self->variable->type_instance->type_data, self->variable->type_instance->type_data_Refman, self->variable->type_instance->type_data_Dynamic);
+    LUMI_err = tl5_compiler_M_TypeInstance_write_cname(self->variable->type_instance, self->variable->type_instance_Refman);
     CHECK(570)
     INIT_STRING_CONST(571, aux_String_19, "_Dynamic*");
     INIT_STRING_CONST(571, aux_String_20, "_Dynamic");
@@ -40546,8 +40666,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_write(tl5_compiler_M_SyntaxTreeVari
   }
   else {
       CHECK_REF(184, self, self_Refman)
-      CHECK_REF(184, self->type_instance, self->type_instance_Refman)
-      LUMI_err = tl5_compiler_M_TypeData_write_cname(self->type_instance->type_data, self->type_instance->type_data_Refman, self->type_instance->type_data_Dynamic);
+      LUMI_err = tl5_compiler_M_TypeInstance_write_cname(self->type_instance, self->type_instance_Refman);
       CHECK(184)
       CHECK_REF(186, self, self_Refman)
       LUMI_err = tl5_compiler_M_access_is_only_var(self->access, &(aux_Bool_1));
@@ -40772,8 +40891,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_write_sequence(tl5_compiler_M_Synta
         CHECK(223)
       }
       else {
-        CHECK_REF(225, data_type, data_type_Refman)
-        LUMI_err = tl5_compiler_M_TypeData_write_cname(data_type->type_data, data_type->type_data_Refman, data_type->type_data_Dynamic);
+        LUMI_err = tl5_compiler_M_TypeInstance_write_cname(data_type, data_type_Refman);
         CHECK(225)
       }
     }
@@ -41093,8 +41211,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_write_var(tl5_compiler_M_SyntaxTree
   Ref_Manager* aux_Ref_Manager = NULL;
   LUMI_inc_ref(self_Refman);
   CHECK_REF(319, self, self_Refman)
-  CHECK_REF(319, self->type_instance, self->type_instance_Refman)
-  LUMI_err = tl5_compiler_M_TypeData_write_cname(self->type_instance->type_data, self->type_instance->type_data_Refman, self->type_instance->type_data_Dynamic);
+  LUMI_err = tl5_compiler_M_TypeInstance_write_cname(self->type_instance, self->type_instance_Refman);
   CHECK(319)
   INIT_STRING_CONST(320, aux_String_0, " ");
   LUMI_err = tl5_compiler_M_write(aux_String_0, aux_String_0_Refman);
@@ -41266,8 +41383,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_write_dynamic(tl5_compiler_M_Syntax
   LUMI_err = tl5_compiler_M_SyntaxTreeVariable_write_spaces(self, self_Refman, self_Dynamic);
   CHECK(353)
   CHECK_REF(354, self, self_Refman)
-  CHECK_REF(354, self->type_instance, self->type_instance_Refman)
-  LUMI_err = tl5_compiler_M_TypeData_write_cname(self->type_instance->type_data, self->type_instance->type_data_Refman, self->type_instance->type_data_Dynamic);
+  LUMI_err = tl5_compiler_M_TypeInstance_write_cname(self->type_instance, self->type_instance_Refman);
   CHECK(354)
   INIT_STRING_CONST(355, aux_String_0, "_Dynamic* ");
   LUMI_err = tl5_compiler_M_write(aux_String_0, aux_String_0_Refman);
@@ -41288,8 +41404,7 @@ Returncode tl5_compiler_M_SyntaxTreeVariable_write_dynamic(tl5_compiler_M_Syntax
       LUMI_err = tl5_compiler_M_write(aux_String_3, aux_String_3_Refman);
       CHECK(361)
       CHECK_REF(362, self, self_Refman)
-      CHECK_REF(362, self->type_instance, self->type_instance_Refman)
-      LUMI_err = tl5_compiler_M_TypeData_write_cname(self->type_instance->type_data, self->type_instance->type_data_Refman, self->type_instance->type_data_Dynamic);
+      LUMI_err = tl5_compiler_M_TypeInstance_write_cname(self->type_instance, self->type_instance_Refman);
       CHECK(362)
       INIT_STRING_CONST(363, aux_String_4, "_dynamic");
       LUMI_err = tl5_compiler_M_write(aux_String_4, aux_String_4_Refman);
@@ -43291,8 +43406,7 @@ Returncode tl5_compiler_M_TypeData_write(tl5_compiler_M_TypeData* self, Ref_Mana
     LUMI_err = tl5_compiler_M_SyntaxTreeBranch_write_spaces(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base));
     CHECK(268)
     CHECK_REF(269, self, self_Refman)
-    CHECK_REF(269, self->base_type, self->base_type_Refman)
-    LUMI_err = tl5_compiler_M_TypeData_write_cname(self->base_type->type_data, self->base_type->type_data_Refman, self->base_type->type_data_Dynamic);
+    LUMI_err = tl5_compiler_M_TypeInstance_write_cname(self->base_type, self->base_type_Refman);
     CHECK(269)
     INIT_STRING_CONST(270, aux_String_2, " _base;\n");
     LUMI_err = tl5_compiler_M_write(aux_String_2, aux_String_2_Refman);
@@ -43320,8 +43434,7 @@ Returncode tl5_compiler_M_TypeData_write(tl5_compiler_M_TypeData* self, Ref_Mana
       LUMI_err = tl5_compiler_M_SyntaxTreeBranch_write_spaces(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base));
       CHECK(278)
       CHECK_REF(279, self, self_Refman)
-      CHECK_REF(279, self->base_type, self->base_type_Refman)
-      LUMI_err = tl5_compiler_M_TypeData_write_cname(self->base_type->type_data, self->base_type->type_data_Refman, self->base_type->type_data_Dynamic);
+      LUMI_err = tl5_compiler_M_TypeInstance_write_cname(self->base_type, self->base_type_Refman);
       CHECK(279)
       INIT_STRING_CONST(280, aux_String_6, "_Dynamic _base;\n");
       LUMI_err = tl5_compiler_M_write(aux_String_6, aux_String_6_Refman);
@@ -43711,8 +43824,7 @@ Returncode tl5_compiler_M_TypeData_write_methods_body(tl5_compiler_M_TypeData* s
     LUMI_err = tl5_compiler_M_write_spaces(tl5_compiler_M_INDENTATION_SPACES);
     CHECK(357)
     CHECK_REF(358, self, self_Refman)
-    CHECK_REF(358, self->base_type, self->base_type_Refman)
-    LUMI_err = tl5_compiler_M_TypeData_write_cname(self->base_type->type_data, self->base_type->type_data_Refman, self->base_type->type_data_Dynamic);
+    LUMI_err = tl5_compiler_M_TypeInstance_write_cname(self->base_type, self->base_type_Refman);
     CHECK(358)
     INIT_STRING_CONST(359, aux_String_4, "_Del(&(self->_base));\n");
     LUMI_err = tl5_compiler_M_write(aux_String_4, aux_String_4_Refman);
@@ -48479,7 +48591,7 @@ USER_MAIN_HEADER {
   LUMI_inc_ref(tl5_compiler_M_expression_ends_Refman);
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "TL5/global/header-string.4.lm"
-  INIT_STRING_CONST(1049, aux_String_1, "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\n\n/* builtin type defines */\n\ntypedef int Int;\ntypedef char Char;\ntypedef unsigned char Byte;\n\ntypedef enum Bool {\n  false = 0,\n  true = 1\n} Bool;\n\ntypedef enum Returncode {\n  OK = EXIT_SUCCESS,\n  ERR = EXIT_FAILURE,\n  FAIL = EXIT_FAILURE > EXIT_SUCCESS? EXIT_FAILURE + 1 : EXIT_SUCCESS + 1\n} Returncode;\n\ntypedef struct Ref_Manager {\n  int count;\n  void* value;\n  void* ref;\n} Ref_Manager;\n\ntypedef struct File {\n  FILE* fobj;\n} File;\n\ntypedef struct Sys {\n  char* argv;\n  int argv_Length;\n  int argv_Value_length;\n  int* argv_String_length;\n  Ref_Manager* argv_Refman;\n  File* stdout_Cname;\n  Ref_Manager* stdout_Cname_Refman;\n  File* stdin_Cname;\n  Ref_Manager* stdin_Cname_Refman;\n  File* stderr_Cname;\n  Ref_Manager* stderr_Cname_Refman;\n} Sys;\n\ntypedef void* Ref;\n\ntypedef char cdef_M_Char;\ntypedef unsigned char cdef_M_Uchar;\ntypedef wchar_t cdef_M_Wchar;\ntypedef short cdef_M_Short;\ntypedef unsigned short cdef_M_Ushort;\ntypedef int cdef_M_Int;\ntypedef unsigned int cdef_M_Uint;\ntypedef long cdef_M_Long;\ntypedef unsigned long cdef_M_Ulong;\ntypedef size_t cdef_M_Size;\ntypedef float cdef_M_Float;\ntypedef double cdef_M_Double;\ntypedef long double cdef_M_LongDouble;\n\ntypedef void (*Dynamic_Del)(void*);\n\ntypedef void Generic_Type;\ntypedef struct Generic_Type_Dynamic { Dynamic_Del _del; } Generic_Type_Dynamic;\n\ntypedef struct File_Coverage {\n  char const* filename;\n  int lines_number;\n  int* line_count;\n} File_Coverage;\n\ntypedef struct Error_Message {\n  char* str;\n  int length;\n} Error_Message;\n\ntypedef struct Error_Messages {\n  Error_Message empty_object;\n  Error_Message outdated_weak_reference;\n  Error_Message object_memory;\n  Error_Message managed_object_memory;\n  Error_Message slice_index;\n  Error_Message string_too_long;\n  Error_Message file_not_opened;\n  Error_Message file_write_failed;\n  Error_Message zero_division;\n  Error_Message loop_limit;\n} Error_Messages;\n\n\n/* macros */\n\n#define START_TRACE(line, cleanup, value, format, message, message_length) { \\\n  LUMI_trace_print( \\\n      format, \\\n      LUMI_FILE_NAME, \\\n      line, \\\n      LUMI_FUNC_NAME, \\\n      message, \\\n      message_length); \\\n  LUMI_err = value; \\\n  LUMI_loop_depth = 0; \\\n  goto cleanup; }\n\n#define RAISE(line, cleanup, message) { \\\n  START_TRACE( \\\n      line, \\\n      cleanup, \\\n      ERR, \\\n      LUMI_raise_format, \\\n      LUMI_error_messages.message.str, \\\n      LUMI_error_messages.message.length) }\n\n#define USER_RAISE(line, cleanup, message, message_length) \\\n  START_TRACE( \\\n      line, \\\n      cleanup, \\\n      ERR, \\\n      LUMI_raise_format, \\\n      message, \\\n      message_length)\n\n#define TEST_FAIL(line, cleanup, message_length, message) \\\n  START_TRACE( \\\n      line, cleanup, FAIL, LUMI_assert_format, message, message_length)\n\n#define TEST_ASSERT(line, cleanup, condition) if (!(condition)) \\\n  TEST_FAIL(line, cleanup, 21, \"condition is not true\")\n\n#define TEST_FAIL_NULL(line, cleanup) \\\n  START_TRACE(line, cleanup, FAIL, LUMI_assert_format, NULL, 0)\n\n#define CHECK(line, cleanup) if (LUMI_err != OK) { \\\n  LUMI_trace_print( \\\n      LUMI_traceline_format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, \\\n      NULL, 0); \\\n  LUMI_loop_depth = 0; \\\n  goto cleanup; }\n\n#define IGNORE_ERRORS(call) \\\n  ++LUMI_trace_ignore_count; (void)call; --LUMI_trace_ignore_count;\n\n#define CHECK_REF(line, cleanup, ref) \\\n  if (ref == NULL) RAISE(line, cleanup, empty_object)\n\n#define CHECK_REFMAN(line, cleanup, refman) \\\n  if (refman != NULL && (refman)->value == NULL) \\\n    RAISE(line, cleanup, outdated_weak_reference)\n\n#define CHECK_REF_REFMAN(line, cleanup, ref, refman) \\\n  CHECK_REF(line, cleanup, ref) \\\n  if ((refman)->value == NULL) RAISE(line, cleanup, outdated_weak_reference)\n\n#define MAIN_PROXY(func) int main(int argc, char* argv[]) { \\\n  return func(argc, argv); \\\n}\n\n#define MAIN_FUNC MAIN_PROXY(LUMI_main)\n#define TEST_MAIN_FUNC MAIN_PROXY(LUMI_test_main)\n#define USER_MAIN_HEADER Returncode LUMI_user_main(void)\n\n#define ARRAY_DEL(Type, array, length) if (array != NULL) { \\\n  int LUMI_n = 0; \\\n  for (; LUMI_n < length; ++LUMI_n) \\\n    Type##_Del(array + LUMI_n); \\\n  }\n\n#define SELF_REF_DEL(Type, field) \\\nwhile (self->field != NULL) { \\\n  Type* value = self->field; \\\n  self->field = value->field; \\\n  value->field = NULL; \\\n  Type##_Del(value); \\\n  free(value); \\\n}\n\n#define SELF_REF_DEL_STR(Type, field) \\\nwhile (self->field != NULL) { \\\n  Type* value = self->field; \\\n  Ref_Manager* value_Refman = self->field##_Refman; \\\n  self->field = value->field; \\\n  self->field##_Refman = value->field##_Refman; \\\n  value->field = NULL; \\\n  value->field##_Refman = NULL; \\\n  Type##_Del(value); \\\n  LUMI_owner_dec_ref(value_Refman); \\\n}\n\n#define SELF_REF_DEL_DYN(Type, bases, field) \\\nwhile (self->field != NULL) { \\\n  Type* value = self->field; \\\n  Type##_Dynamic* value_Dynamic = self->field##_Dynamic; \\\n  self->field = value->field; \\\n  self->field##_Dynamic = value->field##_Dynamic; \\\n  value->field = NULL; \\\n  value->field##_Dynamic = NULL; \\\n  value_Dynamic->bases##del(value); \\\n  free(value); \\\n}\n\n#define SELF_REF_DEL_STR_DYN(Type, bases, field) \\\nwhile (self->field != NULL) { \\\n  Type* value = self->field; \\\n  Ref_Manager* value_Refman = self->field##_Refman; \\\n  Type##_Dynamic* value_Dynamic = self->field##_Dynamic; \\\n  self->field = value->field; \\\n  self->field##_Refman = value->field##_Refman; \\\n  self->field##_Dynamic = value->field##_Dynamic; \\\n  value->field = NULL; \\\n  value->field##_Refman = NULL; \\\n  value->field##_Dynamic = NULL; \\\n  value_Dynamic->bases##del(value); \\\n  LUMI_owner_dec_ref(value_Refman); \\\n}\n\n#define INIT_VAR_REFMAN(line, cleanup, name) \\\n  name##_Refman = LUMI_new_ref(name); \\\n  if (name##_Refman == NULL) { RAISE(line, cleanup, managed_object_memory) }\n\n#define INIT_NEW_REFMAN(line, cleanup, name) \\\n  name##_Refman = LUMI_new_ref(name); \\\n  if (name##_Refman == NULL) { \\\n    free(name); \\\n    name = NULL; \\\n    RAISE(line, cleanup, managed_object_memory) }\n\n#define INIT_NEW(line, cleanup, name, type, size) \\\n  if (size <= 0) RAISE(line, cleanup, slice_index) \\\n  name = LUMI_alloc(sizeof(type) * size); \\\n  if (name == NULL) RAISE(line, cleanup, object_memory)\n\n#define INIT_NEW_ARRAY(line, cleanup, name, type, length, value_size) \\\n  name##_Length = length; \\\n  INIT_NEW(line, cleanup, name, type, name##_Length * value_size)\n\n#define INIT_NEW_STRING(line, cleanup, name, size) \\\n  name##_Max_length = size; \\\n  INIT_NEW(line, cleanup, name, char, name##_Max_length) \\\n  name##_Length = LUMI_alloc(sizeof(int)); \\\n  if (name##_Length == NULL) { \\\n    name##_Length = &Lumi_empty_int; \\\n    free(name); name = NULL; \\\n    RAISE(line, cleanup, object_memory) }\n\n#define INIT_STRING_CONST(line, cleanup, name, text) \\\n  name = text; \\\n  name##_Max_length = sizeof(text); \\\n  *name##_Length = sizeof(text) - 1;\n\n\n#define String_Del(name) do { if (name##_Length != &Lumi_empty_int) { \\\n  free(name##_Length); \\\n  name##_Length = &Lumi_empty_int; } } while (false)\n\n\n/* traceback */\n\n#define CRAISE(message) { \\\n  LUMI_C_trace_print(__LINE__, LUMI_FUNC_NAME, message); \\\n  return ERR; }\n#define CCHECK(err) { \\\n  Returncode LUMI_cerr = err; \\\n  if (LUMI_cerr != OK) return LUMI_cerr; }\n\nchar* LUMI_raise_format = \"Error raised in %s:%d %s()\\n\";\nchar* LUMI_assert_format = \"Assert failed in %s:%d %s()\\n\";\nchar* LUMI_traceline_format = \"  called from %s:%d %s()\\n\";\nFILE* LUMI_trace_stream = NULL;\nint LUMI_trace_ignore_count = 0;\nchar* LUMI_expected_error = NULL;\nint LUMI_expected_error_trace_ignore_count = 0;\nGeneric_Type_Dynamic* dynamic_Void = NULL;\n\nSys* sys = NULL;\nRef_Manager* sys_Refman = NULL;\nint Lumi_empty_int = 0;\n\n#define ERROR_MESAGE(message) {message, sizeof(message) - 1}\n\nError_Messages LUMI_error_messages = {\n  ERROR_MESAGE(\"empty object used\"),\n  ERROR_MESAGE(\"outdated weak reference used\"),\n  ERROR_MESAGE(\"insufficient memory for object dynamic allocation\"),\n  ERROR_MESAGE(\"insufficient memory for managed object\"),\n  ERROR_MESAGE(\"slice index out of bounds\"),\n  ERROR_MESAGE(\"string too long\"),\n  ERROR_MESAGE(\"file not opened\"),\n  ERROR_MESAGE(\"file write failed\"),\n  ERROR_MESAGE(\"zero division\"),\n  ERROR_MESAGE(\"loop limit reached\")\n};\n\nenum {\n  LUMI_DEBUG_NOTHING = 0,\n  LUMI_DEBUG_FAIL,\n  LUMI_DEBUG_SUCCESS\n};\nint lumi_debug_value = LUMI_DEBUG_NOTHING;\n\nvoid LUMI_trace_print(\n    char const* format,\n    char const* filename,\n    int line,\n    char const* funcname,\n    char const* message,\n    int message_length) {\n  if (LUMI_trace_ignore_count == 0) {\n    if (message != NULL) {\n      fprintf(\n          LUMI_trace_stream,\n          \"Error: %.*s\\n  \",\n          message_length,\n          message);\n    }\n    fprintf(LUMI_trace_stream, format, filename, line, funcname);\n  }\n  else if (LUMI_expected_error != NULL &&\n      LUMI_expected_error_trace_ignore_count == LUMI_trace_ignore_count &&\n      format != LUMI_traceline_format) {\n    int n;\n    if (message == NULL) {\n      LUMI_expected_error = NULL;\n      if (LUMI_trace_ignore_count == 1) {\n        fprintf(\n            LUMI_trace_stream,\n            \"Assert failed: error with no message raised\\n  \");\n      }\n      return;\n    }\n    for (n = 0; n <= message_length; ++n) {\n      if (((n == message_length)? '\\0': message[n]) !=\n          LUMI_expected_error[n]) {\n        LUMI_expected_error = NULL;\n        if (LUMI_trace_ignore_count == 1) {\n          fprintf(\n              LUMI_trace_stream,\n              \"Assert failed: unexpected error message \\\"%.*s\\\"\\n  \",\n              message_length,\n              message);\n        }\n        return;\n      }\n    }\n  }\n}\n\n/* like strnlen */\nint cstring_length(char* cstring, int max_length) {\n  int length = 0;\n  while (cstring[length] != '\\0' && length < max_length) {\n    ++length;\n  }\n  return length;\n}\n\nvoid LUMI_C_trace_print(int line, char const* funcname, char* message) {\n  LUMI_trace_print(\n      LUMI_raise_format,\n      \"builtin\",\n      line,\n      funcname,\n      message,\n      cstring_length(message, 255));\n}\n\n\n/* main */\n\nReturncode LUMI_user_main(void);\nint set_sys(int argc, char* argv[]);\n#define SET_SYS err = set_sys(argc, argv); if (err != OK) return err;\n\nint LUMI_main(int argc, char* argv[]) {\n  Returncode err;\n  LUMI_trace_stream = stderr;\n  SET_SYS\n  err = LUMI_user_main();\n  if (err != OK) {\n    fprintf(stderr, \"  called from executable start\\n\");\n  }\n  return err;\n}\n\n\n/* tests */\n\nint LUMI_test_main(int argc, char* argv[]) {\n  Returncode err;\n  LUMI_trace_stream = stdout;\n  SET_SYS\n  printf(\"Running tests:\\n\");\n  err = LUMI_user_main();\n  if (err == OK) {\n    printf(\"Tests passed\\n\");\n  }\n  else {\n    printf(\"Tests failed\\n\");\n    return ERR;\n  }\n  return OK;\n}\n\nBool LUMI_run_test(char* test_name, Returncode (*test_func)(void)) {\n  Returncode err;\n  printf(\"testing %s... \", test_name);\n  fflush(stdout);\n  err = test_func();\n  if (err == OK) {\n    printf(\"OK\\n\");\n    return true;\n  }\n  return false;\n}\n\nint calc_coverage(File_Coverage* files_coverage, int files_number) {\n  int n;\n  int all_lines = 0;\n  int covered_lines = 0;\n  for (n = 0; n < files_number; ++n) {\n    int line;\n    for (line = 0; line < files_coverage[n].lines_number; ++line) {\n      if (files_coverage[n].line_count[line] >= 0) {\n        ++all_lines;\n      }\n      if (files_coverage[n].line_count[line] > 0) {\n        ++covered_lines;\n      }\n    }\n  }\n  return covered_lines * 100 / all_lines;\n}\n\nvoid make_coverage_xml(File_Coverage* files_coverage, int files_number) {\n  int n;\n  FILE* xml = NULL;\n  xml = fopen(\"cobertura.xml\", \"w\");\n  if (xml == NULL) {\n    return;\n  }\n  fputs(\"<?xml version=\\\"1.0\\\" ?>\\n\", xml);\n  fputs(\n    \"<!DOCTYPE coverage SYSTEM 'https://raw.githubusercontent.com/cobertura/\"\n    \"cobertura/master/cobertura/src/site/htdocs/xml/coverage-loose.dtd'>\\n\",\n    xml);\n  fputs(\"<coverage timestamp=\\\"0\\\" version=\\\"lumi 0.0.5\\\">\\n\", xml);\n  fputs(\" <packages>\\n\", xml);\n\n  for (n = 0; n < files_number; ++n) {\n    int line;\n    fputs(\"  <package name=\\\"\\\">\\n\", xml);\n    fputs(\"   <classes>\\n\", xml);\n    fprintf(\n      xml,\n      \"    <class name=\\\"%s\\\" filename=\\\"%s\\\">\\n\",\n      files_coverage[n].filename,\n      files_coverage[n].filename);\n    fputs(\"     <methods/>\\n\", xml);\n    fputs(\"     <lines>\\n\", xml);\n\n    for (line = 0; line < files_coverage[n].lines_number; ++line) {\n      if (files_coverage[n].line_count[line] >= 0) {\n        fprintf(\n          xml,\n          \"      <line branch=\\\"false\\\" hits=\\\"%d\\\" number=\\\"%d\\\"/>\\n\",\n          files_coverage[n].line_count[line],\n          line);\n      }\n    }\n\n    fputs(\"     </lines>\\n\", xml);\n    fputs(\"    </class>\\n\", xml);\n    fputs(\"   </classes>\\n\", xml);\n    fputs(\"  </package>\\n\", xml);\n  }\n\n  fputs(\" </packages>\\n\", xml);\n  fputs(\"</coverage>\\n\", xml);\n  fclose(xml);\n}\n\nBool LUMI_test_coverage(File_Coverage* files_coverage, int files_number) {\n  int n;\n  int coverage;\n  Bool generate_xml = false;\n  if (sys->argv != NULL && sys->argv_Refman->value != NULL &&\n      sys->argv_Length > 1 && sys->argv_String_length[1] > 1) {\n    char* arg = sys->argv + sys->argv_Value_length;\n    generate_xml = arg[0] == '-' && arg[1] == 'x';\n  }\n  printf(\"testing code coverage... \");\n  coverage = calc_coverage(files_coverage, files_number);\n  if (coverage == 100) {\n    printf(\"100%%\\n\");\n    if (generate_xml) {\n      make_coverage_xml(files_coverage, files_number);\n    }\n    return true;\n  }\n\n  printf(\"%d%% - failed, lines not covered:\\n\", coverage);\n  for (n = 0; n < files_number; ++n) {\n    coverage = calc_coverage(files_coverage + n, 1);\n    if (coverage < 100) {\n      int line;\n      int first_uncovered;\n      Bool prev_uncovered = false;\n      printf(\"  %s(%d%%):\", files_coverage[n].filename, coverage);\n      for (line = 0; line < files_coverage[n].lines_number; ++line) {\n        if (files_coverage[n].line_count[line] == 0) {\n          if (!prev_uncovered) {\n            first_uncovered = line;\n            prev_uncovered = true;\n          }\n        }\n        else if (prev_uncovered) {\n          printf(\" %d\", first_uncovered);\n          if (first_uncovered < line - 1) {\n            printf(\"-%d\", line - 1);\n          }\n          prev_uncovered = false;\n        }\n      }\n      printf(\"\\n\");\n    }\n  }\n  if (generate_xml) {\n    make_coverage_xml(files_coverage, files_number);\n  }\n  return false;\n}\n\n\n/* reference counting */\n\nvoid new_Mock(Bool*);\nReturncode delete_Mock(Ref);\n\nvoid* LUMI_alloc(size_t size) {\n  Bool allocate_success = true;\n  new_Mock(&allocate_success);\n  if (allocate_success) {\n    return calloc(1, size);\n  }\n  return NULL;\n}\n\nRef_Manager* LUMI_new_ref(void* value) {\n  Ref_Manager* ref = NULL;\n  Bool allocate_success = true;\n  new_Mock(&allocate_success);\n  if (allocate_success) {\n    ref = malloc(sizeof(Ref_Manager));\n    if (ref != NULL) {\n      ref->count = 1;\n      ref->value = value;\n      ref->ref = value;\n    }\n  }\n  return ref;\n}\n\nvoid LUMI_inc_ref(Ref_Manager* ref) {\n  if (ref != NULL) {\n    ++ref->count;\n  }\n}\n\nvoid dec_ref(Ref_Manager* ref) {\n  --ref->count;\n  if (ref->count == 0) {\n    IGNORE_ERRORS( delete_Mock(ref->ref); )\n    free(ref);\n  }\n}\n\nvoid LUMI_dec_ref(Ref_Manager* ref) {\n  if (ref != NULL) {\n    dec_ref(ref);\n  }\n}\n\nvoid LUMI_var_dec_ref(Ref_Manager* ref) {\n  if (ref != NULL) {\n    ref->value = NULL;\n    dec_ref(ref);\n  }\n}\n\nvoid LUMI_owner_dec_ref(Ref_Manager* ref) {\n  if (ref != NULL) {\n    free(ref->value);\n    ref->value = NULL;\n    dec_ref(ref);\n  }\n}\n\n\n/* Int */\n\n#define LUMI_FUNC_NAME \"Int.str\"\nReturncode Int_str(Int value, char* str, int str_max_length, int* str_length) {\n  Bool is_neg;\n  int abs;\n  int swap;\n  char* next;\n  char* last;\n  is_neg = value < 0;\n  abs = value;\n  if (is_neg) {\n    abs = -value;\n  }\n  swap = 0;\n  *str_length = is_neg;\n  do {\n    swap *= 10;\n    swap += abs % 10;\n    abs /= 10;\n    if (str_max_length <= *str_length + 1) {\n      *str_length = 0;\n      CRAISE(LUMI_error_messages.string_too_long.str)\n    }\n    ++*str_length;\n  } while (abs > 0);\n  next = str;\n  if (is_neg) {\n    *next = '-';\n    ++next;\n  }\n  last = str + *str_length;\n  while (next < last) {\n    *next = '0' + swap % 10;\n    ++next;\n    swap /= 10;\n  }\n  *last = '\\0';\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n\n/* Array */\n\nvoid Array_length(void* self, int length, Int* length_out) {\n  *length_out = length;\n}\n\n\n/* String */\n\nvoid String_length(\n    char* self, int max_length, int *length, Int* length_out) {\n  *length_out = *length;\n}\n\nvoid String_max_length(\n    char* self, int max_length, int *length, Int* max_length_out) {\n  *max_length_out = max_length;\n}\n\n#define LUMI_FUNC_NAME \"String.copy\"\nReturncode String_copy(\n    char* self, int max_length, int* length, char* source, int source_length) {\n  if (self == source) {\n    return OK;\n  }\n  if (source_length >= max_length) {\n    CRAISE(LUMI_error_messages.string_too_long.str)\n  }\n  *length = source_length;\n  memcpy(self, source, source_length);\n  self[source_length] = '\\0';\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\nvoid String_clear(char* self, int max_length, int* length) {\n  *length = 0;\n}\n\nvoid String_equal(\n    char* self, int max_length, int *length,\n    char* other, int other_length,\n    Bool* out_equal) {\n  if (self == other) {\n    *out_equal = *length == other_length;\n    return;\n  }\n  if (*length != other_length) {\n    *out_equal = false;\n    return;\n  }\n  *out_equal = strncmp(self, other, *length) == 0;\n}\n\n#define LUMI_FUNC_NAME \"String.get\"\nReturncode String_get(\n    char* self, int max_length, int *length, Int index, Char* out_char) {\n  if (index < 0 || index >= *length) {\n    CRAISE(LUMI_error_messages.slice_index.str)\n  }\n  *out_char = self[index];\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"String.set\"\nReturncode String_set(\n    char* self, int max_length, int *length, Int index, Char ch) {\n  if (index < 0 || index >= *length) {\n    CRAISE(LUMI_error_messages.slice_index.str)\n  }\n  self[index] = ch;\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"String.append\"\nReturncode String_append(char* self, int max_length, int* length, Char ch) {\n  if (*length + 1 >= max_length) {\n    CRAISE(LUMI_error_messages.string_too_long.str)\n  }\n  self[*length] = ch;\n  ++(*length);\n  self[*length] = '\\0';\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"String.concat\"\nReturncode String_concat(\n    char* self, int max_length, int* length, char* ext, int ext_length) {\n  if (*length + ext_length >= max_length) {\n    CRAISE(LUMI_error_messages.string_too_long.str)\n  }\n  memcpy(self + *length, ext, ext_length);\n  *length += ext_length;\n  self[*length] = '\\0';\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"String.concat-int\"\nReturncode String_concat_int(\n    char* self, int max_length, int* length, Int num) {\n  int added_length = 0;\n  CCHECK(Int_str(num, self + *length, max_length - *length, &added_length));\n  *length += added_length;\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\nvoid String_find(\n    char* self, int max_length, int *length,\n    char* pattern, int pattern_length,\n    Int* out_index) {\n  int n;\n  for (n = 0; n <= *length - pattern_length; ++n) {\n    if (strncmp(self + n, pattern, pattern_length) == 0) {\n      *out_index = n;\n      return;\n    }\n  }\n  *out_index = *length;\n}\n\nvoid String_has(\n    char* self, int max_length, int *length, Char ch, Bool* found) {\n  int n;\n  for (n = 0; n < *length; ++n) {\n    if (self[n] == ch) {\n      *found = true;\n      return;\n    }\n  }\n  *found = false;\n}\n\n\n/* File */\n\nvoid File_Del(File* self) {\n  if (self != NULL && self->fobj != NULL) {\n    fclose(self->fobj);\n  }\n}\n\nGeneric_Type_Dynamic File_dynamic = { (Dynamic_Del)File_Del };\n\n#define LUMI_FUNC_NAME \"file-close\"\nReturncode file_close(File* file) {\n  if (lumi_debug_value == LUMI_DEBUG_FAIL || file->fobj != NULL) {\n    if (lumi_debug_value == LUMI_DEBUG_FAIL || fclose(file->fobj) != 0) {\n      free(file);\n      CRAISE(\"close file failed\")\n    }\n    file->fobj = NULL;\n  }\n  free(file);\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"open-file\"\nReturncode open_file(\n    File** file,\n    char* name, int name_max_length, int name_length,\n    char* mode) {\n  FILE* new_fobj = NULL;\n  if (lumi_debug_value == LUMI_DEBUG_NOTHING) {\n    CCHECK(file_close(*file));\n  }\n  *file = NULL;\n  if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n    if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n      new_fobj = fopen(name, mode);\n    }\n    if (new_fobj == NULL) {\n      CRAISE(\"open file failed\")\n    }\n  }\n  *file = LUMI_alloc(sizeof(File));\n  if (*file == NULL) {\n    if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n      fclose(new_fobj);\n    }\n    CRAISE(LUMI_error_messages.object_memory.str)\n  }\n  (*file)->fobj = new_fobj;\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\nReturncode file_open_read(\n    char* name, int name_max_length, int *name_length, File** file) {\n  return open_file(file, name, name_max_length, *name_length, \"r\");\n}\n\nReturncode file_open_write(\n    char* name, int name_max_length, int *name_length, File** file) {\n  return open_file(\n    file, name, name_max_length, *name_length, \"w\");\n}\n\nBool getc_is_eof(int get, char* ch) {\n  if (get == EOF) {\n    return true;\n  }\n  else {\n    *ch = get;\n    return false;\n  }\n}\n\n#define LUMI_FUNC_NAME \"File.getc\"\nReturncode File_getc(File* file, Char* out_char, Bool* is_eof) {\n  if (file->fobj == NULL) CRAISE(LUMI_error_messages.file_not_opened.str)\n  *is_eof = getc_is_eof(getc(file->fobj), out_char);\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"File.putc\"\nReturncode File_putc(File* file, Char ch) {\n  int res = '\\0';\n  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n    if (file->fobj == NULL) CRAISE(LUMI_error_messages.file_not_opened.str)\n    res = putc(ch, file->fobj);\n  }\n  if (res != ch) {\n    CRAISE(LUMI_error_messages.file_write_failed.str)\n  }\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"File.write\"\nReturncode File_write(File* file, char* text, int text_length) {\n  int n, ch, res=0;\n  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n    if (file->fobj == NULL) CRAISE(LUMI_error_messages.file_not_opened.str)\n  }\n  for (n = 0; n < text_length; ++n) {\n    ch = text[n];\n    if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n      res = putc(ch, file->fobj);\n    }\n    if (ch != res) {\n      CRAISE(LUMI_error_messages.file_write_failed.str)\n    }\n  }\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n\n/* system */\n\nint set_sys(int argc, char* argv[]) {\n  int arg;\n  sys = LUMI_alloc(sizeof(Sys));\n  sys_Refman = LUMI_new_ref(sys);\n  if (sys != NULL) {\n    int max_length = 0;\n    sys->stdout_Cname = LUMI_alloc(sizeof(File));\n    sys->stdout_Cname_Refman = LUMI_new_ref(sys->stdout_Cname);\n    sys->stdin_Cname = LUMI_alloc(sizeof(File));\n    sys->stdin_Cname_Refman = LUMI_new_ref(sys->stdin_Cname);\n    sys->stderr_Cname = LUMI_alloc(sizeof(File));\n    sys->stderr_Cname_Refman = LUMI_new_ref(sys->stderr_Cname);\n    sys->argv_Length = argc;\n    sys->argv_Value_length = 0;\n    sys->argv_String_length = LUMI_alloc(sizeof(int) * argc);\n    for (arg = 0; arg < argc; ++arg) {\n      int length = cstring_length(argv[arg], 1024);\n      if (sys->argv_String_length != NULL) {\n        sys->argv_String_length[arg] = length;\n      }\n      if (length > sys->argv_Value_length) {\n        sys->argv_Value_length = length;\n      }\n    }\n    ++sys->argv_Value_length;\n    sys->argv = LUMI_alloc(sys->argv_Value_length * sys->argv_Length);\n    sys->argv_Refman = LUMI_new_ref(sys->argv);\n  }\n  if (sys == NULL || sys_Refman == NULL || sys->argv == NULL ||\n    sys->argv_Refman == NULL || sys->argv_String_length == NULL ||\n    sys->stdout_Cname == NULL || sys->stdout_Cname_Refman == NULL ||\n    sys->stdin_Cname == NULL || sys->stdin_Cname_Refman == NULL ||\n    sys->stderr_Cname == NULL || sys->stderr_Cname_Refman == NULL) {\n    fprintf(stderr, \"insufficient memory\\n\");\n    return ERR;\n  }\n  ++sys_Refman->count;\n  ++sys->argv_Refman->count;\n  ++sys->stdout_Cname_Refman->count;\n  ++sys->stdin_Cname_Refman->count;\n  ++sys->stderr_Cname_Refman->count;\n  sys->stdout_Cname->fobj = stdout;\n  sys->stdin_Cname->fobj = stdin;\n  sys->stderr_Cname->fobj = stderr;\n  for (arg = 0; arg < argc; ++arg) {\n    strncpy(sys->argv + sys->argv_Value_length * arg, argv[arg], sys->argv_Length);\n  }\n  return OK;\n}\n\nvoid Sys_Del(Sys* self) {}\nGeneric_Type_Dynamic Sys_dynamic = { (Dynamic_Del)Sys_Del };\n\n#define LUMI_FUNC_NAME \"Sys.print\"\nReturncode Sys_print(Sys* _, char* text, int text_length) {\n  int n, ch, res;\n  for (n = 0; n < text_length; ++n) {\n    ch = text[n];\n    res = putchar(ch);\n    if (ch != res) {\n      CRAISE(LUMI_error_messages.file_write_failed.str)\n    }\n  }\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"Sys.println\"\nReturncode Sys_println(Sys* _, char* text, int text_length) {\n  Sys_print(NULL, text, text_length);\n  if (putchar('\\n') != '\\n') {\n    CRAISE(LUMI_error_messages.file_write_failed.str)\n  }\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\nvoid Sys_getchar(Sys* _, char* out_char, Bool* is_eof) {\n  *is_eof = getc_is_eof(getchar(), out_char);\n}\n\n#define LUMI_FUNC_NAME \"Sys.getline\"\nReturncode Sys_getline(\n    Sys* _, char* line, int line_max_length, int* line_length) {\n  int ch = 0;\n  *line_length = 0;\n  if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n    ch = getchar();\n  }\n  while (ch != EOF && ch != '\\n') {\n    if (*line_length + 1 >= line_max_length) {\n      CRAISE(LUMI_error_messages.string_too_long.str)\n    }\n    line[*line_length] = ch;\n    ++(*line_length);\n    if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n      ch = getchar();\n    }\n  }\n  line[*line_length] = '\\0';\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"Sys.exit\"\nReturncode Sys_exit(Sys* _, Int status) {\n  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n    exit(status);\n  }\n  CRAISE(\"exit failed\")\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"Sys.system\"\nReturncode Sys_system(\n    Sys* _,\n    char* command, int command_max_length, int *command_length,\n    Int* status) {\n  int res = -1;\n  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n    res = system(command);\n  }\n  if (res == -1) {\n    CRAISE(\"command execution failed\")\n  }\n  *status = res;\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\nReturncode Sys_getenv(\n    Sys* _,\n    char* name, int name_max_length, int *name_length,\n    char* value, int value_max_length, int* value_length,\n    Bool* exists) {\n  char* ret;\n  ret = getenv(name);\n  if (ret == NULL) {\n    *exists = false;\n    return OK;\n  }\n  *value_length = cstring_length(ret, value_max_length);\n  strncpy(value, ret, *value_length);\n  *exists = true;\n  return OK;\n}\n");
+  INIT_STRING_CONST(1050, aux_String_1, "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\n\n/* builtin type defines */\n\ntypedef int Int;\ntypedef char Char;\ntypedef unsigned char Byte;\n\ntypedef enum Bool {\n  false = 0,\n  true = 1\n} Bool;\n\ntypedef enum Returncode {\n  OK = EXIT_SUCCESS,\n  ERR = EXIT_FAILURE,\n  FAIL = EXIT_FAILURE > EXIT_SUCCESS? EXIT_FAILURE + 1 : EXIT_SUCCESS + 1\n} Returncode;\n\ntypedef struct Ref_Manager {\n  int count;\n  void* value;\n  void* ref;\n} Ref_Manager;\n\ntypedef struct File {\n  FILE* fobj;\n} File;\n\ntypedef struct Sys {\n  char* argv;\n  int argv_Length;\n  int argv_Value_length;\n  int* argv_String_length;\n  Ref_Manager* argv_Refman;\n  File* stdout_Cname;\n  Ref_Manager* stdout_Cname_Refman;\n  File* stdin_Cname;\n  Ref_Manager* stdin_Cname_Refman;\n  File* stderr_Cname;\n  Ref_Manager* stderr_Cname_Refman;\n} Sys;\n\ntypedef void* Ref;\n\ntypedef char cdef_M_Char;\ntypedef unsigned char cdef_M_Uchar;\ntypedef wchar_t cdef_M_Wchar;\ntypedef short cdef_M_Short;\ntypedef unsigned short cdef_M_Ushort;\ntypedef int cdef_M_Int;\ntypedef unsigned int cdef_M_Uint;\ntypedef long cdef_M_Long;\ntypedef unsigned long cdef_M_Ulong;\ntypedef size_t cdef_M_Size;\ntypedef float cdef_M_Float;\ntypedef double cdef_M_Double;\ntypedef long double cdef_M_LongDouble;\ntypedef void* cdef_M_VoidPointer;\n\ntypedef void (*Dynamic_Del)(void*);\n\ntypedef void Generic_Type;\ntypedef struct Generic_Type_Dynamic { Dynamic_Del _del; } Generic_Type_Dynamic;\n\ntypedef struct File_Coverage {\n  char const* filename;\n  int lines_number;\n  int* line_count;\n} File_Coverage;\n\ntypedef struct Error_Message {\n  char* str;\n  int length;\n} Error_Message;\n\ntypedef struct Error_Messages {\n  Error_Message empty_object;\n  Error_Message outdated_weak_reference;\n  Error_Message object_memory;\n  Error_Message managed_object_memory;\n  Error_Message slice_index;\n  Error_Message string_too_long;\n  Error_Message file_not_opened;\n  Error_Message file_write_failed;\n  Error_Message zero_division;\n  Error_Message loop_limit;\n} Error_Messages;\n\n\n/* macros */\n\n#define START_TRACE(line, cleanup, value, format, message, message_length) { \\\n  LUMI_trace_print( \\\n      format, \\\n      LUMI_FILE_NAME, \\\n      line, \\\n      LUMI_FUNC_NAME, \\\n      message, \\\n      message_length); \\\n  LUMI_err = value; \\\n  LUMI_loop_depth = 0; \\\n  goto cleanup; }\n\n#define RAISE(line, cleanup, message) { \\\n  START_TRACE( \\\n      line, \\\n      cleanup, \\\n      ERR, \\\n      LUMI_raise_format, \\\n      LUMI_error_messages.message.str, \\\n      LUMI_error_messages.message.length) }\n\n#define USER_RAISE(line, cleanup, message, message_length) \\\n  START_TRACE( \\\n      line, \\\n      cleanup, \\\n      ERR, \\\n      LUMI_raise_format, \\\n      message, \\\n      message_length)\n\n#define TEST_FAIL(line, cleanup, message_length, message) \\\n  START_TRACE( \\\n      line, cleanup, FAIL, LUMI_assert_format, message, message_length)\n\n#define TEST_ASSERT(line, cleanup, condition) if (!(condition)) \\\n  TEST_FAIL(line, cleanup, 21, \"condition is not true\")\n\n#define TEST_FAIL_NULL(line, cleanup) \\\n  START_TRACE(line, cleanup, FAIL, LUMI_assert_format, NULL, 0)\n\n#define CHECK(line, cleanup) if (LUMI_err != OK) { \\\n  LUMI_trace_print( \\\n      LUMI_traceline_format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, \\\n      NULL, 0); \\\n  LUMI_loop_depth = 0; \\\n  goto cleanup; }\n\n#define IGNORE_ERRORS(call) \\\n  ++LUMI_trace_ignore_count; (void)call; --LUMI_trace_ignore_count;\n\n#define CHECK_REF(line, cleanup, ref) \\\n  if (ref == NULL) RAISE(line, cleanup, empty_object)\n\n#define CHECK_REFMAN(line, cleanup, refman) \\\n  if (refman != NULL && (refman)->value == NULL) \\\n    RAISE(line, cleanup, outdated_weak_reference)\n\n#define CHECK_REF_REFMAN(line, cleanup, ref, refman) \\\n  CHECK_REF(line, cleanup, ref) \\\n  if ((refman)->value == NULL) RAISE(line, cleanup, outdated_weak_reference)\n\n#define MAIN_PROXY(func) int main(int argc, char* argv[]) { \\\n  return func(argc, argv); \\\n}\n\n#define MAIN_FUNC MAIN_PROXY(LUMI_main)\n#define TEST_MAIN_FUNC MAIN_PROXY(LUMI_test_main)\n#define USER_MAIN_HEADER Returncode LUMI_user_main(void)\n\n#define ARRAY_DEL(Type, array, length) if (array != NULL) { \\\n  int LUMI_n = 0; \\\n  for (; LUMI_n < length; ++LUMI_n) \\\n    Type##_Del(array + LUMI_n); \\\n  }\n\n#define SELF_REF_DEL(Type, field) \\\nwhile (self->field != NULL) { \\\n  Type* value = self->field; \\\n  self->field = value->field; \\\n  value->field = NULL; \\\n  Type##_Del(value); \\\n  free(value); \\\n}\n\n#define SELF_REF_DEL_STR(Type, field) \\\nwhile (self->field != NULL) { \\\n  Type* value = self->field; \\\n  Ref_Manager* value_Refman = self->field##_Refman; \\\n  self->field = value->field; \\\n  self->field##_Refman = value->field##_Refman; \\\n  value->field = NULL; \\\n  value->field##_Refman = NULL; \\\n  Type##_Del(value); \\\n  LUMI_owner_dec_ref(value_Refman); \\\n}\n\n#define SELF_REF_DEL_DYN(Type, bases, field) \\\nwhile (self->field != NULL) { \\\n  Type* value = self->field; \\\n  Type##_Dynamic* value_Dynamic = self->field##_Dynamic; \\\n  self->field = value->field; \\\n  self->field##_Dynamic = value->field##_Dynamic; \\\n  value->field = NULL; \\\n  value->field##_Dynamic = NULL; \\\n  value_Dynamic->bases##del(value); \\\n  free(value); \\\n}\n\n#define SELF_REF_DEL_STR_DYN(Type, bases, field) \\\nwhile (self->field != NULL) { \\\n  Type* value = self->field; \\\n  Ref_Manager* value_Refman = self->field##_Refman; \\\n  Type##_Dynamic* value_Dynamic = self->field##_Dynamic; \\\n  self->field = value->field; \\\n  self->field##_Refman = value->field##_Refman; \\\n  self->field##_Dynamic = value->field##_Dynamic; \\\n  value->field = NULL; \\\n  value->field##_Refman = NULL; \\\n  value->field##_Dynamic = NULL; \\\n  value_Dynamic->bases##del(value); \\\n  LUMI_owner_dec_ref(value_Refman); \\\n}\n\n#define INIT_VAR_REFMAN(line, cleanup, name) \\\n  name##_Refman = LUMI_new_ref(name); \\\n  if (name##_Refman == NULL) { RAISE(line, cleanup, managed_object_memory) }\n\n#define INIT_NEW_REFMAN(line, cleanup, name) \\\n  name##_Refman = LUMI_new_ref(name); \\\n  if (name##_Refman == NULL) { \\\n    free(name); \\\n    name = NULL; \\\n    RAISE(line, cleanup, managed_object_memory) }\n\n#define INIT_NEW(line, cleanup, name, type, size) \\\n  if (size <= 0) RAISE(line, cleanup, slice_index) \\\n  name = LUMI_alloc(sizeof(type) * size); \\\n  if (name == NULL) RAISE(line, cleanup, object_memory)\n\n#define INIT_NEW_ARRAY(line, cleanup, name, type, length, value_size) \\\n  name##_Length = length; \\\n  INIT_NEW(line, cleanup, name, type, name##_Length * value_size)\n\n#define INIT_NEW_STRING(line, cleanup, name, size) \\\n  name##_Max_length = size; \\\n  INIT_NEW(line, cleanup, name, char, name##_Max_length) \\\n  name##_Length = LUMI_alloc(sizeof(int)); \\\n  if (name##_Length == NULL) { \\\n    name##_Length = &Lumi_empty_int; \\\n    free(name); name = NULL; \\\n    RAISE(line, cleanup, object_memory) }\n\n#define INIT_STRING_CONST(line, cleanup, name, text) \\\n  name = text; \\\n  name##_Max_length = sizeof(text); \\\n  *name##_Length = sizeof(text) - 1;\n\n\n#define String_Del(name) do { if (name##_Length != &Lumi_empty_int) { \\\n  free(name##_Length); \\\n  name##_Length = &Lumi_empty_int; } } while (false)\n\n\n/* traceback */\n\n#define CRAISE(message) { \\\n  LUMI_C_trace_print(__LINE__, LUMI_FUNC_NAME, message); \\\n  return ERR; }\n#define CCHECK(err) { \\\n  Returncode LUMI_cerr = err; \\\n  if (LUMI_cerr != OK) return LUMI_cerr; }\n\nchar* LUMI_raise_format = \"Error raised in %s:%d %s()\\n\";\nchar* LUMI_assert_format = \"Assert failed in %s:%d %s()\\n\";\nchar* LUMI_traceline_format = \"  called from %s:%d %s()\\n\";\nFILE* LUMI_trace_stream = NULL;\nint LUMI_trace_ignore_count = 0;\nchar* LUMI_expected_error = NULL;\nint LUMI_expected_error_trace_ignore_count = 0;\nGeneric_Type_Dynamic* dynamic_Void = NULL;\n\nSys* sys = NULL;\nRef_Manager* sys_Refman = NULL;\nint Lumi_empty_int = 0;\n\n#define ERROR_MESAGE(message) {message, sizeof(message) - 1}\n\nError_Messages LUMI_error_messages = {\n  ERROR_MESAGE(\"empty object used\"),\n  ERROR_MESAGE(\"outdated weak reference used\"),\n  ERROR_MESAGE(\"insufficient memory for object dynamic allocation\"),\n  ERROR_MESAGE(\"insufficient memory for managed object\"),\n  ERROR_MESAGE(\"slice index out of bounds\"),\n  ERROR_MESAGE(\"string too long\"),\n  ERROR_MESAGE(\"file not opened\"),\n  ERROR_MESAGE(\"file write failed\"),\n  ERROR_MESAGE(\"zero division\"),\n  ERROR_MESAGE(\"loop limit reached\")\n};\n\nenum {\n  LUMI_DEBUG_NOTHING = 0,\n  LUMI_DEBUG_FAIL,\n  LUMI_DEBUG_SUCCESS\n};\nint lumi_debug_value = LUMI_DEBUG_NOTHING;\n\nvoid LUMI_trace_print(\n    char const* format,\n    char const* filename,\n    int line,\n    char const* funcname,\n    char const* message,\n    int message_length) {\n  if (LUMI_trace_ignore_count == 0) {\n    if (message != NULL) {\n      fprintf(\n          LUMI_trace_stream,\n          \"Error: %.*s\\n  \",\n          message_length,\n          message);\n    }\n    fprintf(LUMI_trace_stream, format, filename, line, funcname);\n  }\n  else if (LUMI_expected_error != NULL &&\n      LUMI_expected_error_trace_ignore_count == LUMI_trace_ignore_count &&\n      format != LUMI_traceline_format) {\n    int n;\n    if (message == NULL) {\n      LUMI_expected_error = NULL;\n      if (LUMI_trace_ignore_count == 1) {\n        fprintf(\n            LUMI_trace_stream,\n            \"Assert failed: error with no message raised\\n  \");\n      }\n      return;\n    }\n    for (n = 0; n <= message_length; ++n) {\n      if (((n == message_length)? '\\0': message[n]) !=\n          LUMI_expected_error[n]) {\n        LUMI_expected_error = NULL;\n        if (LUMI_trace_ignore_count == 1) {\n          fprintf(\n              LUMI_trace_stream,\n              \"Assert failed: unexpected error message \\\"%.*s\\\"\\n  \",\n              message_length,\n              message);\n        }\n        return;\n      }\n    }\n  }\n}\n\n/* like strnlen */\nint cstring_length(char* cstring, int max_length) {\n  int length = 0;\n  while (cstring[length] != '\\0' && length < max_length) {\n    ++length;\n  }\n  return length;\n}\n\nvoid LUMI_C_trace_print(int line, char const* funcname, char* message) {\n  LUMI_trace_print(\n      LUMI_raise_format,\n      \"builtin\",\n      line,\n      funcname,\n      message,\n      cstring_length(message, 255));\n}\n\n\n/* main */\n\nReturncode LUMI_user_main(void);\nint set_sys(int argc, char* argv[]);\n#define SET_SYS err = set_sys(argc, argv); if (err != OK) return err;\n\nint LUMI_main(int argc, char* argv[]) {\n  Returncode err;\n  LUMI_trace_stream = stderr;\n  SET_SYS\n  err = LUMI_user_main();\n  if (err != OK) {\n    fprintf(stderr, \"  called from executable start\\n\");\n  }\n  return err;\n}\n\n\n/* tests */\n\nint LUMI_test_main(int argc, char* argv[]) {\n  Returncode err;\n  LUMI_trace_stream = stdout;\n  SET_SYS\n  printf(\"Running tests:\\n\");\n  err = LUMI_user_main();\n  if (err == OK) {\n    printf(\"Tests passed\\n\");\n  }\n  else {\n    printf(\"Tests failed\\n\");\n    return ERR;\n  }\n  return OK;\n}\n\nBool LUMI_run_test(char* test_name, Returncode (*test_func)(void)) {\n  Returncode err;\n  printf(\"testing %s... \", test_name);\n  fflush(stdout);\n  err = test_func();\n  if (err == OK) {\n    printf(\"OK\\n\");\n    return true;\n  }\n  return false;\n}\n\nint calc_coverage(File_Coverage* files_coverage, int files_number) {\n  int n;\n  int all_lines = 0;\n  int covered_lines = 0;\n  for (n = 0; n < files_number; ++n) {\n    int line;\n    for (line = 0; line < files_coverage[n].lines_number; ++line) {\n      if (files_coverage[n].line_count[line] >= 0) {\n        ++all_lines;\n      }\n      if (files_coverage[n].line_count[line] > 0) {\n        ++covered_lines;\n      }\n    }\n  }\n  return covered_lines * 100 / all_lines;\n}\n\nvoid make_coverage_xml(File_Coverage* files_coverage, int files_number) {\n  int n;\n  FILE* xml = NULL;\n  xml = fopen(\"cobertura.xml\", \"w\");\n  if (xml == NULL) {\n    return;\n  }\n  fputs(\"<?xml version=\\\"1.0\\\" ?>\\n\", xml);\n  fputs(\n    \"<!DOCTYPE coverage SYSTEM 'https://raw.githubusercontent.com/cobertura/\"\n    \"cobertura/master/cobertura/src/site/htdocs/xml/coverage-loose.dtd'>\\n\",\n    xml);\n  fputs(\"<coverage timestamp=\\\"0\\\" version=\\\"lumi 0.0.5\\\">\\n\", xml);\n  fputs(\" <packages>\\n\", xml);\n\n  for (n = 0; n < files_number; ++n) {\n    int line;\n    fputs(\"  <package name=\\\"\\\">\\n\", xml);\n    fputs(\"   <classes>\\n\", xml);\n    fprintf(\n      xml,\n      \"    <class name=\\\"%s\\\" filename=\\\"%s\\\">\\n\",\n      files_coverage[n].filename,\n      files_coverage[n].filename);\n    fputs(\"     <methods/>\\n\", xml);\n    fputs(\"     <lines>\\n\", xml);\n\n    for (line = 0; line < files_coverage[n].lines_number; ++line) {\n      if (files_coverage[n].line_count[line] >= 0) {\n        fprintf(\n          xml,\n          \"      <line branch=\\\"false\\\" hits=\\\"%d\\\" number=\\\"%d\\\"/>\\n\",\n          files_coverage[n].line_count[line],\n          line);\n      }\n    }\n\n    fputs(\"     </lines>\\n\", xml);\n    fputs(\"    </class>\\n\", xml);\n    fputs(\"   </classes>\\n\", xml);\n    fputs(\"  </package>\\n\", xml);\n  }\n\n  fputs(\" </packages>\\n\", xml);\n  fputs(\"</coverage>\\n\", xml);\n  fclose(xml);\n}\n\nBool LUMI_test_coverage(File_Coverage* files_coverage, int files_number) {\n  int n;\n  int coverage;\n  Bool generate_xml = false;\n  if (sys->argv != NULL && sys->argv_Refman->value != NULL &&\n      sys->argv_Length > 1 && sys->argv_String_length[1] > 1) {\n    char* arg = sys->argv + sys->argv_Value_length;\n    generate_xml = arg[0] == '-' && arg[1] == 'x';\n  }\n  printf(\"testing code coverage... \");\n  coverage = calc_coverage(files_coverage, files_number);\n  if (coverage == 100) {\n    printf(\"100%%\\n\");\n    if (generate_xml) {\n      make_coverage_xml(files_coverage, files_number);\n    }\n    return true;\n  }\n\n  printf(\"%d%% - failed, lines not covered:\\n\", coverage);\n  for (n = 0; n < files_number; ++n) {\n    coverage = calc_coverage(files_coverage + n, 1);\n    if (coverage < 100) {\n      int line;\n      int first_uncovered;\n      Bool prev_uncovered = false;\n      printf(\"  %s(%d%%):\", files_coverage[n].filename, coverage);\n      for (line = 0; line < files_coverage[n].lines_number; ++line) {\n        if (files_coverage[n].line_count[line] == 0) {\n          if (!prev_uncovered) {\n            first_uncovered = line;\n            prev_uncovered = true;\n          }\n        }\n        else if (prev_uncovered) {\n          printf(\" %d\", first_uncovered);\n          if (first_uncovered < line - 1) {\n            printf(\"-%d\", line - 1);\n          }\n          prev_uncovered = false;\n        }\n      }\n      printf(\"\\n\");\n    }\n  }\n  if (generate_xml) {\n    make_coverage_xml(files_coverage, files_number);\n  }\n  return false;\n}\n\n\n/* reference counting */\n\nvoid new_Mock(Bool*);\nReturncode delete_Mock(Ref);\n\nvoid* LUMI_alloc(size_t size) {\n  Bool allocate_success = true;\n  new_Mock(&allocate_success);\n  if (allocate_success) {\n    return calloc(1, size);\n  }\n  return NULL;\n}\n\nRef_Manager* LUMI_new_ref(void* value) {\n  Ref_Manager* ref = NULL;\n  Bool allocate_success = true;\n  new_Mock(&allocate_success);\n  if (allocate_success) {\n    ref = malloc(sizeof(Ref_Manager));\n    if (ref != NULL) {\n      ref->count = 1;\n      ref->value = value;\n      ref->ref = value;\n    }\n  }\n  return ref;\n}\n\nvoid LUMI_inc_ref(Ref_Manager* ref) {\n  if (ref != NULL) {\n    ++ref->count;\n  }\n}\n\nvoid dec_ref(Ref_Manager* ref) {\n  --ref->count;\n  if (ref->count == 0) {\n    IGNORE_ERRORS( delete_Mock(ref->ref); )\n    free(ref);\n  }\n}\n\nvoid LUMI_dec_ref(Ref_Manager* ref) {\n  if (ref != NULL) {\n    dec_ref(ref);\n  }\n}\n\nvoid LUMI_var_dec_ref(Ref_Manager* ref) {\n  if (ref != NULL) {\n    ref->value = NULL;\n    dec_ref(ref);\n  }\n}\n\nvoid LUMI_owner_dec_ref(Ref_Manager* ref) {\n  if (ref != NULL) {\n    free(ref->value);\n    ref->value = NULL;\n    dec_ref(ref);\n  }\n}\n\n\n/* Int */\n\n#define LUMI_FUNC_NAME \"Int.str\"\nReturncode Int_str(Int value, char* str, int str_max_length, int* str_length) {\n  Bool is_neg;\n  int abs;\n  int swap;\n  char* next;\n  char* last;\n  is_neg = value < 0;\n  abs = value;\n  if (is_neg) {\n    abs = -value;\n  }\n  swap = 0;\n  *str_length = is_neg;\n  do {\n    swap *= 10;\n    swap += abs % 10;\n    abs /= 10;\n    if (str_max_length <= *str_length + 1) {\n      *str_length = 0;\n      CRAISE(LUMI_error_messages.string_too_long.str)\n    }\n    ++*str_length;\n  } while (abs > 0);\n  next = str;\n  if (is_neg) {\n    *next = '-';\n    ++next;\n  }\n  last = str + *str_length;\n  while (next < last) {\n    *next = '0' + swap % 10;\n    ++next;\n    swap /= 10;\n  }\n  *last = '\\0';\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n\n/* Array */\n\nvoid Array_length(void* self, int length, Int* length_out) {\n  *length_out = length;\n}\n\n\n/* String */\n\nvoid String_length(\n    char* self, int max_length, int *length, Int* length_out) {\n  *length_out = *length;\n}\n\nvoid String_max_length(\n    char* self, int max_length, int *length, Int* max_length_out) {\n  *max_length_out = max_length;\n}\n\n#define LUMI_FUNC_NAME \"String.copy\"\nReturncode String_copy(\n    char* self, int max_length, int* length, char* source, int source_length) {\n  if (self == source) {\n    return OK;\n  }\n  if (source_length >= max_length) {\n    CRAISE(LUMI_error_messages.string_too_long.str)\n  }\n  *length = source_length;\n  memcpy(self, source, source_length);\n  self[source_length] = '\\0';\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\nvoid String_clear(char* self, int max_length, int* length) {\n  *length = 0;\n}\n\nvoid String_equal(\n    char* self, int max_length, int *length,\n    char* other, int other_length,\n    Bool* out_equal) {\n  if (self == other) {\n    *out_equal = *length == other_length;\n    return;\n  }\n  if (*length != other_length) {\n    *out_equal = false;\n    return;\n  }\n  *out_equal = strncmp(self, other, *length) == 0;\n}\n\n#define LUMI_FUNC_NAME \"String.get\"\nReturncode String_get(\n    char* self, int max_length, int *length, Int index, Char* out_char) {\n  if (index < 0 || index >= *length) {\n    CRAISE(LUMI_error_messages.slice_index.str)\n  }\n  *out_char = self[index];\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"String.set\"\nReturncode String_set(\n    char* self, int max_length, int *length, Int index, Char ch) {\n  if (index < 0 || index >= *length) {\n    CRAISE(LUMI_error_messages.slice_index.str)\n  }\n  self[index] = ch;\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"String.append\"\nReturncode String_append(char* self, int max_length, int* length, Char ch) {\n  if (*length + 1 >= max_length) {\n    CRAISE(LUMI_error_messages.string_too_long.str)\n  }\n  self[*length] = ch;\n  ++(*length);\n  self[*length] = '\\0';\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"String.concat\"\nReturncode String_concat(\n    char* self, int max_length, int* length, char* ext, int ext_length) {\n  if (*length + ext_length >= max_length) {\n    CRAISE(LUMI_error_messages.string_too_long.str)\n  }\n  memcpy(self + *length, ext, ext_length);\n  *length += ext_length;\n  self[*length] = '\\0';\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"String.concat-int\"\nReturncode String_concat_int(\n    char* self, int max_length, int* length, Int num) {\n  int added_length = 0;\n  CCHECK(Int_str(num, self + *length, max_length - *length, &added_length));\n  *length += added_length;\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\nvoid String_find(\n    char* self, int max_length, int *length,\n    char* pattern, int pattern_length,\n    Int* out_index) {\n  int n;\n  for (n = 0; n <= *length - pattern_length; ++n) {\n    if (strncmp(self + n, pattern, pattern_length) == 0) {\n      *out_index = n;\n      return;\n    }\n  }\n  *out_index = *length;\n}\n\nvoid String_has(\n    char* self, int max_length, int *length, Char ch, Bool* found) {\n  int n;\n  for (n = 0; n < *length; ++n) {\n    if (self[n] == ch) {\n      *found = true;\n      return;\n    }\n  }\n  *found = false;\n}\n\n\n/* File */\n\nvoid File_Del(File* self) {\n  if (self != NULL && self->fobj != NULL) {\n    fclose(self->fobj);\n  }\n}\n\nGeneric_Type_Dynamic File_dynamic = { (Dynamic_Del)File_Del };\n\n#define LUMI_FUNC_NAME \"file-close\"\nReturncode file_close(File* file) {\n  if (lumi_debug_value == LUMI_DEBUG_FAIL || file->fobj != NULL) {\n    if (lumi_debug_value == LUMI_DEBUG_FAIL || fclose(file->fobj) != 0) {\n      free(file);\n      CRAISE(\"close file failed\")\n    }\n    file->fobj = NULL;\n  }\n  free(file);\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"open-file\"\nReturncode open_file(\n    File** file,\n    char* name, int name_max_length, int name_length,\n    char* mode) {\n  FILE* new_fobj = NULL;\n  if (lumi_debug_value == LUMI_DEBUG_NOTHING) {\n    CCHECK(file_close(*file));\n  }\n  *file = NULL;\n  if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n    if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n      new_fobj = fopen(name, mode);\n    }\n    if (new_fobj == NULL) {\n      CRAISE(\"open file failed\")\n    }\n  }\n  *file = LUMI_alloc(sizeof(File));\n  if (*file == NULL) {\n    if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n      fclose(new_fobj);\n    }\n    CRAISE(LUMI_error_messages.object_memory.str)\n  }\n  (*file)->fobj = new_fobj;\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\nReturncode file_open_read(\n    char* name, int name_max_length, int *name_length, File** file) {\n  return open_file(file, name, name_max_length, *name_length, \"r\");\n}\n\nReturncode file_open_write(\n    char* name, int name_max_length, int *name_length, File** file) {\n  return open_file(\n    file, name, name_max_length, *name_length, \"w\");\n}\n\nBool getc_is_eof(int get, char* ch) {\n  if (get == EOF) {\n    return true;\n  }\n  else {\n    *ch = get;\n    return false;\n  }\n}\n\n#define LUMI_FUNC_NAME \"File.getc\"\nReturncode File_getc(File* file, Char* out_char, Bool* is_eof) {\n  if (file->fobj == NULL) CRAISE(LUMI_error_messages.file_not_opened.str)\n  *is_eof = getc_is_eof(getc(file->fobj), out_char);\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"File.putc\"\nReturncode File_putc(File* file, Char ch) {\n  int res = '\\0';\n  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n    if (file->fobj == NULL) CRAISE(LUMI_error_messages.file_not_opened.str)\n    res = putc(ch, file->fobj);\n  }\n  if (res != ch) {\n    CRAISE(LUMI_error_messages.file_write_failed.str)\n  }\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"File.write\"\nReturncode File_write(File* file, char* text, int text_length) {\n  int n, ch, res=0;\n  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n    if (file->fobj == NULL) CRAISE(LUMI_error_messages.file_not_opened.str)\n  }\n  for (n = 0; n < text_length; ++n) {\n    ch = text[n];\n    if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n      res = putc(ch, file->fobj);\n    }\n    if (ch != res) {\n      CRAISE(LUMI_error_messages.file_write_failed.str)\n    }\n  }\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n\n/* system */\n\nint set_sys(int argc, char* argv[]) {\n  int arg;\n  sys = LUMI_alloc(sizeof(Sys));\n  sys_Refman = LUMI_new_ref(sys);\n  if (sys != NULL) {\n    int max_length = 0;\n    sys->stdout_Cname = LUMI_alloc(sizeof(File));\n    sys->stdout_Cname_Refman = LUMI_new_ref(sys->stdout_Cname);\n    sys->stdin_Cname = LUMI_alloc(sizeof(File));\n    sys->stdin_Cname_Refman = LUMI_new_ref(sys->stdin_Cname);\n    sys->stderr_Cname = LUMI_alloc(sizeof(File));\n    sys->stderr_Cname_Refman = LUMI_new_ref(sys->stderr_Cname);\n    sys->argv_Length = argc;\n    sys->argv_Value_length = 0;\n    sys->argv_String_length = LUMI_alloc(sizeof(int) * argc);\n    for (arg = 0; arg < argc; ++arg) {\n      int length = cstring_length(argv[arg], 1024);\n      if (sys->argv_String_length != NULL) {\n        sys->argv_String_length[arg] = length;\n      }\n      if (length > sys->argv_Value_length) {\n        sys->argv_Value_length = length;\n      }\n    }\n    ++sys->argv_Value_length;\n    sys->argv = LUMI_alloc(sys->argv_Value_length * sys->argv_Length);\n    sys->argv_Refman = LUMI_new_ref(sys->argv);\n  }\n  if (sys == NULL || sys_Refman == NULL || sys->argv == NULL ||\n    sys->argv_Refman == NULL || sys->argv_String_length == NULL ||\n    sys->stdout_Cname == NULL || sys->stdout_Cname_Refman == NULL ||\n    sys->stdin_Cname == NULL || sys->stdin_Cname_Refman == NULL ||\n    sys->stderr_Cname == NULL || sys->stderr_Cname_Refman == NULL) {\n    fprintf(stderr, \"insufficient memory\\n\");\n    return ERR;\n  }\n  ++sys_Refman->count;\n  ++sys->argv_Refman->count;\n  ++sys->stdout_Cname_Refman->count;\n  ++sys->stdin_Cname_Refman->count;\n  ++sys->stderr_Cname_Refman->count;\n  sys->stdout_Cname->fobj = stdout;\n  sys->stdin_Cname->fobj = stdin;\n  sys->stderr_Cname->fobj = stderr;\n  for (arg = 0; arg < argc; ++arg) {\n    strncpy(sys->argv + sys->argv_Value_length * arg, argv[arg], sys->argv_Length);\n  }\n  return OK;\n}\n\nvoid Sys_Del(Sys* self) {}\nGeneric_Type_Dynamic Sys_dynamic = { (Dynamic_Del)Sys_Del };\n\n#define LUMI_FUNC_NAME \"Sys.print\"\nReturncode Sys_print(Sys* _, char* text, int text_length) {\n  int n, ch, res;\n  for (n = 0; n < text_length; ++n) {\n    ch = text[n];\n    res = putchar(ch);\n    if (ch != res) {\n      CRAISE(LUMI_error_messages.file_write_failed.str)\n    }\n  }\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"Sys.println\"\nReturncode Sys_println(Sys* _, char* text, int text_length) {\n  Sys_print(NULL, text, text_length);\n  if (putchar('\\n') != '\\n') {\n    CRAISE(LUMI_error_messages.file_write_failed.str)\n  }\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\nvoid Sys_getchar(Sys* _, char* out_char, Bool* is_eof) {\n  *is_eof = getc_is_eof(getchar(), out_char);\n}\n\n#define LUMI_FUNC_NAME \"Sys.getline\"\nReturncode Sys_getline(\n    Sys* _, char* line, int line_max_length, int* line_length) {\n  int ch = 0;\n  *line_length = 0;\n  if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n    ch = getchar();\n  }\n  while (ch != EOF && ch != '\\n') {\n    if (*line_length + 1 >= line_max_length) {\n      CRAISE(LUMI_error_messages.string_too_long.str)\n    }\n    line[*line_length] = ch;\n    ++(*line_length);\n    if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n      ch = getchar();\n    }\n  }\n  line[*line_length] = '\\0';\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"Sys.exit\"\nReturncode Sys_exit(Sys* _, Int status) {\n  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n    exit(status);\n  }\n  CRAISE(\"exit failed\")\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"Sys.system\"\nReturncode Sys_system(\n    Sys* _,\n    char* command, int command_max_length, int *command_length,\n    Int* status) {\n  int res = -1;\n  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n    res = system(command);\n  }\n  if (res == -1) {\n    CRAISE(\"command execution failed\")\n  }\n  *status = res;\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\nReturncode Sys_getenv(\n    Sys* _,\n    char* name, int name_max_length, int *name_length,\n    char* value, int value_max_length, int* value_length,\n    Bool* exists) {\n  char* ret;\n  ret = getenv(name);\n  if (ret == NULL) {\n    *exists = false;\n    return OK;\n  }\n  *value_length = cstring_length(ret, value_max_length);\n  strncpy(value, ret, *value_length);\n  *exists = true;\n  return OK;\n}\n");
   tl5_compiler_M_output_header_code = aux_String_1;
   tl5_compiler_M_output_header_code_Refman = aux_String_1_Refman;
   LUMI_inc_ref(tl5_compiler_M_output_header_code_Refman);

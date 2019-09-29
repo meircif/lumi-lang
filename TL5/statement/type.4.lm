@@ -266,7 +266,7 @@ class TypeData(SyntaxTreeNamespace)
     self.indentation-spaces := INDENTATION-SPACES
     if self.base-type?
       self.write-spaces()
-      self.base-type.type-data.write-cname()
+      self.base-type.write-cname()
       write(user " _base;\n")
     self.write-children(user self.variables)
     write(user "};\n")
@@ -276,7 +276,7 @@ class TypeData(SyntaxTreeNamespace)
       write(user "_Dynamic {\n")
       if self.is-base-dynamic()
         self.write-spaces()
-        self.base-type.type-data.write-cname()
+        self.base-type.write-cname()
         write(user "_Dynamic _base;\n")
       else
         self.write-spaces()
@@ -355,7 +355,7 @@ class TypeData(SyntaxTreeNamespace)
     write(user "if (self == NULL) return;\n")
     if self.base-type?
       write-spaces(copy INDENTATION-SPACES)
-      self.base-type.type-data.write-cname()
+      self.base-type.write-cname()
       write(user "_Del(&(self->_base));\n")
     if self.is-delete-mocked
       write-spaces(copy INDENTATION-SPACES)
