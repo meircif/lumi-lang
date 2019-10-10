@@ -3785,6 +3785,8 @@ expected space after "new", got "new-line"
 sequence length is not constant
 /// @ te10
 illegal variable name "error--name"
+/// @ te11
+unexpected space after variable name
 /// @@ test-initialize
 /// @ t0
 ut_M_Tb* aux_Tb_0 = NULL;
@@ -5625,11 +5627,27 @@ void ut_M_call(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
+/// @ tf2
+void ut_M_call(void);
+void ut_M_call(void) {
+    unsigned LUMI_loop_depth = 1;
+    SOME_External_func();
+LUMI_block0_cleanup:
+    (void)0;
+}
 /// @ tv0
 void ut_M_use(void);
 void ut_M_use(void) {
     unsigned LUMI_loop_depth = 1;
     x = 2;
+LUMI_block0_cleanup:
+    (void)0;
+}
+/// @ tv1
+void ut_M_use(void);
+void ut_M_use(void) {
+    unsigned LUMI_loop_depth = 1;
+    SOME_External_var = 2;
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -5641,12 +5659,29 @@ void ut_M_get(Int* x) {
 LUMI_block0_cleanup:
     (void)0;
 }
+/// @ tc1
+void ut_M_get(Int* x);
+void ut_M_get(Int* x) {
+    unsigned LUMI_loop_depth = 1;
+    *x = SOME_External_const;
+LUMI_block0_cleanup:
+    (void)0;
+}
 /// @ tt0
 void ut_M_call(void);
 void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
     Native n = 0;
     n = external(n);
+LUMI_block0_cleanup:
+    (void)0;
+}
+/// @ tt1
+void ut_M_call(void);
+void ut_M_call(void) {
+    unsigned LUMI_loop_depth = 1;
+    SOME_External_type n = 0;
+    n = SOME_External_func(n);
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -5686,12 +5721,18 @@ managed argument to native function
 error raising native function
 /// @ tef13
 output argument in native function call
+/// @ tef14
+no '"' around string constant "error"
 /// @ tev0
 only primitive types supported for native variable, got "String"
+/// @ tev1
+no '"' around string constant "error"
 /// @ tec0
-expected new-line after "VALUE", got " "
+no '"' around string constant "error"
 /// @ tec1
 sequence length is not constant
+/// @ tet0
+no '"' around string constant "error"
 /// @@ test-parameter-type
 /// @ t0
 typedef struct ut_M_Test ut_M_Test;

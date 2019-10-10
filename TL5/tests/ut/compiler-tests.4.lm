@@ -270,4 +270,3 @@ test test-no-code-to-test()
   test-cover-error(
       copy true,
       user "General code error: no code to test under module \"error\"\n")
-

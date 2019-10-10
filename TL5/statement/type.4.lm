@@ -23,8 +23,8 @@ class TypeData(SyntaxTreeNamespace)
     new-node.parse(copy is-dynamic)
   
   func inst parse(copy Bool is-dynamic)
-    self.is-dynamic := is-dynamic
     self.set-location()
+    self.is-dynamic := is-dynamic
     self.my-module := glob.current-module
     read-new(user "({")->(owner self.name)
     self.add-type(user self.my-module)
@@ -233,7 +233,7 @@ class TypeData(SyntaxTreeNamespace)
       type-data.collect-delete-group()
       type-data.delete-group.extend(user self.delete-group)
   
-  func inst write-cname()
+  func dynamic write-cname()
     if self.my-module?
       self.my-module.write-prefix()
     write-cname(user self.name)

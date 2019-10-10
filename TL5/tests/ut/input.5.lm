@@ -1665,6 +1665,8 @@ new
 var Array{i:Int} error
 ; @ ec te10
 var Int error--name
+; @ ec te11
+var Int x 
 ; @@ test-initialize
 ; @ c t0
 tb := Tb(copy i)!
@@ -2385,17 +2387,35 @@ func call()
     user Test? t
     i := external(copy 5, user s, user a, user t)
     i := (2 * external(copy 5, user s, user a, user t)) + 3
+; @ g tf2
+native func external() "SOME_External_func"
+func call()
+    external()
 ; @ g tv0
 native var Int x
+func use()
+    x := 2
+; @ g tv1
+native var Int x "SOME_External_var"
 func use()
     x := 2
 ; @ g tc0
 native const Int VALUE
 func get()->(var Int x)
     x := VALUE
+; @ g tc1
+native const Int VALUE "SOME_External_const"
+func get()->(var Int x)
+    x := VALUE
 ; @ g tt0
 native type Native
 native func external(copy Native n)->(copy Native no)
+func call()
+    var Native n
+    n := external(copy n)
+; @ g tt1
+native type Native "SOME_External_type"
+native func external(copy Native n)->(copy Native no) "SOME_External_func"
 func call()
     var Native n
     n := external(copy n)
@@ -2438,13 +2458,19 @@ native func ! error()
 native func fun()->(copy Int res)
 func error(copy Int i)
     fun()->(copy i)
+; @ eg tef14
+native func fun()->(copy Int res) error
 ; @ eg tev0
 native var String s
+; @ eg tev1
+native var Int x error
 ; @ eg tec0
-native const Int VALUE 12
+native const Int VALUE error
 ; @ eg tec1
 native const Int VALUE
 var String{VALUE} error
+; @ eg tet0
+native type Native error
 ; @@ test-parameter-type
 ; @ g t0
 struct Test{Generic}

@@ -7,7 +7,7 @@ typedef struct Native {
 
 extern int external_int;
 
-void external0(void);
+void MY_Some_external(void);
 
 Native external1(int i, char* s, int* a);
 

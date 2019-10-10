@@ -25,6 +25,12 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   var Bool header-only
   var Bool external-body
   var Bool err-aux-var
+
+  new()
+    self.set-location()
+    self.arguments.new()
+    self.delete-group-builder-owner := DeleteGroupBuilder(user self)
+    self.delete-group-builder := self.delete-group-builder-owner
   
   func inst parse-new(user TypeData parent-type)->(
       owner SyntaxTreeFunction new-node)
@@ -56,12 +62,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       self.my-module := glob.current-module
     self.parse-header(copy false)
     self.parse-body()
-  
-  new()
-    self.set-location()
-    self.arguments.new()
-    self.delete-group-builder-owner := DeleteGroupBuilder(user self)
-    self.delete-group-builder := self.delete-group-builder-owner
   
   func inst parse-body()
     if self.header-only
@@ -361,7 +361,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
           parameter.access = Access.WEAK
         self.write-variable-cleanup(user parameter.get-variable(), user _)
   
-  func inst write-cname()
+  func dynamic write-cname()
     if self.parent-type?
       self.parent-type.write-cname()
       write(user "_")

@@ -45,7 +45,9 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.type-instance.parse(
           user " ", user self, user _, copy INDENTATION-SPACES)
     self.expect-space(user "type")
-    read-new(user "!(")->(owner self.name)
+    read-new(user "!( ")->(owner self.name)
+    if glob.last-char = ' ' and not self.is-native
+      self.syntax-error-msg(user "unexpected space after variable name")
     self.check-name()
     if glob.last-char = '(' and self.parent-type?
       self.syntax-error-msg(user "type members cannot be initialized")
@@ -155,7 +157,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   func dynamic check-memory(user ReferenceMemoryList refs)
     refs.add(user self)
   
-  func inst write-cname()
+  func dynamic write-cname()
     if self.my-module?
       self.my-module.write-prefix()
     write-cname(user self.name)
@@ -475,9 +477,7 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
     read-new(user " ")->(owner self.name)
     if not is-legal-name(user self.name, copy NameGroup.CONSTANT)
       self.syntax-error(user "illegal constant name", user self.name)
-    if self.is-native
-      self.expect-new-line(user self.name)
-    else
+    if not self.is-native
       self.expect-space(user self.name)
       self.value.new(user "", user self)
     glob.type-int.new-type-instance()->(owner self.type-instance)

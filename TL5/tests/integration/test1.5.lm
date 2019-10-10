@@ -127,7 +127,7 @@ native include "external.h"
 native var Int external-int
 native const Int EXTERNAL-CONST
 native type Native
-native func external0()
+native func external0() "MY_Some_external"
 native func external1(copy Int i, user String s, user Array{Int} a)->(
         copy Native n)
 native func external2(copy Native n)->(copy Int i)

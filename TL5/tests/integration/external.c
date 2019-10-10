@@ -4,7 +4,7 @@ int external_int = 6;
 
 struct Native nvar = {3, 4};
 
-void external0(void) {
+void MY_Some_external(void) {
   external_int = 7;
 }
 

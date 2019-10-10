@@ -2,26 +2,37 @@
 module tl5-compiler
 
 
+struct NativeText
+  owner String text
+  
+  new(user SyntaxTreeNode node)
+    read-new(user "")->(owner self.text)
+    node.check-string(user self.text)
+  
+  func write()
+    write(user self.text[1:self.text.length - 2])
+
+
 ~~~ Native include declaration in the syntax tree ~~~
 class NativeInclude(SyntaxTreeFunction)
-  owner String path
+  owner NativeText path
 
   func inst parse-new()->(owner NativeInclude new-node)
     new-node := NativeInclude()
     new-node.parse()
   
   func inst parse()
-    read-new(user "")->(owner self.path)
-    self.check-string(user self.path)
+    self.path := NativeText(user self)
   
   func dynamic write()
     write(user "\n#include <")
-    write(user self.path[1:self.path.length - 2])
+    self.path.write()
     write(user ">\n")
 
 
 ~~~ Native function declaration in the syntax tree ~~~
 class NativeFunction(SyntaxTreeFunction)
+  owner NativeText cname
   user ModuleMembers outer-module
   
   func inst parse-new()->(owner NativeFunction new-node)
@@ -31,6 +42,8 @@ class NativeFunction(SyntaxTreeFunction)
   func inst parse()
     self.outer-module := glob.current-module
     self.parse-header(copy true)
+    if glob.last-char = ' '
+      self.cname := NativeText(user self)
     if self.arguments.has-error
       self.syntax-error-msg(user "error raising native function")
     if self.arguments.outputs.first?
@@ -53,16 +66,29 @@ class NativeFunction(SyntaxTreeFunction)
   
   func dynamic write()
     ; do nothing
+  
+  func dynamic write-cname()
+    if self.cname?
+      self.cname.write()
+    else
+      base()
 
 
 ~~~ Native variable declaration in the syntax tree ~~~
 class NativeVariable(SyntaxTreeVariable)
+  owner NativeText cname
+  
   func inst parse-new()->(owner NativeVariable new-node)
     new-node := NativeVariable(user _)
-    new-node.parse(
+    new-node.parse-native()
+  
+  func inst parse-native()
+    self.is-native := true
+    self.parse(
         copy Access.VAR, copy false, user _, user glob.global-module)
-    new-node.is-native := true
-    new-node.my-module := _
+    if glob.last-char = ' '
+      self.cname := NativeText(user self)
+    self.my-module := _
   
   func dynamic analyze()
     if not self.type-instance.type-data.is-primitive
@@ -73,16 +99,29 @@ class NativeVariable(SyntaxTreeVariable)
   
   func dynamic write()
     ; do nothing
+  
+  func dynamic write-cname()
+    if self.cname?
+      self.cname.write()
+    else
+      base()
 
 
 ~~~ Native constant declaration in the syntax tree ~~~
 class NativeConstant(SyntaxTreeConstant)
+  owner NativeText cname
+  
   func inst parse-new()->(owner NativeConstant new-node)
     new-node := NativeConstant(user _)
-    new-node.is-native := true
-    new-node.parse(user glob.global-module)
-    new-node.is-ordered := true
-    new-node.my-module := _
+    new-node.parse-native()
+  
+  func inst parse-native()
+    self.is-native := true
+    self.parse(user glob.global-module)
+    if glob.last-char = ' '
+      self.cname := NativeText(user self)
+    self.is-ordered := true
+    self.my-module := _
 
   func dynamic analyze()
     ; do nothing
@@ -92,17 +131,30 @@ class NativeConstant(SyntaxTreeConstant)
 
   func dynamic write()
     ; do nothing
+  
+  func dynamic write-cname()
+    if self.cname?
+      self.cname.write()
+    else
+      base()
 
 
 ~~~ Native variable declaration in the syntax tree ~~~
 class NativeType(TypeData)
+  owner NativeText cname
+
+  new()
+    self.set-location()
+    self.is-primitive := true
+  
   func inst parse-new()->(owner NativeType new-node)
     new-node := NativeType()
     new-node.parse()
   
   func inst parse()
-    self.is-primitive := true
-    read-new(user "")->(owner self.name)
+    read-new(user " ")->(owner self.name)
+    if glob.last-char = ' '
+      self.cname := NativeText(user self)
     self.add-type(user glob.global-module)
   
   func dynamic analyze()
@@ -122,3 +174,9 @@ class NativeType(TypeData)
   
   func dynamic write()
     ; do nothing
+  
+  func dynamic write-cname()
+    if self.cname?
+      self.cname.write()
+    else
+      base()
