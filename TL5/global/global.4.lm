@@ -235,6 +235,7 @@ struct Global
     self.type-pointer.parameters.add(owner string-new-copy(user "Pointed"))
     self.root.modules.add(owner cdef-module)
     user SyntaxTreeFunction function
+    user TypeInstance argument-type-instance
     
     ; Pointer
     self.add-builtin-method(
@@ -247,6 +248,57 @@ struct Global
         user function, copy Access.VAR, user self.type-generic, user "pointed")
     string-new-copy(user self.type-pointer.parameters.first.item)->(
         owner function.arguments.parameters.last.item.get-type-instance().name)
+    
+    self.add-builtin-method(
+        user self.type-pointer,
+        user "set-from-array",
+        copy false,
+        copy Access.COPY)->(
+        user function)
+    self.add-builtin-argument(
+        user function,
+        user function.arguments.parameters,
+        copy false,
+        copy Access.USER,
+        user self.type-array,
+        user self.type-generic,
+        user "array")
+    function.arguments.parameters.last.item.get-type-instance()->(
+        user argument-type-instance)
+    string-new-copy(user self.type-pointer.parameters.first.item)->(
+        owner argument-type-instance.parameters.first.item.name)
+        
+    self.add-builtin-method(
+        user self.type-pointer,
+        user "get-pointed-at",
+        copy false,
+        copy Access.COPY)->(
+        user function)
+    self.add-builtin-parameter(
+        user function, copy Access.COPY, user self.type-int, user "index")
+    self.add-builtin-output(
+        user function, copy Access.VAR, user self.type-generic, user "pointed")
+    function.arguments.outputs.last.item.get-type-instance()->(
+        user argument-type-instance)
+    argument-type-instance.conditional := false
+    string-new-copy(user self.type-pointer.parameters.first.item)->(
+        owner argument-type-instance.name)
+        
+    self.add-builtin-method(
+        user self.type-pointer,
+        user "get-ref-at",
+        copy false,
+        copy Access.COPY)->(
+        user function)
+    self.add-builtin-parameter(
+        user function, copy Access.COPY, user self.type-int, user "index")
+    self.add-builtin-output(
+        user function, copy Access.USER, user self.type-generic, user "pointed")
+    function.arguments.outputs.last.item.get-type-instance()->(
+        user argument-type-instance)
+    argument-type-instance.conditional := false
+    string-new-copy(user self.type-pointer.parameters.first.item)->(
+        owner argument-type-instance.name)
     
     ; Int
     self.add-builtin-method(

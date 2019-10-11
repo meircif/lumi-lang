@@ -3947,10 +3947,35 @@ var cdef.Pointer{cdef.Uint} p-uint
 var cdef.Pointer{Test} p-test
 var cdef.Pointer{cdef.Pointer{cdef.Int}} pp-int
 var cdef.Pointer{cdef.Pointer{cdef.Pointer{cdef.Char}}} ppp-char
-var cdef.Char cchar
-p-char.set-point-to(var cchar)
+; @ c t2
+var cdef.Int int
+var cdef.Pointer{cdef.Int} p-int
+var cdef.Pointer{cdef.Pointer{cdef.Int}} pp-int
+user Array?{cdef.Int} arr-int
+p-int.set-from-array(user arr-int!)
+p-int.set-point-to(var int)
+pp-int.set-point-to(var p-int)
+pp-int.get-pointed-at(copy 0)->(var p-int)
+p-int.get-pointed-at(copy 3)->(var int)
+var Test test
+user Test u-test(user test)
+var cdef.Pointer{Test} p-test
+user Array?{Test} arr-test
+p-test.set-from-array(user arr-test!)
+p-test.set-point-to(var test)
+p-test.get-ref-at(copy 5)->(user u-test)
+; @ c t3
+var cdef.Pointer{cdef.Char} p-char
 ostr!.copy-char-pointer(copy p-char)!
 ostr!.set-null-term-length()
 ; @ ec te0
 var cdef.Pointer{Ta} error
+; @ ec te1
+var cdef.Int int
+var cdef.Pointer{cdef.Int} p-int
+p-int.get-ref-at(copy 5)->(user int)
+; @ ec te2
+var Test test
+var cdef.Pointer{Test} p-test
+p-test.get-pointed-at(copy 0)->(var test)
 ; @

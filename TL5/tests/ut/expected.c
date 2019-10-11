@@ -8938,13 +8938,41 @@ cdef_M_VoidPointer p_void = 0;
     ut_M_Test* p_test = 0;
     cdef_M_Int** pp_int = 0;
     cdef_M_Char*** ppp_char = 0;
-    cdef_M_Char cchar = 0;
-    cdef_M_Pointer_set_point_to(p_char, cchar, &cdef_M_Char_dynamic);
-    CHECK_REF(9, LUMI_block0_cleanup, ut_M_ostr)
+/// @ t2
+cdef_M_Int int = 0;
+    cdef_M_Int* p_int = 0;
+    cdef_M_Int** pp_int = 0;
+    cdef_M_Int* arr_int = NULL;
+    int arr_int_Length = 0;
+    ut_M_Test test_Var = {0};
+    ut_M_Test* test = NULL;
+    ut_M_Test* u_test = NULL;
+    ut_M_Test* p_test = 0;
+    ut_M_Test* arr_test = NULL;
+    int arr_test_Length = 0;
+    CHECK_REF(5, LUMI_block0_cleanup, arr_int)
+    cdef_M_Pointer_set_from_array(p_int, arr_int, arr_int_Length);
+    cdef_M_Pointer_set_point_to(p_int, int, &cdef_M_Int_dynamic);
+    cdef_M_Pointer_set_point_to(pp_int, p_int, &cdef_M_Int*_dynamic);
+    cdef_M_Pointer_get_pointed_at(pp_int, 0, (void*)&(p_int), &dynamic_Void);
+    cdef_M_Pointer_get_pointed_at(p_int, 3, (void*)&(int), &dynamic_Void);
+    test = &test_Var;
+    u_test = test;
+    CHECK_REF(14, LUMI_block0_cleanup, arr_test)
+    cdef_M_Pointer_set_from_array(p_test, arr_test, arr_test_Length);
+    cdef_M_Pointer_set_point_to(p_test, test, &ut_M_Test_dynamic);
+    cdef_M_Pointer_get_ref_at(p_test, 5, (void*)&(u_test), &dynamic_Void);
+/// @ t3
+cdef_M_Char* p_char = 0;
+    CHECK_REF(2, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = String_copy_char_pointer(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, p_char);
-    CHECK(9, LUMI_block0_cleanup)
-    CHECK_REF(10, LUMI_block0_cleanup, ut_M_ostr)
+    CHECK(2, LUMI_block0_cleanup)
+    CHECK_REF(3, LUMI_block0_cleanup, ut_M_ostr)
     String_set_null_term_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
 /// @ te0
 dynamic pointed type "Ta"
+/// @ te1
+assigning into access "user" invalid access "var"
+/// @ te2
+non assignable call output
 /// @
