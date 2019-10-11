@@ -7,10 +7,9 @@ native type CtimeT "time_t"
 
 native const Int CLOCKS-PER-SEC
 
-native func c-asctime(user Time timeptr)->(
-        copy cdef.Pointer{cdef.Char} res) "asctime"
-
 native func c-clock()->(copy cdef.Double res) "clock"
+
+native func c-time(copy cdef.Pointer{CtimeT} timer)->(copy CtimeT res) "time"
 
 native func c-ctime(copy cdef.Pointer{CtimeT} timer)->(
         copy cdef.Pointer{cdef.Char} res) "ctime"
@@ -18,11 +17,8 @@ native func c-ctime(copy cdef.Pointer{CtimeT} timer)->(
 native func c-difftime(copy CtimeT time1, copy CtimeT time2)->(
         copy cdef.Double res) "difftime"
 
-native func c-gmtime(copy cdef.Pointer{CtimeT} timer)->(
-        user Time? res) "gmtime"
-
-native func c-localtime(copy cdef.Pointer{CtimeT} timer)->(
-        user Time? res) "localtime"
+native func c-asctime(user Time timeptr)->(
+        copy cdef.Pointer{cdef.Char} res) "asctime"
 
 native func c-mktime(user Time timeptr)->(copy CtimeT res) "mktime"
 
@@ -33,11 +29,11 @@ native func c-strftime(
         user Time timeptr)->(
         copy cdef.Size res) "strftime"
 
-native func c-time(copy cdef.Pointer{CtimeT} timer)->(copy CtimeT res) "time"
+native func c-gmtime(copy cdef.Pointer{CtimeT} timer)->(
+        user Time? res) "gmtime"
 
-
-func clock()->(var Int ticks)
-    ticks := c-clock()
+native func c-localtime(copy cdef.Pointer{CtimeT} timer)->(
+        user Time? res) "localtime"
 
 
 struct Timer
@@ -63,10 +59,6 @@ struct Timer
         new-time := c-localtime(copy self.c-pointer())
 
 
-func difftime(user Timer timer1, user Timer timer2)->(var Int diff)
-    diff := c-difftime(copy timer1.c-timer, copy timer2.c-timer)
-
-
 struct Time
     var Int sec
     var Int min
@@ -90,3 +82,11 @@ struct Time
                 user format,
                 user self)
         target.set-null-term-length()
+
+
+func clock()->(var Int ticks)
+    ticks := c-clock()
+
+
+func difftime(user Timer timer1, user Timer timer2)->(var Int diff)
+    diff := c-difftime(copy timer1.c-timer, copy timer2.c-timer)
