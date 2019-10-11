@@ -97,6 +97,7 @@ struct Global
   user TypeData type-file
   user TypeData type-sys
   user TypeData type-pointer
+  user TypeData type-c-char
   
   ~~~ referenced built-in functions ~~~
   user SyntaxTreeFunction string-copy-function
@@ -215,7 +216,7 @@ struct Global
     
     ; cdef types
     new ModuleMembers cdef-module(user "cdef")
-    self.add-cint-type(user cdef-module, user "Char")
+    self.add-cint-type(user cdef-module, user "Char")->(user self.type-c-char)
     self.add-cint-type(user cdef-module, user "Uchar")
     self.add-cint-type(user cdef-module, user "Short")
     self.add-cint-type(user cdef-module, user "Ushort")
@@ -227,15 +228,25 @@ struct Global
     self.add-cint-type(user cdef-module, user "Float")
     self.add-cint-type(user cdef-module, user "Double")
     self.add-cint-type(user cdef-module, user "LongDouble")
-    user TypeData void-pointer
-    self.add-cdef-type(user cdef-module, user "VoidPointer")->(
-        user void-pointer)
+    self.add-cdef-type(user cdef-module, user "VoidPointer")
     self.add-cdef-type(user cdef-module, user "Pointer")->(
         user self.type-pointer)
     self.type-pointer.parameters := List{String}()
     self.type-pointer.parameters.add(owner string-new-copy(user "Pointed"))
     self.root.modules.add(owner cdef-module)
     user SyntaxTreeFunction function
+    
+    ; Pointer
+    self.add-builtin-method(
+        user self.type-pointer,
+        user "set-point-to",
+        copy false,
+        copy Access.COPY)->(
+        user function)
+    self.add-builtin-parameter(
+        user function, copy Access.VAR, user self.type-generic, user "pointed")
+    string-new-copy(user self.type-pointer.parameters.first.item)->(
+        owner function.arguments.parameters.last.item.get-type-instance().name)
     
     ; Int
     self.add-builtin-method(
@@ -283,6 +294,28 @@ struct Global
     self.add-builtin-char-array-argument(
         user function, copy false, copy Access.USER, user "other")
     self.string-copy-function := function
+
+    self.add-builtin-method(
+        user self.type-string,
+        user "copy-char-pointer",
+        copy true,
+        copy Access.USER)->(
+        user function)
+    self.add-builtin-argument(
+        user function,
+        user function.arguments.parameters,
+        copy false,
+        copy Access.COPY,
+        user self.type-pointer,
+        user self.type-c-char,
+        user "char-pointer")
+
+    self.add-builtin-method(
+        user self.type-string,
+        user "set-null-term-length",
+        copy false,
+        copy Access.USER)->(
+        user function)
     
     self.add-builtin-method(
         user self.type-string, user "clear", copy false, copy Access.USER)->(
@@ -472,8 +505,10 @@ struct Global
         user self.global-module, user name, copy is-primitive)->(
         user type-data)
   
-  func add-cint-type(user ModuleMembers cdef-module, user String name)
-    self.add-cdef-type(user cdef-module, user name).is-int-like := true
+  func add-cint-type(user ModuleMembers cdef-module, user String name)->(
+      user TypeData type-data)
+    self.add-cdef-type(user cdef-module, user name)->(user type-data)
+    type-data.is-int-like := true
   
   func add-cdef-type(user ModuleMembers cdef-module, user String name)->(
       user TypeData type-data)

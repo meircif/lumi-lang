@@ -175,9 +175,9 @@ struct TypeInstance
               user "too many parameters given for type",
               user self.type-data.name)
         if self.type-data is glob.type-pointer
-          if not sub-type.type-data.is-primitive
+          if sub-type.type-data.is-dynamic
             node.syntax-error(
-                user "non primitive pointed type",
+                user "dynamic pointed type",
                 user sub-type.type-data.name)
         else-if sub-type.type-data.is-primitive
           node.syntax-error(

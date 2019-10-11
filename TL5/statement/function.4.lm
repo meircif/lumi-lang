@@ -458,7 +458,8 @@ class DeclarationArgument(Argument)
     self.variable.type-instance.link-types(user self)
   
   func dynamic analyze()
-    if self.variable.type-instance.type-data.is-primitive
+    user TypeData type-data(user self.variable.type-instance.type-data)
+    if type-data.is-primitive
       if self.is-output and not self.is-native and self.access != Access.VAR
         self.syntax-error2(
             user "output",
@@ -476,14 +477,14 @@ class DeclarationArgument(Argument)
           user "argument",
           user self.variable.name,
           user "access should not be \"copy\" for non-primitive type",
-          user self.variable.type-instance.type-data.name)
+          user type-data.name)
     else-if self.is-output
       if access-is-only-var(copy self.access)
         self.syntax-error2(
             user "output",
             user self.variable.name,
             user "access should not be \"var\" for non-primitive type",
-            user self.variable.type-instance.type-data.name)
+            user type-data.name)
       if not self.variable.type-instance.conditional
         self.syntax-error(
             user "not yet supporting non-conditional and non-primitive output",
@@ -495,8 +496,11 @@ class DeclarationArgument(Argument)
       if access-has-refman(copy self.access)
         self.syntax-error-msg(user "managed argument to native function")
       if self.is-output
-        if self.access = Access.USER
-          self.syntax-error-msg(user "user output to native function")
+        if self.access = Access.USER and (type-data.is-dynamic or
+            type-data is glob.type-string or type-data is glob.type-array)
+          self.syntax-error(
+              user "user output to native function with non struct type",
+              user type-data.name)
         if self.access = Access.VAR
           self.syntax-error-msg(user "var output to native function")
   

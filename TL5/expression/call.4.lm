@@ -77,6 +77,9 @@ class CallExpression(Expression)
   func inst write-func-call()
     if self.arguments.has-error
       write(user "LUMI_err = ")
+    else-if self.native-output and self.result-type?
+      if not self.result-type.type-data.is-primitive
+        write(user "(void*)")
     self.write-function()
     if self.native-output
       self.arguments.write-call()
@@ -326,6 +329,10 @@ class CallArgument(Argument)
       if self.is-down-cast or self.is-generic
         write(user "(void*)")
       write(user "&(")
+    else-if self.is-native and not self.real-type.type-data.is-primitive and
+        not self.real-type.type-data is glob.type-array and
+        not self.real-type.type-data is glob.type-string
+      write(user "(void*)")
     self.value.write-cast()
     if self.is-output
       write(user ")")
@@ -379,7 +386,6 @@ class CallArgument(Argument)
           user "_Length", user "&Lumi_empty_int", copy false)
       if self.is-output
         write(user ")")
-      
     
     if access-has-refman(copy self.access) and not self.is-native
       ; , [&(]`value`_Refman[)]

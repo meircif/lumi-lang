@@ -9,8 +9,11 @@ struct NativeText
     read-new(user "")->(owner self.text)
     node.check-string(user self.text)
   
-  func write()
-    write(user self.text[1:self.text.length - 2])
+  func write(user String name)
+    if self?
+      write(user self.text[1:self.text.length - 2])
+    else
+      write-cname(user name)
 
 
 ~~~ Native include declaration in the syntax tree ~~~
@@ -26,21 +29,20 @@ class NativeInclude(SyntaxTreeFunction)
   
   func dynamic write()
     write(user "\n#include <")
-    self.path.write()
+    self.path.write(user _)
     write(user ">\n")
 
 
 ~~~ Native function declaration in the syntax tree ~~~
 class NativeFunction(SyntaxTreeFunction)
   owner NativeText cname
-  user ModuleMembers outer-module
   
   func inst parse-new()->(owner NativeFunction new-node)
     new-node := NativeFunction()
     new-node.parse()
   
   func inst parse()
-    self.outer-module := glob.current-module
+    self.my-module := glob.current-module
     self.parse-header(copy true)
     if glob.last-char = ' '
       self.cname := NativeText(user self)
@@ -49,17 +51,10 @@ class NativeFunction(SyntaxTreeFunction)
     if self.arguments.outputs.first?
       if self.arguments.outputs.first.next?
         self.syntax-error-msg(user "more than one output to native function")
-    glob.global-module.function-map.add(user self.name, user self)
+    glob.current-module.function-map.add(user self.name, user self)
   
-  func dynamic link-types()
-    glob.current-module := self.outer-module
-    base()
-    glob.current-module := _
-  
-  func dynamic analyze()
-    glob.current-module := self.outer-module
-    base()
-    glob.current-module := _
+  func dynamic check-memory(user ReferenceMemoryList global-refs)
+    ; do nothing
   
   func dynamic write-declaration()
     ; do nothing
@@ -68,10 +63,7 @@ class NativeFunction(SyntaxTreeFunction)
     ; do nothing
   
   func dynamic write-cname()
-    if self.cname?
-      self.cname.write()
-    else
-      base()
+    self.cname.write(user self.name)
 
 
 ~~~ Native variable declaration in the syntax tree ~~~
@@ -84,11 +76,9 @@ class NativeVariable(SyntaxTreeVariable)
   
   func inst parse-native()
     self.is-native := true
-    self.parse(
-        copy Access.VAR, copy false, user _, user glob.global-module)
+    self.parse(copy Access.VAR, copy false, user _)
     if glob.last-char = ' '
       self.cname := NativeText(user self)
-    self.my-module := _
   
   func dynamic analyze()
     if not self.type-instance.type-data.is-primitive
@@ -101,10 +91,7 @@ class NativeVariable(SyntaxTreeVariable)
     ; do nothing
   
   func dynamic write-cname()
-    if self.cname?
-      self.cname.write()
-    else
-      base()
+    self.cname.write(user self.name)
 
 
 ~~~ Native constant declaration in the syntax tree ~~~
@@ -117,11 +104,10 @@ class NativeConstant(SyntaxTreeConstant)
   
   func inst parse-native()
     self.is-native := true
-    self.parse(user glob.global-module)
+    self.parse()
     if glob.last-char = ' '
       self.cname := NativeText(user self)
     self.is-ordered := true
-    self.my-module := _
 
   func dynamic analyze()
     ; do nothing
@@ -133,10 +119,7 @@ class NativeConstant(SyntaxTreeConstant)
     ; do nothing
   
   func dynamic write-cname()
-    if self.cname?
-      self.cname.write()
-    else
-      base()
+    self.cname.write(user self.name)
 
 
 ~~~ Native variable declaration in the syntax tree ~~~
@@ -155,7 +138,7 @@ class NativeType(TypeData)
     read-new(user " ")->(owner self.name)
     if glob.last-char = ' '
       self.cname := NativeText(user self)
-    self.add-type(user glob.global-module)
+    self.add-type(user glob.current-module)
   
   func dynamic analyze()
     ; do nothing
@@ -176,7 +159,4 @@ class NativeType(TypeData)
     ; do nothing
   
   func dynamic write-cname()
-    if self.cname?
-      self.cname.write()
-    else
-      base()
+    self.cname.write(user self.name)

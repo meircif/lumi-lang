@@ -597,6 +597,10 @@ void LUMI_owner_dec_ref(Ref_Manager* ref) {
   }
 }
 
+/* Pointer */
+
+#define cdef_M_Pointer_set_point_to(pointer, value, _) pointer = &value
+
 
 /* Int */
 
@@ -675,6 +679,33 @@ Returncode String_copy(
   return OK;
 }
 #undef LUMI_FUNC_NAME
+
+#define LUMI_FUNC_NAME "String.copy-char-pointer"
+Returncode String_copy_char_pointer(
+    char* self, int max_length, int* length, char* source) {
+  int source_length;
+  if (source == NULL) {
+    *length = 0;
+    self[0] = '\0';
+    return OK;
+  }
+  if (self == source) {
+    return OK;
+  }
+  source_length = cstring_length(source, max_length);
+  if (source_length >= max_length) {
+    CRAISE(LUMI_error_messages.string_too_long.str)
+  }
+  *length = source_length;
+  memcpy(self, source, source_length);
+  self[source_length] = '\0';
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+void String_set_null_term_length(char* self, int max_length, int* length) {
+  *length = cstring_length(self, max_length);
+}
 
 void String_clear(char* self, int max_length, int* length) {
   *length = 0;

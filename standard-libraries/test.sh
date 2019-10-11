@@ -33,6 +33,11 @@ $CCW -Wno-missing-braces -Wno-typedef-redefinition ../TL4/tl4-compiler.c \
   ../TL3/lumi.3.c -I../TL3 -I../TL4 -o standard-libraries/tl4-compiler
 
 
+# compile tl5-compiler
+$CCA -Wno-overlength-strings ../TL5/tl5-compiler.c ../TL4/lumi.4.c \
+  -I../TL4 -o standard-libraries/tl5-compiler
+
+
 # run standard-libraries unit-tests
 standard-libraries/tl4-compiler standard-libraries/math-tests.c \
   ../standard-libraries/math.4.lm ../standard-libraries/iterator.4.lm \
@@ -42,6 +47,7 @@ $CCA standard-libraries/math-tests.c ../TL4/lumi.4.c -I../TL4 \
 standard-libraries/math-tests -xml
 mkdir standard-libraries/cover-math-tests
 mv cobertura.xml standard-libraries/cover-math-tests
+
 standard-libraries/tl4-compiler standard-libraries/ds-tests.c \
   ../standard-libraries/list.4.lm ../standard-libraries/iterator.4.lm \
   ../standard-libraries/tests/ds-tests.4.lm -t ds
@@ -50,6 +56,15 @@ $CCA standard-libraries/ds-tests.c ../TL4/lumi.4.c -I../TL4 \
 standard-libraries/ds-tests -xml
 mkdir standard-libraries/cover-ds-tests
 mv cobertura.xml standard-libraries/cover-ds-tests
+
+standard-libraries/tl5-compiler standard-libraries/time-tests.c \
+  ../standard-libraries/time.5.lm ../standard-libraries/tests/time-tests.5.lm \
+  -t time
+$CCA standard-libraries/time-tests.c -I../standard-libraries/tests \
+  -o standard-libraries/time-tests
+standard-libraries/time-tests -xml
+mkdir standard-libraries/cover-time-tests
+mv cobertura.xml standard-libraries/cover-time-tests
 
 
 # Standard Libraries teardown

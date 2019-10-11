@@ -2391,6 +2391,13 @@ func call()
 native func external() "SOME_External_func"
 func call()
     external()
+; @ g tf3
+struct Test
+    var Int x
+native func external()->(user Test? t)
+func call()
+    user Test? t
+    t := external()
 ; @ g tv0
 native var Int x
 func use()
@@ -2431,9 +2438,9 @@ native include native.h
 native func error()
 native func error()
 ; @ eg tef1
-native func error()->(copy Int a, copy Int b)
+native func ! error()
 ; @ eg tef2
-native func error()->(user String? s)
+native func error()->(copy Int a, copy Int b)
 ; @ eg tef3
 native func error()->(owner String? s)
 ; @ eg tef4
@@ -2453,13 +2460,24 @@ native func error(strong String s)
 ; @ eg tef11
 native func error(s-var String s)
 ; @ eg tef12
-native func ! error()
-; @ eg tef13
 native func fun()->(copy Int res)
 func error(copy Int i)
     fun()->(copy i)
-; @ eg tef14
+; @ eg tef13
 native func fun()->(copy Int res) error
+; @ eg tef14
+native func error()->(user String? s)
+; @ eg tef15
+native func error()->(user Array?{Int} a)
+; @ eg tef16
+struct Error
+    var Int x
+native func error()->(user Error s)
+; @ eg tef17
+class Error
+    var Int x
+    func dynamic user meth()
+native func error()->(user Error? e)
 ; @ eg tev0
 native var String s
 ; @ eg tev1
@@ -3273,9 +3291,9 @@ func fun()
 ; @-
 module second
 test use()
-    var Native n
-    x := 2
-    external()
+    var ut.Native n
+    ut.x := 2
+    ut.external()
 ; @ ec te0
 ut.error
 ; @ eg te1
@@ -3926,8 +3944,13 @@ i := c-long-double
 var cdef.VoidPointer p-void
 var cdef.Pointer{cdef.Char} p-char
 var cdef.Pointer{cdef.Uint} p-uint
+var cdef.Pointer{Test} p-test
 var cdef.Pointer{cdef.Pointer{cdef.Int}} pp-int
 var cdef.Pointer{cdef.Pointer{cdef.Pointer{cdef.Char}}} ppp-char
+var cdef.Char cchar
+p-char.set-point-to(var cchar)
+ostr!.copy-char-pointer(copy p-char)!
+ostr!.set-null-term-length()
 ; @ ec te0
-var cdef.Pointer{String} error
+var cdef.Pointer{Ta} error
 ; @

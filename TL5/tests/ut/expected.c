@@ -5622,8 +5622,8 @@ void ut_M_call(void) {
     int a_Length = 0;
     ut_M_Test* t = NULL;
     ut_M_Test_Dynamic* t_Dynamic = NULL;
-    i = external(5, s, a, t);
-    i = (2 * external(5, s, a, t)) + 3;
+    i = external(5, s, a, (void*)t);
+    i = (2 * external(5, s, a, (void*)t)) + 3;
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -5632,6 +5632,24 @@ void ut_M_call(void);
 void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
     SOME_External_func();
+LUMI_block0_cleanup:
+    (void)0;
+}
+/// @ tf3
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    Int x;
+};
+void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_call(void);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+}
+void ut_M_call(void) {
+    unsigned LUMI_loop_depth = 1;
+    ut_M_Test* t = NULL;
+    t = (void*)external();
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -5696,9 +5714,9 @@ no '"' around string constant "native.h"
 /// @ tef0
 redefinition of function "error"
 /// @ tef1
-more than one output to native function
+error raising native function
 /// @ tef2
-user output to native function
+more than one output to native function
 /// @ tef3
 owner argument to native function
 /// @ tef4
@@ -5718,11 +5736,17 @@ owner argument to native function
 /// @ tef11
 managed argument to native function
 /// @ tef12
-error raising native function
-/// @ tef13
 output argument in native function call
-/// @ tef14
+/// @ tef13
 no '"' around string constant "error"
+/// @ tef14
+user output to native function with non struct type "String"
+/// @ tef15
+user output to native function with non struct type "Array"
+/// @ tef16
+not yet supporting non-conditional and non-primitive output "s"
+/// @ tef17
+user output to native function with non struct type "Error"
 /// @ tev0
 only primitive types supported for native variable, got "String"
 /// @ tev1
@@ -8911,8 +8935,16 @@ cdef_M_Char c_char = 0;
 cdef_M_VoidPointer p_void = 0;
     cdef_M_Char* p_char = 0;
     cdef_M_Uint* p_uint = 0;
+    ut_M_Test* p_test = 0;
     cdef_M_Int** pp_int = 0;
     cdef_M_Char*** ppp_char = 0;
+    cdef_M_Char cchar = 0;
+    cdef_M_Pointer_set_point_to(p_char, cchar, &cdef_M_Char_dynamic);
+    CHECK_REF(9, LUMI_block0_cleanup, ut_M_ostr)
+    LUMI_err = String_copy_char_pointer(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, p_char);
+    CHECK(9, LUMI_block0_cleanup)
+    CHECK_REF(10, LUMI_block0_cleanup, ut_M_ostr)
+    String_set_null_term_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
 /// @ te0
-non primitive pointed type "String"
+dynamic pointed type "Ta"
 /// @
