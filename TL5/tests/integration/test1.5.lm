@@ -123,6 +123,7 @@ test test-another()
     var Int x
     assert! x = 0
 
+
 native include "external.h"
 native var Int external-int
 native const Int EXTERNAL-CONST
@@ -131,7 +132,7 @@ native func external0() "MY_Some_external"
 native func external1(copy Int i, user String s, user Array{Int} a)->(
         copy Native n)
 native func external2(copy Native n)->(copy Int i)
-
+native code "#define MY_DEF_VALUE 12"
 
 test test-native()
     assert! external-int = 6
@@ -145,6 +146,9 @@ test test-native()
     assert! s[0] = 'a'
     assert! a[0] = 3
     assert! external2(copy n) = 7
+    var Int x
+    native "x = MY_DEF_VALUE;"
+    assert! x = 12
 
 
 test test-pointer()

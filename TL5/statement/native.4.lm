@@ -165,3 +165,20 @@ class NativeType(TypeData)
   
   func dynamic write-cname()
     self.cname.write(user self.name)
+
+
+~~~ Native code declaration in the syntax tree ~~~
+class NativeCode(SyntaxTreeCode)
+  owner NativeText code
+  
+  func inst parse-new(user SyntaxTreeBlock parent)->(owner NativeCode new-node)
+    new-node := NativeCode(user parent)
+    NativeText.parse-new(user _, user new-node)->(owner new-node.code)
+  
+  func dynamic write()
+    if self.parent?
+      self.write-spaces()
+    else
+      write(user "\n")
+    self.code.write(user _)
+    write(user "\n")

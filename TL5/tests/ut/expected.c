@@ -5703,6 +5703,16 @@ void ut_M_call(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
+/// @ tb0
+#define HAS_SOME_DEFINE
+Int ut_M_x = 0;
+Int ut_M_y = 0;
+/// @ tb1
+#ifdef __UNIX__
+    *io = 3;
+    #else
+    *io = 4;
+    #endif
 /// @ te0
 expected space after "native", got "("
 /// @ te1
@@ -5757,6 +5767,10 @@ no '"' around string constant "error"
 sequence length is not constant
 /// @ tet0
 no '"' around string constant "error"
+/// @ teb0
+no '"' around string constant "#define error"
+/// @ teb1
+no '"' around string constant "#ifdef error"
 /// @@ test-parameter-type
 /// @ t0
 typedef struct ut_M_Test ut_M_Test;

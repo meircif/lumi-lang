@@ -13,7 +13,7 @@ class SyntaxTreeRoot(GlobalNodes)
   var List{EnumData} enums
   var NameMap{SyntaxTreeConstant} constants
   var List{ModuleMembers} modules
-  var List{NativeInclude} native-includes
+  var List{SyntaxTreeNode} global-nodes
   user String output-file-name
   owner SyntaxTreeMainFunction main-function
   var GlobalInit global-init
@@ -145,7 +145,7 @@ class SyntaxTreeRoot(GlobalNodes)
     self.expect-space(user "native")
     
     if keyword.equal(user "include")
-      self.native-includes.add(owner NativeInclude.parse-new(user _))
+      self.global-nodes.add(owner NativeInclude.parse-new(user _))
     
     else-if keyword.equal(user "func")
       self.functions.add(owner NativeFunction.parse-new(user _))
@@ -158,6 +158,9 @@ class SyntaxTreeRoot(GlobalNodes)
       
     else-if keyword.equal(user "type")
       self.types.add(owner NativeType.parse-new(user _))
+      
+    else-if keyword.equal(user "code")
+      self.global-nodes.add(owner NativeCode.parse-new(user _, user _))
       
     else
       self.syntax-error(user "unknown \"native\" keyword", user keyword)
@@ -250,8 +253,8 @@ class SyntaxTreeRoot(GlobalNodes)
       
     write-global(user output-header-code)
     
-    write-global(user "\n\n/* native includes */\n")
-    self.write-children(user self.native-includes)
+    write-global(user "\n\n/* global nodes */\n")
+    self.write-children(user self.global-nodes)
     
     write-global(user "\n\n/* types declaration */\n")
     var TypeDeclarationWriter type-declaration-writer

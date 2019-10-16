@@ -2426,6 +2426,16 @@ native func external(copy Native n)->(copy Native no) "SOME_External_func"
 func call()
     var Native n
     n := external(copy n)
+; @ g tb0
+var Int x
+native code "#define HAS_SOME_DEFINE"
+var Int y
+; @ c tb1
+native "#ifdef __UNIX__"
+io := 3
+native "#else"
+io := 4
+native "#endif"
 ; @ eg te0
 native()
 ; @ eg te1
@@ -2489,6 +2499,10 @@ native const Int VALUE
 var String{VALUE} error
 ; @ eg tet0
 native type Native error
+; @ eg teb0
+native code #define error
+; @ ec teb1
+native #ifdef error
 ; @@ test-parameter-type
 ; @ g t0
 struct Test{Generic}
