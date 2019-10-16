@@ -228,7 +228,6 @@ struct Global
     self.add-cint-type(user cdef-module, user "Float")
     self.add-cint-type(user cdef-module, user "Double")
     self.add-cint-type(user cdef-module, user "LongDouble")
-    self.add-cdef-type(user cdef-module, user "VoidPointer")
     self.add-cdef-type(user cdef-module, user "Pointer")->(
         user self.type-pointer)
     self.type-pointer.parameters := List{String}()
@@ -246,6 +245,17 @@ struct Global
         user function)
     self.add-builtin-parameter(
         user function, copy Access.VAR, user self.type-generic, user "pointed")
+    string-new-copy(user self.type-pointer.parameters.first.item)->(
+        owner function.arguments.parameters.last.item.get-type-instance().name)
+        
+    self.add-builtin-method(
+        user self.type-pointer,
+        user "set-from-ref",
+        copy false,
+        copy Access.COPY)->(
+        user function)
+    self.add-builtin-parameter(
+        user function, copy Access.USER, user self.type-generic, user "ref")
     string-new-copy(user self.type-pointer.parameters.first.item)->(
         owner function.arguments.parameters.last.item.get-type-instance().name)
     
@@ -268,10 +278,11 @@ struct Global
     string-new-copy(user self.type-pointer.parameters.first.item)->(
         owner argument-type-instance.parameters.first.item.name)
         
-    self.add-builtin-method(
+    self.add-builtin-method-native(
         user self.type-pointer,
         user "get-pointed-at",
         copy false,
+        user "cdef_M_Pointer_get_pointed_at",
         copy Access.COPY)->(
         user function)
     self.add-builtin-parameter(
@@ -284,10 +295,11 @@ struct Global
     string-new-copy(user self.type-pointer.parameters.first.item)->(
         owner argument-type-instance.name)
         
-    self.add-builtin-method(
+    self.add-builtin-method-native(
         user self.type-pointer,
         user "get-ref-at",
         copy false,
+        user "cdef_M_Pointer_get_ref_at",
         copy Access.COPY)->(
         user function)
     self.add-builtin-parameter(
@@ -349,7 +361,7 @@ struct Global
 
     self.add-builtin-method(
         user self.type-string,
-        user "copy-char-pointer",
+        user "copy-from-pointer",
         copy true,
         copy Access.USER)->(
         user function)
@@ -359,8 +371,8 @@ struct Global
         copy false,
         copy Access.COPY,
         user self.type-pointer,
-        user self.type-c-char,
-        user "char-pointer")
+        user self.type-char,
+        user "pointer")
 
     self.add-builtin-method(
         user self.type-string,
@@ -621,7 +633,8 @@ struct Global
   func add-builtin-global-function(user String name, copy Bool has-error)->(
       user SyntaxTreeFunction function)
     self.add-builtin-function(
-        user name, copy has-error, user _, user self.builtins)->(user function)
+        user name, copy has-error, user _, user _, user self.builtins)->(
+        user function)
     self.global-module.function-map.add(user function.name, user function)
   
   func add-builtin-method(
@@ -630,22 +643,49 @@ struct Global
       copy Bool has-error,
       copy Int access)->(
       user SyntaxTreeFunction function)
+    self.add-builtin-method-native(
+        user builtin-type,
+        user name,
+        copy has-error,
+        user _,
+        copy access)->(
+        user function)
+  
+  func add-builtin-method-native(
+      user TypeData builtin-type,
+      user String name,
+      copy Bool has-error,
+      user String native-name,
+      copy Int access)->(
+      user SyntaxTreeFunction function)
     self.add-builtin-function(
-        user name, copy has-error, user builtin-type, user builtin-type)->(
+        user name,
+        copy has-error,
+        user native-name,
+        user builtin-type,
+        user builtin-type)->(
         user function)
     self.add-builtin-parameter(
         user function, copy access, user builtin-type, user "self")
     user Argument self-param(user function.arguments.parameters.first.item)
+    self-param.is-native := native-name?
     function.self-access := self-param.access
     function.self-conditional := self-param.get-type-instance().conditional
   
   func add-builtin-function(
       user String name,
       copy Bool has-error,
+      user String native-name,
       user TypeData parent-type,
       user SyntaxTreeNamespace namespace)->(
       user SyntaxTreeFunction out-function)
-    new SyntaxTreeFunction function
+    owner SyntaxTreeFunction function
+    if native-name?
+      new NativeFunction native-function
+      native-function.cname := NativeText(user native-name)
+      function := native-function
+    else
+      function := SyntaxTreeFunction()
     function.arguments.has-error := has-error
     out-function := function
     string-new-copy(user name)->(owner function.name)
@@ -706,6 +746,8 @@ struct Global
     new DeclarationArgument argument
     argument.access := access
     argument.is-output := is-output
+    if function.arguments.parameters.first?
+      argument.is-native := function.arguments.parameters.first.item.is-native
     argument.variable := SyntaxTreeVariable(user _)
     string-new-copy(user name)->(owner argument.variable.name)
     argument.variable.access := access

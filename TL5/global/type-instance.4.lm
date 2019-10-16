@@ -273,6 +273,9 @@ struct TypeInstance
       node.syntax-error(
           user "assigning into a weak reference an illegal access",
           user glob.access-names[self-access])
+    if self.type-data is glob.type-pointer and
+        target.type-data is glob.type-pointer
+      return
     if self.type-data is glob.type-generic and
         target.type-data is glob.type-generic
       if not self.name.equal(user target.name)
@@ -440,7 +443,10 @@ struct TypeInstance
         
   func write-cname()
     if self.type-data is glob.type-pointer
-      self.parameters.first.item.write-cname()
-      write(user "*")
+      if self.parameters?
+        self.parameters.first.item.write-cname()
+        write(user "*")
+      else
+        write(user "void*")
     else
       self.type-data.write-cname()

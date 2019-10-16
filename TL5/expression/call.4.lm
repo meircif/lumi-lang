@@ -43,10 +43,13 @@ class CallExpression(Expression)
       output.value := variable-expression
       self.output := output.value
       self.arguments.outputs.add(owner output)
-    else-if self.result-type? and not self.native-output
-      self.arguments.get-output()->(user self.output)
-      self.output.result-type.reference-path.copy-new()->(
-          owner self.result-type.reference-path)
+    else-if self.result-type?
+      if self.native-output
+        self.result-type.reference-path := ReferencePath(user _)
+      else
+        self.arguments.get-output()->(user self.output)
+        self.output.result-type.reference-path.copy-new()->(
+            owner self.result-type.reference-path)
     self.assignable := self.result-type?
 
   func dynamic check-memory(user ReferenceMemoryList refs)
@@ -79,10 +82,15 @@ class CallExpression(Expression)
       write(user "LUMI_err = ")
     else-if self.native-output and self.result-type?
       if not self.result-type.type-data.is-primitive
-        write(user "(void*)")
+        write(user "((")
+        self.result-type.type-data.write-cname()
+        write(user "*)")
     self.write-function()
     if self.native-output
       self.arguments.write-call()
+      if self.result-type?
+        if not self.result-type.type-data.is-primitive
+          write(user ")")
     else
       self.code-node.write-call(user self.arguments)
 

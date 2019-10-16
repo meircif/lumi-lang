@@ -5,13 +5,18 @@ module tl5-compiler
 struct NativeText
   owner String text
   
-  new(user SyntaxTreeNode node)
-    read-new(user "")->(owner self.text)
-    node.check-string(user self.text)
+  new(user String text)
+    string-new-copy(user text)->(owner self.text)
+
+  func parse-new(user SyntaxTreeNode node)->(owner NativeText native-text)
+    owner String text
+    read-new(user "")->(owner text)
+    node.check-string(user text)
+    native-text := NativeText(user text[1:text.length - 2])
   
   func write(user String name)
     if self?
-      write(user self.text[1:self.text.length - 2])
+      write(user self.text)
     else
       write-cname(user name)
 
@@ -25,7 +30,7 @@ class NativeInclude(SyntaxTreeFunction)
     new-node.parse()
   
   func inst parse()
-    self.path := NativeText(user self)
+    NativeText.parse-new(user _, user self)->(owner self.path)
   
   func dynamic write()
     write(user "\n#include <")
@@ -45,7 +50,7 @@ class NativeFunction(SyntaxTreeFunction)
     self.my-module := glob.current-module
     self.parse-header(copy true)
     if glob.last-char = ' '
-      self.cname := NativeText(user self)
+      NativeText.parse-new(user _, user self)->(owner self.cname)
     if self.arguments.has-error
       self.syntax-error-msg(user "error raising native function")
     if self.arguments.outputs.first?
@@ -78,7 +83,7 @@ class NativeVariable(SyntaxTreeVariable)
     self.is-native := true
     self.parse(copy Access.VAR, copy false, user _)
     if glob.last-char = ' '
-      self.cname := NativeText(user self)
+      NativeText.parse-new(user _, user self)->(owner self.cname)
   
   func dynamic analyze()
     if not self.type-instance.type-data.is-primitive
@@ -106,7 +111,7 @@ class NativeConstant(SyntaxTreeConstant)
     self.is-native := true
     self.parse()
     if glob.last-char = ' '
-      self.cname := NativeText(user self)
+      NativeText.parse-new(user _, user self)->(owner self.cname)
     self.is-ordered := true
 
   func dynamic analyze()
@@ -137,7 +142,7 @@ class NativeType(TypeData)
   func inst parse()
     read-new(user " ")->(owner self.name)
     if glob.last-char = ' '
-      self.cname := NativeText(user self)
+      NativeText.parse-new(user _, user self)->(owner self.cname)
     self.add-type(user glob.current-module)
   
   func dynamic analyze()

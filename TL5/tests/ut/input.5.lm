@@ -3556,10 +3556,6 @@ func ! fun(owner Test? t)->(var Int x)
 func ! fun(owner String s)->(var Int x)
     for _ in fun(owner s)!:s.length()
 ; @ ec teo24
-str := ostr
-for n in str!
-    ostr := _
-; @ ec teo25
 new String{12} s!
 try
     owner String s2(owner s)
@@ -3567,6 +3563,12 @@ try
         raise
     s := s2
 s.clear()
+; @ eg teo25
+struct Test
+    owner String? s
+func error()
+    var cdef.Pointer{Test} pt
+    pt.get-ref-at(copy 0).s := _
 ; @ ec teu0
 user String? s
 so := _
@@ -3844,6 +3846,10 @@ func fun(user String sin)->(user String? sout)
     if true
         return
     sout := sin
+; @ ec teu48
+str := ostr
+for n in str!
+    ostr := _
 ; @ eg tev0
 func fun(var String s)
 func error(user String s)
@@ -3941,12 +3947,15 @@ i := c-double
 c-long-double := i
 i := c-long-double
 ; @ c t1
-var cdef.VoidPointer p-void
+var cdef.Pointer p-void
 var cdef.Pointer{cdef.Char} p-char
 var cdef.Pointer{cdef.Uint} p-uint
 var cdef.Pointer{Test} p-test
 var cdef.Pointer{cdef.Pointer{cdef.Int}} pp-int
 var cdef.Pointer{cdef.Pointer{cdef.Pointer{cdef.Char}}} ppp-char
+p-void := p-char
+p-uint := p-void
+p-char := p-uint
 ; @ c t2
 var cdef.Int int
 var cdef.Pointer{cdef.Int} p-int
@@ -3955,27 +3964,27 @@ user Array?{cdef.Int} arr-int
 p-int.set-from-array(user arr-int!)
 p-int.set-point-to(var int)
 pp-int.set-point-to(var p-int)
-pp-int.get-pointed-at(copy 0)->(var p-int)
-p-int.get-pointed-at(copy 3)->(var int)
+p-int := pp-int.get-pointed-at(copy 0)
+int := p-int.get-pointed-at(copy 3)
 var Test test
 user Test u-test(user test)
 var cdef.Pointer{Test} p-test
 user Array?{Test} arr-test
 p-test.set-from-array(user arr-test!)
-p-test.set-point-to(var test)
-p-test.get-ref-at(copy 5)->(user u-test)
+p-test.set-from-ref(user test)
+u-test := p-test.get-ref-at(copy 5)
 ; @ c t3
-var cdef.Pointer{cdef.Char} p-char
-ostr!.copy-char-pointer(copy p-char)!
+var cdef.Pointer{Char} p-char
+p-char.set-from-array(user ostr!)
+ostr!.copy-from-pointer(copy p-char)!
 ostr!.set-null-term-length()
 ; @ ec te0
 var cdef.Pointer{Ta} error
 ; @ ec te1
-var cdef.Int int
-var cdef.Pointer{cdef.Int} p-int
-p-int.get-ref-at(copy 5)->(user int)
+var cdef.Pointer{Int} p-int
+i := p-int.get-ref-at(copy 5)
 ; @ ec te2
-var Test test
+var Test tv
 var cdef.Pointer{Test} p-test
-p-test.get-pointed-at(copy 0)->(var test)
+tv := p-test.get-pointed-at(copy 0)
 ; @

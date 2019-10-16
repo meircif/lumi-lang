@@ -5649,7 +5649,7 @@ void ut_M_Test_Del(ut_M_Test* self) {
 void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
     ut_M_Test* t = NULL;
-    t = (void*)external();
+    t = ((ut_M_Test*)external());
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -8768,9 +8768,9 @@ using modified reference "t"
 /// @ teo23
 using invalid reference "s"
 /// @ teo24
-using potentially illegal user reference "{anonymous}"
-/// @ teo25
 using invalid reference "s"
+/// @ teo25
+cannot modify owner field "s" in non-owner reference "{anonymous}.s"
 /// @ teu0
 using potentially illegal user reference "s"
 /// @ teu1
@@ -8867,6 +8867,8 @@ using potentially illegal user reference "str"
 returning potentially illegal user output "sout"
 /// @ teu47
 returning potentially illegal user output "sout"
+/// @ teu48
+using potentially illegal user reference "{anonymous}"
 /// @ tev0
 cannot assign value with access "user" into value with access "var"
 /// @ tev1
@@ -8932,12 +8934,15 @@ cdef_M_Char c_char = 0;
     c_long_double = ut_M_i;
     ut_M_i = c_long_double;
 /// @ t1
-cdef_M_VoidPointer p_void = 0;
+void* p_void = 0;
     cdef_M_Char* p_char = 0;
     cdef_M_Uint* p_uint = 0;
     ut_M_Test* p_test = 0;
     cdef_M_Int** pp_int = 0;
     cdef_M_Char*** ppp_char = 0;
+    p_void = p_char;
+    p_uint = p_void;
+    p_char = p_uint;
 /// @ t2
 cdef_M_Int int = 0;
     cdef_M_Int* p_int = 0;
@@ -8954,25 +8959,27 @@ cdef_M_Int int = 0;
     cdef_M_Pointer_set_from_array(p_int, arr_int, arr_int_Length);
     cdef_M_Pointer_set_point_to(p_int, int, &cdef_M_Int_dynamic);
     cdef_M_Pointer_set_point_to(pp_int, p_int, &cdef_M_Int*_dynamic);
-    cdef_M_Pointer_get_pointed_at(pp_int, 0, (void*)&(p_int), &dynamic_Void);
-    cdef_M_Pointer_get_pointed_at(p_int, 3, (void*)&(int), &dynamic_Void);
+    p_int = cdef_M_Pointer_get_pointed_at(pp_int, 0);
+    int = cdef_M_Pointer_get_pointed_at(p_int, 3);
     test = &test_Var;
     u_test = test;
     CHECK_REF(14, LUMI_block0_cleanup, arr_test)
     cdef_M_Pointer_set_from_array(p_test, arr_test, arr_test_Length);
-    cdef_M_Pointer_set_point_to(p_test, test, &ut_M_Test_dynamic);
-    cdef_M_Pointer_get_ref_at(p_test, 5, (void*)&(u_test), &dynamic_Void);
+    cdef_M_Pointer_set_from_ref(p_test, test, &ut_M_Test_dynamic);
+    u_test = ((ut_M_Test*)cdef_M_Pointer_get_ref_at(p_test, 5));
 /// @ t3
-cdef_M_Char* p_char = 0;
+Char* p_char = 0;
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = String_copy_char_pointer(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, p_char);
-    CHECK(2, LUMI_block0_cleanup)
+    cdef_M_Pointer_set_from_array(p_char, ut_M_ostr, *ut_M_ostr_Length);
     CHECK_REF(3, LUMI_block0_cleanup, ut_M_ostr)
+    LUMI_err = String_copy_from_pointer(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, p_char);
+    CHECK(3, LUMI_block0_cleanup)
+    CHECK_REF(4, LUMI_block0_cleanup, ut_M_ostr)
     String_set_null_term_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
 /// @ te0
 dynamic pointed type "Ta"
 /// @ te1
-assigning into access "user" invalid access "var"
+cannot assign value with access "user" into value with access "var"
 /// @ te2
-non assignable call output
+assigning into non assignable expression
 /// @

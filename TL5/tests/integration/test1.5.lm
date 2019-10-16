@@ -147,6 +147,58 @@ test test-native()
     assert! external2(copy n) = 7
 
 
+test test-pointer()
+    var Int a(copy 3)
+    var Int b(copy 4)
+    var cdef.Pointer{Int} pa
+    var cdef.Pointer{Int} pb
+    var cdef.Pointer{cdef.Pointer{Int}} pp
+    var Array{3:Int} arr
+    pa.set-point-to(var a)
+    b := pa.get-pointed-at(copy 0)
+    assert! b = 3
+    pb.set-point-to(var b)
+    assert! pb <> pa
+    pp.set-point-to(var pa)
+    pb := pp.get-pointed-at(copy 0)
+    assert! pb = pa
+    arr[0] := 1
+    arr[1] := 2
+    arr[2] := 3
+    pa.set-from-array(user arr)
+    assert! pa.get-pointed-at(copy 0) = 1
+    assert! pa.get-pointed-at(copy 1) = 2
+    assert! pa.get-pointed-at(copy 2) = 3
+    
+    var SimpleStruct sa
+    var SimpleStruct sb
+    user SimpleStruct s(user sb)
+    var cdef.Pointer{SimpleStruct} ps
+    var Array{3:SimpleStruct} arrs
+    sa.num := 1
+    sb.num := 1
+    ps.set-from-ref(user sa)
+    s := ps.get-ref-at(copy 0)
+    assert! s.num = 1
+    arrs[0].num := 1
+    arrs[1].num := 2
+    arrs[2].num := 3
+    ps.set-from-array(user arrs)
+    assert! ps.get-ref-at(copy 0).num = 1
+    assert! ps.get-ref-at(copy 1).num = 2
+    assert! ps.get-ref-at(copy 2).num = 3
+    
+    var String{16} stra(user "aabbccdd")!
+    var String{16} strb(user "---")!
+    var cdef.Pointer{Char} pc
+    pc.set-from-array(user stra)
+    strb.copy-from-pointer(copy pc)!
+    assert! strb.equal(user stra)
+    stra[2]! := '\0'
+    stra.set-null-term-length()
+    assert! stra.equal(user "aa")
+
+
 test test-dynamic-type-parameters()
     s-var Data{covered.MiddleType} dmid!
     s-var TopType ttop!
@@ -523,6 +575,9 @@ test test-builtin-errors()
     var String{3} short-str
     assert-error! 123.str(user short-str), "string too long"
     assert-error! short-str.copy(user "aaaaa"), "string too long"
+    var cdef.Pointer{Char} charp
+    charp.set-from-array(user "aaaaa")
+    assert-error! short-str.copy-from-pointer(copy charp), "string too long"
     
     lumi-debug-value := 2
     assert-error! sys.getline(user short-str), "string too long"

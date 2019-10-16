@@ -59,7 +59,6 @@ typedef size_t cdef_M_Size;
 typedef float cdef_M_Float;
 typedef double cdef_M_Double;
 typedef long double cdef_M_LongDouble;
-typedef void* cdef_M_VoidPointer;
 
 typedef void (*Dynamic_Del)(void*);
 
@@ -600,9 +599,10 @@ void LUMI_owner_dec_ref(Ref_Manager* ref) {
 /* Pointer */
 
 #define cdef_M_Pointer_set_point_to(pointer, value, _) pointer = &value
-#define cdef_M_Pointer_get_ref_at(pointer, value, _) do \
-  { typeof(pointer) LUMI_set_pointer = value; *LUMI_set_pointer = *pointer;} \
-  while (false)
+#define cdef_M_Pointer_set_from_ref(pointer, ref, _) pointer = ref
+#define cdef_M_Pointer_set_from_array cdef_M_Pointer_set_from_ref
+#define cdef_M_Pointer_get_pointed_at(pointer, index) pointer[index]
+#define cdef_M_Pointer_get_ref_at(pointer, index) (pointer + index)
 
 
 /* Int */
@@ -683,8 +683,8 @@ Returncode String_copy(
 }
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FUNC_NAME "String.copy-char-pointer"
-Returncode String_copy_char_pointer(
+#define LUMI_FUNC_NAME "String.copy-from-pointer"
+Returncode String_copy_from_pointer(
     char* self, int max_length, int* length, char* source) {
   int source_length;
   if (source == NULL) {

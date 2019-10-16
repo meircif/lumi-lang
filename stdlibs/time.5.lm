@@ -50,7 +50,7 @@ struct Timer
         timer-pointer.set-point-to(var self.c-timer)
 
     func user ! ctime(user String target)
-        target.copy-char-pointer(copy c-ctime(copy self.c-pointer()))!
+        target.copy-from-pointer(copy c-ctime(copy self.c-pointer()))!
     
     func user gmtime()->(user Time? new-time)
         new-time := c-gmtime(copy self.c-pointer())
@@ -71,7 +71,7 @@ struct Time
     var Int isdst
     
     func user ! asctime(user String target)
-        target.copy-char-pointer(copy c-asctime(user self))!
+        target.copy-from-pointer(copy c-asctime(user self))!
     
     func user strftime(user String target, user String format)->(
             var Int copied)
