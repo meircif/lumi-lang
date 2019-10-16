@@ -3785,6 +3785,8 @@ expected space after "new", got "new-line"
 sequence length is not constant
 /// @ te10
 illegal variable name "error--name"
+/// @ te11
+unexpected space after variable name
 /// @@ test-initialize
 /// @ t0
 ut_M_Tb* aux_Tb_0 = NULL;
@@ -5560,8 +5562,27 @@ using "!" where error is not propagated
 /// @ te36
 using "!" where error is not propagated
 /// @@ test-native
+/// @ ti0
+#include <native.h>
+/// @ ti1
+#include <first.h>
+#include <second.h>
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    Int x;
+};
+void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_fun(void);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+}
+void ut_M_fun(void) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
 /// @ tf0
-void external(void);
 void ut_M_call(void);
 void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
@@ -5581,7 +5602,6 @@ struct ut_M_Test_Dynamic {
 };
 void ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_Del(ut_M_Test* self);
-void external(Int i, char* s, int s_Max_length, int* s_Length, ut_M_Test* ta, Int* io);
 void ut_M_call(void);
 ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_meth};
 void ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
@@ -5598,40 +5618,159 @@ void ut_M_call(void) {
     char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
-    ut_M_Test* ta = NULL;
-    ut_M_Test_Dynamic* ta_Dynamic = NULL;
-    external(5, s, s_Max_length, s_Length, ta, &(i));
+    Int* a = NULL;
+    int a_Length = 0;
+    ut_M_Test* t = NULL;
+    ut_M_Test_Dynamic* t_Dynamic = NULL;
+    i = external(5, s, a, (void*)t);
+    i = (2 * external(5, s, a, (void*)t)) + 3;
+LUMI_block0_cleanup:
+    (void)0;
+}
+/// @ tf2
+void ut_M_call(void);
+void ut_M_call(void) {
+    unsigned LUMI_loop_depth = 1;
+    SOME_External_func();
+LUMI_block0_cleanup:
+    (void)0;
+}
+/// @ tf3
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    Int x;
+};
+void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_call(void);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+}
+void ut_M_call(void) {
+    unsigned LUMI_loop_depth = 1;
+    ut_M_Test* t = NULL;
+    t = ((ut_M_Test*)external());
 LUMI_block0_cleanup:
     (void)0;
 }
 /// @ tv0
 void ut_M_use(void);
-extern Int x;
 void ut_M_use(void) {
     unsigned LUMI_loop_depth = 1;
     x = 2;
 LUMI_block0_cleanup:
     (void)0;
 }
+/// @ tv1
+void ut_M_use(void);
+void ut_M_use(void) {
+    unsigned LUMI_loop_depth = 1;
+    SOME_External_var = 2;
+LUMI_block0_cleanup:
+    (void)0;
+}
+/// @ tc0
+void ut_M_get(Int* x);
+void ut_M_get(Int* x) {
+    unsigned LUMI_loop_depth = 1;
+    *x = VALUE;
+LUMI_block0_cleanup:
+    (void)0;
+}
+/// @ tc1
+void ut_M_get(Int* x);
+void ut_M_get(Int* x) {
+    unsigned LUMI_loop_depth = 1;
+    *x = SOME_External_const;
+LUMI_block0_cleanup:
+    (void)0;
+}
 /// @ tt0
-typedef void* Native;
-void external(Native n, Native* no);
+void ut_M_call(void);
+void ut_M_call(void) {
+    unsigned LUMI_loop_depth = 1;
+    Native n = 0;
+    n = external(n);
+LUMI_block0_cleanup:
+    (void)0;
+}
+/// @ tt1
+void ut_M_call(void);
+void ut_M_call(void) {
+    unsigned LUMI_loop_depth = 1;
+    SOME_External_type n = 0;
+    n = SOME_External_func(n);
+LUMI_block0_cleanup:
+    (void)0;
+}
+/// @ tb0
+#define HAS_SOME_DEFINE
+Int ut_M_x = 0;
+Int ut_M_y = 0;
+/// @ tb1
+#ifdef __UNIX__
+    *io = 3;
+    #else
+    *io = 4;
+    #endif
 /// @ te0
 expected space after "native", got "("
 /// @ te1
 expected space after "native", got "new-line"
 /// @ te2
 unknown "native" keyword "error"
+/// @ tei0
+no '"' around string constant "native.h"
+/// @ tef0
+redefinition of function "error"
 /// @ tef1
-owner argument to native function
+error raising native function
 /// @ tef2
-user output to native function
+more than one output to native function
 /// @ tef3
 owner argument to native function
 /// @ tef4
-redefinition of function "error"
-/// @ tev3
+var output to native function
+/// @ tef5
+output "s" access should not be "var" for non-primitive type "String"
+/// @ tef6
+managed argument to native function
+/// @ tef7
+owner argument to native function
+/// @ tef8
+owner argument to native function
+/// @ tef9
+managed argument to native function
+/// @ tef10
+owner argument to native function
+/// @ tef11
+managed argument to native function
+/// @ tef12
+output argument in native function call
+/// @ tef13
+no '"' around string constant "error"
+/// @ tef14
+user output to native function with non struct type "String"
+/// @ tef15
+user output to native function with non struct type "Array"
+/// @ tef16
+not yet supporting non-conditional and non-primitive output "s"
+/// @ tef17
+user output to native function with non struct type "Error"
+/// @ tev0
 only primitive types supported for native variable, got "String"
+/// @ tev1
+no '"' around string constant "error"
+/// @ tec0
+no '"' around string constant "error"
+/// @ tec1
+sequence length is not constant
+/// @ tet0
+no '"' around string constant "error"
+/// @ teb0
+no '"' around string constant "#define error"
+/// @ teb1
+no '"' around string constant "#ifdef error"
 /// @@ test-parameter-type
 /// @ t0
 typedef struct ut_M_Test ut_M_Test;
@@ -8106,11 +8245,8 @@ LUMI_block0_cleanup:
 }
 TEST_MAIN_FUNC
 /// @ t2
-typedef void* Native;
-void external(void);
 void ut_M_fun(void);
 Returncode second_M_use(void);
-extern Int x;
 int LUMI_file0_line_count[7] = {
     -1,-1,-1,-1,-1, 0,-1
 };
@@ -8646,9 +8782,9 @@ using modified reference "t"
 /// @ teo23
 using invalid reference "s"
 /// @ teo24
-using potentially illegal user reference "{anonymous}"
-/// @ teo25
 using invalid reference "s"
+/// @ teo25
+cannot modify owner field "s" in non-owner reference "{anonymous}.s"
 /// @ teu0
 using potentially illegal user reference "s"
 /// @ teu1
@@ -8745,6 +8881,8 @@ using potentially illegal user reference "str"
 returning potentially illegal user output "sout"
 /// @ teu47
 returning potentially illegal user output "sout"
+/// @ teu48
+using potentially illegal user reference "{anonymous}"
 /// @ tev0
 cannot assign value with access "user" into value with access "var"
 /// @ tev1
@@ -8771,4 +8909,91 @@ constructor did not initialize field "s"
 assigning reference into itself
 /// @ tec1
 fields cannot have "user" access
+/// @@ test-c-objects
+/// @ t0
+cdef_M_Char c_char = 0;
+    cdef_M_Uchar c_uchar = 0;
+    cdef_M_Short c_short = 0;
+    cdef_M_Ushort c_ushort = 0;
+    cdef_M_Int c_int = 0;
+    cdef_M_Uint c_uint = 0;
+    cdef_M_Long c_long = 0;
+    cdef_M_Ulong c_ulong = 0;
+    cdef_M_Size c_size = 0;
+    cdef_M_Float c_float = 0;
+    cdef_M_Double c_double = 0;
+    cdef_M_LongDouble c_long_double = 0;
+    c_char = ut_M_i;
+    ut_M_i = c_char;
+    c_uchar = ut_M_i;
+    ut_M_i = c_uchar;
+    c_short = ut_M_i;
+    ut_M_i = c_short;
+    c_ushort = ut_M_i;
+    ut_M_i = c_ushort;
+    c_int = ut_M_i;
+    ut_M_i = c_int;
+    c_uint = ut_M_i;
+    ut_M_i = c_uint;
+    c_long = ut_M_i;
+    ut_M_i = c_long;
+    c_ulong = ut_M_i;
+    ut_M_i = c_ulong;
+    c_size = ut_M_i;
+    ut_M_i = c_size;
+    c_float = ut_M_i;
+    ut_M_i = c_float;
+    c_double = ut_M_i;
+    ut_M_i = c_double;
+    c_long_double = ut_M_i;
+    ut_M_i = c_long_double;
+/// @ t1
+void* p_void = 0;
+    cdef_M_Char* p_char = 0;
+    cdef_M_Uint* p_uint = 0;
+    ut_M_Test* p_test = 0;
+    cdef_M_Int** pp_int = 0;
+    cdef_M_Char*** ppp_char = 0;
+    p_void = p_char;
+    p_uint = p_void;
+    p_char = p_uint;
+/// @ t2
+cdef_M_Int int = 0;
+    cdef_M_Int* p_int = 0;
+    cdef_M_Int** pp_int = 0;
+    cdef_M_Int* arr_int = NULL;
+    int arr_int_Length = 0;
+    ut_M_Test test_Var = {0};
+    ut_M_Test* test = NULL;
+    ut_M_Test* u_test = NULL;
+    ut_M_Test* p_test = 0;
+    ut_M_Test* arr_test = NULL;
+    int arr_test_Length = 0;
+    CHECK_REF(5, LUMI_block0_cleanup, arr_int)
+    cdef_M_Pointer_set_from_array(p_int, arr_int, arr_int_Length);
+    cdef_M_Pointer_set_point_to(p_int, int, &cdef_M_Int_dynamic);
+    cdef_M_Pointer_set_point_to(pp_int, p_int, &cdef_M_Int*_dynamic);
+    p_int = cdef_M_Pointer_get_pointed_at(pp_int, 0);
+    int = cdef_M_Pointer_get_pointed_at(p_int, 3);
+    test = &test_Var;
+    u_test = test;
+    CHECK_REF(14, LUMI_block0_cleanup, arr_test)
+    cdef_M_Pointer_set_from_array(p_test, arr_test, arr_test_Length);
+    cdef_M_Pointer_set_from_ref(p_test, test, &ut_M_Test_dynamic);
+    u_test = ((ut_M_Test*)cdef_M_Pointer_get_ref_at(p_test, 5));
+/// @ t3
+Char* p_char = 0;
+    CHECK_REF(2, LUMI_block0_cleanup, ut_M_ostr)
+    cdef_M_Pointer_set_from_array(p_char, ut_M_ostr, *ut_M_ostr_Length);
+    CHECK_REF(3, LUMI_block0_cleanup, ut_M_ostr)
+    LUMI_err = String_copy_from_pointer(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, p_char);
+    CHECK(3, LUMI_block0_cleanup)
+    CHECK_REF(4, LUMI_block0_cleanup, ut_M_ostr)
+    String_set_null_term_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
+/// @ te0
+dynamic pointed type "Ta"
+/// @ te1
+cannot assign value with access "user" into value with access "var"
+/// @ te2
+assigning into non assignable expression
 /// @

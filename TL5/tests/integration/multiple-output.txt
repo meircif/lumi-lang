@@ -2,6 +2,7 @@ Running tests:
 testing test-func... OK
 testing test-another... OK
 testing test-native... OK
+testing test-pointer... OK
 testing test-dynamic-type-parameters... OK
 testing test-simple-delete... OK
 testing test-complex-delete... OK

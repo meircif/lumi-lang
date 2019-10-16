@@ -174,7 +174,12 @@ struct TypeInstance
           node.syntax-error(
               user "too many parameters given for type",
               user self.type-data.name)
-        if sub-type.type-data.is-primitive
+        if self.type-data is glob.type-pointer
+          if sub-type.type-data.is-dynamic
+            node.syntax-error(
+                user "dynamic pointed type",
+                user sub-type.type-data.name)
+        else-if sub-type.type-data.is-primitive
           node.syntax-error(
               user "unsupported primitive parameter type",
               user sub-type.type-data.name)
@@ -268,6 +273,9 @@ struct TypeInstance
       node.syntax-error(
           user "assigning into a weak reference an illegal access",
           user glob.access-names[self-access])
+    if self.type-data is glob.type-pointer and
+        target.type-data is glob.type-pointer
+      return
     if self.type-data is glob.type-generic and
         target.type-data is glob.type-generic
       if not self.name.equal(user target.name)
@@ -432,3 +440,13 @@ struct TypeInstance
       for parameter in self.parameters.iter()
         parameter.replace-type-parameters(
             user actual-params, copy replace-bases)
+        
+  func write-cname()
+    if self.type-data is glob.type-pointer
+      if self.parameters?
+        self.parameters.first.item.write-cname()
+        write(user "*")
+      else
+        write(user "void*")
+    else
+      self.type-data.write-cname()

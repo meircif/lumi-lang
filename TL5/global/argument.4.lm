@@ -293,8 +293,8 @@ class FunctionArguments(SyntaxTreeNode)
     if my-iter.has()
       assert print-error
       self.syntax-error-msg(user "too many outputs")
-    output-omitted := other-iter.has()
-    if output-omitted
+    if other-iter.has()
+      output-omitted := not other-iter.get().is-native
       if check-calling
         other-iter.next()
       if other-iter.has()

@@ -25,6 +25,12 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
   var Bool header-only
   var Bool external-body
   var Bool err-aux-var
+
+  new()
+    self.set-location()
+    self.arguments.new()
+    self.delete-group-builder-owner := DeleteGroupBuilder(user self)
+    self.delete-group-builder := self.delete-group-builder-owner
   
   func inst parse-new(user TypeData parent-type)->(
       owner SyntaxTreeFunction new-node)
@@ -56,12 +62,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
       self.my-module := glob.current-module
     self.parse-header(copy false)
     self.parse-body()
-  
-  new()
-    self.set-location()
-    self.arguments.new()
-    self.delete-group-builder-owner := DeleteGroupBuilder(user self)
-    self.delete-group-builder := self.delete-group-builder-owner
   
   func inst parse-body()
     if self.header-only
@@ -361,7 +361,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
           parameter.access = Access.WEAK
         self.write-variable-cleanup(user parameter.get-variable(), user _)
   
-  func inst write-cname()
+  func dynamic write-cname()
     if self.parent-type?
       self.parent-type.write-cname()
       write(user "_")
@@ -458,14 +458,15 @@ class DeclarationArgument(Argument)
     self.variable.type-instance.link-types(user self)
   
   func dynamic analyze()
-    if self.variable.type-instance.type-data.is-primitive
-      if self.is-output and self.access != Access.VAR
+    user TypeData type-data(user self.variable.type-instance.type-data)
+    if type-data.is-primitive
+      if self.is-output and not self.is-native and self.access != Access.VAR
         self.syntax-error2(
             user "output",
             user self.variable.name,
             user "access should be \"var\" for primitive types, got",
             user glob.access-names[self.access])
-      else-if not self.is-output and self.access != Access.COPY
+      if not self.is-output and self.access != Access.COPY
         self.syntax-error2(
             user "parameter",
             user self.variable.name,
@@ -476,14 +477,14 @@ class DeclarationArgument(Argument)
           user "argument",
           user self.variable.name,
           user "access should not be \"copy\" for non-primitive type",
-          user self.variable.type-instance.type-data.name)
+          user type-data.name)
     else-if self.is-output
       if access-is-only-var(copy self.access)
         self.syntax-error2(
             user "output",
             user self.variable.name,
             user "access should not be \"var\" for non-primitive type",
-            user self.variable.type-instance.type-data.name)
+            user type-data.name)
       if not self.variable.type-instance.conditional
         self.syntax-error(
             user "not yet supporting non-conditional and non-primitive output",
@@ -492,8 +493,16 @@ class DeclarationArgument(Argument)
     if self.is-native
       if access-is-owner(copy self.access)
         self.syntax-error-msg(user "owner argument to native function")
-      if self.is-output and access-is-user(copy self.access)
-        self.syntax-error-msg(user "user output to native function")
+      if access-has-refman(copy self.access)
+        self.syntax-error-msg(user "managed argument to native function")
+      if self.is-output
+        if self.access = Access.USER and (type-data.is-dynamic or
+            type-data is glob.type-string or type-data is glob.type-array)
+          self.syntax-error(
+              user "user output to native function with non struct type",
+              user type-data.name)
+        if self.access = Access.VAR
+          self.syntax-error-msg(user "var output to native function")
   
   func dynamic get-type-instance()->(user TypeInstance type-instance)
     type-instance := self.variable.type-instance
@@ -550,7 +559,7 @@ class DeclarationArgument(Argument)
     
     else
       ; `type`[*][*] `name`
-      self.variable.type-instance.type-data.write-cname()
+      self.variable.type-instance.write-cname()
       if not self.variable.type-instance.type-data.is-primitive
         write(user "*")
       self.write-name-param(user _, user _)
@@ -562,7 +571,7 @@ class DeclarationArgument(Argument)
     if self.variable.type-instance.type-data.is-dynamic and not self.is-native
       ; , `type`_Dynamic*[*] `name`_Dynamic
       write(user ", ")
-      self.variable.type-instance.type-data.write-cname()
+      self.variable.type-instance.write-cname()
       self.write-name-param(user "_Dynamic*", user "_Dynamic")
   
   func inst write-name-param(user String prefix, user String suffix)

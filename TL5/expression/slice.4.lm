@@ -358,7 +358,7 @@ class SliceExpression(Expression)
   
   func dynamic write-dynamic()
     write(user "&")
-    self.result-type.type-data.write-cname()
+    self.result-type.write-cname()
     write(user "_dynamic")
   
   func dynamic write-refman()

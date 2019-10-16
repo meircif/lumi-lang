@@ -124,21 +124,83 @@ test test-another()
     assert! x = 0
 
 
+native include "external.h"
 native var Int external-int
+native const Int EXTERNAL-CONST
 native type Native
-native func ! external(copy Int i, user String s)->(var Int io, var Native n)
-native func external2(copy Native n)->(var Bool b)
-
+native func external0() "MY_Some_external"
+native func external1(copy Int i, user String s, user Array{Int} a)->(
+        copy Native n)
+native func external2(copy Native n)->(copy Int i)
+native code "#define MY_DEF_VALUE 12"
 
 test test-native()
     assert! external-int = 6
-    var Int i
+    assert! EXTERNAL-CONST = 12
     var Native n
     var String{4} s(user "bb")!
-    assert-error! external(copy 3, user s)->(var i, var n)
-    assert! i = 3
+    var Array{6:Int} a
+    external0()
+    assert! external-int = 7
+    n := external1(copy 3, user s, user a)
     assert! s[0] = 'a'
-    assert! external2(copy n)
+    assert! a[0] = 3
+    assert! external2(copy n) = 7
+    var Int x
+    native "x = MY_DEF_VALUE;"
+    assert! x = 12
+
+
+test test-pointer()
+    var Int a(copy 3)
+    var Int b(copy 4)
+    var cdef.Pointer{Int} pa
+    var cdef.Pointer{Int} pb
+    var cdef.Pointer{cdef.Pointer{Int}} pp
+    var Array{3:Int} arr
+    pa.set-point-to(var a)
+    b := pa.get-pointed-at(copy 0)
+    assert! b = 3
+    pb.set-point-to(var b)
+    assert! pb <> pa
+    pp.set-point-to(var pa)
+    pb := pp.get-pointed-at(copy 0)
+    assert! pb = pa
+    arr[0] := 1
+    arr[1] := 2
+    arr[2] := 3
+    pa.set-from-array(user arr)
+    assert! pa.get-pointed-at(copy 0) = 1
+    assert! pa.get-pointed-at(copy 1) = 2
+    assert! pa.get-pointed-at(copy 2) = 3
+    
+    var SimpleStruct sa
+    var SimpleStruct sb
+    user SimpleStruct s(user sb)
+    var cdef.Pointer{SimpleStruct} ps
+    var Array{3:SimpleStruct} arrs
+    sa.num := 1
+    sb.num := 1
+    ps.set-from-ref(user sa)
+    s := ps.get-ref-at(copy 0)
+    assert! s.num = 1
+    arrs[0].num := 1
+    arrs[1].num := 2
+    arrs[2].num := 3
+    ps.set-from-array(user arrs)
+    assert! ps.get-ref-at(copy 0).num = 1
+    assert! ps.get-ref-at(copy 1).num = 2
+    assert! ps.get-ref-at(copy 2).num = 3
+    
+    var String{16} stra(user "aabbccdd")!
+    var String{16} strb(user "---")!
+    var cdef.Pointer{Char} pc
+    pc.set-from-array(user stra)
+    strb.copy-from-pointer(copy pc)!
+    assert! strb.equal(user stra)
+    stra[2]! := '\0'
+    stra.set-null-term-length()
+    assert! stra.equal(user "aa")
 
 
 test test-dynamic-type-parameters()
@@ -517,6 +579,9 @@ test test-builtin-errors()
     var String{3} short-str
     assert-error! 123.str(user short-str), "string too long"
     assert-error! short-str.copy(user "aaaaa"), "string too long"
+    var cdef.Pointer{Char} charp
+    charp.set-from-array(user "aaaaa")
+    assert-error! short-str.copy-from-pointer(copy charp), "string too long"
     
     lumi-debug-value := 2
     assert-error! sys.getline(user short-str), "string too long"

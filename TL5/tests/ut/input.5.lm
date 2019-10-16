@@ -1665,6 +1665,8 @@ new
 var Array{i:Int} error
 ; @ ec te10
 var Int error--name
+; @ ec te11
+var Int x 
 ; @@ test-initialize
 ; @ c t0
 tb := Tb(copy i)!
@@ -2359,6 +2361,14 @@ assert-error! t!.num
 ; @ ec te36
 assert-error! t!
 ; @@ test-native
+; @ g ti0
+native include "native.h"
+; @ g ti1
+struct Test
+    var Int x
+native include "first.h"
+func fun()
+native include "second.h"
 ; @ g tf0
 native func external()
 func call()
@@ -2367,36 +2377,132 @@ func call()
 class Test
     var Int x
     func dynamic user meth()
-native func external(copy Int i, user String? s, user Test? ta)->(var Int io)
+native func external(
+        copy Int i, user String? s, user Array?{Int} a, user Test? t)->(
+        copy Int res)
 func call()
     var Int i
     user String? s
-    user Test? ta
-    external(copy 5, user s, user ta)->(var i)
+    user Array?{Int} a
+    user Test? t
+    i := external(copy 5, user s, user a, user t)
+    i := (2 * external(copy 5, user s, user a, user t)) + 3
+; @ g tf2
+native func external() "SOME_External_func"
+func call()
+    external()
+; @ g tf3
+struct Test
+    var Int x
+native func external()->(user Test? t)
+func call()
+    user Test? t
+    t := external()
 ; @ g tv0
 native var Int x
 func use()
     x := 2
+; @ g tv1
+native var Int x "SOME_External_var"
+func use()
+    x := 2
+; @ g tc0
+native const Int VALUE
+func get()->(var Int x)
+    x := VALUE
+; @ g tc1
+native const Int VALUE "SOME_External_const"
+func get()->(var Int x)
+    x := VALUE
 ; @ g tt0
 native type Native
-native func external(copy Native n)->(var Native no)
+native func external(copy Native n)->(copy Native no)
+func call()
+    var Native n
+    n := external(copy n)
+; @ g tt1
+native type Native "SOME_External_type"
+native func external(copy Native n)->(copy Native no) "SOME_External_func"
+func call()
+    var Native n
+    n := external(copy n)
+; @ g tb0
+var Int x
+native code "#define HAS_SOME_DEFINE"
+var Int y
+; @ c tb1
+native "#ifdef __UNIX__"
+io := 3
+native "#else"
+io := 4
+native "#endif"
 ; @ eg te0
 native()
 ; @ eg te1
 native error
 ; @ eg te2
 native error 
+; @ eg tei0
+native include native.h
+; @ eg tef0
+native func error()
+native func error()
 ; @ eg tef1
-native func error(owner String s)
+native func ! error()
 ; @ eg tef2
-native func error()->(user String? s)
+native func error()->(copy Int a, copy Int b)
 ; @ eg tef3
 native func error()->(owner String? s)
 ; @ eg tef4
-native func error()
-native func error()
-; @ eg tev3
+native func error()->(var Int s)
+; @ eg tef5
+native func error()->(s-var String? s)
+; @ eg tef6
+native func error()->(weak String? s)
+; @ eg tef7
+native func error()->(strong String? s)
+; @ eg tef8
+native func error(owner String s)
+; @ eg tef9
+native func error(weak String s)
+; @ eg tef10
+native func error(strong String s)
+; @ eg tef11
+native func error(s-var String s)
+; @ eg tef12
+native func fun()->(copy Int res)
+func error(copy Int i)
+    fun()->(copy i)
+; @ eg tef13
+native func fun()->(copy Int res) error
+; @ eg tef14
+native func error()->(user String? s)
+; @ eg tef15
+native func error()->(user Array?{Int} a)
+; @ eg tef16
+struct Error
+    var Int x
+native func error()->(user Error s)
+; @ eg tef17
+class Error
+    var Int x
+    func dynamic user meth()
+native func error()->(user Error? e)
+; @ eg tev0
 native var String s
+; @ eg tev1
+native var Int x error
+; @ eg tec0
+native const Int VALUE error
+; @ eg tec1
+native const Int VALUE
+var String{VALUE} error
+; @ eg tet0
+native type Native error
+; @ eg teb0
+native code #define error
+; @ ec teb1
+native #ifdef error
 ; @@ test-parameter-type
 ; @ g t0
 struct Test{Generic}
@@ -3199,9 +3305,9 @@ func fun()
 ; @-
 module second
 test use()
-    var Native n
-    x := 2
-    external()
+    var ut.Native n
+    ut.x := 2
+    ut.external()
 ; @ ec te0
 ut.error
 ; @ eg te1
@@ -3464,10 +3570,6 @@ func ! fun(owner Test? t)->(var Int x)
 func ! fun(owner String s)->(var Int x)
     for _ in fun(owner s)!:s.length()
 ; @ ec teo24
-str := ostr
-for n in str!
-    ostr := _
-; @ ec teo25
 new String{12} s!
 try
     owner String s2(owner s)
@@ -3475,6 +3577,12 @@ try
         raise
     s := s2
 s.clear()
+; @ eg teo25
+struct Test
+    owner String? s
+func error()
+    var cdef.Pointer{Test} pt
+    pt.get-ref-at(copy 0).s := _
 ; @ ec teu0
 user String? s
 so := _
@@ -3752,6 +3860,10 @@ func fun(user String sin)->(user String? sout)
     if true
         return
     sout := sin
+; @ ec teu48
+str := ostr
+for n in str!
+    ostr := _
 ; @ eg tev0
 func fun(var String s)
 func error(user String s)
@@ -3810,4 +3922,83 @@ str := str
 ; @ eg tec1
 struct Error
     user String s
+; @@ test-c-objects
+; @ c t0
+var cdef.Char c-char
+var cdef.Uchar c-uchar
+var cdef.Short c-short
+var cdef.Ushort c-ushort
+var cdef.Int c-int
+var cdef.Uint c-uint
+var cdef.Long c-long
+var cdef.Ulong c-ulong
+var cdef.Size c-size
+var cdef.Float c-float
+var cdef.Double c-double
+var cdef.LongDouble c-long-double
+c-char := i
+i := c-char
+c-uchar := i
+i := c-uchar
+c-short := i
+i := c-short
+c-ushort := i
+i := c-ushort
+c-int := i
+i := c-int
+c-uint := i
+i := c-uint
+c-long := i
+i := c-long
+c-ulong := i
+i := c-ulong
+c-size := i
+i := c-size
+c-float := i
+i := c-float
+c-double := i
+i := c-double
+c-long-double := i
+i := c-long-double
+; @ c t1
+var cdef.Pointer p-void
+var cdef.Pointer{cdef.Char} p-char
+var cdef.Pointer{cdef.Uint} p-uint
+var cdef.Pointer{Test} p-test
+var cdef.Pointer{cdef.Pointer{cdef.Int}} pp-int
+var cdef.Pointer{cdef.Pointer{cdef.Pointer{cdef.Char}}} ppp-char
+p-void := p-char
+p-uint := p-void
+p-char := p-uint
+; @ c t2
+var cdef.Int int
+var cdef.Pointer{cdef.Int} p-int
+var cdef.Pointer{cdef.Pointer{cdef.Int}} pp-int
+user Array?{cdef.Int} arr-int
+p-int.set-from-array(user arr-int!)
+p-int.set-point-to(var int)
+pp-int.set-point-to(var p-int)
+p-int := pp-int.get-pointed-at(copy 0)
+int := p-int.get-pointed-at(copy 3)
+var Test test
+user Test u-test(user test)
+var cdef.Pointer{Test} p-test
+user Array?{Test} arr-test
+p-test.set-from-array(user arr-test!)
+p-test.set-from-ref(user test)
+u-test := p-test.get-ref-at(copy 5)
+; @ c t3
+var cdef.Pointer{Char} p-char
+p-char.set-from-array(user ostr!)
+ostr!.copy-from-pointer(copy p-char)!
+ostr!.set-null-term-length()
+; @ ec te0
+var cdef.Pointer{Ta} error
+; @ ec te1
+var cdef.Pointer{Int} p-int
+i := p-int.get-ref-at(copy 5)
+; @ ec te2
+var Test tv
+var cdef.Pointer{Test} p-test
+tv := p-test.get-pointed-at(copy 0)
 ; @

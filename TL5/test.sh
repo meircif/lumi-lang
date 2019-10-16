@@ -73,7 +73,8 @@ valgrind -q --leak-check=full --error-exitcode=1 TL5/test-single > /dev/null
 TL5/tl5-compiler -t covered TL5/test-multiple.c \
   TL5/tests/integration/test0.5.lm TL5/tests/integration/test1.5.lm \
   TL5/tests/integration/test2.5.lm
-$CCA TL5/test-multiple.c TL5/tests/integration/external.c -o TL5/test-multiple
+$CCA TL5/test-multiple.c TL5/tests/integration/external.c \
+  -ITL5/tests/integration -o TL5/test-multiple
 TL5/test-multiple -xml > TL5/test-multiple-output.txt
 mkdir TL5/cover-tests
 mv cobertura.xml TL5/cover-tests/
@@ -86,7 +87,7 @@ TL5/tl5-compiler -t integration TL5/test-uncovered.c \
   TL5/tests/integration/test0.5.lm TL5/tests/integration/test1.5.lm \
   TL5/tests/integration/test2.5.lm
 $CCA TL5/test-uncovered.c TL5/tests/integration/external.c \
-  -o TL5/test-uncovered
+  -ITL5/tests/integration -o TL5/test-uncovered
 ! TL5/test-uncovered > TL5/test-uncovered-output.txt
 diff TL5/tests/integration/uncovered-output.txt TL5/test-uncovered-output.txt
 

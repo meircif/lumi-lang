@@ -26,11 +26,12 @@ var Bool compiler-tests-passed
 var Bool file-open-error
 var Bool sys-exit
 var Bool crush-run
+var Bool flag-trace
 
 
 mock Sys.print(user String text)
-  assert text?
-  tl5-compiler-tests.mock-print-text.concat(user text)
+  if text?
+    tl5-compiler-tests.mock-print-text.concat(user text)
 
 
 mock Sys.exit(copy Int returncode)
@@ -117,6 +118,9 @@ func setup-test()
 
 
 test test-compiler()
+  if sys.argv.length > 1
+    sys.argv[1].equal(user "--trace")->(var flag-trace)
+
   var String{256} filename
   set-test-file-name(user filename, user "input", user "5.lm")
   file-open-read.mocked(user filename)->(owner input-file)
@@ -259,9 +263,8 @@ func test-compiler-case(user String suit-name, user String line)
   catch
     suit-passed := false
     compiler-tests-passed := false
-    if sys.argv.length > 1
-      if sys.argv[1].equal(user "--trace")
-        crush-run := true
+    if flag-trace
+      crush-run := true
     if crush-run
       print-case-error()
       run-test(

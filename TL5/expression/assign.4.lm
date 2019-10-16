@@ -190,7 +190,7 @@ class AssignExpression(Expression)
         not self.value.is-generic-cast and
         self.value.result-type.type-data is-not glob.type-empty
       write(user "&")
-      self.value.result-type.type-data.write-cname()
+      self.value.result-type.write-cname()
       write(user "_dynamic")
     else-if (self.target.result-type.type-data is glob.type-generic or
         self.target.is-generic-cast) and
@@ -232,7 +232,7 @@ class AssignExpression(Expression)
         write(user "_String_length);\n")
       else-if not data-type.type-data.is-primitive
         write(user "ARRAY_DEL(")
-        data-type.type-data.write-cname()
+        data-type.write-cname()
         write(user ", ")
         self.target.write()
         write(user ", ")

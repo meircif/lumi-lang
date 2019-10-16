@@ -96,6 +96,8 @@ struct Global
   user TypeData type-module
   user TypeData type-file
   user TypeData type-sys
+  user TypeData type-pointer
+  user TypeData type-c-char
   
   ~~~ referenced built-in functions ~~~
   user SyntaxTreeFunction string-copy-function
@@ -189,28 +191,126 @@ struct Global
         user name, user name, copy order, copy group-index, copy factory)
   
   func init-builtin-types()
-    self.add-builtin-type(user "Char", copy true)->(user self.type-char)
-    self.add-builtin-type(user "Bool", copy true)->(user self.type-bool)
-    self.add-builtin-type(user "Int", copy true)->(user self.type-int)
-    self.add-builtin-type(user "Empty Symbol", copy false)->(
+    self.add-global-type(user "Char", copy true)->(user self.type-char)
+    self.type-char.is-int-like := true
+    self.add-global-type(user "Bool", copy true)->(user self.type-bool)
+    self.add-global-type(user "Int", copy true)->(user self.type-int)
+    self.type-int.is-int-like := true
+    self.add-global-type(user "Empty Symbol", copy false)->(
         user self.type-empty)
-    self.add-builtin-type(user "Func", copy true)->(user self.type-func)
-    self.add-builtin-type(user "Ref", copy true)->(user self.type-ref)
-    self.add-builtin-type(user "String", copy false)->(user self.type-string)
-    self.add-builtin-type(user "Array", copy false)->(user self.type-array)
-    self.add-builtin-type(user "Type Name", copy false)->(user self.type-type)
-    self.add-builtin-type(user "Base Symbol", copy false)->(user self.type-base)
-    self.add-builtin-type(user "Generic Type", copy false)->(
+    self.add-global-type(user "Func", copy true)->(user self.type-func)
+    self.add-global-type(user "Ref", copy true)->(user self.type-ref)
+    self.add-global-type(user "String", copy false)->(user self.type-string)
+    self.add-global-type(user "Array", copy false)->(user self.type-array)
+    self.add-global-type(user "Type Name", copy false)->(user self.type-type)
+    self.add-global-type(user "Base Symbol", copy false)->(user self.type-base)
+    self.add-global-type(user "Generic Type", copy false)->(
         user self.type-generic)
     self.type-generic.is-dynamic := true
-    self.add-builtin-type(user "Module Name", copy false)->(
+    self.add-global-type(user "Module Name", copy false)->(
         user self.type-module)
-    self.add-builtin-type(user "File", copy false)->(user self.type-file)
+    self.add-global-type(user "File", copy false)->(user self.type-file)
     self.type-file.create-disallowed := true
-    self.add-builtin-type(user "Sys", copy false)->(user self.type-sys)
+    self.add-global-type(user "Sys", copy false)->(user self.type-sys)
     self.type-sys.create-disallowed := true
     
+    ; cdef types
+    new ModuleMembers cdef-module(user "cdef")
+    self.add-cint-type(user cdef-module, user "Char")->(user self.type-c-char)
+    self.add-cint-type(user cdef-module, user "Uchar")
+    self.add-cint-type(user cdef-module, user "Short")
+    self.add-cint-type(user cdef-module, user "Ushort")
+    self.add-cint-type(user cdef-module, user "Int")
+    self.add-cint-type(user cdef-module, user "Uint")
+    self.add-cint-type(user cdef-module, user "Long")
+    self.add-cint-type(user cdef-module, user "Ulong")
+    self.add-cint-type(user cdef-module, user "Size")
+    self.add-cint-type(user cdef-module, user "Float")
+    self.add-cint-type(user cdef-module, user "Double")
+    self.add-cint-type(user cdef-module, user "LongDouble")
+    self.add-cdef-type(user cdef-module, user "Pointer")->(
+        user self.type-pointer)
+    self.type-pointer.parameters := List{String}()
+    self.type-pointer.parameters.add(owner string-new-copy(user "Pointed"))
+    self.root.modules.add(owner cdef-module)
     user SyntaxTreeFunction function
+    user TypeInstance argument-type-instance
+    
+    ; Pointer
+    self.add-builtin-method(
+        user self.type-pointer,
+        user "set-point-to",
+        copy false,
+        copy Access.COPY)->(
+        user function)
+    self.add-builtin-parameter(
+        user function, copy Access.VAR, user self.type-generic, user "pointed")
+    string-new-copy(user self.type-pointer.parameters.first.item)->(
+        owner function.arguments.parameters.last.item.get-type-instance().name)
+        
+    self.add-builtin-method(
+        user self.type-pointer,
+        user "set-from-ref",
+        copy false,
+        copy Access.COPY)->(
+        user function)
+    self.add-builtin-parameter(
+        user function, copy Access.USER, user self.type-generic, user "ref")
+    string-new-copy(user self.type-pointer.parameters.first.item)->(
+        owner function.arguments.parameters.last.item.get-type-instance().name)
+    
+    self.add-builtin-method(
+        user self.type-pointer,
+        user "set-from-array",
+        copy false,
+        copy Access.COPY)->(
+        user function)
+    self.add-builtin-argument(
+        user function,
+        user function.arguments.parameters,
+        copy false,
+        copy Access.USER,
+        user self.type-array,
+        user self.type-generic,
+        user "array")
+    function.arguments.parameters.last.item.get-type-instance()->(
+        user argument-type-instance)
+    string-new-copy(user self.type-pointer.parameters.first.item)->(
+        owner argument-type-instance.parameters.first.item.name)
+        
+    self.add-builtin-method-native(
+        user self.type-pointer,
+        user "get-pointed-at",
+        copy false,
+        user "cdef_M_Pointer_get_pointed_at",
+        copy Access.COPY)->(
+        user function)
+    self.add-builtin-parameter(
+        user function, copy Access.COPY, user self.type-int, user "index")
+    self.add-builtin-output(
+        user function, copy Access.VAR, user self.type-generic, user "pointed")
+    function.arguments.outputs.last.item.get-type-instance()->(
+        user argument-type-instance)
+    argument-type-instance.conditional := false
+    string-new-copy(user self.type-pointer.parameters.first.item)->(
+        owner argument-type-instance.name)
+        
+    self.add-builtin-method-native(
+        user self.type-pointer,
+        user "get-ref-at",
+        copy false,
+        user "cdef_M_Pointer_get_ref_at",
+        copy Access.COPY)->(
+        user function)
+    self.add-builtin-parameter(
+        user function, copy Access.COPY, user self.type-int, user "index")
+    self.add-builtin-output(
+        user function, copy Access.USER, user self.type-generic, user "pointed")
+    function.arguments.outputs.last.item.get-type-instance()->(
+        user argument-type-instance)
+    argument-type-instance.conditional := false
+    string-new-copy(user self.type-pointer.parameters.first.item)->(
+        owner argument-type-instance.name)
     
     ; Int
     self.add-builtin-method(
@@ -258,6 +358,28 @@ struct Global
     self.add-builtin-char-array-argument(
         user function, copy false, copy Access.USER, user "other")
     self.string-copy-function := function
+
+    self.add-builtin-method(
+        user self.type-string,
+        user "copy-from-pointer",
+        copy true,
+        copy Access.USER)->(
+        user function)
+    self.add-builtin-argument(
+        user function,
+        user function.arguments.parameters,
+        copy false,
+        copy Access.COPY,
+        user self.type-pointer,
+        user self.type-char,
+        user "pointer")
+
+    self.add-builtin-method(
+        user self.type-string,
+        user "set-null-term-length",
+        copy false,
+        copy Access.USER)->(
+        user function)
     
     self.add-builtin-method(
         user self.type-string, user "clear", copy false, copy Access.USER)->(
@@ -441,14 +563,34 @@ struct Global
     
     self.add-builtin-global-variable(user self.type-sys, user "sys")
   
-  func add-builtin-type(user String name, copy Bool is-primitive)->(
+  func add-global-type(user String name, copy Bool is-primitive)->(
+      user TypeData type-data)
+    self.add-builtin-type(
+        user self.global-module, user name, copy is-primitive)->(
+        user type-data)
+  
+  func add-cint-type(user ModuleMembers cdef-module, user String name)->(
+      user TypeData type-data)
+    self.add-cdef-type(user cdef-module, user name)->(user type-data)
+    type-data.is-int-like := true
+  
+  func add-cdef-type(user ModuleMembers cdef-module, user String name)->(
+      user TypeData type-data)
+    self.add-builtin-type(user cdef-module, user name, copy true)->(
+        user type-data)
+    type-data.my-module := cdef-module
+  
+  func add-builtin-type(
+      user ModuleMembers module,
+      user String name,
+      copy Bool is-primitive)->(
       user TypeData type-data)
     new TypeData new-type
     type-data := new-type
     string-new-copy(user name)->(owner new-type.name)
     new-type.is-primitive := is-primitive
     new-type.is-ordered := true
-    self.global-module.type-map.add(user new-type.name, user new-type)
+    module.type-map.add(user new-type.name, user new-type)
     self.builtins.types.add(owner new-type)
   
   func add-builtin-global-variable(
@@ -491,7 +633,8 @@ struct Global
   func add-builtin-global-function(user String name, copy Bool has-error)->(
       user SyntaxTreeFunction function)
     self.add-builtin-function(
-        user name, copy has-error, user _, user self.builtins)->(user function)
+        user name, copy has-error, user _, user _, user self.builtins)->(
+        user function)
     self.global-module.function-map.add(user function.name, user function)
   
   func add-builtin-method(
@@ -500,22 +643,49 @@ struct Global
       copy Bool has-error,
       copy Int access)->(
       user SyntaxTreeFunction function)
+    self.add-builtin-method-native(
+        user builtin-type,
+        user name,
+        copy has-error,
+        user _,
+        copy access)->(
+        user function)
+  
+  func add-builtin-method-native(
+      user TypeData builtin-type,
+      user String name,
+      copy Bool has-error,
+      user String native-name,
+      copy Int access)->(
+      user SyntaxTreeFunction function)
     self.add-builtin-function(
-        user name, copy has-error, user builtin-type, user builtin-type)->(
+        user name,
+        copy has-error,
+        user native-name,
+        user builtin-type,
+        user builtin-type)->(
         user function)
     self.add-builtin-parameter(
         user function, copy access, user builtin-type, user "self")
     user Argument self-param(user function.arguments.parameters.first.item)
+    self-param.is-native := native-name?
     function.self-access := self-param.access
     function.self-conditional := self-param.get-type-instance().conditional
   
   func add-builtin-function(
       user String name,
       copy Bool has-error,
+      user String native-name,
       user TypeData parent-type,
       user SyntaxTreeNamespace namespace)->(
       user SyntaxTreeFunction out-function)
-    new SyntaxTreeFunction function
+    owner SyntaxTreeFunction function
+    if native-name?
+      new NativeFunction native-function
+      native-function.cname := NativeText(user native-name)
+      function := native-function
+    else
+      function := SyntaxTreeFunction()
     function.arguments.has-error := has-error
     out-function := function
     string-new-copy(user name)->(owner function.name)
@@ -576,6 +746,8 @@ struct Global
     new DeclarationArgument argument
     argument.access := access
     argument.is-output := is-output
+    if function.arguments.parameters.first?
+      argument.is-native := function.arguments.parameters.first.item.is-native
     argument.variable := SyntaxTreeVariable(user _)
     string-new-copy(user name)->(owner argument.variable.name)
     argument.variable.access := access

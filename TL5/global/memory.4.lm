@@ -26,7 +26,8 @@ struct ReferencePath
     if not self? or not reference?
       is-equal := false
       return
-    if self.variable is-not reference.variable or
+    if not self.variable? or not reference.variable? or
+        self.variable is-not reference.variable or
         (self.field? != reference.field?)
       is-equal := false
       return
@@ -40,10 +41,14 @@ struct ReferencePath
     do
       while reference-path.field?
       reference-path := reference-path.field
-    is-conditional := reference-path.variable.type-instance.conditional
+    is-conditional := true
+    if reference-path.variable?
+      is-conditional := reference-path.variable.type-instance.conditional
   
   func print()
-    if self.variable.is-aux
+    if not self.variable?
+      sys.print(user "{anonymous}")
+    else-if self.variable.is-aux
       sys.print(user "{anonymous}")
     else
       sys.print(user self.variable.name)
@@ -62,7 +67,10 @@ struct ReferencePath
     user ReferencePath path(user self)
     do
       while path?
-      if access-is-var(copy path.variable.access)
+      var Bool is-owner
+      if path.variable?
+        access-is-var(copy path.variable.access)->(var is-owner)
+      if is-owner
         if not pure-owner
           node.syntax-error-item-ref(
               user "cannot modify owner field",
@@ -217,6 +225,8 @@ struct ReferenceMemoryList
   func check-user(user Expression expression)
     user ReferencePath exp-path(user expression.result-type.reference-path)
     if not exp-path?
+      return
+    if not exp-path.variable?
       return
     if exp-path.field? or exp-path.variable.access != Access.USER
       return

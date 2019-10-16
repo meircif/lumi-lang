@@ -12,6 +12,7 @@ class TypeData(SyntaxTreeNamespace)
   user SyntaxTreeFunction constructor
   var Bool is-primitive
   var Bool is-dynamic
+  var Bool is-int-like
   var Bool is-ordered
   var Bool is-delete-mocked
   var Bool ordering
@@ -22,8 +23,8 @@ class TypeData(SyntaxTreeNamespace)
     new-node.parse(copy is-dynamic)
   
   func inst parse(copy Bool is-dynamic)
-    self.is-dynamic := is-dynamic
     self.set-location()
+    self.is-dynamic := is-dynamic
     self.my-module := glob.current-module
     read-new(user "({")->(owner self.name)
     self.add-type(user self.my-module)
@@ -77,9 +78,7 @@ class TypeData(SyntaxTreeNamespace)
       self.syntax-error(user "unknown keyword", user keyword)
   
   func inst is-same(user TypeData other)->(var Bool is-same)
-    is-same := self is other or
-        ((self is glob.type-int or self is glob.type-char) and
-        (other is glob.type-int or other is glob.type-char))
+    is-same := self is other or (self.is-int-like and other.is-int-like)
   
   func inst new-type-instance()->(owner TypeInstance type-instance)
     type-instance := TypeInstance()
@@ -234,7 +233,7 @@ class TypeData(SyntaxTreeNamespace)
       type-data.collect-delete-group()
       type-data.delete-group.extend(user self.delete-group)
   
-  func inst write-cname()
+  func dynamic write-cname()
     if self.my-module?
       self.my-module.write-prefix()
     write-cname(user self.name)
@@ -267,7 +266,7 @@ class TypeData(SyntaxTreeNamespace)
     self.indentation-spaces := INDENTATION-SPACES
     if self.base-type?
       self.write-spaces()
-      self.base-type.type-data.write-cname()
+      self.base-type.write-cname()
       write(user " _base;\n")
     self.write-children(user self.variables)
     write(user "};\n")
@@ -277,7 +276,7 @@ class TypeData(SyntaxTreeNamespace)
       write(user "_Dynamic {\n")
       if self.is-base-dynamic()
         self.write-spaces()
-        self.base-type.type-data.write-cname()
+        self.base-type.write-cname()
         write(user "_Dynamic _base;\n")
       else
         self.write-spaces()
@@ -356,7 +355,7 @@ class TypeData(SyntaxTreeNamespace)
     write(user "if (self == NULL) return;\n")
     if self.base-type?
       write-spaces(copy INDENTATION-SPACES)
-      self.base-type.type-data.write-cname()
+      self.base-type.write-cname()
       write(user "_Del(&(self->_base));\n")
     if self.is-delete-mocked
       write-spaces(copy INDENTATION-SPACES)

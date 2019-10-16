@@ -1,0 +1,92 @@
+module time
+
+
+native include "time.h"
+
+native type CtimeT "time_t"
+
+native const Int CLOCKS-PER-SEC
+
+native func c-clock()->(copy cdef.Double res) "clock"
+
+native func c-time(copy cdef.Pointer{CtimeT} timer)->(copy CtimeT res) "time"
+
+native func c-ctime(copy cdef.Pointer{CtimeT} timer)->(
+        copy cdef.Pointer{cdef.Char} res) "ctime"
+
+native func c-difftime(copy CtimeT time1, copy CtimeT time2)->(
+        copy cdef.Double res) "difftime"
+
+native func c-asctime(user Time timeptr)->(
+        copy cdef.Pointer{cdef.Char} res) "asctime"
+
+native func c-mktime(user Time timeptr)->(copy CtimeT res) "mktime"
+
+native func c-strftime(
+        user String target,
+        copy cdef.Size maxsize,
+        user String format,
+        user Time timeptr)->(
+        copy cdef.Size res) "strftime"
+
+native func c-gmtime(copy cdef.Pointer{CtimeT} timer)->(
+        user Time? res) "gmtime"
+
+native func c-localtime(copy cdef.Pointer{CtimeT} timer)->(
+        user Time? res) "localtime"
+
+
+struct Timer
+    var CtimeT c-timer
+    
+    func user time()
+        var cdef.Pointer{CtimeT} null
+        self.c-timer := c-time(copy null)
+    
+    func user mktime(user Time tm)
+        self.c-timer := c-mktime(user tm)
+      
+    func user c-pointer()->(var cdef.Pointer{CtimeT} timer-pointer)
+        timer-pointer.set-point-to(var self.c-timer)
+
+    func user ! ctime(user String target)
+        target.copy-from-pointer(copy c-ctime(copy self.c-pointer()))!
+    
+    func user gmtime()->(user Time? new-time)
+        new-time := c-gmtime(copy self.c-pointer())
+    
+    func user localtime()->(user Time? new-time)
+        new-time := c-localtime(copy self.c-pointer())
+
+
+struct Time
+    var Int sec
+    var Int min
+    var Int hour
+    var Int mday
+    var Int mon
+    var Int year
+    var Int wday
+    var Int yday
+    var Int isdst
+    
+    func user ! asctime(user String target)
+        target.copy-from-pointer(copy c-asctime(user self))!
+    
+    func user strftime(user String target, user String format)->(
+            var Int copied)
+        var Ref timeptr(copy self)
+        copied := c-strftime(
+                user target,
+                copy target.max-length(),
+                user format,
+                user self)
+        target.set-null-term-length()
+
+
+func clock()->(var Int ticks)
+    ticks := c-clock()
+
+
+func difftime(user Timer timer1, user Timer timer2)->(var Int diff)
+    diff := c-difftime(copy timer1.c-timer, copy timer2.c-timer)

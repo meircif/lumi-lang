@@ -242,6 +242,9 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
       self.expect-space(user "assert-error!")
       self.code-nodes.add(owner SyntaxTreeAssertError.parse-new(
           user _, user self))
+          
+    else-if self.equal-and-space(user keyword, user "native")
+      self.code-nodes.add(owner NativeCode.parse-new(user _, user self))
       
     else
       glob.save-input := true

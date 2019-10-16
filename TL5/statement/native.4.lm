@@ -1,60 +1,89 @@
 ~~~ TL5 compiler - Syntax tree native nodes ~~~
 module tl5-compiler
 
-~~~ Parse "native" keyword in the root tree ~~~
-func parse-native(user SyntaxTreeRoot root)
-  user String keyword
-  read-until(user " ", copy false)->(user keyword)
-  root.expect-space(user "native")
+
+struct NativeText
+  owner String text
   
-  if keyword.equal(user "func")
-    root.functions.add(owner NativeFunction.parse-new(user _))
-    
-  else-if keyword.equal(user "var")
-    root.variables.add(owner NativeVariable.parse-new(user _))
-    
-  else-if keyword.equal(user "type")
-    root.types.add(owner NativeType.parse-new(user _))
-    
-  else
-    root.syntax-error(user "unknown \"native\" keyword", user keyword)
+  new(user String text)
+    string-new-copy(user text)->(owner self.text)
+
+  func parse-new(user SyntaxTreeNode node)->(owner NativeText native-text)
+    owner String text
+    read-new(user "")->(owner text)
+    node.check-string(user text)
+    native-text := NativeText(user text[1:text.length - 2])
+  
+  func write(user String name)
+    if self?
+      write(user self.text)
+    else
+      write-cname(user name)
+
+
+~~~ Native include declaration in the syntax tree ~~~
+class NativeInclude(SyntaxTreeFunction)
+  owner NativeText path
+
+  func inst parse-new()->(owner NativeInclude new-node)
+    new-node := NativeInclude()
+    new-node.parse()
+  
+  func inst parse()
+    NativeText.parse-new(user _, user self)->(owner self.path)
+  
+  func dynamic write()
+    write(user "\n#include <")
+    self.path.write(user _)
+    write(user ">\n")
 
 
 ~~~ Native function declaration in the syntax tree ~~~
 class NativeFunction(SyntaxTreeFunction)
-  user ModuleMembers outer-module
+  owner NativeText cname
   
   func inst parse-new()->(owner NativeFunction new-node)
     new-node := NativeFunction()
     new-node.parse()
   
   func inst parse()
-    self.outer-module := glob.current-module
+    self.my-module := glob.current-module
     self.parse-header(copy true)
-    glob.global-module.function-map.add(user self.name, user self)
+    if glob.last-char = ' '
+      NativeText.parse-new(user _, user self)->(owner self.cname)
+    if self.arguments.has-error
+      self.syntax-error-msg(user "error raising native function")
+    if self.arguments.outputs.first?
+      if self.arguments.outputs.first.next?
+        self.syntax-error-msg(user "more than one output to native function")
+    glob.current-module.function-map.add(user self.name, user self)
   
-  func dynamic link-types()
-    glob.current-module := self.outer-module
-    base()
-    glob.current-module := _
+  func dynamic check-memory(user ReferenceMemoryList global-refs)
+    ; do nothing
   
-  func dynamic analyze()
-    glob.current-module := self.outer-module
-    base()
-    glob.current-module := _
+  func dynamic write-declaration()
+    ; do nothing
   
   func dynamic write()
     ; do nothing
+  
+  func dynamic write-cname()
+    self.cname.write(user self.name)
 
 
 ~~~ Native variable declaration in the syntax tree ~~~
 class NativeVariable(SyntaxTreeVariable)
+  owner NativeText cname
+  
   func inst parse-new()->(owner NativeVariable new-node)
     new-node := NativeVariable(user _)
-    new-node.parse(
-        copy Access.VAR, copy false, user _, user glob.global-module)
-    new-node.is-native := true
-    new-node.my-module := _
+    new-node.parse-native()
+  
+  func inst parse-native()
+    self.is-native := true
+    self.parse(copy Access.VAR, copy false, user _)
+    if glob.last-char = ' '
+      NativeText.parse-new(user _, user self)->(owner self.cname)
   
   func dynamic analyze()
     if not self.type-instance.type-data.is-primitive
@@ -64,29 +93,63 @@ class NativeVariable(SyntaxTreeVariable)
     base()
   
   func dynamic write()
-    write(user "\nextern ")
-    base()
+    ; do nothing
+  
+  func dynamic write-cname()
+    self.cname.write(user self.name)
+
+
+~~~ Native constant declaration in the syntax tree ~~~
+class NativeConstant(SyntaxTreeConstant)
+  owner NativeText cname
+  
+  func inst parse-new()->(owner NativeConstant new-node)
+    new-node := NativeConstant(user _)
+    new-node.parse-native()
+  
+  func inst parse-native()
+    self.is-native := true
+    self.parse()
+    if glob.last-char = ' '
+      NativeText.parse-new(user _, user self)->(owner self.cname)
+    self.is-ordered := true
+
+  func dynamic analyze()
+    ; do nothing
+  
+  func dynamic get-constant-value()->(var Int value, var Bool has-value)
+    has-value := false
+
+  func dynamic write()
+    ; do nothing
+  
+  func dynamic write-cname()
+    self.cname.write(user self.name)
 
 
 ~~~ Native variable declaration in the syntax tree ~~~
 class NativeType(TypeData)
+  owner NativeText cname
+
+  new()
+    self.set-location()
+    self.is-primitive := true
+  
   func inst parse-new()->(owner NativeType new-node)
     new-node := NativeType()
     new-node.parse()
   
   func inst parse()
-    self.is-primitive := true
-    read-new(user "")->(owner self.name)
-    self.add-type(user glob.global-module)
+    read-new(user " ")->(owner self.name)
+    if glob.last-char = ' '
+      NativeText.parse-new(user _, user self)->(owner self.cname)
+    self.add-type(user glob.current-module)
   
   func dynamic analyze()
     ; do nothing
   
   func dynamic write-declaration()
-    ; typedef void* `name`;
-    write(user "\ntypedef void* ")
-    write-cname(user self.name)
-    write(user ";\n")
+    ; do nothing
   
   func dynamic write-methods-declaration()
     ; do nothing
@@ -99,3 +162,23 @@ class NativeType(TypeData)
   
   func dynamic write()
     ; do nothing
+  
+  func dynamic write-cname()
+    self.cname.write(user self.name)
+
+
+~~~ Native code declaration in the syntax tree ~~~
+class NativeCode(SyntaxTreeCode)
+  owner NativeText code
+  
+  func inst parse-new(user SyntaxTreeBlock parent)->(owner NativeCode new-node)
+    new-node := NativeCode(user parent)
+    NativeText.parse-new(user _, user new-node)->(owner new-node.code)
+  
+  func dynamic write()
+    if self.parent?
+      self.write-spaces()
+    else
+      write(user "\n")
+    self.code.write(user _)
+    write(user "\n")

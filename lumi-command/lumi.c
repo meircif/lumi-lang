@@ -808,8 +808,8 @@ Returncode lumi_M_Lumi_read_input(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
                 if (op == 'e') {
                   CHECK_REF(174, self, self_Refman)
                   INIT_STRING_CONST(175, aux_String_5, "e");
-                  INIT_STRING_CONST(175, aux_String_6, "file name");
-                  LUMI_err = lumi_M_Lumi_get_opt_param(self, self_Refman, aux_String_5, aux_String_5_Refman, aux_String_6, aux_String_6_Refman, &(index), &(aux_String_7), &(aux_String_7_Refman));
+                  INIT_STRING_CONST(175, aux_String_6, "argument");
+                  LUMI_err = lumi_M_Lumi_get_any_opt_param(self, self_Refman, aux_String_5, aux_String_5_Refman, aux_String_6, aux_String_6_Refman, &(index), &(aux_String_7), &(aux_String_7_Refman));
                   CHECK(173)
                   LUMI_err = lumi_M_Lumi_concat_file_name(self, self_Refman, &(self->external_files), self_Refman, aux_String_7, aux_String_7_Refman);
                   CHECK(173)
@@ -1468,7 +1468,7 @@ Returncode lumi_M_help(void) {
   Ref_Manager* aux_String_0_Refman = NULL;
   LUMI_err = Sys_println(sys, sys_Refman, lumi_M_usage, lumi_M_usage_Refman);
   CHECK(39)
-  INIT_STRING_CONST(51, aux_String_0, "Options:\n  -h \t\t print help\n  -o <file> \t output file name\n  -t <module> \t compile test program for <module>\n  -c \t\t only create C file(s)\n  -l<version> \t only run C compiler for TL<version>\n  -e <file> \t external C file for C compilation\n  -p <lumipath>  path of lumi-lang repository\n  -r \t\t   run the compiled program\n  -ra <arguments>  run the compiled program with given arguments\n  -v \t\t print executed commands\n  -d \t\t only print commands without execution");
+  INIT_STRING_CONST(51, aux_String_0, "Options:\n  -h \t\t   print help\n  -o <file> \t   output file name\n  -t <module> \t   compile test program for <module>\n  -c \t\t   only create C file(s)\n  -l<version> \t   only run C compiler for TL<version>\n  -e <argument>    extra argument for C compilation\n  -p <lumipath>    path of lumi-lang repository\n  -r \t\t   run the compiled program\n  -ra <arguments>  run the compiled program with given arguments\n  -v \t\t   print executed commands\n  -d \t\t   only print commands without execution");
   LUMI_err = Sys_println(sys, sys_Refman, aux_String_0, aux_String_0_Refman);
   CHECK(40)
   LUMI_err = Sys_exit(sys, sys_Refman, 0);

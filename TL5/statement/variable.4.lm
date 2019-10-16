@@ -26,14 +26,12 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     new-node.parse(
         copy access,
         copy is-create,
-        user parent-type,
-        user glob.current-module)
+        user parent-type)
   
   func inst parse(
       copy Int access,
       copy Bool is-create,
-      user TypeData parent-type,
-      user ModuleMembers my-module)
+      user TypeData parent-type)
     self.parent-type := parent-type
     self.access := access
     self.is-create := is-create
@@ -45,13 +43,15 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       self.type-instance.parse(
           user " ", user self, user _, copy INDENTATION-SPACES)
     self.expect-space(user "type")
-    read-new(user "!(")->(owner self.name)
+    read-new(user "!( ")->(owner self.name)
+    if glob.last-char = ' ' and not self.is-native
+      self.syntax-error-msg(user "unexpected space after variable name")
     self.check-name()
     if glob.last-char = '(' and self.parent-type?
       self.syntax-error-msg(user "type members cannot be initialized")
     if not self.parent? and not self.parent-type?
       self.parent := glob.root.global-init
-      self.my-module := my-module
+      self.my-module := glob.current-module
       self.my-module.variable-map.add(user self.name, user self)
     if self.parent?
       self.is-initialized := glob.last-char = '(' or self.is-create
@@ -155,7 +155,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   func dynamic check-memory(user ReferenceMemoryList refs)
     refs.add(user self)
   
-  func inst write-cname()
+  func dynamic write-cname()
     if self.my-module?
       self.my-module.write-prefix()
     write-cname(user self.name)
@@ -181,7 +181,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     if self.type-instance.type-data is glob.type-func
       self.type-instance.arguments.write-pointer(user self.name)
     else
-      self.type-instance.type-data.write-cname()
+      self.type-instance.write-cname()
       if not self.type-instance.type-data.is-primitive and
           not (self.parent-type? and access-is-only-var(copy self.access))
         write(user "*")
@@ -222,7 +222,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     else-if data-type.type-data is glob.type-func
       data-type.arguments.write-pointer-start()
     else
-      data-type.type-data.write-cname()
+      data-type.write-cname()
     if not is-new-var
       write(user "*")
     if data-type.type-data is-not glob.type-func
@@ -316,7 +316,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   
   func inst write-var()
     ; `type` `name`_Var = {...};
-    self.type-instance.type-data.write-cname()
+    self.type-instance.write-cname()
     write(user " ")
     self.write-cname()
     write(user "_Var = {")
@@ -351,7 +351,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   func inst write-dynamic()
     ; `type`_Dynamic* `name`_Dynamic[ = `type`_dynamic];
     self.write-spaces()
-    self.type-instance.type-data.write-cname()
+    self.type-instance.write-cname()
     write(user "_Dynamic* ")
     self.write-cname()
     write(user "_Dynamic")
@@ -359,7 +359,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
       write(user " = ")
       if self.is-create
         write(user "&")
-        self.type-instance.type-data.write-cname()
+        self.type-instance.write-cname()
         write(user "_dynamic")
       else
         write(user "NULL")
@@ -475,8 +475,9 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
     read-new(user " ")->(owner self.name)
     if not is-legal-name(user self.name, copy NameGroup.CONSTANT)
       self.syntax-error(user "illegal constant name", user self.name)
-    self.expect-space(user self.name)
-    self.value.new(user "", user self)
+    if not self.is-native
+      self.expect-space(user self.name)
+      self.value.new(user "", user self)
     glob.type-int.new-type-instance()->(owner self.type-instance)
     self.my-module.variable-map.add(user self.name, user self)
   
