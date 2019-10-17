@@ -2,6 +2,23 @@
 module tl5-compiler-tests
 
 
+var Bool arguments-set
+var String{1024} test-base-dir
+
+func setup-arguments()
+  if arguments-set
+    return
+  for n in 1:sys.argv.length
+    user String arg(user sys.argv[n])
+    if arg.equal(user "--trace")
+      flag-trace := true
+    else-if arg[0] != '-' and test-base-dir.length = 0
+      test-base-dir.new(user arg)
+  if test-base-dir.length = 0
+    sys.getenv(user "TEST_DIR", user test-base-dir)
+  arguments-set := true
+
+
 func assert-string-slice(
     user String expected,
     user String actual,
@@ -53,9 +70,8 @@ func assert-string(user String expected, user String actual)
 
 func set-test-file-name(
     user String filename, user String base-name, user String suffix)
-  var String{1024} base-dir
-  if sys.getenv(user "TEST_DIR", user base-dir)
-    filename.new(user base-dir)
+  setup-arguments()
+  filename.new(user test-base-dir)
   filename.concat(user base-name)
   filename.append(copy '.')
   filename.concat(user suffix)
