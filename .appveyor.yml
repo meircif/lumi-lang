@@ -18,7 +18,7 @@ build_script:
   - "cd TL4"
   - "%CC% tl4-compiler.c ../TL3/lumi.3.c -I../TL3 -I. -o ../tl4-compiler.exe"
   - "cd .."
-  - "if NOT [%CC%]==[cl] %CC% TL5/tl5-compiler.c TL4/lumi.4.c -ITL4 -o tl5-compiler.exe"
+  - "%CC% TL5/tl5-compiler.c TL4/lumi.4.c -ITL4 -o tl5-compiler.exe"
   - "%CC% lumi-command/lumi.c TL4/lumi.4.c -ITL4 -o lumi.exe"
   - ps: .\tl4-compiler.exe tl5-compiler-tests.c -t tl5-compiler TL5\tl5-compiler.4.lm (get-item TL5\*\*.4.lm) (get-item TL5\tests\ut\*.4.lm)
   - "%CC% tl5-compiler-tests.c TL4/lumi.4.c -ITL4/ -o tl5-compiler-tests.exe"
@@ -29,6 +29,6 @@ test_script:
   - "dir /B tl2-compiler.exe >nul"
   - "dir /B tl3-compiler.exe >nul"
   - "dir /B tl4-compiler.exe >nul"
-  - "if NOT [%CC%]==[cl] dir /B tl5-compiler.exe >nul"
+  - "dir /B tl5-compiler.exe >nul"
   - "dir /B lumi.exe >nul"
   - tl5-compiler-tests.exe TL5\tests\ut\

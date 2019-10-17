@@ -251,7 +251,7 @@ class SyntaxTreeRoot(GlobalNodes)
       sys.print(user "\"\n")
       sys.exit(copy 1)
       
-    write-global(user output-header-code)
+    write-output-header-code()
     
     write-global(user "\n\n/* global nodes */\n")
     self.write-children(user self.global-nodes)

@@ -4047,6 +4047,8 @@ Returncode tl5_compiler_M_access_is_only_var(Int access, Bool* is_only_var);
 
 Returncode tl5_compiler_M_access_is_var(Int access, Bool* is_var);
 
+Returncode tl5_compiler_M_write_output_header_code(void);
+
 Returncode tl5_compiler_M_write_global(String* text, Ref_Manager* text_Refman);
 
 
@@ -4316,9 +4318,6 @@ Ref_Manager* tl5_compiler_M_expression_ends_Refman = NULL;
 
 tl5_compiler_M_Global* tl5_compiler_M_glob = NULL;
 Ref_Manager* tl5_compiler_M_glob_Refman = NULL;
-
-String* tl5_compiler_M_output_header_code = NULL;
-Ref_Manager* tl5_compiler_M_output_header_code_Refman = NULL;
 
 
 /* types methods body */
@@ -27718,7 +27717,7 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_write(tl5_compiler_M_SyntaxTreeRoot* se
     LUMI_err = Sys_exit(sys, sys_Refman, 1);
     CHECK(252)
   }
-  LUMI_err = tl5_compiler_M_write_global(tl5_compiler_M_output_header_code, tl5_compiler_M_output_header_code_Refman);
+  LUMI_err = tl5_compiler_M_write_output_header_code();
   CHECK(254)
   INIT_STRING_CONST(256, aux_String_2, "\n\n/* global nodes */\n");
   LUMI_err = tl5_compiler_M_write_global(aux_String_2, aux_String_2_Refman);
@@ -49532,6 +49531,7583 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
+#define LUMI_FILE_NAME "TL5/global/header-string.4.lm"
+#define LUMI_FUNC_NAME "write-output-header-code"
+Returncode tl5_compiler_M_write_output_header_code(void) {
+  Returncode LUMI_err = OK;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  String aux_String_1_Var = {0};
+  String* aux_String_1 = NULL;
+  Ref_Manager* aux_String_1_Refman = NULL;
+  String aux_String_2_Var = {0};
+  String* aux_String_2 = NULL;
+  Ref_Manager* aux_String_2_Refman = NULL;
+  String aux_String_3_Var = {0};
+  String* aux_String_3 = NULL;
+  Ref_Manager* aux_String_3_Refman = NULL;
+  String aux_String_4_Var = {0};
+  String* aux_String_4 = NULL;
+  Ref_Manager* aux_String_4_Refman = NULL;
+  String aux_String_5_Var = {0};
+  String* aux_String_5 = NULL;
+  Ref_Manager* aux_String_5_Refman = NULL;
+  String aux_String_6_Var = {0};
+  String* aux_String_6 = NULL;
+  Ref_Manager* aux_String_6_Refman = NULL;
+  String aux_String_7_Var = {0};
+  String* aux_String_7 = NULL;
+  Ref_Manager* aux_String_7_Refman = NULL;
+  String aux_String_8_Var = {0};
+  String* aux_String_8 = NULL;
+  Ref_Manager* aux_String_8_Refman = NULL;
+  String aux_String_9_Var = {0};
+  String* aux_String_9 = NULL;
+  Ref_Manager* aux_String_9_Refman = NULL;
+  String aux_String_10_Var = {0};
+  String* aux_String_10 = NULL;
+  Ref_Manager* aux_String_10_Refman = NULL;
+  String aux_String_11_Var = {0};
+  String* aux_String_11 = NULL;
+  Ref_Manager* aux_String_11_Refman = NULL;
+  String aux_String_12_Var = {0};
+  String* aux_String_12 = NULL;
+  Ref_Manager* aux_String_12_Refman = NULL;
+  String aux_String_13_Var = {0};
+  String* aux_String_13 = NULL;
+  Ref_Manager* aux_String_13_Refman = NULL;
+  String aux_String_14_Var = {0};
+  String* aux_String_14 = NULL;
+  Ref_Manager* aux_String_14_Refman = NULL;
+  String aux_String_15_Var = {0};
+  String* aux_String_15 = NULL;
+  Ref_Manager* aux_String_15_Refman = NULL;
+  String aux_String_16_Var = {0};
+  String* aux_String_16 = NULL;
+  Ref_Manager* aux_String_16_Refman = NULL;
+  String aux_String_17_Var = {0};
+  String* aux_String_17 = NULL;
+  Ref_Manager* aux_String_17_Refman = NULL;
+  String aux_String_18_Var = {0};
+  String* aux_String_18 = NULL;
+  Ref_Manager* aux_String_18_Refman = NULL;
+  String aux_String_19_Var = {0};
+  String* aux_String_19 = NULL;
+  Ref_Manager* aux_String_19_Refman = NULL;
+  String aux_String_20_Var = {0};
+  String* aux_String_20 = NULL;
+  Ref_Manager* aux_String_20_Refman = NULL;
+  String aux_String_21_Var = {0};
+  String* aux_String_21 = NULL;
+  Ref_Manager* aux_String_21_Refman = NULL;
+  String aux_String_22_Var = {0};
+  String* aux_String_22 = NULL;
+  Ref_Manager* aux_String_22_Refman = NULL;
+  String aux_String_23_Var = {0};
+  String* aux_String_23 = NULL;
+  Ref_Manager* aux_String_23_Refman = NULL;
+  String aux_String_24_Var = {0};
+  String* aux_String_24 = NULL;
+  Ref_Manager* aux_String_24_Refman = NULL;
+  String aux_String_25_Var = {0};
+  String* aux_String_25 = NULL;
+  Ref_Manager* aux_String_25_Refman = NULL;
+  String aux_String_26_Var = {0};
+  String* aux_String_26 = NULL;
+  Ref_Manager* aux_String_26_Refman = NULL;
+  String aux_String_27_Var = {0};
+  String* aux_String_27 = NULL;
+  Ref_Manager* aux_String_27_Refman = NULL;
+  String aux_String_28_Var = {0};
+  String* aux_String_28 = NULL;
+  Ref_Manager* aux_String_28_Refman = NULL;
+  String aux_String_29_Var = {0};
+  String* aux_String_29 = NULL;
+  Ref_Manager* aux_String_29_Refman = NULL;
+  String aux_String_30_Var = {0};
+  String* aux_String_30 = NULL;
+  Ref_Manager* aux_String_30_Refman = NULL;
+  String aux_String_31_Var = {0};
+  String* aux_String_31 = NULL;
+  Ref_Manager* aux_String_31_Refman = NULL;
+  String aux_String_32_Var = {0};
+  String* aux_String_32 = NULL;
+  Ref_Manager* aux_String_32_Refman = NULL;
+  String aux_String_33_Var = {0};
+  String* aux_String_33 = NULL;
+  Ref_Manager* aux_String_33_Refman = NULL;
+  String aux_String_34_Var = {0};
+  String* aux_String_34 = NULL;
+  Ref_Manager* aux_String_34_Refman = NULL;
+  String aux_String_35_Var = {0};
+  String* aux_String_35 = NULL;
+  Ref_Manager* aux_String_35_Refman = NULL;
+  String aux_String_36_Var = {0};
+  String* aux_String_36 = NULL;
+  Ref_Manager* aux_String_36_Refman = NULL;
+  String aux_String_37_Var = {0};
+  String* aux_String_37 = NULL;
+  Ref_Manager* aux_String_37_Refman = NULL;
+  String aux_String_38_Var = {0};
+  String* aux_String_38 = NULL;
+  Ref_Manager* aux_String_38_Refman = NULL;
+  String aux_String_39_Var = {0};
+  String* aux_String_39 = NULL;
+  Ref_Manager* aux_String_39_Refman = NULL;
+  String aux_String_40_Var = {0};
+  String* aux_String_40 = NULL;
+  Ref_Manager* aux_String_40_Refman = NULL;
+  String aux_String_41_Var = {0};
+  String* aux_String_41 = NULL;
+  Ref_Manager* aux_String_41_Refman = NULL;
+  String aux_String_42_Var = {0};
+  String* aux_String_42 = NULL;
+  Ref_Manager* aux_String_42_Refman = NULL;
+  String aux_String_43_Var = {0};
+  String* aux_String_43 = NULL;
+  Ref_Manager* aux_String_43_Refman = NULL;
+  String aux_String_44_Var = {0};
+  String* aux_String_44 = NULL;
+  Ref_Manager* aux_String_44_Refman = NULL;
+  String aux_String_45_Var = {0};
+  String* aux_String_45 = NULL;
+  Ref_Manager* aux_String_45_Refman = NULL;
+  String aux_String_46_Var = {0};
+  String* aux_String_46 = NULL;
+  Ref_Manager* aux_String_46_Refman = NULL;
+  String aux_String_47_Var = {0};
+  String* aux_String_47 = NULL;
+  Ref_Manager* aux_String_47_Refman = NULL;
+  String aux_String_48_Var = {0};
+  String* aux_String_48 = NULL;
+  Ref_Manager* aux_String_48_Refman = NULL;
+  String aux_String_49_Var = {0};
+  String* aux_String_49 = NULL;
+  Ref_Manager* aux_String_49_Refman = NULL;
+  String aux_String_50_Var = {0};
+  String* aux_String_50 = NULL;
+  Ref_Manager* aux_String_50_Refman = NULL;
+  String aux_String_51_Var = {0};
+  String* aux_String_51 = NULL;
+  Ref_Manager* aux_String_51_Refman = NULL;
+  String aux_String_52_Var = {0};
+  String* aux_String_52 = NULL;
+  Ref_Manager* aux_String_52_Refman = NULL;
+  String aux_String_53_Var = {0};
+  String* aux_String_53 = NULL;
+  Ref_Manager* aux_String_53_Refman = NULL;
+  String aux_String_54_Var = {0};
+  String* aux_String_54 = NULL;
+  Ref_Manager* aux_String_54_Refman = NULL;
+  String aux_String_55_Var = {0};
+  String* aux_String_55 = NULL;
+  Ref_Manager* aux_String_55_Refman = NULL;
+  String aux_String_56_Var = {0};
+  String* aux_String_56 = NULL;
+  Ref_Manager* aux_String_56_Refman = NULL;
+  String aux_String_57_Var = {0};
+  String* aux_String_57 = NULL;
+  Ref_Manager* aux_String_57_Refman = NULL;
+  String aux_String_58_Var = {0};
+  String* aux_String_58 = NULL;
+  Ref_Manager* aux_String_58_Refman = NULL;
+  String aux_String_59_Var = {0};
+  String* aux_String_59 = NULL;
+  Ref_Manager* aux_String_59_Refman = NULL;
+  String aux_String_60_Var = {0};
+  String* aux_String_60 = NULL;
+  Ref_Manager* aux_String_60_Refman = NULL;
+  String aux_String_61_Var = {0};
+  String* aux_String_61 = NULL;
+  Ref_Manager* aux_String_61_Refman = NULL;
+  String aux_String_62_Var = {0};
+  String* aux_String_62 = NULL;
+  Ref_Manager* aux_String_62_Refman = NULL;
+  String aux_String_63_Var = {0};
+  String* aux_String_63 = NULL;
+  Ref_Manager* aux_String_63_Refman = NULL;
+  String aux_String_64_Var = {0};
+  String* aux_String_64 = NULL;
+  Ref_Manager* aux_String_64_Refman = NULL;
+  String aux_String_65_Var = {0};
+  String* aux_String_65 = NULL;
+  Ref_Manager* aux_String_65_Refman = NULL;
+  String aux_String_66_Var = {0};
+  String* aux_String_66 = NULL;
+  Ref_Manager* aux_String_66_Refman = NULL;
+  String aux_String_67_Var = {0};
+  String* aux_String_67 = NULL;
+  Ref_Manager* aux_String_67_Refman = NULL;
+  String aux_String_68_Var = {0};
+  String* aux_String_68 = NULL;
+  Ref_Manager* aux_String_68_Refman = NULL;
+  String aux_String_69_Var = {0};
+  String* aux_String_69 = NULL;
+  Ref_Manager* aux_String_69_Refman = NULL;
+  String aux_String_70_Var = {0};
+  String* aux_String_70 = NULL;
+  Ref_Manager* aux_String_70_Refman = NULL;
+  String aux_String_71_Var = {0};
+  String* aux_String_71 = NULL;
+  Ref_Manager* aux_String_71_Refman = NULL;
+  String aux_String_72_Var = {0};
+  String* aux_String_72 = NULL;
+  Ref_Manager* aux_String_72_Refman = NULL;
+  String aux_String_73_Var = {0};
+  String* aux_String_73 = NULL;
+  Ref_Manager* aux_String_73_Refman = NULL;
+  String aux_String_74_Var = {0};
+  String* aux_String_74 = NULL;
+  Ref_Manager* aux_String_74_Refman = NULL;
+  String aux_String_75_Var = {0};
+  String* aux_String_75 = NULL;
+  Ref_Manager* aux_String_75_Refman = NULL;
+  String aux_String_76_Var = {0};
+  String* aux_String_76 = NULL;
+  Ref_Manager* aux_String_76_Refman = NULL;
+  String aux_String_77_Var = {0};
+  String* aux_String_77 = NULL;
+  Ref_Manager* aux_String_77_Refman = NULL;
+  String aux_String_78_Var = {0};
+  String* aux_String_78 = NULL;
+  Ref_Manager* aux_String_78_Refman = NULL;
+  String aux_String_79_Var = {0};
+  String* aux_String_79 = NULL;
+  Ref_Manager* aux_String_79_Refman = NULL;
+  String aux_String_80_Var = {0};
+  String* aux_String_80 = NULL;
+  Ref_Manager* aux_String_80_Refman = NULL;
+  String aux_String_81_Var = {0};
+  String* aux_String_81 = NULL;
+  Ref_Manager* aux_String_81_Refman = NULL;
+  String aux_String_82_Var = {0};
+  String* aux_String_82 = NULL;
+  Ref_Manager* aux_String_82_Refman = NULL;
+  String aux_String_83_Var = {0};
+  String* aux_String_83 = NULL;
+  Ref_Manager* aux_String_83_Refman = NULL;
+  String aux_String_84_Var = {0};
+  String* aux_String_84 = NULL;
+  Ref_Manager* aux_String_84_Refman = NULL;
+  String aux_String_85_Var = {0};
+  String* aux_String_85 = NULL;
+  Ref_Manager* aux_String_85_Refman = NULL;
+  String aux_String_86_Var = {0};
+  String* aux_String_86 = NULL;
+  Ref_Manager* aux_String_86_Refman = NULL;
+  String aux_String_87_Var = {0};
+  String* aux_String_87 = NULL;
+  Ref_Manager* aux_String_87_Refman = NULL;
+  String aux_String_88_Var = {0};
+  String* aux_String_88 = NULL;
+  Ref_Manager* aux_String_88_Refman = NULL;
+  String aux_String_89_Var = {0};
+  String* aux_String_89 = NULL;
+  Ref_Manager* aux_String_89_Refman = NULL;
+  String aux_String_90_Var = {0};
+  String* aux_String_90 = NULL;
+  Ref_Manager* aux_String_90_Refman = NULL;
+  String aux_String_91_Var = {0};
+  String* aux_String_91 = NULL;
+  Ref_Manager* aux_String_91_Refman = NULL;
+  String aux_String_92_Var = {0};
+  String* aux_String_92 = NULL;
+  Ref_Manager* aux_String_92_Refman = NULL;
+  String aux_String_93_Var = {0};
+  String* aux_String_93 = NULL;
+  Ref_Manager* aux_String_93_Refman = NULL;
+  String aux_String_94_Var = {0};
+  String* aux_String_94 = NULL;
+  Ref_Manager* aux_String_94_Refman = NULL;
+  String aux_String_95_Var = {0};
+  String* aux_String_95 = NULL;
+  Ref_Manager* aux_String_95_Refman = NULL;
+  String aux_String_96_Var = {0};
+  String* aux_String_96 = NULL;
+  Ref_Manager* aux_String_96_Refman = NULL;
+  String aux_String_97_Var = {0};
+  String* aux_String_97 = NULL;
+  Ref_Manager* aux_String_97_Refman = NULL;
+  String aux_String_98_Var = {0};
+  String* aux_String_98 = NULL;
+  Ref_Manager* aux_String_98_Refman = NULL;
+  String aux_String_99_Var = {0};
+  String* aux_String_99 = NULL;
+  Ref_Manager* aux_String_99_Refman = NULL;
+  String aux_String_100_Var = {0};
+  String* aux_String_100 = NULL;
+  Ref_Manager* aux_String_100_Refman = NULL;
+  String aux_String_101_Var = {0};
+  String* aux_String_101 = NULL;
+  Ref_Manager* aux_String_101_Refman = NULL;
+  String aux_String_102_Var = {0};
+  String* aux_String_102 = NULL;
+  Ref_Manager* aux_String_102_Refman = NULL;
+  String aux_String_103_Var = {0};
+  String* aux_String_103 = NULL;
+  Ref_Manager* aux_String_103_Refman = NULL;
+  String aux_String_104_Var = {0};
+  String* aux_String_104 = NULL;
+  Ref_Manager* aux_String_104_Refman = NULL;
+  String aux_String_105_Var = {0};
+  String* aux_String_105 = NULL;
+  Ref_Manager* aux_String_105_Refman = NULL;
+  String aux_String_106_Var = {0};
+  String* aux_String_106 = NULL;
+  Ref_Manager* aux_String_106_Refman = NULL;
+  String aux_String_107_Var = {0};
+  String* aux_String_107 = NULL;
+  Ref_Manager* aux_String_107_Refman = NULL;
+  String aux_String_108_Var = {0};
+  String* aux_String_108 = NULL;
+  Ref_Manager* aux_String_108_Refman = NULL;
+  String aux_String_109_Var = {0};
+  String* aux_String_109 = NULL;
+  Ref_Manager* aux_String_109_Refman = NULL;
+  String aux_String_110_Var = {0};
+  String* aux_String_110 = NULL;
+  Ref_Manager* aux_String_110_Refman = NULL;
+  String aux_String_111_Var = {0};
+  String* aux_String_111 = NULL;
+  Ref_Manager* aux_String_111_Refman = NULL;
+  String aux_String_112_Var = {0};
+  String* aux_String_112 = NULL;
+  Ref_Manager* aux_String_112_Refman = NULL;
+  String aux_String_113_Var = {0};
+  String* aux_String_113 = NULL;
+  Ref_Manager* aux_String_113_Refman = NULL;
+  String aux_String_114_Var = {0};
+  String* aux_String_114 = NULL;
+  Ref_Manager* aux_String_114_Refman = NULL;
+  String aux_String_115_Var = {0};
+  String* aux_String_115 = NULL;
+  Ref_Manager* aux_String_115_Refman = NULL;
+  String aux_String_116_Var = {0};
+  String* aux_String_116 = NULL;
+  Ref_Manager* aux_String_116_Refman = NULL;
+  String aux_String_117_Var = {0};
+  String* aux_String_117 = NULL;
+  Ref_Manager* aux_String_117_Refman = NULL;
+  String aux_String_118_Var = {0};
+  String* aux_String_118 = NULL;
+  Ref_Manager* aux_String_118_Refman = NULL;
+  String aux_String_119_Var = {0};
+  String* aux_String_119 = NULL;
+  Ref_Manager* aux_String_119_Refman = NULL;
+  String aux_String_120_Var = {0};
+  String* aux_String_120 = NULL;
+  Ref_Manager* aux_String_120_Refman = NULL;
+  String aux_String_121_Var = {0};
+  String* aux_String_121 = NULL;
+  Ref_Manager* aux_String_121_Refman = NULL;
+  String aux_String_122_Var = {0};
+  String* aux_String_122 = NULL;
+  Ref_Manager* aux_String_122_Refman = NULL;
+  String aux_String_123_Var = {0};
+  String* aux_String_123 = NULL;
+  Ref_Manager* aux_String_123_Refman = NULL;
+  String aux_String_124_Var = {0};
+  String* aux_String_124 = NULL;
+  Ref_Manager* aux_String_124_Refman = NULL;
+  String aux_String_125_Var = {0};
+  String* aux_String_125 = NULL;
+  Ref_Manager* aux_String_125_Refman = NULL;
+  String aux_String_126_Var = {0};
+  String* aux_String_126 = NULL;
+  Ref_Manager* aux_String_126_Refman = NULL;
+  String aux_String_127_Var = {0};
+  String* aux_String_127 = NULL;
+  Ref_Manager* aux_String_127_Refman = NULL;
+  String aux_String_128_Var = {0};
+  String* aux_String_128 = NULL;
+  Ref_Manager* aux_String_128_Refman = NULL;
+  String aux_String_129_Var = {0};
+  String* aux_String_129 = NULL;
+  Ref_Manager* aux_String_129_Refman = NULL;
+  String aux_String_130_Var = {0};
+  String* aux_String_130 = NULL;
+  Ref_Manager* aux_String_130_Refman = NULL;
+  String aux_String_131_Var = {0};
+  String* aux_String_131 = NULL;
+  Ref_Manager* aux_String_131_Refman = NULL;
+  String aux_String_132_Var = {0};
+  String* aux_String_132 = NULL;
+  Ref_Manager* aux_String_132_Refman = NULL;
+  String aux_String_133_Var = {0};
+  String* aux_String_133 = NULL;
+  Ref_Manager* aux_String_133_Refman = NULL;
+  String aux_String_134_Var = {0};
+  String* aux_String_134 = NULL;
+  Ref_Manager* aux_String_134_Refman = NULL;
+  String aux_String_135_Var = {0};
+  String* aux_String_135 = NULL;
+  Ref_Manager* aux_String_135_Refman = NULL;
+  String aux_String_136_Var = {0};
+  String* aux_String_136 = NULL;
+  Ref_Manager* aux_String_136_Refman = NULL;
+  String aux_String_137_Var = {0};
+  String* aux_String_137 = NULL;
+  Ref_Manager* aux_String_137_Refman = NULL;
+  String aux_String_138_Var = {0};
+  String* aux_String_138 = NULL;
+  Ref_Manager* aux_String_138_Refman = NULL;
+  String aux_String_139_Var = {0};
+  String* aux_String_139 = NULL;
+  Ref_Manager* aux_String_139_Refman = NULL;
+  String aux_String_140_Var = {0};
+  String* aux_String_140 = NULL;
+  Ref_Manager* aux_String_140_Refman = NULL;
+  String aux_String_141_Var = {0};
+  String* aux_String_141 = NULL;
+  Ref_Manager* aux_String_141_Refman = NULL;
+  String aux_String_142_Var = {0};
+  String* aux_String_142 = NULL;
+  Ref_Manager* aux_String_142_Refman = NULL;
+  String aux_String_143_Var = {0};
+  String* aux_String_143 = NULL;
+  Ref_Manager* aux_String_143_Refman = NULL;
+  String aux_String_144_Var = {0};
+  String* aux_String_144 = NULL;
+  Ref_Manager* aux_String_144_Refman = NULL;
+  String aux_String_145_Var = {0};
+  String* aux_String_145 = NULL;
+  Ref_Manager* aux_String_145_Refman = NULL;
+  String aux_String_146_Var = {0};
+  String* aux_String_146 = NULL;
+  Ref_Manager* aux_String_146_Refman = NULL;
+  String aux_String_147_Var = {0};
+  String* aux_String_147 = NULL;
+  Ref_Manager* aux_String_147_Refman = NULL;
+  String aux_String_148_Var = {0};
+  String* aux_String_148 = NULL;
+  Ref_Manager* aux_String_148_Refman = NULL;
+  String aux_String_149_Var = {0};
+  String* aux_String_149 = NULL;
+  Ref_Manager* aux_String_149_Refman = NULL;
+  String aux_String_150_Var = {0};
+  String* aux_String_150 = NULL;
+  Ref_Manager* aux_String_150_Refman = NULL;
+  String aux_String_151_Var = {0};
+  String* aux_String_151 = NULL;
+  Ref_Manager* aux_String_151_Refman = NULL;
+  String aux_String_152_Var = {0};
+  String* aux_String_152 = NULL;
+  Ref_Manager* aux_String_152_Refman = NULL;
+  String aux_String_153_Var = {0};
+  String* aux_String_153 = NULL;
+  Ref_Manager* aux_String_153_Refman = NULL;
+  String aux_String_154_Var = {0};
+  String* aux_String_154 = NULL;
+  Ref_Manager* aux_String_154_Refman = NULL;
+  String aux_String_155_Var = {0};
+  String* aux_String_155 = NULL;
+  Ref_Manager* aux_String_155_Refman = NULL;
+  String aux_String_156_Var = {0};
+  String* aux_String_156 = NULL;
+  Ref_Manager* aux_String_156_Refman = NULL;
+  String aux_String_157_Var = {0};
+  String* aux_String_157 = NULL;
+  Ref_Manager* aux_String_157_Refman = NULL;
+  String aux_String_158_Var = {0};
+  String* aux_String_158 = NULL;
+  Ref_Manager* aux_String_158_Refman = NULL;
+  String aux_String_159_Var = {0};
+  String* aux_String_159 = NULL;
+  Ref_Manager* aux_String_159_Refman = NULL;
+  String aux_String_160_Var = {0};
+  String* aux_String_160 = NULL;
+  Ref_Manager* aux_String_160_Refman = NULL;
+  String aux_String_161_Var = {0};
+  String* aux_String_161 = NULL;
+  Ref_Manager* aux_String_161_Refman = NULL;
+  String aux_String_162_Var = {0};
+  String* aux_String_162 = NULL;
+  Ref_Manager* aux_String_162_Refman = NULL;
+  String aux_String_163_Var = {0};
+  String* aux_String_163 = NULL;
+  Ref_Manager* aux_String_163_Refman = NULL;
+  String aux_String_164_Var = {0};
+  String* aux_String_164 = NULL;
+  Ref_Manager* aux_String_164_Refman = NULL;
+  String aux_String_165_Var = {0};
+  String* aux_String_165 = NULL;
+  Ref_Manager* aux_String_165_Refman = NULL;
+  String aux_String_166_Var = {0};
+  String* aux_String_166 = NULL;
+  Ref_Manager* aux_String_166_Refman = NULL;
+  String aux_String_167_Var = {0};
+  String* aux_String_167 = NULL;
+  Ref_Manager* aux_String_167_Refman = NULL;
+  String aux_String_168_Var = {0};
+  String* aux_String_168 = NULL;
+  Ref_Manager* aux_String_168_Refman = NULL;
+  String aux_String_169_Var = {0};
+  String* aux_String_169 = NULL;
+  Ref_Manager* aux_String_169_Refman = NULL;
+  String aux_String_170_Var = {0};
+  String* aux_String_170 = NULL;
+  Ref_Manager* aux_String_170_Refman = NULL;
+  String aux_String_171_Var = {0};
+  String* aux_String_171 = NULL;
+  Ref_Manager* aux_String_171_Refman = NULL;
+  String aux_String_172_Var = {0};
+  String* aux_String_172 = NULL;
+  Ref_Manager* aux_String_172_Refman = NULL;
+  String aux_String_173_Var = {0};
+  String* aux_String_173 = NULL;
+  Ref_Manager* aux_String_173_Refman = NULL;
+  String aux_String_174_Var = {0};
+  String* aux_String_174 = NULL;
+  Ref_Manager* aux_String_174_Refman = NULL;
+  String aux_String_175_Var = {0};
+  String* aux_String_175 = NULL;
+  Ref_Manager* aux_String_175_Refman = NULL;
+  String aux_String_176_Var = {0};
+  String* aux_String_176 = NULL;
+  Ref_Manager* aux_String_176_Refman = NULL;
+  String aux_String_177_Var = {0};
+  String* aux_String_177 = NULL;
+  Ref_Manager* aux_String_177_Refman = NULL;
+  String aux_String_178_Var = {0};
+  String* aux_String_178 = NULL;
+  Ref_Manager* aux_String_178_Refman = NULL;
+  String aux_String_179_Var = {0};
+  String* aux_String_179 = NULL;
+  Ref_Manager* aux_String_179_Refman = NULL;
+  String aux_String_180_Var = {0};
+  String* aux_String_180 = NULL;
+  Ref_Manager* aux_String_180_Refman = NULL;
+  String aux_String_181_Var = {0};
+  String* aux_String_181 = NULL;
+  Ref_Manager* aux_String_181_Refman = NULL;
+  String aux_String_182_Var = {0};
+  String* aux_String_182 = NULL;
+  Ref_Manager* aux_String_182_Refman = NULL;
+  String aux_String_183_Var = {0};
+  String* aux_String_183 = NULL;
+  Ref_Manager* aux_String_183_Refman = NULL;
+  String aux_String_184_Var = {0};
+  String* aux_String_184 = NULL;
+  Ref_Manager* aux_String_184_Refman = NULL;
+  String aux_String_185_Var = {0};
+  String* aux_String_185 = NULL;
+  Ref_Manager* aux_String_185_Refman = NULL;
+  String aux_String_186_Var = {0};
+  String* aux_String_186 = NULL;
+  Ref_Manager* aux_String_186_Refman = NULL;
+  String aux_String_187_Var = {0};
+  String* aux_String_187 = NULL;
+  Ref_Manager* aux_String_187_Refman = NULL;
+  String aux_String_188_Var = {0};
+  String* aux_String_188 = NULL;
+  Ref_Manager* aux_String_188_Refman = NULL;
+  String aux_String_189_Var = {0};
+  String* aux_String_189 = NULL;
+  Ref_Manager* aux_String_189_Refman = NULL;
+  String aux_String_190_Var = {0};
+  String* aux_String_190 = NULL;
+  Ref_Manager* aux_String_190_Refman = NULL;
+  String aux_String_191_Var = {0};
+  String* aux_String_191 = NULL;
+  Ref_Manager* aux_String_191_Refman = NULL;
+  String aux_String_192_Var = {0};
+  String* aux_String_192 = NULL;
+  Ref_Manager* aux_String_192_Refman = NULL;
+  String aux_String_193_Var = {0};
+  String* aux_String_193 = NULL;
+  Ref_Manager* aux_String_193_Refman = NULL;
+  String aux_String_194_Var = {0};
+  String* aux_String_194 = NULL;
+  Ref_Manager* aux_String_194_Refman = NULL;
+  String aux_String_195_Var = {0};
+  String* aux_String_195 = NULL;
+  Ref_Manager* aux_String_195_Refman = NULL;
+  String aux_String_196_Var = {0};
+  String* aux_String_196 = NULL;
+  Ref_Manager* aux_String_196_Refman = NULL;
+  String aux_String_197_Var = {0};
+  String* aux_String_197 = NULL;
+  Ref_Manager* aux_String_197_Refman = NULL;
+  String aux_String_198_Var = {0};
+  String* aux_String_198 = NULL;
+  Ref_Manager* aux_String_198_Refman = NULL;
+  String aux_String_199_Var = {0};
+  String* aux_String_199 = NULL;
+  Ref_Manager* aux_String_199_Refman = NULL;
+  String aux_String_200_Var = {0};
+  String* aux_String_200 = NULL;
+  Ref_Manager* aux_String_200_Refman = NULL;
+  String aux_String_201_Var = {0};
+  String* aux_String_201 = NULL;
+  Ref_Manager* aux_String_201_Refman = NULL;
+  String aux_String_202_Var = {0};
+  String* aux_String_202 = NULL;
+  Ref_Manager* aux_String_202_Refman = NULL;
+  String aux_String_203_Var = {0};
+  String* aux_String_203 = NULL;
+  Ref_Manager* aux_String_203_Refman = NULL;
+  String aux_String_204_Var = {0};
+  String* aux_String_204 = NULL;
+  Ref_Manager* aux_String_204_Refman = NULL;
+  String aux_String_205_Var = {0};
+  String* aux_String_205 = NULL;
+  Ref_Manager* aux_String_205_Refman = NULL;
+  String aux_String_206_Var = {0};
+  String* aux_String_206 = NULL;
+  Ref_Manager* aux_String_206_Refman = NULL;
+  String aux_String_207_Var = {0};
+  String* aux_String_207 = NULL;
+  Ref_Manager* aux_String_207_Refman = NULL;
+  String aux_String_208_Var = {0};
+  String* aux_String_208 = NULL;
+  Ref_Manager* aux_String_208_Refman = NULL;
+  String aux_String_209_Var = {0};
+  String* aux_String_209 = NULL;
+  Ref_Manager* aux_String_209_Refman = NULL;
+  String aux_String_210_Var = {0};
+  String* aux_String_210 = NULL;
+  Ref_Manager* aux_String_210_Refman = NULL;
+  String aux_String_211_Var = {0};
+  String* aux_String_211 = NULL;
+  Ref_Manager* aux_String_211_Refman = NULL;
+  String aux_String_212_Var = {0};
+  String* aux_String_212 = NULL;
+  Ref_Manager* aux_String_212_Refman = NULL;
+  String aux_String_213_Var = {0};
+  String* aux_String_213 = NULL;
+  Ref_Manager* aux_String_213_Refman = NULL;
+  String aux_String_214_Var = {0};
+  String* aux_String_214 = NULL;
+  Ref_Manager* aux_String_214_Refman = NULL;
+  String aux_String_215_Var = {0};
+  String* aux_String_215 = NULL;
+  Ref_Manager* aux_String_215_Refman = NULL;
+  String aux_String_216_Var = {0};
+  String* aux_String_216 = NULL;
+  Ref_Manager* aux_String_216_Refman = NULL;
+  String aux_String_217_Var = {0};
+  String* aux_String_217 = NULL;
+  Ref_Manager* aux_String_217_Refman = NULL;
+  String aux_String_218_Var = {0};
+  String* aux_String_218 = NULL;
+  Ref_Manager* aux_String_218_Refman = NULL;
+  String aux_String_219_Var = {0};
+  String* aux_String_219 = NULL;
+  Ref_Manager* aux_String_219_Refman = NULL;
+  String aux_String_220_Var = {0};
+  String* aux_String_220 = NULL;
+  Ref_Manager* aux_String_220_Refman = NULL;
+  String aux_String_221_Var = {0};
+  String* aux_String_221 = NULL;
+  Ref_Manager* aux_String_221_Refman = NULL;
+  String aux_String_222_Var = {0};
+  String* aux_String_222 = NULL;
+  Ref_Manager* aux_String_222_Refman = NULL;
+  String aux_String_223_Var = {0};
+  String* aux_String_223 = NULL;
+  Ref_Manager* aux_String_223_Refman = NULL;
+  String aux_String_224_Var = {0};
+  String* aux_String_224 = NULL;
+  Ref_Manager* aux_String_224_Refman = NULL;
+  String aux_String_225_Var = {0};
+  String* aux_String_225 = NULL;
+  Ref_Manager* aux_String_225_Refman = NULL;
+  String aux_String_226_Var = {0};
+  String* aux_String_226 = NULL;
+  Ref_Manager* aux_String_226_Refman = NULL;
+  String aux_String_227_Var = {0};
+  String* aux_String_227 = NULL;
+  Ref_Manager* aux_String_227_Refman = NULL;
+  String aux_String_228_Var = {0};
+  String* aux_String_228 = NULL;
+  Ref_Manager* aux_String_228_Refman = NULL;
+  String aux_String_229_Var = {0};
+  String* aux_String_229 = NULL;
+  Ref_Manager* aux_String_229_Refman = NULL;
+  String aux_String_230_Var = {0};
+  String* aux_String_230 = NULL;
+  Ref_Manager* aux_String_230_Refman = NULL;
+  String aux_String_231_Var = {0};
+  String* aux_String_231 = NULL;
+  Ref_Manager* aux_String_231_Refman = NULL;
+  String aux_String_232_Var = {0};
+  String* aux_String_232 = NULL;
+  Ref_Manager* aux_String_232_Refman = NULL;
+  String aux_String_233_Var = {0};
+  String* aux_String_233 = NULL;
+  Ref_Manager* aux_String_233_Refman = NULL;
+  String aux_String_234_Var = {0};
+  String* aux_String_234 = NULL;
+  Ref_Manager* aux_String_234_Refman = NULL;
+  String aux_String_235_Var = {0};
+  String* aux_String_235 = NULL;
+  Ref_Manager* aux_String_235_Refman = NULL;
+  String aux_String_236_Var = {0};
+  String* aux_String_236 = NULL;
+  Ref_Manager* aux_String_236_Refman = NULL;
+  String aux_String_237_Var = {0};
+  String* aux_String_237 = NULL;
+  Ref_Manager* aux_String_237_Refman = NULL;
+  String aux_String_238_Var = {0};
+  String* aux_String_238 = NULL;
+  Ref_Manager* aux_String_238_Refman = NULL;
+  String aux_String_239_Var = {0};
+  String* aux_String_239 = NULL;
+  Ref_Manager* aux_String_239_Refman = NULL;
+  String aux_String_240_Var = {0};
+  String* aux_String_240 = NULL;
+  Ref_Manager* aux_String_240_Refman = NULL;
+  String aux_String_241_Var = {0};
+  String* aux_String_241 = NULL;
+  Ref_Manager* aux_String_241_Refman = NULL;
+  String aux_String_242_Var = {0};
+  String* aux_String_242 = NULL;
+  Ref_Manager* aux_String_242_Refman = NULL;
+  String aux_String_243_Var = {0};
+  String* aux_String_243 = NULL;
+  Ref_Manager* aux_String_243_Refman = NULL;
+  String aux_String_244_Var = {0};
+  String* aux_String_244 = NULL;
+  Ref_Manager* aux_String_244_Refman = NULL;
+  String aux_String_245_Var = {0};
+  String* aux_String_245 = NULL;
+  Ref_Manager* aux_String_245_Refman = NULL;
+  String aux_String_246_Var = {0};
+  String* aux_String_246 = NULL;
+  Ref_Manager* aux_String_246_Refman = NULL;
+  String aux_String_247_Var = {0};
+  String* aux_String_247 = NULL;
+  Ref_Manager* aux_String_247_Refman = NULL;
+  String aux_String_248_Var = {0};
+  String* aux_String_248 = NULL;
+  Ref_Manager* aux_String_248_Refman = NULL;
+  String aux_String_249_Var = {0};
+  String* aux_String_249 = NULL;
+  Ref_Manager* aux_String_249_Refman = NULL;
+  String aux_String_250_Var = {0};
+  String* aux_String_250 = NULL;
+  Ref_Manager* aux_String_250_Refman = NULL;
+  String aux_String_251_Var = {0};
+  String* aux_String_251 = NULL;
+  Ref_Manager* aux_String_251_Refman = NULL;
+  String aux_String_252_Var = {0};
+  String* aux_String_252 = NULL;
+  Ref_Manager* aux_String_252_Refman = NULL;
+  String aux_String_253_Var = {0};
+  String* aux_String_253 = NULL;
+  Ref_Manager* aux_String_253_Refman = NULL;
+  String aux_String_254_Var = {0};
+  String* aux_String_254 = NULL;
+  Ref_Manager* aux_String_254_Refman = NULL;
+  String aux_String_255_Var = {0};
+  String* aux_String_255 = NULL;
+  Ref_Manager* aux_String_255_Refman = NULL;
+  String aux_String_256_Var = {0};
+  String* aux_String_256 = NULL;
+  Ref_Manager* aux_String_256_Refman = NULL;
+  String aux_String_257_Var = {0};
+  String* aux_String_257 = NULL;
+  Ref_Manager* aux_String_257_Refman = NULL;
+  String aux_String_258_Var = {0};
+  String* aux_String_258 = NULL;
+  Ref_Manager* aux_String_258_Refman = NULL;
+  String aux_String_259_Var = {0};
+  String* aux_String_259 = NULL;
+  Ref_Manager* aux_String_259_Refman = NULL;
+  String aux_String_260_Var = {0};
+  String* aux_String_260 = NULL;
+  Ref_Manager* aux_String_260_Refman = NULL;
+  String aux_String_261_Var = {0};
+  String* aux_String_261 = NULL;
+  Ref_Manager* aux_String_261_Refman = NULL;
+  String aux_String_262_Var = {0};
+  String* aux_String_262 = NULL;
+  Ref_Manager* aux_String_262_Refman = NULL;
+  String aux_String_263_Var = {0};
+  String* aux_String_263 = NULL;
+  Ref_Manager* aux_String_263_Refman = NULL;
+  String aux_String_264_Var = {0};
+  String* aux_String_264 = NULL;
+  Ref_Manager* aux_String_264_Refman = NULL;
+  String aux_String_265_Var = {0};
+  String* aux_String_265 = NULL;
+  Ref_Manager* aux_String_265_Refman = NULL;
+  String aux_String_266_Var = {0};
+  String* aux_String_266 = NULL;
+  Ref_Manager* aux_String_266_Refman = NULL;
+  String aux_String_267_Var = {0};
+  String* aux_String_267 = NULL;
+  Ref_Manager* aux_String_267_Refman = NULL;
+  String aux_String_268_Var = {0};
+  String* aux_String_268 = NULL;
+  Ref_Manager* aux_String_268_Refman = NULL;
+  String aux_String_269_Var = {0};
+  String* aux_String_269 = NULL;
+  Ref_Manager* aux_String_269_Refman = NULL;
+  String aux_String_270_Var = {0};
+  String* aux_String_270 = NULL;
+  Ref_Manager* aux_String_270_Refman = NULL;
+  String aux_String_271_Var = {0};
+  String* aux_String_271 = NULL;
+  Ref_Manager* aux_String_271_Refman = NULL;
+  String aux_String_272_Var = {0};
+  String* aux_String_272 = NULL;
+  Ref_Manager* aux_String_272_Refman = NULL;
+  String aux_String_273_Var = {0};
+  String* aux_String_273 = NULL;
+  Ref_Manager* aux_String_273_Refman = NULL;
+  String aux_String_274_Var = {0};
+  String* aux_String_274 = NULL;
+  Ref_Manager* aux_String_274_Refman = NULL;
+  String aux_String_275_Var = {0};
+  String* aux_String_275 = NULL;
+  Ref_Manager* aux_String_275_Refman = NULL;
+  String aux_String_276_Var = {0};
+  String* aux_String_276 = NULL;
+  Ref_Manager* aux_String_276_Refman = NULL;
+  String aux_String_277_Var = {0};
+  String* aux_String_277 = NULL;
+  Ref_Manager* aux_String_277_Refman = NULL;
+  String aux_String_278_Var = {0};
+  String* aux_String_278 = NULL;
+  Ref_Manager* aux_String_278_Refman = NULL;
+  String aux_String_279_Var = {0};
+  String* aux_String_279 = NULL;
+  Ref_Manager* aux_String_279_Refman = NULL;
+  String aux_String_280_Var = {0};
+  String* aux_String_280 = NULL;
+  Ref_Manager* aux_String_280_Refman = NULL;
+  String aux_String_281_Var = {0};
+  String* aux_String_281 = NULL;
+  Ref_Manager* aux_String_281_Refman = NULL;
+  String aux_String_282_Var = {0};
+  String* aux_String_282 = NULL;
+  Ref_Manager* aux_String_282_Refman = NULL;
+  String aux_String_283_Var = {0};
+  String* aux_String_283 = NULL;
+  Ref_Manager* aux_String_283_Refman = NULL;
+  String aux_String_284_Var = {0};
+  String* aux_String_284 = NULL;
+  Ref_Manager* aux_String_284_Refman = NULL;
+  String aux_String_285_Var = {0};
+  String* aux_String_285 = NULL;
+  Ref_Manager* aux_String_285_Refman = NULL;
+  String aux_String_286_Var = {0};
+  String* aux_String_286 = NULL;
+  Ref_Manager* aux_String_286_Refman = NULL;
+  String aux_String_287_Var = {0};
+  String* aux_String_287 = NULL;
+  Ref_Manager* aux_String_287_Refman = NULL;
+  String aux_String_288_Var = {0};
+  String* aux_String_288 = NULL;
+  Ref_Manager* aux_String_288_Refman = NULL;
+  String aux_String_289_Var = {0};
+  String* aux_String_289 = NULL;
+  Ref_Manager* aux_String_289_Refman = NULL;
+  String aux_String_290_Var = {0};
+  String* aux_String_290 = NULL;
+  Ref_Manager* aux_String_290_Refman = NULL;
+  String aux_String_291_Var = {0};
+  String* aux_String_291 = NULL;
+  Ref_Manager* aux_String_291_Refman = NULL;
+  String aux_String_292_Var = {0};
+  String* aux_String_292 = NULL;
+  Ref_Manager* aux_String_292_Refman = NULL;
+  String aux_String_293_Var = {0};
+  String* aux_String_293 = NULL;
+  Ref_Manager* aux_String_293_Refman = NULL;
+  String aux_String_294_Var = {0};
+  String* aux_String_294 = NULL;
+  Ref_Manager* aux_String_294_Refman = NULL;
+  String aux_String_295_Var = {0};
+  String* aux_String_295 = NULL;
+  Ref_Manager* aux_String_295_Refman = NULL;
+  String aux_String_296_Var = {0};
+  String* aux_String_296 = NULL;
+  Ref_Manager* aux_String_296_Refman = NULL;
+  String aux_String_297_Var = {0};
+  String* aux_String_297 = NULL;
+  Ref_Manager* aux_String_297_Refman = NULL;
+  String aux_String_298_Var = {0};
+  String* aux_String_298 = NULL;
+  Ref_Manager* aux_String_298_Refman = NULL;
+  String aux_String_299_Var = {0};
+  String* aux_String_299 = NULL;
+  Ref_Manager* aux_String_299_Refman = NULL;
+  String aux_String_300_Var = {0};
+  String* aux_String_300 = NULL;
+  Ref_Manager* aux_String_300_Refman = NULL;
+  String aux_String_301_Var = {0};
+  String* aux_String_301 = NULL;
+  Ref_Manager* aux_String_301_Refman = NULL;
+  String aux_String_302_Var = {0};
+  String* aux_String_302 = NULL;
+  Ref_Manager* aux_String_302_Refman = NULL;
+  String aux_String_303_Var = {0};
+  String* aux_String_303 = NULL;
+  Ref_Manager* aux_String_303_Refman = NULL;
+  String aux_String_304_Var = {0};
+  String* aux_String_304 = NULL;
+  Ref_Manager* aux_String_304_Refman = NULL;
+  String aux_String_305_Var = {0};
+  String* aux_String_305 = NULL;
+  Ref_Manager* aux_String_305_Refman = NULL;
+  String aux_String_306_Var = {0};
+  String* aux_String_306 = NULL;
+  Ref_Manager* aux_String_306_Refman = NULL;
+  String aux_String_307_Var = {0};
+  String* aux_String_307 = NULL;
+  Ref_Manager* aux_String_307_Refman = NULL;
+  String aux_String_308_Var = {0};
+  String* aux_String_308 = NULL;
+  Ref_Manager* aux_String_308_Refman = NULL;
+  String aux_String_309_Var = {0};
+  String* aux_String_309 = NULL;
+  Ref_Manager* aux_String_309_Refman = NULL;
+  String aux_String_310_Var = {0};
+  String* aux_String_310 = NULL;
+  Ref_Manager* aux_String_310_Refman = NULL;
+  String aux_String_311_Var = {0};
+  String* aux_String_311 = NULL;
+  Ref_Manager* aux_String_311_Refman = NULL;
+  String aux_String_312_Var = {0};
+  String* aux_String_312 = NULL;
+  Ref_Manager* aux_String_312_Refman = NULL;
+  String aux_String_313_Var = {0};
+  String* aux_String_313 = NULL;
+  Ref_Manager* aux_String_313_Refman = NULL;
+  String aux_String_314_Var = {0};
+  String* aux_String_314 = NULL;
+  Ref_Manager* aux_String_314_Refman = NULL;
+  String aux_String_315_Var = {0};
+  String* aux_String_315 = NULL;
+  Ref_Manager* aux_String_315_Refman = NULL;
+  String aux_String_316_Var = {0};
+  String* aux_String_316 = NULL;
+  Ref_Manager* aux_String_316_Refman = NULL;
+  String aux_String_317_Var = {0};
+  String* aux_String_317 = NULL;
+  Ref_Manager* aux_String_317_Refman = NULL;
+  String aux_String_318_Var = {0};
+  String* aux_String_318 = NULL;
+  Ref_Manager* aux_String_318_Refman = NULL;
+  String aux_String_319_Var = {0};
+  String* aux_String_319 = NULL;
+  Ref_Manager* aux_String_319_Refman = NULL;
+  String aux_String_320_Var = {0};
+  String* aux_String_320 = NULL;
+  Ref_Manager* aux_String_320_Refman = NULL;
+  String aux_String_321_Var = {0};
+  String* aux_String_321 = NULL;
+  Ref_Manager* aux_String_321_Refman = NULL;
+  String aux_String_322_Var = {0};
+  String* aux_String_322 = NULL;
+  Ref_Manager* aux_String_322_Refman = NULL;
+  String aux_String_323_Var = {0};
+  String* aux_String_323 = NULL;
+  Ref_Manager* aux_String_323_Refman = NULL;
+  String aux_String_324_Var = {0};
+  String* aux_String_324 = NULL;
+  Ref_Manager* aux_String_324_Refman = NULL;
+  String aux_String_325_Var = {0};
+  String* aux_String_325 = NULL;
+  Ref_Manager* aux_String_325_Refman = NULL;
+  String aux_String_326_Var = {0};
+  String* aux_String_326 = NULL;
+  Ref_Manager* aux_String_326_Refman = NULL;
+  String aux_String_327_Var = {0};
+  String* aux_String_327 = NULL;
+  Ref_Manager* aux_String_327_Refman = NULL;
+  String aux_String_328_Var = {0};
+  String* aux_String_328 = NULL;
+  Ref_Manager* aux_String_328_Refman = NULL;
+  String aux_String_329_Var = {0};
+  String* aux_String_329 = NULL;
+  Ref_Manager* aux_String_329_Refman = NULL;
+  String aux_String_330_Var = {0};
+  String* aux_String_330 = NULL;
+  Ref_Manager* aux_String_330_Refman = NULL;
+  String aux_String_331_Var = {0};
+  String* aux_String_331 = NULL;
+  Ref_Manager* aux_String_331_Refman = NULL;
+  String aux_String_332_Var = {0};
+  String* aux_String_332 = NULL;
+  Ref_Manager* aux_String_332_Refman = NULL;
+  String aux_String_333_Var = {0};
+  String* aux_String_333 = NULL;
+  Ref_Manager* aux_String_333_Refman = NULL;
+  String aux_String_334_Var = {0};
+  String* aux_String_334 = NULL;
+  Ref_Manager* aux_String_334_Refman = NULL;
+  String aux_String_335_Var = {0};
+  String* aux_String_335 = NULL;
+  Ref_Manager* aux_String_335_Refman = NULL;
+  String aux_String_336_Var = {0};
+  String* aux_String_336 = NULL;
+  Ref_Manager* aux_String_336_Refman = NULL;
+  String aux_String_337_Var = {0};
+  String* aux_String_337 = NULL;
+  Ref_Manager* aux_String_337_Refman = NULL;
+  String aux_String_338_Var = {0};
+  String* aux_String_338 = NULL;
+  Ref_Manager* aux_String_338_Refman = NULL;
+  String aux_String_339_Var = {0};
+  String* aux_String_339 = NULL;
+  Ref_Manager* aux_String_339_Refman = NULL;
+  String aux_String_340_Var = {0};
+  String* aux_String_340 = NULL;
+  Ref_Manager* aux_String_340_Refman = NULL;
+  String aux_String_341_Var = {0};
+  String* aux_String_341 = NULL;
+  Ref_Manager* aux_String_341_Refman = NULL;
+  String aux_String_342_Var = {0};
+  String* aux_String_342 = NULL;
+  Ref_Manager* aux_String_342_Refman = NULL;
+  String aux_String_343_Var = {0};
+  String* aux_String_343 = NULL;
+  Ref_Manager* aux_String_343_Refman = NULL;
+  String aux_String_344_Var = {0};
+  String* aux_String_344 = NULL;
+  Ref_Manager* aux_String_344_Refman = NULL;
+  String aux_String_345_Var = {0};
+  String* aux_String_345 = NULL;
+  Ref_Manager* aux_String_345_Refman = NULL;
+  String aux_String_346_Var = {0};
+  String* aux_String_346 = NULL;
+  Ref_Manager* aux_String_346_Refman = NULL;
+  String aux_String_347_Var = {0};
+  String* aux_String_347 = NULL;
+  Ref_Manager* aux_String_347_Refman = NULL;
+  String aux_String_348_Var = {0};
+  String* aux_String_348 = NULL;
+  Ref_Manager* aux_String_348_Refman = NULL;
+  String aux_String_349_Var = {0};
+  String* aux_String_349 = NULL;
+  Ref_Manager* aux_String_349_Refman = NULL;
+  String aux_String_350_Var = {0};
+  String* aux_String_350 = NULL;
+  Ref_Manager* aux_String_350_Refman = NULL;
+  String aux_String_351_Var = {0};
+  String* aux_String_351 = NULL;
+  Ref_Manager* aux_String_351_Refman = NULL;
+  String aux_String_352_Var = {0};
+  String* aux_String_352 = NULL;
+  Ref_Manager* aux_String_352_Refman = NULL;
+  String aux_String_353_Var = {0};
+  String* aux_String_353 = NULL;
+  Ref_Manager* aux_String_353_Refman = NULL;
+  String aux_String_354_Var = {0};
+  String* aux_String_354 = NULL;
+  Ref_Manager* aux_String_354_Refman = NULL;
+  String aux_String_355_Var = {0};
+  String* aux_String_355 = NULL;
+  Ref_Manager* aux_String_355_Refman = NULL;
+  String aux_String_356_Var = {0};
+  String* aux_String_356 = NULL;
+  Ref_Manager* aux_String_356_Refman = NULL;
+  String aux_String_357_Var = {0};
+  String* aux_String_357 = NULL;
+  Ref_Manager* aux_String_357_Refman = NULL;
+  String aux_String_358_Var = {0};
+  String* aux_String_358 = NULL;
+  Ref_Manager* aux_String_358_Refman = NULL;
+  String aux_String_359_Var = {0};
+  String* aux_String_359 = NULL;
+  Ref_Manager* aux_String_359_Refman = NULL;
+  String aux_String_360_Var = {0};
+  String* aux_String_360 = NULL;
+  Ref_Manager* aux_String_360_Refman = NULL;
+  String aux_String_361_Var = {0};
+  String* aux_String_361 = NULL;
+  Ref_Manager* aux_String_361_Refman = NULL;
+  String aux_String_362_Var = {0};
+  String* aux_String_362 = NULL;
+  Ref_Manager* aux_String_362_Refman = NULL;
+  String aux_String_363_Var = {0};
+  String* aux_String_363 = NULL;
+  Ref_Manager* aux_String_363_Refman = NULL;
+  String aux_String_364_Var = {0};
+  String* aux_String_364 = NULL;
+  Ref_Manager* aux_String_364_Refman = NULL;
+  String aux_String_365_Var = {0};
+  String* aux_String_365 = NULL;
+  Ref_Manager* aux_String_365_Refman = NULL;
+  String aux_String_366_Var = {0};
+  String* aux_String_366 = NULL;
+  Ref_Manager* aux_String_366_Refman = NULL;
+  String aux_String_367_Var = {0};
+  String* aux_String_367 = NULL;
+  Ref_Manager* aux_String_367_Refman = NULL;
+  String aux_String_368_Var = {0};
+  String* aux_String_368 = NULL;
+  Ref_Manager* aux_String_368_Refman = NULL;
+  String aux_String_369_Var = {0};
+  String* aux_String_369 = NULL;
+  Ref_Manager* aux_String_369_Refman = NULL;
+  String aux_String_370_Var = {0};
+  String* aux_String_370 = NULL;
+  Ref_Manager* aux_String_370_Refman = NULL;
+  String aux_String_371_Var = {0};
+  String* aux_String_371 = NULL;
+  Ref_Manager* aux_String_371_Refman = NULL;
+  String aux_String_372_Var = {0};
+  String* aux_String_372 = NULL;
+  Ref_Manager* aux_String_372_Refman = NULL;
+  String aux_String_373_Var = {0};
+  String* aux_String_373 = NULL;
+  Ref_Manager* aux_String_373_Refman = NULL;
+  String aux_String_374_Var = {0};
+  String* aux_String_374 = NULL;
+  Ref_Manager* aux_String_374_Refman = NULL;
+  String aux_String_375_Var = {0};
+  String* aux_String_375 = NULL;
+  Ref_Manager* aux_String_375_Refman = NULL;
+  String aux_String_376_Var = {0};
+  String* aux_String_376 = NULL;
+  Ref_Manager* aux_String_376_Refman = NULL;
+  String aux_String_377_Var = {0};
+  String* aux_String_377 = NULL;
+  Ref_Manager* aux_String_377_Refman = NULL;
+  String aux_String_378_Var = {0};
+  String* aux_String_378 = NULL;
+  Ref_Manager* aux_String_378_Refman = NULL;
+  String aux_String_379_Var = {0};
+  String* aux_String_379 = NULL;
+  Ref_Manager* aux_String_379_Refman = NULL;
+  String aux_String_380_Var = {0};
+  String* aux_String_380 = NULL;
+  Ref_Manager* aux_String_380_Refman = NULL;
+  String aux_String_381_Var = {0};
+  String* aux_String_381 = NULL;
+  Ref_Manager* aux_String_381_Refman = NULL;
+  String aux_String_382_Var = {0};
+  String* aux_String_382 = NULL;
+  Ref_Manager* aux_String_382_Refman = NULL;
+  String aux_String_383_Var = {0};
+  String* aux_String_383 = NULL;
+  Ref_Manager* aux_String_383_Refman = NULL;
+  String aux_String_384_Var = {0};
+  String* aux_String_384 = NULL;
+  Ref_Manager* aux_String_384_Refman = NULL;
+  String aux_String_385_Var = {0};
+  String* aux_String_385 = NULL;
+  Ref_Manager* aux_String_385_Refman = NULL;
+  String aux_String_386_Var = {0};
+  String* aux_String_386 = NULL;
+  Ref_Manager* aux_String_386_Refman = NULL;
+  String aux_String_387_Var = {0};
+  String* aux_String_387 = NULL;
+  Ref_Manager* aux_String_387_Refman = NULL;
+  String aux_String_388_Var = {0};
+  String* aux_String_388 = NULL;
+  Ref_Manager* aux_String_388_Refman = NULL;
+  String aux_String_389_Var = {0};
+  String* aux_String_389 = NULL;
+  Ref_Manager* aux_String_389_Refman = NULL;
+  String aux_String_390_Var = {0};
+  String* aux_String_390 = NULL;
+  Ref_Manager* aux_String_390_Refman = NULL;
+  String aux_String_391_Var = {0};
+  String* aux_String_391 = NULL;
+  Ref_Manager* aux_String_391_Refman = NULL;
+  String aux_String_392_Var = {0};
+  String* aux_String_392 = NULL;
+  Ref_Manager* aux_String_392_Refman = NULL;
+  String aux_String_393_Var = {0};
+  String* aux_String_393 = NULL;
+  Ref_Manager* aux_String_393_Refman = NULL;
+  String aux_String_394_Var = {0};
+  String* aux_String_394 = NULL;
+  Ref_Manager* aux_String_394_Refman = NULL;
+  String aux_String_395_Var = {0};
+  String* aux_String_395 = NULL;
+  Ref_Manager* aux_String_395_Refman = NULL;
+  String aux_String_396_Var = {0};
+  String* aux_String_396 = NULL;
+  Ref_Manager* aux_String_396_Refman = NULL;
+  String aux_String_397_Var = {0};
+  String* aux_String_397 = NULL;
+  Ref_Manager* aux_String_397_Refman = NULL;
+  String aux_String_398_Var = {0};
+  String* aux_String_398 = NULL;
+  Ref_Manager* aux_String_398_Refman = NULL;
+  String aux_String_399_Var = {0};
+  String* aux_String_399 = NULL;
+  Ref_Manager* aux_String_399_Refman = NULL;
+  String aux_String_400_Var = {0};
+  String* aux_String_400 = NULL;
+  Ref_Manager* aux_String_400_Refman = NULL;
+  String aux_String_401_Var = {0};
+  String* aux_String_401 = NULL;
+  Ref_Manager* aux_String_401_Refman = NULL;
+  String aux_String_402_Var = {0};
+  String* aux_String_402 = NULL;
+  Ref_Manager* aux_String_402_Refman = NULL;
+  String aux_String_403_Var = {0};
+  String* aux_String_403 = NULL;
+  Ref_Manager* aux_String_403_Refman = NULL;
+  String aux_String_404_Var = {0};
+  String* aux_String_404 = NULL;
+  Ref_Manager* aux_String_404_Refman = NULL;
+  String aux_String_405_Var = {0};
+  String* aux_String_405 = NULL;
+  Ref_Manager* aux_String_405_Refman = NULL;
+  String aux_String_406_Var = {0};
+  String* aux_String_406 = NULL;
+  Ref_Manager* aux_String_406_Refman = NULL;
+  String aux_String_407_Var = {0};
+  String* aux_String_407 = NULL;
+  Ref_Manager* aux_String_407_Refman = NULL;
+  String aux_String_408_Var = {0};
+  String* aux_String_408 = NULL;
+  Ref_Manager* aux_String_408_Refman = NULL;
+  String aux_String_409_Var = {0};
+  String* aux_String_409 = NULL;
+  Ref_Manager* aux_String_409_Refman = NULL;
+  String aux_String_410_Var = {0};
+  String* aux_String_410 = NULL;
+  Ref_Manager* aux_String_410_Refman = NULL;
+  String aux_String_411_Var = {0};
+  String* aux_String_411 = NULL;
+  Ref_Manager* aux_String_411_Refman = NULL;
+  String aux_String_412_Var = {0};
+  String* aux_String_412 = NULL;
+  Ref_Manager* aux_String_412_Refman = NULL;
+  String aux_String_413_Var = {0};
+  String* aux_String_413 = NULL;
+  Ref_Manager* aux_String_413_Refman = NULL;
+  String aux_String_414_Var = {0};
+  String* aux_String_414 = NULL;
+  Ref_Manager* aux_String_414_Refman = NULL;
+  String aux_String_415_Var = {0};
+  String* aux_String_415 = NULL;
+  Ref_Manager* aux_String_415_Refman = NULL;
+  String aux_String_416_Var = {0};
+  String* aux_String_416 = NULL;
+  Ref_Manager* aux_String_416_Refman = NULL;
+  String aux_String_417_Var = {0};
+  String* aux_String_417 = NULL;
+  Ref_Manager* aux_String_417_Refman = NULL;
+  String aux_String_418_Var = {0};
+  String* aux_String_418 = NULL;
+  Ref_Manager* aux_String_418_Refman = NULL;
+  String aux_String_419_Var = {0};
+  String* aux_String_419 = NULL;
+  Ref_Manager* aux_String_419_Refman = NULL;
+  String aux_String_420_Var = {0};
+  String* aux_String_420 = NULL;
+  Ref_Manager* aux_String_420_Refman = NULL;
+  String aux_String_421_Var = {0};
+  String* aux_String_421 = NULL;
+  Ref_Manager* aux_String_421_Refman = NULL;
+  String aux_String_422_Var = {0};
+  String* aux_String_422 = NULL;
+  Ref_Manager* aux_String_422_Refman = NULL;
+  String aux_String_423_Var = {0};
+  String* aux_String_423 = NULL;
+  Ref_Manager* aux_String_423_Refman = NULL;
+  String aux_String_424_Var = {0};
+  String* aux_String_424 = NULL;
+  Ref_Manager* aux_String_424_Refman = NULL;
+  String aux_String_425_Var = {0};
+  String* aux_String_425 = NULL;
+  Ref_Manager* aux_String_425_Refman = NULL;
+  String aux_String_426_Var = {0};
+  String* aux_String_426 = NULL;
+  Ref_Manager* aux_String_426_Refman = NULL;
+  String aux_String_427_Var = {0};
+  String* aux_String_427 = NULL;
+  Ref_Manager* aux_String_427_Refman = NULL;
+  String aux_String_428_Var = {0};
+  String* aux_String_428 = NULL;
+  Ref_Manager* aux_String_428_Refman = NULL;
+  String aux_String_429_Var = {0};
+  String* aux_String_429 = NULL;
+  Ref_Manager* aux_String_429_Refman = NULL;
+  String aux_String_430_Var = {0};
+  String* aux_String_430 = NULL;
+  Ref_Manager* aux_String_430_Refman = NULL;
+  String aux_String_431_Var = {0};
+  String* aux_String_431 = NULL;
+  Ref_Manager* aux_String_431_Refman = NULL;
+  String aux_String_432_Var = {0};
+  String* aux_String_432 = NULL;
+  Ref_Manager* aux_String_432_Refman = NULL;
+  String aux_String_433_Var = {0};
+  String* aux_String_433 = NULL;
+  Ref_Manager* aux_String_433_Refman = NULL;
+  String aux_String_434_Var = {0};
+  String* aux_String_434 = NULL;
+  Ref_Manager* aux_String_434_Refman = NULL;
+  String aux_String_435_Var = {0};
+  String* aux_String_435 = NULL;
+  Ref_Manager* aux_String_435_Refman = NULL;
+  String aux_String_436_Var = {0};
+  String* aux_String_436 = NULL;
+  Ref_Manager* aux_String_436_Refman = NULL;
+  String aux_String_437_Var = {0};
+  String* aux_String_437 = NULL;
+  Ref_Manager* aux_String_437_Refman = NULL;
+  String aux_String_438_Var = {0};
+  String* aux_String_438 = NULL;
+  Ref_Manager* aux_String_438_Refman = NULL;
+  String aux_String_439_Var = {0};
+  String* aux_String_439 = NULL;
+  Ref_Manager* aux_String_439_Refman = NULL;
+  String aux_String_440_Var = {0};
+  String* aux_String_440 = NULL;
+  Ref_Manager* aux_String_440_Refman = NULL;
+  String aux_String_441_Var = {0};
+  String* aux_String_441 = NULL;
+  Ref_Manager* aux_String_441_Refman = NULL;
+  String aux_String_442_Var = {0};
+  String* aux_String_442 = NULL;
+  Ref_Manager* aux_String_442_Refman = NULL;
+  String aux_String_443_Var = {0};
+  String* aux_String_443 = NULL;
+  Ref_Manager* aux_String_443_Refman = NULL;
+  String aux_String_444_Var = {0};
+  String* aux_String_444 = NULL;
+  Ref_Manager* aux_String_444_Refman = NULL;
+  String aux_String_445_Var = {0};
+  String* aux_String_445 = NULL;
+  Ref_Manager* aux_String_445_Refman = NULL;
+  String aux_String_446_Var = {0};
+  String* aux_String_446 = NULL;
+  Ref_Manager* aux_String_446_Refman = NULL;
+  String aux_String_447_Var = {0};
+  String* aux_String_447 = NULL;
+  Ref_Manager* aux_String_447_Refman = NULL;
+  String aux_String_448_Var = {0};
+  String* aux_String_448 = NULL;
+  Ref_Manager* aux_String_448_Refman = NULL;
+  String aux_String_449_Var = {0};
+  String* aux_String_449 = NULL;
+  Ref_Manager* aux_String_449_Refman = NULL;
+  String aux_String_450_Var = {0};
+  String* aux_String_450 = NULL;
+  Ref_Manager* aux_String_450_Refman = NULL;
+  String aux_String_451_Var = {0};
+  String* aux_String_451 = NULL;
+  Ref_Manager* aux_String_451_Refman = NULL;
+  String aux_String_452_Var = {0};
+  String* aux_String_452 = NULL;
+  Ref_Manager* aux_String_452_Refman = NULL;
+  String aux_String_453_Var = {0};
+  String* aux_String_453 = NULL;
+  Ref_Manager* aux_String_453_Refman = NULL;
+  String aux_String_454_Var = {0};
+  String* aux_String_454 = NULL;
+  Ref_Manager* aux_String_454_Refman = NULL;
+  String aux_String_455_Var = {0};
+  String* aux_String_455 = NULL;
+  Ref_Manager* aux_String_455_Refman = NULL;
+  String aux_String_456_Var = {0};
+  String* aux_String_456 = NULL;
+  Ref_Manager* aux_String_456_Refman = NULL;
+  String aux_String_457_Var = {0};
+  String* aux_String_457 = NULL;
+  Ref_Manager* aux_String_457_Refman = NULL;
+  String aux_String_458_Var = {0};
+  String* aux_String_458 = NULL;
+  Ref_Manager* aux_String_458_Refman = NULL;
+  String aux_String_459_Var = {0};
+  String* aux_String_459 = NULL;
+  Ref_Manager* aux_String_459_Refman = NULL;
+  String aux_String_460_Var = {0};
+  String* aux_String_460 = NULL;
+  Ref_Manager* aux_String_460_Refman = NULL;
+  String aux_String_461_Var = {0};
+  String* aux_String_461 = NULL;
+  Ref_Manager* aux_String_461_Refman = NULL;
+  String aux_String_462_Var = {0};
+  String* aux_String_462 = NULL;
+  Ref_Manager* aux_String_462_Refman = NULL;
+  String aux_String_463_Var = {0};
+  String* aux_String_463 = NULL;
+  Ref_Manager* aux_String_463_Refman = NULL;
+  String aux_String_464_Var = {0};
+  String* aux_String_464 = NULL;
+  Ref_Manager* aux_String_464_Refman = NULL;
+  String aux_String_465_Var = {0};
+  String* aux_String_465 = NULL;
+  Ref_Manager* aux_String_465_Refman = NULL;
+  String aux_String_466_Var = {0};
+  String* aux_String_466 = NULL;
+  Ref_Manager* aux_String_466_Refman = NULL;
+  String aux_String_467_Var = {0};
+  String* aux_String_467 = NULL;
+  Ref_Manager* aux_String_467_Refman = NULL;
+  String aux_String_468_Var = {0};
+  String* aux_String_468 = NULL;
+  Ref_Manager* aux_String_468_Refman = NULL;
+  String aux_String_469_Var = {0};
+  String* aux_String_469 = NULL;
+  Ref_Manager* aux_String_469_Refman = NULL;
+  String aux_String_470_Var = {0};
+  String* aux_String_470 = NULL;
+  Ref_Manager* aux_String_470_Refman = NULL;
+  String aux_String_471_Var = {0};
+  String* aux_String_471 = NULL;
+  Ref_Manager* aux_String_471_Refman = NULL;
+  String aux_String_472_Var = {0};
+  String* aux_String_472 = NULL;
+  Ref_Manager* aux_String_472_Refman = NULL;
+  String aux_String_473_Var = {0};
+  String* aux_String_473 = NULL;
+  Ref_Manager* aux_String_473_Refman = NULL;
+  String aux_String_474_Var = {0};
+  String* aux_String_474 = NULL;
+  Ref_Manager* aux_String_474_Refman = NULL;
+  String aux_String_475_Var = {0};
+  String* aux_String_475 = NULL;
+  Ref_Manager* aux_String_475_Refman = NULL;
+  String aux_String_476_Var = {0};
+  String* aux_String_476 = NULL;
+  Ref_Manager* aux_String_476_Refman = NULL;
+  String aux_String_477_Var = {0};
+  String* aux_String_477 = NULL;
+  Ref_Manager* aux_String_477_Refman = NULL;
+  String aux_String_478_Var = {0};
+  String* aux_String_478 = NULL;
+  Ref_Manager* aux_String_478_Refman = NULL;
+  String aux_String_479_Var = {0};
+  String* aux_String_479 = NULL;
+  Ref_Manager* aux_String_479_Refman = NULL;
+  String aux_String_480_Var = {0};
+  String* aux_String_480 = NULL;
+  Ref_Manager* aux_String_480_Refman = NULL;
+  String aux_String_481_Var = {0};
+  String* aux_String_481 = NULL;
+  Ref_Manager* aux_String_481_Refman = NULL;
+  String aux_String_482_Var = {0};
+  String* aux_String_482 = NULL;
+  Ref_Manager* aux_String_482_Refman = NULL;
+  String aux_String_483_Var = {0};
+  String* aux_String_483 = NULL;
+  Ref_Manager* aux_String_483_Refman = NULL;
+  String aux_String_484_Var = {0};
+  String* aux_String_484 = NULL;
+  Ref_Manager* aux_String_484_Refman = NULL;
+  String aux_String_485_Var = {0};
+  String* aux_String_485 = NULL;
+  Ref_Manager* aux_String_485_Refman = NULL;
+  String aux_String_486_Var = {0};
+  String* aux_String_486 = NULL;
+  Ref_Manager* aux_String_486_Refman = NULL;
+  String aux_String_487_Var = {0};
+  String* aux_String_487 = NULL;
+  Ref_Manager* aux_String_487_Refman = NULL;
+  String aux_String_488_Var = {0};
+  String* aux_String_488 = NULL;
+  Ref_Manager* aux_String_488_Refman = NULL;
+  String aux_String_489_Var = {0};
+  String* aux_String_489 = NULL;
+  Ref_Manager* aux_String_489_Refman = NULL;
+  String aux_String_490_Var = {0};
+  String* aux_String_490 = NULL;
+  Ref_Manager* aux_String_490_Refman = NULL;
+  String aux_String_491_Var = {0};
+  String* aux_String_491 = NULL;
+  Ref_Manager* aux_String_491_Refman = NULL;
+  String aux_String_492_Var = {0};
+  String* aux_String_492 = NULL;
+  Ref_Manager* aux_String_492_Refman = NULL;
+  String aux_String_493_Var = {0};
+  String* aux_String_493 = NULL;
+  Ref_Manager* aux_String_493_Refman = NULL;
+  String aux_String_494_Var = {0};
+  String* aux_String_494 = NULL;
+  Ref_Manager* aux_String_494_Refman = NULL;
+  String aux_String_495_Var = {0};
+  String* aux_String_495 = NULL;
+  Ref_Manager* aux_String_495_Refman = NULL;
+  String aux_String_496_Var = {0};
+  String* aux_String_496 = NULL;
+  Ref_Manager* aux_String_496_Refman = NULL;
+  String aux_String_497_Var = {0};
+  String* aux_String_497 = NULL;
+  Ref_Manager* aux_String_497_Refman = NULL;
+  String aux_String_498_Var = {0};
+  String* aux_String_498 = NULL;
+  Ref_Manager* aux_String_498_Refman = NULL;
+  String aux_String_499_Var = {0};
+  String* aux_String_499 = NULL;
+  Ref_Manager* aux_String_499_Refman = NULL;
+  String aux_String_500_Var = {0};
+  String* aux_String_500 = NULL;
+  Ref_Manager* aux_String_500_Refman = NULL;
+  String aux_String_501_Var = {0};
+  String* aux_String_501 = NULL;
+  Ref_Manager* aux_String_501_Refman = NULL;
+  String aux_String_502_Var = {0};
+  String* aux_String_502 = NULL;
+  Ref_Manager* aux_String_502_Refman = NULL;
+  String aux_String_503_Var = {0};
+  String* aux_String_503 = NULL;
+  Ref_Manager* aux_String_503_Refman = NULL;
+  String aux_String_504_Var = {0};
+  String* aux_String_504 = NULL;
+  Ref_Manager* aux_String_504_Refman = NULL;
+  String aux_String_505_Var = {0};
+  String* aux_String_505 = NULL;
+  Ref_Manager* aux_String_505_Refman = NULL;
+  String aux_String_506_Var = {0};
+  String* aux_String_506 = NULL;
+  Ref_Manager* aux_String_506_Refman = NULL;
+  String aux_String_507_Var = {0};
+  String* aux_String_507 = NULL;
+  Ref_Manager* aux_String_507_Refman = NULL;
+  String aux_String_508_Var = {0};
+  String* aux_String_508 = NULL;
+  Ref_Manager* aux_String_508_Refman = NULL;
+  String aux_String_509_Var = {0};
+  String* aux_String_509 = NULL;
+  Ref_Manager* aux_String_509_Refman = NULL;
+  String aux_String_510_Var = {0};
+  String* aux_String_510 = NULL;
+  Ref_Manager* aux_String_510_Refman = NULL;
+  String aux_String_511_Var = {0};
+  String* aux_String_511 = NULL;
+  Ref_Manager* aux_String_511_Refman = NULL;
+  String aux_String_512_Var = {0};
+  String* aux_String_512 = NULL;
+  Ref_Manager* aux_String_512_Refman = NULL;
+  String aux_String_513_Var = {0};
+  String* aux_String_513 = NULL;
+  Ref_Manager* aux_String_513_Refman = NULL;
+  String aux_String_514_Var = {0};
+  String* aux_String_514 = NULL;
+  Ref_Manager* aux_String_514_Refman = NULL;
+  String aux_String_515_Var = {0};
+  String* aux_String_515 = NULL;
+  Ref_Manager* aux_String_515_Refman = NULL;
+  String aux_String_516_Var = {0};
+  String* aux_String_516 = NULL;
+  Ref_Manager* aux_String_516_Refman = NULL;
+  String aux_String_517_Var = {0};
+  String* aux_String_517 = NULL;
+  Ref_Manager* aux_String_517_Refman = NULL;
+  String aux_String_518_Var = {0};
+  String* aux_String_518 = NULL;
+  Ref_Manager* aux_String_518_Refman = NULL;
+  String aux_String_519_Var = {0};
+  String* aux_String_519 = NULL;
+  Ref_Manager* aux_String_519_Refman = NULL;
+  String aux_String_520_Var = {0};
+  String* aux_String_520 = NULL;
+  Ref_Manager* aux_String_520_Refman = NULL;
+  String aux_String_521_Var = {0};
+  String* aux_String_521 = NULL;
+  Ref_Manager* aux_String_521_Refman = NULL;
+  String aux_String_522_Var = {0};
+  String* aux_String_522 = NULL;
+  Ref_Manager* aux_String_522_Refman = NULL;
+  String aux_String_523_Var = {0};
+  String* aux_String_523 = NULL;
+  Ref_Manager* aux_String_523_Refman = NULL;
+  String aux_String_524_Var = {0};
+  String* aux_String_524 = NULL;
+  Ref_Manager* aux_String_524_Refman = NULL;
+  String aux_String_525_Var = {0};
+  String* aux_String_525 = NULL;
+  Ref_Manager* aux_String_525_Refman = NULL;
+  String aux_String_526_Var = {0};
+  String* aux_String_526 = NULL;
+  Ref_Manager* aux_String_526_Refman = NULL;
+  String aux_String_527_Var = {0};
+  String* aux_String_527 = NULL;
+  Ref_Manager* aux_String_527_Refman = NULL;
+  String aux_String_528_Var = {0};
+  String* aux_String_528 = NULL;
+  Ref_Manager* aux_String_528_Refman = NULL;
+  String aux_String_529_Var = {0};
+  String* aux_String_529 = NULL;
+  Ref_Manager* aux_String_529_Refman = NULL;
+  String aux_String_530_Var = {0};
+  String* aux_String_530 = NULL;
+  Ref_Manager* aux_String_530_Refman = NULL;
+  String aux_String_531_Var = {0};
+  String* aux_String_531 = NULL;
+  Ref_Manager* aux_String_531_Refman = NULL;
+  String aux_String_532_Var = {0};
+  String* aux_String_532 = NULL;
+  Ref_Manager* aux_String_532_Refman = NULL;
+  String aux_String_533_Var = {0};
+  String* aux_String_533 = NULL;
+  Ref_Manager* aux_String_533_Refman = NULL;
+  String aux_String_534_Var = {0};
+  String* aux_String_534 = NULL;
+  Ref_Manager* aux_String_534_Refman = NULL;
+  String aux_String_535_Var = {0};
+  String* aux_String_535 = NULL;
+  Ref_Manager* aux_String_535_Refman = NULL;
+  String aux_String_536_Var = {0};
+  String* aux_String_536 = NULL;
+  Ref_Manager* aux_String_536_Refman = NULL;
+  String aux_String_537_Var = {0};
+  String* aux_String_537 = NULL;
+  Ref_Manager* aux_String_537_Refman = NULL;
+  String aux_String_538_Var = {0};
+  String* aux_String_538 = NULL;
+  Ref_Manager* aux_String_538_Refman = NULL;
+  String aux_String_539_Var = {0};
+  String* aux_String_539 = NULL;
+  Ref_Manager* aux_String_539_Refman = NULL;
+  String aux_String_540_Var = {0};
+  String* aux_String_540 = NULL;
+  Ref_Manager* aux_String_540_Refman = NULL;
+  String aux_String_541_Var = {0};
+  String* aux_String_541 = NULL;
+  Ref_Manager* aux_String_541_Refman = NULL;
+  String aux_String_542_Var = {0};
+  String* aux_String_542 = NULL;
+  Ref_Manager* aux_String_542_Refman = NULL;
+  String aux_String_543_Var = {0};
+  String* aux_String_543 = NULL;
+  Ref_Manager* aux_String_543_Refman = NULL;
+  String aux_String_544_Var = {0};
+  String* aux_String_544 = NULL;
+  Ref_Manager* aux_String_544_Refman = NULL;
+  String aux_String_545_Var = {0};
+  String* aux_String_545 = NULL;
+  Ref_Manager* aux_String_545_Refman = NULL;
+  String aux_String_546_Var = {0};
+  String* aux_String_546 = NULL;
+  Ref_Manager* aux_String_546_Refman = NULL;
+  String aux_String_547_Var = {0};
+  String* aux_String_547 = NULL;
+  Ref_Manager* aux_String_547_Refman = NULL;
+  String aux_String_548_Var = {0};
+  String* aux_String_548 = NULL;
+  Ref_Manager* aux_String_548_Refman = NULL;
+  String aux_String_549_Var = {0};
+  String* aux_String_549 = NULL;
+  Ref_Manager* aux_String_549_Refman = NULL;
+  String aux_String_550_Var = {0};
+  String* aux_String_550 = NULL;
+  Ref_Manager* aux_String_550_Refman = NULL;
+  String aux_String_551_Var = {0};
+  String* aux_String_551 = NULL;
+  Ref_Manager* aux_String_551_Refman = NULL;
+  String aux_String_552_Var = {0};
+  String* aux_String_552 = NULL;
+  Ref_Manager* aux_String_552_Refman = NULL;
+  String aux_String_553_Var = {0};
+  String* aux_String_553 = NULL;
+  Ref_Manager* aux_String_553_Refman = NULL;
+  String aux_String_554_Var = {0};
+  String* aux_String_554 = NULL;
+  Ref_Manager* aux_String_554_Refman = NULL;
+  String aux_String_555_Var = {0};
+  String* aux_String_555 = NULL;
+  Ref_Manager* aux_String_555_Refman = NULL;
+  String aux_String_556_Var = {0};
+  String* aux_String_556 = NULL;
+  Ref_Manager* aux_String_556_Refman = NULL;
+  String aux_String_557_Var = {0};
+  String* aux_String_557 = NULL;
+  Ref_Manager* aux_String_557_Refman = NULL;
+  String aux_String_558_Var = {0};
+  String* aux_String_558 = NULL;
+  Ref_Manager* aux_String_558_Refman = NULL;
+  String aux_String_559_Var = {0};
+  String* aux_String_559 = NULL;
+  Ref_Manager* aux_String_559_Refman = NULL;
+  String aux_String_560_Var = {0};
+  String* aux_String_560 = NULL;
+  Ref_Manager* aux_String_560_Refman = NULL;
+  String aux_String_561_Var = {0};
+  String* aux_String_561 = NULL;
+  Ref_Manager* aux_String_561_Refman = NULL;
+  String aux_String_562_Var = {0};
+  String* aux_String_562 = NULL;
+  Ref_Manager* aux_String_562_Refman = NULL;
+  String aux_String_563_Var = {0};
+  String* aux_String_563 = NULL;
+  Ref_Manager* aux_String_563_Refman = NULL;
+  String aux_String_564_Var = {0};
+  String* aux_String_564 = NULL;
+  Ref_Manager* aux_String_564_Refman = NULL;
+  String aux_String_565_Var = {0};
+  String* aux_String_565 = NULL;
+  Ref_Manager* aux_String_565_Refman = NULL;
+  String aux_String_566_Var = {0};
+  String* aux_String_566 = NULL;
+  Ref_Manager* aux_String_566_Refman = NULL;
+  String aux_String_567_Var = {0};
+  String* aux_String_567 = NULL;
+  Ref_Manager* aux_String_567_Refman = NULL;
+  String aux_String_568_Var = {0};
+  String* aux_String_568 = NULL;
+  Ref_Manager* aux_String_568_Refman = NULL;
+  String aux_String_569_Var = {0};
+  String* aux_String_569 = NULL;
+  Ref_Manager* aux_String_569_Refman = NULL;
+  String aux_String_570_Var = {0};
+  String* aux_String_570 = NULL;
+  Ref_Manager* aux_String_570_Refman = NULL;
+  String aux_String_571_Var = {0};
+  String* aux_String_571 = NULL;
+  Ref_Manager* aux_String_571_Refman = NULL;
+  String aux_String_572_Var = {0};
+  String* aux_String_572 = NULL;
+  Ref_Manager* aux_String_572_Refman = NULL;
+  String aux_String_573_Var = {0};
+  String* aux_String_573 = NULL;
+  Ref_Manager* aux_String_573_Refman = NULL;
+  String aux_String_574_Var = {0};
+  String* aux_String_574 = NULL;
+  Ref_Manager* aux_String_574_Refman = NULL;
+  String aux_String_575_Var = {0};
+  String* aux_String_575 = NULL;
+  Ref_Manager* aux_String_575_Refman = NULL;
+  String aux_String_576_Var = {0};
+  String* aux_String_576 = NULL;
+  Ref_Manager* aux_String_576_Refman = NULL;
+  String aux_String_577_Var = {0};
+  String* aux_String_577 = NULL;
+  Ref_Manager* aux_String_577_Refman = NULL;
+  String aux_String_578_Var = {0};
+  String* aux_String_578 = NULL;
+  Ref_Manager* aux_String_578_Refman = NULL;
+  String aux_String_579_Var = {0};
+  String* aux_String_579 = NULL;
+  Ref_Manager* aux_String_579_Refman = NULL;
+  String aux_String_580_Var = {0};
+  String* aux_String_580 = NULL;
+  Ref_Manager* aux_String_580_Refman = NULL;
+  String aux_String_581_Var = {0};
+  String* aux_String_581 = NULL;
+  Ref_Manager* aux_String_581_Refman = NULL;
+  String aux_String_582_Var = {0};
+  String* aux_String_582 = NULL;
+  Ref_Manager* aux_String_582_Refman = NULL;
+  String aux_String_583_Var = {0};
+  String* aux_String_583 = NULL;
+  Ref_Manager* aux_String_583_Refman = NULL;
+  String aux_String_584_Var = {0};
+  String* aux_String_584 = NULL;
+  Ref_Manager* aux_String_584_Refman = NULL;
+  String aux_String_585_Var = {0};
+  String* aux_String_585 = NULL;
+  Ref_Manager* aux_String_585_Refman = NULL;
+  String aux_String_586_Var = {0};
+  String* aux_String_586 = NULL;
+  Ref_Manager* aux_String_586_Refman = NULL;
+  String aux_String_587_Var = {0};
+  String* aux_String_587 = NULL;
+  Ref_Manager* aux_String_587_Refman = NULL;
+  String aux_String_588_Var = {0};
+  String* aux_String_588 = NULL;
+  Ref_Manager* aux_String_588_Refman = NULL;
+  String aux_String_589_Var = {0};
+  String* aux_String_589 = NULL;
+  Ref_Manager* aux_String_589_Refman = NULL;
+  String aux_String_590_Var = {0};
+  String* aux_String_590 = NULL;
+  Ref_Manager* aux_String_590_Refman = NULL;
+  String aux_String_591_Var = {0};
+  String* aux_String_591 = NULL;
+  Ref_Manager* aux_String_591_Refman = NULL;
+  String aux_String_592_Var = {0};
+  String* aux_String_592 = NULL;
+  Ref_Manager* aux_String_592_Refman = NULL;
+  String aux_String_593_Var = {0};
+  String* aux_String_593 = NULL;
+  Ref_Manager* aux_String_593_Refman = NULL;
+  String aux_String_594_Var = {0};
+  String* aux_String_594 = NULL;
+  Ref_Manager* aux_String_594_Refman = NULL;
+  String aux_String_595_Var = {0};
+  String* aux_String_595 = NULL;
+  Ref_Manager* aux_String_595_Refman = NULL;
+  String aux_String_596_Var = {0};
+  String* aux_String_596 = NULL;
+  Ref_Manager* aux_String_596_Refman = NULL;
+  String aux_String_597_Var = {0};
+  String* aux_String_597 = NULL;
+  Ref_Manager* aux_String_597_Refman = NULL;
+  String aux_String_598_Var = {0};
+  String* aux_String_598 = NULL;
+  Ref_Manager* aux_String_598_Refman = NULL;
+  String aux_String_599_Var = {0};
+  String* aux_String_599 = NULL;
+  Ref_Manager* aux_String_599_Refman = NULL;
+  String aux_String_600_Var = {0};
+  String* aux_String_600 = NULL;
+  Ref_Manager* aux_String_600_Refman = NULL;
+  String aux_String_601_Var = {0};
+  String* aux_String_601 = NULL;
+  Ref_Manager* aux_String_601_Refman = NULL;
+  String aux_String_602_Var = {0};
+  String* aux_String_602 = NULL;
+  Ref_Manager* aux_String_602_Refman = NULL;
+  String aux_String_603_Var = {0};
+  String* aux_String_603 = NULL;
+  Ref_Manager* aux_String_603_Refman = NULL;
+  String aux_String_604_Var = {0};
+  String* aux_String_604 = NULL;
+  Ref_Manager* aux_String_604_Refman = NULL;
+  String aux_String_605_Var = {0};
+  String* aux_String_605 = NULL;
+  Ref_Manager* aux_String_605_Refman = NULL;
+  String aux_String_606_Var = {0};
+  String* aux_String_606 = NULL;
+  Ref_Manager* aux_String_606_Refman = NULL;
+  String aux_String_607_Var = {0};
+  String* aux_String_607 = NULL;
+  Ref_Manager* aux_String_607_Refman = NULL;
+  String aux_String_608_Var = {0};
+  String* aux_String_608 = NULL;
+  Ref_Manager* aux_String_608_Refman = NULL;
+  String aux_String_609_Var = {0};
+  String* aux_String_609 = NULL;
+  Ref_Manager* aux_String_609_Refman = NULL;
+  String aux_String_610_Var = {0};
+  String* aux_String_610 = NULL;
+  Ref_Manager* aux_String_610_Refman = NULL;
+  String aux_String_611_Var = {0};
+  String* aux_String_611 = NULL;
+  Ref_Manager* aux_String_611_Refman = NULL;
+  String aux_String_612_Var = {0};
+  String* aux_String_612 = NULL;
+  Ref_Manager* aux_String_612_Refman = NULL;
+  String aux_String_613_Var = {0};
+  String* aux_String_613 = NULL;
+  Ref_Manager* aux_String_613_Refman = NULL;
+  String aux_String_614_Var = {0};
+  String* aux_String_614 = NULL;
+  Ref_Manager* aux_String_614_Refman = NULL;
+  String aux_String_615_Var = {0};
+  String* aux_String_615 = NULL;
+  Ref_Manager* aux_String_615_Refman = NULL;
+  String aux_String_616_Var = {0};
+  String* aux_String_616 = NULL;
+  Ref_Manager* aux_String_616_Refman = NULL;
+  String aux_String_617_Var = {0};
+  String* aux_String_617 = NULL;
+  Ref_Manager* aux_String_617_Refman = NULL;
+  String aux_String_618_Var = {0};
+  String* aux_String_618 = NULL;
+  Ref_Manager* aux_String_618_Refman = NULL;
+  String aux_String_619_Var = {0};
+  String* aux_String_619 = NULL;
+  Ref_Manager* aux_String_619_Refman = NULL;
+  String aux_String_620_Var = {0};
+  String* aux_String_620 = NULL;
+  Ref_Manager* aux_String_620_Refman = NULL;
+  String aux_String_621_Var = {0};
+  String* aux_String_621 = NULL;
+  Ref_Manager* aux_String_621_Refman = NULL;
+  String aux_String_622_Var = {0};
+  String* aux_String_622 = NULL;
+  Ref_Manager* aux_String_622_Refman = NULL;
+  String aux_String_623_Var = {0};
+  String* aux_String_623 = NULL;
+  Ref_Manager* aux_String_623_Refman = NULL;
+  String aux_String_624_Var = {0};
+  String* aux_String_624 = NULL;
+  Ref_Manager* aux_String_624_Refman = NULL;
+  String aux_String_625_Var = {0};
+  String* aux_String_625 = NULL;
+  Ref_Manager* aux_String_625_Refman = NULL;
+  String aux_String_626_Var = {0};
+  String* aux_String_626 = NULL;
+  Ref_Manager* aux_String_626_Refman = NULL;
+  String aux_String_627_Var = {0};
+  String* aux_String_627 = NULL;
+  Ref_Manager* aux_String_627_Refman = NULL;
+  String aux_String_628_Var = {0};
+  String* aux_String_628 = NULL;
+  Ref_Manager* aux_String_628_Refman = NULL;
+  String aux_String_629_Var = {0};
+  String* aux_String_629 = NULL;
+  Ref_Manager* aux_String_629_Refman = NULL;
+  String aux_String_630_Var = {0};
+  String* aux_String_630 = NULL;
+  Ref_Manager* aux_String_630_Refman = NULL;
+  String aux_String_631_Var = {0};
+  String* aux_String_631 = NULL;
+  Ref_Manager* aux_String_631_Refman = NULL;
+  String aux_String_632_Var = {0};
+  String* aux_String_632 = NULL;
+  Ref_Manager* aux_String_632_Refman = NULL;
+  String aux_String_633_Var = {0};
+  String* aux_String_633 = NULL;
+  Ref_Manager* aux_String_633_Refman = NULL;
+  String aux_String_634_Var = {0};
+  String* aux_String_634 = NULL;
+  Ref_Manager* aux_String_634_Refman = NULL;
+  String aux_String_635_Var = {0};
+  String* aux_String_635 = NULL;
+  Ref_Manager* aux_String_635_Refman = NULL;
+  String aux_String_636_Var = {0};
+  String* aux_String_636 = NULL;
+  Ref_Manager* aux_String_636_Refman = NULL;
+  String aux_String_637_Var = {0};
+  String* aux_String_637 = NULL;
+  Ref_Manager* aux_String_637_Refman = NULL;
+  String aux_String_638_Var = {0};
+  String* aux_String_638 = NULL;
+  Ref_Manager* aux_String_638_Refman = NULL;
+  String aux_String_639_Var = {0};
+  String* aux_String_639 = NULL;
+  Ref_Manager* aux_String_639_Refman = NULL;
+  String aux_String_640_Var = {0};
+  String* aux_String_640 = NULL;
+  Ref_Manager* aux_String_640_Refman = NULL;
+  String aux_String_641_Var = {0};
+  String* aux_String_641 = NULL;
+  Ref_Manager* aux_String_641_Refman = NULL;
+  String aux_String_642_Var = {0};
+  String* aux_String_642 = NULL;
+  Ref_Manager* aux_String_642_Refman = NULL;
+  String aux_String_643_Var = {0};
+  String* aux_String_643 = NULL;
+  Ref_Manager* aux_String_643_Refman = NULL;
+  String aux_String_644_Var = {0};
+  String* aux_String_644 = NULL;
+  Ref_Manager* aux_String_644_Refman = NULL;
+  String aux_String_645_Var = {0};
+  String* aux_String_645 = NULL;
+  Ref_Manager* aux_String_645_Refman = NULL;
+  String aux_String_646_Var = {0};
+  String* aux_String_646 = NULL;
+  Ref_Manager* aux_String_646_Refman = NULL;
+  String aux_String_647_Var = {0};
+  String* aux_String_647 = NULL;
+  Ref_Manager* aux_String_647_Refman = NULL;
+  String aux_String_648_Var = {0};
+  String* aux_String_648 = NULL;
+  Ref_Manager* aux_String_648_Refman = NULL;
+  String aux_String_649_Var = {0};
+  String* aux_String_649 = NULL;
+  Ref_Manager* aux_String_649_Refman = NULL;
+  String aux_String_650_Var = {0};
+  String* aux_String_650 = NULL;
+  Ref_Manager* aux_String_650_Refman = NULL;
+  String aux_String_651_Var = {0};
+  String* aux_String_651 = NULL;
+  Ref_Manager* aux_String_651_Refman = NULL;
+  String aux_String_652_Var = {0};
+  String* aux_String_652 = NULL;
+  Ref_Manager* aux_String_652_Refman = NULL;
+  String aux_String_653_Var = {0};
+  String* aux_String_653 = NULL;
+  Ref_Manager* aux_String_653_Refman = NULL;
+  String aux_String_654_Var = {0};
+  String* aux_String_654 = NULL;
+  Ref_Manager* aux_String_654_Refman = NULL;
+  String aux_String_655_Var = {0};
+  String* aux_String_655 = NULL;
+  Ref_Manager* aux_String_655_Refman = NULL;
+  String aux_String_656_Var = {0};
+  String* aux_String_656 = NULL;
+  Ref_Manager* aux_String_656_Refman = NULL;
+  String aux_String_657_Var = {0};
+  String* aux_String_657 = NULL;
+  Ref_Manager* aux_String_657_Refman = NULL;
+  String aux_String_658_Var = {0};
+  String* aux_String_658 = NULL;
+  Ref_Manager* aux_String_658_Refman = NULL;
+  String aux_String_659_Var = {0};
+  String* aux_String_659 = NULL;
+  Ref_Manager* aux_String_659_Refman = NULL;
+  String aux_String_660_Var = {0};
+  String* aux_String_660 = NULL;
+  Ref_Manager* aux_String_660_Refman = NULL;
+  String aux_String_661_Var = {0};
+  String* aux_String_661 = NULL;
+  Ref_Manager* aux_String_661_Refman = NULL;
+  String aux_String_662_Var = {0};
+  String* aux_String_662 = NULL;
+  Ref_Manager* aux_String_662_Refman = NULL;
+  String aux_String_663_Var = {0};
+  String* aux_String_663 = NULL;
+  Ref_Manager* aux_String_663_Refman = NULL;
+  String aux_String_664_Var = {0};
+  String* aux_String_664 = NULL;
+  Ref_Manager* aux_String_664_Refman = NULL;
+  String aux_String_665_Var = {0};
+  String* aux_String_665 = NULL;
+  Ref_Manager* aux_String_665_Refman = NULL;
+  String aux_String_666_Var = {0};
+  String* aux_String_666 = NULL;
+  Ref_Manager* aux_String_666_Refman = NULL;
+  String aux_String_667_Var = {0};
+  String* aux_String_667 = NULL;
+  Ref_Manager* aux_String_667_Refman = NULL;
+  String aux_String_668_Var = {0};
+  String* aux_String_668 = NULL;
+  Ref_Manager* aux_String_668_Refman = NULL;
+  String aux_String_669_Var = {0};
+  String* aux_String_669 = NULL;
+  Ref_Manager* aux_String_669_Refman = NULL;
+  String aux_String_670_Var = {0};
+  String* aux_String_670 = NULL;
+  Ref_Manager* aux_String_670_Refman = NULL;
+  String aux_String_671_Var = {0};
+  String* aux_String_671 = NULL;
+  Ref_Manager* aux_String_671_Refman = NULL;
+  String aux_String_672_Var = {0};
+  String* aux_String_672 = NULL;
+  Ref_Manager* aux_String_672_Refman = NULL;
+  String aux_String_673_Var = {0};
+  String* aux_String_673 = NULL;
+  Ref_Manager* aux_String_673_Refman = NULL;
+  String aux_String_674_Var = {0};
+  String* aux_String_674 = NULL;
+  Ref_Manager* aux_String_674_Refman = NULL;
+  String aux_String_675_Var = {0};
+  String* aux_String_675 = NULL;
+  Ref_Manager* aux_String_675_Refman = NULL;
+  String aux_String_676_Var = {0};
+  String* aux_String_676 = NULL;
+  Ref_Manager* aux_String_676_Refman = NULL;
+  String aux_String_677_Var = {0};
+  String* aux_String_677 = NULL;
+  Ref_Manager* aux_String_677_Refman = NULL;
+  String aux_String_678_Var = {0};
+  String* aux_String_678 = NULL;
+  Ref_Manager* aux_String_678_Refman = NULL;
+  String aux_String_679_Var = {0};
+  String* aux_String_679 = NULL;
+  Ref_Manager* aux_String_679_Refman = NULL;
+  String aux_String_680_Var = {0};
+  String* aux_String_680 = NULL;
+  Ref_Manager* aux_String_680_Refman = NULL;
+  String aux_String_681_Var = {0};
+  String* aux_String_681 = NULL;
+  Ref_Manager* aux_String_681_Refman = NULL;
+  String aux_String_682_Var = {0};
+  String* aux_String_682 = NULL;
+  Ref_Manager* aux_String_682_Refman = NULL;
+  String aux_String_683_Var = {0};
+  String* aux_String_683 = NULL;
+  Ref_Manager* aux_String_683_Refman = NULL;
+  String aux_String_684_Var = {0};
+  String* aux_String_684 = NULL;
+  Ref_Manager* aux_String_684_Refman = NULL;
+  String aux_String_685_Var = {0};
+  String* aux_String_685 = NULL;
+  Ref_Manager* aux_String_685_Refman = NULL;
+  String aux_String_686_Var = {0};
+  String* aux_String_686 = NULL;
+  Ref_Manager* aux_String_686_Refman = NULL;
+  String aux_String_687_Var = {0};
+  String* aux_String_687 = NULL;
+  Ref_Manager* aux_String_687_Refman = NULL;
+  String aux_String_688_Var = {0};
+  String* aux_String_688 = NULL;
+  Ref_Manager* aux_String_688_Refman = NULL;
+  String aux_String_689_Var = {0};
+  String* aux_String_689 = NULL;
+  Ref_Manager* aux_String_689_Refman = NULL;
+  String aux_String_690_Var = {0};
+  String* aux_String_690 = NULL;
+  Ref_Manager* aux_String_690_Refman = NULL;
+  String aux_String_691_Var = {0};
+  String* aux_String_691 = NULL;
+  Ref_Manager* aux_String_691_Refman = NULL;
+  String aux_String_692_Var = {0};
+  String* aux_String_692 = NULL;
+  Ref_Manager* aux_String_692_Refman = NULL;
+  String aux_String_693_Var = {0};
+  String* aux_String_693 = NULL;
+  Ref_Manager* aux_String_693_Refman = NULL;
+  String aux_String_694_Var = {0};
+  String* aux_String_694 = NULL;
+  Ref_Manager* aux_String_694_Refman = NULL;
+  String aux_String_695_Var = {0};
+  String* aux_String_695 = NULL;
+  Ref_Manager* aux_String_695_Refman = NULL;
+  String aux_String_696_Var = {0};
+  String* aux_String_696 = NULL;
+  Ref_Manager* aux_String_696_Refman = NULL;
+  String aux_String_697_Var = {0};
+  String* aux_String_697 = NULL;
+  Ref_Manager* aux_String_697_Refman = NULL;
+  String aux_String_698_Var = {0};
+  String* aux_String_698 = NULL;
+  Ref_Manager* aux_String_698_Refman = NULL;
+  String aux_String_699_Var = {0};
+  String* aux_String_699 = NULL;
+  Ref_Manager* aux_String_699_Refman = NULL;
+  String aux_String_700_Var = {0};
+  String* aux_String_700 = NULL;
+  Ref_Manager* aux_String_700_Refman = NULL;
+  String aux_String_701_Var = {0};
+  String* aux_String_701 = NULL;
+  Ref_Manager* aux_String_701_Refman = NULL;
+  String aux_String_702_Var = {0};
+  String* aux_String_702 = NULL;
+  Ref_Manager* aux_String_702_Refman = NULL;
+  String aux_String_703_Var = {0};
+  String* aux_String_703 = NULL;
+  Ref_Manager* aux_String_703_Refman = NULL;
+  String aux_String_704_Var = {0};
+  String* aux_String_704 = NULL;
+  Ref_Manager* aux_String_704_Refman = NULL;
+  String aux_String_705_Var = {0};
+  String* aux_String_705 = NULL;
+  Ref_Manager* aux_String_705_Refman = NULL;
+  String aux_String_706_Var = {0};
+  String* aux_String_706 = NULL;
+  Ref_Manager* aux_String_706_Refman = NULL;
+  String aux_String_707_Var = {0};
+  String* aux_String_707 = NULL;
+  Ref_Manager* aux_String_707_Refman = NULL;
+  String aux_String_708_Var = {0};
+  String* aux_String_708 = NULL;
+  Ref_Manager* aux_String_708_Refman = NULL;
+  String aux_String_709_Var = {0};
+  String* aux_String_709 = NULL;
+  Ref_Manager* aux_String_709_Refman = NULL;
+  String aux_String_710_Var = {0};
+  String* aux_String_710 = NULL;
+  Ref_Manager* aux_String_710_Refman = NULL;
+  String aux_String_711_Var = {0};
+  String* aux_String_711 = NULL;
+  Ref_Manager* aux_String_711_Refman = NULL;
+  String aux_String_712_Var = {0};
+  String* aux_String_712 = NULL;
+  Ref_Manager* aux_String_712_Refman = NULL;
+  String aux_String_713_Var = {0};
+  String* aux_String_713 = NULL;
+  Ref_Manager* aux_String_713_Refman = NULL;
+  String aux_String_714_Var = {0};
+  String* aux_String_714 = NULL;
+  Ref_Manager* aux_String_714_Refman = NULL;
+  String aux_String_715_Var = {0};
+  String* aux_String_715 = NULL;
+  Ref_Manager* aux_String_715_Refman = NULL;
+  String aux_String_716_Var = {0};
+  String* aux_String_716 = NULL;
+  Ref_Manager* aux_String_716_Refman = NULL;
+  String aux_String_717_Var = {0};
+  String* aux_String_717 = NULL;
+  Ref_Manager* aux_String_717_Refman = NULL;
+  String aux_String_718_Var = {0};
+  String* aux_String_718 = NULL;
+  Ref_Manager* aux_String_718_Refman = NULL;
+  String aux_String_719_Var = {0};
+  String* aux_String_719 = NULL;
+  Ref_Manager* aux_String_719_Refman = NULL;
+  String aux_String_720_Var = {0};
+  String* aux_String_720 = NULL;
+  Ref_Manager* aux_String_720_Refman = NULL;
+  String aux_String_721_Var = {0};
+  String* aux_String_721 = NULL;
+  Ref_Manager* aux_String_721_Refman = NULL;
+  String aux_String_722_Var = {0};
+  String* aux_String_722 = NULL;
+  Ref_Manager* aux_String_722_Refman = NULL;
+  String aux_String_723_Var = {0};
+  String* aux_String_723 = NULL;
+  Ref_Manager* aux_String_723_Refman = NULL;
+  String aux_String_724_Var = {0};
+  String* aux_String_724 = NULL;
+  Ref_Manager* aux_String_724_Refman = NULL;
+  String aux_String_725_Var = {0};
+  String* aux_String_725 = NULL;
+  Ref_Manager* aux_String_725_Refman = NULL;
+  String aux_String_726_Var = {0};
+  String* aux_String_726 = NULL;
+  Ref_Manager* aux_String_726_Refman = NULL;
+  String aux_String_727_Var = {0};
+  String* aux_String_727 = NULL;
+  Ref_Manager* aux_String_727_Refman = NULL;
+  String aux_String_728_Var = {0};
+  String* aux_String_728 = NULL;
+  Ref_Manager* aux_String_728_Refman = NULL;
+  String aux_String_729_Var = {0};
+  String* aux_String_729 = NULL;
+  Ref_Manager* aux_String_729_Refman = NULL;
+  String aux_String_730_Var = {0};
+  String* aux_String_730 = NULL;
+  Ref_Manager* aux_String_730_Refman = NULL;
+  String aux_String_731_Var = {0};
+  String* aux_String_731 = NULL;
+  Ref_Manager* aux_String_731_Refman = NULL;
+  String aux_String_732_Var = {0};
+  String* aux_String_732 = NULL;
+  Ref_Manager* aux_String_732_Refman = NULL;
+  String aux_String_733_Var = {0};
+  String* aux_String_733 = NULL;
+  Ref_Manager* aux_String_733_Refman = NULL;
+  String aux_String_734_Var = {0};
+  String* aux_String_734 = NULL;
+  Ref_Manager* aux_String_734_Refman = NULL;
+  String aux_String_735_Var = {0};
+  String* aux_String_735 = NULL;
+  Ref_Manager* aux_String_735_Refman = NULL;
+  String aux_String_736_Var = {0};
+  String* aux_String_736 = NULL;
+  Ref_Manager* aux_String_736_Refman = NULL;
+  String aux_String_737_Var = {0};
+  String* aux_String_737 = NULL;
+  Ref_Manager* aux_String_737_Refman = NULL;
+  String aux_String_738_Var = {0};
+  String* aux_String_738 = NULL;
+  Ref_Manager* aux_String_738_Refman = NULL;
+  String aux_String_739_Var = {0};
+  String* aux_String_739 = NULL;
+  Ref_Manager* aux_String_739_Refman = NULL;
+  String aux_String_740_Var = {0};
+  String* aux_String_740 = NULL;
+  Ref_Manager* aux_String_740_Refman = NULL;
+  String aux_String_741_Var = {0};
+  String* aux_String_741 = NULL;
+  Ref_Manager* aux_String_741_Refman = NULL;
+  String aux_String_742_Var = {0};
+  String* aux_String_742 = NULL;
+  Ref_Manager* aux_String_742_Refman = NULL;
+  String aux_String_743_Var = {0};
+  String* aux_String_743 = NULL;
+  Ref_Manager* aux_String_743_Refman = NULL;
+  String aux_String_744_Var = {0};
+  String* aux_String_744 = NULL;
+  Ref_Manager* aux_String_744_Refman = NULL;
+  String aux_String_745_Var = {0};
+  String* aux_String_745 = NULL;
+  Ref_Manager* aux_String_745_Refman = NULL;
+  String aux_String_746_Var = {0};
+  String* aux_String_746 = NULL;
+  Ref_Manager* aux_String_746_Refman = NULL;
+  String aux_String_747_Var = {0};
+  String* aux_String_747 = NULL;
+  Ref_Manager* aux_String_747_Refman = NULL;
+  String aux_String_748_Var = {0};
+  String* aux_String_748 = NULL;
+  Ref_Manager* aux_String_748_Refman = NULL;
+  String aux_String_749_Var = {0};
+  String* aux_String_749 = NULL;
+  Ref_Manager* aux_String_749_Refman = NULL;
+  String aux_String_750_Var = {0};
+  String* aux_String_750 = NULL;
+  Ref_Manager* aux_String_750_Refman = NULL;
+  String aux_String_751_Var = {0};
+  String* aux_String_751 = NULL;
+  Ref_Manager* aux_String_751_Refman = NULL;
+  String aux_String_752_Var = {0};
+  String* aux_String_752 = NULL;
+  Ref_Manager* aux_String_752_Refman = NULL;
+  String aux_String_753_Var = {0};
+  String* aux_String_753 = NULL;
+  Ref_Manager* aux_String_753_Refman = NULL;
+  String aux_String_754_Var = {0};
+  String* aux_String_754 = NULL;
+  Ref_Manager* aux_String_754_Refman = NULL;
+  String aux_String_755_Var = {0};
+  String* aux_String_755 = NULL;
+  Ref_Manager* aux_String_755_Refman = NULL;
+  String aux_String_756_Var = {0};
+  String* aux_String_756 = NULL;
+  Ref_Manager* aux_String_756_Refman = NULL;
+  String aux_String_757_Var = {0};
+  String* aux_String_757 = NULL;
+  Ref_Manager* aux_String_757_Refman = NULL;
+  String aux_String_758_Var = {0};
+  String* aux_String_758 = NULL;
+  Ref_Manager* aux_String_758_Refman = NULL;
+  String aux_String_759_Var = {0};
+  String* aux_String_759 = NULL;
+  Ref_Manager* aux_String_759_Refman = NULL;
+  String aux_String_760_Var = {0};
+  String* aux_String_760 = NULL;
+  Ref_Manager* aux_String_760_Refman = NULL;
+  String aux_String_761_Var = {0};
+  String* aux_String_761 = NULL;
+  Ref_Manager* aux_String_761_Refman = NULL;
+  String aux_String_762_Var = {0};
+  String* aux_String_762 = NULL;
+  Ref_Manager* aux_String_762_Refman = NULL;
+  String aux_String_763_Var = {0};
+  String* aux_String_763 = NULL;
+  Ref_Manager* aux_String_763_Refman = NULL;
+  String aux_String_764_Var = {0};
+  String* aux_String_764 = NULL;
+  Ref_Manager* aux_String_764_Refman = NULL;
+  String aux_String_765_Var = {0};
+  String* aux_String_765 = NULL;
+  Ref_Manager* aux_String_765_Refman = NULL;
+  String aux_String_766_Var = {0};
+  String* aux_String_766 = NULL;
+  Ref_Manager* aux_String_766_Refman = NULL;
+  String aux_String_767_Var = {0};
+  String* aux_String_767 = NULL;
+  Ref_Manager* aux_String_767_Refman = NULL;
+  String aux_String_768_Var = {0};
+  String* aux_String_768 = NULL;
+  Ref_Manager* aux_String_768_Refman = NULL;
+  String aux_String_769_Var = {0};
+  String* aux_String_769 = NULL;
+  Ref_Manager* aux_String_769_Refman = NULL;
+  String aux_String_770_Var = {0};
+  String* aux_String_770 = NULL;
+  Ref_Manager* aux_String_770_Refman = NULL;
+  String aux_String_771_Var = {0};
+  String* aux_String_771 = NULL;
+  Ref_Manager* aux_String_771_Refman = NULL;
+  String aux_String_772_Var = {0};
+  String* aux_String_772 = NULL;
+  Ref_Manager* aux_String_772_Refman = NULL;
+  String aux_String_773_Var = {0};
+  String* aux_String_773 = NULL;
+  Ref_Manager* aux_String_773_Refman = NULL;
+  String aux_String_774_Var = {0};
+  String* aux_String_774 = NULL;
+  Ref_Manager* aux_String_774_Refman = NULL;
+  String aux_String_775_Var = {0};
+  String* aux_String_775 = NULL;
+  Ref_Manager* aux_String_775_Refman = NULL;
+  String aux_String_776_Var = {0};
+  String* aux_String_776 = NULL;
+  Ref_Manager* aux_String_776_Refman = NULL;
+  String aux_String_777_Var = {0};
+  String* aux_String_777 = NULL;
+  Ref_Manager* aux_String_777_Refman = NULL;
+  String aux_String_778_Var = {0};
+  String* aux_String_778 = NULL;
+  Ref_Manager* aux_String_778_Refman = NULL;
+  String aux_String_779_Var = {0};
+  String* aux_String_779 = NULL;
+  Ref_Manager* aux_String_779_Refman = NULL;
+  String aux_String_780_Var = {0};
+  String* aux_String_780 = NULL;
+  Ref_Manager* aux_String_780_Refman = NULL;
+  String aux_String_781_Var = {0};
+  String* aux_String_781 = NULL;
+  Ref_Manager* aux_String_781_Refman = NULL;
+  String aux_String_782_Var = {0};
+  String* aux_String_782 = NULL;
+  Ref_Manager* aux_String_782_Refman = NULL;
+  String aux_String_783_Var = {0};
+  String* aux_String_783 = NULL;
+  Ref_Manager* aux_String_783_Refman = NULL;
+  String aux_String_784_Var = {0};
+  String* aux_String_784 = NULL;
+  Ref_Manager* aux_String_784_Refman = NULL;
+  String aux_String_785_Var = {0};
+  String* aux_String_785 = NULL;
+  Ref_Manager* aux_String_785_Refman = NULL;
+  String aux_String_786_Var = {0};
+  String* aux_String_786 = NULL;
+  Ref_Manager* aux_String_786_Refman = NULL;
+  String aux_String_787_Var = {0};
+  String* aux_String_787 = NULL;
+  Ref_Manager* aux_String_787_Refman = NULL;
+  String aux_String_788_Var = {0};
+  String* aux_String_788 = NULL;
+  Ref_Manager* aux_String_788_Refman = NULL;
+  String aux_String_789_Var = {0};
+  String* aux_String_789 = NULL;
+  Ref_Manager* aux_String_789_Refman = NULL;
+  String aux_String_790_Var = {0};
+  String* aux_String_790 = NULL;
+  Ref_Manager* aux_String_790_Refman = NULL;
+  String aux_String_791_Var = {0};
+  String* aux_String_791 = NULL;
+  Ref_Manager* aux_String_791_Refman = NULL;
+  String aux_String_792_Var = {0};
+  String* aux_String_792 = NULL;
+  Ref_Manager* aux_String_792_Refman = NULL;
+  String aux_String_793_Var = {0};
+  String* aux_String_793 = NULL;
+  Ref_Manager* aux_String_793_Refman = NULL;
+  String aux_String_794_Var = {0};
+  String* aux_String_794 = NULL;
+  Ref_Manager* aux_String_794_Refman = NULL;
+  String aux_String_795_Var = {0};
+  String* aux_String_795 = NULL;
+  Ref_Manager* aux_String_795_Refman = NULL;
+  String aux_String_796_Var = {0};
+  String* aux_String_796 = NULL;
+  Ref_Manager* aux_String_796_Refman = NULL;
+  String aux_String_797_Var = {0};
+  String* aux_String_797 = NULL;
+  Ref_Manager* aux_String_797_Refman = NULL;
+  String aux_String_798_Var = {0};
+  String* aux_String_798 = NULL;
+  Ref_Manager* aux_String_798_Refman = NULL;
+  String aux_String_799_Var = {0};
+  String* aux_String_799 = NULL;
+  Ref_Manager* aux_String_799_Refman = NULL;
+  String aux_String_800_Var = {0};
+  String* aux_String_800 = NULL;
+  Ref_Manager* aux_String_800_Refman = NULL;
+  String aux_String_801_Var = {0};
+  String* aux_String_801 = NULL;
+  Ref_Manager* aux_String_801_Refman = NULL;
+  String aux_String_802_Var = {0};
+  String* aux_String_802 = NULL;
+  Ref_Manager* aux_String_802_Refman = NULL;
+  String aux_String_803_Var = {0};
+  String* aux_String_803 = NULL;
+  Ref_Manager* aux_String_803_Refman = NULL;
+  String aux_String_804_Var = {0};
+  String* aux_String_804 = NULL;
+  Ref_Manager* aux_String_804_Refman = NULL;
+  String aux_String_805_Var = {0};
+  String* aux_String_805 = NULL;
+  Ref_Manager* aux_String_805_Refman = NULL;
+  String aux_String_806_Var = {0};
+  String* aux_String_806 = NULL;
+  Ref_Manager* aux_String_806_Refman = NULL;
+  String aux_String_807_Var = {0};
+  String* aux_String_807 = NULL;
+  Ref_Manager* aux_String_807_Refman = NULL;
+  String aux_String_808_Var = {0};
+  String* aux_String_808 = NULL;
+  Ref_Manager* aux_String_808_Refman = NULL;
+  String aux_String_809_Var = {0};
+  String* aux_String_809 = NULL;
+  Ref_Manager* aux_String_809_Refman = NULL;
+  String aux_String_810_Var = {0};
+  String* aux_String_810 = NULL;
+  Ref_Manager* aux_String_810_Refman = NULL;
+  String aux_String_811_Var = {0};
+  String* aux_String_811 = NULL;
+  Ref_Manager* aux_String_811_Refman = NULL;
+  String aux_String_812_Var = {0};
+  String* aux_String_812 = NULL;
+  Ref_Manager* aux_String_812_Refman = NULL;
+  String aux_String_813_Var = {0};
+  String* aux_String_813 = NULL;
+  Ref_Manager* aux_String_813_Refman = NULL;
+  String aux_String_814_Var = {0};
+  String* aux_String_814 = NULL;
+  Ref_Manager* aux_String_814_Refman = NULL;
+  String aux_String_815_Var = {0};
+  String* aux_String_815 = NULL;
+  Ref_Manager* aux_String_815_Refman = NULL;
+  String aux_String_816_Var = {0};
+  String* aux_String_816 = NULL;
+  Ref_Manager* aux_String_816_Refman = NULL;
+  String aux_String_817_Var = {0};
+  String* aux_String_817 = NULL;
+  Ref_Manager* aux_String_817_Refman = NULL;
+  String aux_String_818_Var = {0};
+  String* aux_String_818 = NULL;
+  Ref_Manager* aux_String_818_Refman = NULL;
+  String aux_String_819_Var = {0};
+  String* aux_String_819 = NULL;
+  Ref_Manager* aux_String_819_Refman = NULL;
+  String aux_String_820_Var = {0};
+  String* aux_String_820 = NULL;
+  Ref_Manager* aux_String_820_Refman = NULL;
+  String aux_String_821_Var = {0};
+  String* aux_String_821 = NULL;
+  Ref_Manager* aux_String_821_Refman = NULL;
+  String aux_String_822_Var = {0};
+  String* aux_String_822 = NULL;
+  Ref_Manager* aux_String_822_Refman = NULL;
+  String aux_String_823_Var = {0};
+  String* aux_String_823 = NULL;
+  Ref_Manager* aux_String_823_Refman = NULL;
+  String aux_String_824_Var = {0};
+  String* aux_String_824 = NULL;
+  Ref_Manager* aux_String_824_Refman = NULL;
+  String aux_String_825_Var = {0};
+  String* aux_String_825 = NULL;
+  Ref_Manager* aux_String_825_Refman = NULL;
+  String aux_String_826_Var = {0};
+  String* aux_String_826 = NULL;
+  Ref_Manager* aux_String_826_Refman = NULL;
+  String aux_String_827_Var = {0};
+  String* aux_String_827 = NULL;
+  Ref_Manager* aux_String_827_Refman = NULL;
+  String aux_String_828_Var = {0};
+  String* aux_String_828 = NULL;
+  Ref_Manager* aux_String_828_Refman = NULL;
+  String aux_String_829_Var = {0};
+  String* aux_String_829 = NULL;
+  Ref_Manager* aux_String_829_Refman = NULL;
+  String aux_String_830_Var = {0};
+  String* aux_String_830 = NULL;
+  Ref_Manager* aux_String_830_Refman = NULL;
+  String aux_String_831_Var = {0};
+  String* aux_String_831 = NULL;
+  Ref_Manager* aux_String_831_Refman = NULL;
+  String aux_String_832_Var = {0};
+  String* aux_String_832 = NULL;
+  Ref_Manager* aux_String_832_Refman = NULL;
+  String aux_String_833_Var = {0};
+  String* aux_String_833 = NULL;
+  Ref_Manager* aux_String_833_Refman = NULL;
+  String aux_String_834_Var = {0};
+  String* aux_String_834 = NULL;
+  Ref_Manager* aux_String_834_Refman = NULL;
+  String aux_String_835_Var = {0};
+  String* aux_String_835 = NULL;
+  Ref_Manager* aux_String_835_Refman = NULL;
+  String aux_String_836_Var = {0};
+  String* aux_String_836 = NULL;
+  Ref_Manager* aux_String_836_Refman = NULL;
+  String aux_String_837_Var = {0};
+  String* aux_String_837 = NULL;
+  Ref_Manager* aux_String_837_Refman = NULL;
+  String aux_String_838_Var = {0};
+  String* aux_String_838 = NULL;
+  Ref_Manager* aux_String_838_Refman = NULL;
+  String aux_String_839_Var = {0};
+  String* aux_String_839 = NULL;
+  Ref_Manager* aux_String_839_Refman = NULL;
+  String aux_String_840_Var = {0};
+  String* aux_String_840 = NULL;
+  Ref_Manager* aux_String_840_Refman = NULL;
+  String aux_String_841_Var = {0};
+  String* aux_String_841 = NULL;
+  Ref_Manager* aux_String_841_Refman = NULL;
+  String aux_String_842_Var = {0};
+  String* aux_String_842 = NULL;
+  Ref_Manager* aux_String_842_Refman = NULL;
+  String aux_String_843_Var = {0};
+  String* aux_String_843 = NULL;
+  Ref_Manager* aux_String_843_Refman = NULL;
+  String aux_String_844_Var = {0};
+  String* aux_String_844 = NULL;
+  Ref_Manager* aux_String_844_Refman = NULL;
+  String aux_String_845_Var = {0};
+  String* aux_String_845 = NULL;
+  Ref_Manager* aux_String_845_Refman = NULL;
+  String aux_String_846_Var = {0};
+  String* aux_String_846 = NULL;
+  Ref_Manager* aux_String_846_Refman = NULL;
+  String aux_String_847_Var = {0};
+  String* aux_String_847 = NULL;
+  Ref_Manager* aux_String_847_Refman = NULL;
+  String aux_String_848_Var = {0};
+  String* aux_String_848 = NULL;
+  Ref_Manager* aux_String_848_Refman = NULL;
+  String aux_String_849_Var = {0};
+  String* aux_String_849 = NULL;
+  Ref_Manager* aux_String_849_Refman = NULL;
+  String aux_String_850_Var = {0};
+  String* aux_String_850 = NULL;
+  Ref_Manager* aux_String_850_Refman = NULL;
+  String aux_String_851_Var = {0};
+  String* aux_String_851 = NULL;
+  Ref_Manager* aux_String_851_Refman = NULL;
+  String aux_String_852_Var = {0};
+  String* aux_String_852 = NULL;
+  Ref_Manager* aux_String_852_Refman = NULL;
+  String aux_String_853_Var = {0};
+  String* aux_String_853 = NULL;
+  Ref_Manager* aux_String_853_Refman = NULL;
+  String aux_String_854_Var = {0};
+  String* aux_String_854 = NULL;
+  Ref_Manager* aux_String_854_Refman = NULL;
+  String aux_String_855_Var = {0};
+  String* aux_String_855 = NULL;
+  Ref_Manager* aux_String_855_Refman = NULL;
+  String aux_String_856_Var = {0};
+  String* aux_String_856 = NULL;
+  Ref_Manager* aux_String_856_Refman = NULL;
+  String aux_String_857_Var = {0};
+  String* aux_String_857 = NULL;
+  Ref_Manager* aux_String_857_Refman = NULL;
+  String aux_String_858_Var = {0};
+  String* aux_String_858 = NULL;
+  Ref_Manager* aux_String_858_Refman = NULL;
+  String aux_String_859_Var = {0};
+  String* aux_String_859 = NULL;
+  Ref_Manager* aux_String_859_Refman = NULL;
+  String aux_String_860_Var = {0};
+  String* aux_String_860 = NULL;
+  Ref_Manager* aux_String_860_Refman = NULL;
+  String aux_String_861_Var = {0};
+  String* aux_String_861 = NULL;
+  Ref_Manager* aux_String_861_Refman = NULL;
+  String aux_String_862_Var = {0};
+  String* aux_String_862 = NULL;
+  Ref_Manager* aux_String_862_Refman = NULL;
+  String aux_String_863_Var = {0};
+  String* aux_String_863 = NULL;
+  Ref_Manager* aux_String_863_Refman = NULL;
+  String aux_String_864_Var = {0};
+  String* aux_String_864 = NULL;
+  Ref_Manager* aux_String_864_Refman = NULL;
+  String aux_String_865_Var = {0};
+  String* aux_String_865 = NULL;
+  Ref_Manager* aux_String_865_Refman = NULL;
+  String aux_String_866_Var = {0};
+  String* aux_String_866 = NULL;
+  Ref_Manager* aux_String_866_Refman = NULL;
+  String aux_String_867_Var = {0};
+  String* aux_String_867 = NULL;
+  Ref_Manager* aux_String_867_Refman = NULL;
+  String aux_String_868_Var = {0};
+  String* aux_String_868 = NULL;
+  Ref_Manager* aux_String_868_Refman = NULL;
+  String aux_String_869_Var = {0};
+  String* aux_String_869 = NULL;
+  Ref_Manager* aux_String_869_Refman = NULL;
+  String aux_String_870_Var = {0};
+  String* aux_String_870 = NULL;
+  Ref_Manager* aux_String_870_Refman = NULL;
+  String aux_String_871_Var = {0};
+  String* aux_String_871 = NULL;
+  Ref_Manager* aux_String_871_Refman = NULL;
+  String aux_String_872_Var = {0};
+  String* aux_String_872 = NULL;
+  Ref_Manager* aux_String_872_Refman = NULL;
+  String aux_String_873_Var = {0};
+  String* aux_String_873 = NULL;
+  Ref_Manager* aux_String_873_Refman = NULL;
+  String aux_String_874_Var = {0};
+  String* aux_String_874 = NULL;
+  Ref_Manager* aux_String_874_Refman = NULL;
+  String aux_String_875_Var = {0};
+  String* aux_String_875 = NULL;
+  Ref_Manager* aux_String_875_Refman = NULL;
+  String aux_String_876_Var = {0};
+  String* aux_String_876 = NULL;
+  Ref_Manager* aux_String_876_Refman = NULL;
+  String aux_String_877_Var = {0};
+  String* aux_String_877 = NULL;
+  Ref_Manager* aux_String_877_Refman = NULL;
+  String aux_String_878_Var = {0};
+  String* aux_String_878 = NULL;
+  Ref_Manager* aux_String_878_Refman = NULL;
+  String aux_String_879_Var = {0};
+  String* aux_String_879 = NULL;
+  Ref_Manager* aux_String_879_Refman = NULL;
+  String aux_String_880_Var = {0};
+  String* aux_String_880 = NULL;
+  Ref_Manager* aux_String_880_Refman = NULL;
+  String aux_String_881_Var = {0};
+  String* aux_String_881 = NULL;
+  Ref_Manager* aux_String_881_Refman = NULL;
+  String aux_String_882_Var = {0};
+  String* aux_String_882 = NULL;
+  Ref_Manager* aux_String_882_Refman = NULL;
+  String aux_String_883_Var = {0};
+  String* aux_String_883 = NULL;
+  Ref_Manager* aux_String_883_Refman = NULL;
+  String aux_String_884_Var = {0};
+  String* aux_String_884 = NULL;
+  Ref_Manager* aux_String_884_Refman = NULL;
+  String aux_String_885_Var = {0};
+  String* aux_String_885 = NULL;
+  Ref_Manager* aux_String_885_Refman = NULL;
+  String aux_String_886_Var = {0};
+  String* aux_String_886 = NULL;
+  Ref_Manager* aux_String_886_Refman = NULL;
+  String aux_String_887_Var = {0};
+  String* aux_String_887 = NULL;
+  Ref_Manager* aux_String_887_Refman = NULL;
+  String aux_String_888_Var = {0};
+  String* aux_String_888 = NULL;
+  Ref_Manager* aux_String_888_Refman = NULL;
+  String aux_String_889_Var = {0};
+  String* aux_String_889 = NULL;
+  Ref_Manager* aux_String_889_Refman = NULL;
+  String aux_String_890_Var = {0};
+  String* aux_String_890 = NULL;
+  Ref_Manager* aux_String_890_Refman = NULL;
+  String aux_String_891_Var = {0};
+  String* aux_String_891 = NULL;
+  Ref_Manager* aux_String_891_Refman = NULL;
+  String aux_String_892_Var = {0};
+  String* aux_String_892 = NULL;
+  Ref_Manager* aux_String_892_Refman = NULL;
+  String aux_String_893_Var = {0};
+  String* aux_String_893 = NULL;
+  Ref_Manager* aux_String_893_Refman = NULL;
+  String aux_String_894_Var = {0};
+  String* aux_String_894 = NULL;
+  Ref_Manager* aux_String_894_Refman = NULL;
+  String aux_String_895_Var = {0};
+  String* aux_String_895 = NULL;
+  Ref_Manager* aux_String_895_Refman = NULL;
+  String aux_String_896_Var = {0};
+  String* aux_String_896 = NULL;
+  Ref_Manager* aux_String_896_Refman = NULL;
+  String aux_String_897_Var = {0};
+  String* aux_String_897 = NULL;
+  Ref_Manager* aux_String_897_Refman = NULL;
+  String aux_String_898_Var = {0};
+  String* aux_String_898 = NULL;
+  Ref_Manager* aux_String_898_Refman = NULL;
+  String aux_String_899_Var = {0};
+  String* aux_String_899 = NULL;
+  Ref_Manager* aux_String_899_Refman = NULL;
+  String aux_String_900_Var = {0};
+  String* aux_String_900 = NULL;
+  Ref_Manager* aux_String_900_Refman = NULL;
+  String aux_String_901_Var = {0};
+  String* aux_String_901 = NULL;
+  Ref_Manager* aux_String_901_Refman = NULL;
+  String aux_String_902_Var = {0};
+  String* aux_String_902 = NULL;
+  Ref_Manager* aux_String_902_Refman = NULL;
+  String aux_String_903_Var = {0};
+  String* aux_String_903 = NULL;
+  Ref_Manager* aux_String_903_Refman = NULL;
+  String aux_String_904_Var = {0};
+  String* aux_String_904 = NULL;
+  Ref_Manager* aux_String_904_Refman = NULL;
+  String aux_String_905_Var = {0};
+  String* aux_String_905 = NULL;
+  Ref_Manager* aux_String_905_Refman = NULL;
+  String aux_String_906_Var = {0};
+  String* aux_String_906 = NULL;
+  Ref_Manager* aux_String_906_Refman = NULL;
+  String aux_String_907_Var = {0};
+  String* aux_String_907 = NULL;
+  Ref_Manager* aux_String_907_Refman = NULL;
+  String aux_String_908_Var = {0};
+  String* aux_String_908 = NULL;
+  Ref_Manager* aux_String_908_Refman = NULL;
+  String aux_String_909_Var = {0};
+  String* aux_String_909 = NULL;
+  Ref_Manager* aux_String_909_Refman = NULL;
+  String aux_String_910_Var = {0};
+  String* aux_String_910 = NULL;
+  Ref_Manager* aux_String_910_Refman = NULL;
+  String aux_String_911_Var = {0};
+  String* aux_String_911 = NULL;
+  Ref_Manager* aux_String_911_Refman = NULL;
+  String aux_String_912_Var = {0};
+  String* aux_String_912 = NULL;
+  Ref_Manager* aux_String_912_Refman = NULL;
+  String aux_String_913_Var = {0};
+  String* aux_String_913 = NULL;
+  Ref_Manager* aux_String_913_Refman = NULL;
+  String aux_String_914_Var = {0};
+  String* aux_String_914 = NULL;
+  Ref_Manager* aux_String_914_Refman = NULL;
+  String aux_String_915_Var = {0};
+  String* aux_String_915 = NULL;
+  Ref_Manager* aux_String_915_Refman = NULL;
+  String aux_String_916_Var = {0};
+  String* aux_String_916 = NULL;
+  Ref_Manager* aux_String_916_Refman = NULL;
+  String aux_String_917_Var = {0};
+  String* aux_String_917 = NULL;
+  Ref_Manager* aux_String_917_Refman = NULL;
+  String aux_String_918_Var = {0};
+  String* aux_String_918 = NULL;
+  Ref_Manager* aux_String_918_Refman = NULL;
+  String aux_String_919_Var = {0};
+  String* aux_String_919 = NULL;
+  Ref_Manager* aux_String_919_Refman = NULL;
+  String aux_String_920_Var = {0};
+  String* aux_String_920 = NULL;
+  Ref_Manager* aux_String_920_Refman = NULL;
+  String aux_String_921_Var = {0};
+  String* aux_String_921 = NULL;
+  Ref_Manager* aux_String_921_Refman = NULL;
+  String aux_String_922_Var = {0};
+  String* aux_String_922 = NULL;
+  Ref_Manager* aux_String_922_Refman = NULL;
+  String aux_String_923_Var = {0};
+  String* aux_String_923 = NULL;
+  Ref_Manager* aux_String_923_Refman = NULL;
+  String aux_String_924_Var = {0};
+  String* aux_String_924 = NULL;
+  Ref_Manager* aux_String_924_Refman = NULL;
+  String aux_String_925_Var = {0};
+  String* aux_String_925 = NULL;
+  Ref_Manager* aux_String_925_Refman = NULL;
+  String aux_String_926_Var = {0};
+  String* aux_String_926 = NULL;
+  Ref_Manager* aux_String_926_Refman = NULL;
+  String aux_String_927_Var = {0};
+  String* aux_String_927 = NULL;
+  Ref_Manager* aux_String_927_Refman = NULL;
+  String aux_String_928_Var = {0};
+  String* aux_String_928 = NULL;
+  Ref_Manager* aux_String_928_Refman = NULL;
+  String aux_String_929_Var = {0};
+  String* aux_String_929 = NULL;
+  Ref_Manager* aux_String_929_Refman = NULL;
+  String aux_String_930_Var = {0};
+  String* aux_String_930 = NULL;
+  Ref_Manager* aux_String_930_Refman = NULL;
+  String aux_String_931_Var = {0};
+  String* aux_String_931 = NULL;
+  Ref_Manager* aux_String_931_Refman = NULL;
+  String aux_String_932_Var = {0};
+  String* aux_String_932 = NULL;
+  Ref_Manager* aux_String_932_Refman = NULL;
+  String aux_String_933_Var = {0};
+  String* aux_String_933 = NULL;
+  Ref_Manager* aux_String_933_Refman = NULL;
+  String aux_String_934_Var = {0};
+  String* aux_String_934 = NULL;
+  Ref_Manager* aux_String_934_Refman = NULL;
+  String aux_String_935_Var = {0};
+  String* aux_String_935 = NULL;
+  Ref_Manager* aux_String_935_Refman = NULL;
+  String aux_String_936_Var = {0};
+  String* aux_String_936 = NULL;
+  Ref_Manager* aux_String_936_Refman = NULL;
+  String aux_String_937_Var = {0};
+  String* aux_String_937 = NULL;
+  Ref_Manager* aux_String_937_Refman = NULL;
+  String aux_String_938_Var = {0};
+  String* aux_String_938 = NULL;
+  Ref_Manager* aux_String_938_Refman = NULL;
+  String aux_String_939_Var = {0};
+  String* aux_String_939 = NULL;
+  Ref_Manager* aux_String_939_Refman = NULL;
+  String aux_String_940_Var = {0};
+  String* aux_String_940 = NULL;
+  Ref_Manager* aux_String_940_Refman = NULL;
+  String aux_String_941_Var = {0};
+  String* aux_String_941 = NULL;
+  Ref_Manager* aux_String_941_Refman = NULL;
+  String aux_String_942_Var = {0};
+  String* aux_String_942 = NULL;
+  Ref_Manager* aux_String_942_Refman = NULL;
+  String aux_String_943_Var = {0};
+  String* aux_String_943 = NULL;
+  Ref_Manager* aux_String_943_Refman = NULL;
+  String aux_String_944_Var = {0};
+  String* aux_String_944 = NULL;
+  Ref_Manager* aux_String_944_Refman = NULL;
+  String aux_String_945_Var = {0};
+  String* aux_String_945 = NULL;
+  Ref_Manager* aux_String_945_Refman = NULL;
+  String aux_String_946_Var = {0};
+  String* aux_String_946 = NULL;
+  Ref_Manager* aux_String_946_Refman = NULL;
+  String aux_String_947_Var = {0};
+  String* aux_String_947 = NULL;
+  Ref_Manager* aux_String_947_Refman = NULL;
+  String aux_String_948_Var = {0};
+  String* aux_String_948 = NULL;
+  Ref_Manager* aux_String_948_Refman = NULL;
+  String aux_String_949_Var = {0};
+  String* aux_String_949 = NULL;
+  Ref_Manager* aux_String_949_Refman = NULL;
+  String aux_String_950_Var = {0};
+  String* aux_String_950 = NULL;
+  Ref_Manager* aux_String_950_Refman = NULL;
+  String aux_String_951_Var = {0};
+  String* aux_String_951 = NULL;
+  Ref_Manager* aux_String_951_Refman = NULL;
+  String aux_String_952_Var = {0};
+  String* aux_String_952 = NULL;
+  Ref_Manager* aux_String_952_Refman = NULL;
+  String aux_String_953_Var = {0};
+  String* aux_String_953 = NULL;
+  Ref_Manager* aux_String_953_Refman = NULL;
+  String aux_String_954_Var = {0};
+  String* aux_String_954 = NULL;
+  Ref_Manager* aux_String_954_Refman = NULL;
+  String aux_String_955_Var = {0};
+  String* aux_String_955 = NULL;
+  Ref_Manager* aux_String_955_Refman = NULL;
+  String aux_String_956_Var = {0};
+  String* aux_String_956 = NULL;
+  Ref_Manager* aux_String_956_Refman = NULL;
+  String aux_String_957_Var = {0};
+  String* aux_String_957 = NULL;
+  Ref_Manager* aux_String_957_Refman = NULL;
+  String aux_String_958_Var = {0};
+  String* aux_String_958 = NULL;
+  Ref_Manager* aux_String_958_Refman = NULL;
+  String aux_String_959_Var = {0};
+  String* aux_String_959 = NULL;
+  Ref_Manager* aux_String_959_Refman = NULL;
+  String aux_String_960_Var = {0};
+  String* aux_String_960 = NULL;
+  Ref_Manager* aux_String_960_Refman = NULL;
+  String aux_String_961_Var = {0};
+  String* aux_String_961 = NULL;
+  Ref_Manager* aux_String_961_Refman = NULL;
+  String aux_String_962_Var = {0};
+  String* aux_String_962 = NULL;
+  Ref_Manager* aux_String_962_Refman = NULL;
+  String aux_String_963_Var = {0};
+  String* aux_String_963 = NULL;
+  Ref_Manager* aux_String_963_Refman = NULL;
+  String aux_String_964_Var = {0};
+  String* aux_String_964 = NULL;
+  Ref_Manager* aux_String_964_Refman = NULL;
+  String aux_String_965_Var = {0};
+  String* aux_String_965 = NULL;
+  Ref_Manager* aux_String_965_Refman = NULL;
+  String aux_String_966_Var = {0};
+  String* aux_String_966 = NULL;
+  Ref_Manager* aux_String_966_Refman = NULL;
+  String aux_String_967_Var = {0};
+  String* aux_String_967 = NULL;
+  Ref_Manager* aux_String_967_Refman = NULL;
+  String aux_String_968_Var = {0};
+  String* aux_String_968 = NULL;
+  Ref_Manager* aux_String_968_Refman = NULL;
+  String aux_String_969_Var = {0};
+  String* aux_String_969 = NULL;
+  Ref_Manager* aux_String_969_Refman = NULL;
+  String aux_String_970_Var = {0};
+  String* aux_String_970 = NULL;
+  Ref_Manager* aux_String_970_Refman = NULL;
+  String aux_String_971_Var = {0};
+  String* aux_String_971 = NULL;
+  Ref_Manager* aux_String_971_Refman = NULL;
+  String aux_String_972_Var = {0};
+  String* aux_String_972 = NULL;
+  Ref_Manager* aux_String_972_Refman = NULL;
+  String aux_String_973_Var = {0};
+  String* aux_String_973 = NULL;
+  Ref_Manager* aux_String_973_Refman = NULL;
+  String aux_String_974_Var = {0};
+  String* aux_String_974 = NULL;
+  Ref_Manager* aux_String_974_Refman = NULL;
+  String aux_String_975_Var = {0};
+  String* aux_String_975 = NULL;
+  Ref_Manager* aux_String_975_Refman = NULL;
+  String aux_String_976_Var = {0};
+  String* aux_String_976 = NULL;
+  Ref_Manager* aux_String_976_Refman = NULL;
+  String aux_String_977_Var = {0};
+  String* aux_String_977 = NULL;
+  Ref_Manager* aux_String_977_Refman = NULL;
+  String aux_String_978_Var = {0};
+  String* aux_String_978 = NULL;
+  Ref_Manager* aux_String_978_Refman = NULL;
+  String aux_String_979_Var = {0};
+  String* aux_String_979 = NULL;
+  Ref_Manager* aux_String_979_Refman = NULL;
+  String aux_String_980_Var = {0};
+  String* aux_String_980 = NULL;
+  Ref_Manager* aux_String_980_Refman = NULL;
+  String aux_String_981_Var = {0};
+  String* aux_String_981 = NULL;
+  Ref_Manager* aux_String_981_Refman = NULL;
+  String aux_String_982_Var = {0};
+  String* aux_String_982 = NULL;
+  Ref_Manager* aux_String_982_Refman = NULL;
+  String aux_String_983_Var = {0};
+  String* aux_String_983 = NULL;
+  Ref_Manager* aux_String_983_Refman = NULL;
+  String aux_String_984_Var = {0};
+  String* aux_String_984 = NULL;
+  Ref_Manager* aux_String_984_Refman = NULL;
+  String aux_String_985_Var = {0};
+  String* aux_String_985 = NULL;
+  Ref_Manager* aux_String_985_Refman = NULL;
+  String aux_String_986_Var = {0};
+  String* aux_String_986 = NULL;
+  Ref_Manager* aux_String_986_Refman = NULL;
+  String aux_String_987_Var = {0};
+  String* aux_String_987 = NULL;
+  Ref_Manager* aux_String_987_Refman = NULL;
+  String aux_String_988_Var = {0};
+  String* aux_String_988 = NULL;
+  Ref_Manager* aux_String_988_Refman = NULL;
+  String aux_String_989_Var = {0};
+  String* aux_String_989 = NULL;
+  Ref_Manager* aux_String_989_Refman = NULL;
+  String aux_String_990_Var = {0};
+  String* aux_String_990 = NULL;
+  Ref_Manager* aux_String_990_Refman = NULL;
+  String aux_String_991_Var = {0};
+  String* aux_String_991 = NULL;
+  Ref_Manager* aux_String_991_Refman = NULL;
+  String aux_String_992_Var = {0};
+  String* aux_String_992 = NULL;
+  Ref_Manager* aux_String_992_Refman = NULL;
+  String aux_String_993_Var = {0};
+  String* aux_String_993 = NULL;
+  Ref_Manager* aux_String_993_Refman = NULL;
+  String aux_String_994_Var = {0};
+  String* aux_String_994 = NULL;
+  Ref_Manager* aux_String_994_Refman = NULL;
+  String aux_String_995_Var = {0};
+  String* aux_String_995 = NULL;
+  Ref_Manager* aux_String_995_Refman = NULL;
+  String aux_String_996_Var = {0};
+  String* aux_String_996 = NULL;
+  Ref_Manager* aux_String_996_Refman = NULL;
+  String aux_String_997_Var = {0};
+  String* aux_String_997 = NULL;
+  Ref_Manager* aux_String_997_Refman = NULL;
+  String aux_String_998_Var = {0};
+  String* aux_String_998 = NULL;
+  Ref_Manager* aux_String_998_Refman = NULL;
+  String aux_String_999_Var = {0};
+  String* aux_String_999 = NULL;
+  Ref_Manager* aux_String_999_Refman = NULL;
+  String aux_String_1000_Var = {0};
+  String* aux_String_1000 = NULL;
+  Ref_Manager* aux_String_1000_Refman = NULL;
+  String aux_String_1001_Var = {0};
+  String* aux_String_1001 = NULL;
+  Ref_Manager* aux_String_1001_Refman = NULL;
+  String aux_String_1002_Var = {0};
+  String* aux_String_1002 = NULL;
+  Ref_Manager* aux_String_1002_Refman = NULL;
+  String aux_String_1003_Var = {0};
+  String* aux_String_1003 = NULL;
+  Ref_Manager* aux_String_1003_Refman = NULL;
+  String aux_String_1004_Var = {0};
+  String* aux_String_1004 = NULL;
+  Ref_Manager* aux_String_1004_Refman = NULL;
+  String aux_String_1005_Var = {0};
+  String* aux_String_1005 = NULL;
+  Ref_Manager* aux_String_1005_Refman = NULL;
+  String aux_String_1006_Var = {0};
+  String* aux_String_1006 = NULL;
+  Ref_Manager* aux_String_1006_Refman = NULL;
+  String aux_String_1007_Var = {0};
+  String* aux_String_1007 = NULL;
+  Ref_Manager* aux_String_1007_Refman = NULL;
+  String aux_String_1008_Var = {0};
+  String* aux_String_1008 = NULL;
+  Ref_Manager* aux_String_1008_Refman = NULL;
+  String aux_String_1009_Var = {0};
+  String* aux_String_1009 = NULL;
+  Ref_Manager* aux_String_1009_Refman = NULL;
+  String aux_String_1010_Var = {0};
+  String* aux_String_1010 = NULL;
+  Ref_Manager* aux_String_1010_Refman = NULL;
+  String aux_String_1011_Var = {0};
+  String* aux_String_1011 = NULL;
+  Ref_Manager* aux_String_1011_Refman = NULL;
+  String aux_String_1012_Var = {0};
+  String* aux_String_1012 = NULL;
+  Ref_Manager* aux_String_1012_Refman = NULL;
+  String aux_String_1013_Var = {0};
+  String* aux_String_1013 = NULL;
+  Ref_Manager* aux_String_1013_Refman = NULL;
+  String aux_String_1014_Var = {0};
+  String* aux_String_1014 = NULL;
+  Ref_Manager* aux_String_1014_Refman = NULL;
+  String aux_String_1015_Var = {0};
+  String* aux_String_1015 = NULL;
+  Ref_Manager* aux_String_1015_Refman = NULL;
+  String aux_String_1016_Var = {0};
+  String* aux_String_1016 = NULL;
+  Ref_Manager* aux_String_1016_Refman = NULL;
+  String aux_String_1017_Var = {0};
+  String* aux_String_1017 = NULL;
+  Ref_Manager* aux_String_1017_Refman = NULL;
+  String aux_String_1018_Var = {0};
+  String* aux_String_1018 = NULL;
+  Ref_Manager* aux_String_1018_Refman = NULL;
+  String aux_String_1019_Var = {0};
+  String* aux_String_1019 = NULL;
+  Ref_Manager* aux_String_1019_Refman = NULL;
+  String aux_String_1020_Var = {0};
+  String* aux_String_1020 = NULL;
+  Ref_Manager* aux_String_1020_Refman = NULL;
+  String aux_String_1021_Var = {0};
+  String* aux_String_1021 = NULL;
+  Ref_Manager* aux_String_1021_Refman = NULL;
+  String aux_String_1022_Var = {0};
+  String* aux_String_1022 = NULL;
+  Ref_Manager* aux_String_1022_Refman = NULL;
+  String aux_String_1023_Var = {0};
+  String* aux_String_1023 = NULL;
+  Ref_Manager* aux_String_1023_Refman = NULL;
+  String aux_String_1024_Var = {0};
+  String* aux_String_1024 = NULL;
+  Ref_Manager* aux_String_1024_Refman = NULL;
+  String aux_String_1025_Var = {0};
+  String* aux_String_1025 = NULL;
+  Ref_Manager* aux_String_1025_Refman = NULL;
+  String aux_String_1026_Var = {0};
+  String* aux_String_1026 = NULL;
+  Ref_Manager* aux_String_1026_Refman = NULL;
+  String aux_String_1027_Var = {0};
+  String* aux_String_1027 = NULL;
+  Ref_Manager* aux_String_1027_Refman = NULL;
+  String aux_String_1028_Var = {0};
+  String* aux_String_1028 = NULL;
+  Ref_Manager* aux_String_1028_Refman = NULL;
+  String aux_String_1029_Var = {0};
+  String* aux_String_1029 = NULL;
+  Ref_Manager* aux_String_1029_Refman = NULL;
+  String aux_String_1030_Var = {0};
+  String* aux_String_1030 = NULL;
+  Ref_Manager* aux_String_1030_Refman = NULL;
+  String aux_String_1031_Var = {0};
+  String* aux_String_1031 = NULL;
+  Ref_Manager* aux_String_1031_Refman = NULL;
+  String aux_String_1032_Var = {0};
+  String* aux_String_1032 = NULL;
+  Ref_Manager* aux_String_1032_Refman = NULL;
+  String aux_String_1033_Var = {0};
+  String* aux_String_1033 = NULL;
+  Ref_Manager* aux_String_1033_Refman = NULL;
+  String aux_String_1034_Var = {0};
+  String* aux_String_1034 = NULL;
+  Ref_Manager* aux_String_1034_Refman = NULL;
+  String aux_String_1035_Var = {0};
+  String* aux_String_1035 = NULL;
+  Ref_Manager* aux_String_1035_Refman = NULL;
+  String aux_String_1036_Var = {0};
+  String* aux_String_1036 = NULL;
+  Ref_Manager* aux_String_1036_Refman = NULL;
+  String aux_String_1037_Var = {0};
+  String* aux_String_1037 = NULL;
+  Ref_Manager* aux_String_1037_Refman = NULL;
+  String aux_String_1038_Var = {0};
+  String* aux_String_1038 = NULL;
+  Ref_Manager* aux_String_1038_Refman = NULL;
+  String aux_String_1039_Var = {0};
+  String* aux_String_1039 = NULL;
+  Ref_Manager* aux_String_1039_Refman = NULL;
+  String aux_String_1040_Var = {0};
+  String* aux_String_1040 = NULL;
+  Ref_Manager* aux_String_1040_Refman = NULL;
+  String aux_String_1041_Var = {0};
+  String* aux_String_1041 = NULL;
+  Ref_Manager* aux_String_1041_Refman = NULL;
+  String aux_String_1042_Var = {0};
+  String* aux_String_1042 = NULL;
+  Ref_Manager* aux_String_1042_Refman = NULL;
+  String aux_String_1043_Var = {0};
+  String* aux_String_1043 = NULL;
+  Ref_Manager* aux_String_1043_Refman = NULL;
+  String aux_String_1044_Var = {0};
+  String* aux_String_1044 = NULL;
+  Ref_Manager* aux_String_1044_Refman = NULL;
+  String aux_String_1045_Var = {0};
+  String* aux_String_1045 = NULL;
+  Ref_Manager* aux_String_1045_Refman = NULL;
+  String aux_String_1046_Var = {0};
+  String* aux_String_1046 = NULL;
+  Ref_Manager* aux_String_1046_Refman = NULL;
+  String aux_String_1047_Var = {0};
+  String* aux_String_1047 = NULL;
+  Ref_Manager* aux_String_1047_Refman = NULL;
+  String aux_String_1048_Var = {0};
+  String* aux_String_1048 = NULL;
+  Ref_Manager* aux_String_1048_Refman = NULL;
+  String aux_String_1049_Var = {0};
+  String* aux_String_1049 = NULL;
+  Ref_Manager* aux_String_1049_Refman = NULL;
+  String aux_String_1050_Var = {0};
+  String* aux_String_1050 = NULL;
+  Ref_Manager* aux_String_1050_Refman = NULL;
+  String aux_String_1051_Var = {0};
+  String* aux_String_1051 = NULL;
+  Ref_Manager* aux_String_1051_Refman = NULL;
+  String aux_String_1052_Var = {0};
+  String* aux_String_1052 = NULL;
+  Ref_Manager* aux_String_1052_Refman = NULL;
+  String aux_String_1053_Var = {0};
+  String* aux_String_1053 = NULL;
+  Ref_Manager* aux_String_1053_Refman = NULL;
+  String aux_String_1054_Var = {0};
+  String* aux_String_1054 = NULL;
+  Ref_Manager* aux_String_1054_Refman = NULL;
+  String aux_String_1055_Var = {0};
+  String* aux_String_1055 = NULL;
+  Ref_Manager* aux_String_1055_Refman = NULL;
+  String aux_String_1056_Var = {0};
+  String* aux_String_1056 = NULL;
+  Ref_Manager* aux_String_1056_Refman = NULL;
+  String aux_String_1057_Var = {0};
+  String* aux_String_1057 = NULL;
+  Ref_Manager* aux_String_1057_Refman = NULL;
+  String aux_String_1058_Var = {0};
+  String* aux_String_1058 = NULL;
+  Ref_Manager* aux_String_1058_Refman = NULL;
+  String aux_String_1059_Var = {0};
+  String* aux_String_1059 = NULL;
+  Ref_Manager* aux_String_1059_Refman = NULL;
+  String aux_String_1060_Var = {0};
+  String* aux_String_1060 = NULL;
+  Ref_Manager* aux_String_1060_Refman = NULL;
+  String aux_String_1061_Var = {0};
+  String* aux_String_1061 = NULL;
+  Ref_Manager* aux_String_1061_Refman = NULL;
+  String aux_String_1062_Var = {0};
+  String* aux_String_1062 = NULL;
+  Ref_Manager* aux_String_1062_Refman = NULL;
+  String aux_String_1063_Var = {0};
+  String* aux_String_1063 = NULL;
+  Ref_Manager* aux_String_1063_Refman = NULL;
+  String aux_String_1064_Var = {0};
+  String* aux_String_1064 = NULL;
+  Ref_Manager* aux_String_1064_Refman = NULL;
+  String aux_String_1065_Var = {0};
+  String* aux_String_1065 = NULL;
+  Ref_Manager* aux_String_1065_Refman = NULL;
+  String aux_String_1066_Var = {0};
+  String* aux_String_1066 = NULL;
+  Ref_Manager* aux_String_1066_Refman = NULL;
+  String aux_String_1067_Var = {0};
+  String* aux_String_1067 = NULL;
+  Ref_Manager* aux_String_1067_Refman = NULL;
+  String aux_String_1068_Var = {0};
+  String* aux_String_1068 = NULL;
+  Ref_Manager* aux_String_1068_Refman = NULL;
+  String aux_String_1069_Var = {0};
+  String* aux_String_1069 = NULL;
+  Ref_Manager* aux_String_1069_Refman = NULL;
+  String aux_String_1070_Var = {0};
+  String* aux_String_1070 = NULL;
+  Ref_Manager* aux_String_1070_Refman = NULL;
+  String aux_String_1071_Var = {0};
+  String* aux_String_1071 = NULL;
+  Ref_Manager* aux_String_1071_Refman = NULL;
+  String aux_String_1072_Var = {0};
+  String* aux_String_1072 = NULL;
+  Ref_Manager* aux_String_1072_Refman = NULL;
+  String aux_String_1073_Var = {0};
+  String* aux_String_1073 = NULL;
+  Ref_Manager* aux_String_1073_Refman = NULL;
+  String aux_String_1074_Var = {0};
+  String* aux_String_1074 = NULL;
+  Ref_Manager* aux_String_1074_Refman = NULL;
+  String aux_String_1075_Var = {0};
+  String* aux_String_1075 = NULL;
+  Ref_Manager* aux_String_1075_Refman = NULL;
+  String aux_String_1076_Var = {0};
+  String* aux_String_1076 = NULL;
+  Ref_Manager* aux_String_1076_Refman = NULL;
+  String aux_String_1077_Var = {0};
+  String* aux_String_1077 = NULL;
+  Ref_Manager* aux_String_1077_Refman = NULL;
+  String aux_String_1078_Var = {0};
+  String* aux_String_1078 = NULL;
+  Ref_Manager* aux_String_1078_Refman = NULL;
+  String aux_String_1079_Var = {0};
+  String* aux_String_1079 = NULL;
+  Ref_Manager* aux_String_1079_Refman = NULL;
+  String aux_String_1080_Var = {0};
+  String* aux_String_1080 = NULL;
+  Ref_Manager* aux_String_1080_Refman = NULL;
+  INIT_STRING_CONST(4, aux_String_0, "#include <stdio.h>\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_0, aux_String_0_Refman);
+  CHECK(4)
+  INIT_STRING_CONST(5, aux_String_1, "#include <stdlib.h>\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1, aux_String_1_Refman);
+  CHECK(5)
+  INIT_STRING_CONST(6, aux_String_2, "#include <string.h>\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_2, aux_String_2_Refman);
+  CHECK(6)
+  INIT_STRING_CONST(7, aux_String_3, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_3, aux_String_3_Refman);
+  CHECK(7)
+  INIT_STRING_CONST(8, aux_String_4, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_4, aux_String_4_Refman);
+  CHECK(8)
+  INIT_STRING_CONST(9, aux_String_5, "/* builtin type defines */\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_5, aux_String_5_Refman);
+  CHECK(9)
+  INIT_STRING_CONST(10, aux_String_6, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_6, aux_String_6_Refman);
+  CHECK(10)
+  INIT_STRING_CONST(11, aux_String_7, "typedef int Int;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_7, aux_String_7_Refman);
+  CHECK(11)
+  INIT_STRING_CONST(12, aux_String_8, "typedef char Char;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_8, aux_String_8_Refman);
+  CHECK(12)
+  INIT_STRING_CONST(13, aux_String_9, "typedef unsigned char Byte;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_9, aux_String_9_Refman);
+  CHECK(13)
+  INIT_STRING_CONST(14, aux_String_10, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_10, aux_String_10_Refman);
+  CHECK(14)
+  INIT_STRING_CONST(15, aux_String_11, "typedef enum Bool {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_11, aux_String_11_Refman);
+  CHECK(15)
+  INIT_STRING_CONST(16, aux_String_12, "  false = 0,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_12, aux_String_12_Refman);
+  CHECK(16)
+  INIT_STRING_CONST(17, aux_String_13, "  true = 1\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_13, aux_String_13_Refman);
+  CHECK(17)
+  INIT_STRING_CONST(18, aux_String_14, "} Bool;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_14, aux_String_14_Refman);
+  CHECK(18)
+  INIT_STRING_CONST(19, aux_String_15, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_15, aux_String_15_Refman);
+  CHECK(19)
+  INIT_STRING_CONST(20, aux_String_16, "typedef enum Returncode {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_16, aux_String_16_Refman);
+  CHECK(20)
+  INIT_STRING_CONST(21, aux_String_17, "  OK = EXIT_SUCCESS,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_17, aux_String_17_Refman);
+  CHECK(21)
+  INIT_STRING_CONST(22, aux_String_18, "  ERR = EXIT_FAILURE,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_18, aux_String_18_Refman);
+  CHECK(22)
+  INIT_STRING_CONST(23, aux_String_19, "  FAIL = EXIT_FAILURE > EXIT_SUCCESS? EXIT_FAILURE + 1 : EXIT_SUCCESS + 1\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_19, aux_String_19_Refman);
+  CHECK(23)
+  INIT_STRING_CONST(24, aux_String_20, "} Returncode;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_20, aux_String_20_Refman);
+  CHECK(24)
+  INIT_STRING_CONST(25, aux_String_21, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_21, aux_String_21_Refman);
+  CHECK(25)
+  INIT_STRING_CONST(26, aux_String_22, "typedef struct Ref_Manager {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_22, aux_String_22_Refman);
+  CHECK(26)
+  INIT_STRING_CONST(27, aux_String_23, "  int count;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_23, aux_String_23_Refman);
+  CHECK(27)
+  INIT_STRING_CONST(28, aux_String_24, "  void* value;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_24, aux_String_24_Refman);
+  CHECK(28)
+  INIT_STRING_CONST(29, aux_String_25, "  void* ref;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_25, aux_String_25_Refman);
+  CHECK(29)
+  INIT_STRING_CONST(30, aux_String_26, "} Ref_Manager;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_26, aux_String_26_Refman);
+  CHECK(30)
+  INIT_STRING_CONST(31, aux_String_27, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_27, aux_String_27_Refman);
+  CHECK(31)
+  INIT_STRING_CONST(32, aux_String_28, "typedef struct File {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_28, aux_String_28_Refman);
+  CHECK(32)
+  INIT_STRING_CONST(33, aux_String_29, "  FILE* fobj;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_29, aux_String_29_Refman);
+  CHECK(33)
+  INIT_STRING_CONST(34, aux_String_30, "} File;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_30, aux_String_30_Refman);
+  CHECK(34)
+  INIT_STRING_CONST(35, aux_String_31, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_31, aux_String_31_Refman);
+  CHECK(35)
+  INIT_STRING_CONST(36, aux_String_32, "typedef struct Sys {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_32, aux_String_32_Refman);
+  CHECK(36)
+  INIT_STRING_CONST(37, aux_String_33, "  char* argv;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_33, aux_String_33_Refman);
+  CHECK(37)
+  INIT_STRING_CONST(38, aux_String_34, "  int argv_Length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_34, aux_String_34_Refman);
+  CHECK(38)
+  INIT_STRING_CONST(39, aux_String_35, "  int argv_Value_length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_35, aux_String_35_Refman);
+  CHECK(39)
+  INIT_STRING_CONST(40, aux_String_36, "  int* argv_String_length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_36, aux_String_36_Refman);
+  CHECK(40)
+  INIT_STRING_CONST(41, aux_String_37, "  Ref_Manager* argv_Refman;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_37, aux_String_37_Refman);
+  CHECK(41)
+  INIT_STRING_CONST(42, aux_String_38, "  File* stdout_Cname;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_38, aux_String_38_Refman);
+  CHECK(42)
+  INIT_STRING_CONST(43, aux_String_39, "  Ref_Manager* stdout_Cname_Refman;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_39, aux_String_39_Refman);
+  CHECK(43)
+  INIT_STRING_CONST(44, aux_String_40, "  File* stdin_Cname;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_40, aux_String_40_Refman);
+  CHECK(44)
+  INIT_STRING_CONST(45, aux_String_41, "  Ref_Manager* stdin_Cname_Refman;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_41, aux_String_41_Refman);
+  CHECK(45)
+  INIT_STRING_CONST(46, aux_String_42, "  File* stderr_Cname;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_42, aux_String_42_Refman);
+  CHECK(46)
+  INIT_STRING_CONST(47, aux_String_43, "  Ref_Manager* stderr_Cname_Refman;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_43, aux_String_43_Refman);
+  CHECK(47)
+  INIT_STRING_CONST(48, aux_String_44, "} Sys;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_44, aux_String_44_Refman);
+  CHECK(48)
+  INIT_STRING_CONST(49, aux_String_45, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_45, aux_String_45_Refman);
+  CHECK(49)
+  INIT_STRING_CONST(50, aux_String_46, "typedef void* Ref;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_46, aux_String_46_Refman);
+  CHECK(50)
+  INIT_STRING_CONST(51, aux_String_47, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_47, aux_String_47_Refman);
+  CHECK(51)
+  INIT_STRING_CONST(52, aux_String_48, "typedef char cdef_M_Char;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_48, aux_String_48_Refman);
+  CHECK(52)
+  INIT_STRING_CONST(53, aux_String_49, "typedef unsigned char cdef_M_Uchar;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_49, aux_String_49_Refman);
+  CHECK(53)
+  INIT_STRING_CONST(54, aux_String_50, "typedef wchar_t cdef_M_Wchar;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_50, aux_String_50_Refman);
+  CHECK(54)
+  INIT_STRING_CONST(55, aux_String_51, "typedef short cdef_M_Short;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_51, aux_String_51_Refman);
+  CHECK(55)
+  INIT_STRING_CONST(56, aux_String_52, "typedef unsigned short cdef_M_Ushort;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_52, aux_String_52_Refman);
+  CHECK(56)
+  INIT_STRING_CONST(57, aux_String_53, "typedef int cdef_M_Int;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_53, aux_String_53_Refman);
+  CHECK(57)
+  INIT_STRING_CONST(58, aux_String_54, "typedef unsigned int cdef_M_Uint;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_54, aux_String_54_Refman);
+  CHECK(58)
+  INIT_STRING_CONST(59, aux_String_55, "typedef long cdef_M_Long;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_55, aux_String_55_Refman);
+  CHECK(59)
+  INIT_STRING_CONST(60, aux_String_56, "typedef unsigned long cdef_M_Ulong;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_56, aux_String_56_Refman);
+  CHECK(60)
+  INIT_STRING_CONST(61, aux_String_57, "typedef size_t cdef_M_Size;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_57, aux_String_57_Refman);
+  CHECK(61)
+  INIT_STRING_CONST(62, aux_String_58, "typedef float cdef_M_Float;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_58, aux_String_58_Refman);
+  CHECK(62)
+  INIT_STRING_CONST(63, aux_String_59, "typedef double cdef_M_Double;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_59, aux_String_59_Refman);
+  CHECK(63)
+  INIT_STRING_CONST(64, aux_String_60, "typedef long double cdef_M_LongDouble;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_60, aux_String_60_Refman);
+  CHECK(64)
+  INIT_STRING_CONST(65, aux_String_61, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_61, aux_String_61_Refman);
+  CHECK(65)
+  INIT_STRING_CONST(66, aux_String_62, "typedef void (*Dynamic_Del)(void*);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_62, aux_String_62_Refman);
+  CHECK(66)
+  INIT_STRING_CONST(67, aux_String_63, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_63, aux_String_63_Refman);
+  CHECK(67)
+  INIT_STRING_CONST(68, aux_String_64, "typedef void Generic_Type;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_64, aux_String_64_Refman);
+  CHECK(68)
+  INIT_STRING_CONST(69, aux_String_65, "typedef struct Generic_Type_Dynamic { Dynamic_Del _del; } Generic_Type_Dynamic;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_65, aux_String_65_Refman);
+  CHECK(69)
+  INIT_STRING_CONST(70, aux_String_66, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_66, aux_String_66_Refman);
+  CHECK(70)
+  INIT_STRING_CONST(71, aux_String_67, "typedef struct File_Coverage {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_67, aux_String_67_Refman);
+  CHECK(71)
+  INIT_STRING_CONST(72, aux_String_68, "  char const* filename;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_68, aux_String_68_Refman);
+  CHECK(72)
+  INIT_STRING_CONST(73, aux_String_69, "  int lines_number;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_69, aux_String_69_Refman);
+  CHECK(73)
+  INIT_STRING_CONST(74, aux_String_70, "  int* line_count;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_70, aux_String_70_Refman);
+  CHECK(74)
+  INIT_STRING_CONST(75, aux_String_71, "} File_Coverage;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_71, aux_String_71_Refman);
+  CHECK(75)
+  INIT_STRING_CONST(76, aux_String_72, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_72, aux_String_72_Refman);
+  CHECK(76)
+  INIT_STRING_CONST(77, aux_String_73, "typedef struct Error_Message {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_73, aux_String_73_Refman);
+  CHECK(77)
+  INIT_STRING_CONST(78, aux_String_74, "  char* str;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_74, aux_String_74_Refman);
+  CHECK(78)
+  INIT_STRING_CONST(79, aux_String_75, "  int length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_75, aux_String_75_Refman);
+  CHECK(79)
+  INIT_STRING_CONST(80, aux_String_76, "} Error_Message;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_76, aux_String_76_Refman);
+  CHECK(80)
+  INIT_STRING_CONST(81, aux_String_77, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_77, aux_String_77_Refman);
+  CHECK(81)
+  INIT_STRING_CONST(82, aux_String_78, "typedef struct Error_Messages {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_78, aux_String_78_Refman);
+  CHECK(82)
+  INIT_STRING_CONST(83, aux_String_79, "  Error_Message empty_object;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_79, aux_String_79_Refman);
+  CHECK(83)
+  INIT_STRING_CONST(84, aux_String_80, "  Error_Message outdated_weak_reference;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_80, aux_String_80_Refman);
+  CHECK(84)
+  INIT_STRING_CONST(85, aux_String_81, "  Error_Message object_memory;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_81, aux_String_81_Refman);
+  CHECK(85)
+  INIT_STRING_CONST(86, aux_String_82, "  Error_Message managed_object_memory;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_82, aux_String_82_Refman);
+  CHECK(86)
+  INIT_STRING_CONST(87, aux_String_83, "  Error_Message slice_index;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_83, aux_String_83_Refman);
+  CHECK(87)
+  INIT_STRING_CONST(88, aux_String_84, "  Error_Message string_too_long;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_84, aux_String_84_Refman);
+  CHECK(88)
+  INIT_STRING_CONST(89, aux_String_85, "  Error_Message file_not_opened;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_85, aux_String_85_Refman);
+  CHECK(89)
+  INIT_STRING_CONST(90, aux_String_86, "  Error_Message file_write_failed;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_86, aux_String_86_Refman);
+  CHECK(90)
+  INIT_STRING_CONST(91, aux_String_87, "  Error_Message zero_division;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_87, aux_String_87_Refman);
+  CHECK(91)
+  INIT_STRING_CONST(92, aux_String_88, "  Error_Message loop_limit;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_88, aux_String_88_Refman);
+  CHECK(92)
+  INIT_STRING_CONST(93, aux_String_89, "} Error_Messages;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_89, aux_String_89_Refman);
+  CHECK(93)
+  INIT_STRING_CONST(94, aux_String_90, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_90, aux_String_90_Refman);
+  CHECK(94)
+  INIT_STRING_CONST(95, aux_String_91, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_91, aux_String_91_Refman);
+  CHECK(95)
+  INIT_STRING_CONST(96, aux_String_92, "/* macros */\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_92, aux_String_92_Refman);
+  CHECK(96)
+  INIT_STRING_CONST(97, aux_String_93, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_93, aux_String_93_Refman);
+  CHECK(97)
+  INIT_STRING_CONST(98, aux_String_94, "#define START_TRACE(line, cleanup, value, format, message, message_length) { \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_94, aux_String_94_Refman);
+  CHECK(98)
+  INIT_STRING_CONST(99, aux_String_95, "  LUMI_trace_print( \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_95, aux_String_95_Refman);
+  CHECK(99)
+  INIT_STRING_CONST(100, aux_String_96, "      format, \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_96, aux_String_96_Refman);
+  CHECK(100)
+  INIT_STRING_CONST(101, aux_String_97, "      LUMI_FILE_NAME, \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_97, aux_String_97_Refman);
+  CHECK(101)
+  INIT_STRING_CONST(102, aux_String_98, "      line, \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_98, aux_String_98_Refman);
+  CHECK(102)
+  INIT_STRING_CONST(103, aux_String_99, "      LUMI_FUNC_NAME, \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_99, aux_String_99_Refman);
+  CHECK(103)
+  INIT_STRING_CONST(104, aux_String_100, "      message, \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_100, aux_String_100_Refman);
+  CHECK(104)
+  INIT_STRING_CONST(105, aux_String_101, "      message_length); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_101, aux_String_101_Refman);
+  CHECK(105)
+  INIT_STRING_CONST(106, aux_String_102, "  LUMI_err = value; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_102, aux_String_102_Refman);
+  CHECK(106)
+  INIT_STRING_CONST(107, aux_String_103, "  LUMI_loop_depth = 0; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_103, aux_String_103_Refman);
+  CHECK(107)
+  INIT_STRING_CONST(108, aux_String_104, "  goto cleanup; }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_104, aux_String_104_Refman);
+  CHECK(108)
+  INIT_STRING_CONST(109, aux_String_105, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_105, aux_String_105_Refman);
+  CHECK(109)
+  INIT_STRING_CONST(110, aux_String_106, "#define RAISE(line, cleanup, message) { \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_106, aux_String_106_Refman);
+  CHECK(110)
+  INIT_STRING_CONST(111, aux_String_107, "  START_TRACE( \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_107, aux_String_107_Refman);
+  CHECK(111)
+  INIT_STRING_CONST(112, aux_String_108, "      line, \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_108, aux_String_108_Refman);
+  CHECK(112)
+  INIT_STRING_CONST(113, aux_String_109, "      cleanup, \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_109, aux_String_109_Refman);
+  CHECK(113)
+  INIT_STRING_CONST(114, aux_String_110, "      ERR, \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_110, aux_String_110_Refman);
+  CHECK(114)
+  INIT_STRING_CONST(115, aux_String_111, "      LUMI_raise_format, \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_111, aux_String_111_Refman);
+  CHECK(115)
+  INIT_STRING_CONST(116, aux_String_112, "      LUMI_error_messages.message.str, \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_112, aux_String_112_Refman);
+  CHECK(116)
+  INIT_STRING_CONST(117, aux_String_113, "      LUMI_error_messages.message.length) }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_113, aux_String_113_Refman);
+  CHECK(117)
+  INIT_STRING_CONST(118, aux_String_114, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_114, aux_String_114_Refman);
+  CHECK(118)
+  INIT_STRING_CONST(119, aux_String_115, "#define USER_RAISE(line, cleanup, message, message_length) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_115, aux_String_115_Refman);
+  CHECK(119)
+  INIT_STRING_CONST(120, aux_String_116, "  START_TRACE( \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_116, aux_String_116_Refman);
+  CHECK(120)
+  INIT_STRING_CONST(121, aux_String_117, "      line, \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_117, aux_String_117_Refman);
+  CHECK(121)
+  INIT_STRING_CONST(122, aux_String_118, "      cleanup, \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_118, aux_String_118_Refman);
+  CHECK(122)
+  INIT_STRING_CONST(123, aux_String_119, "      ERR, \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_119, aux_String_119_Refman);
+  CHECK(123)
+  INIT_STRING_CONST(124, aux_String_120, "      LUMI_raise_format, \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_120, aux_String_120_Refman);
+  CHECK(124)
+  INIT_STRING_CONST(125, aux_String_121, "      message, \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_121, aux_String_121_Refman);
+  CHECK(125)
+  INIT_STRING_CONST(126, aux_String_122, "      message_length)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_122, aux_String_122_Refman);
+  CHECK(126)
+  INIT_STRING_CONST(127, aux_String_123, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_123, aux_String_123_Refman);
+  CHECK(127)
+  INIT_STRING_CONST(128, aux_String_124, "#define TEST_FAIL(line, cleanup, message_length, message) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_124, aux_String_124_Refman);
+  CHECK(128)
+  INIT_STRING_CONST(129, aux_String_125, "  START_TRACE( \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_125, aux_String_125_Refman);
+  CHECK(129)
+  INIT_STRING_CONST(130, aux_String_126, "      line, cleanup, FAIL, LUMI_assert_format, message, message_length)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_126, aux_String_126_Refman);
+  CHECK(130)
+  INIT_STRING_CONST(131, aux_String_127, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_127, aux_String_127_Refman);
+  CHECK(131)
+  INIT_STRING_CONST(132, aux_String_128, "#define TEST_ASSERT(line, cleanup, condition) if (!(condition)) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_128, aux_String_128_Refman);
+  CHECK(132)
+  INIT_STRING_CONST(133, aux_String_129, "  TEST_FAIL(line, cleanup, 21, \"condition is not true\")\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_129, aux_String_129_Refman);
+  CHECK(133)
+  INIT_STRING_CONST(134, aux_String_130, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_130, aux_String_130_Refman);
+  CHECK(134)
+  INIT_STRING_CONST(135, aux_String_131, "#define TEST_FAIL_NULL(line, cleanup) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_131, aux_String_131_Refman);
+  CHECK(135)
+  INIT_STRING_CONST(136, aux_String_132, "  START_TRACE(line, cleanup, FAIL, LUMI_assert_format, NULL, 0)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_132, aux_String_132_Refman);
+  CHECK(136)
+  INIT_STRING_CONST(137, aux_String_133, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_133, aux_String_133_Refman);
+  CHECK(137)
+  INIT_STRING_CONST(138, aux_String_134, "#define CHECK(line, cleanup) if (LUMI_err != OK) { \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_134, aux_String_134_Refman);
+  CHECK(138)
+  INIT_STRING_CONST(139, aux_String_135, "  LUMI_trace_print( \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_135, aux_String_135_Refman);
+  CHECK(139)
+  INIT_STRING_CONST(140, aux_String_136, "      LUMI_traceline_format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_136, aux_String_136_Refman);
+  CHECK(140)
+  INIT_STRING_CONST(141, aux_String_137, "      NULL, 0); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_137, aux_String_137_Refman);
+  CHECK(141)
+  INIT_STRING_CONST(142, aux_String_138, "  LUMI_loop_depth = 0; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_138, aux_String_138_Refman);
+  CHECK(142)
+  INIT_STRING_CONST(143, aux_String_139, "  goto cleanup; }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_139, aux_String_139_Refman);
+  CHECK(143)
+  INIT_STRING_CONST(144, aux_String_140, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_140, aux_String_140_Refman);
+  CHECK(144)
+  INIT_STRING_CONST(145, aux_String_141, "#define IGNORE_ERRORS(call) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_141, aux_String_141_Refman);
+  CHECK(145)
+  INIT_STRING_CONST(146, aux_String_142, "  ++LUMI_trace_ignore_count; (void)call; --LUMI_trace_ignore_count;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_142, aux_String_142_Refman);
+  CHECK(146)
+  INIT_STRING_CONST(147, aux_String_143, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_143, aux_String_143_Refman);
+  CHECK(147)
+  INIT_STRING_CONST(148, aux_String_144, "#define CHECK_REF(line, cleanup, ref) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_144, aux_String_144_Refman);
+  CHECK(148)
+  INIT_STRING_CONST(149, aux_String_145, "  if (ref == NULL) RAISE(line, cleanup, empty_object)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_145, aux_String_145_Refman);
+  CHECK(149)
+  INIT_STRING_CONST(150, aux_String_146, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_146, aux_String_146_Refman);
+  CHECK(150)
+  INIT_STRING_CONST(151, aux_String_147, "#define CHECK_REFMAN(line, cleanup, refman) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_147, aux_String_147_Refman);
+  CHECK(151)
+  INIT_STRING_CONST(152, aux_String_148, "  if (refman != NULL && (refman)->value == NULL) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_148, aux_String_148_Refman);
+  CHECK(152)
+  INIT_STRING_CONST(153, aux_String_149, "    RAISE(line, cleanup, outdated_weak_reference)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_149, aux_String_149_Refman);
+  CHECK(153)
+  INIT_STRING_CONST(154, aux_String_150, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_150, aux_String_150_Refman);
+  CHECK(154)
+  INIT_STRING_CONST(155, aux_String_151, "#define CHECK_REF_REFMAN(line, cleanup, ref, refman) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_151, aux_String_151_Refman);
+  CHECK(155)
+  INIT_STRING_CONST(156, aux_String_152, "  CHECK_REF(line, cleanup, ref) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_152, aux_String_152_Refman);
+  CHECK(156)
+  INIT_STRING_CONST(157, aux_String_153, "  if ((refman)->value == NULL) RAISE(line, cleanup, outdated_weak_reference)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_153, aux_String_153_Refman);
+  CHECK(157)
+  INIT_STRING_CONST(158, aux_String_154, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_154, aux_String_154_Refman);
+  CHECK(158)
+  INIT_STRING_CONST(159, aux_String_155, "#define MAIN_PROXY(func) int main(int argc, char* argv[]) { \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_155, aux_String_155_Refman);
+  CHECK(159)
+  INIT_STRING_CONST(160, aux_String_156, "  return func(argc, argv); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_156, aux_String_156_Refman);
+  CHECK(160)
+  INIT_STRING_CONST(161, aux_String_157, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_157, aux_String_157_Refman);
+  CHECK(161)
+  INIT_STRING_CONST(162, aux_String_158, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_158, aux_String_158_Refman);
+  CHECK(162)
+  INIT_STRING_CONST(163, aux_String_159, "#define MAIN_FUNC MAIN_PROXY(LUMI_main)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_159, aux_String_159_Refman);
+  CHECK(163)
+  INIT_STRING_CONST(164, aux_String_160, "#define TEST_MAIN_FUNC MAIN_PROXY(LUMI_test_main)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_160, aux_String_160_Refman);
+  CHECK(164)
+  INIT_STRING_CONST(165, aux_String_161, "#define USER_MAIN_HEADER Returncode LUMI_user_main(void)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_161, aux_String_161_Refman);
+  CHECK(165)
+  INIT_STRING_CONST(166, aux_String_162, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_162, aux_String_162_Refman);
+  CHECK(166)
+  INIT_STRING_CONST(167, aux_String_163, "#define ARRAY_DEL(Type, array, length) if (array != NULL) { \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_163, aux_String_163_Refman);
+  CHECK(167)
+  INIT_STRING_CONST(168, aux_String_164, "  int LUMI_n = 0; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_164, aux_String_164_Refman);
+  CHECK(168)
+  INIT_STRING_CONST(169, aux_String_165, "  for (; LUMI_n < length; ++LUMI_n) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_165, aux_String_165_Refman);
+  CHECK(169)
+  INIT_STRING_CONST(170, aux_String_166, "    Type##_Del(array + LUMI_n); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_166, aux_String_166_Refman);
+  CHECK(170)
+  INIT_STRING_CONST(171, aux_String_167, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_167, aux_String_167_Refman);
+  CHECK(171)
+  INIT_STRING_CONST(172, aux_String_168, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_168, aux_String_168_Refman);
+  CHECK(172)
+  INIT_STRING_CONST(173, aux_String_169, "#define SELF_REF_DEL(Type, field) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_169, aux_String_169_Refman);
+  CHECK(173)
+  INIT_STRING_CONST(174, aux_String_170, "while (self->field != NULL) { \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_170, aux_String_170_Refman);
+  CHECK(174)
+  INIT_STRING_CONST(175, aux_String_171, "  Type* value = self->field; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_171, aux_String_171_Refman);
+  CHECK(175)
+  INIT_STRING_CONST(176, aux_String_172, "  self->field = value->field; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_172, aux_String_172_Refman);
+  CHECK(176)
+  INIT_STRING_CONST(177, aux_String_173, "  value->field = NULL; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_173, aux_String_173_Refman);
+  CHECK(177)
+  INIT_STRING_CONST(178, aux_String_174, "  Type##_Del(value); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_174, aux_String_174_Refman);
+  CHECK(178)
+  INIT_STRING_CONST(179, aux_String_175, "  free(value); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_175, aux_String_175_Refman);
+  CHECK(179)
+  INIT_STRING_CONST(180, aux_String_176, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_176, aux_String_176_Refman);
+  CHECK(180)
+  INIT_STRING_CONST(181, aux_String_177, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_177, aux_String_177_Refman);
+  CHECK(181)
+  INIT_STRING_CONST(182, aux_String_178, "#define SELF_REF_DEL_STR(Type, field) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_178, aux_String_178_Refman);
+  CHECK(182)
+  INIT_STRING_CONST(183, aux_String_179, "while (self->field != NULL) { \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_179, aux_String_179_Refman);
+  CHECK(183)
+  INIT_STRING_CONST(184, aux_String_180, "  Type* value = self->field; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_180, aux_String_180_Refman);
+  CHECK(184)
+  INIT_STRING_CONST(185, aux_String_181, "  Ref_Manager* value_Refman = self->field##_Refman; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_181, aux_String_181_Refman);
+  CHECK(185)
+  INIT_STRING_CONST(186, aux_String_182, "  self->field = value->field; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_182, aux_String_182_Refman);
+  CHECK(186)
+  INIT_STRING_CONST(187, aux_String_183, "  self->field##_Refman = value->field##_Refman; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_183, aux_String_183_Refman);
+  CHECK(187)
+  INIT_STRING_CONST(188, aux_String_184, "  value->field = NULL; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_184, aux_String_184_Refman);
+  CHECK(188)
+  INIT_STRING_CONST(189, aux_String_185, "  value->field##_Refman = NULL; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_185, aux_String_185_Refman);
+  CHECK(189)
+  INIT_STRING_CONST(190, aux_String_186, "  Type##_Del(value); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_186, aux_String_186_Refman);
+  CHECK(190)
+  INIT_STRING_CONST(191, aux_String_187, "  LUMI_owner_dec_ref(value_Refman); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_187, aux_String_187_Refman);
+  CHECK(191)
+  INIT_STRING_CONST(192, aux_String_188, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_188, aux_String_188_Refman);
+  CHECK(192)
+  INIT_STRING_CONST(193, aux_String_189, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_189, aux_String_189_Refman);
+  CHECK(193)
+  INIT_STRING_CONST(194, aux_String_190, "#define SELF_REF_DEL_DYN(Type, bases, field) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_190, aux_String_190_Refman);
+  CHECK(194)
+  INIT_STRING_CONST(195, aux_String_191, "while (self->field != NULL) { \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_191, aux_String_191_Refman);
+  CHECK(195)
+  INIT_STRING_CONST(196, aux_String_192, "  Type* value = self->field; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_192, aux_String_192_Refman);
+  CHECK(196)
+  INIT_STRING_CONST(197, aux_String_193, "  Type##_Dynamic* value_Dynamic = self->field##_Dynamic; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_193, aux_String_193_Refman);
+  CHECK(197)
+  INIT_STRING_CONST(198, aux_String_194, "  self->field = value->field; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_194, aux_String_194_Refman);
+  CHECK(198)
+  INIT_STRING_CONST(199, aux_String_195, "  self->field##_Dynamic = value->field##_Dynamic; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_195, aux_String_195_Refman);
+  CHECK(199)
+  INIT_STRING_CONST(200, aux_String_196, "  value->field = NULL; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_196, aux_String_196_Refman);
+  CHECK(200)
+  INIT_STRING_CONST(201, aux_String_197, "  value->field##_Dynamic = NULL; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_197, aux_String_197_Refman);
+  CHECK(201)
+  INIT_STRING_CONST(202, aux_String_198, "  value_Dynamic->bases##del(value); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_198, aux_String_198_Refman);
+  CHECK(202)
+  INIT_STRING_CONST(203, aux_String_199, "  free(value); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_199, aux_String_199_Refman);
+  CHECK(203)
+  INIT_STRING_CONST(204, aux_String_200, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_200, aux_String_200_Refman);
+  CHECK(204)
+  INIT_STRING_CONST(205, aux_String_201, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_201, aux_String_201_Refman);
+  CHECK(205)
+  INIT_STRING_CONST(206, aux_String_202, "#define SELF_REF_DEL_STR_DYN(Type, bases, field) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_202, aux_String_202_Refman);
+  CHECK(206)
+  INIT_STRING_CONST(207, aux_String_203, "while (self->field != NULL) { \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_203, aux_String_203_Refman);
+  CHECK(207)
+  INIT_STRING_CONST(208, aux_String_204, "  Type* value = self->field; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_204, aux_String_204_Refman);
+  CHECK(208)
+  INIT_STRING_CONST(209, aux_String_205, "  Ref_Manager* value_Refman = self->field##_Refman; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_205, aux_String_205_Refman);
+  CHECK(209)
+  INIT_STRING_CONST(210, aux_String_206, "  Type##_Dynamic* value_Dynamic = self->field##_Dynamic; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_206, aux_String_206_Refman);
+  CHECK(210)
+  INIT_STRING_CONST(211, aux_String_207, "  self->field = value->field; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_207, aux_String_207_Refman);
+  CHECK(211)
+  INIT_STRING_CONST(212, aux_String_208, "  self->field##_Refman = value->field##_Refman; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_208, aux_String_208_Refman);
+  CHECK(212)
+  INIT_STRING_CONST(213, aux_String_209, "  self->field##_Dynamic = value->field##_Dynamic; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_209, aux_String_209_Refman);
+  CHECK(213)
+  INIT_STRING_CONST(214, aux_String_210, "  value->field = NULL; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_210, aux_String_210_Refman);
+  CHECK(214)
+  INIT_STRING_CONST(215, aux_String_211, "  value->field##_Refman = NULL; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_211, aux_String_211_Refman);
+  CHECK(215)
+  INIT_STRING_CONST(216, aux_String_212, "  value->field##_Dynamic = NULL; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_212, aux_String_212_Refman);
+  CHECK(216)
+  INIT_STRING_CONST(217, aux_String_213, "  value_Dynamic->bases##del(value); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_213, aux_String_213_Refman);
+  CHECK(217)
+  INIT_STRING_CONST(218, aux_String_214, "  LUMI_owner_dec_ref(value_Refman); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_214, aux_String_214_Refman);
+  CHECK(218)
+  INIT_STRING_CONST(219, aux_String_215, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_215, aux_String_215_Refman);
+  CHECK(219)
+  INIT_STRING_CONST(220, aux_String_216, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_216, aux_String_216_Refman);
+  CHECK(220)
+  INIT_STRING_CONST(221, aux_String_217, "#define INIT_VAR_REFMAN(line, cleanup, name) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_217, aux_String_217_Refman);
+  CHECK(221)
+  INIT_STRING_CONST(222, aux_String_218, "  name##_Refman = LUMI_new_ref(name); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_218, aux_String_218_Refman);
+  CHECK(222)
+  INIT_STRING_CONST(223, aux_String_219, "  if (name##_Refman == NULL) { RAISE(line, cleanup, managed_object_memory) }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_219, aux_String_219_Refman);
+  CHECK(223)
+  INIT_STRING_CONST(224, aux_String_220, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_220, aux_String_220_Refman);
+  CHECK(224)
+  INIT_STRING_CONST(225, aux_String_221, "#define INIT_NEW_REFMAN(line, cleanup, name) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_221, aux_String_221_Refman);
+  CHECK(225)
+  INIT_STRING_CONST(226, aux_String_222, "  name##_Refman = LUMI_new_ref(name); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_222, aux_String_222_Refman);
+  CHECK(226)
+  INIT_STRING_CONST(227, aux_String_223, "  if (name##_Refman == NULL) { \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_223, aux_String_223_Refman);
+  CHECK(227)
+  INIT_STRING_CONST(228, aux_String_224, "    free(name); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_224, aux_String_224_Refman);
+  CHECK(228)
+  INIT_STRING_CONST(229, aux_String_225, "    name = NULL; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_225, aux_String_225_Refman);
+  CHECK(229)
+  INIT_STRING_CONST(230, aux_String_226, "    RAISE(line, cleanup, managed_object_memory) }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_226, aux_String_226_Refman);
+  CHECK(230)
+  INIT_STRING_CONST(231, aux_String_227, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_227, aux_String_227_Refman);
+  CHECK(231)
+  INIT_STRING_CONST(232, aux_String_228, "#define INIT_NEW(line, cleanup, name, type, size) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_228, aux_String_228_Refman);
+  CHECK(232)
+  INIT_STRING_CONST(233, aux_String_229, "  if (size <= 0) RAISE(line, cleanup, slice_index) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_229, aux_String_229_Refman);
+  CHECK(233)
+  INIT_STRING_CONST(234, aux_String_230, "  name = LUMI_alloc(sizeof(type) * size); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_230, aux_String_230_Refman);
+  CHECK(234)
+  INIT_STRING_CONST(235, aux_String_231, "  if (name == NULL) RAISE(line, cleanup, object_memory)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_231, aux_String_231_Refman);
+  CHECK(235)
+  INIT_STRING_CONST(236, aux_String_232, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_232, aux_String_232_Refman);
+  CHECK(236)
+  INIT_STRING_CONST(237, aux_String_233, "#define INIT_NEW_ARRAY(line, cleanup, name, type, length, value_size) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_233, aux_String_233_Refman);
+  CHECK(237)
+  INIT_STRING_CONST(238, aux_String_234, "  name##_Length = length; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_234, aux_String_234_Refman);
+  CHECK(238)
+  INIT_STRING_CONST(239, aux_String_235, "  INIT_NEW(line, cleanup, name, type, name##_Length * value_size)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_235, aux_String_235_Refman);
+  CHECK(239)
+  INIT_STRING_CONST(240, aux_String_236, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_236, aux_String_236_Refman);
+  CHECK(240)
+  INIT_STRING_CONST(241, aux_String_237, "#define INIT_NEW_STRING(line, cleanup, name, size) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_237, aux_String_237_Refman);
+  CHECK(241)
+  INIT_STRING_CONST(242, aux_String_238, "  name##_Max_length = size; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_238, aux_String_238_Refman);
+  CHECK(242)
+  INIT_STRING_CONST(243, aux_String_239, "  INIT_NEW(line, cleanup, name, char, name##_Max_length) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_239, aux_String_239_Refman);
+  CHECK(243)
+  INIT_STRING_CONST(244, aux_String_240, "  name##_Length = LUMI_alloc(sizeof(int)); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_240, aux_String_240_Refman);
+  CHECK(244)
+  INIT_STRING_CONST(245, aux_String_241, "  if (name##_Length == NULL) { \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_241, aux_String_241_Refman);
+  CHECK(245)
+  INIT_STRING_CONST(246, aux_String_242, "    name##_Length = &Lumi_empty_int; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_242, aux_String_242_Refman);
+  CHECK(246)
+  INIT_STRING_CONST(247, aux_String_243, "    free(name); name = NULL; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_243, aux_String_243_Refman);
+  CHECK(247)
+  INIT_STRING_CONST(248, aux_String_244, "    RAISE(line, cleanup, object_memory) }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_244, aux_String_244_Refman);
+  CHECK(248)
+  INIT_STRING_CONST(249, aux_String_245, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_245, aux_String_245_Refman);
+  CHECK(249)
+  INIT_STRING_CONST(250, aux_String_246, "#define INIT_STRING_CONST(line, cleanup, name, text) \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_246, aux_String_246_Refman);
+  CHECK(250)
+  INIT_STRING_CONST(251, aux_String_247, "  name = text; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_247, aux_String_247_Refman);
+  CHECK(251)
+  INIT_STRING_CONST(252, aux_String_248, "  name##_Max_length = sizeof(text); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_248, aux_String_248_Refman);
+  CHECK(252)
+  INIT_STRING_CONST(253, aux_String_249, "  *name##_Length = sizeof(text) - 1;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_249, aux_String_249_Refman);
+  CHECK(253)
+  INIT_STRING_CONST(254, aux_String_250, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_250, aux_String_250_Refman);
+  CHECK(254)
+  INIT_STRING_CONST(255, aux_String_251, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_251, aux_String_251_Refman);
+  CHECK(255)
+  INIT_STRING_CONST(256, aux_String_252, "#define String_Del(name) do { if (name##_Length != &Lumi_empty_int) { \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_252, aux_String_252_Refman);
+  CHECK(256)
+  INIT_STRING_CONST(257, aux_String_253, "  free(name##_Length); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_253, aux_String_253_Refman);
+  CHECK(257)
+  INIT_STRING_CONST(258, aux_String_254, "  name##_Length = &Lumi_empty_int; } } while (false)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_254, aux_String_254_Refman);
+  CHECK(258)
+  INIT_STRING_CONST(259, aux_String_255, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_255, aux_String_255_Refman);
+  CHECK(259)
+  INIT_STRING_CONST(260, aux_String_256, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_256, aux_String_256_Refman);
+  CHECK(260)
+  INIT_STRING_CONST(261, aux_String_257, "/* traceback */\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_257, aux_String_257_Refman);
+  CHECK(261)
+  INIT_STRING_CONST(262, aux_String_258, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_258, aux_String_258_Refman);
+  CHECK(262)
+  INIT_STRING_CONST(263, aux_String_259, "#define CRAISE(message) { \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_259, aux_String_259_Refman);
+  CHECK(263)
+  INIT_STRING_CONST(264, aux_String_260, "  LUMI_C_trace_print(__LINE__, LUMI_FUNC_NAME, message); \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_260, aux_String_260_Refman);
+  CHECK(264)
+  INIT_STRING_CONST(265, aux_String_261, "  return ERR; }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_261, aux_String_261_Refman);
+  CHECK(265)
+  INIT_STRING_CONST(266, aux_String_262, "#define CCHECK(err) { \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_262, aux_String_262_Refman);
+  CHECK(266)
+  INIT_STRING_CONST(267, aux_String_263, "  Returncode LUMI_cerr = err; \\\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_263, aux_String_263_Refman);
+  CHECK(267)
+  INIT_STRING_CONST(268, aux_String_264, "  if (LUMI_cerr != OK) return LUMI_cerr; }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_264, aux_String_264_Refman);
+  CHECK(268)
+  INIT_STRING_CONST(269, aux_String_265, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_265, aux_String_265_Refman);
+  CHECK(269)
+  INIT_STRING_CONST(270, aux_String_266, "char* LUMI_raise_format = \"Error raised in %s:%d %s()\\n\";\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_266, aux_String_266_Refman);
+  CHECK(270)
+  INIT_STRING_CONST(271, aux_String_267, "char* LUMI_assert_format = \"Assert failed in %s:%d %s()\\n\";\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_267, aux_String_267_Refman);
+  CHECK(271)
+  INIT_STRING_CONST(272, aux_String_268, "char* LUMI_traceline_format = \"  called from %s:%d %s()\\n\";\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_268, aux_String_268_Refman);
+  CHECK(272)
+  INIT_STRING_CONST(273, aux_String_269, "FILE* LUMI_trace_stream = NULL;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_269, aux_String_269_Refman);
+  CHECK(273)
+  INIT_STRING_CONST(274, aux_String_270, "int LUMI_trace_ignore_count = 0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_270, aux_String_270_Refman);
+  CHECK(274)
+  INIT_STRING_CONST(275, aux_String_271, "char* LUMI_expected_error = NULL;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_271, aux_String_271_Refman);
+  CHECK(275)
+  INIT_STRING_CONST(276, aux_String_272, "int LUMI_expected_error_trace_ignore_count = 0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_272, aux_String_272_Refman);
+  CHECK(276)
+  INIT_STRING_CONST(277, aux_String_273, "Generic_Type_Dynamic* dynamic_Void = NULL;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_273, aux_String_273_Refman);
+  CHECK(277)
+  INIT_STRING_CONST(278, aux_String_274, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_274, aux_String_274_Refman);
+  CHECK(278)
+  INIT_STRING_CONST(279, aux_String_275, "Sys* sys = NULL;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_275, aux_String_275_Refman);
+  CHECK(279)
+  INIT_STRING_CONST(280, aux_String_276, "Ref_Manager* sys_Refman = NULL;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_276, aux_String_276_Refman);
+  CHECK(280)
+  INIT_STRING_CONST(281, aux_String_277, "int Lumi_empty_int = 0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_277, aux_String_277_Refman);
+  CHECK(281)
+  INIT_STRING_CONST(282, aux_String_278, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_278, aux_String_278_Refman);
+  CHECK(282)
+  INIT_STRING_CONST(283, aux_String_279, "#define ERROR_MESAGE(message) {message, sizeof(message) - 1}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_279, aux_String_279_Refman);
+  CHECK(283)
+  INIT_STRING_CONST(284, aux_String_280, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_280, aux_String_280_Refman);
+  CHECK(284)
+  INIT_STRING_CONST(285, aux_String_281, "Error_Messages LUMI_error_messages = {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_281, aux_String_281_Refman);
+  CHECK(285)
+  INIT_STRING_CONST(286, aux_String_282, "  ERROR_MESAGE(\"empty object used\"),\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_282, aux_String_282_Refman);
+  CHECK(286)
+  INIT_STRING_CONST(287, aux_String_283, "  ERROR_MESAGE(\"outdated weak reference used\"),\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_283, aux_String_283_Refman);
+  CHECK(287)
+  INIT_STRING_CONST(288, aux_String_284, "  ERROR_MESAGE(\"insufficient memory for object dynamic allocation\"),\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_284, aux_String_284_Refman);
+  CHECK(288)
+  INIT_STRING_CONST(289, aux_String_285, "  ERROR_MESAGE(\"insufficient memory for managed object\"),\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_285, aux_String_285_Refman);
+  CHECK(289)
+  INIT_STRING_CONST(290, aux_String_286, "  ERROR_MESAGE(\"slice index out of bounds\"),\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_286, aux_String_286_Refman);
+  CHECK(290)
+  INIT_STRING_CONST(291, aux_String_287, "  ERROR_MESAGE(\"string too long\"),\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_287, aux_String_287_Refman);
+  CHECK(291)
+  INIT_STRING_CONST(292, aux_String_288, "  ERROR_MESAGE(\"file not opened\"),\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_288, aux_String_288_Refman);
+  CHECK(292)
+  INIT_STRING_CONST(293, aux_String_289, "  ERROR_MESAGE(\"file write failed\"),\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_289, aux_String_289_Refman);
+  CHECK(293)
+  INIT_STRING_CONST(294, aux_String_290, "  ERROR_MESAGE(\"zero division\"),\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_290, aux_String_290_Refman);
+  CHECK(294)
+  INIT_STRING_CONST(295, aux_String_291, "  ERROR_MESAGE(\"loop limit reached\")\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_291, aux_String_291_Refman);
+  CHECK(295)
+  INIT_STRING_CONST(296, aux_String_292, "};\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_292, aux_String_292_Refman);
+  CHECK(296)
+  INIT_STRING_CONST(297, aux_String_293, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_293, aux_String_293_Refman);
+  CHECK(297)
+  INIT_STRING_CONST(298, aux_String_294, "enum {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_294, aux_String_294_Refman);
+  CHECK(298)
+  INIT_STRING_CONST(299, aux_String_295, "  LUMI_DEBUG_NOTHING = 0,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_295, aux_String_295_Refman);
+  CHECK(299)
+  INIT_STRING_CONST(300, aux_String_296, "  LUMI_DEBUG_FAIL,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_296, aux_String_296_Refman);
+  CHECK(300)
+  INIT_STRING_CONST(301, aux_String_297, "  LUMI_DEBUG_SUCCESS\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_297, aux_String_297_Refman);
+  CHECK(301)
+  INIT_STRING_CONST(302, aux_String_298, "};\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_298, aux_String_298_Refman);
+  CHECK(302)
+  INIT_STRING_CONST(303, aux_String_299, "int lumi_debug_value = LUMI_DEBUG_NOTHING;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_299, aux_String_299_Refman);
+  CHECK(303)
+  INIT_STRING_CONST(304, aux_String_300, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_300, aux_String_300_Refman);
+  CHECK(304)
+  INIT_STRING_CONST(305, aux_String_301, "void LUMI_trace_print(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_301, aux_String_301_Refman);
+  CHECK(305)
+  INIT_STRING_CONST(306, aux_String_302, "    char const* format,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_302, aux_String_302_Refman);
+  CHECK(306)
+  INIT_STRING_CONST(307, aux_String_303, "    char const* filename,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_303, aux_String_303_Refman);
+  CHECK(307)
+  INIT_STRING_CONST(308, aux_String_304, "    int line,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_304, aux_String_304_Refman);
+  CHECK(308)
+  INIT_STRING_CONST(309, aux_String_305, "    char const* funcname,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_305, aux_String_305_Refman);
+  CHECK(309)
+  INIT_STRING_CONST(310, aux_String_306, "    char const* message,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_306, aux_String_306_Refman);
+  CHECK(310)
+  INIT_STRING_CONST(311, aux_String_307, "    int message_length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_307, aux_String_307_Refman);
+  CHECK(311)
+  INIT_STRING_CONST(312, aux_String_308, "  if (LUMI_trace_ignore_count == 0) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_308, aux_String_308_Refman);
+  CHECK(312)
+  INIT_STRING_CONST(313, aux_String_309, "    if (message != NULL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_309, aux_String_309_Refman);
+  CHECK(313)
+  INIT_STRING_CONST(314, aux_String_310, "      fprintf(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_310, aux_String_310_Refman);
+  CHECK(314)
+  INIT_STRING_CONST(315, aux_String_311, "          LUMI_trace_stream,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_311, aux_String_311_Refman);
+  CHECK(315)
+  INIT_STRING_CONST(316, aux_String_312, "          \"Error: %.*s\\n  \",\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_312, aux_String_312_Refman);
+  CHECK(316)
+  INIT_STRING_CONST(317, aux_String_313, "          message_length,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_313, aux_String_313_Refman);
+  CHECK(317)
+  INIT_STRING_CONST(318, aux_String_314, "          message);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_314, aux_String_314_Refman);
+  CHECK(318)
+  INIT_STRING_CONST(319, aux_String_315, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_315, aux_String_315_Refman);
+  CHECK(319)
+  INIT_STRING_CONST(320, aux_String_316, "    fprintf(LUMI_trace_stream, format, filename, line, funcname);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_316, aux_String_316_Refman);
+  CHECK(320)
+  INIT_STRING_CONST(321, aux_String_317, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_317, aux_String_317_Refman);
+  CHECK(321)
+  INIT_STRING_CONST(322, aux_String_318, "  else if (LUMI_expected_error != NULL &&\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_318, aux_String_318_Refman);
+  CHECK(322)
+  INIT_STRING_CONST(323, aux_String_319, "      LUMI_expected_error_trace_ignore_count == LUMI_trace_ignore_count &&\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_319, aux_String_319_Refman);
+  CHECK(323)
+  INIT_STRING_CONST(324, aux_String_320, "      format != LUMI_traceline_format) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_320, aux_String_320_Refman);
+  CHECK(324)
+  INIT_STRING_CONST(325, aux_String_321, "    int n;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_321, aux_String_321_Refman);
+  CHECK(325)
+  INIT_STRING_CONST(326, aux_String_322, "    if (message == NULL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_322, aux_String_322_Refman);
+  CHECK(326)
+  INIT_STRING_CONST(327, aux_String_323, "      LUMI_expected_error = NULL;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_323, aux_String_323_Refman);
+  CHECK(327)
+  INIT_STRING_CONST(328, aux_String_324, "      if (LUMI_trace_ignore_count == 1) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_324, aux_String_324_Refman);
+  CHECK(328)
+  INIT_STRING_CONST(329, aux_String_325, "        fprintf(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_325, aux_String_325_Refman);
+  CHECK(329)
+  INIT_STRING_CONST(330, aux_String_326, "            LUMI_trace_stream,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_326, aux_String_326_Refman);
+  CHECK(330)
+  INIT_STRING_CONST(331, aux_String_327, "            \"Assert failed: error with no message raised\\n  \");\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_327, aux_String_327_Refman);
+  CHECK(331)
+  INIT_STRING_CONST(332, aux_String_328, "      }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_328, aux_String_328_Refman);
+  CHECK(332)
+  INIT_STRING_CONST(333, aux_String_329, "      return;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_329, aux_String_329_Refman);
+  CHECK(333)
+  INIT_STRING_CONST(334, aux_String_330, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_330, aux_String_330_Refman);
+  CHECK(334)
+  INIT_STRING_CONST(335, aux_String_331, "    for (n = 0; n <= message_length; ++n) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_331, aux_String_331_Refman);
+  CHECK(335)
+  INIT_STRING_CONST(336, aux_String_332, "      if (((n == message_length)? '\\0': message[n]) !=\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_332, aux_String_332_Refman);
+  CHECK(336)
+  INIT_STRING_CONST(337, aux_String_333, "          LUMI_expected_error[n]) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_333, aux_String_333_Refman);
+  CHECK(337)
+  INIT_STRING_CONST(338, aux_String_334, "        LUMI_expected_error = NULL;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_334, aux_String_334_Refman);
+  CHECK(338)
+  INIT_STRING_CONST(339, aux_String_335, "        if (LUMI_trace_ignore_count == 1) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_335, aux_String_335_Refman);
+  CHECK(339)
+  INIT_STRING_CONST(340, aux_String_336, "          fprintf(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_336, aux_String_336_Refman);
+  CHECK(340)
+  INIT_STRING_CONST(341, aux_String_337, "              LUMI_trace_stream,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_337, aux_String_337_Refman);
+  CHECK(341)
+  INIT_STRING_CONST(342, aux_String_338, "              \"Assert failed: unexpected error message \\\"%.*s\\\"\\n  \",\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_338, aux_String_338_Refman);
+  CHECK(342)
+  INIT_STRING_CONST(343, aux_String_339, "              message_length,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_339, aux_String_339_Refman);
+  CHECK(343)
+  INIT_STRING_CONST(344, aux_String_340, "              message);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_340, aux_String_340_Refman);
+  CHECK(344)
+  INIT_STRING_CONST(345, aux_String_341, "        }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_341, aux_String_341_Refman);
+  CHECK(345)
+  INIT_STRING_CONST(346, aux_String_342, "        return;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_342, aux_String_342_Refman);
+  CHECK(346)
+  INIT_STRING_CONST(347, aux_String_343, "      }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_343, aux_String_343_Refman);
+  CHECK(347)
+  INIT_STRING_CONST(348, aux_String_344, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_344, aux_String_344_Refman);
+  CHECK(348)
+  INIT_STRING_CONST(349, aux_String_345, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_345, aux_String_345_Refman);
+  CHECK(349)
+  INIT_STRING_CONST(350, aux_String_346, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_346, aux_String_346_Refman);
+  CHECK(350)
+  INIT_STRING_CONST(351, aux_String_347, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_347, aux_String_347_Refman);
+  CHECK(351)
+  INIT_STRING_CONST(352, aux_String_348, "/* like strnlen */\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_348, aux_String_348_Refman);
+  CHECK(352)
+  INIT_STRING_CONST(353, aux_String_349, "int cstring_length(char* cstring, int max_length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_349, aux_String_349_Refman);
+  CHECK(353)
+  INIT_STRING_CONST(354, aux_String_350, "  int length = 0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_350, aux_String_350_Refman);
+  CHECK(354)
+  INIT_STRING_CONST(355, aux_String_351, "  while (cstring[length] != '\\0' && length < max_length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_351, aux_String_351_Refman);
+  CHECK(355)
+  INIT_STRING_CONST(356, aux_String_352, "    ++length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_352, aux_String_352_Refman);
+  CHECK(356)
+  INIT_STRING_CONST(357, aux_String_353, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_353, aux_String_353_Refman);
+  CHECK(357)
+  INIT_STRING_CONST(358, aux_String_354, "  return length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_354, aux_String_354_Refman);
+  CHECK(358)
+  INIT_STRING_CONST(359, aux_String_355, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_355, aux_String_355_Refman);
+  CHECK(359)
+  INIT_STRING_CONST(360, aux_String_356, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_356, aux_String_356_Refman);
+  CHECK(360)
+  INIT_STRING_CONST(361, aux_String_357, "void LUMI_C_trace_print(int line, char const* funcname, char* message) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_357, aux_String_357_Refman);
+  CHECK(361)
+  INIT_STRING_CONST(362, aux_String_358, "  LUMI_trace_print(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_358, aux_String_358_Refman);
+  CHECK(362)
+  INIT_STRING_CONST(363, aux_String_359, "      LUMI_raise_format,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_359, aux_String_359_Refman);
+  CHECK(363)
+  INIT_STRING_CONST(364, aux_String_360, "      \"builtin\",\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_360, aux_String_360_Refman);
+  CHECK(364)
+  INIT_STRING_CONST(365, aux_String_361, "      line,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_361, aux_String_361_Refman);
+  CHECK(365)
+  INIT_STRING_CONST(366, aux_String_362, "      funcname,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_362, aux_String_362_Refman);
+  CHECK(366)
+  INIT_STRING_CONST(367, aux_String_363, "      message,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_363, aux_String_363_Refman);
+  CHECK(367)
+  INIT_STRING_CONST(368, aux_String_364, "      cstring_length(message, 255));\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_364, aux_String_364_Refman);
+  CHECK(368)
+  INIT_STRING_CONST(369, aux_String_365, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_365, aux_String_365_Refman);
+  CHECK(369)
+  INIT_STRING_CONST(370, aux_String_366, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_366, aux_String_366_Refman);
+  CHECK(370)
+  INIT_STRING_CONST(371, aux_String_367, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_367, aux_String_367_Refman);
+  CHECK(371)
+  INIT_STRING_CONST(372, aux_String_368, "/* main */\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_368, aux_String_368_Refman);
+  CHECK(372)
+  INIT_STRING_CONST(373, aux_String_369, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_369, aux_String_369_Refman);
+  CHECK(373)
+  INIT_STRING_CONST(374, aux_String_370, "Returncode LUMI_user_main(void);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_370, aux_String_370_Refman);
+  CHECK(374)
+  INIT_STRING_CONST(375, aux_String_371, "int set_sys(int argc, char* argv[]);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_371, aux_String_371_Refman);
+  CHECK(375)
+  INIT_STRING_CONST(376, aux_String_372, "#define SET_SYS err = set_sys(argc, argv); if (err != OK) return err;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_372, aux_String_372_Refman);
+  CHECK(376)
+  INIT_STRING_CONST(377, aux_String_373, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_373, aux_String_373_Refman);
+  CHECK(377)
+  INIT_STRING_CONST(378, aux_String_374, "int LUMI_main(int argc, char* argv[]) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_374, aux_String_374_Refman);
+  CHECK(378)
+  INIT_STRING_CONST(379, aux_String_375, "  Returncode err;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_375, aux_String_375_Refman);
+  CHECK(379)
+  INIT_STRING_CONST(380, aux_String_376, "  LUMI_trace_stream = stderr;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_376, aux_String_376_Refman);
+  CHECK(380)
+  INIT_STRING_CONST(381, aux_String_377, "  SET_SYS\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_377, aux_String_377_Refman);
+  CHECK(381)
+  INIT_STRING_CONST(382, aux_String_378, "  err = LUMI_user_main();\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_378, aux_String_378_Refman);
+  CHECK(382)
+  INIT_STRING_CONST(383, aux_String_379, "  if (err != OK) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_379, aux_String_379_Refman);
+  CHECK(383)
+  INIT_STRING_CONST(384, aux_String_380, "    fprintf(stderr, \"  called from executable start\\n\");\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_380, aux_String_380_Refman);
+  CHECK(384)
+  INIT_STRING_CONST(385, aux_String_381, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_381, aux_String_381_Refman);
+  CHECK(385)
+  INIT_STRING_CONST(386, aux_String_382, "  return err;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_382, aux_String_382_Refman);
+  CHECK(386)
+  INIT_STRING_CONST(387, aux_String_383, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_383, aux_String_383_Refman);
+  CHECK(387)
+  INIT_STRING_CONST(388, aux_String_384, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_384, aux_String_384_Refman);
+  CHECK(388)
+  INIT_STRING_CONST(389, aux_String_385, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_385, aux_String_385_Refman);
+  CHECK(389)
+  INIT_STRING_CONST(390, aux_String_386, "/* tests */\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_386, aux_String_386_Refman);
+  CHECK(390)
+  INIT_STRING_CONST(391, aux_String_387, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_387, aux_String_387_Refman);
+  CHECK(391)
+  INIT_STRING_CONST(392, aux_String_388, "int LUMI_test_main(int argc, char* argv[]) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_388, aux_String_388_Refman);
+  CHECK(392)
+  INIT_STRING_CONST(393, aux_String_389, "  Returncode err;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_389, aux_String_389_Refman);
+  CHECK(393)
+  INIT_STRING_CONST(394, aux_String_390, "  LUMI_trace_stream = stdout;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_390, aux_String_390_Refman);
+  CHECK(394)
+  INIT_STRING_CONST(395, aux_String_391, "  SET_SYS\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_391, aux_String_391_Refman);
+  CHECK(395)
+  INIT_STRING_CONST(396, aux_String_392, "  printf(\"Running tests:\\n\");\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_392, aux_String_392_Refman);
+  CHECK(396)
+  INIT_STRING_CONST(397, aux_String_393, "  err = LUMI_user_main();\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_393, aux_String_393_Refman);
+  CHECK(397)
+  INIT_STRING_CONST(398, aux_String_394, "  if (err == OK) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_394, aux_String_394_Refman);
+  CHECK(398)
+  INIT_STRING_CONST(399, aux_String_395, "    printf(\"Tests passed\\n\");\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_395, aux_String_395_Refman);
+  CHECK(399)
+  INIT_STRING_CONST(400, aux_String_396, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_396, aux_String_396_Refman);
+  CHECK(400)
+  INIT_STRING_CONST(401, aux_String_397, "  else {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_397, aux_String_397_Refman);
+  CHECK(401)
+  INIT_STRING_CONST(402, aux_String_398, "    printf(\"Tests failed\\n\");\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_398, aux_String_398_Refman);
+  CHECK(402)
+  INIT_STRING_CONST(403, aux_String_399, "    return ERR;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_399, aux_String_399_Refman);
+  CHECK(403)
+  INIT_STRING_CONST(404, aux_String_400, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_400, aux_String_400_Refman);
+  CHECK(404)
+  INIT_STRING_CONST(405, aux_String_401, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_401, aux_String_401_Refman);
+  CHECK(405)
+  INIT_STRING_CONST(406, aux_String_402, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_402, aux_String_402_Refman);
+  CHECK(406)
+  INIT_STRING_CONST(407, aux_String_403, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_403, aux_String_403_Refman);
+  CHECK(407)
+  INIT_STRING_CONST(408, aux_String_404, "Bool LUMI_run_test(char* test_name, Returncode (*test_func)(void)) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_404, aux_String_404_Refman);
+  CHECK(408)
+  INIT_STRING_CONST(409, aux_String_405, "  Returncode err;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_405, aux_String_405_Refman);
+  CHECK(409)
+  INIT_STRING_CONST(410, aux_String_406, "  printf(\"testing %s... \", test_name);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_406, aux_String_406_Refman);
+  CHECK(410)
+  INIT_STRING_CONST(411, aux_String_407, "  fflush(stdout);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_407, aux_String_407_Refman);
+  CHECK(411)
+  INIT_STRING_CONST(412, aux_String_408, "  err = test_func();\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_408, aux_String_408_Refman);
+  CHECK(412)
+  INIT_STRING_CONST(413, aux_String_409, "  if (err == OK) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_409, aux_String_409_Refman);
+  CHECK(413)
+  INIT_STRING_CONST(414, aux_String_410, "    printf(\"OK\\n\");\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_410, aux_String_410_Refman);
+  CHECK(414)
+  INIT_STRING_CONST(415, aux_String_411, "    return true;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_411, aux_String_411_Refman);
+  CHECK(415)
+  INIT_STRING_CONST(416, aux_String_412, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_412, aux_String_412_Refman);
+  CHECK(416)
+  INIT_STRING_CONST(417, aux_String_413, "  return false;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_413, aux_String_413_Refman);
+  CHECK(417)
+  INIT_STRING_CONST(418, aux_String_414, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_414, aux_String_414_Refman);
+  CHECK(418)
+  INIT_STRING_CONST(419, aux_String_415, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_415, aux_String_415_Refman);
+  CHECK(419)
+  INIT_STRING_CONST(420, aux_String_416, "int calc_coverage(File_Coverage* files_coverage, int files_number) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_416, aux_String_416_Refman);
+  CHECK(420)
+  INIT_STRING_CONST(421, aux_String_417, "  int n;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_417, aux_String_417_Refman);
+  CHECK(421)
+  INIT_STRING_CONST(422, aux_String_418, "  int all_lines = 0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_418, aux_String_418_Refman);
+  CHECK(422)
+  INIT_STRING_CONST(423, aux_String_419, "  int covered_lines = 0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_419, aux_String_419_Refman);
+  CHECK(423)
+  INIT_STRING_CONST(424, aux_String_420, "  for (n = 0; n < files_number; ++n) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_420, aux_String_420_Refman);
+  CHECK(424)
+  INIT_STRING_CONST(425, aux_String_421, "    int line;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_421, aux_String_421_Refman);
+  CHECK(425)
+  INIT_STRING_CONST(426, aux_String_422, "    for (line = 0; line < files_coverage[n].lines_number; ++line) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_422, aux_String_422_Refman);
+  CHECK(426)
+  INIT_STRING_CONST(427, aux_String_423, "      if (files_coverage[n].line_count[line] >= 0) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_423, aux_String_423_Refman);
+  CHECK(427)
+  INIT_STRING_CONST(428, aux_String_424, "        ++all_lines;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_424, aux_String_424_Refman);
+  CHECK(428)
+  INIT_STRING_CONST(429, aux_String_425, "      }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_425, aux_String_425_Refman);
+  CHECK(429)
+  INIT_STRING_CONST(430, aux_String_426, "      if (files_coverage[n].line_count[line] > 0) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_426, aux_String_426_Refman);
+  CHECK(430)
+  INIT_STRING_CONST(431, aux_String_427, "        ++covered_lines;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_427, aux_String_427_Refman);
+  CHECK(431)
+  INIT_STRING_CONST(432, aux_String_428, "      }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_428, aux_String_428_Refman);
+  CHECK(432)
+  INIT_STRING_CONST(433, aux_String_429, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_429, aux_String_429_Refman);
+  CHECK(433)
+  INIT_STRING_CONST(434, aux_String_430, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_430, aux_String_430_Refman);
+  CHECK(434)
+  INIT_STRING_CONST(435, aux_String_431, "  return covered_lines * 100 / all_lines;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_431, aux_String_431_Refman);
+  CHECK(435)
+  INIT_STRING_CONST(436, aux_String_432, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_432, aux_String_432_Refman);
+  CHECK(436)
+  INIT_STRING_CONST(437, aux_String_433, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_433, aux_String_433_Refman);
+  CHECK(437)
+  INIT_STRING_CONST(438, aux_String_434, "void make_coverage_xml(File_Coverage* files_coverage, int files_number) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_434, aux_String_434_Refman);
+  CHECK(438)
+  INIT_STRING_CONST(439, aux_String_435, "  int n;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_435, aux_String_435_Refman);
+  CHECK(439)
+  INIT_STRING_CONST(440, aux_String_436, "  FILE* xml = NULL;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_436, aux_String_436_Refman);
+  CHECK(440)
+  INIT_STRING_CONST(441, aux_String_437, "  xml = fopen(\"cobertura.xml\", \"w\");\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_437, aux_String_437_Refman);
+  CHECK(441)
+  INIT_STRING_CONST(442, aux_String_438, "  if (xml == NULL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_438, aux_String_438_Refman);
+  CHECK(442)
+  INIT_STRING_CONST(443, aux_String_439, "    return;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_439, aux_String_439_Refman);
+  CHECK(443)
+  INIT_STRING_CONST(444, aux_String_440, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_440, aux_String_440_Refman);
+  CHECK(444)
+  INIT_STRING_CONST(445, aux_String_441, "  fputs(\"<?xml version=\\\"1.0\\\" ?>\\n\", xml);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_441, aux_String_441_Refman);
+  CHECK(445)
+  INIT_STRING_CONST(446, aux_String_442, "  fputs(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_442, aux_String_442_Refman);
+  CHECK(446)
+  INIT_STRING_CONST(447, aux_String_443, "    \"<!DOCTYPE coverage SYSTEM 'https://raw.githubusercontent.com/cobertura/\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_443, aux_String_443_Refman);
+  CHECK(447)
+  INIT_STRING_CONST(448, aux_String_444, "    \"cobertura/master/cobertura/src/site/htdocs/xml/coverage-loose.dtd'>\\n\",\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_444, aux_String_444_Refman);
+  CHECK(448)
+  INIT_STRING_CONST(449, aux_String_445, "    xml);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_445, aux_String_445_Refman);
+  CHECK(449)
+  INIT_STRING_CONST(450, aux_String_446, "  fputs(\"<coverage timestamp=\\\"0\\\" version=\\\"lumi 0.0.5\\\">\\n\", xml);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_446, aux_String_446_Refman);
+  CHECK(450)
+  INIT_STRING_CONST(451, aux_String_447, "  fputs(\" <packages>\\n\", xml);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_447, aux_String_447_Refman);
+  CHECK(451)
+  INIT_STRING_CONST(452, aux_String_448, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_448, aux_String_448_Refman);
+  CHECK(452)
+  INIT_STRING_CONST(453, aux_String_449, "  for (n = 0; n < files_number; ++n) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_449, aux_String_449_Refman);
+  CHECK(453)
+  INIT_STRING_CONST(454, aux_String_450, "    int line;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_450, aux_String_450_Refman);
+  CHECK(454)
+  INIT_STRING_CONST(455, aux_String_451, "    fputs(\"  <package name=\\\"\\\">\\n\", xml);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_451, aux_String_451_Refman);
+  CHECK(455)
+  INIT_STRING_CONST(456, aux_String_452, "    fputs(\"   <classes>\\n\", xml);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_452, aux_String_452_Refman);
+  CHECK(456)
+  INIT_STRING_CONST(457, aux_String_453, "    fprintf(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_453, aux_String_453_Refman);
+  CHECK(457)
+  INIT_STRING_CONST(458, aux_String_454, "      xml,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_454, aux_String_454_Refman);
+  CHECK(458)
+  INIT_STRING_CONST(459, aux_String_455, "      \"    <class name=\\\"%s\\\" filename=\\\"%s\\\">\\n\",\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_455, aux_String_455_Refman);
+  CHECK(459)
+  INIT_STRING_CONST(460, aux_String_456, "      files_coverage[n].filename,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_456, aux_String_456_Refman);
+  CHECK(460)
+  INIT_STRING_CONST(461, aux_String_457, "      files_coverage[n].filename);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_457, aux_String_457_Refman);
+  CHECK(461)
+  INIT_STRING_CONST(462, aux_String_458, "    fputs(\"     <methods/>\\n\", xml);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_458, aux_String_458_Refman);
+  CHECK(462)
+  INIT_STRING_CONST(463, aux_String_459, "    fputs(\"     <lines>\\n\", xml);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_459, aux_String_459_Refman);
+  CHECK(463)
+  INIT_STRING_CONST(464, aux_String_460, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_460, aux_String_460_Refman);
+  CHECK(464)
+  INIT_STRING_CONST(465, aux_String_461, "    for (line = 0; line < files_coverage[n].lines_number; ++line) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_461, aux_String_461_Refman);
+  CHECK(465)
+  INIT_STRING_CONST(466, aux_String_462, "      if (files_coverage[n].line_count[line] >= 0) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_462, aux_String_462_Refman);
+  CHECK(466)
+  INIT_STRING_CONST(467, aux_String_463, "        fprintf(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_463, aux_String_463_Refman);
+  CHECK(467)
+  INIT_STRING_CONST(468, aux_String_464, "          xml,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_464, aux_String_464_Refman);
+  CHECK(468)
+  INIT_STRING_CONST(469, aux_String_465, "          \"      <line branch=\\\"false\\\" hits=\\\"%d\\\" number=\\\"%d\\\"/>\\n\",\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_465, aux_String_465_Refman);
+  CHECK(469)
+  INIT_STRING_CONST(470, aux_String_466, "          files_coverage[n].line_count[line],\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_466, aux_String_466_Refman);
+  CHECK(470)
+  INIT_STRING_CONST(471, aux_String_467, "          line);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_467, aux_String_467_Refman);
+  CHECK(471)
+  INIT_STRING_CONST(472, aux_String_468, "      }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_468, aux_String_468_Refman);
+  CHECK(472)
+  INIT_STRING_CONST(473, aux_String_469, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_469, aux_String_469_Refman);
+  CHECK(473)
+  INIT_STRING_CONST(474, aux_String_470, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_470, aux_String_470_Refman);
+  CHECK(474)
+  INIT_STRING_CONST(475, aux_String_471, "    fputs(\"     </lines>\\n\", xml);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_471, aux_String_471_Refman);
+  CHECK(475)
+  INIT_STRING_CONST(476, aux_String_472, "    fputs(\"    </class>\\n\", xml);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_472, aux_String_472_Refman);
+  CHECK(476)
+  INIT_STRING_CONST(477, aux_String_473, "    fputs(\"   </classes>\\n\", xml);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_473, aux_String_473_Refman);
+  CHECK(477)
+  INIT_STRING_CONST(478, aux_String_474, "    fputs(\"  </package>\\n\", xml);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_474, aux_String_474_Refman);
+  CHECK(478)
+  INIT_STRING_CONST(479, aux_String_475, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_475, aux_String_475_Refman);
+  CHECK(479)
+  INIT_STRING_CONST(480, aux_String_476, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_476, aux_String_476_Refman);
+  CHECK(480)
+  INIT_STRING_CONST(481, aux_String_477, "  fputs(\" </packages>\\n\", xml);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_477, aux_String_477_Refman);
+  CHECK(481)
+  INIT_STRING_CONST(482, aux_String_478, "  fputs(\"</coverage>\\n\", xml);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_478, aux_String_478_Refman);
+  CHECK(482)
+  INIT_STRING_CONST(483, aux_String_479, "  fclose(xml);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_479, aux_String_479_Refman);
+  CHECK(483)
+  INIT_STRING_CONST(484, aux_String_480, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_480, aux_String_480_Refman);
+  CHECK(484)
+  INIT_STRING_CONST(485, aux_String_481, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_481, aux_String_481_Refman);
+  CHECK(485)
+  INIT_STRING_CONST(486, aux_String_482, "Bool LUMI_test_coverage(File_Coverage* files_coverage, int files_number) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_482, aux_String_482_Refman);
+  CHECK(486)
+  INIT_STRING_CONST(487, aux_String_483, "  int n;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_483, aux_String_483_Refman);
+  CHECK(487)
+  INIT_STRING_CONST(488, aux_String_484, "  int coverage;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_484, aux_String_484_Refman);
+  CHECK(488)
+  INIT_STRING_CONST(489, aux_String_485, "  Bool generate_xml = false;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_485, aux_String_485_Refman);
+  CHECK(489)
+  INIT_STRING_CONST(490, aux_String_486, "  if (sys->argv != NULL && sys->argv_Refman->value != NULL &&\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_486, aux_String_486_Refman);
+  CHECK(490)
+  INIT_STRING_CONST(491, aux_String_487, "      sys->argv_Length > 1 && sys->argv_String_length[1] > 1) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_487, aux_String_487_Refman);
+  CHECK(491)
+  INIT_STRING_CONST(492, aux_String_488, "    char* arg = sys->argv + sys->argv_Value_length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_488, aux_String_488_Refman);
+  CHECK(492)
+  INIT_STRING_CONST(493, aux_String_489, "    generate_xml = arg[0] == '-' && arg[1] == 'x';\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_489, aux_String_489_Refman);
+  CHECK(493)
+  INIT_STRING_CONST(494, aux_String_490, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_490, aux_String_490_Refman);
+  CHECK(494)
+  INIT_STRING_CONST(495, aux_String_491, "  printf(\"testing code coverage... \");\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_491, aux_String_491_Refman);
+  CHECK(495)
+  INIT_STRING_CONST(496, aux_String_492, "  coverage = calc_coverage(files_coverage, files_number);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_492, aux_String_492_Refman);
+  CHECK(496)
+  INIT_STRING_CONST(497, aux_String_493, "  if (coverage == 100) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_493, aux_String_493_Refman);
+  CHECK(497)
+  INIT_STRING_CONST(498, aux_String_494, "    printf(\"100%%\\n\");\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_494, aux_String_494_Refman);
+  CHECK(498)
+  INIT_STRING_CONST(499, aux_String_495, "    if (generate_xml) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_495, aux_String_495_Refman);
+  CHECK(499)
+  INIT_STRING_CONST(500, aux_String_496, "      make_coverage_xml(files_coverage, files_number);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_496, aux_String_496_Refman);
+  CHECK(500)
+  INIT_STRING_CONST(501, aux_String_497, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_497, aux_String_497_Refman);
+  CHECK(501)
+  INIT_STRING_CONST(502, aux_String_498, "    return true;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_498, aux_String_498_Refman);
+  CHECK(502)
+  INIT_STRING_CONST(503, aux_String_499, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_499, aux_String_499_Refman);
+  CHECK(503)
+  INIT_STRING_CONST(504, aux_String_500, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_500, aux_String_500_Refman);
+  CHECK(504)
+  INIT_STRING_CONST(505, aux_String_501, "  printf(\"%d%% - failed, lines not covered:\\n\", coverage);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_501, aux_String_501_Refman);
+  CHECK(505)
+  INIT_STRING_CONST(506, aux_String_502, "  for (n = 0; n < files_number; ++n) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_502, aux_String_502_Refman);
+  CHECK(506)
+  INIT_STRING_CONST(507, aux_String_503, "    coverage = calc_coverage(files_coverage + n, 1);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_503, aux_String_503_Refman);
+  CHECK(507)
+  INIT_STRING_CONST(508, aux_String_504, "    if (coverage < 100) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_504, aux_String_504_Refman);
+  CHECK(508)
+  INIT_STRING_CONST(509, aux_String_505, "      int line;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_505, aux_String_505_Refman);
+  CHECK(509)
+  INIT_STRING_CONST(510, aux_String_506, "      int first_uncovered;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_506, aux_String_506_Refman);
+  CHECK(510)
+  INIT_STRING_CONST(511, aux_String_507, "      Bool prev_uncovered = false;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_507, aux_String_507_Refman);
+  CHECK(511)
+  INIT_STRING_CONST(512, aux_String_508, "      printf(\"  %s(%d%%):\", files_coverage[n].filename, coverage);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_508, aux_String_508_Refman);
+  CHECK(512)
+  INIT_STRING_CONST(513, aux_String_509, "      for (line = 0; line < files_coverage[n].lines_number; ++line) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_509, aux_String_509_Refman);
+  CHECK(513)
+  INIT_STRING_CONST(514, aux_String_510, "        if (files_coverage[n].line_count[line] == 0) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_510, aux_String_510_Refman);
+  CHECK(514)
+  INIT_STRING_CONST(515, aux_String_511, "          if (!prev_uncovered) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_511, aux_String_511_Refman);
+  CHECK(515)
+  INIT_STRING_CONST(516, aux_String_512, "            first_uncovered = line;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_512, aux_String_512_Refman);
+  CHECK(516)
+  INIT_STRING_CONST(517, aux_String_513, "            prev_uncovered = true;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_513, aux_String_513_Refman);
+  CHECK(517)
+  INIT_STRING_CONST(518, aux_String_514, "          }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_514, aux_String_514_Refman);
+  CHECK(518)
+  INIT_STRING_CONST(519, aux_String_515, "        }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_515, aux_String_515_Refman);
+  CHECK(519)
+  INIT_STRING_CONST(520, aux_String_516, "        else if (prev_uncovered) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_516, aux_String_516_Refman);
+  CHECK(520)
+  INIT_STRING_CONST(521, aux_String_517, "          printf(\" %d\", first_uncovered);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_517, aux_String_517_Refman);
+  CHECK(521)
+  INIT_STRING_CONST(522, aux_String_518, "          if (first_uncovered < line - 1) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_518, aux_String_518_Refman);
+  CHECK(522)
+  INIT_STRING_CONST(523, aux_String_519, "            printf(\"-%d\", line - 1);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_519, aux_String_519_Refman);
+  CHECK(523)
+  INIT_STRING_CONST(524, aux_String_520, "          }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_520, aux_String_520_Refman);
+  CHECK(524)
+  INIT_STRING_CONST(525, aux_String_521, "          prev_uncovered = false;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_521, aux_String_521_Refman);
+  CHECK(525)
+  INIT_STRING_CONST(526, aux_String_522, "        }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_522, aux_String_522_Refman);
+  CHECK(526)
+  INIT_STRING_CONST(527, aux_String_523, "      }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_523, aux_String_523_Refman);
+  CHECK(527)
+  INIT_STRING_CONST(528, aux_String_524, "      printf(\"\\n\");\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_524, aux_String_524_Refman);
+  CHECK(528)
+  INIT_STRING_CONST(529, aux_String_525, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_525, aux_String_525_Refman);
+  CHECK(529)
+  INIT_STRING_CONST(530, aux_String_526, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_526, aux_String_526_Refman);
+  CHECK(530)
+  INIT_STRING_CONST(531, aux_String_527, "  if (generate_xml) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_527, aux_String_527_Refman);
+  CHECK(531)
+  INIT_STRING_CONST(532, aux_String_528, "    make_coverage_xml(files_coverage, files_number);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_528, aux_String_528_Refman);
+  CHECK(532)
+  INIT_STRING_CONST(533, aux_String_529, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_529, aux_String_529_Refman);
+  CHECK(533)
+  INIT_STRING_CONST(534, aux_String_530, "  return false;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_530, aux_String_530_Refman);
+  CHECK(534)
+  INIT_STRING_CONST(535, aux_String_531, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_531, aux_String_531_Refman);
+  CHECK(535)
+  INIT_STRING_CONST(536, aux_String_532, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_532, aux_String_532_Refman);
+  CHECK(536)
+  INIT_STRING_CONST(537, aux_String_533, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_533, aux_String_533_Refman);
+  CHECK(537)
+  INIT_STRING_CONST(538, aux_String_534, "/* reference counting */\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_534, aux_String_534_Refman);
+  CHECK(538)
+  INIT_STRING_CONST(539, aux_String_535, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_535, aux_String_535_Refman);
+  CHECK(539)
+  INIT_STRING_CONST(540, aux_String_536, "void new_Mock(Bool*);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_536, aux_String_536_Refman);
+  CHECK(540)
+  INIT_STRING_CONST(541, aux_String_537, "Returncode delete_Mock(Ref);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_537, aux_String_537_Refman);
+  CHECK(541)
+  INIT_STRING_CONST(542, aux_String_538, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_538, aux_String_538_Refman);
+  CHECK(542)
+  INIT_STRING_CONST(543, aux_String_539, "void* LUMI_alloc(size_t size) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_539, aux_String_539_Refman);
+  CHECK(543)
+  INIT_STRING_CONST(544, aux_String_540, "  Bool allocate_success = true;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_540, aux_String_540_Refman);
+  CHECK(544)
+  INIT_STRING_CONST(545, aux_String_541, "  new_Mock(&allocate_success);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_541, aux_String_541_Refman);
+  CHECK(545)
+  INIT_STRING_CONST(546, aux_String_542, "  if (allocate_success) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_542, aux_String_542_Refman);
+  CHECK(546)
+  INIT_STRING_CONST(547, aux_String_543, "    return calloc(1, size);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_543, aux_String_543_Refman);
+  CHECK(547)
+  INIT_STRING_CONST(548, aux_String_544, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_544, aux_String_544_Refman);
+  CHECK(548)
+  INIT_STRING_CONST(549, aux_String_545, "  return NULL;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_545, aux_String_545_Refman);
+  CHECK(549)
+  INIT_STRING_CONST(550, aux_String_546, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_546, aux_String_546_Refman);
+  CHECK(550)
+  INIT_STRING_CONST(551, aux_String_547, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_547, aux_String_547_Refman);
+  CHECK(551)
+  INIT_STRING_CONST(552, aux_String_548, "Ref_Manager* LUMI_new_ref(void* value) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_548, aux_String_548_Refman);
+  CHECK(552)
+  INIT_STRING_CONST(553, aux_String_549, "  Ref_Manager* ref = NULL;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_549, aux_String_549_Refman);
+  CHECK(553)
+  INIT_STRING_CONST(554, aux_String_550, "  Bool allocate_success = true;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_550, aux_String_550_Refman);
+  CHECK(554)
+  INIT_STRING_CONST(555, aux_String_551, "  new_Mock(&allocate_success);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_551, aux_String_551_Refman);
+  CHECK(555)
+  INIT_STRING_CONST(556, aux_String_552, "  if (allocate_success) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_552, aux_String_552_Refman);
+  CHECK(556)
+  INIT_STRING_CONST(557, aux_String_553, "    ref = malloc(sizeof(Ref_Manager));\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_553, aux_String_553_Refman);
+  CHECK(557)
+  INIT_STRING_CONST(558, aux_String_554, "    if (ref != NULL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_554, aux_String_554_Refman);
+  CHECK(558)
+  INIT_STRING_CONST(559, aux_String_555, "      ref->count = 1;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_555, aux_String_555_Refman);
+  CHECK(559)
+  INIT_STRING_CONST(560, aux_String_556, "      ref->value = value;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_556, aux_String_556_Refman);
+  CHECK(560)
+  INIT_STRING_CONST(561, aux_String_557, "      ref->ref = value;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_557, aux_String_557_Refman);
+  CHECK(561)
+  INIT_STRING_CONST(562, aux_String_558, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_558, aux_String_558_Refman);
+  CHECK(562)
+  INIT_STRING_CONST(563, aux_String_559, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_559, aux_String_559_Refman);
+  CHECK(563)
+  INIT_STRING_CONST(564, aux_String_560, "  return ref;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_560, aux_String_560_Refman);
+  CHECK(564)
+  INIT_STRING_CONST(565, aux_String_561, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_561, aux_String_561_Refman);
+  CHECK(565)
+  INIT_STRING_CONST(566, aux_String_562, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_562, aux_String_562_Refman);
+  CHECK(566)
+  INIT_STRING_CONST(567, aux_String_563, "void LUMI_inc_ref(Ref_Manager* ref) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_563, aux_String_563_Refman);
+  CHECK(567)
+  INIT_STRING_CONST(568, aux_String_564, "  if (ref != NULL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_564, aux_String_564_Refman);
+  CHECK(568)
+  INIT_STRING_CONST(569, aux_String_565, "    ++ref->count;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_565, aux_String_565_Refman);
+  CHECK(569)
+  INIT_STRING_CONST(570, aux_String_566, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_566, aux_String_566_Refman);
+  CHECK(570)
+  INIT_STRING_CONST(571, aux_String_567, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_567, aux_String_567_Refman);
+  CHECK(571)
+  INIT_STRING_CONST(572, aux_String_568, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_568, aux_String_568_Refman);
+  CHECK(572)
+  INIT_STRING_CONST(573, aux_String_569, "void dec_ref(Ref_Manager* ref) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_569, aux_String_569_Refman);
+  CHECK(573)
+  INIT_STRING_CONST(574, aux_String_570, "  --ref->count;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_570, aux_String_570_Refman);
+  CHECK(574)
+  INIT_STRING_CONST(575, aux_String_571, "  if (ref->count == 0) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_571, aux_String_571_Refman);
+  CHECK(575)
+  INIT_STRING_CONST(576, aux_String_572, "    IGNORE_ERRORS( delete_Mock(ref->ref); )\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_572, aux_String_572_Refman);
+  CHECK(576)
+  INIT_STRING_CONST(577, aux_String_573, "    free(ref);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_573, aux_String_573_Refman);
+  CHECK(577)
+  INIT_STRING_CONST(578, aux_String_574, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_574, aux_String_574_Refman);
+  CHECK(578)
+  INIT_STRING_CONST(579, aux_String_575, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_575, aux_String_575_Refman);
+  CHECK(579)
+  INIT_STRING_CONST(580, aux_String_576, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_576, aux_String_576_Refman);
+  CHECK(580)
+  INIT_STRING_CONST(581, aux_String_577, "void LUMI_dec_ref(Ref_Manager* ref) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_577, aux_String_577_Refman);
+  CHECK(581)
+  INIT_STRING_CONST(582, aux_String_578, "  if (ref != NULL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_578, aux_String_578_Refman);
+  CHECK(582)
+  INIT_STRING_CONST(583, aux_String_579, "    dec_ref(ref);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_579, aux_String_579_Refman);
+  CHECK(583)
+  INIT_STRING_CONST(584, aux_String_580, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_580, aux_String_580_Refman);
+  CHECK(584)
+  INIT_STRING_CONST(585, aux_String_581, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_581, aux_String_581_Refman);
+  CHECK(585)
+  INIT_STRING_CONST(586, aux_String_582, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_582, aux_String_582_Refman);
+  CHECK(586)
+  INIT_STRING_CONST(587, aux_String_583, "void LUMI_var_dec_ref(Ref_Manager* ref) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_583, aux_String_583_Refman);
+  CHECK(587)
+  INIT_STRING_CONST(588, aux_String_584, "  if (ref != NULL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_584, aux_String_584_Refman);
+  CHECK(588)
+  INIT_STRING_CONST(589, aux_String_585, "    ref->value = NULL;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_585, aux_String_585_Refman);
+  CHECK(589)
+  INIT_STRING_CONST(590, aux_String_586, "    dec_ref(ref);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_586, aux_String_586_Refman);
+  CHECK(590)
+  INIT_STRING_CONST(591, aux_String_587, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_587, aux_String_587_Refman);
+  CHECK(591)
+  INIT_STRING_CONST(592, aux_String_588, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_588, aux_String_588_Refman);
+  CHECK(592)
+  INIT_STRING_CONST(593, aux_String_589, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_589, aux_String_589_Refman);
+  CHECK(593)
+  INIT_STRING_CONST(594, aux_String_590, "void LUMI_owner_dec_ref(Ref_Manager* ref) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_590, aux_String_590_Refman);
+  CHECK(594)
+  INIT_STRING_CONST(595, aux_String_591, "  if (ref != NULL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_591, aux_String_591_Refman);
+  CHECK(595)
+  INIT_STRING_CONST(596, aux_String_592, "    free(ref->value);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_592, aux_String_592_Refman);
+  CHECK(596)
+  INIT_STRING_CONST(597, aux_String_593, "    ref->value = NULL;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_593, aux_String_593_Refman);
+  CHECK(597)
+  INIT_STRING_CONST(598, aux_String_594, "    dec_ref(ref);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_594, aux_String_594_Refman);
+  CHECK(598)
+  INIT_STRING_CONST(599, aux_String_595, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_595, aux_String_595_Refman);
+  CHECK(599)
+  INIT_STRING_CONST(600, aux_String_596, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_596, aux_String_596_Refman);
+  CHECK(600)
+  INIT_STRING_CONST(601, aux_String_597, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_597, aux_String_597_Refman);
+  CHECK(601)
+  INIT_STRING_CONST(602, aux_String_598, "/* Pointer */\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_598, aux_String_598_Refman);
+  CHECK(602)
+  INIT_STRING_CONST(603, aux_String_599, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_599, aux_String_599_Refman);
+  CHECK(603)
+  INIT_STRING_CONST(604, aux_String_600, "#define cdef_M_Pointer_set_point_to(pointer, value, _) pointer = &value\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_600, aux_String_600_Refman);
+  CHECK(604)
+  INIT_STRING_CONST(605, aux_String_601, "#define cdef_M_Pointer_set_from_ref(pointer, ref, _) pointer = ref\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_601, aux_String_601_Refman);
+  CHECK(605)
+  INIT_STRING_CONST(606, aux_String_602, "#define cdef_M_Pointer_set_from_array cdef_M_Pointer_set_from_ref\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_602, aux_String_602_Refman);
+  CHECK(606)
+  INIT_STRING_CONST(607, aux_String_603, "#define cdef_M_Pointer_get_pointed_at(pointer, index) pointer[index]\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_603, aux_String_603_Refman);
+  CHECK(607)
+  INIT_STRING_CONST(608, aux_String_604, "#define cdef_M_Pointer_get_ref_at(pointer, index) (pointer + index)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_604, aux_String_604_Refman);
+  CHECK(608)
+  INIT_STRING_CONST(609, aux_String_605, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_605, aux_String_605_Refman);
+  CHECK(609)
+  INIT_STRING_CONST(610, aux_String_606, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_606, aux_String_606_Refman);
+  CHECK(610)
+  INIT_STRING_CONST(611, aux_String_607, "/* Int */\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_607, aux_String_607_Refman);
+  CHECK(611)
+  INIT_STRING_CONST(612, aux_String_608, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_608, aux_String_608_Refman);
+  CHECK(612)
+  INIT_STRING_CONST(613, aux_String_609, "#define LUMI_FUNC_NAME \"Int.str\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_609, aux_String_609_Refman);
+  CHECK(613)
+  INIT_STRING_CONST(614, aux_String_610, "Returncode Int_str(Int value, char* str, int str_max_length, int* str_length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_610, aux_String_610_Refman);
+  CHECK(614)
+  INIT_STRING_CONST(615, aux_String_611, "  Bool is_neg;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_611, aux_String_611_Refman);
+  CHECK(615)
+  INIT_STRING_CONST(616, aux_String_612, "  int abs;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_612, aux_String_612_Refman);
+  CHECK(616)
+  INIT_STRING_CONST(617, aux_String_613, "  int swap;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_613, aux_String_613_Refman);
+  CHECK(617)
+  INIT_STRING_CONST(618, aux_String_614, "  char* next;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_614, aux_String_614_Refman);
+  CHECK(618)
+  INIT_STRING_CONST(619, aux_String_615, "  char* last;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_615, aux_String_615_Refman);
+  CHECK(619)
+  INIT_STRING_CONST(620, aux_String_616, "  is_neg = value < 0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_616, aux_String_616_Refman);
+  CHECK(620)
+  INIT_STRING_CONST(621, aux_String_617, "  abs = value;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_617, aux_String_617_Refman);
+  CHECK(621)
+  INIT_STRING_CONST(622, aux_String_618, "  if (is_neg) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_618, aux_String_618_Refman);
+  CHECK(622)
+  INIT_STRING_CONST(623, aux_String_619, "    abs = -value;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_619, aux_String_619_Refman);
+  CHECK(623)
+  INIT_STRING_CONST(624, aux_String_620, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_620, aux_String_620_Refman);
+  CHECK(624)
+  INIT_STRING_CONST(625, aux_String_621, "  swap = 0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_621, aux_String_621_Refman);
+  CHECK(625)
+  INIT_STRING_CONST(626, aux_String_622, "  *str_length = is_neg;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_622, aux_String_622_Refman);
+  CHECK(626)
+  INIT_STRING_CONST(627, aux_String_623, "  do {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_623, aux_String_623_Refman);
+  CHECK(627)
+  INIT_STRING_CONST(628, aux_String_624, "    swap *= 10;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_624, aux_String_624_Refman);
+  CHECK(628)
+  INIT_STRING_CONST(629, aux_String_625, "    swap += abs % 10;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_625, aux_String_625_Refman);
+  CHECK(629)
+  INIT_STRING_CONST(630, aux_String_626, "    abs /= 10;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_626, aux_String_626_Refman);
+  CHECK(630)
+  INIT_STRING_CONST(631, aux_String_627, "    if (str_max_length <= *str_length + 1) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_627, aux_String_627_Refman);
+  CHECK(631)
+  INIT_STRING_CONST(632, aux_String_628, "      *str_length = 0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_628, aux_String_628_Refman);
+  CHECK(632)
+  INIT_STRING_CONST(633, aux_String_629, "      CRAISE(LUMI_error_messages.string_too_long.str)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_629, aux_String_629_Refman);
+  CHECK(633)
+  INIT_STRING_CONST(634, aux_String_630, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_630, aux_String_630_Refman);
+  CHECK(634)
+  INIT_STRING_CONST(635, aux_String_631, "    ++*str_length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_631, aux_String_631_Refman);
+  CHECK(635)
+  INIT_STRING_CONST(636, aux_String_632, "  } while (abs > 0);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_632, aux_String_632_Refman);
+  CHECK(636)
+  INIT_STRING_CONST(637, aux_String_633, "  next = str;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_633, aux_String_633_Refman);
+  CHECK(637)
+  INIT_STRING_CONST(638, aux_String_634, "  if (is_neg) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_634, aux_String_634_Refman);
+  CHECK(638)
+  INIT_STRING_CONST(639, aux_String_635, "    *next = '-';\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_635, aux_String_635_Refman);
+  CHECK(639)
+  INIT_STRING_CONST(640, aux_String_636, "    ++next;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_636, aux_String_636_Refman);
+  CHECK(640)
+  INIT_STRING_CONST(641, aux_String_637, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_637, aux_String_637_Refman);
+  CHECK(641)
+  INIT_STRING_CONST(642, aux_String_638, "  last = str + *str_length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_638, aux_String_638_Refman);
+  CHECK(642)
+  INIT_STRING_CONST(643, aux_String_639, "  while (next < last) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_639, aux_String_639_Refman);
+  CHECK(643)
+  INIT_STRING_CONST(644, aux_String_640, "    *next = '0' + swap % 10;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_640, aux_String_640_Refman);
+  CHECK(644)
+  INIT_STRING_CONST(645, aux_String_641, "    ++next;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_641, aux_String_641_Refman);
+  CHECK(645)
+  INIT_STRING_CONST(646, aux_String_642, "    swap /= 10;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_642, aux_String_642_Refman);
+  CHECK(646)
+  INIT_STRING_CONST(647, aux_String_643, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_643, aux_String_643_Refman);
+  CHECK(647)
+  INIT_STRING_CONST(648, aux_String_644, "  *last = '\\0';\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_644, aux_String_644_Refman);
+  CHECK(648)
+  INIT_STRING_CONST(649, aux_String_645, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_645, aux_String_645_Refman);
+  CHECK(649)
+  INIT_STRING_CONST(650, aux_String_646, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_646, aux_String_646_Refman);
+  CHECK(650)
+  INIT_STRING_CONST(651, aux_String_647, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_647, aux_String_647_Refman);
+  CHECK(651)
+  INIT_STRING_CONST(652, aux_String_648, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_648, aux_String_648_Refman);
+  CHECK(652)
+  INIT_STRING_CONST(653, aux_String_649, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_649, aux_String_649_Refman);
+  CHECK(653)
+  INIT_STRING_CONST(654, aux_String_650, "/* Array */\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_650, aux_String_650_Refman);
+  CHECK(654)
+  INIT_STRING_CONST(655, aux_String_651, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_651, aux_String_651_Refman);
+  CHECK(655)
+  INIT_STRING_CONST(656, aux_String_652, "void Array_length(void* self, int length, Int* length_out) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_652, aux_String_652_Refman);
+  CHECK(656)
+  INIT_STRING_CONST(657, aux_String_653, "  *length_out = length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_653, aux_String_653_Refman);
+  CHECK(657)
+  INIT_STRING_CONST(658, aux_String_654, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_654, aux_String_654_Refman);
+  CHECK(658)
+  INIT_STRING_CONST(659, aux_String_655, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_655, aux_String_655_Refman);
+  CHECK(659)
+  INIT_STRING_CONST(660, aux_String_656, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_656, aux_String_656_Refman);
+  CHECK(660)
+  INIT_STRING_CONST(661, aux_String_657, "/* String */\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_657, aux_String_657_Refman);
+  CHECK(661)
+  INIT_STRING_CONST(662, aux_String_658, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_658, aux_String_658_Refman);
+  CHECK(662)
+  INIT_STRING_CONST(663, aux_String_659, "void String_length(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_659, aux_String_659_Refman);
+  CHECK(663)
+  INIT_STRING_CONST(664, aux_String_660, "    char* self, int max_length, int *length, Int* length_out) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_660, aux_String_660_Refman);
+  CHECK(664)
+  INIT_STRING_CONST(665, aux_String_661, "  *length_out = *length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_661, aux_String_661_Refman);
+  CHECK(665)
+  INIT_STRING_CONST(666, aux_String_662, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_662, aux_String_662_Refman);
+  CHECK(666)
+  INIT_STRING_CONST(667, aux_String_663, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_663, aux_String_663_Refman);
+  CHECK(667)
+  INIT_STRING_CONST(668, aux_String_664, "void String_max_length(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_664, aux_String_664_Refman);
+  CHECK(668)
+  INIT_STRING_CONST(669, aux_String_665, "    char* self, int max_length, int *length, Int* max_length_out) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_665, aux_String_665_Refman);
+  CHECK(669)
+  INIT_STRING_CONST(670, aux_String_666, "  *max_length_out = max_length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_666, aux_String_666_Refman);
+  CHECK(670)
+  INIT_STRING_CONST(671, aux_String_667, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_667, aux_String_667_Refman);
+  CHECK(671)
+  INIT_STRING_CONST(672, aux_String_668, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_668, aux_String_668_Refman);
+  CHECK(672)
+  INIT_STRING_CONST(673, aux_String_669, "#define LUMI_FUNC_NAME \"String.copy\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_669, aux_String_669_Refman);
+  CHECK(673)
+  INIT_STRING_CONST(674, aux_String_670, "Returncode String_copy(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_670, aux_String_670_Refman);
+  CHECK(674)
+  INIT_STRING_CONST(675, aux_String_671, "    char* self, int max_length, int* length, char* source, int source_length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_671, aux_String_671_Refman);
+  CHECK(675)
+  INIT_STRING_CONST(676, aux_String_672, "  if (self == source) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_672, aux_String_672_Refman);
+  CHECK(676)
+  INIT_STRING_CONST(677, aux_String_673, "    return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_673, aux_String_673_Refman);
+  CHECK(677)
+  INIT_STRING_CONST(678, aux_String_674, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_674, aux_String_674_Refman);
+  CHECK(678)
+  INIT_STRING_CONST(679, aux_String_675, "  if (source_length >= max_length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_675, aux_String_675_Refman);
+  CHECK(679)
+  INIT_STRING_CONST(680, aux_String_676, "    CRAISE(LUMI_error_messages.string_too_long.str)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_676, aux_String_676_Refman);
+  CHECK(680)
+  INIT_STRING_CONST(681, aux_String_677, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_677, aux_String_677_Refman);
+  CHECK(681)
+  INIT_STRING_CONST(682, aux_String_678, "  *length = source_length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_678, aux_String_678_Refman);
+  CHECK(682)
+  INIT_STRING_CONST(683, aux_String_679, "  memcpy(self, source, source_length);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_679, aux_String_679_Refman);
+  CHECK(683)
+  INIT_STRING_CONST(684, aux_String_680, "  self[source_length] = '\\0';\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_680, aux_String_680_Refman);
+  CHECK(684)
+  INIT_STRING_CONST(685, aux_String_681, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_681, aux_String_681_Refman);
+  CHECK(685)
+  INIT_STRING_CONST(686, aux_String_682, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_682, aux_String_682_Refman);
+  CHECK(686)
+  INIT_STRING_CONST(687, aux_String_683, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_683, aux_String_683_Refman);
+  CHECK(687)
+  INIT_STRING_CONST(688, aux_String_684, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_684, aux_String_684_Refman);
+  CHECK(688)
+  INIT_STRING_CONST(689, aux_String_685, "#define LUMI_FUNC_NAME \"String.copy-from-pointer\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_685, aux_String_685_Refman);
+  CHECK(689)
+  INIT_STRING_CONST(690, aux_String_686, "Returncode String_copy_from_pointer(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_686, aux_String_686_Refman);
+  CHECK(690)
+  INIT_STRING_CONST(691, aux_String_687, "    char* self, int max_length, int* length, char* source) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_687, aux_String_687_Refman);
+  CHECK(691)
+  INIT_STRING_CONST(692, aux_String_688, "  int source_length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_688, aux_String_688_Refman);
+  CHECK(692)
+  INIT_STRING_CONST(693, aux_String_689, "  if (source == NULL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_689, aux_String_689_Refman);
+  CHECK(693)
+  INIT_STRING_CONST(694, aux_String_690, "    *length = 0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_690, aux_String_690_Refman);
+  CHECK(694)
+  INIT_STRING_CONST(695, aux_String_691, "    self[0] = '\\0';\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_691, aux_String_691_Refman);
+  CHECK(695)
+  INIT_STRING_CONST(696, aux_String_692, "    return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_692, aux_String_692_Refman);
+  CHECK(696)
+  INIT_STRING_CONST(697, aux_String_693, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_693, aux_String_693_Refman);
+  CHECK(697)
+  INIT_STRING_CONST(698, aux_String_694, "  if (self == source) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_694, aux_String_694_Refman);
+  CHECK(698)
+  INIT_STRING_CONST(699, aux_String_695, "    return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_695, aux_String_695_Refman);
+  CHECK(699)
+  INIT_STRING_CONST(700, aux_String_696, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_696, aux_String_696_Refman);
+  CHECK(700)
+  INIT_STRING_CONST(701, aux_String_697, "  source_length = cstring_length(source, max_length);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_697, aux_String_697_Refman);
+  CHECK(701)
+  INIT_STRING_CONST(702, aux_String_698, "  if (source_length >= max_length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_698, aux_String_698_Refman);
+  CHECK(702)
+  INIT_STRING_CONST(703, aux_String_699, "    CRAISE(LUMI_error_messages.string_too_long.str)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_699, aux_String_699_Refman);
+  CHECK(703)
+  INIT_STRING_CONST(704, aux_String_700, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_700, aux_String_700_Refman);
+  CHECK(704)
+  INIT_STRING_CONST(705, aux_String_701, "  *length = source_length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_701, aux_String_701_Refman);
+  CHECK(705)
+  INIT_STRING_CONST(706, aux_String_702, "  memcpy(self, source, source_length);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_702, aux_String_702_Refman);
+  CHECK(706)
+  INIT_STRING_CONST(707, aux_String_703, "  self[source_length] = '\\0';\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_703, aux_String_703_Refman);
+  CHECK(707)
+  INIT_STRING_CONST(708, aux_String_704, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_704, aux_String_704_Refman);
+  CHECK(708)
+  INIT_STRING_CONST(709, aux_String_705, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_705, aux_String_705_Refman);
+  CHECK(709)
+  INIT_STRING_CONST(710, aux_String_706, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_706, aux_String_706_Refman);
+  CHECK(710)
+  INIT_STRING_CONST(711, aux_String_707, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_707, aux_String_707_Refman);
+  CHECK(711)
+  INIT_STRING_CONST(712, aux_String_708, "void String_set_null_term_length(char* self, int max_length, int* length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_708, aux_String_708_Refman);
+  CHECK(712)
+  INIT_STRING_CONST(713, aux_String_709, "  *length = cstring_length(self, max_length);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_709, aux_String_709_Refman);
+  CHECK(713)
+  INIT_STRING_CONST(714, aux_String_710, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_710, aux_String_710_Refman);
+  CHECK(714)
+  INIT_STRING_CONST(715, aux_String_711, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_711, aux_String_711_Refman);
+  CHECK(715)
+  INIT_STRING_CONST(716, aux_String_712, "void String_clear(char* self, int max_length, int* length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_712, aux_String_712_Refman);
+  CHECK(716)
+  INIT_STRING_CONST(717, aux_String_713, "  *length = 0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_713, aux_String_713_Refman);
+  CHECK(717)
+  INIT_STRING_CONST(718, aux_String_714, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_714, aux_String_714_Refman);
+  CHECK(718)
+  INIT_STRING_CONST(719, aux_String_715, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_715, aux_String_715_Refman);
+  CHECK(719)
+  INIT_STRING_CONST(720, aux_String_716, "void String_equal(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_716, aux_String_716_Refman);
+  CHECK(720)
+  INIT_STRING_CONST(721, aux_String_717, "    char* self, int max_length, int *length,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_717, aux_String_717_Refman);
+  CHECK(721)
+  INIT_STRING_CONST(722, aux_String_718, "    char* other, int other_length,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_718, aux_String_718_Refman);
+  CHECK(722)
+  INIT_STRING_CONST(723, aux_String_719, "    Bool* out_equal) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_719, aux_String_719_Refman);
+  CHECK(723)
+  INIT_STRING_CONST(724, aux_String_720, "  if (self == other) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_720, aux_String_720_Refman);
+  CHECK(724)
+  INIT_STRING_CONST(725, aux_String_721, "    *out_equal = *length == other_length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_721, aux_String_721_Refman);
+  CHECK(725)
+  INIT_STRING_CONST(726, aux_String_722, "    return;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_722, aux_String_722_Refman);
+  CHECK(726)
+  INIT_STRING_CONST(727, aux_String_723, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_723, aux_String_723_Refman);
+  CHECK(727)
+  INIT_STRING_CONST(728, aux_String_724, "  if (*length != other_length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_724, aux_String_724_Refman);
+  CHECK(728)
+  INIT_STRING_CONST(729, aux_String_725, "    *out_equal = false;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_725, aux_String_725_Refman);
+  CHECK(729)
+  INIT_STRING_CONST(730, aux_String_726, "    return;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_726, aux_String_726_Refman);
+  CHECK(730)
+  INIT_STRING_CONST(731, aux_String_727, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_727, aux_String_727_Refman);
+  CHECK(731)
+  INIT_STRING_CONST(732, aux_String_728, "  *out_equal = strncmp(self, other, *length) == 0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_728, aux_String_728_Refman);
+  CHECK(732)
+  INIT_STRING_CONST(733, aux_String_729, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_729, aux_String_729_Refman);
+  CHECK(733)
+  INIT_STRING_CONST(734, aux_String_730, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_730, aux_String_730_Refman);
+  CHECK(734)
+  INIT_STRING_CONST(735, aux_String_731, "#define LUMI_FUNC_NAME \"String.get\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_731, aux_String_731_Refman);
+  CHECK(735)
+  INIT_STRING_CONST(736, aux_String_732, "Returncode String_get(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_732, aux_String_732_Refman);
+  CHECK(736)
+  INIT_STRING_CONST(737, aux_String_733, "    char* self, int max_length, int *length, Int index, Char* out_char) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_733, aux_String_733_Refman);
+  CHECK(737)
+  INIT_STRING_CONST(738, aux_String_734, "  if (index < 0 || index >= *length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_734, aux_String_734_Refman);
+  CHECK(738)
+  INIT_STRING_CONST(739, aux_String_735, "    CRAISE(LUMI_error_messages.slice_index.str)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_735, aux_String_735_Refman);
+  CHECK(739)
+  INIT_STRING_CONST(740, aux_String_736, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_736, aux_String_736_Refman);
+  CHECK(740)
+  INIT_STRING_CONST(741, aux_String_737, "  *out_char = self[index];\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_737, aux_String_737_Refman);
+  CHECK(741)
+  INIT_STRING_CONST(742, aux_String_738, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_738, aux_String_738_Refman);
+  CHECK(742)
+  INIT_STRING_CONST(743, aux_String_739, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_739, aux_String_739_Refman);
+  CHECK(743)
+  INIT_STRING_CONST(744, aux_String_740, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_740, aux_String_740_Refman);
+  CHECK(744)
+  INIT_STRING_CONST(745, aux_String_741, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_741, aux_String_741_Refman);
+  CHECK(745)
+  INIT_STRING_CONST(746, aux_String_742, "#define LUMI_FUNC_NAME \"String.set\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_742, aux_String_742_Refman);
+  CHECK(746)
+  INIT_STRING_CONST(747, aux_String_743, "Returncode String_set(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_743, aux_String_743_Refman);
+  CHECK(747)
+  INIT_STRING_CONST(748, aux_String_744, "    char* self, int max_length, int *length, Int index, Char ch) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_744, aux_String_744_Refman);
+  CHECK(748)
+  INIT_STRING_CONST(749, aux_String_745, "  if (index < 0 || index >= *length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_745, aux_String_745_Refman);
+  CHECK(749)
+  INIT_STRING_CONST(750, aux_String_746, "    CRAISE(LUMI_error_messages.slice_index.str)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_746, aux_String_746_Refman);
+  CHECK(750)
+  INIT_STRING_CONST(751, aux_String_747, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_747, aux_String_747_Refman);
+  CHECK(751)
+  INIT_STRING_CONST(752, aux_String_748, "  self[index] = ch;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_748, aux_String_748_Refman);
+  CHECK(752)
+  INIT_STRING_CONST(753, aux_String_749, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_749, aux_String_749_Refman);
+  CHECK(753)
+  INIT_STRING_CONST(754, aux_String_750, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_750, aux_String_750_Refman);
+  CHECK(754)
+  INIT_STRING_CONST(755, aux_String_751, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_751, aux_String_751_Refman);
+  CHECK(755)
+  INIT_STRING_CONST(756, aux_String_752, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_752, aux_String_752_Refman);
+  CHECK(756)
+  INIT_STRING_CONST(757, aux_String_753, "#define LUMI_FUNC_NAME \"String.append\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_753, aux_String_753_Refman);
+  CHECK(757)
+  INIT_STRING_CONST(758, aux_String_754, "Returncode String_append(char* self, int max_length, int* length, Char ch) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_754, aux_String_754_Refman);
+  CHECK(758)
+  INIT_STRING_CONST(759, aux_String_755, "  if (*length + 1 >= max_length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_755, aux_String_755_Refman);
+  CHECK(759)
+  INIT_STRING_CONST(760, aux_String_756, "    CRAISE(LUMI_error_messages.string_too_long.str)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_756, aux_String_756_Refman);
+  CHECK(760)
+  INIT_STRING_CONST(761, aux_String_757, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_757, aux_String_757_Refman);
+  CHECK(761)
+  INIT_STRING_CONST(762, aux_String_758, "  self[*length] = ch;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_758, aux_String_758_Refman);
+  CHECK(762)
+  INIT_STRING_CONST(763, aux_String_759, "  ++(*length);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_759, aux_String_759_Refman);
+  CHECK(763)
+  INIT_STRING_CONST(764, aux_String_760, "  self[*length] = '\\0';\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_760, aux_String_760_Refman);
+  CHECK(764)
+  INIT_STRING_CONST(765, aux_String_761, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_761, aux_String_761_Refman);
+  CHECK(765)
+  INIT_STRING_CONST(766, aux_String_762, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_762, aux_String_762_Refman);
+  CHECK(766)
+  INIT_STRING_CONST(767, aux_String_763, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_763, aux_String_763_Refman);
+  CHECK(767)
+  INIT_STRING_CONST(768, aux_String_764, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_764, aux_String_764_Refman);
+  CHECK(768)
+  INIT_STRING_CONST(769, aux_String_765, "#define LUMI_FUNC_NAME \"String.concat\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_765, aux_String_765_Refman);
+  CHECK(769)
+  INIT_STRING_CONST(770, aux_String_766, "Returncode String_concat(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_766, aux_String_766_Refman);
+  CHECK(770)
+  INIT_STRING_CONST(771, aux_String_767, "    char* self, int max_length, int* length, char* ext, int ext_length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_767, aux_String_767_Refman);
+  CHECK(771)
+  INIT_STRING_CONST(772, aux_String_768, "  if (*length + ext_length >= max_length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_768, aux_String_768_Refman);
+  CHECK(772)
+  INIT_STRING_CONST(773, aux_String_769, "    CRAISE(LUMI_error_messages.string_too_long.str)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_769, aux_String_769_Refman);
+  CHECK(773)
+  INIT_STRING_CONST(774, aux_String_770, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_770, aux_String_770_Refman);
+  CHECK(774)
+  INIT_STRING_CONST(775, aux_String_771, "  memcpy(self + *length, ext, ext_length);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_771, aux_String_771_Refman);
+  CHECK(775)
+  INIT_STRING_CONST(776, aux_String_772, "  *length += ext_length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_772, aux_String_772_Refman);
+  CHECK(776)
+  INIT_STRING_CONST(777, aux_String_773, "  self[*length] = '\\0';\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_773, aux_String_773_Refman);
+  CHECK(777)
+  INIT_STRING_CONST(778, aux_String_774, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_774, aux_String_774_Refman);
+  CHECK(778)
+  INIT_STRING_CONST(779, aux_String_775, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_775, aux_String_775_Refman);
+  CHECK(779)
+  INIT_STRING_CONST(780, aux_String_776, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_776, aux_String_776_Refman);
+  CHECK(780)
+  INIT_STRING_CONST(781, aux_String_777, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_777, aux_String_777_Refman);
+  CHECK(781)
+  INIT_STRING_CONST(782, aux_String_778, "#define LUMI_FUNC_NAME \"String.concat-int\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_778, aux_String_778_Refman);
+  CHECK(782)
+  INIT_STRING_CONST(783, aux_String_779, "Returncode String_concat_int(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_779, aux_String_779_Refman);
+  CHECK(783)
+  INIT_STRING_CONST(784, aux_String_780, "    char* self, int max_length, int* length, Int num) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_780, aux_String_780_Refman);
+  CHECK(784)
+  INIT_STRING_CONST(785, aux_String_781, "  int added_length = 0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_781, aux_String_781_Refman);
+  CHECK(785)
+  INIT_STRING_CONST(786, aux_String_782, "  CCHECK(Int_str(num, self + *length, max_length - *length, &added_length));\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_782, aux_String_782_Refman);
+  CHECK(786)
+  INIT_STRING_CONST(787, aux_String_783, "  *length += added_length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_783, aux_String_783_Refman);
+  CHECK(787)
+  INIT_STRING_CONST(788, aux_String_784, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_784, aux_String_784_Refman);
+  CHECK(788)
+  INIT_STRING_CONST(789, aux_String_785, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_785, aux_String_785_Refman);
+  CHECK(789)
+  INIT_STRING_CONST(790, aux_String_786, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_786, aux_String_786_Refman);
+  CHECK(790)
+  INIT_STRING_CONST(791, aux_String_787, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_787, aux_String_787_Refman);
+  CHECK(791)
+  INIT_STRING_CONST(792, aux_String_788, "void String_find(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_788, aux_String_788_Refman);
+  CHECK(792)
+  INIT_STRING_CONST(793, aux_String_789, "    char* self, int max_length, int *length,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_789, aux_String_789_Refman);
+  CHECK(793)
+  INIT_STRING_CONST(794, aux_String_790, "    char* pattern, int pattern_length,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_790, aux_String_790_Refman);
+  CHECK(794)
+  INIT_STRING_CONST(795, aux_String_791, "    Int* out_index) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_791, aux_String_791_Refman);
+  CHECK(795)
+  INIT_STRING_CONST(796, aux_String_792, "  int n;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_792, aux_String_792_Refman);
+  CHECK(796)
+  INIT_STRING_CONST(797, aux_String_793, "  for (n = 0; n <= *length - pattern_length; ++n) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_793, aux_String_793_Refman);
+  CHECK(797)
+  INIT_STRING_CONST(798, aux_String_794, "    if (strncmp(self + n, pattern, pattern_length) == 0) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_794, aux_String_794_Refman);
+  CHECK(798)
+  INIT_STRING_CONST(799, aux_String_795, "      *out_index = n;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_795, aux_String_795_Refman);
+  CHECK(799)
+  INIT_STRING_CONST(800, aux_String_796, "      return;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_796, aux_String_796_Refman);
+  CHECK(800)
+  INIT_STRING_CONST(801, aux_String_797, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_797, aux_String_797_Refman);
+  CHECK(801)
+  INIT_STRING_CONST(802, aux_String_798, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_798, aux_String_798_Refman);
+  CHECK(802)
+  INIT_STRING_CONST(803, aux_String_799, "  *out_index = *length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_799, aux_String_799_Refman);
+  CHECK(803)
+  INIT_STRING_CONST(804, aux_String_800, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_800, aux_String_800_Refman);
+  CHECK(804)
+  INIT_STRING_CONST(805, aux_String_801, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_801, aux_String_801_Refman);
+  CHECK(805)
+  INIT_STRING_CONST(806, aux_String_802, "void String_has(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_802, aux_String_802_Refman);
+  CHECK(806)
+  INIT_STRING_CONST(807, aux_String_803, "    char* self, int max_length, int *length, Char ch, Bool* found) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_803, aux_String_803_Refman);
+  CHECK(807)
+  INIT_STRING_CONST(808, aux_String_804, "  int n;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_804, aux_String_804_Refman);
+  CHECK(808)
+  INIT_STRING_CONST(809, aux_String_805, "  for (n = 0; n < *length; ++n) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_805, aux_String_805_Refman);
+  CHECK(809)
+  INIT_STRING_CONST(810, aux_String_806, "    if (self[n] == ch) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_806, aux_String_806_Refman);
+  CHECK(810)
+  INIT_STRING_CONST(811, aux_String_807, "      *found = true;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_807, aux_String_807_Refman);
+  CHECK(811)
+  INIT_STRING_CONST(812, aux_String_808, "      return;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_808, aux_String_808_Refman);
+  CHECK(812)
+  INIT_STRING_CONST(813, aux_String_809, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_809, aux_String_809_Refman);
+  CHECK(813)
+  INIT_STRING_CONST(814, aux_String_810, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_810, aux_String_810_Refman);
+  CHECK(814)
+  INIT_STRING_CONST(815, aux_String_811, "  *found = false;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_811, aux_String_811_Refman);
+  CHECK(815)
+  INIT_STRING_CONST(816, aux_String_812, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_812, aux_String_812_Refman);
+  CHECK(816)
+  INIT_STRING_CONST(817, aux_String_813, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_813, aux_String_813_Refman);
+  CHECK(817)
+  INIT_STRING_CONST(818, aux_String_814, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_814, aux_String_814_Refman);
+  CHECK(818)
+  INIT_STRING_CONST(819, aux_String_815, "/* File */\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_815, aux_String_815_Refman);
+  CHECK(819)
+  INIT_STRING_CONST(820, aux_String_816, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_816, aux_String_816_Refman);
+  CHECK(820)
+  INIT_STRING_CONST(821, aux_String_817, "void File_Del(File* self) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_817, aux_String_817_Refman);
+  CHECK(821)
+  INIT_STRING_CONST(822, aux_String_818, "  if (self != NULL && self->fobj != NULL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_818, aux_String_818_Refman);
+  CHECK(822)
+  INIT_STRING_CONST(823, aux_String_819, "    fclose(self->fobj);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_819, aux_String_819_Refman);
+  CHECK(823)
+  INIT_STRING_CONST(824, aux_String_820, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_820, aux_String_820_Refman);
+  CHECK(824)
+  INIT_STRING_CONST(825, aux_String_821, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_821, aux_String_821_Refman);
+  CHECK(825)
+  INIT_STRING_CONST(826, aux_String_822, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_822, aux_String_822_Refman);
+  CHECK(826)
+  INIT_STRING_CONST(827, aux_String_823, "Generic_Type_Dynamic File_dynamic = { (Dynamic_Del)File_Del };\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_823, aux_String_823_Refman);
+  CHECK(827)
+  INIT_STRING_CONST(828, aux_String_824, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_824, aux_String_824_Refman);
+  CHECK(828)
+  INIT_STRING_CONST(829, aux_String_825, "#define LUMI_FUNC_NAME \"file-close\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_825, aux_String_825_Refman);
+  CHECK(829)
+  INIT_STRING_CONST(830, aux_String_826, "Returncode file_close(File* file) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_826, aux_String_826_Refman);
+  CHECK(830)
+  INIT_STRING_CONST(831, aux_String_827, "  if (lumi_debug_value == LUMI_DEBUG_FAIL || file->fobj != NULL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_827, aux_String_827_Refman);
+  CHECK(831)
+  INIT_STRING_CONST(832, aux_String_828, "    if (lumi_debug_value == LUMI_DEBUG_FAIL || fclose(file->fobj) != 0) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_828, aux_String_828_Refman);
+  CHECK(832)
+  INIT_STRING_CONST(833, aux_String_829, "      free(file);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_829, aux_String_829_Refman);
+  CHECK(833)
+  INIT_STRING_CONST(834, aux_String_830, "      CRAISE(\"close file failed\")\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_830, aux_String_830_Refman);
+  CHECK(834)
+  INIT_STRING_CONST(835, aux_String_831, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_831, aux_String_831_Refman);
+  CHECK(835)
+  INIT_STRING_CONST(836, aux_String_832, "    file->fobj = NULL;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_832, aux_String_832_Refman);
+  CHECK(836)
+  INIT_STRING_CONST(837, aux_String_833, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_833, aux_String_833_Refman);
+  CHECK(837)
+  INIT_STRING_CONST(838, aux_String_834, "  free(file);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_834, aux_String_834_Refman);
+  CHECK(838)
+  INIT_STRING_CONST(839, aux_String_835, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_835, aux_String_835_Refman);
+  CHECK(839)
+  INIT_STRING_CONST(840, aux_String_836, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_836, aux_String_836_Refman);
+  CHECK(840)
+  INIT_STRING_CONST(841, aux_String_837, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_837, aux_String_837_Refman);
+  CHECK(841)
+  INIT_STRING_CONST(842, aux_String_838, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_838, aux_String_838_Refman);
+  CHECK(842)
+  INIT_STRING_CONST(843, aux_String_839, "#define LUMI_FUNC_NAME \"open-file\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_839, aux_String_839_Refman);
+  CHECK(843)
+  INIT_STRING_CONST(844, aux_String_840, "Returncode open_file(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_840, aux_String_840_Refman);
+  CHECK(844)
+  INIT_STRING_CONST(845, aux_String_841, "    File** file,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_841, aux_String_841_Refman);
+  CHECK(845)
+  INIT_STRING_CONST(846, aux_String_842, "    char* name, int name_max_length, int name_length,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_842, aux_String_842_Refman);
+  CHECK(846)
+  INIT_STRING_CONST(847, aux_String_843, "    char* mode) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_843, aux_String_843_Refman);
+  CHECK(847)
+  INIT_STRING_CONST(848, aux_String_844, "  FILE* new_fobj = NULL;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_844, aux_String_844_Refman);
+  CHECK(848)
+  INIT_STRING_CONST(849, aux_String_845, "  if (lumi_debug_value == LUMI_DEBUG_NOTHING) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_845, aux_String_845_Refman);
+  CHECK(849)
+  INIT_STRING_CONST(850, aux_String_846, "    CCHECK(file_close(*file));\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_846, aux_String_846_Refman);
+  CHECK(850)
+  INIT_STRING_CONST(851, aux_String_847, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_847, aux_String_847_Refman);
+  CHECK(851)
+  INIT_STRING_CONST(852, aux_String_848, "  *file = NULL;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_848, aux_String_848_Refman);
+  CHECK(852)
+  INIT_STRING_CONST(853, aux_String_849, "  if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_849, aux_String_849_Refman);
+  CHECK(853)
+  INIT_STRING_CONST(854, aux_String_850, "    if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_850, aux_String_850_Refman);
+  CHECK(854)
+  INIT_STRING_CONST(855, aux_String_851, "      new_fobj = fopen(name, mode);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_851, aux_String_851_Refman);
+  CHECK(855)
+  INIT_STRING_CONST(856, aux_String_852, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_852, aux_String_852_Refman);
+  CHECK(856)
+  INIT_STRING_CONST(857, aux_String_853, "    if (new_fobj == NULL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_853, aux_String_853_Refman);
+  CHECK(857)
+  INIT_STRING_CONST(858, aux_String_854, "      CRAISE(\"open file failed\")\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_854, aux_String_854_Refman);
+  CHECK(858)
+  INIT_STRING_CONST(859, aux_String_855, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_855, aux_String_855_Refman);
+  CHECK(859)
+  INIT_STRING_CONST(860, aux_String_856, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_856, aux_String_856_Refman);
+  CHECK(860)
+  INIT_STRING_CONST(861, aux_String_857, "  *file = LUMI_alloc(sizeof(File));\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_857, aux_String_857_Refman);
+  CHECK(861)
+  INIT_STRING_CONST(862, aux_String_858, "  if (*file == NULL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_858, aux_String_858_Refman);
+  CHECK(862)
+  INIT_STRING_CONST(863, aux_String_859, "    if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_859, aux_String_859_Refman);
+  CHECK(863)
+  INIT_STRING_CONST(864, aux_String_860, "      fclose(new_fobj);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_860, aux_String_860_Refman);
+  CHECK(864)
+  INIT_STRING_CONST(865, aux_String_861, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_861, aux_String_861_Refman);
+  CHECK(865)
+  INIT_STRING_CONST(866, aux_String_862, "    CRAISE(LUMI_error_messages.object_memory.str)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_862, aux_String_862_Refman);
+  CHECK(866)
+  INIT_STRING_CONST(867, aux_String_863, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_863, aux_String_863_Refman);
+  CHECK(867)
+  INIT_STRING_CONST(868, aux_String_864, "  (*file)->fobj = new_fobj;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_864, aux_String_864_Refman);
+  CHECK(868)
+  INIT_STRING_CONST(869, aux_String_865, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_865, aux_String_865_Refman);
+  CHECK(869)
+  INIT_STRING_CONST(870, aux_String_866, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_866, aux_String_866_Refman);
+  CHECK(870)
+  INIT_STRING_CONST(871, aux_String_867, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_867, aux_String_867_Refman);
+  CHECK(871)
+  INIT_STRING_CONST(872, aux_String_868, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_868, aux_String_868_Refman);
+  CHECK(872)
+  INIT_STRING_CONST(873, aux_String_869, "Returncode file_open_read(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_869, aux_String_869_Refman);
+  CHECK(873)
+  INIT_STRING_CONST(874, aux_String_870, "    char* name, int name_max_length, int *name_length, File** file) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_870, aux_String_870_Refman);
+  CHECK(874)
+  INIT_STRING_CONST(875, aux_String_871, "  return open_file(file, name, name_max_length, *name_length, \"r\");\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_871, aux_String_871_Refman);
+  CHECK(875)
+  INIT_STRING_CONST(876, aux_String_872, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_872, aux_String_872_Refman);
+  CHECK(876)
+  INIT_STRING_CONST(877, aux_String_873, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_873, aux_String_873_Refman);
+  CHECK(877)
+  INIT_STRING_CONST(878, aux_String_874, "Returncode file_open_write(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_874, aux_String_874_Refman);
+  CHECK(878)
+  INIT_STRING_CONST(879, aux_String_875, "    char* name, int name_max_length, int *name_length, File** file) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_875, aux_String_875_Refman);
+  CHECK(879)
+  INIT_STRING_CONST(880, aux_String_876, "  return open_file(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_876, aux_String_876_Refman);
+  CHECK(880)
+  INIT_STRING_CONST(881, aux_String_877, "    file, name, name_max_length, *name_length, \"w\");\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_877, aux_String_877_Refman);
+  CHECK(881)
+  INIT_STRING_CONST(882, aux_String_878, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_878, aux_String_878_Refman);
+  CHECK(882)
+  INIT_STRING_CONST(883, aux_String_879, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_879, aux_String_879_Refman);
+  CHECK(883)
+  INIT_STRING_CONST(884, aux_String_880, "Bool getc_is_eof(int get, char* ch) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_880, aux_String_880_Refman);
+  CHECK(884)
+  INIT_STRING_CONST(885, aux_String_881, "  if (get == EOF) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_881, aux_String_881_Refman);
+  CHECK(885)
+  INIT_STRING_CONST(886, aux_String_882, "    return true;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_882, aux_String_882_Refman);
+  CHECK(886)
+  INIT_STRING_CONST(887, aux_String_883, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_883, aux_String_883_Refman);
+  CHECK(887)
+  INIT_STRING_CONST(888, aux_String_884, "  else {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_884, aux_String_884_Refman);
+  CHECK(888)
+  INIT_STRING_CONST(889, aux_String_885, "    *ch = get;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_885, aux_String_885_Refman);
+  CHECK(889)
+  INIT_STRING_CONST(890, aux_String_886, "    return false;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_886, aux_String_886_Refman);
+  CHECK(890)
+  INIT_STRING_CONST(891, aux_String_887, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_887, aux_String_887_Refman);
+  CHECK(891)
+  INIT_STRING_CONST(892, aux_String_888, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_888, aux_String_888_Refman);
+  CHECK(892)
+  INIT_STRING_CONST(893, aux_String_889, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_889, aux_String_889_Refman);
+  CHECK(893)
+  INIT_STRING_CONST(894, aux_String_890, "#define LUMI_FUNC_NAME \"File.getc\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_890, aux_String_890_Refman);
+  CHECK(894)
+  INIT_STRING_CONST(895, aux_String_891, "Returncode File_getc(File* file, Char* out_char, Bool* is_eof) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_891, aux_String_891_Refman);
+  CHECK(895)
+  INIT_STRING_CONST(896, aux_String_892, "  if (file->fobj == NULL) CRAISE(LUMI_error_messages.file_not_opened.str)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_892, aux_String_892_Refman);
+  CHECK(896)
+  INIT_STRING_CONST(897, aux_String_893, "  *is_eof = getc_is_eof(getc(file->fobj), out_char);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_893, aux_String_893_Refman);
+  CHECK(897)
+  INIT_STRING_CONST(898, aux_String_894, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_894, aux_String_894_Refman);
+  CHECK(898)
+  INIT_STRING_CONST(899, aux_String_895, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_895, aux_String_895_Refman);
+  CHECK(899)
+  INIT_STRING_CONST(900, aux_String_896, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_896, aux_String_896_Refman);
+  CHECK(900)
+  INIT_STRING_CONST(901, aux_String_897, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_897, aux_String_897_Refman);
+  CHECK(901)
+  INIT_STRING_CONST(902, aux_String_898, "#define LUMI_FUNC_NAME \"File.putc\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_898, aux_String_898_Refman);
+  CHECK(902)
+  INIT_STRING_CONST(903, aux_String_899, "Returncode File_putc(File* file, Char ch) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_899, aux_String_899_Refman);
+  CHECK(903)
+  INIT_STRING_CONST(904, aux_String_900, "  int res = '\\0';\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_900, aux_String_900_Refman);
+  CHECK(904)
+  INIT_STRING_CONST(905, aux_String_901, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_901, aux_String_901_Refman);
+  CHECK(905)
+  INIT_STRING_CONST(906, aux_String_902, "    if (file->fobj == NULL) CRAISE(LUMI_error_messages.file_not_opened.str)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_902, aux_String_902_Refman);
+  CHECK(906)
+  INIT_STRING_CONST(907, aux_String_903, "    res = putc(ch, file->fobj);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_903, aux_String_903_Refman);
+  CHECK(907)
+  INIT_STRING_CONST(908, aux_String_904, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_904, aux_String_904_Refman);
+  CHECK(908)
+  INIT_STRING_CONST(909, aux_String_905, "  if (res != ch) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_905, aux_String_905_Refman);
+  CHECK(909)
+  INIT_STRING_CONST(910, aux_String_906, "    CRAISE(LUMI_error_messages.file_write_failed.str)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_906, aux_String_906_Refman);
+  CHECK(910)
+  INIT_STRING_CONST(911, aux_String_907, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_907, aux_String_907_Refman);
+  CHECK(911)
+  INIT_STRING_CONST(912, aux_String_908, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_908, aux_String_908_Refman);
+  CHECK(912)
+  INIT_STRING_CONST(913, aux_String_909, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_909, aux_String_909_Refman);
+  CHECK(913)
+  INIT_STRING_CONST(914, aux_String_910, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_910, aux_String_910_Refman);
+  CHECK(914)
+  INIT_STRING_CONST(915, aux_String_911, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_911, aux_String_911_Refman);
+  CHECK(915)
+  INIT_STRING_CONST(916, aux_String_912, "#define LUMI_FUNC_NAME \"File.write\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_912, aux_String_912_Refman);
+  CHECK(916)
+  INIT_STRING_CONST(917, aux_String_913, "Returncode File_write(File* file, char* text, int text_length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_913, aux_String_913_Refman);
+  CHECK(917)
+  INIT_STRING_CONST(918, aux_String_914, "  int n, ch, res=0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_914, aux_String_914_Refman);
+  CHECK(918)
+  INIT_STRING_CONST(919, aux_String_915, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_915, aux_String_915_Refman);
+  CHECK(919)
+  INIT_STRING_CONST(920, aux_String_916, "    if (file->fobj == NULL) CRAISE(LUMI_error_messages.file_not_opened.str)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_916, aux_String_916_Refman);
+  CHECK(920)
+  INIT_STRING_CONST(921, aux_String_917, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_917, aux_String_917_Refman);
+  CHECK(921)
+  INIT_STRING_CONST(922, aux_String_918, "  for (n = 0; n < text_length; ++n) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_918, aux_String_918_Refman);
+  CHECK(922)
+  INIT_STRING_CONST(923, aux_String_919, "    ch = text[n];\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_919, aux_String_919_Refman);
+  CHECK(923)
+  INIT_STRING_CONST(924, aux_String_920, "    if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_920, aux_String_920_Refman);
+  CHECK(924)
+  INIT_STRING_CONST(925, aux_String_921, "      res = putc(ch, file->fobj);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_921, aux_String_921_Refman);
+  CHECK(925)
+  INIT_STRING_CONST(926, aux_String_922, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_922, aux_String_922_Refman);
+  CHECK(926)
+  INIT_STRING_CONST(927, aux_String_923, "    if (ch != res) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_923, aux_String_923_Refman);
+  CHECK(927)
+  INIT_STRING_CONST(928, aux_String_924, "      CRAISE(LUMI_error_messages.file_write_failed.str)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_924, aux_String_924_Refman);
+  CHECK(928)
+  INIT_STRING_CONST(929, aux_String_925, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_925, aux_String_925_Refman);
+  CHECK(929)
+  INIT_STRING_CONST(930, aux_String_926, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_926, aux_String_926_Refman);
+  CHECK(930)
+  INIT_STRING_CONST(931, aux_String_927, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_927, aux_String_927_Refman);
+  CHECK(931)
+  INIT_STRING_CONST(932, aux_String_928, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_928, aux_String_928_Refman);
+  CHECK(932)
+  INIT_STRING_CONST(933, aux_String_929, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_929, aux_String_929_Refman);
+  CHECK(933)
+  INIT_STRING_CONST(934, aux_String_930, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_930, aux_String_930_Refman);
+  CHECK(934)
+  INIT_STRING_CONST(935, aux_String_931, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_931, aux_String_931_Refman);
+  CHECK(935)
+  INIT_STRING_CONST(936, aux_String_932, "/* system */\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_932, aux_String_932_Refman);
+  CHECK(936)
+  INIT_STRING_CONST(937, aux_String_933, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_933, aux_String_933_Refman);
+  CHECK(937)
+  INIT_STRING_CONST(938, aux_String_934, "int set_sys(int argc, char* argv[]) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_934, aux_String_934_Refman);
+  CHECK(938)
+  INIT_STRING_CONST(939, aux_String_935, "  int arg;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_935, aux_String_935_Refman);
+  CHECK(939)
+  INIT_STRING_CONST(940, aux_String_936, "  sys = LUMI_alloc(sizeof(Sys));\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_936, aux_String_936_Refman);
+  CHECK(940)
+  INIT_STRING_CONST(941, aux_String_937, "  sys_Refman = LUMI_new_ref(sys);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_937, aux_String_937_Refman);
+  CHECK(941)
+  INIT_STRING_CONST(942, aux_String_938, "  if (sys != NULL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_938, aux_String_938_Refman);
+  CHECK(942)
+  INIT_STRING_CONST(943, aux_String_939, "    int max_length = 0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_939, aux_String_939_Refman);
+  CHECK(943)
+  INIT_STRING_CONST(944, aux_String_940, "    sys->stdout_Cname = LUMI_alloc(sizeof(File));\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_940, aux_String_940_Refman);
+  CHECK(944)
+  INIT_STRING_CONST(945, aux_String_941, "    sys->stdout_Cname_Refman = LUMI_new_ref(sys->stdout_Cname);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_941, aux_String_941_Refman);
+  CHECK(945)
+  INIT_STRING_CONST(946, aux_String_942, "    sys->stdin_Cname = LUMI_alloc(sizeof(File));\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_942, aux_String_942_Refman);
+  CHECK(946)
+  INIT_STRING_CONST(947, aux_String_943, "    sys->stdin_Cname_Refman = LUMI_new_ref(sys->stdin_Cname);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_943, aux_String_943_Refman);
+  CHECK(947)
+  INIT_STRING_CONST(948, aux_String_944, "    sys->stderr_Cname = LUMI_alloc(sizeof(File));\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_944, aux_String_944_Refman);
+  CHECK(948)
+  INIT_STRING_CONST(949, aux_String_945, "    sys->stderr_Cname_Refman = LUMI_new_ref(sys->stderr_Cname);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_945, aux_String_945_Refman);
+  CHECK(949)
+  INIT_STRING_CONST(950, aux_String_946, "    sys->argv_Length = argc;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_946, aux_String_946_Refman);
+  CHECK(950)
+  INIT_STRING_CONST(951, aux_String_947, "    sys->argv_Value_length = 0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_947, aux_String_947_Refman);
+  CHECK(951)
+  INIT_STRING_CONST(952, aux_String_948, "    sys->argv_String_length = LUMI_alloc(sizeof(int) * argc);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_948, aux_String_948_Refman);
+  CHECK(952)
+  INIT_STRING_CONST(953, aux_String_949, "    for (arg = 0; arg < argc; ++arg) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_949, aux_String_949_Refman);
+  CHECK(953)
+  INIT_STRING_CONST(954, aux_String_950, "      int length = cstring_length(argv[arg], 1024);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_950, aux_String_950_Refman);
+  CHECK(954)
+  INIT_STRING_CONST(955, aux_String_951, "      if (sys->argv_String_length != NULL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_951, aux_String_951_Refman);
+  CHECK(955)
+  INIT_STRING_CONST(956, aux_String_952, "        sys->argv_String_length[arg] = length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_952, aux_String_952_Refman);
+  CHECK(956)
+  INIT_STRING_CONST(957, aux_String_953, "      }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_953, aux_String_953_Refman);
+  CHECK(957)
+  INIT_STRING_CONST(958, aux_String_954, "      if (length > sys->argv_Value_length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_954, aux_String_954_Refman);
+  CHECK(958)
+  INIT_STRING_CONST(959, aux_String_955, "        sys->argv_Value_length = length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_955, aux_String_955_Refman);
+  CHECK(959)
+  INIT_STRING_CONST(960, aux_String_956, "      }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_956, aux_String_956_Refman);
+  CHECK(960)
+  INIT_STRING_CONST(961, aux_String_957, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_957, aux_String_957_Refman);
+  CHECK(961)
+  INIT_STRING_CONST(962, aux_String_958, "    ++sys->argv_Value_length;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_958, aux_String_958_Refman);
+  CHECK(962)
+  INIT_STRING_CONST(963, aux_String_959, "    sys->argv = LUMI_alloc(sys->argv_Value_length * sys->argv_Length);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_959, aux_String_959_Refman);
+  CHECK(963)
+  INIT_STRING_CONST(964, aux_String_960, "    sys->argv_Refman = LUMI_new_ref(sys->argv);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_960, aux_String_960_Refman);
+  CHECK(964)
+  INIT_STRING_CONST(965, aux_String_961, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_961, aux_String_961_Refman);
+  CHECK(965)
+  INIT_STRING_CONST(966, aux_String_962, "  if (sys == NULL || sys_Refman == NULL || sys->argv == NULL ||\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_962, aux_String_962_Refman);
+  CHECK(966)
+  INIT_STRING_CONST(967, aux_String_963, "    sys->argv_Refman == NULL || sys->argv_String_length == NULL ||\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_963, aux_String_963_Refman);
+  CHECK(967)
+  INIT_STRING_CONST(968, aux_String_964, "    sys->stdout_Cname == NULL || sys->stdout_Cname_Refman == NULL ||\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_964, aux_String_964_Refman);
+  CHECK(968)
+  INIT_STRING_CONST(969, aux_String_965, "    sys->stdin_Cname == NULL || sys->stdin_Cname_Refman == NULL ||\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_965, aux_String_965_Refman);
+  CHECK(969)
+  INIT_STRING_CONST(970, aux_String_966, "    sys->stderr_Cname == NULL || sys->stderr_Cname_Refman == NULL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_966, aux_String_966_Refman);
+  CHECK(970)
+  INIT_STRING_CONST(971, aux_String_967, "    fprintf(stderr, \"insufficient memory\\n\");\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_967, aux_String_967_Refman);
+  CHECK(971)
+  INIT_STRING_CONST(972, aux_String_968, "    return ERR;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_968, aux_String_968_Refman);
+  CHECK(972)
+  INIT_STRING_CONST(973, aux_String_969, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_969, aux_String_969_Refman);
+  CHECK(973)
+  INIT_STRING_CONST(974, aux_String_970, "  ++sys_Refman->count;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_970, aux_String_970_Refman);
+  CHECK(974)
+  INIT_STRING_CONST(975, aux_String_971, "  ++sys->argv_Refman->count;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_971, aux_String_971_Refman);
+  CHECK(975)
+  INIT_STRING_CONST(976, aux_String_972, "  ++sys->stdout_Cname_Refman->count;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_972, aux_String_972_Refman);
+  CHECK(976)
+  INIT_STRING_CONST(977, aux_String_973, "  ++sys->stdin_Cname_Refman->count;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_973, aux_String_973_Refman);
+  CHECK(977)
+  INIT_STRING_CONST(978, aux_String_974, "  ++sys->stderr_Cname_Refman->count;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_974, aux_String_974_Refman);
+  CHECK(978)
+  INIT_STRING_CONST(979, aux_String_975, "  sys->stdout_Cname->fobj = stdout;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_975, aux_String_975_Refman);
+  CHECK(979)
+  INIT_STRING_CONST(980, aux_String_976, "  sys->stdin_Cname->fobj = stdin;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_976, aux_String_976_Refman);
+  CHECK(980)
+  INIT_STRING_CONST(981, aux_String_977, "  sys->stderr_Cname->fobj = stderr;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_977, aux_String_977_Refman);
+  CHECK(981)
+  INIT_STRING_CONST(982, aux_String_978, "  for (arg = 0; arg < argc; ++arg) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_978, aux_String_978_Refman);
+  CHECK(982)
+  INIT_STRING_CONST(983, aux_String_979, "    strncpy(sys->argv + sys->argv_Value_length * arg, argv[arg], sys->argv_Length);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_979, aux_String_979_Refman);
+  CHECK(983)
+  INIT_STRING_CONST(984, aux_String_980, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_980, aux_String_980_Refman);
+  CHECK(984)
+  INIT_STRING_CONST(985, aux_String_981, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_981, aux_String_981_Refman);
+  CHECK(985)
+  INIT_STRING_CONST(986, aux_String_982, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_982, aux_String_982_Refman);
+  CHECK(986)
+  INIT_STRING_CONST(987, aux_String_983, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_983, aux_String_983_Refman);
+  CHECK(987)
+  INIT_STRING_CONST(988, aux_String_984, "void Sys_Del(Sys* self) {}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_984, aux_String_984_Refman);
+  CHECK(988)
+  INIT_STRING_CONST(989, aux_String_985, "Generic_Type_Dynamic Sys_dynamic = { (Dynamic_Del)Sys_Del };\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_985, aux_String_985_Refman);
+  CHECK(989)
+  INIT_STRING_CONST(990, aux_String_986, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_986, aux_String_986_Refman);
+  CHECK(990)
+  INIT_STRING_CONST(991, aux_String_987, "#define LUMI_FUNC_NAME \"Sys.print\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_987, aux_String_987_Refman);
+  CHECK(991)
+  INIT_STRING_CONST(992, aux_String_988, "Returncode Sys_print(Sys* _, char* text, int text_length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_988, aux_String_988_Refman);
+  CHECK(992)
+  INIT_STRING_CONST(993, aux_String_989, "  int n, ch, res;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_989, aux_String_989_Refman);
+  CHECK(993)
+  INIT_STRING_CONST(994, aux_String_990, "  for (n = 0; n < text_length; ++n) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_990, aux_String_990_Refman);
+  CHECK(994)
+  INIT_STRING_CONST(995, aux_String_991, "    ch = text[n];\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_991, aux_String_991_Refman);
+  CHECK(995)
+  INIT_STRING_CONST(996, aux_String_992, "    res = putchar(ch);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_992, aux_String_992_Refman);
+  CHECK(996)
+  INIT_STRING_CONST(997, aux_String_993, "    if (ch != res) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_993, aux_String_993_Refman);
+  CHECK(997)
+  INIT_STRING_CONST(998, aux_String_994, "      CRAISE(LUMI_error_messages.file_write_failed.str)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_994, aux_String_994_Refman);
+  CHECK(998)
+  INIT_STRING_CONST(999, aux_String_995, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_995, aux_String_995_Refman);
+  CHECK(999)
+  INIT_STRING_CONST(1000, aux_String_996, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_996, aux_String_996_Refman);
+  CHECK(1000)
+  INIT_STRING_CONST(1001, aux_String_997, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_997, aux_String_997_Refman);
+  CHECK(1001)
+  INIT_STRING_CONST(1002, aux_String_998, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_998, aux_String_998_Refman);
+  CHECK(1002)
+  INIT_STRING_CONST(1003, aux_String_999, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_999, aux_String_999_Refman);
+  CHECK(1003)
+  INIT_STRING_CONST(1004, aux_String_1000, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1000, aux_String_1000_Refman);
+  CHECK(1004)
+  INIT_STRING_CONST(1005, aux_String_1001, "#define LUMI_FUNC_NAME \"Sys.println\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1001, aux_String_1001_Refman);
+  CHECK(1005)
+  INIT_STRING_CONST(1006, aux_String_1002, "Returncode Sys_println(Sys* _, char* text, int text_length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1002, aux_String_1002_Refman);
+  CHECK(1006)
+  INIT_STRING_CONST(1007, aux_String_1003, "  Sys_print(NULL, text, text_length);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1003, aux_String_1003_Refman);
+  CHECK(1007)
+  INIT_STRING_CONST(1008, aux_String_1004, "  if (putchar('\\n') != '\\n') {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1004, aux_String_1004_Refman);
+  CHECK(1008)
+  INIT_STRING_CONST(1009, aux_String_1005, "    CRAISE(LUMI_error_messages.file_write_failed.str)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1005, aux_String_1005_Refman);
+  CHECK(1009)
+  INIT_STRING_CONST(1010, aux_String_1006, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1006, aux_String_1006_Refman);
+  CHECK(1010)
+  INIT_STRING_CONST(1011, aux_String_1007, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1007, aux_String_1007_Refman);
+  CHECK(1011)
+  INIT_STRING_CONST(1012, aux_String_1008, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1008, aux_String_1008_Refman);
+  CHECK(1012)
+  INIT_STRING_CONST(1013, aux_String_1009, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1009, aux_String_1009_Refman);
+  CHECK(1013)
+  INIT_STRING_CONST(1014, aux_String_1010, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1010, aux_String_1010_Refman);
+  CHECK(1014)
+  INIT_STRING_CONST(1015, aux_String_1011, "void Sys_getchar(Sys* _, char* out_char, Bool* is_eof) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1011, aux_String_1011_Refman);
+  CHECK(1015)
+  INIT_STRING_CONST(1016, aux_String_1012, "  *is_eof = getc_is_eof(getchar(), out_char);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1012, aux_String_1012_Refman);
+  CHECK(1016)
+  INIT_STRING_CONST(1017, aux_String_1013, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1013, aux_String_1013_Refman);
+  CHECK(1017)
+  INIT_STRING_CONST(1018, aux_String_1014, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1014, aux_String_1014_Refman);
+  CHECK(1018)
+  INIT_STRING_CONST(1019, aux_String_1015, "#define LUMI_FUNC_NAME \"Sys.getline\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1015, aux_String_1015_Refman);
+  CHECK(1019)
+  INIT_STRING_CONST(1020, aux_String_1016, "Returncode Sys_getline(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1016, aux_String_1016_Refman);
+  CHECK(1020)
+  INIT_STRING_CONST(1021, aux_String_1017, "    Sys* _, char* line, int line_max_length, int* line_length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1017, aux_String_1017_Refman);
+  CHECK(1021)
+  INIT_STRING_CONST(1022, aux_String_1018, "  int ch = 0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1018, aux_String_1018_Refman);
+  CHECK(1022)
+  INIT_STRING_CONST(1023, aux_String_1019, "  *line_length = 0;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1019, aux_String_1019_Refman);
+  CHECK(1023)
+  INIT_STRING_CONST(1024, aux_String_1020, "  if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1020, aux_String_1020_Refman);
+  CHECK(1024)
+  INIT_STRING_CONST(1025, aux_String_1021, "    ch = getchar();\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1021, aux_String_1021_Refman);
+  CHECK(1025)
+  INIT_STRING_CONST(1026, aux_String_1022, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1022, aux_String_1022_Refman);
+  CHECK(1026)
+  INIT_STRING_CONST(1027, aux_String_1023, "  while (ch != EOF && ch != '\\n') {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1023, aux_String_1023_Refman);
+  CHECK(1027)
+  INIT_STRING_CONST(1028, aux_String_1024, "    if (*line_length + 1 >= line_max_length) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1024, aux_String_1024_Refman);
+  CHECK(1028)
+  INIT_STRING_CONST(1029, aux_String_1025, "      CRAISE(LUMI_error_messages.string_too_long.str)\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1025, aux_String_1025_Refman);
+  CHECK(1029)
+  INIT_STRING_CONST(1030, aux_String_1026, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1026, aux_String_1026_Refman);
+  CHECK(1030)
+  INIT_STRING_CONST(1031, aux_String_1027, "    line[*line_length] = ch;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1027, aux_String_1027_Refman);
+  CHECK(1031)
+  INIT_STRING_CONST(1032, aux_String_1028, "    ++(*line_length);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1028, aux_String_1028_Refman);
+  CHECK(1032)
+  INIT_STRING_CONST(1033, aux_String_1029, "    if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1029, aux_String_1029_Refman);
+  CHECK(1033)
+  INIT_STRING_CONST(1034, aux_String_1030, "      ch = getchar();\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1030, aux_String_1030_Refman);
+  CHECK(1034)
+  INIT_STRING_CONST(1035, aux_String_1031, "    }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1031, aux_String_1031_Refman);
+  CHECK(1035)
+  INIT_STRING_CONST(1036, aux_String_1032, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1032, aux_String_1032_Refman);
+  CHECK(1036)
+  INIT_STRING_CONST(1037, aux_String_1033, "  line[*line_length] = '\\0';\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1033, aux_String_1033_Refman);
+  CHECK(1037)
+  INIT_STRING_CONST(1038, aux_String_1034, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1034, aux_String_1034_Refman);
+  CHECK(1038)
+  INIT_STRING_CONST(1039, aux_String_1035, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1035, aux_String_1035_Refman);
+  CHECK(1039)
+  INIT_STRING_CONST(1040, aux_String_1036, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1036, aux_String_1036_Refman);
+  CHECK(1040)
+  INIT_STRING_CONST(1041, aux_String_1037, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1037, aux_String_1037_Refman);
+  CHECK(1041)
+  INIT_STRING_CONST(1042, aux_String_1038, "#define LUMI_FUNC_NAME \"Sys.exit\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1038, aux_String_1038_Refman);
+  CHECK(1042)
+  INIT_STRING_CONST(1043, aux_String_1039, "Returncode Sys_exit(Sys* _, Int status) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1039, aux_String_1039_Refman);
+  CHECK(1043)
+  INIT_STRING_CONST(1044, aux_String_1040, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1040, aux_String_1040_Refman);
+  CHECK(1044)
+  INIT_STRING_CONST(1045, aux_String_1041, "    exit(status);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1041, aux_String_1041_Refman);
+  CHECK(1045)
+  INIT_STRING_CONST(1046, aux_String_1042, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1042, aux_String_1042_Refman);
+  CHECK(1046)
+  INIT_STRING_CONST(1047, aux_String_1043, "  CRAISE(\"exit failed\")\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1043, aux_String_1043_Refman);
+  CHECK(1047)
+  INIT_STRING_CONST(1048, aux_String_1044, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1044, aux_String_1044_Refman);
+  CHECK(1048)
+  INIT_STRING_CONST(1049, aux_String_1045, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1045, aux_String_1045_Refman);
+  CHECK(1049)
+  INIT_STRING_CONST(1050, aux_String_1046, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1046, aux_String_1046_Refman);
+  CHECK(1050)
+  INIT_STRING_CONST(1051, aux_String_1047, "#define LUMI_FUNC_NAME \"Sys.system\"\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1047, aux_String_1047_Refman);
+  CHECK(1051)
+  INIT_STRING_CONST(1052, aux_String_1048, "Returncode Sys_system(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1048, aux_String_1048_Refman);
+  CHECK(1052)
+  INIT_STRING_CONST(1053, aux_String_1049, "    Sys* _,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1049, aux_String_1049_Refman);
+  CHECK(1053)
+  INIT_STRING_CONST(1054, aux_String_1050, "    char* command, int command_max_length, int *command_length,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1050, aux_String_1050_Refman);
+  CHECK(1054)
+  INIT_STRING_CONST(1055, aux_String_1051, "    Int* status) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1051, aux_String_1051_Refman);
+  CHECK(1055)
+  INIT_STRING_CONST(1056, aux_String_1052, "  int res = -1;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1052, aux_String_1052_Refman);
+  CHECK(1056)
+  INIT_STRING_CONST(1057, aux_String_1053, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1053, aux_String_1053_Refman);
+  CHECK(1057)
+  INIT_STRING_CONST(1058, aux_String_1054, "    res = system(command);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1054, aux_String_1054_Refman);
+  CHECK(1058)
+  INIT_STRING_CONST(1059, aux_String_1055, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1055, aux_String_1055_Refman);
+  CHECK(1059)
+  INIT_STRING_CONST(1060, aux_String_1056, "  if (res == -1) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1056, aux_String_1056_Refman);
+  CHECK(1060)
+  INIT_STRING_CONST(1061, aux_String_1057, "    CRAISE(\"command execution failed\")\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1057, aux_String_1057_Refman);
+  CHECK(1061)
+  INIT_STRING_CONST(1062, aux_String_1058, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1058, aux_String_1058_Refman);
+  CHECK(1062)
+  INIT_STRING_CONST(1063, aux_String_1059, "  *status = res;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1059, aux_String_1059_Refman);
+  CHECK(1063)
+  INIT_STRING_CONST(1064, aux_String_1060, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1060, aux_String_1060_Refman);
+  CHECK(1064)
+  INIT_STRING_CONST(1065, aux_String_1061, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1061, aux_String_1061_Refman);
+  CHECK(1065)
+  INIT_STRING_CONST(1066, aux_String_1062, "#undef LUMI_FUNC_NAME\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1062, aux_String_1062_Refman);
+  CHECK(1066)
+  INIT_STRING_CONST(1067, aux_String_1063, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1063, aux_String_1063_Refman);
+  CHECK(1067)
+  INIT_STRING_CONST(1068, aux_String_1064, "Returncode Sys_getenv(\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1064, aux_String_1064_Refman);
+  CHECK(1068)
+  INIT_STRING_CONST(1069, aux_String_1065, "    Sys* _,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1065, aux_String_1065_Refman);
+  CHECK(1069)
+  INIT_STRING_CONST(1070, aux_String_1066, "    char* name, int name_max_length, int *name_length,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1066, aux_String_1066_Refman);
+  CHECK(1070)
+  INIT_STRING_CONST(1071, aux_String_1067, "    char* value, int value_max_length, int* value_length,\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1067, aux_String_1067_Refman);
+  CHECK(1071)
+  INIT_STRING_CONST(1072, aux_String_1068, "    Bool* exists) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1068, aux_String_1068_Refman);
+  CHECK(1072)
+  INIT_STRING_CONST(1073, aux_String_1069, "  char* ret;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1069, aux_String_1069_Refman);
+  CHECK(1073)
+  INIT_STRING_CONST(1074, aux_String_1070, "  ret = getenv(name);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1070, aux_String_1070_Refman);
+  CHECK(1074)
+  INIT_STRING_CONST(1075, aux_String_1071, "  if (ret == NULL) {\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1071, aux_String_1071_Refman);
+  CHECK(1075)
+  INIT_STRING_CONST(1076, aux_String_1072, "    *exists = false;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1072, aux_String_1072_Refman);
+  CHECK(1076)
+  INIT_STRING_CONST(1077, aux_String_1073, "    return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1073, aux_String_1073_Refman);
+  CHECK(1077)
+  INIT_STRING_CONST(1078, aux_String_1074, "  }\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1074, aux_String_1074_Refman);
+  CHECK(1078)
+  INIT_STRING_CONST(1079, aux_String_1075, "  *value_length = cstring_length(ret, value_max_length);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1075, aux_String_1075_Refman);
+  CHECK(1079)
+  INIT_STRING_CONST(1080, aux_String_1076, "  strncpy(value, ret, *value_length);\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1076, aux_String_1076_Refman);
+  CHECK(1080)
+  INIT_STRING_CONST(1081, aux_String_1077, "  *exists = true;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1077, aux_String_1077_Refman);
+  CHECK(1081)
+  INIT_STRING_CONST(1082, aux_String_1078, "  return OK;\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1078, aux_String_1078_Refman);
+  CHECK(1082)
+  INIT_STRING_CONST(1083, aux_String_1079, "}\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1079, aux_String_1079_Refman);
+  CHECK(1083)
+  INIT_STRING_CONST(1084, aux_String_1080, "\n");
+  LUMI_err = tl5_compiler_M_write_global(aux_String_1080, aux_String_1080_Refman);
+  CHECK(1084)
+LUMI_cleanup:
+  LUMI_var_dec_ref(aux_String_1080_Refman);
+  LUMI_var_dec_ref(aux_String_1079_Refman);
+  LUMI_var_dec_ref(aux_String_1078_Refman);
+  LUMI_var_dec_ref(aux_String_1077_Refman);
+  LUMI_var_dec_ref(aux_String_1076_Refman);
+  LUMI_var_dec_ref(aux_String_1075_Refman);
+  LUMI_var_dec_ref(aux_String_1074_Refman);
+  LUMI_var_dec_ref(aux_String_1073_Refman);
+  LUMI_var_dec_ref(aux_String_1072_Refman);
+  LUMI_var_dec_ref(aux_String_1071_Refman);
+  LUMI_var_dec_ref(aux_String_1070_Refman);
+  LUMI_var_dec_ref(aux_String_1069_Refman);
+  LUMI_var_dec_ref(aux_String_1068_Refman);
+  LUMI_var_dec_ref(aux_String_1067_Refman);
+  LUMI_var_dec_ref(aux_String_1066_Refman);
+  LUMI_var_dec_ref(aux_String_1065_Refman);
+  LUMI_var_dec_ref(aux_String_1064_Refman);
+  LUMI_var_dec_ref(aux_String_1063_Refman);
+  LUMI_var_dec_ref(aux_String_1062_Refman);
+  LUMI_var_dec_ref(aux_String_1061_Refman);
+  LUMI_var_dec_ref(aux_String_1060_Refman);
+  LUMI_var_dec_ref(aux_String_1059_Refman);
+  LUMI_var_dec_ref(aux_String_1058_Refman);
+  LUMI_var_dec_ref(aux_String_1057_Refman);
+  LUMI_var_dec_ref(aux_String_1056_Refman);
+  LUMI_var_dec_ref(aux_String_1055_Refman);
+  LUMI_var_dec_ref(aux_String_1054_Refman);
+  LUMI_var_dec_ref(aux_String_1053_Refman);
+  LUMI_var_dec_ref(aux_String_1052_Refman);
+  LUMI_var_dec_ref(aux_String_1051_Refman);
+  LUMI_var_dec_ref(aux_String_1050_Refman);
+  LUMI_var_dec_ref(aux_String_1049_Refman);
+  LUMI_var_dec_ref(aux_String_1048_Refman);
+  LUMI_var_dec_ref(aux_String_1047_Refman);
+  LUMI_var_dec_ref(aux_String_1046_Refman);
+  LUMI_var_dec_ref(aux_String_1045_Refman);
+  LUMI_var_dec_ref(aux_String_1044_Refman);
+  LUMI_var_dec_ref(aux_String_1043_Refman);
+  LUMI_var_dec_ref(aux_String_1042_Refman);
+  LUMI_var_dec_ref(aux_String_1041_Refman);
+  LUMI_var_dec_ref(aux_String_1040_Refman);
+  LUMI_var_dec_ref(aux_String_1039_Refman);
+  LUMI_var_dec_ref(aux_String_1038_Refman);
+  LUMI_var_dec_ref(aux_String_1037_Refman);
+  LUMI_var_dec_ref(aux_String_1036_Refman);
+  LUMI_var_dec_ref(aux_String_1035_Refman);
+  LUMI_var_dec_ref(aux_String_1034_Refman);
+  LUMI_var_dec_ref(aux_String_1033_Refman);
+  LUMI_var_dec_ref(aux_String_1032_Refman);
+  LUMI_var_dec_ref(aux_String_1031_Refman);
+  LUMI_var_dec_ref(aux_String_1030_Refman);
+  LUMI_var_dec_ref(aux_String_1029_Refman);
+  LUMI_var_dec_ref(aux_String_1028_Refman);
+  LUMI_var_dec_ref(aux_String_1027_Refman);
+  LUMI_var_dec_ref(aux_String_1026_Refman);
+  LUMI_var_dec_ref(aux_String_1025_Refman);
+  LUMI_var_dec_ref(aux_String_1024_Refman);
+  LUMI_var_dec_ref(aux_String_1023_Refman);
+  LUMI_var_dec_ref(aux_String_1022_Refman);
+  LUMI_var_dec_ref(aux_String_1021_Refman);
+  LUMI_var_dec_ref(aux_String_1020_Refman);
+  LUMI_var_dec_ref(aux_String_1019_Refman);
+  LUMI_var_dec_ref(aux_String_1018_Refman);
+  LUMI_var_dec_ref(aux_String_1017_Refman);
+  LUMI_var_dec_ref(aux_String_1016_Refman);
+  LUMI_var_dec_ref(aux_String_1015_Refman);
+  LUMI_var_dec_ref(aux_String_1014_Refman);
+  LUMI_var_dec_ref(aux_String_1013_Refman);
+  LUMI_var_dec_ref(aux_String_1012_Refman);
+  LUMI_var_dec_ref(aux_String_1011_Refman);
+  LUMI_var_dec_ref(aux_String_1010_Refman);
+  LUMI_var_dec_ref(aux_String_1009_Refman);
+  LUMI_var_dec_ref(aux_String_1008_Refman);
+  LUMI_var_dec_ref(aux_String_1007_Refman);
+  LUMI_var_dec_ref(aux_String_1006_Refman);
+  LUMI_var_dec_ref(aux_String_1005_Refman);
+  LUMI_var_dec_ref(aux_String_1004_Refman);
+  LUMI_var_dec_ref(aux_String_1003_Refman);
+  LUMI_var_dec_ref(aux_String_1002_Refman);
+  LUMI_var_dec_ref(aux_String_1001_Refman);
+  LUMI_var_dec_ref(aux_String_1000_Refman);
+  LUMI_var_dec_ref(aux_String_999_Refman);
+  LUMI_var_dec_ref(aux_String_998_Refman);
+  LUMI_var_dec_ref(aux_String_997_Refman);
+  LUMI_var_dec_ref(aux_String_996_Refman);
+  LUMI_var_dec_ref(aux_String_995_Refman);
+  LUMI_var_dec_ref(aux_String_994_Refman);
+  LUMI_var_dec_ref(aux_String_993_Refman);
+  LUMI_var_dec_ref(aux_String_992_Refman);
+  LUMI_var_dec_ref(aux_String_991_Refman);
+  LUMI_var_dec_ref(aux_String_990_Refman);
+  LUMI_var_dec_ref(aux_String_989_Refman);
+  LUMI_var_dec_ref(aux_String_988_Refman);
+  LUMI_var_dec_ref(aux_String_987_Refman);
+  LUMI_var_dec_ref(aux_String_986_Refman);
+  LUMI_var_dec_ref(aux_String_985_Refman);
+  LUMI_var_dec_ref(aux_String_984_Refman);
+  LUMI_var_dec_ref(aux_String_983_Refman);
+  LUMI_var_dec_ref(aux_String_982_Refman);
+  LUMI_var_dec_ref(aux_String_981_Refman);
+  LUMI_var_dec_ref(aux_String_980_Refman);
+  LUMI_var_dec_ref(aux_String_979_Refman);
+  LUMI_var_dec_ref(aux_String_978_Refman);
+  LUMI_var_dec_ref(aux_String_977_Refman);
+  LUMI_var_dec_ref(aux_String_976_Refman);
+  LUMI_var_dec_ref(aux_String_975_Refman);
+  LUMI_var_dec_ref(aux_String_974_Refman);
+  LUMI_var_dec_ref(aux_String_973_Refman);
+  LUMI_var_dec_ref(aux_String_972_Refman);
+  LUMI_var_dec_ref(aux_String_971_Refman);
+  LUMI_var_dec_ref(aux_String_970_Refman);
+  LUMI_var_dec_ref(aux_String_969_Refman);
+  LUMI_var_dec_ref(aux_String_968_Refman);
+  LUMI_var_dec_ref(aux_String_967_Refman);
+  LUMI_var_dec_ref(aux_String_966_Refman);
+  LUMI_var_dec_ref(aux_String_965_Refman);
+  LUMI_var_dec_ref(aux_String_964_Refman);
+  LUMI_var_dec_ref(aux_String_963_Refman);
+  LUMI_var_dec_ref(aux_String_962_Refman);
+  LUMI_var_dec_ref(aux_String_961_Refman);
+  LUMI_var_dec_ref(aux_String_960_Refman);
+  LUMI_var_dec_ref(aux_String_959_Refman);
+  LUMI_var_dec_ref(aux_String_958_Refman);
+  LUMI_var_dec_ref(aux_String_957_Refman);
+  LUMI_var_dec_ref(aux_String_956_Refman);
+  LUMI_var_dec_ref(aux_String_955_Refman);
+  LUMI_var_dec_ref(aux_String_954_Refman);
+  LUMI_var_dec_ref(aux_String_953_Refman);
+  LUMI_var_dec_ref(aux_String_952_Refman);
+  LUMI_var_dec_ref(aux_String_951_Refman);
+  LUMI_var_dec_ref(aux_String_950_Refman);
+  LUMI_var_dec_ref(aux_String_949_Refman);
+  LUMI_var_dec_ref(aux_String_948_Refman);
+  LUMI_var_dec_ref(aux_String_947_Refman);
+  LUMI_var_dec_ref(aux_String_946_Refman);
+  LUMI_var_dec_ref(aux_String_945_Refman);
+  LUMI_var_dec_ref(aux_String_944_Refman);
+  LUMI_var_dec_ref(aux_String_943_Refman);
+  LUMI_var_dec_ref(aux_String_942_Refman);
+  LUMI_var_dec_ref(aux_String_941_Refman);
+  LUMI_var_dec_ref(aux_String_940_Refman);
+  LUMI_var_dec_ref(aux_String_939_Refman);
+  LUMI_var_dec_ref(aux_String_938_Refman);
+  LUMI_var_dec_ref(aux_String_937_Refman);
+  LUMI_var_dec_ref(aux_String_936_Refman);
+  LUMI_var_dec_ref(aux_String_935_Refman);
+  LUMI_var_dec_ref(aux_String_934_Refman);
+  LUMI_var_dec_ref(aux_String_933_Refman);
+  LUMI_var_dec_ref(aux_String_932_Refman);
+  LUMI_var_dec_ref(aux_String_931_Refman);
+  LUMI_var_dec_ref(aux_String_930_Refman);
+  LUMI_var_dec_ref(aux_String_929_Refman);
+  LUMI_var_dec_ref(aux_String_928_Refman);
+  LUMI_var_dec_ref(aux_String_927_Refman);
+  LUMI_var_dec_ref(aux_String_926_Refman);
+  LUMI_var_dec_ref(aux_String_925_Refman);
+  LUMI_var_dec_ref(aux_String_924_Refman);
+  LUMI_var_dec_ref(aux_String_923_Refman);
+  LUMI_var_dec_ref(aux_String_922_Refman);
+  LUMI_var_dec_ref(aux_String_921_Refman);
+  LUMI_var_dec_ref(aux_String_920_Refman);
+  LUMI_var_dec_ref(aux_String_919_Refman);
+  LUMI_var_dec_ref(aux_String_918_Refman);
+  LUMI_var_dec_ref(aux_String_917_Refman);
+  LUMI_var_dec_ref(aux_String_916_Refman);
+  LUMI_var_dec_ref(aux_String_915_Refman);
+  LUMI_var_dec_ref(aux_String_914_Refman);
+  LUMI_var_dec_ref(aux_String_913_Refman);
+  LUMI_var_dec_ref(aux_String_912_Refman);
+  LUMI_var_dec_ref(aux_String_911_Refman);
+  LUMI_var_dec_ref(aux_String_910_Refman);
+  LUMI_var_dec_ref(aux_String_909_Refman);
+  LUMI_var_dec_ref(aux_String_908_Refman);
+  LUMI_var_dec_ref(aux_String_907_Refman);
+  LUMI_var_dec_ref(aux_String_906_Refman);
+  LUMI_var_dec_ref(aux_String_905_Refman);
+  LUMI_var_dec_ref(aux_String_904_Refman);
+  LUMI_var_dec_ref(aux_String_903_Refman);
+  LUMI_var_dec_ref(aux_String_902_Refman);
+  LUMI_var_dec_ref(aux_String_901_Refman);
+  LUMI_var_dec_ref(aux_String_900_Refman);
+  LUMI_var_dec_ref(aux_String_899_Refman);
+  LUMI_var_dec_ref(aux_String_898_Refman);
+  LUMI_var_dec_ref(aux_String_897_Refman);
+  LUMI_var_dec_ref(aux_String_896_Refman);
+  LUMI_var_dec_ref(aux_String_895_Refman);
+  LUMI_var_dec_ref(aux_String_894_Refman);
+  LUMI_var_dec_ref(aux_String_893_Refman);
+  LUMI_var_dec_ref(aux_String_892_Refman);
+  LUMI_var_dec_ref(aux_String_891_Refman);
+  LUMI_var_dec_ref(aux_String_890_Refman);
+  LUMI_var_dec_ref(aux_String_889_Refman);
+  LUMI_var_dec_ref(aux_String_888_Refman);
+  LUMI_var_dec_ref(aux_String_887_Refman);
+  LUMI_var_dec_ref(aux_String_886_Refman);
+  LUMI_var_dec_ref(aux_String_885_Refman);
+  LUMI_var_dec_ref(aux_String_884_Refman);
+  LUMI_var_dec_ref(aux_String_883_Refman);
+  LUMI_var_dec_ref(aux_String_882_Refman);
+  LUMI_var_dec_ref(aux_String_881_Refman);
+  LUMI_var_dec_ref(aux_String_880_Refman);
+  LUMI_var_dec_ref(aux_String_879_Refman);
+  LUMI_var_dec_ref(aux_String_878_Refman);
+  LUMI_var_dec_ref(aux_String_877_Refman);
+  LUMI_var_dec_ref(aux_String_876_Refman);
+  LUMI_var_dec_ref(aux_String_875_Refman);
+  LUMI_var_dec_ref(aux_String_874_Refman);
+  LUMI_var_dec_ref(aux_String_873_Refman);
+  LUMI_var_dec_ref(aux_String_872_Refman);
+  LUMI_var_dec_ref(aux_String_871_Refman);
+  LUMI_var_dec_ref(aux_String_870_Refman);
+  LUMI_var_dec_ref(aux_String_869_Refman);
+  LUMI_var_dec_ref(aux_String_868_Refman);
+  LUMI_var_dec_ref(aux_String_867_Refman);
+  LUMI_var_dec_ref(aux_String_866_Refman);
+  LUMI_var_dec_ref(aux_String_865_Refman);
+  LUMI_var_dec_ref(aux_String_864_Refman);
+  LUMI_var_dec_ref(aux_String_863_Refman);
+  LUMI_var_dec_ref(aux_String_862_Refman);
+  LUMI_var_dec_ref(aux_String_861_Refman);
+  LUMI_var_dec_ref(aux_String_860_Refman);
+  LUMI_var_dec_ref(aux_String_859_Refman);
+  LUMI_var_dec_ref(aux_String_858_Refman);
+  LUMI_var_dec_ref(aux_String_857_Refman);
+  LUMI_var_dec_ref(aux_String_856_Refman);
+  LUMI_var_dec_ref(aux_String_855_Refman);
+  LUMI_var_dec_ref(aux_String_854_Refman);
+  LUMI_var_dec_ref(aux_String_853_Refman);
+  LUMI_var_dec_ref(aux_String_852_Refman);
+  LUMI_var_dec_ref(aux_String_851_Refman);
+  LUMI_var_dec_ref(aux_String_850_Refman);
+  LUMI_var_dec_ref(aux_String_849_Refman);
+  LUMI_var_dec_ref(aux_String_848_Refman);
+  LUMI_var_dec_ref(aux_String_847_Refman);
+  LUMI_var_dec_ref(aux_String_846_Refman);
+  LUMI_var_dec_ref(aux_String_845_Refman);
+  LUMI_var_dec_ref(aux_String_844_Refman);
+  LUMI_var_dec_ref(aux_String_843_Refman);
+  LUMI_var_dec_ref(aux_String_842_Refman);
+  LUMI_var_dec_ref(aux_String_841_Refman);
+  LUMI_var_dec_ref(aux_String_840_Refman);
+  LUMI_var_dec_ref(aux_String_839_Refman);
+  LUMI_var_dec_ref(aux_String_838_Refman);
+  LUMI_var_dec_ref(aux_String_837_Refman);
+  LUMI_var_dec_ref(aux_String_836_Refman);
+  LUMI_var_dec_ref(aux_String_835_Refman);
+  LUMI_var_dec_ref(aux_String_834_Refman);
+  LUMI_var_dec_ref(aux_String_833_Refman);
+  LUMI_var_dec_ref(aux_String_832_Refman);
+  LUMI_var_dec_ref(aux_String_831_Refman);
+  LUMI_var_dec_ref(aux_String_830_Refman);
+  LUMI_var_dec_ref(aux_String_829_Refman);
+  LUMI_var_dec_ref(aux_String_828_Refman);
+  LUMI_var_dec_ref(aux_String_827_Refman);
+  LUMI_var_dec_ref(aux_String_826_Refman);
+  LUMI_var_dec_ref(aux_String_825_Refman);
+  LUMI_var_dec_ref(aux_String_824_Refman);
+  LUMI_var_dec_ref(aux_String_823_Refman);
+  LUMI_var_dec_ref(aux_String_822_Refman);
+  LUMI_var_dec_ref(aux_String_821_Refman);
+  LUMI_var_dec_ref(aux_String_820_Refman);
+  LUMI_var_dec_ref(aux_String_819_Refman);
+  LUMI_var_dec_ref(aux_String_818_Refman);
+  LUMI_var_dec_ref(aux_String_817_Refman);
+  LUMI_var_dec_ref(aux_String_816_Refman);
+  LUMI_var_dec_ref(aux_String_815_Refman);
+  LUMI_var_dec_ref(aux_String_814_Refman);
+  LUMI_var_dec_ref(aux_String_813_Refman);
+  LUMI_var_dec_ref(aux_String_812_Refman);
+  LUMI_var_dec_ref(aux_String_811_Refman);
+  LUMI_var_dec_ref(aux_String_810_Refman);
+  LUMI_var_dec_ref(aux_String_809_Refman);
+  LUMI_var_dec_ref(aux_String_808_Refman);
+  LUMI_var_dec_ref(aux_String_807_Refman);
+  LUMI_var_dec_ref(aux_String_806_Refman);
+  LUMI_var_dec_ref(aux_String_805_Refman);
+  LUMI_var_dec_ref(aux_String_804_Refman);
+  LUMI_var_dec_ref(aux_String_803_Refman);
+  LUMI_var_dec_ref(aux_String_802_Refman);
+  LUMI_var_dec_ref(aux_String_801_Refman);
+  LUMI_var_dec_ref(aux_String_800_Refman);
+  LUMI_var_dec_ref(aux_String_799_Refman);
+  LUMI_var_dec_ref(aux_String_798_Refman);
+  LUMI_var_dec_ref(aux_String_797_Refman);
+  LUMI_var_dec_ref(aux_String_796_Refman);
+  LUMI_var_dec_ref(aux_String_795_Refman);
+  LUMI_var_dec_ref(aux_String_794_Refman);
+  LUMI_var_dec_ref(aux_String_793_Refman);
+  LUMI_var_dec_ref(aux_String_792_Refman);
+  LUMI_var_dec_ref(aux_String_791_Refman);
+  LUMI_var_dec_ref(aux_String_790_Refman);
+  LUMI_var_dec_ref(aux_String_789_Refman);
+  LUMI_var_dec_ref(aux_String_788_Refman);
+  LUMI_var_dec_ref(aux_String_787_Refman);
+  LUMI_var_dec_ref(aux_String_786_Refman);
+  LUMI_var_dec_ref(aux_String_785_Refman);
+  LUMI_var_dec_ref(aux_String_784_Refman);
+  LUMI_var_dec_ref(aux_String_783_Refman);
+  LUMI_var_dec_ref(aux_String_782_Refman);
+  LUMI_var_dec_ref(aux_String_781_Refman);
+  LUMI_var_dec_ref(aux_String_780_Refman);
+  LUMI_var_dec_ref(aux_String_779_Refman);
+  LUMI_var_dec_ref(aux_String_778_Refman);
+  LUMI_var_dec_ref(aux_String_777_Refman);
+  LUMI_var_dec_ref(aux_String_776_Refman);
+  LUMI_var_dec_ref(aux_String_775_Refman);
+  LUMI_var_dec_ref(aux_String_774_Refman);
+  LUMI_var_dec_ref(aux_String_773_Refman);
+  LUMI_var_dec_ref(aux_String_772_Refman);
+  LUMI_var_dec_ref(aux_String_771_Refman);
+  LUMI_var_dec_ref(aux_String_770_Refman);
+  LUMI_var_dec_ref(aux_String_769_Refman);
+  LUMI_var_dec_ref(aux_String_768_Refman);
+  LUMI_var_dec_ref(aux_String_767_Refman);
+  LUMI_var_dec_ref(aux_String_766_Refman);
+  LUMI_var_dec_ref(aux_String_765_Refman);
+  LUMI_var_dec_ref(aux_String_764_Refman);
+  LUMI_var_dec_ref(aux_String_763_Refman);
+  LUMI_var_dec_ref(aux_String_762_Refman);
+  LUMI_var_dec_ref(aux_String_761_Refman);
+  LUMI_var_dec_ref(aux_String_760_Refman);
+  LUMI_var_dec_ref(aux_String_759_Refman);
+  LUMI_var_dec_ref(aux_String_758_Refman);
+  LUMI_var_dec_ref(aux_String_757_Refman);
+  LUMI_var_dec_ref(aux_String_756_Refman);
+  LUMI_var_dec_ref(aux_String_755_Refman);
+  LUMI_var_dec_ref(aux_String_754_Refman);
+  LUMI_var_dec_ref(aux_String_753_Refman);
+  LUMI_var_dec_ref(aux_String_752_Refman);
+  LUMI_var_dec_ref(aux_String_751_Refman);
+  LUMI_var_dec_ref(aux_String_750_Refman);
+  LUMI_var_dec_ref(aux_String_749_Refman);
+  LUMI_var_dec_ref(aux_String_748_Refman);
+  LUMI_var_dec_ref(aux_String_747_Refman);
+  LUMI_var_dec_ref(aux_String_746_Refman);
+  LUMI_var_dec_ref(aux_String_745_Refman);
+  LUMI_var_dec_ref(aux_String_744_Refman);
+  LUMI_var_dec_ref(aux_String_743_Refman);
+  LUMI_var_dec_ref(aux_String_742_Refman);
+  LUMI_var_dec_ref(aux_String_741_Refman);
+  LUMI_var_dec_ref(aux_String_740_Refman);
+  LUMI_var_dec_ref(aux_String_739_Refman);
+  LUMI_var_dec_ref(aux_String_738_Refman);
+  LUMI_var_dec_ref(aux_String_737_Refman);
+  LUMI_var_dec_ref(aux_String_736_Refman);
+  LUMI_var_dec_ref(aux_String_735_Refman);
+  LUMI_var_dec_ref(aux_String_734_Refman);
+  LUMI_var_dec_ref(aux_String_733_Refman);
+  LUMI_var_dec_ref(aux_String_732_Refman);
+  LUMI_var_dec_ref(aux_String_731_Refman);
+  LUMI_var_dec_ref(aux_String_730_Refman);
+  LUMI_var_dec_ref(aux_String_729_Refman);
+  LUMI_var_dec_ref(aux_String_728_Refman);
+  LUMI_var_dec_ref(aux_String_727_Refman);
+  LUMI_var_dec_ref(aux_String_726_Refman);
+  LUMI_var_dec_ref(aux_String_725_Refman);
+  LUMI_var_dec_ref(aux_String_724_Refman);
+  LUMI_var_dec_ref(aux_String_723_Refman);
+  LUMI_var_dec_ref(aux_String_722_Refman);
+  LUMI_var_dec_ref(aux_String_721_Refman);
+  LUMI_var_dec_ref(aux_String_720_Refman);
+  LUMI_var_dec_ref(aux_String_719_Refman);
+  LUMI_var_dec_ref(aux_String_718_Refman);
+  LUMI_var_dec_ref(aux_String_717_Refman);
+  LUMI_var_dec_ref(aux_String_716_Refman);
+  LUMI_var_dec_ref(aux_String_715_Refman);
+  LUMI_var_dec_ref(aux_String_714_Refman);
+  LUMI_var_dec_ref(aux_String_713_Refman);
+  LUMI_var_dec_ref(aux_String_712_Refman);
+  LUMI_var_dec_ref(aux_String_711_Refman);
+  LUMI_var_dec_ref(aux_String_710_Refman);
+  LUMI_var_dec_ref(aux_String_709_Refman);
+  LUMI_var_dec_ref(aux_String_708_Refman);
+  LUMI_var_dec_ref(aux_String_707_Refman);
+  LUMI_var_dec_ref(aux_String_706_Refman);
+  LUMI_var_dec_ref(aux_String_705_Refman);
+  LUMI_var_dec_ref(aux_String_704_Refman);
+  LUMI_var_dec_ref(aux_String_703_Refman);
+  LUMI_var_dec_ref(aux_String_702_Refman);
+  LUMI_var_dec_ref(aux_String_701_Refman);
+  LUMI_var_dec_ref(aux_String_700_Refman);
+  LUMI_var_dec_ref(aux_String_699_Refman);
+  LUMI_var_dec_ref(aux_String_698_Refman);
+  LUMI_var_dec_ref(aux_String_697_Refman);
+  LUMI_var_dec_ref(aux_String_696_Refman);
+  LUMI_var_dec_ref(aux_String_695_Refman);
+  LUMI_var_dec_ref(aux_String_694_Refman);
+  LUMI_var_dec_ref(aux_String_693_Refman);
+  LUMI_var_dec_ref(aux_String_692_Refman);
+  LUMI_var_dec_ref(aux_String_691_Refman);
+  LUMI_var_dec_ref(aux_String_690_Refman);
+  LUMI_var_dec_ref(aux_String_689_Refman);
+  LUMI_var_dec_ref(aux_String_688_Refman);
+  LUMI_var_dec_ref(aux_String_687_Refman);
+  LUMI_var_dec_ref(aux_String_686_Refman);
+  LUMI_var_dec_ref(aux_String_685_Refman);
+  LUMI_var_dec_ref(aux_String_684_Refman);
+  LUMI_var_dec_ref(aux_String_683_Refman);
+  LUMI_var_dec_ref(aux_String_682_Refman);
+  LUMI_var_dec_ref(aux_String_681_Refman);
+  LUMI_var_dec_ref(aux_String_680_Refman);
+  LUMI_var_dec_ref(aux_String_679_Refman);
+  LUMI_var_dec_ref(aux_String_678_Refman);
+  LUMI_var_dec_ref(aux_String_677_Refman);
+  LUMI_var_dec_ref(aux_String_676_Refman);
+  LUMI_var_dec_ref(aux_String_675_Refman);
+  LUMI_var_dec_ref(aux_String_674_Refman);
+  LUMI_var_dec_ref(aux_String_673_Refman);
+  LUMI_var_dec_ref(aux_String_672_Refman);
+  LUMI_var_dec_ref(aux_String_671_Refman);
+  LUMI_var_dec_ref(aux_String_670_Refman);
+  LUMI_var_dec_ref(aux_String_669_Refman);
+  LUMI_var_dec_ref(aux_String_668_Refman);
+  LUMI_var_dec_ref(aux_String_667_Refman);
+  LUMI_var_dec_ref(aux_String_666_Refman);
+  LUMI_var_dec_ref(aux_String_665_Refman);
+  LUMI_var_dec_ref(aux_String_664_Refman);
+  LUMI_var_dec_ref(aux_String_663_Refman);
+  LUMI_var_dec_ref(aux_String_662_Refman);
+  LUMI_var_dec_ref(aux_String_661_Refman);
+  LUMI_var_dec_ref(aux_String_660_Refman);
+  LUMI_var_dec_ref(aux_String_659_Refman);
+  LUMI_var_dec_ref(aux_String_658_Refman);
+  LUMI_var_dec_ref(aux_String_657_Refman);
+  LUMI_var_dec_ref(aux_String_656_Refman);
+  LUMI_var_dec_ref(aux_String_655_Refman);
+  LUMI_var_dec_ref(aux_String_654_Refman);
+  LUMI_var_dec_ref(aux_String_653_Refman);
+  LUMI_var_dec_ref(aux_String_652_Refman);
+  LUMI_var_dec_ref(aux_String_651_Refman);
+  LUMI_var_dec_ref(aux_String_650_Refman);
+  LUMI_var_dec_ref(aux_String_649_Refman);
+  LUMI_var_dec_ref(aux_String_648_Refman);
+  LUMI_var_dec_ref(aux_String_647_Refman);
+  LUMI_var_dec_ref(aux_String_646_Refman);
+  LUMI_var_dec_ref(aux_String_645_Refman);
+  LUMI_var_dec_ref(aux_String_644_Refman);
+  LUMI_var_dec_ref(aux_String_643_Refman);
+  LUMI_var_dec_ref(aux_String_642_Refman);
+  LUMI_var_dec_ref(aux_String_641_Refman);
+  LUMI_var_dec_ref(aux_String_640_Refman);
+  LUMI_var_dec_ref(aux_String_639_Refman);
+  LUMI_var_dec_ref(aux_String_638_Refman);
+  LUMI_var_dec_ref(aux_String_637_Refman);
+  LUMI_var_dec_ref(aux_String_636_Refman);
+  LUMI_var_dec_ref(aux_String_635_Refman);
+  LUMI_var_dec_ref(aux_String_634_Refman);
+  LUMI_var_dec_ref(aux_String_633_Refman);
+  LUMI_var_dec_ref(aux_String_632_Refman);
+  LUMI_var_dec_ref(aux_String_631_Refman);
+  LUMI_var_dec_ref(aux_String_630_Refman);
+  LUMI_var_dec_ref(aux_String_629_Refman);
+  LUMI_var_dec_ref(aux_String_628_Refman);
+  LUMI_var_dec_ref(aux_String_627_Refman);
+  LUMI_var_dec_ref(aux_String_626_Refman);
+  LUMI_var_dec_ref(aux_String_625_Refman);
+  LUMI_var_dec_ref(aux_String_624_Refman);
+  LUMI_var_dec_ref(aux_String_623_Refman);
+  LUMI_var_dec_ref(aux_String_622_Refman);
+  LUMI_var_dec_ref(aux_String_621_Refman);
+  LUMI_var_dec_ref(aux_String_620_Refman);
+  LUMI_var_dec_ref(aux_String_619_Refman);
+  LUMI_var_dec_ref(aux_String_618_Refman);
+  LUMI_var_dec_ref(aux_String_617_Refman);
+  LUMI_var_dec_ref(aux_String_616_Refman);
+  LUMI_var_dec_ref(aux_String_615_Refman);
+  LUMI_var_dec_ref(aux_String_614_Refman);
+  LUMI_var_dec_ref(aux_String_613_Refman);
+  LUMI_var_dec_ref(aux_String_612_Refman);
+  LUMI_var_dec_ref(aux_String_611_Refman);
+  LUMI_var_dec_ref(aux_String_610_Refman);
+  LUMI_var_dec_ref(aux_String_609_Refman);
+  LUMI_var_dec_ref(aux_String_608_Refman);
+  LUMI_var_dec_ref(aux_String_607_Refman);
+  LUMI_var_dec_ref(aux_String_606_Refman);
+  LUMI_var_dec_ref(aux_String_605_Refman);
+  LUMI_var_dec_ref(aux_String_604_Refman);
+  LUMI_var_dec_ref(aux_String_603_Refman);
+  LUMI_var_dec_ref(aux_String_602_Refman);
+  LUMI_var_dec_ref(aux_String_601_Refman);
+  LUMI_var_dec_ref(aux_String_600_Refman);
+  LUMI_var_dec_ref(aux_String_599_Refman);
+  LUMI_var_dec_ref(aux_String_598_Refman);
+  LUMI_var_dec_ref(aux_String_597_Refman);
+  LUMI_var_dec_ref(aux_String_596_Refman);
+  LUMI_var_dec_ref(aux_String_595_Refman);
+  LUMI_var_dec_ref(aux_String_594_Refman);
+  LUMI_var_dec_ref(aux_String_593_Refman);
+  LUMI_var_dec_ref(aux_String_592_Refman);
+  LUMI_var_dec_ref(aux_String_591_Refman);
+  LUMI_var_dec_ref(aux_String_590_Refman);
+  LUMI_var_dec_ref(aux_String_589_Refman);
+  LUMI_var_dec_ref(aux_String_588_Refman);
+  LUMI_var_dec_ref(aux_String_587_Refman);
+  LUMI_var_dec_ref(aux_String_586_Refman);
+  LUMI_var_dec_ref(aux_String_585_Refman);
+  LUMI_var_dec_ref(aux_String_584_Refman);
+  LUMI_var_dec_ref(aux_String_583_Refman);
+  LUMI_var_dec_ref(aux_String_582_Refman);
+  LUMI_var_dec_ref(aux_String_581_Refman);
+  LUMI_var_dec_ref(aux_String_580_Refman);
+  LUMI_var_dec_ref(aux_String_579_Refman);
+  LUMI_var_dec_ref(aux_String_578_Refman);
+  LUMI_var_dec_ref(aux_String_577_Refman);
+  LUMI_var_dec_ref(aux_String_576_Refman);
+  LUMI_var_dec_ref(aux_String_575_Refman);
+  LUMI_var_dec_ref(aux_String_574_Refman);
+  LUMI_var_dec_ref(aux_String_573_Refman);
+  LUMI_var_dec_ref(aux_String_572_Refman);
+  LUMI_var_dec_ref(aux_String_571_Refman);
+  LUMI_var_dec_ref(aux_String_570_Refman);
+  LUMI_var_dec_ref(aux_String_569_Refman);
+  LUMI_var_dec_ref(aux_String_568_Refman);
+  LUMI_var_dec_ref(aux_String_567_Refman);
+  LUMI_var_dec_ref(aux_String_566_Refman);
+  LUMI_var_dec_ref(aux_String_565_Refman);
+  LUMI_var_dec_ref(aux_String_564_Refman);
+  LUMI_var_dec_ref(aux_String_563_Refman);
+  LUMI_var_dec_ref(aux_String_562_Refman);
+  LUMI_var_dec_ref(aux_String_561_Refman);
+  LUMI_var_dec_ref(aux_String_560_Refman);
+  LUMI_var_dec_ref(aux_String_559_Refman);
+  LUMI_var_dec_ref(aux_String_558_Refman);
+  LUMI_var_dec_ref(aux_String_557_Refman);
+  LUMI_var_dec_ref(aux_String_556_Refman);
+  LUMI_var_dec_ref(aux_String_555_Refman);
+  LUMI_var_dec_ref(aux_String_554_Refman);
+  LUMI_var_dec_ref(aux_String_553_Refman);
+  LUMI_var_dec_ref(aux_String_552_Refman);
+  LUMI_var_dec_ref(aux_String_551_Refman);
+  LUMI_var_dec_ref(aux_String_550_Refman);
+  LUMI_var_dec_ref(aux_String_549_Refman);
+  LUMI_var_dec_ref(aux_String_548_Refman);
+  LUMI_var_dec_ref(aux_String_547_Refman);
+  LUMI_var_dec_ref(aux_String_546_Refman);
+  LUMI_var_dec_ref(aux_String_545_Refman);
+  LUMI_var_dec_ref(aux_String_544_Refman);
+  LUMI_var_dec_ref(aux_String_543_Refman);
+  LUMI_var_dec_ref(aux_String_542_Refman);
+  LUMI_var_dec_ref(aux_String_541_Refman);
+  LUMI_var_dec_ref(aux_String_540_Refman);
+  LUMI_var_dec_ref(aux_String_539_Refman);
+  LUMI_var_dec_ref(aux_String_538_Refman);
+  LUMI_var_dec_ref(aux_String_537_Refman);
+  LUMI_var_dec_ref(aux_String_536_Refman);
+  LUMI_var_dec_ref(aux_String_535_Refman);
+  LUMI_var_dec_ref(aux_String_534_Refman);
+  LUMI_var_dec_ref(aux_String_533_Refman);
+  LUMI_var_dec_ref(aux_String_532_Refman);
+  LUMI_var_dec_ref(aux_String_531_Refman);
+  LUMI_var_dec_ref(aux_String_530_Refman);
+  LUMI_var_dec_ref(aux_String_529_Refman);
+  LUMI_var_dec_ref(aux_String_528_Refman);
+  LUMI_var_dec_ref(aux_String_527_Refman);
+  LUMI_var_dec_ref(aux_String_526_Refman);
+  LUMI_var_dec_ref(aux_String_525_Refman);
+  LUMI_var_dec_ref(aux_String_524_Refman);
+  LUMI_var_dec_ref(aux_String_523_Refman);
+  LUMI_var_dec_ref(aux_String_522_Refman);
+  LUMI_var_dec_ref(aux_String_521_Refman);
+  LUMI_var_dec_ref(aux_String_520_Refman);
+  LUMI_var_dec_ref(aux_String_519_Refman);
+  LUMI_var_dec_ref(aux_String_518_Refman);
+  LUMI_var_dec_ref(aux_String_517_Refman);
+  LUMI_var_dec_ref(aux_String_516_Refman);
+  LUMI_var_dec_ref(aux_String_515_Refman);
+  LUMI_var_dec_ref(aux_String_514_Refman);
+  LUMI_var_dec_ref(aux_String_513_Refman);
+  LUMI_var_dec_ref(aux_String_512_Refman);
+  LUMI_var_dec_ref(aux_String_511_Refman);
+  LUMI_var_dec_ref(aux_String_510_Refman);
+  LUMI_var_dec_ref(aux_String_509_Refman);
+  LUMI_var_dec_ref(aux_String_508_Refman);
+  LUMI_var_dec_ref(aux_String_507_Refman);
+  LUMI_var_dec_ref(aux_String_506_Refman);
+  LUMI_var_dec_ref(aux_String_505_Refman);
+  LUMI_var_dec_ref(aux_String_504_Refman);
+  LUMI_var_dec_ref(aux_String_503_Refman);
+  LUMI_var_dec_ref(aux_String_502_Refman);
+  LUMI_var_dec_ref(aux_String_501_Refman);
+  LUMI_var_dec_ref(aux_String_500_Refman);
+  LUMI_var_dec_ref(aux_String_499_Refman);
+  LUMI_var_dec_ref(aux_String_498_Refman);
+  LUMI_var_dec_ref(aux_String_497_Refman);
+  LUMI_var_dec_ref(aux_String_496_Refman);
+  LUMI_var_dec_ref(aux_String_495_Refman);
+  LUMI_var_dec_ref(aux_String_494_Refman);
+  LUMI_var_dec_ref(aux_String_493_Refman);
+  LUMI_var_dec_ref(aux_String_492_Refman);
+  LUMI_var_dec_ref(aux_String_491_Refman);
+  LUMI_var_dec_ref(aux_String_490_Refman);
+  LUMI_var_dec_ref(aux_String_489_Refman);
+  LUMI_var_dec_ref(aux_String_488_Refman);
+  LUMI_var_dec_ref(aux_String_487_Refman);
+  LUMI_var_dec_ref(aux_String_486_Refman);
+  LUMI_var_dec_ref(aux_String_485_Refman);
+  LUMI_var_dec_ref(aux_String_484_Refman);
+  LUMI_var_dec_ref(aux_String_483_Refman);
+  LUMI_var_dec_ref(aux_String_482_Refman);
+  LUMI_var_dec_ref(aux_String_481_Refman);
+  LUMI_var_dec_ref(aux_String_480_Refman);
+  LUMI_var_dec_ref(aux_String_479_Refman);
+  LUMI_var_dec_ref(aux_String_478_Refman);
+  LUMI_var_dec_ref(aux_String_477_Refman);
+  LUMI_var_dec_ref(aux_String_476_Refman);
+  LUMI_var_dec_ref(aux_String_475_Refman);
+  LUMI_var_dec_ref(aux_String_474_Refman);
+  LUMI_var_dec_ref(aux_String_473_Refman);
+  LUMI_var_dec_ref(aux_String_472_Refman);
+  LUMI_var_dec_ref(aux_String_471_Refman);
+  LUMI_var_dec_ref(aux_String_470_Refman);
+  LUMI_var_dec_ref(aux_String_469_Refman);
+  LUMI_var_dec_ref(aux_String_468_Refman);
+  LUMI_var_dec_ref(aux_String_467_Refman);
+  LUMI_var_dec_ref(aux_String_466_Refman);
+  LUMI_var_dec_ref(aux_String_465_Refman);
+  LUMI_var_dec_ref(aux_String_464_Refman);
+  LUMI_var_dec_ref(aux_String_463_Refman);
+  LUMI_var_dec_ref(aux_String_462_Refman);
+  LUMI_var_dec_ref(aux_String_461_Refman);
+  LUMI_var_dec_ref(aux_String_460_Refman);
+  LUMI_var_dec_ref(aux_String_459_Refman);
+  LUMI_var_dec_ref(aux_String_458_Refman);
+  LUMI_var_dec_ref(aux_String_457_Refman);
+  LUMI_var_dec_ref(aux_String_456_Refman);
+  LUMI_var_dec_ref(aux_String_455_Refman);
+  LUMI_var_dec_ref(aux_String_454_Refman);
+  LUMI_var_dec_ref(aux_String_453_Refman);
+  LUMI_var_dec_ref(aux_String_452_Refman);
+  LUMI_var_dec_ref(aux_String_451_Refman);
+  LUMI_var_dec_ref(aux_String_450_Refman);
+  LUMI_var_dec_ref(aux_String_449_Refman);
+  LUMI_var_dec_ref(aux_String_448_Refman);
+  LUMI_var_dec_ref(aux_String_447_Refman);
+  LUMI_var_dec_ref(aux_String_446_Refman);
+  LUMI_var_dec_ref(aux_String_445_Refman);
+  LUMI_var_dec_ref(aux_String_444_Refman);
+  LUMI_var_dec_ref(aux_String_443_Refman);
+  LUMI_var_dec_ref(aux_String_442_Refman);
+  LUMI_var_dec_ref(aux_String_441_Refman);
+  LUMI_var_dec_ref(aux_String_440_Refman);
+  LUMI_var_dec_ref(aux_String_439_Refman);
+  LUMI_var_dec_ref(aux_String_438_Refman);
+  LUMI_var_dec_ref(aux_String_437_Refman);
+  LUMI_var_dec_ref(aux_String_436_Refman);
+  LUMI_var_dec_ref(aux_String_435_Refman);
+  LUMI_var_dec_ref(aux_String_434_Refman);
+  LUMI_var_dec_ref(aux_String_433_Refman);
+  LUMI_var_dec_ref(aux_String_432_Refman);
+  LUMI_var_dec_ref(aux_String_431_Refman);
+  LUMI_var_dec_ref(aux_String_430_Refman);
+  LUMI_var_dec_ref(aux_String_429_Refman);
+  LUMI_var_dec_ref(aux_String_428_Refman);
+  LUMI_var_dec_ref(aux_String_427_Refman);
+  LUMI_var_dec_ref(aux_String_426_Refman);
+  LUMI_var_dec_ref(aux_String_425_Refman);
+  LUMI_var_dec_ref(aux_String_424_Refman);
+  LUMI_var_dec_ref(aux_String_423_Refman);
+  LUMI_var_dec_ref(aux_String_422_Refman);
+  LUMI_var_dec_ref(aux_String_421_Refman);
+  LUMI_var_dec_ref(aux_String_420_Refman);
+  LUMI_var_dec_ref(aux_String_419_Refman);
+  LUMI_var_dec_ref(aux_String_418_Refman);
+  LUMI_var_dec_ref(aux_String_417_Refman);
+  LUMI_var_dec_ref(aux_String_416_Refman);
+  LUMI_var_dec_ref(aux_String_415_Refman);
+  LUMI_var_dec_ref(aux_String_414_Refman);
+  LUMI_var_dec_ref(aux_String_413_Refman);
+  LUMI_var_dec_ref(aux_String_412_Refman);
+  LUMI_var_dec_ref(aux_String_411_Refman);
+  LUMI_var_dec_ref(aux_String_410_Refman);
+  LUMI_var_dec_ref(aux_String_409_Refman);
+  LUMI_var_dec_ref(aux_String_408_Refman);
+  LUMI_var_dec_ref(aux_String_407_Refman);
+  LUMI_var_dec_ref(aux_String_406_Refman);
+  LUMI_var_dec_ref(aux_String_405_Refman);
+  LUMI_var_dec_ref(aux_String_404_Refman);
+  LUMI_var_dec_ref(aux_String_403_Refman);
+  LUMI_var_dec_ref(aux_String_402_Refman);
+  LUMI_var_dec_ref(aux_String_401_Refman);
+  LUMI_var_dec_ref(aux_String_400_Refman);
+  LUMI_var_dec_ref(aux_String_399_Refman);
+  LUMI_var_dec_ref(aux_String_398_Refman);
+  LUMI_var_dec_ref(aux_String_397_Refman);
+  LUMI_var_dec_ref(aux_String_396_Refman);
+  LUMI_var_dec_ref(aux_String_395_Refman);
+  LUMI_var_dec_ref(aux_String_394_Refman);
+  LUMI_var_dec_ref(aux_String_393_Refman);
+  LUMI_var_dec_ref(aux_String_392_Refman);
+  LUMI_var_dec_ref(aux_String_391_Refman);
+  LUMI_var_dec_ref(aux_String_390_Refman);
+  LUMI_var_dec_ref(aux_String_389_Refman);
+  LUMI_var_dec_ref(aux_String_388_Refman);
+  LUMI_var_dec_ref(aux_String_387_Refman);
+  LUMI_var_dec_ref(aux_String_386_Refman);
+  LUMI_var_dec_ref(aux_String_385_Refman);
+  LUMI_var_dec_ref(aux_String_384_Refman);
+  LUMI_var_dec_ref(aux_String_383_Refman);
+  LUMI_var_dec_ref(aux_String_382_Refman);
+  LUMI_var_dec_ref(aux_String_381_Refman);
+  LUMI_var_dec_ref(aux_String_380_Refman);
+  LUMI_var_dec_ref(aux_String_379_Refman);
+  LUMI_var_dec_ref(aux_String_378_Refman);
+  LUMI_var_dec_ref(aux_String_377_Refman);
+  LUMI_var_dec_ref(aux_String_376_Refman);
+  LUMI_var_dec_ref(aux_String_375_Refman);
+  LUMI_var_dec_ref(aux_String_374_Refman);
+  LUMI_var_dec_ref(aux_String_373_Refman);
+  LUMI_var_dec_ref(aux_String_372_Refman);
+  LUMI_var_dec_ref(aux_String_371_Refman);
+  LUMI_var_dec_ref(aux_String_370_Refman);
+  LUMI_var_dec_ref(aux_String_369_Refman);
+  LUMI_var_dec_ref(aux_String_368_Refman);
+  LUMI_var_dec_ref(aux_String_367_Refman);
+  LUMI_var_dec_ref(aux_String_366_Refman);
+  LUMI_var_dec_ref(aux_String_365_Refman);
+  LUMI_var_dec_ref(aux_String_364_Refman);
+  LUMI_var_dec_ref(aux_String_363_Refman);
+  LUMI_var_dec_ref(aux_String_362_Refman);
+  LUMI_var_dec_ref(aux_String_361_Refman);
+  LUMI_var_dec_ref(aux_String_360_Refman);
+  LUMI_var_dec_ref(aux_String_359_Refman);
+  LUMI_var_dec_ref(aux_String_358_Refman);
+  LUMI_var_dec_ref(aux_String_357_Refman);
+  LUMI_var_dec_ref(aux_String_356_Refman);
+  LUMI_var_dec_ref(aux_String_355_Refman);
+  LUMI_var_dec_ref(aux_String_354_Refman);
+  LUMI_var_dec_ref(aux_String_353_Refman);
+  LUMI_var_dec_ref(aux_String_352_Refman);
+  LUMI_var_dec_ref(aux_String_351_Refman);
+  LUMI_var_dec_ref(aux_String_350_Refman);
+  LUMI_var_dec_ref(aux_String_349_Refman);
+  LUMI_var_dec_ref(aux_String_348_Refman);
+  LUMI_var_dec_ref(aux_String_347_Refman);
+  LUMI_var_dec_ref(aux_String_346_Refman);
+  LUMI_var_dec_ref(aux_String_345_Refman);
+  LUMI_var_dec_ref(aux_String_344_Refman);
+  LUMI_var_dec_ref(aux_String_343_Refman);
+  LUMI_var_dec_ref(aux_String_342_Refman);
+  LUMI_var_dec_ref(aux_String_341_Refman);
+  LUMI_var_dec_ref(aux_String_340_Refman);
+  LUMI_var_dec_ref(aux_String_339_Refman);
+  LUMI_var_dec_ref(aux_String_338_Refman);
+  LUMI_var_dec_ref(aux_String_337_Refman);
+  LUMI_var_dec_ref(aux_String_336_Refman);
+  LUMI_var_dec_ref(aux_String_335_Refman);
+  LUMI_var_dec_ref(aux_String_334_Refman);
+  LUMI_var_dec_ref(aux_String_333_Refman);
+  LUMI_var_dec_ref(aux_String_332_Refman);
+  LUMI_var_dec_ref(aux_String_331_Refman);
+  LUMI_var_dec_ref(aux_String_330_Refman);
+  LUMI_var_dec_ref(aux_String_329_Refman);
+  LUMI_var_dec_ref(aux_String_328_Refman);
+  LUMI_var_dec_ref(aux_String_327_Refman);
+  LUMI_var_dec_ref(aux_String_326_Refman);
+  LUMI_var_dec_ref(aux_String_325_Refman);
+  LUMI_var_dec_ref(aux_String_324_Refman);
+  LUMI_var_dec_ref(aux_String_323_Refman);
+  LUMI_var_dec_ref(aux_String_322_Refman);
+  LUMI_var_dec_ref(aux_String_321_Refman);
+  LUMI_var_dec_ref(aux_String_320_Refman);
+  LUMI_var_dec_ref(aux_String_319_Refman);
+  LUMI_var_dec_ref(aux_String_318_Refman);
+  LUMI_var_dec_ref(aux_String_317_Refman);
+  LUMI_var_dec_ref(aux_String_316_Refman);
+  LUMI_var_dec_ref(aux_String_315_Refman);
+  LUMI_var_dec_ref(aux_String_314_Refman);
+  LUMI_var_dec_ref(aux_String_313_Refman);
+  LUMI_var_dec_ref(aux_String_312_Refman);
+  LUMI_var_dec_ref(aux_String_311_Refman);
+  LUMI_var_dec_ref(aux_String_310_Refman);
+  LUMI_var_dec_ref(aux_String_309_Refman);
+  LUMI_var_dec_ref(aux_String_308_Refman);
+  LUMI_var_dec_ref(aux_String_307_Refman);
+  LUMI_var_dec_ref(aux_String_306_Refman);
+  LUMI_var_dec_ref(aux_String_305_Refman);
+  LUMI_var_dec_ref(aux_String_304_Refman);
+  LUMI_var_dec_ref(aux_String_303_Refman);
+  LUMI_var_dec_ref(aux_String_302_Refman);
+  LUMI_var_dec_ref(aux_String_301_Refman);
+  LUMI_var_dec_ref(aux_String_300_Refman);
+  LUMI_var_dec_ref(aux_String_299_Refman);
+  LUMI_var_dec_ref(aux_String_298_Refman);
+  LUMI_var_dec_ref(aux_String_297_Refman);
+  LUMI_var_dec_ref(aux_String_296_Refman);
+  LUMI_var_dec_ref(aux_String_295_Refman);
+  LUMI_var_dec_ref(aux_String_294_Refman);
+  LUMI_var_dec_ref(aux_String_293_Refman);
+  LUMI_var_dec_ref(aux_String_292_Refman);
+  LUMI_var_dec_ref(aux_String_291_Refman);
+  LUMI_var_dec_ref(aux_String_290_Refman);
+  LUMI_var_dec_ref(aux_String_289_Refman);
+  LUMI_var_dec_ref(aux_String_288_Refman);
+  LUMI_var_dec_ref(aux_String_287_Refman);
+  LUMI_var_dec_ref(aux_String_286_Refman);
+  LUMI_var_dec_ref(aux_String_285_Refman);
+  LUMI_var_dec_ref(aux_String_284_Refman);
+  LUMI_var_dec_ref(aux_String_283_Refman);
+  LUMI_var_dec_ref(aux_String_282_Refman);
+  LUMI_var_dec_ref(aux_String_281_Refman);
+  LUMI_var_dec_ref(aux_String_280_Refman);
+  LUMI_var_dec_ref(aux_String_279_Refman);
+  LUMI_var_dec_ref(aux_String_278_Refman);
+  LUMI_var_dec_ref(aux_String_277_Refman);
+  LUMI_var_dec_ref(aux_String_276_Refman);
+  LUMI_var_dec_ref(aux_String_275_Refman);
+  LUMI_var_dec_ref(aux_String_274_Refman);
+  LUMI_var_dec_ref(aux_String_273_Refman);
+  LUMI_var_dec_ref(aux_String_272_Refman);
+  LUMI_var_dec_ref(aux_String_271_Refman);
+  LUMI_var_dec_ref(aux_String_270_Refman);
+  LUMI_var_dec_ref(aux_String_269_Refman);
+  LUMI_var_dec_ref(aux_String_268_Refman);
+  LUMI_var_dec_ref(aux_String_267_Refman);
+  LUMI_var_dec_ref(aux_String_266_Refman);
+  LUMI_var_dec_ref(aux_String_265_Refman);
+  LUMI_var_dec_ref(aux_String_264_Refman);
+  LUMI_var_dec_ref(aux_String_263_Refman);
+  LUMI_var_dec_ref(aux_String_262_Refman);
+  LUMI_var_dec_ref(aux_String_261_Refman);
+  LUMI_var_dec_ref(aux_String_260_Refman);
+  LUMI_var_dec_ref(aux_String_259_Refman);
+  LUMI_var_dec_ref(aux_String_258_Refman);
+  LUMI_var_dec_ref(aux_String_257_Refman);
+  LUMI_var_dec_ref(aux_String_256_Refman);
+  LUMI_var_dec_ref(aux_String_255_Refman);
+  LUMI_var_dec_ref(aux_String_254_Refman);
+  LUMI_var_dec_ref(aux_String_253_Refman);
+  LUMI_var_dec_ref(aux_String_252_Refman);
+  LUMI_var_dec_ref(aux_String_251_Refman);
+  LUMI_var_dec_ref(aux_String_250_Refman);
+  LUMI_var_dec_ref(aux_String_249_Refman);
+  LUMI_var_dec_ref(aux_String_248_Refman);
+  LUMI_var_dec_ref(aux_String_247_Refman);
+  LUMI_var_dec_ref(aux_String_246_Refman);
+  LUMI_var_dec_ref(aux_String_245_Refman);
+  LUMI_var_dec_ref(aux_String_244_Refman);
+  LUMI_var_dec_ref(aux_String_243_Refman);
+  LUMI_var_dec_ref(aux_String_242_Refman);
+  LUMI_var_dec_ref(aux_String_241_Refman);
+  LUMI_var_dec_ref(aux_String_240_Refman);
+  LUMI_var_dec_ref(aux_String_239_Refman);
+  LUMI_var_dec_ref(aux_String_238_Refman);
+  LUMI_var_dec_ref(aux_String_237_Refman);
+  LUMI_var_dec_ref(aux_String_236_Refman);
+  LUMI_var_dec_ref(aux_String_235_Refman);
+  LUMI_var_dec_ref(aux_String_234_Refman);
+  LUMI_var_dec_ref(aux_String_233_Refman);
+  LUMI_var_dec_ref(aux_String_232_Refman);
+  LUMI_var_dec_ref(aux_String_231_Refman);
+  LUMI_var_dec_ref(aux_String_230_Refman);
+  LUMI_var_dec_ref(aux_String_229_Refman);
+  LUMI_var_dec_ref(aux_String_228_Refman);
+  LUMI_var_dec_ref(aux_String_227_Refman);
+  LUMI_var_dec_ref(aux_String_226_Refman);
+  LUMI_var_dec_ref(aux_String_225_Refman);
+  LUMI_var_dec_ref(aux_String_224_Refman);
+  LUMI_var_dec_ref(aux_String_223_Refman);
+  LUMI_var_dec_ref(aux_String_222_Refman);
+  LUMI_var_dec_ref(aux_String_221_Refman);
+  LUMI_var_dec_ref(aux_String_220_Refman);
+  LUMI_var_dec_ref(aux_String_219_Refman);
+  LUMI_var_dec_ref(aux_String_218_Refman);
+  LUMI_var_dec_ref(aux_String_217_Refman);
+  LUMI_var_dec_ref(aux_String_216_Refman);
+  LUMI_var_dec_ref(aux_String_215_Refman);
+  LUMI_var_dec_ref(aux_String_214_Refman);
+  LUMI_var_dec_ref(aux_String_213_Refman);
+  LUMI_var_dec_ref(aux_String_212_Refman);
+  LUMI_var_dec_ref(aux_String_211_Refman);
+  LUMI_var_dec_ref(aux_String_210_Refman);
+  LUMI_var_dec_ref(aux_String_209_Refman);
+  LUMI_var_dec_ref(aux_String_208_Refman);
+  LUMI_var_dec_ref(aux_String_207_Refman);
+  LUMI_var_dec_ref(aux_String_206_Refman);
+  LUMI_var_dec_ref(aux_String_205_Refman);
+  LUMI_var_dec_ref(aux_String_204_Refman);
+  LUMI_var_dec_ref(aux_String_203_Refman);
+  LUMI_var_dec_ref(aux_String_202_Refman);
+  LUMI_var_dec_ref(aux_String_201_Refman);
+  LUMI_var_dec_ref(aux_String_200_Refman);
+  LUMI_var_dec_ref(aux_String_199_Refman);
+  LUMI_var_dec_ref(aux_String_198_Refman);
+  LUMI_var_dec_ref(aux_String_197_Refman);
+  LUMI_var_dec_ref(aux_String_196_Refman);
+  LUMI_var_dec_ref(aux_String_195_Refman);
+  LUMI_var_dec_ref(aux_String_194_Refman);
+  LUMI_var_dec_ref(aux_String_193_Refman);
+  LUMI_var_dec_ref(aux_String_192_Refman);
+  LUMI_var_dec_ref(aux_String_191_Refman);
+  LUMI_var_dec_ref(aux_String_190_Refman);
+  LUMI_var_dec_ref(aux_String_189_Refman);
+  LUMI_var_dec_ref(aux_String_188_Refman);
+  LUMI_var_dec_ref(aux_String_187_Refman);
+  LUMI_var_dec_ref(aux_String_186_Refman);
+  LUMI_var_dec_ref(aux_String_185_Refman);
+  LUMI_var_dec_ref(aux_String_184_Refman);
+  LUMI_var_dec_ref(aux_String_183_Refman);
+  LUMI_var_dec_ref(aux_String_182_Refman);
+  LUMI_var_dec_ref(aux_String_181_Refman);
+  LUMI_var_dec_ref(aux_String_180_Refman);
+  LUMI_var_dec_ref(aux_String_179_Refman);
+  LUMI_var_dec_ref(aux_String_178_Refman);
+  LUMI_var_dec_ref(aux_String_177_Refman);
+  LUMI_var_dec_ref(aux_String_176_Refman);
+  LUMI_var_dec_ref(aux_String_175_Refman);
+  LUMI_var_dec_ref(aux_String_174_Refman);
+  LUMI_var_dec_ref(aux_String_173_Refman);
+  LUMI_var_dec_ref(aux_String_172_Refman);
+  LUMI_var_dec_ref(aux_String_171_Refman);
+  LUMI_var_dec_ref(aux_String_170_Refman);
+  LUMI_var_dec_ref(aux_String_169_Refman);
+  LUMI_var_dec_ref(aux_String_168_Refman);
+  LUMI_var_dec_ref(aux_String_167_Refman);
+  LUMI_var_dec_ref(aux_String_166_Refman);
+  LUMI_var_dec_ref(aux_String_165_Refman);
+  LUMI_var_dec_ref(aux_String_164_Refman);
+  LUMI_var_dec_ref(aux_String_163_Refman);
+  LUMI_var_dec_ref(aux_String_162_Refman);
+  LUMI_var_dec_ref(aux_String_161_Refman);
+  LUMI_var_dec_ref(aux_String_160_Refman);
+  LUMI_var_dec_ref(aux_String_159_Refman);
+  LUMI_var_dec_ref(aux_String_158_Refman);
+  LUMI_var_dec_ref(aux_String_157_Refman);
+  LUMI_var_dec_ref(aux_String_156_Refman);
+  LUMI_var_dec_ref(aux_String_155_Refman);
+  LUMI_var_dec_ref(aux_String_154_Refman);
+  LUMI_var_dec_ref(aux_String_153_Refman);
+  LUMI_var_dec_ref(aux_String_152_Refman);
+  LUMI_var_dec_ref(aux_String_151_Refman);
+  LUMI_var_dec_ref(aux_String_150_Refman);
+  LUMI_var_dec_ref(aux_String_149_Refman);
+  LUMI_var_dec_ref(aux_String_148_Refman);
+  LUMI_var_dec_ref(aux_String_147_Refman);
+  LUMI_var_dec_ref(aux_String_146_Refman);
+  LUMI_var_dec_ref(aux_String_145_Refman);
+  LUMI_var_dec_ref(aux_String_144_Refman);
+  LUMI_var_dec_ref(aux_String_143_Refman);
+  LUMI_var_dec_ref(aux_String_142_Refman);
+  LUMI_var_dec_ref(aux_String_141_Refman);
+  LUMI_var_dec_ref(aux_String_140_Refman);
+  LUMI_var_dec_ref(aux_String_139_Refman);
+  LUMI_var_dec_ref(aux_String_138_Refman);
+  LUMI_var_dec_ref(aux_String_137_Refman);
+  LUMI_var_dec_ref(aux_String_136_Refman);
+  LUMI_var_dec_ref(aux_String_135_Refman);
+  LUMI_var_dec_ref(aux_String_134_Refman);
+  LUMI_var_dec_ref(aux_String_133_Refman);
+  LUMI_var_dec_ref(aux_String_132_Refman);
+  LUMI_var_dec_ref(aux_String_131_Refman);
+  LUMI_var_dec_ref(aux_String_130_Refman);
+  LUMI_var_dec_ref(aux_String_129_Refman);
+  LUMI_var_dec_ref(aux_String_128_Refman);
+  LUMI_var_dec_ref(aux_String_127_Refman);
+  LUMI_var_dec_ref(aux_String_126_Refman);
+  LUMI_var_dec_ref(aux_String_125_Refman);
+  LUMI_var_dec_ref(aux_String_124_Refman);
+  LUMI_var_dec_ref(aux_String_123_Refman);
+  LUMI_var_dec_ref(aux_String_122_Refman);
+  LUMI_var_dec_ref(aux_String_121_Refman);
+  LUMI_var_dec_ref(aux_String_120_Refman);
+  LUMI_var_dec_ref(aux_String_119_Refman);
+  LUMI_var_dec_ref(aux_String_118_Refman);
+  LUMI_var_dec_ref(aux_String_117_Refman);
+  LUMI_var_dec_ref(aux_String_116_Refman);
+  LUMI_var_dec_ref(aux_String_115_Refman);
+  LUMI_var_dec_ref(aux_String_114_Refman);
+  LUMI_var_dec_ref(aux_String_113_Refman);
+  LUMI_var_dec_ref(aux_String_112_Refman);
+  LUMI_var_dec_ref(aux_String_111_Refman);
+  LUMI_var_dec_ref(aux_String_110_Refman);
+  LUMI_var_dec_ref(aux_String_109_Refman);
+  LUMI_var_dec_ref(aux_String_108_Refman);
+  LUMI_var_dec_ref(aux_String_107_Refman);
+  LUMI_var_dec_ref(aux_String_106_Refman);
+  LUMI_var_dec_ref(aux_String_105_Refman);
+  LUMI_var_dec_ref(aux_String_104_Refman);
+  LUMI_var_dec_ref(aux_String_103_Refman);
+  LUMI_var_dec_ref(aux_String_102_Refman);
+  LUMI_var_dec_ref(aux_String_101_Refman);
+  LUMI_var_dec_ref(aux_String_100_Refman);
+  LUMI_var_dec_ref(aux_String_99_Refman);
+  LUMI_var_dec_ref(aux_String_98_Refman);
+  LUMI_var_dec_ref(aux_String_97_Refman);
+  LUMI_var_dec_ref(aux_String_96_Refman);
+  LUMI_var_dec_ref(aux_String_95_Refman);
+  LUMI_var_dec_ref(aux_String_94_Refman);
+  LUMI_var_dec_ref(aux_String_93_Refman);
+  LUMI_var_dec_ref(aux_String_92_Refman);
+  LUMI_var_dec_ref(aux_String_91_Refman);
+  LUMI_var_dec_ref(aux_String_90_Refman);
+  LUMI_var_dec_ref(aux_String_89_Refman);
+  LUMI_var_dec_ref(aux_String_88_Refman);
+  LUMI_var_dec_ref(aux_String_87_Refman);
+  LUMI_var_dec_ref(aux_String_86_Refman);
+  LUMI_var_dec_ref(aux_String_85_Refman);
+  LUMI_var_dec_ref(aux_String_84_Refman);
+  LUMI_var_dec_ref(aux_String_83_Refman);
+  LUMI_var_dec_ref(aux_String_82_Refman);
+  LUMI_var_dec_ref(aux_String_81_Refman);
+  LUMI_var_dec_ref(aux_String_80_Refman);
+  LUMI_var_dec_ref(aux_String_79_Refman);
+  LUMI_var_dec_ref(aux_String_78_Refman);
+  LUMI_var_dec_ref(aux_String_77_Refman);
+  LUMI_var_dec_ref(aux_String_76_Refman);
+  LUMI_var_dec_ref(aux_String_75_Refman);
+  LUMI_var_dec_ref(aux_String_74_Refman);
+  LUMI_var_dec_ref(aux_String_73_Refman);
+  LUMI_var_dec_ref(aux_String_72_Refman);
+  LUMI_var_dec_ref(aux_String_71_Refman);
+  LUMI_var_dec_ref(aux_String_70_Refman);
+  LUMI_var_dec_ref(aux_String_69_Refman);
+  LUMI_var_dec_ref(aux_String_68_Refman);
+  LUMI_var_dec_ref(aux_String_67_Refman);
+  LUMI_var_dec_ref(aux_String_66_Refman);
+  LUMI_var_dec_ref(aux_String_65_Refman);
+  LUMI_var_dec_ref(aux_String_64_Refman);
+  LUMI_var_dec_ref(aux_String_63_Refman);
+  LUMI_var_dec_ref(aux_String_62_Refman);
+  LUMI_var_dec_ref(aux_String_61_Refman);
+  LUMI_var_dec_ref(aux_String_60_Refman);
+  LUMI_var_dec_ref(aux_String_59_Refman);
+  LUMI_var_dec_ref(aux_String_58_Refman);
+  LUMI_var_dec_ref(aux_String_57_Refman);
+  LUMI_var_dec_ref(aux_String_56_Refman);
+  LUMI_var_dec_ref(aux_String_55_Refman);
+  LUMI_var_dec_ref(aux_String_54_Refman);
+  LUMI_var_dec_ref(aux_String_53_Refman);
+  LUMI_var_dec_ref(aux_String_52_Refman);
+  LUMI_var_dec_ref(aux_String_51_Refman);
+  LUMI_var_dec_ref(aux_String_50_Refman);
+  LUMI_var_dec_ref(aux_String_49_Refman);
+  LUMI_var_dec_ref(aux_String_48_Refman);
+  LUMI_var_dec_ref(aux_String_47_Refman);
+  LUMI_var_dec_ref(aux_String_46_Refman);
+  LUMI_var_dec_ref(aux_String_45_Refman);
+  LUMI_var_dec_ref(aux_String_44_Refman);
+  LUMI_var_dec_ref(aux_String_43_Refman);
+  LUMI_var_dec_ref(aux_String_42_Refman);
+  LUMI_var_dec_ref(aux_String_41_Refman);
+  LUMI_var_dec_ref(aux_String_40_Refman);
+  LUMI_var_dec_ref(aux_String_39_Refman);
+  LUMI_var_dec_ref(aux_String_38_Refman);
+  LUMI_var_dec_ref(aux_String_37_Refman);
+  LUMI_var_dec_ref(aux_String_36_Refman);
+  LUMI_var_dec_ref(aux_String_35_Refman);
+  LUMI_var_dec_ref(aux_String_34_Refman);
+  LUMI_var_dec_ref(aux_String_33_Refman);
+  LUMI_var_dec_ref(aux_String_32_Refman);
+  LUMI_var_dec_ref(aux_String_31_Refman);
+  LUMI_var_dec_ref(aux_String_30_Refman);
+  LUMI_var_dec_ref(aux_String_29_Refman);
+  LUMI_var_dec_ref(aux_String_28_Refman);
+  LUMI_var_dec_ref(aux_String_27_Refman);
+  LUMI_var_dec_ref(aux_String_26_Refman);
+  LUMI_var_dec_ref(aux_String_25_Refman);
+  LUMI_var_dec_ref(aux_String_24_Refman);
+  LUMI_var_dec_ref(aux_String_23_Refman);
+  LUMI_var_dec_ref(aux_String_22_Refman);
+  LUMI_var_dec_ref(aux_String_21_Refman);
+  LUMI_var_dec_ref(aux_String_20_Refman);
+  LUMI_var_dec_ref(aux_String_19_Refman);
+  LUMI_var_dec_ref(aux_String_18_Refman);
+  LUMI_var_dec_ref(aux_String_17_Refman);
+  LUMI_var_dec_ref(aux_String_16_Refman);
+  LUMI_var_dec_ref(aux_String_15_Refman);
+  LUMI_var_dec_ref(aux_String_14_Refman);
+  LUMI_var_dec_ref(aux_String_13_Refman);
+  LUMI_var_dec_ref(aux_String_12_Refman);
+  LUMI_var_dec_ref(aux_String_11_Refman);
+  LUMI_var_dec_ref(aux_String_10_Refman);
+  LUMI_var_dec_ref(aux_String_9_Refman);
+  LUMI_var_dec_ref(aux_String_8_Refman);
+  LUMI_var_dec_ref(aux_String_7_Refman);
+  LUMI_var_dec_ref(aux_String_6_Refman);
+  LUMI_var_dec_ref(aux_String_5_Refman);
+  LUMI_var_dec_ref(aux_String_4_Refman);
+  LUMI_var_dec_ref(aux_String_3_Refman);
+  LUMI_var_dec_ref(aux_String_2_Refman);
+  LUMI_var_dec_ref(aux_String_1_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
+  return LUMI_err;
+}
+#undef LUMI_FILE_NAME
+#undef LUMI_FUNC_NAME
+
 #define LUMI_FILE_NAME "TL5/syntax-tree/root.4.lm"
 #define LUMI_FUNC_NAME "write-global"
 Returncode tl5_compiler_M_write_global(String* text, Ref_Manager* text_Refman) {
@@ -49558,9 +57134,6 @@ USER_MAIN_HEADER {
   String aux_String_0_Var = {0};
   String* aux_String_0 = NULL;
   Ref_Manager* aux_String_0_Refman = NULL;
-  String aux_String_1_Var = {0};
-  String* aux_String_1 = NULL;
-  Ref_Manager* aux_String_1_Refman = NULL;
 #undef RETURN_ERROR
 #define RETURN_ERROR return LUMI_err;
 #define LUMI_FUNC_NAME "global variable initialization"
@@ -49574,12 +57147,6 @@ USER_MAIN_HEADER {
   tl5_compiler_M_expression_ends = aux_String_0;
   tl5_compiler_M_expression_ends_Refman = aux_String_0_Refman;
   LUMI_inc_ref(tl5_compiler_M_expression_ends_Refman);
-#undef LUMI_FILE_NAME
-#define LUMI_FILE_NAME "TL5/global/header-string.4.lm"
-  INIT_STRING_CONST(1084, aux_String_1, "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\n\n/* builtin type defines */\n\ntypedef int Int;\ntypedef char Char;\ntypedef unsigned char Byte;\n\ntypedef enum Bool {\n  false = 0,\n  true = 1\n} Bool;\n\ntypedef enum Returncode {\n  OK = EXIT_SUCCESS,\n  ERR = EXIT_FAILURE,\n  FAIL = EXIT_FAILURE > EXIT_SUCCESS? EXIT_FAILURE + 1 : EXIT_SUCCESS + 1\n} Returncode;\n\ntypedef struct Ref_Manager {\n  int count;\n  void* value;\n  void* ref;\n} Ref_Manager;\n\ntypedef struct File {\n  FILE* fobj;\n} File;\n\ntypedef struct Sys {\n  char* argv;\n  int argv_Length;\n  int argv_Value_length;\n  int* argv_String_length;\n  Ref_Manager* argv_Refman;\n  File* stdout_Cname;\n  Ref_Manager* stdout_Cname_Refman;\n  File* stdin_Cname;\n  Ref_Manager* stdin_Cname_Refman;\n  File* stderr_Cname;\n  Ref_Manager* stderr_Cname_Refman;\n} Sys;\n\ntypedef void* Ref;\n\ntypedef char cdef_M_Char;\ntypedef unsigned char cdef_M_Uchar;\ntypedef wchar_t cdef_M_Wchar;\ntypedef short cdef_M_Short;\ntypedef unsigned short cdef_M_Ushort;\ntypedef int cdef_M_Int;\ntypedef unsigned int cdef_M_Uint;\ntypedef long cdef_M_Long;\ntypedef unsigned long cdef_M_Ulong;\ntypedef size_t cdef_M_Size;\ntypedef float cdef_M_Float;\ntypedef double cdef_M_Double;\ntypedef long double cdef_M_LongDouble;\n\ntypedef void (*Dynamic_Del)(void*);\n\ntypedef void Generic_Type;\ntypedef struct Generic_Type_Dynamic { Dynamic_Del _del; } Generic_Type_Dynamic;\n\ntypedef struct File_Coverage {\n  char const* filename;\n  int lines_number;\n  int* line_count;\n} File_Coverage;\n\ntypedef struct Error_Message {\n  char* str;\n  int length;\n} Error_Message;\n\ntypedef struct Error_Messages {\n  Error_Message empty_object;\n  Error_Message outdated_weak_reference;\n  Error_Message object_memory;\n  Error_Message managed_object_memory;\n  Error_Message slice_index;\n  Error_Message string_too_long;\n  Error_Message file_not_opened;\n  Error_Message file_write_failed;\n  Error_Message zero_division;\n  Error_Message loop_limit;\n} Error_Messages;\n\n\n/* macros */\n\n#define START_TRACE(line, cleanup, value, format, message, message_length) { \\\n  LUMI_trace_print( \\\n      format, \\\n      LUMI_FILE_NAME, \\\n      line, \\\n      LUMI_FUNC_NAME, \\\n      message, \\\n      message_length); \\\n  LUMI_err = value; \\\n  LUMI_loop_depth = 0; \\\n  goto cleanup; }\n\n#define RAISE(line, cleanup, message) { \\\n  START_TRACE( \\\n      line, \\\n      cleanup, \\\n      ERR, \\\n      LUMI_raise_format, \\\n      LUMI_error_messages.message.str, \\\n      LUMI_error_messages.message.length) }\n\n#define USER_RAISE(line, cleanup, message, message_length) \\\n  START_TRACE( \\\n      line, \\\n      cleanup, \\\n      ERR, \\\n      LUMI_raise_format, \\\n      message, \\\n      message_length)\n\n#define TEST_FAIL(line, cleanup, message_length, message) \\\n  START_TRACE( \\\n      line, cleanup, FAIL, LUMI_assert_format, message, message_length)\n\n#define TEST_ASSERT(line, cleanup, condition) if (!(condition)) \\\n  TEST_FAIL(line, cleanup, 21, \"condition is not true\")\n\n#define TEST_FAIL_NULL(line, cleanup) \\\n  START_TRACE(line, cleanup, FAIL, LUMI_assert_format, NULL, 0)\n\n#define CHECK(line, cleanup) if (LUMI_err != OK) { \\\n  LUMI_trace_print( \\\n      LUMI_traceline_format, LUMI_FILE_NAME, line, LUMI_FUNC_NAME, \\\n      NULL, 0); \\\n  LUMI_loop_depth = 0; \\\n  goto cleanup; }\n\n#define IGNORE_ERRORS(call) \\\n  ++LUMI_trace_ignore_count; (void)call; --LUMI_trace_ignore_count;\n\n#define CHECK_REF(line, cleanup, ref) \\\n  if (ref == NULL) RAISE(line, cleanup, empty_object)\n\n#define CHECK_REFMAN(line, cleanup, refman) \\\n  if (refman != NULL && (refman)->value == NULL) \\\n    RAISE(line, cleanup, outdated_weak_reference)\n\n#define CHECK_REF_REFMAN(line, cleanup, ref, refman) \\\n  CHECK_REF(line, cleanup, ref) \\\n  if ((refman)->value == NULL) RAISE(line, cleanup, outdated_weak_reference)\n\n#define MAIN_PROXY(func) int main(int argc, char* argv[]) { \\\n  return func(argc, argv); \\\n}\n\n#define MAIN_FUNC MAIN_PROXY(LUMI_main)\n#define TEST_MAIN_FUNC MAIN_PROXY(LUMI_test_main)\n#define USER_MAIN_HEADER Returncode LUMI_user_main(void)\n\n#define ARRAY_DEL(Type, array, length) if (array != NULL) { \\\n  int LUMI_n = 0; \\\n  for (; LUMI_n < length; ++LUMI_n) \\\n    Type##_Del(array + LUMI_n); \\\n  }\n\n#define SELF_REF_DEL(Type, field) \\\nwhile (self->field != NULL) { \\\n  Type* value = self->field; \\\n  self->field = value->field; \\\n  value->field = NULL; \\\n  Type##_Del(value); \\\n  free(value); \\\n}\n\n#define SELF_REF_DEL_STR(Type, field) \\\nwhile (self->field != NULL) { \\\n  Type* value = self->field; \\\n  Ref_Manager* value_Refman = self->field##_Refman; \\\n  self->field = value->field; \\\n  self->field##_Refman = value->field##_Refman; \\\n  value->field = NULL; \\\n  value->field##_Refman = NULL; \\\n  Type##_Del(value); \\\n  LUMI_owner_dec_ref(value_Refman); \\\n}\n\n#define SELF_REF_DEL_DYN(Type, bases, field) \\\nwhile (self->field != NULL) { \\\n  Type* value = self->field; \\\n  Type##_Dynamic* value_Dynamic = self->field##_Dynamic; \\\n  self->field = value->field; \\\n  self->field##_Dynamic = value->field##_Dynamic; \\\n  value->field = NULL; \\\n  value->field##_Dynamic = NULL; \\\n  value_Dynamic->bases##del(value); \\\n  free(value); \\\n}\n\n#define SELF_REF_DEL_STR_DYN(Type, bases, field) \\\nwhile (self->field != NULL) { \\\n  Type* value = self->field; \\\n  Ref_Manager* value_Refman = self->field##_Refman; \\\n  Type##_Dynamic* value_Dynamic = self->field##_Dynamic; \\\n  self->field = value->field; \\\n  self->field##_Refman = value->field##_Refman; \\\n  self->field##_Dynamic = value->field##_Dynamic; \\\n  value->field = NULL; \\\n  value->field##_Refman = NULL; \\\n  value->field##_Dynamic = NULL; \\\n  value_Dynamic->bases##del(value); \\\n  LUMI_owner_dec_ref(value_Refman); \\\n}\n\n#define INIT_VAR_REFMAN(line, cleanup, name) \\\n  name##_Refman = LUMI_new_ref(name); \\\n  if (name##_Refman == NULL) { RAISE(line, cleanup, managed_object_memory) }\n\n#define INIT_NEW_REFMAN(line, cleanup, name) \\\n  name##_Refman = LUMI_new_ref(name); \\\n  if (name##_Refman == NULL) { \\\n    free(name); \\\n    name = NULL; \\\n    RAISE(line, cleanup, managed_object_memory) }\n\n#define INIT_NEW(line, cleanup, name, type, size) \\\n  if (size <= 0) RAISE(line, cleanup, slice_index) \\\n  name = LUMI_alloc(sizeof(type) * size); \\\n  if (name == NULL) RAISE(line, cleanup, object_memory)\n\n#define INIT_NEW_ARRAY(line, cleanup, name, type, length, value_size) \\\n  name##_Length = length; \\\n  INIT_NEW(line, cleanup, name, type, name##_Length * value_size)\n\n#define INIT_NEW_STRING(line, cleanup, name, size) \\\n  name##_Max_length = size; \\\n  INIT_NEW(line, cleanup, name, char, name##_Max_length) \\\n  name##_Length = LUMI_alloc(sizeof(int)); \\\n  if (name##_Length == NULL) { \\\n    name##_Length = &Lumi_empty_int; \\\n    free(name); name = NULL; \\\n    RAISE(line, cleanup, object_memory) }\n\n#define INIT_STRING_CONST(line, cleanup, name, text) \\\n  name = text; \\\n  name##_Max_length = sizeof(text); \\\n  *name##_Length = sizeof(text) - 1;\n\n\n#define String_Del(name) do { if (name##_Length != &Lumi_empty_int) { \\\n  free(name##_Length); \\\n  name##_Length = &Lumi_empty_int; } } while (false)\n\n\n/* traceback */\n\n#define CRAISE(message) { \\\n  LUMI_C_trace_print(__LINE__, LUMI_FUNC_NAME, message); \\\n  return ERR; }\n#define CCHECK(err) { \\\n  Returncode LUMI_cerr = err; \\\n  if (LUMI_cerr != OK) return LUMI_cerr; }\n\nchar* LUMI_raise_format = \"Error raised in %s:%d %s()\\n\";\nchar* LUMI_assert_format = \"Assert failed in %s:%d %s()\\n\";\nchar* LUMI_traceline_format = \"  called from %s:%d %s()\\n\";\nFILE* LUMI_trace_stream = NULL;\nint LUMI_trace_ignore_count = 0;\nchar* LUMI_expected_error = NULL;\nint LUMI_expected_error_trace_ignore_count = 0;\nGeneric_Type_Dynamic* dynamic_Void = NULL;\n\nSys* sys = NULL;\nRef_Manager* sys_Refman = NULL;\nint Lumi_empty_int = 0;\n\n#define ERROR_MESAGE(message) {message, sizeof(message) - 1}\n\nError_Messages LUMI_error_messages = {\n  ERROR_MESAGE(\"empty object used\"),\n  ERROR_MESAGE(\"outdated weak reference used\"),\n  ERROR_MESAGE(\"insufficient memory for object dynamic allocation\"),\n  ERROR_MESAGE(\"insufficient memory for managed object\"),\n  ERROR_MESAGE(\"slice index out of bounds\"),\n  ERROR_MESAGE(\"string too long\"),\n  ERROR_MESAGE(\"file not opened\"),\n  ERROR_MESAGE(\"file write failed\"),\n  ERROR_MESAGE(\"zero division\"),\n  ERROR_MESAGE(\"loop limit reached\")\n};\n\nenum {\n  LUMI_DEBUG_NOTHING = 0,\n  LUMI_DEBUG_FAIL,\n  LUMI_DEBUG_SUCCESS\n};\nint lumi_debug_value = LUMI_DEBUG_NOTHING;\n\nvoid LUMI_trace_print(\n    char const* format,\n    char const* filename,\n    int line,\n    char const* funcname,\n    char const* message,\n    int message_length) {\n  if (LUMI_trace_ignore_count == 0) {\n    if (message != NULL) {\n      fprintf(\n          LUMI_trace_stream,\n          \"Error: %.*s\\n  \",\n          message_length,\n          message);\n    }\n    fprintf(LUMI_trace_stream, format, filename, line, funcname);\n  }\n  else if (LUMI_expected_error != NULL &&\n      LUMI_expected_error_trace_ignore_count == LUMI_trace_ignore_count &&\n      format != LUMI_traceline_format) {\n    int n;\n    if (message == NULL) {\n      LUMI_expected_error = NULL;\n      if (LUMI_trace_ignore_count == 1) {\n        fprintf(\n            LUMI_trace_stream,\n            \"Assert failed: error with no message raised\\n  \");\n      }\n      return;\n    }\n    for (n = 0; n <= message_length; ++n) {\n      if (((n == message_length)? '\\0': message[n]) !=\n          LUMI_expected_error[n]) {\n        LUMI_expected_error = NULL;\n        if (LUMI_trace_ignore_count == 1) {\n          fprintf(\n              LUMI_trace_stream,\n              \"Assert failed: unexpected error message \\\"%.*s\\\"\\n  \",\n              message_length,\n              message);\n        }\n        return;\n      }\n    }\n  }\n}\n\n/* like strnlen */\nint cstring_length(char* cstring, int max_length) {\n  int length = 0;\n  while (cstring[length] != '\\0' && length < max_length) {\n    ++length;\n  }\n  return length;\n}\n\nvoid LUMI_C_trace_print(int line, char const* funcname, char* message) {\n  LUMI_trace_print(\n      LUMI_raise_format,\n      \"builtin\",\n      line,\n      funcname,\n      message,\n      cstring_length(message, 255));\n}\n\n\n/* main */\n\nReturncode LUMI_user_main(void);\nint set_sys(int argc, char* argv[]);\n#define SET_SYS err = set_sys(argc, argv); if (err != OK) return err;\n\nint LUMI_main(int argc, char* argv[]) {\n  Returncode err;\n  LUMI_trace_stream = stderr;\n  SET_SYS\n  err = LUMI_user_main();\n  if (err != OK) {\n    fprintf(stderr, \"  called from executable start\\n\");\n  }\n  return err;\n}\n\n\n/* tests */\n\nint LUMI_test_main(int argc, char* argv[]) {\n  Returncode err;\n  LUMI_trace_stream = stdout;\n  SET_SYS\n  printf(\"Running tests:\\n\");\n  err = LUMI_user_main();\n  if (err == OK) {\n    printf(\"Tests passed\\n\");\n  }\n  else {\n    printf(\"Tests failed\\n\");\n    return ERR;\n  }\n  return OK;\n}\n\nBool LUMI_run_test(char* test_name, Returncode (*test_func)(void)) {\n  Returncode err;\n  printf(\"testing %s... \", test_name);\n  fflush(stdout);\n  err = test_func();\n  if (err == OK) {\n    printf(\"OK\\n\");\n    return true;\n  }\n  return false;\n}\n\nint calc_coverage(File_Coverage* files_coverage, int files_number) {\n  int n;\n  int all_lines = 0;\n  int covered_lines = 0;\n  for (n = 0; n < files_number; ++n) {\n    int line;\n    for (line = 0; line < files_coverage[n].lines_number; ++line) {\n      if (files_coverage[n].line_count[line] >= 0) {\n        ++all_lines;\n      }\n      if (files_coverage[n].line_count[line] > 0) {\n        ++covered_lines;\n      }\n    }\n  }\n  return covered_lines * 100 / all_lines;\n}\n\nvoid make_coverage_xml(File_Coverage* files_coverage, int files_number) {\n  int n;\n  FILE* xml = NULL;\n  xml = fopen(\"cobertura.xml\", \"w\");\n  if (xml == NULL) {\n    return;\n  }\n  fputs(\"<?xml version=\\\"1.0\\\" ?>\\n\", xml);\n  fputs(\n    \"<!DOCTYPE coverage SYSTEM 'https://raw.githubusercontent.com/cobertura/\"\n    \"cobertura/master/cobertura/src/site/htdocs/xml/coverage-loose.dtd'>\\n\",\n    xml);\n  fputs(\"<coverage timestamp=\\\"0\\\" version=\\\"lumi 0.0.5\\\">\\n\", xml);\n  fputs(\" <packages>\\n\", xml);\n\n  for (n = 0; n < files_number; ++n) {\n    int line;\n    fputs(\"  <package name=\\\"\\\">\\n\", xml);\n    fputs(\"   <classes>\\n\", xml);\n    fprintf(\n      xml,\n      \"    <class name=\\\"%s\\\" filename=\\\"%s\\\">\\n\",\n      files_coverage[n].filename,\n      files_coverage[n].filename);\n    fputs(\"     <methods/>\\n\", xml);\n    fputs(\"     <lines>\\n\", xml);\n\n    for (line = 0; line < files_coverage[n].lines_number; ++line) {\n      if (files_coverage[n].line_count[line] >= 0) {\n        fprintf(\n          xml,\n          \"      <line branch=\\\"false\\\" hits=\\\"%d\\\" number=\\\"%d\\\"/>\\n\",\n          files_coverage[n].line_count[line],\n          line);\n      }\n    }\n\n    fputs(\"     </lines>\\n\", xml);\n    fputs(\"    </class>\\n\", xml);\n    fputs(\"   </classes>\\n\", xml);\n    fputs(\"  </package>\\n\", xml);\n  }\n\n  fputs(\" </packages>\\n\", xml);\n  fputs(\"</coverage>\\n\", xml);\n  fclose(xml);\n}\n\nBool LUMI_test_coverage(File_Coverage* files_coverage, int files_number) {\n  int n;\n  int coverage;\n  Bool generate_xml = false;\n  if (sys->argv != NULL && sys->argv_Refman->value != NULL &&\n      sys->argv_Length > 1 && sys->argv_String_length[1] > 1) {\n    char* arg = sys->argv + sys->argv_Value_length;\n    generate_xml = arg[0] == '-' && arg[1] == 'x';\n  }\n  printf(\"testing code coverage... \");\n  coverage = calc_coverage(files_coverage, files_number);\n  if (coverage == 100) {\n    printf(\"100%%\\n\");\n    if (generate_xml) {\n      make_coverage_xml(files_coverage, files_number);\n    }\n    return true;\n  }\n\n  printf(\"%d%% - failed, lines not covered:\\n\", coverage);\n  for (n = 0; n < files_number; ++n) {\n    coverage = calc_coverage(files_coverage + n, 1);\n    if (coverage < 100) {\n      int line;\n      int first_uncovered;\n      Bool prev_uncovered = false;\n      printf(\"  %s(%d%%):\", files_coverage[n].filename, coverage);\n      for (line = 0; line < files_coverage[n].lines_number; ++line) {\n        if (files_coverage[n].line_count[line] == 0) {\n          if (!prev_uncovered) {\n            first_uncovered = line;\n            prev_uncovered = true;\n          }\n        }\n        else if (prev_uncovered) {\n          printf(\" %d\", first_uncovered);\n          if (first_uncovered < line - 1) {\n            printf(\"-%d\", line - 1);\n          }\n          prev_uncovered = false;\n        }\n      }\n      printf(\"\\n\");\n    }\n  }\n  if (generate_xml) {\n    make_coverage_xml(files_coverage, files_number);\n  }\n  return false;\n}\n\n\n/* reference counting */\n\nvoid new_Mock(Bool*);\nReturncode delete_Mock(Ref);\n\nvoid* LUMI_alloc(size_t size) {\n  Bool allocate_success = true;\n  new_Mock(&allocate_success);\n  if (allocate_success) {\n    return calloc(1, size);\n  }\n  return NULL;\n}\n\nRef_Manager* LUMI_new_ref(void* value) {\n  Ref_Manager* ref = NULL;\n  Bool allocate_success = true;\n  new_Mock(&allocate_success);\n  if (allocate_success) {\n    ref = malloc(sizeof(Ref_Manager));\n    if (ref != NULL) {\n      ref->count = 1;\n      ref->value = value;\n      ref->ref = value;\n    }\n  }\n  return ref;\n}\n\nvoid LUMI_inc_ref(Ref_Manager* ref) {\n  if (ref != NULL) {\n    ++ref->count;\n  }\n}\n\nvoid dec_ref(Ref_Manager* ref) {\n  --ref->count;\n  if (ref->count == 0) {\n    IGNORE_ERRORS( delete_Mock(ref->ref); )\n    free(ref);\n  }\n}\n\nvoid LUMI_dec_ref(Ref_Manager* ref) {\n  if (ref != NULL) {\n    dec_ref(ref);\n  }\n}\n\nvoid LUMI_var_dec_ref(Ref_Manager* ref) {\n  if (ref != NULL) {\n    ref->value = NULL;\n    dec_ref(ref);\n  }\n}\n\nvoid LUMI_owner_dec_ref(Ref_Manager* ref) {\n  if (ref != NULL) {\n    free(ref->value);\n    ref->value = NULL;\n    dec_ref(ref);\n  }\n}\n\n/* Pointer */\n\n#define cdef_M_Pointer_set_point_to(pointer, value, _) pointer = &value\n#define cdef_M_Pointer_set_from_ref(pointer, ref, _) pointer = ref\n#define cdef_M_Pointer_set_from_array cdef_M_Pointer_set_from_ref\n#define cdef_M_Pointer_get_pointed_at(pointer, index) pointer[index]\n#define cdef_M_Pointer_get_ref_at(pointer, index) (pointer + index)\n\n\n/* Int */\n\n#define LUMI_FUNC_NAME \"Int.str\"\nReturncode Int_str(Int value, char* str, int str_max_length, int* str_length) {\n  Bool is_neg;\n  int abs;\n  int swap;\n  char* next;\n  char* last;\n  is_neg = value < 0;\n  abs = value;\n  if (is_neg) {\n    abs = -value;\n  }\n  swap = 0;\n  *str_length = is_neg;\n  do {\n    swap *= 10;\n    swap += abs % 10;\n    abs /= 10;\n    if (str_max_length <= *str_length + 1) {\n      *str_length = 0;\n      CRAISE(LUMI_error_messages.string_too_long.str)\n    }\n    ++*str_length;\n  } while (abs > 0);\n  next = str;\n  if (is_neg) {\n    *next = '-';\n    ++next;\n  }\n  last = str + *str_length;\n  while (next < last) {\n    *next = '0' + swap % 10;\n    ++next;\n    swap /= 10;\n  }\n  *last = '\\0';\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n\n/* Array */\n\nvoid Array_length(void* self, int length, Int* length_out) {\n  *length_out = length;\n}\n\n\n/* String */\n\nvoid String_length(\n    char* self, int max_length, int *length, Int* length_out) {\n  *length_out = *length;\n}\n\nvoid String_max_length(\n    char* self, int max_length, int *length, Int* max_length_out) {\n  *max_length_out = max_length;\n}\n\n#define LUMI_FUNC_NAME \"String.copy\"\nReturncode String_copy(\n    char* self, int max_length, int* length, char* source, int source_length) {\n  if (self == source) {\n    return OK;\n  }\n  if (source_length >= max_length) {\n    CRAISE(LUMI_error_messages.string_too_long.str)\n  }\n  *length = source_length;\n  memcpy(self, source, source_length);\n  self[source_length] = '\\0';\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"String.copy-from-pointer\"\nReturncode String_copy_from_pointer(\n    char* self, int max_length, int* length, char* source) {\n  int source_length;\n  if (source == NULL) {\n    *length = 0;\n    self[0] = '\\0';\n    return OK;\n  }\n  if (self == source) {\n    return OK;\n  }\n  source_length = cstring_length(source, max_length);\n  if (source_length >= max_length) {\n    CRAISE(LUMI_error_messages.string_too_long.str)\n  }\n  *length = source_length;\n  memcpy(self, source, source_length);\n  self[source_length] = '\\0';\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\nvoid String_set_null_term_length(char* self, int max_length, int* length) {\n  *length = cstring_length(self, max_length);\n}\n\nvoid String_clear(char* self, int max_length, int* length) {\n  *length = 0;\n}\n\nvoid String_equal(\n    char* self, int max_length, int *length,\n    char* other, int other_length,\n    Bool* out_equal) {\n  if (self == other) {\n    *out_equal = *length == other_length;\n    return;\n  }\n  if (*length != other_length) {\n    *out_equal = false;\n    return;\n  }\n  *out_equal = strncmp(self, other, *length) == 0;\n}\n\n#define LUMI_FUNC_NAME \"String.get\"\nReturncode String_get(\n    char* self, int max_length, int *length, Int index, Char* out_char) {\n  if (index < 0 || index >= *length) {\n    CRAISE(LUMI_error_messages.slice_index.str)\n  }\n  *out_char = self[index];\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"String.set\"\nReturncode String_set(\n    char* self, int max_length, int *length, Int index, Char ch) {\n  if (index < 0 || index >= *length) {\n    CRAISE(LUMI_error_messages.slice_index.str)\n  }\n  self[index] = ch;\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"String.append\"\nReturncode String_append(char* self, int max_length, int* length, Char ch) {\n  if (*length + 1 >= max_length) {\n    CRAISE(LUMI_error_messages.string_too_long.str)\n  }\n  self[*length] = ch;\n  ++(*length);\n  self[*length] = '\\0';\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"String.concat\"\nReturncode String_concat(\n    char* self, int max_length, int* length, char* ext, int ext_length) {\n  if (*length + ext_length >= max_length) {\n    CRAISE(LUMI_error_messages.string_too_long.str)\n  }\n  memcpy(self + *length, ext, ext_length);\n  *length += ext_length;\n  self[*length] = '\\0';\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"String.concat-int\"\nReturncode String_concat_int(\n    char* self, int max_length, int* length, Int num) {\n  int added_length = 0;\n  CCHECK(Int_str(num, self + *length, max_length - *length, &added_length));\n  *length += added_length;\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\nvoid String_find(\n    char* self, int max_length, int *length,\n    char* pattern, int pattern_length,\n    Int* out_index) {\n  int n;\n  for (n = 0; n <= *length - pattern_length; ++n) {\n    if (strncmp(self + n, pattern, pattern_length) == 0) {\n      *out_index = n;\n      return;\n    }\n  }\n  *out_index = *length;\n}\n\nvoid String_has(\n    char* self, int max_length, int *length, Char ch, Bool* found) {\n  int n;\n  for (n = 0; n < *length; ++n) {\n    if (self[n] == ch) {\n      *found = true;\n      return;\n    }\n  }\n  *found = false;\n}\n\n\n/* File */\n\nvoid File_Del(File* self) {\n  if (self != NULL && self->fobj != NULL) {\n    fclose(self->fobj);\n  }\n}\n\nGeneric_Type_Dynamic File_dynamic = { (Dynamic_Del)File_Del };\n\n#define LUMI_FUNC_NAME \"file-close\"\nReturncode file_close(File* file) {\n  if (lumi_debug_value == LUMI_DEBUG_FAIL || file->fobj != NULL) {\n    if (lumi_debug_value == LUMI_DEBUG_FAIL || fclose(file->fobj) != 0) {\n      free(file);\n      CRAISE(\"close file failed\")\n    }\n    file->fobj = NULL;\n  }\n  free(file);\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"open-file\"\nReturncode open_file(\n    File** file,\n    char* name, int name_max_length, int name_length,\n    char* mode) {\n  FILE* new_fobj = NULL;\n  if (lumi_debug_value == LUMI_DEBUG_NOTHING) {\n    CCHECK(file_close(*file));\n  }\n  *file = NULL;\n  if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n    if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n      new_fobj = fopen(name, mode);\n    }\n    if (new_fobj == NULL) {\n      CRAISE(\"open file failed\")\n    }\n  }\n  *file = LUMI_alloc(sizeof(File));\n  if (*file == NULL) {\n    if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n      fclose(new_fobj);\n    }\n    CRAISE(LUMI_error_messages.object_memory.str)\n  }\n  (*file)->fobj = new_fobj;\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\nReturncode file_open_read(\n    char* name, int name_max_length, int *name_length, File** file) {\n  return open_file(file, name, name_max_length, *name_length, \"r\");\n}\n\nReturncode file_open_write(\n    char* name, int name_max_length, int *name_length, File** file) {\n  return open_file(\n    file, name, name_max_length, *name_length, \"w\");\n}\n\nBool getc_is_eof(int get, char* ch) {\n  if (get == EOF) {\n    return true;\n  }\n  else {\n    *ch = get;\n    return false;\n  }\n}\n\n#define LUMI_FUNC_NAME \"File.getc\"\nReturncode File_getc(File* file, Char* out_char, Bool* is_eof) {\n  if (file->fobj == NULL) CRAISE(LUMI_error_messages.file_not_opened.str)\n  *is_eof = getc_is_eof(getc(file->fobj), out_char);\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"File.putc\"\nReturncode File_putc(File* file, Char ch) {\n  int res = '\\0';\n  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n    if (file->fobj == NULL) CRAISE(LUMI_error_messages.file_not_opened.str)\n    res = putc(ch, file->fobj);\n  }\n  if (res != ch) {\n    CRAISE(LUMI_error_messages.file_write_failed.str)\n  }\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"File.write\"\nReturncode File_write(File* file, char* text, int text_length) {\n  int n, ch, res=0;\n  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n    if (file->fobj == NULL) CRAISE(LUMI_error_messages.file_not_opened.str)\n  }\n  for (n = 0; n < text_length; ++n) {\n    ch = text[n];\n    if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n      res = putc(ch, file->fobj);\n    }\n    if (ch != res) {\n      CRAISE(LUMI_error_messages.file_write_failed.str)\n    }\n  }\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n\n/* system */\n\nint set_sys(int argc, char* argv[]) {\n  int arg;\n  sys = LUMI_alloc(sizeof(Sys));\n  sys_Refman = LUMI_new_ref(sys);\n  if (sys != NULL) {\n    int max_length = 0;\n    sys->stdout_Cname = LUMI_alloc(sizeof(File));\n    sys->stdout_Cname_Refman = LUMI_new_ref(sys->stdout_Cname);\n    sys->stdin_Cname = LUMI_alloc(sizeof(File));\n    sys->stdin_Cname_Refman = LUMI_new_ref(sys->stdin_Cname);\n    sys->stderr_Cname = LUMI_alloc(sizeof(File));\n    sys->stderr_Cname_Refman = LUMI_new_ref(sys->stderr_Cname);\n    sys->argv_Length = argc;\n    sys->argv_Value_length = 0;\n    sys->argv_String_length = LUMI_alloc(sizeof(int) * argc);\n    for (arg = 0; arg < argc; ++arg) {\n      int length = cstring_length(argv[arg], 1024);\n      if (sys->argv_String_length != NULL) {\n        sys->argv_String_length[arg] = length;\n      }\n      if (length > sys->argv_Value_length) {\n        sys->argv_Value_length = length;\n      }\n    }\n    ++sys->argv_Value_length;\n    sys->argv = LUMI_alloc(sys->argv_Value_length * sys->argv_Length);\n    sys->argv_Refman = LUMI_new_ref(sys->argv);\n  }\n  if (sys == NULL || sys_Refman == NULL || sys->argv == NULL ||\n    sys->argv_Refman == NULL || sys->argv_String_length == NULL ||\n    sys->stdout_Cname == NULL || sys->stdout_Cname_Refman == NULL ||\n    sys->stdin_Cname == NULL || sys->stdin_Cname_Refman == NULL ||\n    sys->stderr_Cname == NULL || sys->stderr_Cname_Refman == NULL) {\n    fprintf(stderr, \"insufficient memory\\n\");\n    return ERR;\n  }\n  ++sys_Refman->count;\n  ++sys->argv_Refman->count;\n  ++sys->stdout_Cname_Refman->count;\n  ++sys->stdin_Cname_Refman->count;\n  ++sys->stderr_Cname_Refman->count;\n  sys->stdout_Cname->fobj = stdout;\n  sys->stdin_Cname->fobj = stdin;\n  sys->stderr_Cname->fobj = stderr;\n  for (arg = 0; arg < argc; ++arg) {\n    strncpy(sys->argv + sys->argv_Value_length * arg, argv[arg], sys->argv_Length);\n  }\n  return OK;\n}\n\nvoid Sys_Del(Sys* self) {}\nGeneric_Type_Dynamic Sys_dynamic = { (Dynamic_Del)Sys_Del };\n\n#define LUMI_FUNC_NAME \"Sys.print\"\nReturncode Sys_print(Sys* _, char* text, int text_length) {\n  int n, ch, res;\n  for (n = 0; n < text_length; ++n) {\n    ch = text[n];\n    res = putchar(ch);\n    if (ch != res) {\n      CRAISE(LUMI_error_messages.file_write_failed.str)\n    }\n  }\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"Sys.println\"\nReturncode Sys_println(Sys* _, char* text, int text_length) {\n  Sys_print(NULL, text, text_length);\n  if (putchar('\\n') != '\\n') {\n    CRAISE(LUMI_error_messages.file_write_failed.str)\n  }\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\nvoid Sys_getchar(Sys* _, char* out_char, Bool* is_eof) {\n  *is_eof = getc_is_eof(getchar(), out_char);\n}\n\n#define LUMI_FUNC_NAME \"Sys.getline\"\nReturncode Sys_getline(\n    Sys* _, char* line, int line_max_length, int* line_length) {\n  int ch = 0;\n  *line_length = 0;\n  if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n    ch = getchar();\n  }\n  while (ch != EOF && ch != '\\n') {\n    if (*line_length + 1 >= line_max_length) {\n      CRAISE(LUMI_error_messages.string_too_long.str)\n    }\n    line[*line_length] = ch;\n    ++(*line_length);\n    if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n      ch = getchar();\n    }\n  }\n  line[*line_length] = '\\0';\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"Sys.exit\"\nReturncode Sys_exit(Sys* _, Int status) {\n  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n    exit(status);\n  }\n  CRAISE(\"exit failed\")\n}\n#undef LUMI_FUNC_NAME\n\n#define LUMI_FUNC_NAME \"Sys.system\"\nReturncode Sys_system(\n    Sys* _,\n    char* command, int command_max_length, int *command_length,\n    Int* status) {\n  int res = -1;\n  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n    res = system(command);\n  }\n  if (res == -1) {\n    CRAISE(\"command execution failed\")\n  }\n  *status = res;\n  return OK;\n}\n#undef LUMI_FUNC_NAME\n\nReturncode Sys_getenv(\n    Sys* _,\n    char* name, int name_max_length, int *name_length,\n    char* value, int value_max_length, int* value_length,\n    Bool* exists) {\n  char* ret;\n  ret = getenv(name);\n  if (ret == NULL) {\n    *exists = false;\n    return OK;\n  }\n  *value_length = cstring_length(ret, value_max_length);\n  strncpy(value, ret, *value_length);\n  *exists = true;\n  return OK;\n}\n");
-  tl5_compiler_M_output_header_code = aux_String_1;
-  tl5_compiler_M_output_header_code_Refman = aux_String_1_Refman;
-  LUMI_inc_ref(tl5_compiler_M_output_header_code_Refman);
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 #undef RETURN_ERROR

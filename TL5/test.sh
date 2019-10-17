@@ -48,14 +48,13 @@ popd
 diff ../TL5/tl5-compiler.c TL5/tl5-compiler.c
 
 # compile tl5-compiler
-$CC4 -Wno-overlength-strings ../TL5/tl5-compiler.c ../TL4/lumi.4.c \
-  -I../TL4 -o TL5/tl5-compiler
+$CC4 ../TL5/tl5-compiler.c ../TL4/lumi.4.c -I../TL4 -o TL5/tl5-compiler
 
 # run tl5-compiler unit-tests
 TL5/tl4-compiler -t tl5-compiler TL5/tl5-compiler-tests.c \
   ../TL5/tl5-compiler.4.lm ../TL5/*/*.4.lm ../TL5/tests/ut/*.4.lm
-$CC4 -Wno-overlength-strings TL5/tl5-compiler-tests.c ../TL4/lumi.4.c \
-  -I../TL4 -o TL5/tl5-compiler-tests
+$CC4 TL5/tl5-compiler-tests.c ../TL4/lumi.4.c -I../TL4 -o \
+  TL5/tl5-compiler-tests
 cp -r ../TL5/tests/ut TL5/
 TEST_DIR=TL5/ut/ TL5/tl5-compiler-tests -xml
 mv cobertura.xml TL5/ut/
