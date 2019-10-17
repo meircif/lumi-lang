@@ -213,6 +213,29 @@ Returncode write_spaces(Int num) {
 #endif
 
 
+/* write `text` to the output file as string literal */
+#if LUMI_STAGE == LUMI_DECLARATIONS
+Returncode write_string_literal(String* text);
+#elif LUMI_STAGE == LUMI_FUNCTIONS
+static char* _func_name_write_string_literal = "write-string-literal";
+#define LUMI_FUNC_NAME _func_name_write_string_literal
+Returncode write_string_literal(String* text) {
+  CHECK(107, write_c('\"') )
+  {int i; for (i = (0); i < (text->length); ++i) {
+    if ((i) < 0 || (i) >= (text)->length) RAISE(109)
+    Char ch = ((text)->values[i]);
+    CHECK(110, write_c(ch) )
+    if (ch == '\\') {
+      CHECK(112, write_c(ch) )
+    }
+  }}
+  CHECK(113, write_c('\"') )
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+#endif
+
+
 /* Proxy functions to be mocked in tests */
 #if LUMI_STAGE == LUMI_DECLARATIONS
 Returncode file_open(String* name, Bool is_read, File** file);
@@ -221,10 +244,10 @@ static char* _func_name_file_open = "file-open";
 #define LUMI_FUNC_NAME _func_name_file_open
 Returncode file_open(String* name, Bool is_read, File** file) {
   if (is_read) {
-    CHECK(108, file_open_read(name, &((*file))) )
+    CHECK(119, file_open_read(name, &((*file))) )
   }
   else {
-    CHECK(110, file_open_write(name, &((*file))) )
+    CHECK(121, file_open_write(name, &((*file))) )
   }
   return OK;
 }
@@ -237,7 +260,7 @@ Returncode file_close(File* file);
 static char* _func_name_file_close = "file-close";
 #define LUMI_FUNC_NAME _func_name_file_close
 Returncode file_close(File* file) {
-  CHECK(113, File_close(file) )
+  CHECK(124, File_close(file) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -249,7 +272,7 @@ Returncode file_getc(File* file, Char* ch);
 static char* _func_name_file_getc = "file-getc";
 #define LUMI_FUNC_NAME _func_name_file_getc
 Returncode file_getc(File* file, Char* ch) {
-  CHECK(116, File_getc(file, &((*ch))) )
+  CHECK(127, File_getc(file, &((*ch))) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -261,7 +284,7 @@ Returncode file_putc(File* file, Char ch);
 static char* _func_name_file_putc = "file-putc";
 #define LUMI_FUNC_NAME _func_name_file_putc
 Returncode file_putc(File* file, Char ch) {
-  CHECK(119, File_putc(file, ch) )
+  CHECK(130, File_putc(file, ch) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -273,7 +296,7 @@ Returncode file_write(File* file, String* text);
 static char* _func_name_file_write = "file-write";
 #define LUMI_FUNC_NAME _func_name_file_write
 Returncode file_write(File* file, String* text) {
-  CHECK(122, File_write(file, text) )
+  CHECK(133, File_write(file, text) )
   return OK;
 }
 #undef LUMI_FUNC_NAME

@@ -4031,6 +4031,8 @@ Returncode tl5_compiler_M_write(String* text, Ref_Manager* text_Refman);
 
 Returncode tl5_compiler_M_write_cname(String* name, Ref_Manager* name_Refman);
 
+Returncode tl5_compiler_M_write_string_literal(String* text, Ref_Manager* text_Refman);
+
 Returncode tl5_compiler_M_write_int(Int num);
 
 Returncode tl5_compiler_M_write_spaces(Int num);
@@ -26349,13 +26351,13 @@ Returncode tl5_compiler_M_SyntaxTreeFunction_write_pre_func(tl5_compiler_M_Synta
   String* aux_String_3 = NULL;
   Ref_Manager* aux_String_3_Refman = NULL;
   LUMI_inc_ref(self_Refman);
-  INIT_STRING_CONST(383, aux_String_0, "\n#define LUMI_FILE_NAME \"");
+  INIT_STRING_CONST(383, aux_String_0, "\n#define LUMI_FILE_NAME ");
   LUMI_err = tl5_compiler_M_write(aux_String_0, aux_String_0_Refman);
   CHECK(383)
   CHECK_REF(384, self, self_Refman)
-  LUMI_err = tl5_compiler_M_write(self->_base._base._base.input_file_name, self->_base._base._base.input_file_name_Refman);
+  LUMI_err = tl5_compiler_M_write_string_literal(self->_base._base._base.input_file_name, self->_base._base._base.input_file_name_Refman);
   CHECK(384)
-  INIT_STRING_CONST(385, aux_String_1, "\"\n#define LUMI_FUNC_NAME \"");
+  INIT_STRING_CONST(385, aux_String_1, "\n#define LUMI_FUNC_NAME \"");
   LUMI_err = tl5_compiler_M_write(aux_String_1, aux_String_1_Refman);
   CHECK(385)
   CHECK_REF(386, self, self_Refman)
@@ -28107,13 +28109,13 @@ Returncode tl5_compiler_M_SyntaxTreeRoot_write_test_coverage_data(tl5_compiler_M
       CHECK(351)
       LUMI_err = tl5_compiler_M_write_spaces(tl5_compiler_M_INDENTATION_SPACES);
       CHECK(352)
-      INIT_STRING_CONST(353, aux_String_12, "{\"");
+      INIT_STRING_CONST(353, aux_String_12, "{");
       LUMI_err = tl5_compiler_M_write(aux_String_12, aux_String_12_Refman);
       CHECK(353)
       CHECK_REF(354, line_count, line_count_Refman)
-      LUMI_err = tl5_compiler_M_write(line_count->filename, line_count->filename_Refman);
+      LUMI_err = tl5_compiler_M_write_string_literal(line_count->filename, line_count->filename_Refman);
       CHECK(354)
-      INIT_STRING_CONST(355, aux_String_13, "\", ");
+      INIT_STRING_CONST(355, aux_String_13, ", ");
       LUMI_err = tl5_compiler_M_write(aux_String_13, aux_String_13_Refman);
       CHECK(355)
       CHECK_REF(356, line_count, line_count_Refman)
@@ -46854,14 +46856,14 @@ Returncode tl5_compiler_M_VariableInit_write(tl5_compiler_M_VariableInit* self, 
   CHECK_REF(445, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
   CHECK_REF(445, self, self_Refman)
   if ((void*)self->_base._base.parent == &(tl5_compiler_M_glob->root.global_init)) {
-    INIT_STRING_CONST(446, aux_String_0, "#define LUMI_FILE_NAME \"");
+    INIT_STRING_CONST(446, aux_String_0, "#define LUMI_FILE_NAME ");
     LUMI_err = tl5_compiler_M_write(aux_String_0, aux_String_0_Refman);
     CHECK(446)
     CHECK_REF(447, self, self_Refman)
     CHECK_REF(447, self->_base.variable, self->_base.variable_Refman)
-    LUMI_err = tl5_compiler_M_write(self->_base.variable->_base._base.input_file_name, self->_base.variable->_base._base.input_file_name_Refman);
+    LUMI_err = tl5_compiler_M_write_string_literal(self->_base.variable->_base._base.input_file_name, self->_base.variable->_base._base.input_file_name_Refman);
     CHECK(447)
-    INIT_STRING_CONST(448, aux_String_1, "\"\n");
+    INIT_STRING_CONST(448, aux_String_1, "\n");
     LUMI_err = tl5_compiler_M_write(aux_String_1, aux_String_1_Refman);
     CHECK(448)
   }
@@ -49351,6 +49353,89 @@ LUMI_cleanup:
 #undef LUMI_FUNC_NAME
 
 #define LUMI_FILE_NAME "TL5/global/file-io.4.lm"
+#define LUMI_FUNC_NAME "write-string-literal"
+Returncode tl5_compiler_M_write_string_literal(String* text, Ref_Manager* text_Refman) {
+  Returncode LUMI_err = OK;
+  String* escapes = NULL;
+  Ref_Manager* escapes_Refman = NULL;
+  String* values = NULL;
+  Ref_Manager* values_Refman = NULL;
+  String aux_String_0_Var = {0};
+  String* aux_String_0 = NULL;
+  Ref_Manager* aux_String_0_Refman = NULL;
+  String aux_String_1_Var = {0};
+  String* aux_String_1 = NULL;
+  Ref_Manager* aux_String_1_Refman = NULL;
+  Char ch = 0;
+  String* aux_String_2 = NULL;
+  Ref_Manager* aux_String_2_Refman = NULL;
+  Int n = 0;
+  Ref_Manager* aux_Ref_Manager = NULL;
+  LUMI_inc_ref(text_Refman);
+  LUMI_err = tl5_compiler_M_write_c('\"');
+  CHECK(100)
+  INIT_STRING_CONST(101, aux_String_0, "'\"?\\abfnrtv0");
+  escapes = aux_String_0;
+  escapes_Refman = aux_String_0_Refman;
+  LUMI_inc_ref(escapes_Refman);
+  INIT_STRING_CONST(102, aux_String_1, "\'\"\?\\\a\b\f\n\r\t\v\0");
+  values = aux_String_1;
+  values_Refman = aux_String_1_Refman;
+  LUMI_inc_ref(values_Refman);
+  aux_Ref_Manager = aux_String_2_Refman;
+  aux_String_2_Refman = text_Refman;
+  LUMI_inc_ref(aux_String_2_Refman);
+  LUMI_dec_ref(aux_Ref_Manager);
+  aux_Ref_Manager = NULL;
+  aux_String_2 = text;
+  CHECK_REF(103, aux_String_2, aux_String_2_Refman)
+  {int ch_Index; for (ch_Index = 0; ch_Index < aux_String_2->length; ++ch_Index) {
+    CHECK_REF(103, aux_String_2, aux_String_2_Refman)
+    if ((ch_Index) < 0 || (ch_Index) >= (aux_String_2)->length) RAISE(103, slice_index)
+    ch = ((aux_String_2)->values)[ch_Index];
+    CHECK_REF(104, values, values_Refman)
+    for (n = 0; n < values->length; ++n) {
+      CHECK_REF(105, values, values_Refman)
+      if ((n) < 0 || (n) >= (values)->length) RAISE(105, slice_index)
+      if (ch == (((values)->values)[n])) {
+        break;
+      }
+    }
+    CHECK_REF(107, values, values_Refman)
+    if (n < values->length) {
+      LUMI_err = tl5_compiler_M_write_c('\\');
+      CHECK(108)
+      CHECK_REF(109, escapes, escapes_Refman)
+      if ((n) < 0 || (n) >= (escapes)->length) RAISE(109, slice_index)
+      LUMI_err = tl5_compiler_M_write_c(((escapes)->values)[n]);
+      CHECK(109)
+    }
+    else {
+      LUMI_err = tl5_compiler_M_write_c(ch);
+      CHECK(111)
+    }
+  }}
+  aux_Ref_Manager = aux_String_2_Refman;
+  aux_String_2_Refman = NULL;
+  LUMI_inc_ref(aux_String_2_Refman);
+  LUMI_dec_ref(aux_Ref_Manager);
+  aux_Ref_Manager = NULL;
+  aux_String_2 = NULL;
+  LUMI_err = tl5_compiler_M_write_c('\"');
+  CHECK(112)
+LUMI_cleanup:
+  LUMI_dec_ref(aux_String_2_Refman);
+  LUMI_var_dec_ref(aux_String_1_Refman);
+  LUMI_var_dec_ref(aux_String_0_Refman);
+  LUMI_dec_ref(values_Refman);
+  LUMI_dec_ref(escapes_Refman);
+  LUMI_dec_ref(text_Refman);
+  return LUMI_err;
+}
+#undef LUMI_FILE_NAME
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FILE_NAME "TL5/global/file-io.4.lm"
 #define LUMI_FUNC_NAME "write-int"
 Returncode tl5_compiler_M_write_int(Int num) {
   Returncode LUMI_err = OK;
@@ -49358,12 +49443,12 @@ Returncode tl5_compiler_M_write_int(Int num) {
   String num_str_Var = {64, 0, NULL};
   String* num_str = NULL;
   Ref_Manager* num_str_Refman = NULL;
-  INIT_VAR(100, num_str)
+  INIT_VAR(117, num_str)
   num_str_Var.values = num_str_Values;
   LUMI_err = Int_str(num, num_str, num_str_Refman);
-  CHECK(101)
+  CHECK(118)
   LUMI_err = tl5_compiler_M_write(num_str, num_str_Refman);
-  CHECK(102)
+  CHECK(119)
 LUMI_cleanup:
   LUMI_var_dec_ref(num_str_Refman);
   return LUMI_err;
@@ -49378,7 +49463,7 @@ Returncode tl5_compiler_M_write_spaces(Int num) {
   Int n = 0;
   for (n = 0; n < num; ++n) {
     LUMI_err = tl5_compiler_M_write_c(' ');
-    CHECK(108)
+    CHECK(125)
   }
 LUMI_cleanup:
   return LUMI_err;

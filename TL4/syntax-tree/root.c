@@ -603,9 +603,9 @@ Returncode SyntaxTreeRoot_write_test_coverage_data(SyntaxTreeRoot* self) {
       if (line_count->covered_index > 0) {
         CHECK(332, write(&(String){2, 1, ","}) )
       }
-      CHECK(333, write(&(String){6, 5, "\n  {\""}) )
-      CHECK(334, write(line_count->filename) )
-      CHECK(335, write(&(String){4, 3, "\", "}) )
+      CHECK(333, write(&(String){5, 4, "\n  {"}) )
+      CHECK(334, write_string_literal(line_count->filename) )
+      CHECK(335, write(&(String){3, 2, ", "}) )
       CHECK(336, write_int(line_count->line_needs_cover->length) )
       CHECK(337, write(&(String){12, 11, ", LUMI_file"}) )
       CHECK(338, write_int(line_count->covered_index) )

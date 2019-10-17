@@ -572,9 +572,9 @@ Returncode VariableInit_write(VariableInit* self) {
     return OK;
   }
   if (self->_base.parent == &(glob->root->global_init->_base._base)) {
-    CHECK(348, write(&(String){25, 24, "#define LUMI_FILE_NAME \""}) )
-    CHECK(349, write(self->variable->_base._base.input_file_name) )
-    CHECK(350, write(&(String){3, 2, "\"\n"}) )
+    CHECK(348, write(&(String){24, 23, "#define LUMI_FILE_NAME "}) )
+    CHECK(349, write_string_literal(self->variable->_base._base.input_file_name) )
+    CHECK(350, write(&(String){2, 1, "\n"}) )
   }
   CHECK(351, (self->expression_init)->_base._base._base._dtl[4](self->expression_init) )
   if (self->_base.parent == &(glob->root->global_init->_base._base)) {

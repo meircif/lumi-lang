@@ -8,7 +8,7 @@ func write-syntax-tree(copy Bool is-test)
   if is-test
     mock-argv[3].copy(user "-t")
     mock-argv[4].copy(user "ut")
-    mock-argv[5].copy(user "second.4.lm")
+    mock-argv[5].copy(user "path\\second.4.lm")
   else
     mock-argv.length := 3
   glob.root.is-library := true
@@ -49,7 +49,7 @@ func test-global-scope-error(
   mock-print-active := false
   user String expected-header
   if is-test
-    expected-header := "Code error in second.4.lm["
+    expected-header := "Code error in path\\second.4.lm["
   else
     expected-header := "Code error in mock.4.lm["
   f-assert-string-slice(

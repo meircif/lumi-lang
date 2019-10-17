@@ -31,7 +31,7 @@ Returncode write_syntax_tree(Bool is_test) {
     if ((4) < 0 || (4) >= (mock_argv)->length) RAISE(10)
     CHECK(10, String_copy((&(((String*)((mock_argv)->values))[4])), &(String){3, 2, "ut"}) )
     if ((5) < 0 || (5) >= (mock_argv)->length) RAISE(11)
-    CHECK(11, String_copy((&(((String*)((mock_argv)->values))[5])), &(String){12, 11, "second.4.lm"}) )
+    CHECK(11, String_copy((&(((String*)((mock_argv)->values))[5])), &(String){17, 16, "path\\second.4.lm"}) )
   }
   else {
     mock_argv->length = 3;
@@ -93,7 +93,7 @@ Returncode test_global_scope_error(String* input_text, String* second_file_input
   mock_print_active = false;
   String* expected_header = NULL;
   if (is_test) {
-    expected_header = &(String){27, 26, "Code error in second.4.lm["};
+    expected_header = &(String){32, 31, "Code error in path\\second.4.lm["};
   }
   else {
     expected_header = &(String){25, 24, "Code error in mock.4.lm["};

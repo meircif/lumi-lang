@@ -345,9 +345,9 @@ class VariableInit(SyntaxTreeCode)
         not (? self.expression-init.arguments.parameters.first)
       return
     if self.parent = glob.root.global-init
-      write(user "#define LUMI_FILE_NAME \"")
-      write(user self.variable.input-file-name)
-      write(user "\"\n")
+      write(user "#define LUMI_FILE_NAME ")
+      write-string-literal(user self.variable.input-file-name)
+      write(user "\n")
     self.expression-init.write()
     if self.parent = glob.root.global-init
       write(user "#undef LUMI_FILE_NAME\n")
