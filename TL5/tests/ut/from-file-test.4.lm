@@ -118,9 +118,7 @@ func setup-test()
 
 
 test test-compiler()
-  if sys.argv.length > 1
-    sys.argv[1].equal(user "--trace")->(var flag-trace)
-
+  setup-arguments()
   var String{256} filename
   set-test-file-name(user filename, user "input", user "5.lm")
   file-open-read.mocked(user filename)->(owner input-file)
