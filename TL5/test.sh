@@ -42,7 +42,22 @@ diff ../TL5/global/header-string.4.lm TL5/header-string.4.lm
 # test tl5-compiler C file
 pushd TL5
 ln -s ../../TL5 TL5
-./tl4-compiler tl5-compiler.c TL5/tl5-compiler.4.lm TL5/*/*.4.lm
+./tl4-compiler tl5-compiler.c TL5/tl5-compiler.4.lm \
+  TL5/expression/assign.4.lm TL5/expression/base-type.4.lm \
+  TL5/expression/call.4.lm TL5/expression/constant.4.lm \
+  TL5/expression/container.4.lm TL5/expression/expression.4.lm \
+  TL5/expression/field.4.lm TL5/expression/initialize.4.lm \
+  TL5/expression/operator.4.lm TL5/expression/slice.4.lm \
+  TL5/expression/symbol.4.lm TL5/expression/wrap.4.lm \
+  TL5/global/argument.4.lm TL5/global/common.4.lm TL5/global/file-io.4.lm \
+  TL5/global/global.4.lm TL5/global/header-string.4.lm TL5/global/list.4.lm \
+  TL5/global/map.4.lm TL5/global/memory.4.lm TL5/global/type-instance.4.lm \
+  TL5/statement/enum.4.lm TL5/statement/error.4.lm TL5/statement/for.4.lm \
+  TL5/statement/function.4.lm TL5/statement/native.4.lm \
+  TL5/statement/test.4.lm TL5/statement/type.4.lm TL5/statement/variable.4.lm \
+  TL5/syntax-tree/block.4.lm TL5/syntax-tree/branch.4.lm \
+  TL5/syntax-tree/code.4.lm TL5/syntax-tree/code-flow.4.lm \
+  TL5/syntax-tree/node.4.lm TL5/syntax-tree/root.4.lm
 rm TL5
 popd
 diff ../TL5/tl5-compiler.c TL5/tl5-compiler.c

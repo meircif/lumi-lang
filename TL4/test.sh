@@ -39,8 +39,16 @@ cp ../../TL4/global/*.3.lm global
 cp ../../TL4/expression/*.3.lm expression
 cp ../../TL4/syntax-tree/*.3.lm syntax-tree
 cp ../../TL4/statement/*.3.lm statement
-./tl3-compiler tl4-compiler.3.lm global/*.3.lm expression/*.3.lm \
-  syntax-tree/*.3.lm statement/*.3.lm
+./tl3-compiler tl4-compiler.3.lm global/argument.3.lm global/common.3.lm \
+  global/file-io.3.lm global/global.3.lm global/list.3.lm global/map.3.lm \
+  global/type-instance.3.lm expression/base-type.3.lm expression/call.3.lm \
+  expression/constant.3.lm expression/container.3.lm \
+  expression/expression.3.lm expression/initialize.3.lm expression/slice.3.lm \
+  expression/symbol.3.lm syntax-tree/block.3.lm syntax-tree/branch.3.lm \
+  syntax-tree/code.3.lm syntax-tree/code-flow.3.lm syntax-tree/node.3.lm \
+  syntax-tree/root.3.lm statement/enum.3.lm statement/error.3.lm \
+  statement/for.3.lm statement/function.3.lm statement/native.3.lm \
+  statement/test.3.lm statement/type.3.lm statement/variable.3.lm
 diff ../../TL4/global global
 diff ../../TL4/expression expression
 diff ../../TL4/syntax-tree syntax-tree
