@@ -803,9 +803,9 @@ Returncode write_pre_func(SyntaxTreeFunction* self);
 static char* _func_name_write_pre_func = "write-pre-func";
 #define LUMI_FUNC_NAME _func_name_write_pre_func
 Returncode write_pre_func(SyntaxTreeFunction* self) {
-  CHECK(385, write(&(String){26, 25, "\n#define LUMI_FILE_NAME \""}) )
-  CHECK(386, write(self->_base._base._base.input_file_name) )
-  CHECK(387, write(&(String){27, 26, "\"\n#define LUMI_FUNC_NAME \""}) )
+  CHECK(385, write(&(String){25, 24, "\n#define LUMI_FILE_NAME "}) )
+  CHECK(386, write_string_literal(self->_base._base._base.input_file_name) )
+  CHECK(387, write(&(String){26, 25, "\n#define LUMI_FUNC_NAME \""}) )
   if (NULL != self->parent_type) {
     CHECK(389, write(self->parent_type->name) )
     CHECK(390, write(&(String){2, 1, "."}) )

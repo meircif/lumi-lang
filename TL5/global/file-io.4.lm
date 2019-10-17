@@ -95,6 +95,23 @@ func write-cname(user String name)
       write-c(copy ch)
 
 
+~~~ write `text` to the output file as string literal ~~~
+func write-string-literal(user String text)
+  write-c(copy '\"')
+  user String escapes(user "'\"?\\abfnrtv0")
+  user String values(user "\'\"\?\\\a\b\f\n\r\t\v\0")
+  for ch in text
+    for n in values.length
+      if ch = values[n]
+        break
+    if n < values.length
+      write-c(copy '\\')
+      write-c(copy escapes[n])
+    else
+      write-c(copy ch)
+  write-c(copy '\"')
+
+
 ~~~ write `num` to the output file as text ~~~
 func write-int(copy Int num)
   var String{64} num-str

@@ -18,7 +18,7 @@ func write-syntax-tree(copy Bool is-test)
     mock-argv.length := 6
     mock-argv[3].new(user "-t")
     mock-argv[4].new(user "ut")
-    mock-argv[5].new(user "second.5.lm")
+    mock-argv[5].new(user "path\\second.5.lm")
   else
     mock-argv.length := 3
   tl5-compiler.glob.root.is-library := true
@@ -124,7 +124,7 @@ func test-global-scope-error(
   Sys.print.active := false
   user String expected-header
   if is-test
-    expected-header := "Code error in second.5.lm["
+    expected-header := "Code error in path\\second.5.lm["
   else
     expected-header := "Code error in mock.5.lm["
   test-error-message(user expected-header, user expected-error)

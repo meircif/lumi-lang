@@ -5222,7 +5222,7 @@ int LUMI_file1_line_count[7] = {
 };
 File_Coverage LUMI_file_coverage[2] = {
     {"mock.5.lm", 30, LUMI_file0_line_count},
-    {"second.5.lm", 7, LUMI_file1_line_count}
+    {"path\\second.5.lm", 7, LUMI_file1_line_count}
 };
 void ut_M_fun0(void) {
     Returncode LUMI_err = OK;
@@ -8164,7 +8164,7 @@ USER_MAIN_HEADER {
 #define LUMI_FILE_NAME "mock.5.lm"
     ut_M_t = &ut_M_t_Var;
 #undef LUMI_FILE_NAME
-#define LUMI_FILE_NAME "second.5.lm"
+#define LUMI_FILE_NAME "path\\second.5.lm"
     second_M_t = &second_M_t_Var;
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME

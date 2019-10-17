@@ -330,9 +330,9 @@ class SyntaxTreeRoot(GlobalNodes)
       if line-count.needs-cover
         if line-count.covered-index > 0
           write(user ",")
-        write(user "\n  {\"")
-        write(user line-count.filename)
-        write(user "\", ")
+        write(user "\n  {")
+        write-string-literal(user line-count.filename)
+        write(user ", ")
         write-int(copy line-count.line-needs-cover.length)
         write(user ", LUMI_file")
         write-int(copy line-count.covered-index)

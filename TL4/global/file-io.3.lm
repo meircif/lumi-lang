@@ -102,6 +102,17 @@ func write-spaces(copy Int num)
     write-c(copy ' ')
 
 
+## write `text` to the output file as string literal
+func write-string-literal(user String text)
+  write-c(copy '\"')
+  for i in text.length
+    var Char ch(text[i])
+    write-c(copy ch)
+    if ch = '\\'
+      write-c(copy ch)
+  write-c(copy '\"')
+
+
 ## Proxy functions to be mocked in tests
 func file-open(user String name, copy Bool is-read):(owner File file)
   if is-read

@@ -1777,7 +1777,7 @@ int LUMI_file1_line_count[7] = {
 };
 File_Coverage LUMI_file_coverage[2] = {
   {"mock.4.lm", 30, LUMI_file0_line_count},
-  {"second.4.lm", 7, LUMI_file1_line_count}
+  {"path\\second.4.lm", 7, LUMI_file1_line_count}
 };
 Returncode ut_M_fun0(void) {
   Returncode LUMI_err = OK;
@@ -4505,7 +4505,7 @@ USER_MAIN_HEADER {
 #define LUMI_FILE_NAME "mock.4.lm"
   INIT_VAR(7, ut_M_t)
 #undef LUMI_FILE_NAME
-#define LUMI_FILE_NAME "second.4.lm"
+#define LUMI_FILE_NAME "path\\second.4.lm"
   INIT_VAR(7, second_M_t)
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME

@@ -380,9 +380,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     write(user ";\n")
   
   func inst write-pre-func()
-    write(user "\n#define LUMI_FILE_NAME \"")
-    write(user self.input-file-name)
-    write(user "\"\n#define LUMI_FUNC_NAME \"")
+    write(user "\n#define LUMI_FILE_NAME ")
+    write-string-literal(user self.input-file-name)
+    write(user "\n#define LUMI_FUNC_NAME \"")
     if self.parent-type?
       write(user self.parent-type.name)
       write(user ".")
