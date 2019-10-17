@@ -1,0 +1,6 @@
+gcc
+valgrind
+python3
+python3-pip
+python3-sphinx
+enchant
