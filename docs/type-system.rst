@@ -170,10 +170,10 @@ compiler. For example::
    ; a dynamic interface with "example" method will be created buy the compiler
    ; and used as the parameter actual type
    func auto-example(user Auto automatically-typed-dynamic-reference)
-      automatically-typed-dynamic-reference.example()
+       automatically-typed-dynamic-reference.example()
 
    struct SomeStruct
-     func some-method()
+       func some-method()
 
    var SomeStruct some-item
    ; implementation to the automatically created dynamic interface will be

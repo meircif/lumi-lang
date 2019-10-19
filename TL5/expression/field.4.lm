@@ -4,178 +4,178 @@ module tl5-compiler
 
 ~~~ An instance field expression ~~~
 class FieldExpression(Expression)
-  owner String name
-  user SyntaxTreeVariable variable
-  owner Expression instance
-  var Int bases
+    owner String name
+    user SyntaxTreeVariable variable
+    owner Expression instance
+    var Int bases
 
-  new(user SyntaxTreeCode code-node,
-      owner Expression instance,
-      owner String name)
-    base(user code-node)
-    self.instance := instance
-    self.name := name
-  
-  func dynamic restructure()->(
-      owner Expression expression, owner FunctionArguments arguments)
-    analyze-expression()->(owner self.instance)
-    self.assignable := self.instance.assignable
-    user TypeInstance instance-type(user self.instance.result-type)
-    var Bool typed-expression
-    if instance-type?
-      typed-expression := instance-type.type-data?
-    if not typed-expression
-      self.syntax-error(user "void expression has no member", user self.name)
-    var Bool after-type(copy instance-type.type-data is glob.type-type)
-    var Bool after-base(copy instance-type.type-data is glob.type-base)
-    if after-type
-      instance-type := instance-type.parameters.first.item
-    else-if after-base
-      instance-type := instance-type.parameters.first.item.type-data.base-type
+    new(user SyntaxTreeCode code-node,
+            owner Expression instance,
+            owner String name)
+        base(user code-node)
+        self.instance := instance
+        self.name := name
     
-    if instance-type.type-data is glob.type-module
-      new VariableExpression variable-expression(
-          user self.code-node, owner self.name)
-      variable-expression.module-name := instance-type.name
-      expression := variable-expression
-      expression.restructure()->(owner expression, owner arguments)
-      return
-    
-    instance-type.type-data.find-field(user self.name)->(
-        user self.variable, var self.bases)
-    if self.variable?
-      if after-base
-        self.syntax-error(
-            user "calling \"base\" with non-method", user self.name)
-      if after-type
-        self.syntax-error2(
-            user "field",
-            user self.name,
-            user "is not a global member of type",
-            user instance-type.type-data.name)
-      self.check-expression-all-errors()->(owner self.instance)
-      self.is-complex-field := (self.variable.access = Access.VAR and
-          not self.variable.type-instance.type-data.is-primitive) or
-          self.variable.access = Access.S-VAR
-      self.variable.type-instance.new-replace-params(user instance-type)->(
-          owner self.result-type)
-      instance-type.reference-path.copy-and-add-field(user self.variable)->(
-          owner self.result-type.reference-path)
-      if self.is-complex-field and
-          access-has-refman(copy self.instance.access) and
-          not self.variable.type-instance.type-data is glob.type-string
-        self.access := Access.S-VAR
-      else
-        self.access := self.variable.access
-      self.assignable := not self.is-complex-field
-      if self.variable.type-instance.type-data is glob.type-generic
-        expression := TypeCastExpression(owner expression)
-      return
-    
-    user SyntaxTreeFunction function
-    instance-type.type-data.find-meth(user self.name)->(
-        user function, var self.bases)
-    
-    if not function?
-      if self.instance.is-mocked-function()
-        if self.name.equal(user "mocked")
-          self.instance.restructure()->(owner expression, owner arguments)
-          return
-        if self.name.equal(user "active")
-          self.instance.check-no-error()
-          expression := MockFieldExpression(
-              owner self.instance, owner self.name)
-          return
-      
-      self.syntax-error2(
-          user "type",
-          user instance-type.type-data.name,
-          user "has no member",
-          user self.name)
-    
-    expression := FunctionExpression(
-        user self.code-node,
-        user function,
-        owner self.instance,
-        copy self.bases,
-        copy self.error-propagated,
-        copy after-type,
-        copy after-base)
-    expression.restructure()->(owner expression, owner arguments)
+    func dynamic restructure()->(
+            owner Expression expression, owner FunctionArguments arguments)
+        analyze-expression()->(owner self.instance)
+        self.assignable := self.instance.assignable
+        user TypeInstance instance-type(user self.instance.result-type)
+        var Bool typed-expression
+        if instance-type?
+            typed-expression := instance-type.type-data?
+        if not typed-expression
+            self.syntax-error(user "void expression has no member", user self.name)
+        var Bool after-type(copy instance-type.type-data is glob.type-type)
+        var Bool after-base(copy instance-type.type-data is glob.type-base)
+        if after-type
+            instance-type := instance-type.parameters.first.item
+        else-if after-base
+            instance-type := instance-type.parameters.first.item.type-data.base-type
+        
+        if instance-type.type-data is glob.type-module
+            new VariableExpression variable-expression(
+                    user self.code-node, owner self.name)
+            variable-expression.module-name := instance-type.name
+            expression := variable-expression
+            expression.restructure()->(owner expression, owner arguments)
+            return
+        
+        instance-type.type-data.find-field(user self.name)->(
+                user self.variable, var self.bases)
+        if self.variable?
+            if after-base
+                self.syntax-error(
+                        user "calling \"base\" with non-method", user self.name)
+            if after-type
+                self.syntax-error2(
+                        user "field",
+                        user self.name,
+                        user "is not a global member of type",
+                        user instance-type.type-data.name)
+            self.check-expression-all-errors()->(owner self.instance)
+            self.is-complex-field := (self.variable.access = Access.VAR and
+                    not self.variable.type-instance.type-data.is-primitive) or
+                    self.variable.access = Access.S-VAR
+            self.variable.type-instance.new-replace-params(user instance-type)->(
+                    owner self.result-type)
+            instance-type.reference-path.copy-and-add-field(user self.variable)->(
+                    owner self.result-type.reference-path)
+            if self.is-complex-field and
+                    access-has-refman(copy self.instance.access) and
+                    not self.variable.type-instance.type-data is glob.type-string
+                self.access := Access.S-VAR
+            else
+                self.access := self.variable.access
+            self.assignable := not self.is-complex-field
+            if self.variable.type-instance.type-data is glob.type-generic
+                expression := TypeCastExpression(owner expression)
+            return
+        
+        user SyntaxTreeFunction function
+        instance-type.type-data.find-meth(user self.name)->(
+                user function, var self.bases)
+        
+        if not function?
+            if self.instance.is-mocked-function()
+                if self.name.equal(user "mocked")
+                    self.instance.restructure()->(owner expression, owner arguments)
+                    return
+                if self.name.equal(user "active")
+                    self.instance.check-no-error()
+                    expression := MockFieldExpression(
+                            owner self.instance, owner self.name)
+                    return
+            
+            self.syntax-error2(
+                    user "type",
+                    user instance-type.type-data.name,
+                    user "has no member",
+                    user self.name)
+        
+        expression := FunctionExpression(
+                user self.code-node,
+                user function,
+                owner self.instance,
+                copy self.bases,
+                copy self.error-propagated,
+                copy after-type,
+                copy after-base)
+        expression.restructure()->(owner expression, owner arguments)
 
-  func dynamic check-memory(user ReferenceMemoryList refs)
-    if not self.is-constructor-field()
-      self.instance.check-memory(user refs)
-    refs.check-user(user self.instance)
-    refs.check-reference(user self)
-  
-  func inst is-constructor-field()->(var Bool is-field)
-    is-field := false
-    user SyntaxTreeFunction function(user self.code-node.get-function())
-    if not function.parent-type? or
-        self.result-type.reference-path.field.variable is-not self.variable
-      return
-    is-field := self.result-type.reference-path.variable is
-        function.arguments.parameters.first.item.get-variable()
+    func dynamic check-memory(user ReferenceMemoryList refs)
+        if not self.is-constructor-field()
+            self.instance.check-memory(user refs)
+        refs.check-user(user self.instance)
+        refs.check-reference(user self)
+    
+    func inst is-constructor-field()->(var Bool is-field)
+        is-field := false
+        user SyntaxTreeFunction function(user self.code-node.get-function())
+        if not function.parent-type? or
+                self.result-type.reference-path.field.variable is-not self.variable
+            return
+        is-field := self.result-type.reference-path.variable is
+                function.arguments.parameters.first.item.get-variable()
 
-  func dynamic write-preactions()
-    self.instance.write-preactions()
+    func dynamic write-preactions()
+        self.instance.write-preactions()
 
-  func dynamic write()
-    if self.instance.is-complex-field
-      self.instance.write()
-      write(user ".")
-    else
-      self.instance.write-safe()
-      write(user "->")
-    for n in self.bases
-      write(user "_base.")
-    self.variable.write-cname()
+    func dynamic write()
+        if self.instance.is-complex-field
+            self.instance.write()
+            write(user ".")
+        else
+            self.instance.write-safe()
+            write(user "->")
+        for n in self.bases
+            write(user "_base.")
+        self.variable.write-cname()
 
-  func dynamic write-cast()
-    var Bool ref(copy self.is-complex-field and
-        self.result-type.type-data is-not glob.type-array and
-        self.result-type.type-data is-not glob.type-string)
-    if ref
-      write(user "&(")
-    self.write()
-    if ref
-      write(user ")")
-  
-  func dynamic write-refman()
-    if self.is-complex-field
-      self.instance.write-refman()
-    else
-      base()
-  
-  func dynamic write-dynamic()
-    if self.is-complex-field
-      write(user "&")
-    self.write-dynamic-safe()
-  
-  func dynamic write-dynamic-safe()
-    if self.is-complex-field
-      self.result-type.write-cname()
-      write(user "_dynamic")
-    else
-      base.write-dynamic()
+    func dynamic write-cast()
+        var Bool ref(copy self.is-complex-field and
+                self.result-type.type-data is-not glob.type-array and
+                self.result-type.type-data is-not glob.type-string)
+        if ref
+            write(user "&(")
+        self.write()
+        if ref
+            write(user ")")
+    
+    func dynamic write-refman()
+        if self.is-complex-field
+            self.instance.write-refman()
+        else
+            base()
+    
+    func dynamic write-dynamic()
+        if self.is-complex-field
+            write(user "&")
+        self.write-dynamic-safe()
+    
+    func dynamic write-dynamic-safe()
+        if self.is-complex-field
+            self.result-type.write-cname()
+            write(user "_dynamic")
+        else
+            base.write-dynamic()
 
 
 class MockFieldExpression(Expression)
-  owner Expression instance
-  owner String name
-  
-  new(owner Expression instance, owner String name)
-    self.set-location()
-    self.instance := instance
-    self.name := name
-    self.set-simple-type(user glob.type-bool)
-    self.assignable := true
-  
-  func dynamic analyze()
-    self.instance.analyze()
-  
-  func dynamic write()
-    self.instance.write()
-    write(user "_")
-    write-cname(user self.name)
+    owner Expression instance
+    owner String name
+    
+    new(owner Expression instance, owner String name)
+        self.set-location()
+        self.instance := instance
+        self.name := name
+        self.set-simple-type(user glob.type-bool)
+        self.assignable := true
+    
+    func dynamic analyze()
+        self.instance.analyze()
+    
+    func dynamic write()
+        self.instance.write()
+        write(user "_")
+        write-cname(user self.name)

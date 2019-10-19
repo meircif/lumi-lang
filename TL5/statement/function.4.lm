@@ -3,589 +3,589 @@ module tl5-compiler
 
 ~~~ Function node in the syntax tree ~~~
 class SyntaxTreeFunction(SyntaxTreeBlock)
-  var List{TypeCount} aux-variables
-  var FunctionArguments arguments
-  owner String name
-  owner String type-name
-  owner String module-name
-  owner DeleteGroup delete-group-owner
-  owner DeleteGroupBuilder delete-group-builder-owner
-  user TypeData parent-type
-  user ModuleMembers my-module
-  user SyntaxTreeFunction implemented-function
-  user SyntaxTreeMockFunction mocker-function
-  user SyntaxTreeFunction dynamic-base-method
-  user DeleteGroup delete-group
-  user DeleteGroupBuilder delete-group-builder
-  var Int dynamic-base-count
-  var Int block-count
-  var Int self-access
-  var Bool self-conditional
-  var Bool is-dynamic
-  var Bool header-only
-  var Bool external-body
-  var Bool err-aux-var
+    var List{TypeCount} aux-variables
+    var FunctionArguments arguments
+    owner String name
+    owner String type-name
+    owner String module-name
+    owner DeleteGroup delete-group-owner
+    owner DeleteGroupBuilder delete-group-builder-owner
+    user TypeData parent-type
+    user ModuleMembers my-module
+    user SyntaxTreeFunction implemented-function
+    user SyntaxTreeMockFunction mocker-function
+    user SyntaxTreeFunction dynamic-base-method
+    user DeleteGroup delete-group
+    user DeleteGroupBuilder delete-group-builder
+    var Int dynamic-base-count
+    var Int block-count
+    var Int self-access
+    var Bool self-conditional
+    var Bool is-dynamic
+    var Bool header-only
+    var Bool external-body
+    var Bool err-aux-var
 
-  new()
-    self.set-location()
-    self.arguments.new()
-    self.delete-group-builder-owner := DeleteGroupBuilder(user self)
-    self.delete-group-builder := self.delete-group-builder-owner
-  
-  func inst parse-new(user TypeData parent-type)->(
-      owner SyntaxTreeFunction new-node)
-    new-node := SyntaxTreeFunction()
-    new-node.parse(user parent-type)
-  
-  func inst parse(user TypeData parent-type)
-    self.parent-type := parent-type
-    if self.parent-type?
-      self.indentation-spaces := INDENTATION-SPACES
-      if self.parent-type.is-dynamic
-        user String meth-type
-        read-until(user " ", copy false)->(user meth-type)
-        if meth-type.equal(user "dynamic")
-          self.is-dynamic := true
-        else-if not meth-type.equal(user "inst")
-          self.syntax-error(
-              user "expected \"dynamic\" or \"inst\" method type, got",
-              user meth-type)
-      user String access-str
-      read-until(user " ?(", copy false)->(user access-str)
-      if glob.last-char = '?'
-        self.self-conditional := true
-        read-c()
-      if glob.last-char != ' '
-        self.syntax-error-msg(user "missing access before method name")
-      self.get-access(user access-str)->(var self.self-access)
-    else
-      self.my-module := glob.current-module
-    self.parse-header(copy false)
-    self.parse-body()
-  
-  func inst parse-body()
-    if self.header-only
-      return
-    self.indentation-spaces += INDENTATION-SPACES
-    self.parse-block()
-    self.indentation-spaces := INDENTATION-SPACES
-  
-  func inst parse-header(copy Bool is-native)
-    read-new(user "!.(")->(owner self.name)
-    if glob.last-char = '!'
-      self.arguments.has-error := true
-      read-c()
-      self.expect-space(user "!")
-      read-new(user ".(")->(owner self.name)
-    do
-      while glob.last-char = '.'
-      var Char ch(copy self.name[0])
-      var Bool is-module-name(copy ch >= 'a' and ch <= 'z')
-      if self.parent-type? or self.type-name? or
-          (is-module-name and self.module-name?)
-        self.syntax-error(user "misplaced item", user self.name)
-      self.external-body := true
-      if is-module-name
-        self.module-name := self.name
-      else
-        self.type-name := self.name
-      read-new(user ".(")->(owner self.name)
-    if glob.last-char != '('
-      self.syntax-error-c(user "expected \"(\" after function name, got")
-    if not self.module-name? and not self.type-name?
-      self.register-name()
-    self.parse-arguments(copy is-native)
-  
-  func inst add-self-parameter()
-    self.arguments.add-self-parameter(
-        user self.parent-type,
-        copy self.self-access,
-        copy self.self-conditional)
-  
-  func inst parse-arguments(copy Bool is-native)
-    var DeclarationArgumentFactory argument-factory
-    var SyntaxTreeCode dummy-node(user self)
-    self.arguments.parse(
-        user argument-factory,
-        copy is-native,
-        user dummy-node,
-        copy self.indentation-spaces)
-    if self.parent-type?
-      self.add-self-parameter()
-    if glob.last-char = ' ' and self.parent-type?
-      read-c()
-      self.header-only := glob.last-char = '_'
-      if self.header-only
-        read-c()
-      else
-        glob.last-char := ' '
-  
-  func dynamic register-name()
-    if not is-legal-name(user self.name, copy NameGroup.DEFAULT)
-      self.syntax-error(user "illegal function name", user self.name)
-    if self.parent-type?
-      user SyntaxTreeFunction meth
-      self.parent-type.find-meth(user self.name)->(user meth)
-      if meth?
-        self.syntax-error(user "redefinition of method", user self.name)
-      user SyntaxTreeVariable field
-      self.parent-type.find-field(user self.name)->(user field)
-      if field?
-        self.syntax-error(
-            user "method name overrides field", user self.name)
-    else
-      if glob.module-map.find(user self.name)?
-        self.syntax-error(
-            user "function name overrides module", user self.name)
-      if glob.find-function(user self.name)?
-        self.syntax-error(user "redefinition of function", user self.name)
-      if glob.find-variable(user self.name)?
-        self.syntax-error(
-            user "function name overrides global variable", user self.name)
-      if self.my-module?
-        self.my-module.function-map.add(user self.name, user self)
-  
-  func dynamic get-function()->(user SyntaxTreeFunction function)
-    function := self
-  
-  func dynamic get-parent-type()->(user TypeData parent-type)
-    parent-type := self.parent-type
-  
-  func dynamic find-variable(user String name, user String module-name)->(
-      user SyntaxTreeVariable variable)
-    if base(user name, user module-name)->(user variable)?
-      return
-    if not module-name?
-      self.arguments.find-variable(user name, user _)->(user variable)
-  
-  func dynamic set-has-error()->(var Bool need-check)
-    need-check := true
+    new()
+        self.set-location()
+        self.arguments.new()
+        self.delete-group-builder-owner := DeleteGroupBuilder(user self)
+        self.delete-group-builder := self.delete-group-builder-owner
     
-  func inst new-aux-variable-index(user TypeInstance type-instance)->(
-      var Int index)
-    var ListIterator{TypeCount} iter(user self.aux-variables)
-    do
-      while iter.has()
-      while iter.get().type-data is-not type-instance.type-data
-      iter.next()
-    if iter.has()
-      iter.get().count += 1
-      index := iter.get().count
-    else
-      new TypeCount type-count
-      type-count.type-data := type-instance.type-data
-      self.aux-variables.add(owner type-count)
-      index := 0
-  
-  func dynamic link-types()
-    if self.my-module?
-      glob.current-module := self.my-module
-    if self.type-name?
-      self.find-type(user self.type-name, user self.module-name)->(
-          user self.parent-type)
-      self.parent-type.find-meth(user self.name)->(
-          user self.implemented-function)
-      if not self.implemented-function?
-        self.syntax-error2(
-            user "unknown method",
-            user self.name,
-            user "of type",
-            user self.type-name)
-      self.check-already-implemented()
-      if self.parent-type.constructor is self.implemented-function
-        self.parent-type.constructor := self
-      self.self-access := self.implemented-function.self-access
-      self.self-conditional := self.implemented-function.self-conditional
-      self.add-self-parameter()
-    self.arguments.link-types()
-    base()
-    if self.my-module?
-      glob.current-module := _
-  
-  func dynamic check-already-implemented()
-    if not self.implemented-function.header-only or
-        self.implemented-function.external-body
-      self.syntax-error2(
-          user "type",
-          user self.type-name,
-          user "already implemented method",
-          user self.name)
-    self.implemented-function.external-body := true
-  
-  func dynamic analyze()
-    if self.parent-type?
-      if self is self.parent-type.constructor and self.arguments.outputs.first?
-        self.syntax-error-msg(user "constructor with outputs")
-    if self.my-module?
-      glob.current-module := self.my-module
-    if self.implemented-function?
-      self.arguments.check-same-as(
-          user self.implemented-function.arguments, copy true)
-      self.my-module := self.implemented-function.my-module
-    self.arguments.analyze()
-    if self.header-only
-      return
-    if not self.external-body and self.is-dynamic
-      self.arguments.check-override(
-          user self.dynamic-base-method.arguments,
-          user self.parent-type.base-type,
-          copy self.dynamic-base-count)
-    for parameter in self.arguments.parameters.iter()
-      if access-is-owner(copy parameter.access)
-        self.delete-group-builder.add-deleting(
-            user parameter.get-type-instance())
-    base()
-    for variable in self.variables.iter()
-      if access-is-var(copy variable.access) and
-          not variable.type-instance.type-data.is-primitive
-        self.delete-group-builder.add-deleting(user variable.type-instance)
-    if self.my-module?
-      glob.current-module := _
-  
-  func inst compare(user SyntaxTreeFunction other)
-    if self.is-dynamic != other.is-dynamic
-      self.syntax-error(user "illegal dynamic in function", user self.name)
+    func inst parse-new(user TypeData parent-type)->(
+            owner SyntaxTreeFunction new-node)
+        new-node := SyntaxTreeFunction()
+        new-node.parse(user parent-type)
     
-  func inst collect-delete-group()->(user DeleteGroupBuilder recursive)
-    if self.delete-group?
-      return
-    self.delete-group-builder.build()->(user recursive)
+    func inst parse(user TypeData parent-type)
+        self.parent-type := parent-type
+        if self.parent-type?
+            self.indentation-spaces := INDENTATION-SPACES
+            if self.parent-type.is-dynamic
+                user String meth-type
+                read-until(user " ", copy false)->(user meth-type)
+                if meth-type.equal(user "dynamic")
+                    self.is-dynamic := true
+                else-if not meth-type.equal(user "inst")
+                    self.syntax-error(
+                            user "expected \"dynamic\" or \"inst\" method type, got",
+                            user meth-type)
+            user String access-str
+            read-until(user " ?(", copy false)->(user access-str)
+            if glob.last-char = '?'
+                self.self-conditional := true
+                read-c()
+            if glob.last-char != ' '
+                self.syntax-error-msg(user "missing access before method name")
+            self.get-access(user access-str)->(var self.self-access)
+        else
+            self.my-module := glob.current-module
+        self.parse-header(copy false)
+        self.parse-body()
     
-  func dynamic check-memory(user ReferenceMemoryList global-refs)
-    if self.header-only
-      return
-    var ReferenceMemoryList refs(user global-refs)
-    if not self.check-constructor-memory(user refs)
-      self.check-block-memory(user refs)
-  
-  func inst check-constructor-memory(user ReferenceMemoryList refs)->(
-      var Bool is-constructor)
-    is-constructor := false
-    if not self.parent-type?
-      return
-    if self is-not self.parent-type.constructor
-      return
-    is-constructor := true
-    var ReferencePath reference-path(
-        user self.arguments.parameters.first.item.get-variable())
-    refs.mark-invalid-reference(user reference-path, user self)
-    for field in self.parent-type.variables.iter()
-      if not access-is-only-var(copy field.access) and
-          not field.type-instance.conditional
-        reference-path.field := ReferencePath(user field)
+    func inst parse-body()
+        if self.header-only
+            return
+        self.indentation-spaces += INDENTATION-SPACES
+        self.parse-block()
+        self.indentation-spaces := INDENTATION-SPACES
+    
+    func inst parse-header(copy Bool is-native)
+        read-new(user "!.(")->(owner self.name)
+        if glob.last-char = '!'
+            self.arguments.has-error := true
+            read-c()
+            self.expect-space(user "!")
+            read-new(user ".(")->(owner self.name)
+        do
+            while glob.last-char = '.'
+            var Char ch(copy self.name[0])
+            var Bool is-module-name(copy ch >= 'a' and ch <= 'z')
+            if self.parent-type? or self.type-name? or
+                    (is-module-name and self.module-name?)
+                self.syntax-error(user "misplaced item", user self.name)
+            self.external-body := true
+            if is-module-name
+                self.module-name := self.name
+            else
+                self.type-name := self.name
+            read-new(user ".(")->(owner self.name)
+        if glob.last-char != '('
+            self.syntax-error-c(user "expected \"(\" after function name, got")
+        if not self.module-name? and not self.type-name?
+            self.register-name()
+        self.parse-arguments(copy is-native)
+    
+    func inst add-self-parameter()
+        self.arguments.add-self-parameter(
+                user self.parent-type,
+                copy self.self-access,
+                copy self.self-conditional)
+    
+    func inst parse-arguments(copy Bool is-native)
+        var DeclarationArgumentFactory argument-factory
+        var SyntaxTreeCode dummy-node(user self)
+        self.arguments.parse(
+                user argument-factory,
+                copy is-native,
+                user dummy-node,
+                copy self.indentation-spaces)
+        if self.parent-type?
+            self.add-self-parameter()
+        if glob.last-char = ' ' and self.parent-type?
+            read-c()
+            self.header-only := glob.last-char = '_'
+            if self.header-only
+                read-c()
+            else
+                glob.last-char := ' '
+    
+    func dynamic register-name()
+        if not is-legal-name(user self.name, copy NameGroup.DEFAULT)
+            self.syntax-error(user "illegal function name", user self.name)
+        if self.parent-type?
+            user SyntaxTreeFunction meth
+            self.parent-type.find-meth(user self.name)->(user meth)
+            if meth?
+                self.syntax-error(user "redefinition of method", user self.name)
+            user SyntaxTreeVariable field
+            self.parent-type.find-field(user self.name)->(user field)
+            if field?
+                self.syntax-error(
+                        user "method name overrides field", user self.name)
+        else
+            if glob.module-map.find(user self.name)?
+                self.syntax-error(
+                        user "function name overrides module", user self.name)
+            if glob.find-function(user self.name)?
+                self.syntax-error(user "redefinition of function", user self.name)
+            if glob.find-variable(user self.name)?
+                self.syntax-error(
+                        user "function name overrides global variable", user self.name)
+            if self.my-module?
+                self.my-module.function-map.add(user self.name, user self)
+    
+    func dynamic get-function()->(user SyntaxTreeFunction function)
+        function := self
+    
+    func dynamic get-parent-type()->(user TypeData parent-type)
+        parent-type := self.parent-type
+    
+    func dynamic find-variable(user String name, user String module-name)->(
+            user SyntaxTreeVariable variable)
+        if base(user name, user module-name)->(user variable)?
+            return
+        if not module-name?
+            self.arguments.find-variable(user name, user _)->(user variable)
+    
+    func dynamic set-has-error()->(var Bool need-check)
+        need-check := true
+        
+    func inst new-aux-variable-index(user TypeInstance type-instance)->(
+            var Int index)
+        var ListIterator{TypeCount} iter(user self.aux-variables)
+        do
+            while iter.has()
+            while iter.get().type-data is-not type-instance.type-data
+            iter.next()
+        if iter.has()
+            iter.get().count += 1
+            index := iter.get().count
+        else
+            new TypeCount type-count
+            type-count.type-data := type-instance.type-data
+            self.aux-variables.add(owner type-count)
+            index := 0
+    
+    func dynamic link-types()
+        if self.my-module?
+            glob.current-module := self.my-module
+        if self.type-name?
+            self.find-type(user self.type-name, user self.module-name)->(
+                    user self.parent-type)
+            self.parent-type.find-meth(user self.name)->(
+                    user self.implemented-function)
+            if not self.implemented-function?
+                self.syntax-error2(
+                        user "unknown method",
+                        user self.name,
+                        user "of type",
+                        user self.type-name)
+            self.check-already-implemented()
+            if self.parent-type.constructor is self.implemented-function
+                self.parent-type.constructor := self
+            self.self-access := self.implemented-function.self-access
+            self.self-conditional := self.implemented-function.self-conditional
+            self.add-self-parameter()
+        self.arguments.link-types()
+        base()
+        if self.my-module?
+            glob.current-module := _
+    
+    func dynamic check-already-implemented()
+        if not self.implemented-function.header-only or
+                self.implemented-function.external-body
+            self.syntax-error2(
+                    user "type",
+                    user self.type-name,
+                    user "already implemented method",
+                    user self.name)
+        self.implemented-function.external-body := true
+    
+    func dynamic analyze()
+        if self.parent-type?
+            if self is self.parent-type.constructor and self.arguments.outputs.first?
+                self.syntax-error-msg(user "constructor with outputs")
+        if self.my-module?
+            glob.current-module := self.my-module
+        if self.implemented-function?
+            self.arguments.check-same-as(
+                    user self.implemented-function.arguments, copy true)
+            self.my-module := self.implemented-function.my-module
+        self.arguments.analyze()
+        if self.header-only
+            return
+        if not self.external-body and self.is-dynamic
+            self.arguments.check-override(
+                    user self.dynamic-base-method.arguments,
+                    user self.parent-type.base-type,
+                    copy self.dynamic-base-count)
+        for parameter in self.arguments.parameters.iter()
+            if access-is-owner(copy parameter.access)
+                self.delete-group-builder.add-deleting(
+                        user parameter.get-type-instance())
+        base()
+        for variable in self.variables.iter()
+            if access-is-var(copy variable.access) and
+                    not variable.type-instance.type-data.is-primitive
+                self.delete-group-builder.add-deleting(user variable.type-instance)
+        if self.my-module?
+            glob.current-module := _
+    
+    func inst compare(user SyntaxTreeFunction other)
+        if self.is-dynamic != other.is-dynamic
+            self.syntax-error(user "illegal dynamic in function", user self.name)
+        
+    func inst collect-delete-group()->(user DeleteGroupBuilder recursive)
+        if self.delete-group?
+            return
+        self.delete-group-builder.build()->(user recursive)
+        
+    func dynamic check-memory(user ReferenceMemoryList global-refs)
+        if self.header-only
+            return
+        var ReferenceMemoryList refs(user global-refs)
+        if not self.check-constructor-memory(user refs)
+            self.check-block-memory(user refs)
+    
+    func inst check-constructor-memory(user ReferenceMemoryList refs)->(
+            var Bool is-constructor)
+        is-constructor := false
+        if not self.parent-type?
+            return
+        if self is-not self.parent-type.constructor
+            return
+        is-constructor := true
+        var ReferencePath reference-path(
+                user self.arguments.parameters.first.item.get-variable())
         refs.mark-invalid-reference(user reference-path, user self)
-    self.check-block-memory(user refs)
-    for field in self.parent-type.variables.iter()
-      if not field.type-instance.conditional
-        reference-path.field := ReferencePath(user field)
-        if refs.is-invalid(user reference-path)
-          self.syntax-error(
-              user "constructor did not initialize field", user field.name)
-  
-  func inst check-block-memory(user ReferenceMemoryList refs)
-    self.arguments.check-memory(user refs)
-    self.check-children-memory(user self.variables, user refs)
-    base.check-memory(user refs)
-    for parameter in self.arguments.parameters.iter()
-      if access-is-owner(copy parameter.access)
-        refs.mark-illegal-type(user parameter.get-type-instance())
-    for variable in self.variables.iter()
-      if access-is-var(copy variable.access) and
-          not variable.type-instance.type-data.is-primitive
-        refs.mark-illegal-type(user variable.type-instance)
-    self.check-outputs-memory(user refs)
-  
-  func inst check-outputs-memory(user ReferenceMemoryList refs)
-    for output in self.arguments.outputs.iter()
-      refs.check-output(user output)
-  
-  ~~~ write function body ~~~
-  func dynamic write()
-    ; #define LUMI_FILE_NAME "`file-name`"
-    ; #define LUMI_FUNC_NAME "`parent-type`.`function-name`"
-    ; [void|Returncode] `Type`_`name`(`args`) {
-    ;   `block...`
-    ; }
-    ; #undef LUMI_FILE_NAME
-    ; #undef LUMI_FUNC_NAME
-    if self.header-only
-      return
-    self.write-pre-func()
-    self.write-header()
-    self.write-block()
-    self.write-post-func()
-  
-  func inst write-header()
-    if self.arguments.has-error
-      write(user "\nReturncode ")
-    else
-      write(user "\nvoid ")
-    self.write-cname()
-    self.arguments.write()
-  
-  func inst write-block()
-    ; `previous-text` {
-    ;   [Returncode LUMI_err = OK;]
-    ;   unsigned LUMI_loop_depth = 1;
-    ;   `block...`
-    ;   [return LUMI_err;]
-    ; }
-    write(user " ")
-    self.write-block-start()
-    if self.err-aux-var or self.arguments.has-error
-      write-spaces(copy INDENTATION-SPACES)
-      write(user "Returncode LUMI_err = OK;\n")
-    write-spaces(copy INDENTATION-SPACES)
-    write(user "unsigned LUMI_loop_depth = 1;\n")
-    self.write-block-setup()
-    self.write-setup()
-    self.write-block-body()
-    self.write-block-cleanup()
-    self.write-param-cleanup()
-    if self.arguments.has-error
-      write-spaces(copy INDENTATION-SPACES)
-      write(user "return LUMI_err;\n")
-    self.write-block-end()
-  
-  func inst write-setup()
-    for parameter in self.arguments.parameters.iter()
-      if parameter.access = Access.WEAK
+        for field in self.parent-type.variables.iter()
+            if not access-is-only-var(copy field.access) and
+                    not field.type-instance.conditional
+                reference-path.field := ReferencePath(user field)
+                refs.mark-invalid-reference(user reference-path, user self)
+        self.check-block-memory(user refs)
+        for field in self.parent-type.variables.iter()
+            if not field.type-instance.conditional
+                reference-path.field := ReferencePath(user field)
+                if refs.is-invalid(user reference-path)
+                    self.syntax-error(
+                            user "constructor did not initialize field", user field.name)
+    
+    func inst check-block-memory(user ReferenceMemoryList refs)
+        self.arguments.check-memory(user refs)
+        self.check-children-memory(user self.variables, user refs)
+        base.check-memory(user refs)
+        for parameter in self.arguments.parameters.iter()
+            if access-is-owner(copy parameter.access)
+                refs.mark-illegal-type(user parameter.get-type-instance())
+        for variable in self.variables.iter()
+            if access-is-var(copy variable.access) and
+                    not variable.type-instance.type-data.is-primitive
+                refs.mark-illegal-type(user variable.type-instance)
+        self.check-outputs-memory(user refs)
+    
+    func inst check-outputs-memory(user ReferenceMemoryList refs)
+        for output in self.arguments.outputs.iter()
+            refs.check-output(user output)
+    
+    ~~~ write function body ~~~
+    func dynamic write()
+        ; #define LUMI_FILE_NAME "`file-name`"
+        ; #define LUMI_FUNC_NAME "`parent-type`.`function-name`"
+        ; [void|Returncode] `Type`_`name`(`args`) {
+        ;     `block...`
+        ; }
+        ; #undef LUMI_FILE_NAME
+        ; #undef LUMI_FUNC_NAME
+        if self.header-only
+            return
+        self.write-pre-func()
+        self.write-header()
+        self.write-block()
+        self.write-post-func()
+    
+    func inst write-header()
+        if self.arguments.has-error
+            write(user "\nReturncode ")
+        else
+            write(user "\nvoid ")
+        self.write-cname()
+        self.arguments.write()
+    
+    func inst write-block()
+        ; `previous-text` {
+        ;     [Returncode LUMI_err = OK;]
+        ;     unsigned LUMI_loop_depth = 1;
+        ;     `block...`
+        ;     [return LUMI_err;]
+        ; }
+        write(user " ")
+        self.write-block-start()
+        if self.err-aux-var or self.arguments.has-error
+            write-spaces(copy INDENTATION-SPACES)
+            write(user "Returncode LUMI_err = OK;\n")
         write-spaces(copy INDENTATION-SPACES)
-        write(user "LUMI_inc_ref(")
-        write-cname(user parameter.get-variable().name)
-        write(user "_Refman);\n")
-  
-  func inst write-param-cleanup()
-    for parameter in self.arguments.parameters.iter-back()
-      if access-is-owner(copy parameter.access) or
-          parameter.access = Access.WEAK
-        self.write-variable-cleanup(user parameter.get-variable(), user _)
-  
-  func dynamic write-cname()
-    if self.parent-type?
-      self.parent-type.write-cname()
-      write(user "_")
-    else-if self.my-module?
-      self.my-module.write-prefix()
-    write-cname(user self.name)
-  
-  func inst write-pointer()
-    self.arguments.write-pointer(user self.name)
-  
-  func dynamic write-declaration()
-    ; Returncode `Type`_`name`(`args`);
-    if self.external-body and not self.header-only
-      return
-    self.write-header()
-    write(user ";\n")
-  
-  func inst write-pre-func()
-    write(user "\n#define LUMI_FILE_NAME ")
-    write-string-literal(user self.input-file-name)
-    write(user "\n#define LUMI_FUNC_NAME \"")
-    if self.parent-type?
-      write(user self.parent-type.name)
-      write(user ".")
-    write(user self.name)
-    write(user "\"")
-  
-  func inst write-post-func()
-    write(user "#undef LUMI_FILE_NAME\n")
-    write(user "#undef LUMI_FUNC_NAME\n")
+        write(user "unsigned LUMI_loop_depth = 1;\n")
+        self.write-block-setup()
+        self.write-setup()
+        self.write-block-body()
+        self.write-block-cleanup()
+        self.write-param-cleanup()
+        if self.arguments.has-error
+            write-spaces(copy INDENTATION-SPACES)
+            write(user "return LUMI_err;\n")
+        self.write-block-end()
+    
+    func inst write-setup()
+        for parameter in self.arguments.parameters.iter()
+            if parameter.access = Access.WEAK
+                write-spaces(copy INDENTATION-SPACES)
+                write(user "LUMI_inc_ref(")
+                write-cname(user parameter.get-variable().name)
+                write(user "_Refman);\n")
+    
+    func inst write-param-cleanup()
+        for parameter in self.arguments.parameters.iter-back()
+            if access-is-owner(copy parameter.access) or
+                    parameter.access = Access.WEAK
+                self.write-variable-cleanup(user parameter.get-variable(), user _)
+    
+    func dynamic write-cname()
+        if self.parent-type?
+            self.parent-type.write-cname()
+            write(user "_")
+        else-if self.my-module?
+            self.my-module.write-prefix()
+        write-cname(user self.name)
+    
+    func inst write-pointer()
+        self.arguments.write-pointer(user self.name)
+    
+    func dynamic write-declaration()
+        ; Returncode `Type`_`name`(`args`);
+        if self.external-body and not self.header-only
+            return
+        self.write-header()
+        write(user ";\n")
+    
+    func inst write-pre-func()
+        write(user "\n#define LUMI_FILE_NAME ")
+        write-string-literal(user self.input-file-name)
+        write(user "\n#define LUMI_FUNC_NAME \"")
+        if self.parent-type?
+            write(user self.parent-type.name)
+            write(user ".")
+        write(user self.name)
+        write(user "\"")
+    
+    func inst write-post-func()
+        write(user "#undef LUMI_FILE_NAME\n")
+        write(user "#undef LUMI_FUNC_NAME\n")
 
 
 ~~~ Count occurrences of a specific type ~~~
 struct TypeCount
-  user TypeData type-data
-  var Int count
+    user TypeData type-data
+    var Int count
 
 
 ~~~ Constructor declaration in the syntax tree ~~~
 class SyntaxTreeConstructor(SyntaxTreeFunction)
-  func inst parse-new(user TypeData parent-type)->(
-      owner SyntaxTreeConstructor new-node)
-    new-node := SyntaxTreeConstructor()
-    new-node.parse(user parent-type)
-  
-  func inst parse(user TypeData parent-type)
-    self.parent-type := parent-type
-    self.indentation-spaces := INDENTATION-SPACES
-    self.self-access := Access.VAR
-    self.self-conditional := false
-    self.parent-type.constructor := self
-    if glob.last-char = '!'
-      self.arguments.has-error := true
-      read-c()
-    if glob.last-char != '('
-      self.syntax-error-c(user "expected \"(\" after \"new\", got")
-    string-new-copy(user "new")->(owner self.name)
-    self.parse-arguments(copy false)
-    self.parse-body()
+    func inst parse-new(user TypeData parent-type)->(
+            owner SyntaxTreeConstructor new-node)
+        new-node := SyntaxTreeConstructor()
+        new-node.parse(user parent-type)
+    
+    func inst parse(user TypeData parent-type)
+        self.parent-type := parent-type
+        self.indentation-spaces := INDENTATION-SPACES
+        self.self-access := Access.VAR
+        self.self-conditional := false
+        self.parent-type.constructor := self
+        if glob.last-char = '!'
+            self.arguments.has-error := true
+            read-c()
+        if glob.last-char != '('
+            self.syntax-error-c(user "expected \"(\" after \"new\", got")
+        string-new-copy(user "new")->(owner self.name)
+        self.parse-arguments(copy false)
+        self.parse-body()
 
 
 ~~~ Function declaration argument ~~~
 class DeclarationArgument(Argument)
-  owner SyntaxTreeVariable variable
-  
-  func dynamic copy-new()->(owner DeclarationArgument new-argument)
-    new-argument := DeclarationArgument()
-    self.copy(user new-argument)
-    new-argument.variable := SyntaxTreeVariable(user _)
-    new-argument.variable.access := self.variable.access
-    new-argument.variable.parent-type := self.variable.parent-type
-    self.variable.type-instance.copy-new()->(
-        owner new-argument.variable.type-instance)
-    string-new-copy(user self.variable.name)->(owner new-argument.variable.name)
-  
-  func dynamic parse-value(
-      user SyntaxTreeCode code-node, copy Int indentation-spaces)
-    self.variable := SyntaxTreeVariable(user _)
-    self.variable.access := self.access
-    self.variable.is-output := self.is-output
-    if code-node?
-      self.variable.parent := code-node.parent
-    self.variable.type-instance := TypeInstance()
-    self.variable.type-instance.parse(
-        user " ", user self, user _, copy indentation-spaces)
-    self.expect-space(user "type")
-    read-new(user ",)")->(owner self.variable.name)
-    self.variable.check-name()
-  
-  func dynamic get-parent-type()->(user TypeData parent-type)
-    self.variable.get-parent-type()->(user parent-type)
-  
-  func dynamic link-types()
-    self.variable.type-instance.link-types(user self)
-  
-  func dynamic analyze()
-    user TypeData type-data(user self.variable.type-instance.type-data)
-    if type-data.is-primitive
-      if self.is-output and not self.is-native and self.access != Access.VAR
-        self.syntax-error2(
-            user "output",
-            user self.variable.name,
-            user "access should be \"var\" for primitive types, got",
-            user glob.access-names[self.access])
-      if not self.is-output and self.access != Access.COPY
-        self.syntax-error2(
-            user "parameter",
-            user self.variable.name,
-            user "access should be \"copy\" for primitive types, got",
-            user glob.access-names[self.access])
-    else-if self.access = Access.COPY
-      self.syntax-error2(
-          user "argument",
-          user self.variable.name,
-          user "access should not be \"copy\" for non-primitive type",
-          user type-data.name)
-    else-if self.is-output
-      if access-is-only-var(copy self.access)
-        self.syntax-error2(
-            user "output",
-            user self.variable.name,
-            user "access should not be \"var\" for non-primitive type",
-            user type-data.name)
-      if not self.variable.type-instance.conditional
-        self.syntax-error(
-            user "not yet supporting non-conditional and non-primitive output",
-            user self.variable.name)
-    self.variable.type-instance.analyze-lengths(user self, copy false)
-    if self.is-native
-      if access-is-owner(copy self.access)
-        self.syntax-error-msg(user "owner argument to native function")
-      if access-has-refman(copy self.access)
-        self.syntax-error-msg(user "managed argument to native function")
-      if self.is-output
-        if self.access = Access.USER and (type-data.is-dynamic or
-            type-data is glob.type-string or type-data is glob.type-array)
-          self.syntax-error(
-              user "user output to native function with non struct type",
-              user type-data.name)
-        if self.access = Access.VAR
-          self.syntax-error-msg(user "var output to native function")
-  
-  func dynamic get-type-instance()->(user TypeInstance type-instance)
-    type-instance := self.variable.type-instance
-  
-  func dynamic get-variable()->(user SyntaxTreeVariable variable)
-    variable := self.variable
-  
-  func dynamic check-memory(user ReferenceMemoryList refs)
-    if not self.is-output
-      refs.add(user self.variable)
-  
-  func dynamic write()
-    if self.variable.type-instance.type-data is glob.type-func
-      ; [void|Returncode] (*[*]`name`)(`arguments`)
-      self.variable.type-instance.arguments.write-pointer-start()
-      if self.is-output
-        write(user "*")
-      write-cname(user self.variable.name)
-      write(user ")")
-      self.variable.type-instance.arguments.write()
-      return
+    owner SyntaxTreeVariable variable
     
-    if self.variable.type-instance.type-data is glob.type-array
-      ; `data-type`*[*] `name`, int[*] `name`_Length
-      ; [void|Returncode] (**[*] `name`)(`arguments`), int[*] `name`_Length
-      user TypeInstance data-type
-      var Int depth
-      self.variable.type-instance.get-array-data-type-depth()->(
-          user data-type, var depth)
-      if data-type.type-data is glob.type-string
-        write(user "char")
-      else-if data-type.type-data is glob.type-func
-        data-type.arguments.write-pointer-start()
-      else
-        data-type.type-data.write-cname()
-      self.write-name-param(user "*", user _)
-      if data-type.type-data is glob.type-func
-        write(user ")")
-        data-type.arguments.write()
-      self.write-name-param(user ", int", user "_Length")
-      for n in depth
-        ; , int[*] `name`_Value_length
-        self.write-name-param(user ", int", user _)
-        write-array-value-length(copy n)
-      if data-type.type-data is glob.type-string
-        ; , int*[*] `name`_String_length
-        self.write-name-param(user ", int*", user "_String_length")
+    func dynamic copy-new()->(owner DeclarationArgument new-argument)
+        new-argument := DeclarationArgument()
+        self.copy(user new-argument)
+        new-argument.variable := SyntaxTreeVariable(user _)
+        new-argument.variable.access := self.variable.access
+        new-argument.variable.parent-type := self.variable.parent-type
+        self.variable.type-instance.copy-new()->(
+                owner new-argument.variable.type-instance)
+        string-new-copy(user self.variable.name)->(owner new-argument.variable.name)
     
-    else-if self.variable.type-instance.type-data is glob.type-string
-      ; char*[*] `name`, int[*] `name`_Max_length, int*[*] `name`_Length
-      self.write-name-param(user "char*", user _)
-      self.write-name-param(user ", int", user "_Max_length")
-      self.write-name-param(user ", int*", user "_Length")
+    func dynamic parse-value(
+            user SyntaxTreeCode code-node, copy Int indentation-spaces)
+        self.variable := SyntaxTreeVariable(user _)
+        self.variable.access := self.access
+        self.variable.is-output := self.is-output
+        if code-node?
+            self.variable.parent := code-node.parent
+        self.variable.type-instance := TypeInstance()
+        self.variable.type-instance.parse(
+                user " ", user self, user _, copy indentation-spaces)
+        self.expect-space(user "type")
+        read-new(user ",)")->(owner self.variable.name)
+        self.variable.check-name()
     
-    else
-      ; `type`[*][*] `name`
-      self.variable.type-instance.write-cname()
-      if not self.variable.type-instance.type-data.is-primitive
-        write(user "*")
-      self.write-name-param(user _, user _)
+    func dynamic get-parent-type()->(user TypeData parent-type)
+        self.variable.get-parent-type()->(user parent-type)
     
-    if access-has-refman(copy self.access) and not self.is-native
-      ; , Ref_Manager* `name`_Refman
-      self.write-name-param(user ", Ref_Manager*", user "_Refman")
+    func dynamic link-types()
+        self.variable.type-instance.link-types(user self)
     
-    if self.variable.type-instance.type-data.is-dynamic and not self.is-native
-      ; , `type`_Dynamic*[*] `name`_Dynamic
-      write(user ", ")
-      self.variable.type-instance.write-cname()
-      self.write-name-param(user "_Dynamic*", user "_Dynamic")
-  
-  func inst write-name-param(user String prefix, user String suffix)
-    ; `prefix`[*] `name``suffix`
-    if prefix?
-      write(user prefix)
-    if self.is-output
-      write(user "*")
-    write(user " ")
-    write-cname(user self.variable.name)
-    if suffix?
-      write(user suffix)
+    func dynamic analyze()
+        user TypeData type-data(user self.variable.type-instance.type-data)
+        if type-data.is-primitive
+            if self.is-output and not self.is-native and self.access != Access.VAR
+                self.syntax-error2(
+                        user "output",
+                        user self.variable.name,
+                        user "access should be \"var\" for primitive types, got",
+                        user glob.access-names[self.access])
+            if not self.is-output and self.access != Access.COPY
+                self.syntax-error2(
+                        user "parameter",
+                        user self.variable.name,
+                        user "access should be \"copy\" for primitive types, got",
+                        user glob.access-names[self.access])
+        else-if self.access = Access.COPY
+            self.syntax-error2(
+                    user "argument",
+                    user self.variable.name,
+                    user "access should not be \"copy\" for non-primitive type",
+                    user type-data.name)
+        else-if self.is-output
+            if access-is-only-var(copy self.access)
+                self.syntax-error2(
+                        user "output",
+                        user self.variable.name,
+                        user "access should not be \"var\" for non-primitive type",
+                        user type-data.name)
+            if not self.variable.type-instance.conditional
+                self.syntax-error(
+                        user "not yet supporting non-conditional and non-primitive output",
+                        user self.variable.name)
+        self.variable.type-instance.analyze-lengths(user self, copy false)
+        if self.is-native
+            if access-is-owner(copy self.access)
+                self.syntax-error-msg(user "owner argument to native function")
+            if access-has-refman(copy self.access)
+                self.syntax-error-msg(user "managed argument to native function")
+            if self.is-output
+                if self.access = Access.USER and (type-data.is-dynamic or
+                        type-data is glob.type-string or type-data is glob.type-array)
+                    self.syntax-error(
+                            user "user output to native function with non struct type",
+                            user type-data.name)
+                if self.access = Access.VAR
+                    self.syntax-error-msg(user "var output to native function")
+    
+    func dynamic get-type-instance()->(user TypeInstance type-instance)
+        type-instance := self.variable.type-instance
+    
+    func dynamic get-variable()->(user SyntaxTreeVariable variable)
+        variable := self.variable
+    
+    func dynamic check-memory(user ReferenceMemoryList refs)
+        if not self.is-output
+            refs.add(user self.variable)
+    
+    func dynamic write()
+        if self.variable.type-instance.type-data is glob.type-func
+            ; [void|Returncode] (*[*]`name`)(`arguments`)
+            self.variable.type-instance.arguments.write-pointer-start()
+            if self.is-output
+                write(user "*")
+            write-cname(user self.variable.name)
+            write(user ")")
+            self.variable.type-instance.arguments.write()
+            return
+        
+        if self.variable.type-instance.type-data is glob.type-array
+            ; `data-type`*[*] `name`, int[*] `name`_Length
+            ; [void|Returncode] (**[*] `name`)(`arguments`), int[*] `name`_Length
+            user TypeInstance data-type
+            var Int depth
+            self.variable.type-instance.get-array-data-type-depth()->(
+                    user data-type, var depth)
+            if data-type.type-data is glob.type-string
+                write(user "char")
+            else-if data-type.type-data is glob.type-func
+                data-type.arguments.write-pointer-start()
+            else
+                data-type.type-data.write-cname()
+            self.write-name-param(user "*", user _)
+            if data-type.type-data is glob.type-func
+                write(user ")")
+                data-type.arguments.write()
+            self.write-name-param(user ", int", user "_Length")
+            for n in depth
+                ; , int[*] `name`_Value_length
+                self.write-name-param(user ", int", user _)
+                write-array-value-length(copy n)
+            if data-type.type-data is glob.type-string
+                ; , int*[*] `name`_String_length
+                self.write-name-param(user ", int*", user "_String_length")
+        
+        else-if self.variable.type-instance.type-data is glob.type-string
+            ; char*[*] `name`, int[*] `name`_Max_length, int*[*] `name`_Length
+            self.write-name-param(user "char*", user _)
+            self.write-name-param(user ", int", user "_Max_length")
+            self.write-name-param(user ", int*", user "_Length")
+        
+        else
+            ; `type`[*][*] `name`
+            self.variable.type-instance.write-cname()
+            if not self.variable.type-instance.type-data.is-primitive
+                write(user "*")
+            self.write-name-param(user _, user _)
+        
+        if access-has-refman(copy self.access) and not self.is-native
+            ; , Ref_Manager* `name`_Refman
+            self.write-name-param(user ", Ref_Manager*", user "_Refman")
+        
+        if self.variable.type-instance.type-data.is-dynamic and not self.is-native
+            ; , `type`_Dynamic*[*] `name`_Dynamic
+            write(user ", ")
+            self.variable.type-instance.write-cname()
+            self.write-name-param(user "_Dynamic*", user "_Dynamic")
+    
+    func inst write-name-param(user String prefix, user String suffix)
+        ; `prefix`[*] `name``suffix`
+        if prefix?
+            write(user prefix)
+        if self.is-output
+            write(user "*")
+        write(user " ")
+        write-cname(user self.variable.name)
+        if suffix?
+            write(user suffix)
 
 
 class DeclarationArgumentFactory(ArgumentFactory)
-  func dynamic new-argument()->(owner Argument new-argument)
-    new-argument := DeclarationArgument()
+    func dynamic new-argument()->(owner Argument new-argument)
+        new-argument := DeclarationArgument()

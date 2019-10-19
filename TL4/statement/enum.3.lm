@@ -26,8 +26,8 @@ class EnumData(SyntaxTreeNode)
       var Int spaces
       read-until(user " .([{?", copy true):(user value, copy end, copy spaces)
       while spaces > 0
-      if spaces != 2
-        self.m-syntax-error-indentation(copy spaces, copy 2)
+      if spaces != 4
+        self.m-syntax-error-indentation(copy spaces, copy 4)
       if not f-is-legal-name(user value, copy NAME-CONSTANT)
         self.m-syntax-error(user "illegal constant name", user value)
       if end != '\n'
@@ -56,7 +56,7 @@ class EnumData(SyntaxTreeNode)
     write-cname(user self.name)
   
   func dynamic write()
-    write(user "\nenum {\n  ")
+    write(user "\nenum {\n    ")
     user ListNode{String} node(self.values.first)
     do
       while ? node
@@ -66,7 +66,7 @@ class EnumData(SyntaxTreeNode)
       if node = self.values.first
         write(user " = 0")
       node := node.next
-      write(user ",\n  ")
+      write(user ",\n    ")
     self.write-cname()
     write(user "_length\n")
     write(user "};\n")

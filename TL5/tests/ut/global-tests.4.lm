@@ -6,174 +6,174 @@ var Bool arguments-set
 var String{1024} test-base-dir
 
 func setup-arguments()
-  if arguments-set
-    return
-  for n in 1:sys.argv.length
-    user String arg(user sys.argv[n])
-    if arg.equal(user "--trace")
-      flag-trace := true
-    else-if arg[0] != '-' and test-base-dir.length = 0
-      test-base-dir.new(user arg)
-  if test-base-dir.length = 0
-    sys.getenv(user "TEST_DIR", user test-base-dir)
-  arguments-set := true
+    if arguments-set
+        return
+    for n in 1:sys.argv.length
+        user String arg(user sys.argv[n])
+        if arg.equal(user "--trace")
+            flag-trace := true
+        else-if arg[0] != '-' and test-base-dir.length = 0
+            test-base-dir.new(user arg)
+    if test-base-dir.length = 0
+        sys.getenv(user "TEST_DIR", user test-base-dir)
+    arguments-set := true
 
 
 func assert-string-slice(
-    user String expected,
-    user String actual,
-    copy Int start,
-    copy Int slice-length,
-    copy Bool is-main)
-  user String actual-slice(user "")
-  if actual.length >= start + slice-length
-    actual-slice := actual[start:slice-length]
-  else-if actual.length > start
-    actual-slice := actual[start:actual.length - start]
-  if is-main
-    actual-output-file.write.mocked(user actual-slice)
-    actual-output-file.write.mocked(user "\n")
-  if actual-slice.equal(user expected)
-    return
-  print-case-error()
-  if expected.length > 128 or actual-slice.length > 128
-    sys.print(user "[unmatching large text]")
-  else
-    sys.print(user "[expected `")
-    sys.print(user expected)
-    sys.print(user "`,\n          ")
-    if case-name?
-      for n in case-name.length + 2
-        sys.print(user " ")
-    sys.print(user "got `")
-    sys.print(user actual-slice)
-    sys.print(user "`]")
-  write-new-file(user "expected", user expected)
-  write-new-file(user "actual", user actual-slice)
-  assert false
+        user String expected,
+        user String actual,
+        copy Int start,
+        copy Int slice-length,
+        copy Bool is-main)
+    user String actual-slice(user "")
+    if actual.length >= start + slice-length
+        actual-slice := actual[start:slice-length]
+    else-if actual.length > start
+        actual-slice := actual[start:actual.length - start]
+    if is-main
+        actual-output-file.write.mocked(user actual-slice)
+        actual-output-file.write.mocked(user "\n")
+    if actual-slice.equal(user expected)
+        return
+    print-case-error()
+    if expected.length > 128 or actual-slice.length > 128
+        sys.print(user "[unmatching large text]")
+    else
+        sys.print(user "[expected `")
+        sys.print(user expected)
+        sys.print(user "`,\n                    ")
+        if case-name?
+            for n in case-name.length + 2
+                sys.print(user " ")
+        sys.print(user "got `")
+        sys.print(user actual-slice)
+        sys.print(user "`]")
+    write-new-file(user "expected", user expected)
+    write-new-file(user "actual", user actual-slice)
+    assert false
 
 
 func write-new-file(user String base-name, user String data)
-  var String{256} filename
-  set-test-file-name(user filename, user base-name, user "txt")
-  owner File file
-  file-open-write.mocked(user filename)->(owner file)
-  file.write.mocked(user data)
-  file-close.mocked(owner file)
+    var String{256} filename
+    set-test-file-name(user filename, user base-name, user "txt")
+    owner File file
+    file-open-write.mocked(user filename)->(owner file)
+    file.write.mocked(user data)
+    file-close.mocked(owner file)
 
 
 func assert-string(user String expected, user String actual)
-  assert actual?
-  assert-string-slice(
-      user expected, user actual, copy 0, copy actual.length, copy false)
+    assert actual?
+    assert-string-slice(
+            user expected, user actual, copy 0, copy actual.length, copy false)
 
 
 func set-test-file-name(
-    user String filename, user String base-name, user String suffix)
-  setup-arguments()
-  filename.new(user test-base-dir)
-  filename.concat(user base-name)
-  filename.append(copy '.')
-  filename.concat(user suffix)
+        user String filename, user String base-name, user String suffix)
+    setup-arguments()
+    filename.new(user test-base-dir)
+    filename.concat(user base-name)
+    filename.append(copy '.')
+    filename.concat(user suffix)
 
 
 ; List tests
 test test-list()
-  var tl5-compiler.List{String} list
-  assert not list.pop()?
-  list.add(owner tl5-compiler.string-new-copy(user "value1"))
-  list.add(owner tl5-compiler.string-new-copy(user "value2"))
-  list.add(owner tl5-compiler.string-new-copy(user "value3"))
-  assert not list.remove(user "value")?
-  assert-string(user "value1", user list.pop())
-  assert-string(user "value2", user list.pop())
-  assert-string(user "value3", user list.pop())
-  assert not list.pop()?
+    var tl5-compiler.List{String} list
+    assert not list.pop()?
+    list.add(owner tl5-compiler.string-new-copy(user "value1"))
+    list.add(owner tl5-compiler.string-new-copy(user "value2"))
+    list.add(owner tl5-compiler.string-new-copy(user "value3"))
+    assert not list.remove(user "value")?
+    assert-string(user "value1", user list.pop())
+    assert-string(user "value2", user list.pop())
+    assert-string(user "value3", user list.pop())
+    assert not list.pop()?
 
 
 ; NameMap tests
 test test-name-map()
-  var tl5-compiler.NameMap{String} map
-  assert not map.find(user "name1")?
-  map.remove(user "name1")
-  user String value1(user "value1")
-  map.add(user "name1", user value1)
-  assert-string(user "value1", user map.find(user "name1"))
-  assert not map.find(user "name2")?
-  map.add(user "name2", user "value2")
-  assert-string(user "value1", user map.find(user "name1"))
-  assert-string(user "value2", user map.find(user "name2"))
-  user String value3(user "value3")
-  map.update-or-add(user "name3", user value3)
-  assert-string(user "value3", user map.find(user "name3"))
-  user String value2(user "value2x")
-  map.update-or-add(user "name2", user value2)
-  assert-string(user "value2x", user map.find(user "name2"))
-  map.remove(user value3)
-  assert-string(user "value1", user map.find(user "name1"))
-  assert-string(user "value2x", user map.find(user "name2"))
-  assert not map.find(user "name3")?
-  map.remove(user value2)
-  assert-string(user "value1", user map.find(user "name1"))
-  assert not map.find(user "name2")?
-  map.remove(user value1)
-  assert not map.find(user "name1")?
-  map.add(user "name1", user value1)
-  map.add(user "name2", user value2)
-  map.add(user "name3", user value3)
-  assert-string(user "value1", user map.pop())
-  assert-string(user "value2x", user map.pop())
-  assert-string(user "value3", user map.pop())
-  assert not map.pop()?
+    var tl5-compiler.NameMap{String} map
+    assert not map.find(user "name1")?
+    map.remove(user "name1")
+    user String value1(user "value1")
+    map.add(user "name1", user value1)
+    assert-string(user "value1", user map.find(user "name1"))
+    assert not map.find(user "name2")?
+    map.add(user "name2", user "value2")
+    assert-string(user "value1", user map.find(user "name1"))
+    assert-string(user "value2", user map.find(user "name2"))
+    user String value3(user "value3")
+    map.update-or-add(user "name3", user value3)
+    assert-string(user "value3", user map.find(user "name3"))
+    user String value2(user "value2x")
+    map.update-or-add(user "name2", user value2)
+    assert-string(user "value2x", user map.find(user "name2"))
+    map.remove(user value3)
+    assert-string(user "value1", user map.find(user "name1"))
+    assert-string(user "value2x", user map.find(user "name2"))
+    assert not map.find(user "name3")?
+    map.remove(user value2)
+    assert-string(user "value1", user map.find(user "name1"))
+    assert not map.find(user "name2")?
+    map.remove(user value1)
+    assert not map.find(user "name1")?
+    map.add(user "name1", user value1)
+    map.add(user "name2", user value2)
+    map.add(user "name3", user value3)
+    assert-string(user "value1", user map.pop())
+    assert-string(user "value2x", user map.pop())
+    assert-string(user "value3", user map.pop())
+    assert not map.pop()?
 
 
 ; Illegal call tests
 test test-illegal-call()
-  var tl5-compiler.Argument arg
-  assert-error arg.copy-new()
-  assert-error arg.parse-value(user _, copy 0)
-  assert-error arg.get-type-instance()
-  assert-error arg.get-variable()
-  assert-error arg.get-output()
-  assert-error arg.take-value()
-  assert-error arg.write-preactions()
-  assert-error arg.write-postactions()
-  var tl5-compiler.ArgumentFactory factory
-  assert-error factory.new-argument()
-  var tl5-compiler.SyntaxTreeBranch branch
-  assert-error branch.parse-child(user _)
-  var tl5-compiler.SyntaxTreeNode node
-  assert-error node.write()
-  assert not node.get-parent-type()?
-  var tl5-compiler.NodeAction action
-  assert-error action.action(user _)
-  var tl5-compiler.SyntaxTreeRoot root
-  assert-error root.link-types()
-  var tl5-compiler.TypeWriter tw
-  assert-error tw.write(user _)
-  var tl5-compiler.CallExpression call(user _)
-  assert-error call.write-function()
+    var tl5-compiler.Argument arg
+    assert-error arg.copy-new()
+    assert-error arg.parse-value(user _, copy 0)
+    assert-error arg.get-type-instance()
+    assert-error arg.get-variable()
+    assert-error arg.get-output()
+    assert-error arg.take-value()
+    assert-error arg.write-preactions()
+    assert-error arg.write-postactions()
+    var tl5-compiler.ArgumentFactory factory
+    assert-error factory.new-argument()
+    var tl5-compiler.SyntaxTreeBranch branch
+    assert-error branch.parse-child(user _)
+    var tl5-compiler.SyntaxTreeNode node
+    assert-error node.write()
+    assert not node.get-parent-type()?
+    var tl5-compiler.NodeAction action
+    assert-error action.action(user _)
+    var tl5-compiler.SyntaxTreeRoot root
+    assert-error root.link-types()
+    var tl5-compiler.TypeWriter tw
+    assert-error tw.write(user _)
+    var tl5-compiler.CallExpression call(user _)
+    assert-error call.write-function()
 
 test test-mocked-functions()
-  setup-test()
-  var tl5-compiler.TypeData parent-type
-  tl5-compiler.string-new-copy(user "MockType")->(owner parent-type.name)
-  var tl5-compiler.SyntaxTreeFunction function
-  tl5-compiler.string-new-copy(user "mock-func")->(owner function.name)
-  function.input-file-name := "mock.5.lm"
-  function.parent-type := parent-type
-  function.write-pre-func.mocked()
-  function.write-post-func.mocked()
-  tl5-compiler.write-global.mocked(user "mock text")
-  tl5-compiler.get-sys-argv.mocked()
-  user String expected(user "
-      #define LUMI_FILE_NAME \"mock.5.lm\"
-      #define LUMI_FUNC_NAME \"MockType.mock-func\"#undef LUMI_FILE_NAME
-      #undef LUMI_FUNC_NAME
-      mock text")
-  assert-string-slice(
-      user expected,
-      user mock-output-file-text,
-      copy 0,
-      copy expected.length,
-      copy false)
+    setup-test()
+    var tl5-compiler.TypeData parent-type
+    tl5-compiler.string-new-copy(user "MockType")->(owner parent-type.name)
+    var tl5-compiler.SyntaxTreeFunction function
+    tl5-compiler.string-new-copy(user "mock-func")->(owner function.name)
+    function.input-file-name := "mock.5.lm"
+    function.parent-type := parent-type
+    function.write-pre-func.mocked()
+    function.write-post-func.mocked()
+    tl5-compiler.write-global.mocked(user "mock text")
+    tl5-compiler.get-sys-argv.mocked()
+    user String expected(user "
+            #define LUMI_FILE_NAME \"mock.5.lm\"
+            #define LUMI_FUNC_NAME \"MockType.mock-func\"#undef LUMI_FILE_NAME
+            #undef LUMI_FUNC_NAME
+            mock text")
+    assert-string-slice(
+            user expected,
+            user mock-output-file-text,
+            copy 0,
+            copy expected.length,
+            copy false)

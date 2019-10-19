@@ -3,381 +3,381 @@ module tl5-compiler
 
 ~~~ Reference full member path ~~~
 struct ReferencePath
-  user SyntaxTreeVariable variable
-  owner ReferencePath field
+    user SyntaxTreeVariable variable
+    owner ReferencePath field
 
-  new(user SyntaxTreeVariable variable)
-    self.variable := variable
+    new(user SyntaxTreeVariable variable)
+        self.variable := variable
 
-  func copy-new()->(owner ReferencePath reference)
-    reference := ReferencePath(user self.variable)
-    if self.field?
-      self.field.copy-new()->(owner reference.field)
+    func copy-new()->(owner ReferencePath reference)
+        reference := ReferencePath(user self.variable)
+        if self.field?
+            self.field.copy-new()->(owner reference.field)
 
-  func copy-and-add-field(user SyntaxTreeVariable variable)->(
-      owner ReferencePath reference)
-    reference := ReferencePath(user self.variable)
-    if self.field?
-      self.field.copy-and-add-field(user variable)->(owner reference.field)
-    else
-      reference.field := ReferencePath(user variable)
-  
-  func equals(user ReferencePath reference)->(var Bool is-equal)
-    if not self? or not reference?
-      is-equal := false
-      return
-    if not self.variable? or not reference.variable? or
-        self.variable is-not reference.variable or
-        (self.field? != reference.field?)
-      is-equal := false
-      return
-    if self.field?
-      self.field.equals(user reference.field)->(var is-equal)
-    else
-      is-equal := true
-  
-  func is-conditional()->(var Bool is-conditional)
-    user ReferencePath reference-path(user self)
-    do
-      while reference-path.field?
-      reference-path := reference-path.field
-    is-conditional := true
-    if reference-path.variable?
-      is-conditional := reference-path.variable.type-instance.conditional
-  
-  func print()
-    if not self.variable?
-      sys.print(user "{anonymous}")
-    else-if self.variable.is-aux
-      sys.print(user "{anonymous}")
-    else
-      sys.print(user self.variable.name)
-    if self.field?
-      sys.print(user ".")
-      self.field.print()
-  
-  func print-error(user String text)
-    sys.print(user text)
-    sys.print(user " \"")
-    self.print()
-    sys.print(user "\"\n")
-  
-  func check-pure-owner(user SyntaxTreeNode node)
-    var Bool pure-owner(copy true)
-    user ReferencePath path(user self)
-    do
-      while path?
-      var Bool is-owner
-      if path.variable?
-        access-is-var(copy path.variable.access)->(var is-owner)
-      if is-owner
-        if not pure-owner
-          node.syntax-error-item-ref(
-              user "cannot modify owner field",
-              user path.variable.name,
-              user "in non-owner reference",
-              user self)
-      else
-        pure-owner := false
-      path := path.field
+    func copy-and-add-field(user SyntaxTreeVariable variable)->(
+            owner ReferencePath reference)
+        reference := ReferencePath(user self.variable)
+        if self.field?
+            self.field.copy-and-add-field(user variable)->(owner reference.field)
+        else
+            reference.field := ReferencePath(user variable)
+    
+    func equals(user ReferencePath reference)->(var Bool is-equal)
+        if not self? or not reference?
+            is-equal := false
+            return
+        if not self.variable? or not reference.variable? or
+                self.variable is-not reference.variable or
+                (self.field? != reference.field?)
+            is-equal := false
+            return
+        if self.field?
+            self.field.equals(user reference.field)->(var is-equal)
+        else
+            is-equal := true
+    
+    func is-conditional()->(var Bool is-conditional)
+        user ReferencePath reference-path(user self)
+        do
+            while reference-path.field?
+            reference-path := reference-path.field
+        is-conditional := true
+        if reference-path.variable?
+            is-conditional := reference-path.variable.type-instance.conditional
+    
+    func print()
+        if not self.variable?
+            sys.print(user "{anonymous}")
+        else-if self.variable.is-aux
+            sys.print(user "{anonymous}")
+        else
+            sys.print(user self.variable.name)
+        if self.field?
+            sys.print(user ".")
+            self.field.print()
+    
+    func print-error(user String text)
+        sys.print(user text)
+        sys.print(user " \"")
+        self.print()
+        sys.print(user "\"\n")
+    
+    func check-pure-owner(user SyntaxTreeNode node)
+        var Bool pure-owner(copy true)
+        user ReferencePath path(user self)
+        do
+            while path?
+            var Bool is-owner
+            if path.variable?
+                access-is-var(copy path.variable.access)->(var is-owner)
+            if is-owner
+                if not pure-owner
+                    node.syntax-error-item-ref(
+                            user "cannot modify owner field",
+                            user path.variable.name,
+                            user "in non-owner reference",
+                            user self)
+            else
+                pure-owner := false
+            path := path.field
 
 
 ~~~ List of memory managed references ~~~
 struct ReferenceMemoryList
-  var List{ReferencePath} invalid-references
-  var List{ReferencePath} added-invalid-references
-  var List{ReferencePath} read-owner-references
-  var List{ReferencePath} written-owner-references
-  var NameMap{SyntaxTreeVariable} user-references
-  var NameMap{SyntaxTreeVariable} removed-user-references
-  
-  new(user ReferenceMemoryList parent-list)
-    if not parent-list?
-      return
-    for reference-path in parent-list.invalid-references.iter()
-      if not self.reference-inside(
-          user reference-path, user self.invalid-references)
-        self.invalid-references.add(owner reference-path.copy-new())
-    for variable in parent-list.user-references.iter()
-      self.add(user variable)
+    var List{ReferencePath} invalid-references
+    var List{ReferencePath} added-invalid-references
+    var List{ReferencePath} read-owner-references
+    var List{ReferencePath} written-owner-references
+    var NameMap{SyntaxTreeVariable} user-references
+    var NameMap{SyntaxTreeVariable} removed-user-references
     
-  func add-invalids(user ReferenceMemoryList child-list)
-    for reference-path in child-list.added-invalid-references.iter()
-      self.mark-invalid-reference(user reference-path, user _)
-    for variable in child-list.removed-user-references.iter()
-      self.remove-user-reference(user variable)
-  
-  func add(user SyntaxTreeVariable variable)
-    if variable.access = Access.USER
-      self.user-references.add-if-unique-value(
-          user variable.name, user variable)
-  
-  func mark-illegal-types(
-      user DeleteGroup delete-group, user TypeInstance actual-params)
-    if delete-group.delete-all
-      self.mark-all-illegal()
-    else
-      for type-instance in delete-group.deleting-types.iter()
-        self.mark-specific-illegal-type(user type-instance, user actual-params)
-  
-  func mark-all-illegal()
-    for variable in self.user-references.iter()
-      self.removed-user-references.add-if-unique-value(
-          user variable.name, user variable)
-    self.user-references.clear()
-  
-  func mark-illegal-type(user TypeInstance type-instance)
-    self.mark-specific-illegal-type(user type-instance, user _)
-    if type-instance.type-data.delete-group?
-      self.mark-illegal-types(
-          user type-instance.type-data.delete-group, user type-instance)
-  
-  func mark-specific-illegal-type(
-      user TypeInstance type-instance-base, user TypeInstance actual-params)
-    owner TypeInstance type-instance
-    if actual-params?
-      type-instance-base.new-replace-params(user actual-params)->(
-          owner type-instance)
-    else
-      type-instance-base.copy-new()->(owner type-instance)
-    type-instance.conditional := false
-    var NameMap{SyntaxTreeVariable} to-delete
-    var TypeInstance variable-type-instance
-    for variable in self.user-references.iter()
-      variable.type-instance.copy(user variable-type-instance)
-      type-instance.conditional := false
-      if variable-type-instance.can-be-assigned-to(user type-instance) or
-          type-instance.can-be-assigned-to(user variable-type-instance)
-        to-delete.add(user variable.name, user variable)
-    for variable in to-delete.iter()
-      self.remove-user-reference(user variable)
-  
-  func remove-user-reference(user SyntaxTreeVariable variable)
-    self.removed-user-references.add-if-unique-value(
-        user variable.name, user variable)
-    self.user-references.remove(user variable)
+    new(user ReferenceMemoryList parent-list)
+        if not parent-list?
+            return
+        for reference-path in parent-list.invalid-references.iter()
+            if not self.reference-inside(
+                    user reference-path, user self.invalid-references)
+                self.invalid-references.add(owner reference-path.copy-new())
+        for variable in parent-list.user-references.iter()
+            self.add(user variable)
+        
+    func add-invalids(user ReferenceMemoryList child-list)
+        for reference-path in child-list.added-invalid-references.iter()
+            self.mark-invalid-reference(user reference-path, user _)
+        for variable in child-list.removed-user-references.iter()
+            self.remove-user-reference(user variable)
+    
+    func add(user SyntaxTreeVariable variable)
+        if variable.access = Access.USER
+            self.user-references.add-if-unique-value(
+                    user variable.name, user variable)
+    
+    func mark-illegal-types(
+            user DeleteGroup delete-group, user TypeInstance actual-params)
+        if delete-group.delete-all
+            self.mark-all-illegal()
+        else
+            for type-instance in delete-group.deleting-types.iter()
+                self.mark-specific-illegal-type(user type-instance, user actual-params)
+    
+    func mark-all-illegal()
+        for variable in self.user-references.iter()
+            self.removed-user-references.add-if-unique-value(
+                    user variable.name, user variable)
+        self.user-references.clear()
+    
+    func mark-illegal-type(user TypeInstance type-instance)
+        self.mark-specific-illegal-type(user type-instance, user _)
+        if type-instance.type-data.delete-group?
+            self.mark-illegal-types(
+                    user type-instance.type-data.delete-group, user type-instance)
+    
+    func mark-specific-illegal-type(
+            user TypeInstance type-instance-base, user TypeInstance actual-params)
+        owner TypeInstance type-instance
+        if actual-params?
+            type-instance-base.new-replace-params(user actual-params)->(
+                    owner type-instance)
+        else
+            type-instance-base.copy-new()->(owner type-instance)
+        type-instance.conditional := false
+        var NameMap{SyntaxTreeVariable} to-delete
+        var TypeInstance variable-type-instance
+        for variable in self.user-references.iter()
+            variable.type-instance.copy(user variable-type-instance)
+            type-instance.conditional := false
+            if variable-type-instance.can-be-assigned-to(user type-instance) or
+                    type-instance.can-be-assigned-to(user variable-type-instance)
+                to-delete.add(user variable.name, user variable)
+        for variable in to-delete.iter()
+            self.remove-user-reference(user variable)
+    
+    func remove-user-reference(user SyntaxTreeVariable variable)
+        self.removed-user-references.add-if-unique-value(
+                user variable.name, user variable)
+        self.user-references.remove(user variable)
 
-  func mark-invalid-reference(
-      user ReferencePath reference-path, user SyntaxTreeNode node)
-    if not reference-path?
-      return
-    if reference-path.is-conditional()
-      return
-    self.clear-invalid-reference(user reference-path)
-    self.invalid-references.add(owner reference-path.copy-new())
-    self.added-invalid-references.add(owner reference-path.copy-new())
+    func mark-invalid-reference(
+            user ReferencePath reference-path, user SyntaxTreeNode node)
+        if not reference-path?
+            return
+        if reference-path.is-conditional()
+            return
+        self.clear-invalid-reference(user reference-path)
+        self.invalid-references.add(owner reference-path.copy-new())
+        self.added-invalid-references.add(owner reference-path.copy-new())
 
-  func clear-invalid-reference(user ReferencePath reference-path)
-    if not reference-path?
-      return
-    for refpath in self.invalid-references.iter()
-      if reference-path.equals(user refpath)
-        self.invalid-references.remove(user refpath)
-        return
-  
-  func check-writing-memory(user Expression expression)
-    user ReferencePath reference-path(
-        user expression.result-type.reference-path)
-    if not reference-path?
-      return
-    reference-path.check-pure-owner(user expression)
-    if self.reference-inside(
-        user reference-path, user self.read-owner-references) or
-        self.reference-inside(
-        user reference-path, user self.written-owner-references)
-      expression.syntax-error-ref(
-          user "using modified reference", user reference-path)
-    expression.check-memory(user self)
-    self.written-owner-references.add(owner reference-path.copy-new())
+    func clear-invalid-reference(user ReferencePath reference-path)
+        if not reference-path?
+            return
+        for refpath in self.invalid-references.iter()
+            if reference-path.equals(user refpath)
+                self.invalid-references.remove(user refpath)
+                return
+    
+    func check-writing-memory(user Expression expression)
+        user ReferencePath reference-path(
+                user expression.result-type.reference-path)
+        if not reference-path?
+            return
+        reference-path.check-pure-owner(user expression)
+        if self.reference-inside(
+                user reference-path, user self.read-owner-references) or
+                self.reference-inside(
+                user reference-path, user self.written-owner-references)
+            expression.syntax-error-ref(
+                    user "using modified reference", user reference-path)
+        expression.check-memory(user self)
+        self.written-owner-references.add(owner reference-path.copy-new())
 
-  func clear-line-checks()
-    self.read-owner-references.clear()
-    self.written-owner-references.clear()
-  
-  func reference-inside(
-      user ReferencePath reference-path, user List{ReferencePath} list)->(
-      var Bool inside)
-    inside := false
-    if not reference-path?
-      return
-    for refpath in list.iter()
-      if reference-path.equals(user refpath)
-        inside := true
-        return
-  
-  func is-invalid(user ReferencePath reference-path)->(var Bool is-invalid)
-    self.reference-inside(user reference-path, user self.invalid-references)->(
-        var is-invalid)
-  
-  func check-reference(user Expression expression)
-    self.check-node-reference(
-        user expression.result-type.reference-path, user expression)
-  
-  func check-node-reference(
-      user ReferencePath reference-path, user SyntaxTreeNode node)
-    if self.is-invalid(user reference-path) or self.reference-inside(
-        user reference-path, user self.written-owner-references)
-      node.syntax-error-ref(
-          user "using invalid reference", user reference-path)
-    if reference-path?
-      self.read-owner-references.add(owner reference-path.copy-new())
-  
-  func check-user(user Expression expression)
-    user ReferencePath exp-path(user expression.result-type.reference-path)
-    if not exp-path?
-      return
-    if not exp-path.variable?
-      return
-    if exp-path.field? or exp-path.variable.access != Access.USER
-      return
-    for variable in self.user-references.iter()
-      if variable is exp-path.variable
-        return
-    expression.syntax-error-ref(
-        user "using potentially illegal user reference", user exp-path)
-      
-  func check-output(user Argument output)
-    if output.access != Access.USER
-      return
-    user SyntaxTreeVariable output-variable
-    output.get-variable()->(user output-variable)
-    for variable in self.user-references.iter()
-      if variable is output-variable
-        return
-    output.syntax-error(
-        user "returning potentially illegal user output",
-        user output-variable.name)
+    func clear-line-checks()
+        self.read-owner-references.clear()
+        self.written-owner-references.clear()
+    
+    func reference-inside(
+            user ReferencePath reference-path, user List{ReferencePath} list)->(
+            var Bool inside)
+        inside := false
+        if not reference-path?
+            return
+        for refpath in list.iter()
+            if reference-path.equals(user refpath)
+                inside := true
+                return
+    
+    func is-invalid(user ReferencePath reference-path)->(var Bool is-invalid)
+        self.reference-inside(user reference-path, user self.invalid-references)->(
+                var is-invalid)
+    
+    func check-reference(user Expression expression)
+        self.check-node-reference(
+                user expression.result-type.reference-path, user expression)
+    
+    func check-node-reference(
+            user ReferencePath reference-path, user SyntaxTreeNode node)
+        if self.is-invalid(user reference-path) or self.reference-inside(
+                user reference-path, user self.written-owner-references)
+            node.syntax-error-ref(
+                    user "using invalid reference", user reference-path)
+        if reference-path?
+            self.read-owner-references.add(owner reference-path.copy-new())
+    
+    func check-user(user Expression expression)
+        user ReferencePath exp-path(user expression.result-type.reference-path)
+        if not exp-path?
+            return
+        if not exp-path.variable?
+            return
+        if exp-path.field? or exp-path.variable.access != Access.USER
+            return
+        for variable in self.user-references.iter()
+            if variable is exp-path.variable
+                return
+        expression.syntax-error-ref(
+                user "using potentially illegal user reference", user exp-path)
+            
+    func check-output(user Argument output)
+        if output.access != Access.USER
+            return
+        user SyntaxTreeVariable output-variable
+        output.get-variable()->(user output-variable)
+        for variable in self.user-references.iter()
+            if variable is output-variable
+                return
+        output.syntax-error(
+                user "returning potentially illegal user output",
+                user output-variable.name)
 
 
 struct DeleteGroup
-  owner List{TypeInstance} deleting-types
-  var Bool delete-all
-  
-  new(owner List{TypeInstance} deleting-types, copy Bool delete-all)
-    self.deleting-types := deleting-types
-    self.delete-all := delete-all
+    owner List{TypeInstance} deleting-types
+    var Bool delete-all
+    
+    new(owner List{TypeInstance} deleting-types, copy Bool delete-all)
+        self.deleting-types := deleting-types
+        self.delete-all := delete-all
 
-  func add-deleting(user TypeInstance type-instance)
-    self.add-specific-deleting-type(user type-instance)
-    self.extend(user type-instance.type-data.delete-group)
-  
-  func extend(user DeleteGroup other)
-    if not other?
-      return
-    for deleting-type in other.deleting-types.iter()
-      self.add-specific-deleting-type(user deleting-type)
+    func add-deleting(user TypeInstance type-instance)
+        self.add-specific-deleting-type(user type-instance)
+        self.extend(user type-instance.type-data.delete-group)
+    
+    func extend(user DeleteGroup other)
+        if not other?
+            return
+        for deleting-type in other.deleting-types.iter()
+            self.add-specific-deleting-type(user deleting-type)
 
-  func add-specific-deleting-type(user TypeInstance type-instance-base)
-    if self.delete-all
-      return
-    new TypeInstance type-instance
-    type-instance-base.copy(user type-instance)
-    type-instance.conditional := false
-    user ListNode{TypeInstance} node(user self.deleting-types.first)
-    do
-      while node?
-      if type-instance.can-be-assigned-to(user node.item)
-        return
-      if node.item.can-be-assigned-to(user type-instance)
-        owner TypeInstance new-type
-        type-instance.copy-new()->(owner new-type)
-        node.item := new-type
-        return
-      node := node.next
-    self.deleting-types.add(owner type-instance)
+    func add-specific-deleting-type(user TypeInstance type-instance-base)
+        if self.delete-all
+            return
+        new TypeInstance type-instance
+        type-instance-base.copy(user type-instance)
+        type-instance.conditional := false
+        user ListNode{TypeInstance} node(user self.deleting-types.first)
+        do
+            while node?
+            if type-instance.can-be-assigned-to(user node.item)
+                return
+            if node.item.can-be-assigned-to(user type-instance)
+                owner TypeInstance new-type
+                type-instance.copy-new()->(owner new-type)
+                node.item := new-type
+                return
+            node := node.next
+        self.deleting-types.add(owner type-instance)
 
-  func set-delete-all()
-    self.delete-all := true
-    self.deleting-types.clear()
+    func set-delete-all()
+        self.delete-all := true
+        self.deleting-types.clear()
 
 
 struct FunctionCall
-  owner TypeInstance calling-type
-  user SyntaxTreeFunction function
-  
-  new(user SyntaxTreeFunction function, user TypeInstance calling-type)
-    calling-type.copy-new()->(owner self.calling-type)
-    self.function := function
+    owner TypeInstance calling-type
+    user SyntaxTreeFunction function
+    
+    new(user SyntaxTreeFunction function, user TypeInstance calling-type)
+        calling-type.copy-new()->(owner self.calling-type)
+        self.function := function
 
 
 struct DeleteGroupBuilder(DeleteGroup)
-  var List{FunctionCall} calling-functions
-  var NameMap{SyntaxTreeFunction} members
-  user SyntaxTreeFunction owner-member
-  var Bool working
-  
-  new(user SyntaxTreeFunction owner-member)
-    base(owner List{TypeInstance}(), copy false)
-    self.owner-member := owner-member
-    self.members.add(user self.owner-member.name, user self.owner-member)
-  
-  func add-calling(
-      user SyntaxTreeFunction function, user TypeInstance calling-type)
-    self.calling-functions.add(
-        owner FunctionCall(user function, user calling-type))
-      
-  func add-dynamic-override(
-      user TypeData type-data,
-      user SyntaxTreeFunction overwriting,
-      user SyntaxTreeFunction overridden)
-    var TypeInstance calling-type
-    calling-type.type-data := type-data
-    string-new-copy(user type-data.name)->(owner calling-type.name)
-    if type-data.parameters?
-      self.set-delete-all()
-    self.add-calling(user overwriting, user calling-type)
+    var List{FunctionCall} calling-functions
+    var NameMap{SyntaxTreeFunction} members
+    user SyntaxTreeFunction owner-member
+    var Bool working
+    
+    new(user SyntaxTreeFunction owner-member)
+        base(owner List{TypeInstance}(), copy false)
+        self.owner-member := owner-member
+        self.members.add(user self.owner-member.name, user self.owner-member)
+    
+    func add-calling(
+            user SyntaxTreeFunction function, user TypeInstance calling-type)
+        self.calling-functions.add(
+                owner FunctionCall(user function, user calling-type))
+            
+    func add-dynamic-override(
+            user TypeData type-data,
+            user SyntaxTreeFunction overwriting,
+            user SyntaxTreeFunction overridden)
+        var TypeInstance calling-type
+        calling-type.type-data := type-data
+        string-new-copy(user type-data.name)->(owner calling-type.name)
+        if type-data.parameters?
+            self.set-delete-all()
+        self.add-calling(user overwriting, user calling-type)
 
-  func build()->(user DeleteGroupBuilder recursive)
-    if self.working
-      recursive := self
-      return
-    self.working := true
-    do
-      owner FunctionCall call
-      while self.calling-functions.pop()->(owner call)?
-      if call.function.collect-delete-group()->(user recursive)?
-        if recursive is self
-          recursive := _
-          continue
-        recursive.merge-from(user self)
-        return
-      self.extend-call(owner call)
-    self.done()
-  
-  func extend-call(owner FunctionCall call)
-    if self.delete-all
-      return
-    if call.function.delete-group.delete-all
-      self.set-delete-all()
-      return
-    for type-instance in call.function.delete-group.deleting-types.iter()
-      type-instance.replace-type-parameters(user call.calling-type, copy true)
-      self.add-deleting(user type-instance)
-  
-  func merge-from(user DeleteGroupBuilder other)
-    if other.delete-all
-      self.set-delete-all()
-    else-if not self.delete-all
-      self.extend(user other)
-    do
-      user SyntaxTreeFunction function
-      while other.members.pop()->(user function)?
-      self.members.add(user function.name, user function)
-      function.delete-group-builder := self
-    do
-      owner FunctionCall call
-      while other.calling-functions.pop()->(owner call)?
-      self.calling-functions.add(owner call)
-    other.kill()
-  
-  func done()
-    self.owner-member.delete-group-owner := DeleteGroup(
-        owner self.deleting-types, copy self.delete-all)
-    for member in self.members.iter()
-      member.delete-group := self.owner-member.delete-group-owner
-      member.delete-group-builder := _
-    self.working := false
-    self.kill()
-  
-  func kill()
-    self.owner-member.delete-group-builder-owner := _
+    func build()->(user DeleteGroupBuilder recursive)
+        if self.working
+            recursive := self
+            return
+        self.working := true
+        do
+            owner FunctionCall call
+            while self.calling-functions.pop()->(owner call)?
+            if call.function.collect-delete-group()->(user recursive)?
+                if recursive is self
+                    recursive := _
+                    continue
+                recursive.merge-from(user self)
+                return
+            self.extend-call(owner call)
+        self.done()
+    
+    func extend-call(owner FunctionCall call)
+        if self.delete-all
+            return
+        if call.function.delete-group.delete-all
+            self.set-delete-all()
+            return
+        for type-instance in call.function.delete-group.deleting-types.iter()
+            type-instance.replace-type-parameters(user call.calling-type, copy true)
+            self.add-deleting(user type-instance)
+    
+    func merge-from(user DeleteGroupBuilder other)
+        if other.delete-all
+            self.set-delete-all()
+        else-if not self.delete-all
+            self.extend(user other)
+        do
+            user SyntaxTreeFunction function
+            while other.members.pop()->(user function)?
+            self.members.add(user function.name, user function)
+            function.delete-group-builder := self
+        do
+            owner FunctionCall call
+            while other.calling-functions.pop()->(owner call)?
+            self.calling-functions.add(owner call)
+        other.kill()
+    
+    func done()
+        self.owner-member.delete-group-owner := DeleteGroup(
+                owner self.deleting-types, copy self.delete-all)
+        for member in self.members.iter()
+            member.delete-group := self.owner-member.delete-group-owner
+            member.delete-group-builder := _
+        self.working := false
+        self.kill()
+    
+    func kill()
+        self.owner-member.delete-group-builder-owner := _

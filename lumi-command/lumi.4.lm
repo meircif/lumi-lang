@@ -26,336 +26,336 @@ user String usage(user "Usage: lumi [options] file...")
 
 
 struct Input
-  user String name
+    user String name
 
 
 func error-if(copy Bool is-error, user String error-msg)
-  if is-error
-    sys.println(user error-msg)
-    sys.exit(copy 1)
+    if is-error
+        sys.println(user error-msg)
+        sys.exit(copy 1)
 
 
 func help()
-  sys.println(user usage)
-  sys.println(user "Options:
-        -h \t\t   print help
-        -o <file> \t   output file name
-        -t <module> \t   compile test program for <module>
-        -c \t\t   only create C file(s)
-        -l<version> \t   only run C compiler for TL<version>
-        -e <argument>    extra argument for C compilation
-        -p <lumipath>    path of lumi-lang repository
-        -r \t\t   run the compiled program
-        -ra <arguments>  run the compiled program with given arguments
-        -v \t\t   print executed commands
-        -d \t\t   only print commands without execution")
-  sys.exit(copy 0)
+    sys.println(user usage)
+    sys.println(user "Options:
+              -h \t\t   print help
+              -o <file> \t   output file name
+              -t <module> \t   compile test program for <module>
+              -c \t\t   only create C file(s)
+              -l<version> \t   only run C compiler for TL<version>
+              -e <argument>    extra argument for C compilation
+              -p <lumipath>    path of lumi-lang repository
+              -r \t\t   run the compiled program
+              -ra <arguments>  run the compiled program with given arguments
+              -v \t\t   print executed commands
+              -d \t\t   only print commands without execution")
+    sys.exit(copy 0)
 
 
 struct Lumi
-  var Bool running-lumi
-  var Bool running-c
-  var Bool running-program
-  var Bool explicit-output
-  var Bool verbose
-  var Bool execute
-  owner String implicit-output
-  user String output
-  user String mut
-  user String execute-arguments
-  var Char version
-  user String main-input
-  var IncrementalString input-files
-  var IncrementalString external-files
-  var IncrementalString command
-  var IncrementalString lumi-path
-  var Char path-separator
-  var Bool lumi-path-ends-with-separator
+    var Bool running-lumi
+    var Bool running-c
+    var Bool running-program
+    var Bool explicit-output
+    var Bool verbose
+    var Bool execute
+    owner String implicit-output
+    user String output
+    user String mut
+    user String execute-arguments
+    var Char version
+    user String main-input
+    var IncrementalString input-files
+    var IncrementalString external-files
+    var IncrementalString command
+    var IncrementalString lumi-path
+    var Char path-separator
+    var Bool lumi-path-ends-with-separator
 
-  func new()
-    self.running-lumi := true
-    self.running-c := true
-    self.execute := true
-    self.input-files.new()
-    self.external-files.new()
-    self.command.new()
-    self.lumi-path.new()
-    self.path-separator := '/'
-    self.lumi-path-ends-with-separator := true
+    func new()
+        self.running-lumi := true
+        self.running-c := true
+        self.execute := true
+        self.input-files.new()
+        self.external-files.new()
+        self.command.new()
+        self.lumi-path.new()
+        self.path-separator := '/'
+        self.lumi-path-ends-with-separator := true
 
-  func run-command(user String error-msg)
-    if self.verbose
-      sys.println(user self.command.text)
-    if self.execute
-      self.command.append(copy 0)
-      if sys.system(user self.command.text) != 0
-        if error-msg?
-          sys.println(user error-msg)
-        sys.exit(copy 1)
+    func run-command(user String error-msg)
+        if self.verbose
+            sys.println(user self.command.text)
+        if self.execute
+            self.command.append(copy 0)
+            if sys.system(user self.command.text) != 0
+                if error-msg?
+                    sys.println(user error-msg)
+                sys.exit(copy 1)
 
-  func get-any-opt-param(user String option, user String param)->(
-      var Int index, user String value)
-    self.check-opt-param-error(
-        copy index >= sys.argv.length - 1, user option, user param)
-    index += 1
-    value := sys.argv[index]
+    func get-any-opt-param(user String option, user String param)->(
+            var Int index, user String value)
+        self.check-opt-param-error(
+                copy index >= sys.argv.length - 1, user option, user param)
+        index += 1
+        value := sys.argv[index]
 
-  func get-opt-param(user String option, user String param)->(
-      var Int index, user String value)
-    self.get-any-opt-param(user option, user param)->(var index, user value)
-    self.check-opt-param-error(copy value[0] = '-', user option, user param)
-    self.check-param(user value)
+    func get-opt-param(user String option, user String param)->(
+            var Int index, user String value)
+        self.get-any-opt-param(user option, user param)->(var index, user value)
+        self.check-opt-param-error(copy value[0] = '-', user option, user param)
+        self.check-param(user value)
 
-  func check-opt-param-error(
-      copy Bool is-error, user String option, user String param)
-    if is-error
-      sys.print(user "error: missing ")
-      sys.print(user param)
-      sys.print(user " after \"-")
-      sys.print(user option)
-      sys.println(user "\" flag")
-      sys.exit(copy 1)
+    func check-opt-param-error(
+            copy Bool is-error, user String option, user String param)
+        if is-error
+            sys.print(user "error: missing ")
+            sys.print(user param)
+            sys.print(user " after \"-")
+            sys.print(user option)
+            sys.println(user "\" flag")
+            sys.exit(copy 1)
 
-  func check-param(user String value)
-    if value.has(copy '"')
-      sys.print(user "error: illegal \" character in parameter '")
-      sys.print(user value)
-      sys.println(user "'")
-      sys.exit(copy 1)
+    func check-param(user String value)
+        if value.has(copy '"')
+            sys.print(user "error: illegal \" character in parameter '")
+            sys.print(user value)
+            sys.println(user "'")
+            sys.exit(copy 1)
 
-  func concat-lumi-output()
-    self.command.concat(user " \"")
-    self.command.concat(user self.output)
-    if self.running-c or not self.explicit-output
-      self.command.concat(user ".c")
-    self.command.concat(user "\"")
-
-  func concat-first-file-name(user IncrementalString target, user String name)
-    target.concat(user "\"")
-    target.concat(user name)
-    target.concat(user "\"")
-
-  func concat-file-name(user IncrementalString target, user String name)
-    target.concat(user " ")
-    self.concat-first-file-name(user target, user name)
-
-  func concat-tl-path()
-    self.command.concat(user self.lumi-path.text)
-    if not self.lumi-path-ends-with-separator
-      self.command.append(copy self.path-separator)
-    self.command.concat(user "TL")
-    self.command.append(copy self.version)
-    self.command.append(copy self.path-separator)
-
-  func read-input()
-    error-if(copy sys.argv.length < 2, user usage)
-    var Int input-files-num
-    user String first-input
-    user String last-input
-
-    for index in 1:sys.argv.length
-      user String arg(user sys.argv[index])
-      if arg[0] = '-'
-        if arg.length < 2
-          sys.println(user "warning: unknown flag \"-\"")
-        else
-          var Char op(copy arg[1])
-          if op = 'h'
-            help()
-          else-if op = 'o'
-            self.get-opt-param(user "o", user "file name")->(
-                var index, user self.output)
-            self.explicit-output := true
-          else-if op = 't'
-            self.get-opt-param(user "t", user "module name")->(
-                var index, user self.mut)
-          else-if op = 'e'
-            self.concat-file-name(
-                user self.external-files,
-                user self.get-any-opt-param(user "e", user "argument")->(
-                var index))
-          else-if op = 'p'
-            self.lumi-path.clear(
-                user self.get-opt-param(user "p", user "path")->(var index))
-          else-if op = 'c'
-            self.running-c := false
-          else-if op = 'l' and arg.length > 2
-            self.running-lumi := false
-            self.version := arg[2]
-          else-if op = 'r'
-            self.running-program := true
-            if arg.length > 2
-              if arg[2] = 'a'
-                self.get-any-opt-param(user "ra", user "arguments")->(
-                    var index, user self.execute-arguments)
-          else-if op = 'v'
-            self.verbose := true
-          else-if op = 'd'
-            self.verbose := true
-            self.execute := false
-          else
-            sys.print(user "warning: unknown flag \"")
-            sys.print(user arg)
-            sys.println(user "\"")
-      else
-        self.check-param(user arg)
-        if not first-input?
-          first-input := arg
-        last-input := arg
-        self.concat-file-name(user self.input-files, user arg)
-        input-files-num += 1
-
-    error-if(copy input-files-num = 0, user "error: no input files")
-    error-if(
-        copy self.running-program and not self.running-c,
-        user "error: cannot run program when C compilation is turned off by \
-        \"-c\" flag")
-
-    if self.running-lumi
-      error-if(
-          copy first-input.length < 6,
-          user "error: Lumi file name too short")
-      self.version := first-input[first-input.length - 4]
-    if self.version < '0' or self.version > '5'
-      sys.print(user "error: unsupported version TL")
-      var String{2} version-string
-      version-string.append(copy self.version)
-      sys.println(user version-string)
-      sys.exit(copy 1)
-    error-if(
-        copy self.version < '2' and input-files-num > 1,
-        user "error: multiple files not supported before TL2")
-    error-if(
-        copy self.version >= '2' and self.version <= '3' and
-        self.explicit-output and not self.running-c,
-        user "error: cannot specify C output file in TL2 & TL3")
-    error-if(
-        copy self.version < '4' and self.mut?,
-        user "error: testing not supported before TL4")
-    if self.version <= '2'
-      self.main-input := last-input
-    else
-      self.main-input := first-input
-
-    if not self.output?
-      var Int suffix-length(copy 2)
-      if self.running-lumi
-        suffix-length := 5
-      self.implicit-output := String{self.main-input.length}(
-          user self.main-input[0:self.main-input.length - suffix-length])
-      self.output := self.implicit-output
-
-
-  func run-lumi()
-    self.command.clear(user "tl")
-    self.command.append(copy self.version)
-    self.command.concat(user "-compiler")
-    if self.version >= '4'
-      if self.mut?
-        self.command.concat(user " -t")
-        self.concat-file-name(user self.command, user self.mut)
-      self.concat-lumi-output()
-    self.command.concat(user self.input-files.text)
-    if self.version <= '1'
-      self.concat-lumi-output()
-    self.run-command(user "Lumi compiler failed")
-
-  func run-c()
-    if not self.command.getenv(user "CC")
-      self.command.clear(user "gcc")
-    if self.version < '5'
-      if self.lumi-path.text.length = 0
-        self.lumi-path.getenv(user "LUMIPATH")
-      if self.lumi-path.text.length > 0
-        var Char last(copy self.lumi-path.text[self.lumi-path.text.length - 1])
-        if last = '\\'
-          self.path-separator := '\\'
-        self.lumi-path-ends-with-separator := last = self.path-separator
-    self.command.concat(user " -g")
-    if self.running-lumi
-      if self.version >= '2' and self.version <= '3' and self.explicit-output
+    func concat-lumi-output()
         self.command.concat(user " \"")
-        self.command.concat(
-            user self.main-input[0:self.main-input.length - 5])
-        self.command.concat(user ".c\"")
-      else
-        self.concat-lumi-output()
-    else
-      self.command.concat(user self.input-files.text)
-    self.command.concat(user self.external-files.text)
-    self.command.concat(user " ")
-    if self.version < '5'
-      self.concat-tl-path()
-      if self.version = '0'
-        self.command.concat(user "tl0-file.c ")
-        self.concat-tl-path()
-        self.command.concat(user "tl0-string.c")
-      else
-        self.command.concat(user "lumi.")
+        self.command.concat(user self.output)
+        if self.running-c or not self.explicit-output
+            self.command.concat(user ".c")
+        self.command.concat(user "\"")
+
+    func concat-first-file-name(user IncrementalString target, user String name)
+        target.concat(user "\"")
+        target.concat(user name)
+        target.concat(user "\"")
+
+    func concat-file-name(user IncrementalString target, user String name)
+        target.concat(user " ")
+        self.concat-first-file-name(user target, user name)
+
+    func concat-tl-path()
+        self.command.concat(user self.lumi-path.text)
+        if not self.lumi-path-ends-with-separator
+            self.command.append(copy self.path-separator)
+        self.command.concat(user "TL")
         self.command.append(copy self.version)
-        self.command.concat(user ".c")
-      self.command.concat(user " -I")
-      self.concat-tl-path()
-      self.command.append(copy ' ')
-    self.command.concat(user "-o")
-    self.concat-file-name(user self.command, user self.output)
-    self.run-command(user "C compiler failed")
+        self.command.append(copy self.path-separator)
 
-  func run-program()
-    self.command.text.clear()
-    if not self.output.has(copy self.path-separator)
-      self.command.append(copy '.')
-      self.command.append(copy self.path-separator)
-    self.concat-first-file-name(user self.command, user self.output)
-    if self.execute-arguments?
-      self.command.concat(user " ")
-      self.command.concat(user self.execute-arguments)
-    self.run-command(user _)
+    func read-input()
+        error-if(copy sys.argv.length < 2, user usage)
+        var Int input-files-num
+        user String first-input
+        user String last-input
 
-  func run()
-    self.read-input()
-    if self.running-lumi
-      self.run-lumi()
-    if self.running-c
-      self.run-c()
-    if self.running-program
-      self.run-program()
+        for index in 1:sys.argv.length
+            user String arg(user sys.argv[index])
+            if arg[0] = '-'
+                if arg.length < 2
+                    sys.println(user "warning: unknown flag \"-\"")
+                else
+                    var Char op(copy arg[1])
+                    if op = 'h'
+                        help()
+                    else-if op = 'o'
+                        self.get-opt-param(user "o", user "file name")->(
+                                var index, user self.output)
+                        self.explicit-output := true
+                    else-if op = 't'
+                        self.get-opt-param(user "t", user "module name")->(
+                                var index, user self.mut)
+                    else-if op = 'e'
+                        self.concat-file-name(
+                                user self.external-files,
+                                user self.get-any-opt-param(user "e", user "argument")->(
+                                var index))
+                    else-if op = 'p'
+                        self.lumi-path.clear(
+                                user self.get-opt-param(user "p", user "path")->(var index))
+                    else-if op = 'c'
+                        self.running-c := false
+                    else-if op = 'l' and arg.length > 2
+                        self.running-lumi := false
+                        self.version := arg[2]
+                    else-if op = 'r'
+                        self.running-program := true
+                        if arg.length > 2
+                            if arg[2] = 'a'
+                                self.get-any-opt-param(user "ra", user "arguments")->(
+                                        var index, user self.execute-arguments)
+                    else-if op = 'v'
+                        self.verbose := true
+                    else-if op = 'd'
+                        self.verbose := true
+                        self.execute := false
+                    else
+                        sys.print(user "warning: unknown flag \"")
+                        sys.print(user arg)
+                        sys.println(user "\"")
+            else
+                self.check-param(user arg)
+                if not first-input?
+                    first-input := arg
+                last-input := arg
+                self.concat-file-name(user self.input-files, user arg)
+                input-files-num += 1
+
+        error-if(copy input-files-num = 0, user "error: no input files")
+        error-if(
+                copy self.running-program and not self.running-c,
+                user "error: cannot run program when C compilation is turned off by \
+                \"-c\" flag")
+
+        if self.running-lumi
+            error-if(
+                    copy first-input.length < 6,
+                    user "error: Lumi file name too short")
+            self.version := first-input[first-input.length - 4]
+        if self.version < '0' or self.version > '5'
+            sys.print(user "error: unsupported version TL")
+            var String{2} version-string
+            version-string.append(copy self.version)
+            sys.println(user version-string)
+            sys.exit(copy 1)
+        error-if(
+                copy self.version < '2' and input-files-num > 1,
+                user "error: multiple files not supported before TL2")
+        error-if(
+                copy self.version >= '2' and self.version <= '3' and
+                self.explicit-output and not self.running-c,
+                user "error: cannot specify C output file in TL2 & TL3")
+        error-if(
+                copy self.version < '4' and self.mut?,
+                user "error: testing not supported before TL4")
+        if self.version <= '2'
+            self.main-input := last-input
+        else
+            self.main-input := first-input
+
+        if not self.output?
+            var Int suffix-length(copy 2)
+            if self.running-lumi
+                suffix-length := 5
+            self.implicit-output := String{self.main-input.length}(
+                    user self.main-input[0:self.main-input.length - suffix-length])
+            self.output := self.implicit-output
+
+
+    func run-lumi()
+        self.command.clear(user "tl")
+        self.command.append(copy self.version)
+        self.command.concat(user "-compiler")
+        if self.version >= '4'
+            if self.mut?
+                self.command.concat(user " -t")
+                self.concat-file-name(user self.command, user self.mut)
+            self.concat-lumi-output()
+        self.command.concat(user self.input-files.text)
+        if self.version <= '1'
+            self.concat-lumi-output()
+        self.run-command(user "Lumi compiler failed")
+
+    func run-c()
+        if not self.command.getenv(user "CC")
+            self.command.clear(user "gcc")
+        if self.version < '5'
+            if self.lumi-path.text.length = 0
+                self.lumi-path.getenv(user "LUMIPATH")
+            if self.lumi-path.text.length > 0
+                var Char last(copy self.lumi-path.text[self.lumi-path.text.length - 1])
+                if last = '\\'
+                    self.path-separator := '\\'
+                self.lumi-path-ends-with-separator := last = self.path-separator
+        self.command.concat(user " -g")
+        if self.running-lumi
+            if self.version >= '2' and self.version <= '3' and self.explicit-output
+                self.command.concat(user " \"")
+                self.command.concat(
+                        user self.main-input[0:self.main-input.length - 5])
+                self.command.concat(user ".c\"")
+            else
+                self.concat-lumi-output()
+        else
+            self.command.concat(user self.input-files.text)
+        self.command.concat(user self.external-files.text)
+        self.command.concat(user " ")
+        if self.version < '5'
+            self.concat-tl-path()
+            if self.version = '0'
+                self.command.concat(user "tl0-file.c ")
+                self.concat-tl-path()
+                self.command.concat(user "tl0-string.c")
+            else
+                self.command.concat(user "lumi.")
+                self.command.append(copy self.version)
+                self.command.concat(user ".c")
+            self.command.concat(user " -I")
+            self.concat-tl-path()
+            self.command.append(copy ' ')
+        self.command.concat(user "-o")
+        self.concat-file-name(user self.command, user self.output)
+        self.run-command(user "C compiler failed")
+
+    func run-program()
+        self.command.text.clear()
+        if not self.output.has(copy self.path-separator)
+            self.command.append(copy '.')
+            self.command.append(copy self.path-separator)
+        self.concat-first-file-name(user self.command, user self.output)
+        if self.execute-arguments?
+            self.command.concat(user " ")
+            self.command.concat(user self.execute-arguments)
+        self.run-command(user _)
+
+    func run()
+        self.read-input()
+        if self.running-lumi
+            self.run-lumi()
+        if self.running-c
+            self.run-c()
+        if self.running-program
+            self.run-program()
 
 
 struct IncrementalString
-  owner String text
-  
-  new()
-    self.text := String{64}()
-  
-  func clear(user String text)
-    self.text.clear()
-    self.concat(user text)
-  
-  func concat(user String text)
-    do
-      try
-        self.text.concat(user text)
-      catch
-        self.realloc()
-        continue
-      break
-  
-  func append(copy Char ch)
-    var String{2} text
-    text.append(copy ch)
-    self.concat(user text)
-  
-  func getenv(user String name)->(var Bool exists)
-    do
-      while sys.getenv(user name, user self.text)->(var exists)
-      while self.text.length = self.text.max-length
-      self.realloc()
-  
-  func realloc()
-    self.text := String{self.text.max-length * 2}(user self.text)
+    owner String text
+    
+    new()
+        self.text := String{64}()
+    
+    func clear(user String text)
+        self.text.clear()
+        self.concat(user text)
+    
+    func concat(user String text)
+        do
+            try
+                self.text.concat(user text)
+            catch
+                self.realloc()
+                continue
+            break
+    
+    func append(copy Char ch)
+        var String{2} text
+        text.append(copy ch)
+        self.concat(user text)
+    
+    func getenv(user String name)->(var Bool exists)
+        do
+            while sys.getenv(user name, user self.text)->(var exists)
+            while self.text.length = self.text.max-length
+            self.realloc()
+    
+    func realloc()
+        self.text := String{self.text.max-length * 2}(user self.text)
 
 
 main
-  var Lumi lumi-object
-  lumi-object.run()
+    var Lumi lumi-object
+    lumi-object.run()

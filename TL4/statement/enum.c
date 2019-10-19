@@ -69,8 +69,8 @@ Returncode EnumData_parse(EnumData* self, Char* end) {
     Int spaces = 0;
     CHECK(27, read_until(&(String){7, 6, " .([{?"}, true, &(value), &((*end)), &(spaces)) )
     if (!(spaces > 0)) break;
-    if (spaces != 2) {
-      CHECK(30, SyntaxTreeNode_m_syntax_error_indentation(&(self->_base), spaces, 2) )
+    if (spaces != 4) {
+      CHECK(30, SyntaxTreeNode_m_syntax_error_indentation(&(self->_base), spaces, 4) )
     }
     Bool _Bool144;
     CHECK(31, f_is_legal_name(value, NAME_CONSTANT, &(_Bool144)) )
@@ -138,7 +138,7 @@ Returncode EnumData_write(EnumData* self);
 static char* _func_name_EnumData_write = "EnumData.write";
 #define LUMI_FUNC_NAME _func_name_EnumData_write
 Returncode EnumData_write(EnumData* self) {
-  CHECK(59, write(&(String){11, 10, "\nenum {\n  "}) )
+  CHECK(59, write(&(String){13, 12, "\nenum {\n    "}) )
   ListNode* node = self->values->first;
   while (true) {
     if (!(NULL != node)) break;
@@ -149,7 +149,7 @@ Returncode EnumData_write(EnumData* self) {
       CHECK(67, write(&(String){5, 4, " = 0"}) )
     }
     node = node->next;
-    CHECK(69, write(&(String){5, 4, ",\n  "}) )
+    CHECK(69, write(&(String){7, 6, ",\n    "}) )
   }
   CHECK(70, EnumData_write_cname(self) )
   CHECK(71, write(&(String){9, 8, "_length\n"}) )

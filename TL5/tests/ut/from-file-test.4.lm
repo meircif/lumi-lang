@@ -30,310 +30,310 @@ var Bool flag-trace
 
 
 mock Sys.print(user String text)
-  if text?
-    tl5-compiler-tests.mock-print-text.concat(user text)
+    if text?
+        tl5-compiler-tests.mock-print-text.concat(user text)
 
 
 mock Sys.exit(copy Int returncode)
-  sys-exit := true
-  raise "Sys.exit"
+    sys-exit := true
+    raise "Sys.exit"
 
 
 func set-mock-file-text(user String text, user String second-file-text)
-  mock-input-file-text.new(user "module ut\n")
-  mock-input-line-reset-index := mock-input-file-text.length
-  mock-input-file-text.concat(user text)
-  if second-file-text?
-    mock-input-line-eof-index := mock-input-file-text.length
-    mock-input-file-text.concat(user second-file-text)
-  else
-    mock-input-line-eof-index := - 1
-  mock-input-file-index := 0
+    mock-input-file-text.new(user "module ut\n")
+    mock-input-line-reset-index := mock-input-file-text.length
+    mock-input-file-text.concat(user text)
+    if second-file-text?
+        mock-input-line-eof-index := mock-input-file-text.length
+        mock-input-file-text.concat(user second-file-text)
+    else
+        mock-input-line-eof-index := - 1
+    mock-input-file-index := 0
 
 
 mock file-open-read(user String name)->(owner File file)
-  if file-open-error
-    raise
+    if file-open-error
+        raise
 
 
 mock file-open-write(user String name)->(owner File file)
-  if file-open-error
-    raise
+    if file-open-error
+        raise
 
 
 mock file-close(owner File file)
-  tl5-compiler-tests.mock-input-line-eof-index := - 1
+    tl5-compiler-tests.mock-input-line-eof-index := - 1
 
 
 mock File.getc()->(var Char ch, var Bool is-eof)
-  assert self is tl5-compiler.glob.input-file
-  if tl5-compiler-tests.mock-input-file-index =
-      tl5-compiler-tests.mock-input-line-eof-index or
-      tl5-compiler-tests.mock-input-file-index >=
-      tl5-compiler-tests.mock-input-file-text.length
-    is-eof := true
-    return
-  is-eof := false
-  ch := tl5-compiler-tests.mock-input-file-text[tl5-compiler-tests.mock-input-file-index]
-  if tl5-compiler-tests.mock-input-file-index =
-      tl5-compiler-tests.mock-input-line-reset-index
-    tl5-compiler.glob.line-number := 1
-  tl5-compiler-tests.mock-input-file-index += 1
+    assert self is tl5-compiler.glob.input-file
+    if tl5-compiler-tests.mock-input-file-index =
+            tl5-compiler-tests.mock-input-line-eof-index or
+            tl5-compiler-tests.mock-input-file-index >=
+            tl5-compiler-tests.mock-input-file-text.length
+        is-eof := true
+        return
+    is-eof := false
+    ch := tl5-compiler-tests.mock-input-file-text[tl5-compiler-tests.mock-input-file-index]
+    if tl5-compiler-tests.mock-input-file-index =
+            tl5-compiler-tests.mock-input-line-reset-index
+        tl5-compiler.glob.line-number := 1
+    tl5-compiler-tests.mock-input-file-index += 1
 
 
 mock File.putc(copy Char ch)
-  assert self is tl5-compiler.glob.output-file
-  tl5-compiler-tests.mock-output-file-text.append(copy ch)
+    assert self is tl5-compiler.glob.output-file
+    tl5-compiler-tests.mock-output-file-text.append(copy ch)
 
 
 mock File.write(user String text)
-  assert self is tl5-compiler.glob.output-file
-  for n in text.length
-    var Char ch(copy text[n])
-    if ch != '\n' or ch != tl5-compiler-tests.mock-output-file-last
-      tl5-compiler-tests.mock-output-file-text.append(copy ch)
-    tl5-compiler-tests.mock-output-file-last := ch
+    assert self is tl5-compiler.glob.output-file
+    for n in text.length
+        var Char ch(copy text[n])
+        if ch != '\n' or ch != tl5-compiler-tests.mock-output-file-last
+            tl5-compiler-tests.mock-output-file-text.append(copy ch)
+        tl5-compiler-tests.mock-output-file-last := ch
 
 
 mock tl5-compiler.write-global(user String text)
-  ; do nothing
+    ; do nothing
 
 
 mock tl5-compiler.SyntaxTreeFunction.write-pre-func()
-  ; do nothing
+    ; do nothing
 
 
 mock tl5-compiler.SyntaxTreeFunction.write-post-func()
-  ; do nothing
+    ; do nothing
 
 
 func setup-test()
-  tested-compiler := tl5-compiler.Global()
-  mock-output-file-last := '\0'
-  mock-input-file-index := 0
-  file-open-error := false
-  mock-print-text.clear()
-  mock-output-file-text.clear()
-  mock-input-file-text.clear()
+    tested-compiler := tl5-compiler.Global()
+    mock-output-file-last := '\0'
+    mock-input-file-index := 0
+    file-open-error := false
+    mock-print-text.clear()
+    mock-output-file-text.clear()
+    mock-input-file-text.clear()
 
 
 test test-compiler()
-  setup-arguments()
-  var String{256} filename
-  set-test-file-name(user filename, user "input", user "5.lm")
-  file-open-read.mocked(user filename)->(owner input-file)
-  set-test-file-name(user filename, user "expected", user "c")
-  file-open-read.mocked(user filename)->(owner expected-output-file)
-  set-test-file-name(user filename, user "actual", user "c")
-  file-open-write.mocked(user filename)->(owner actual-output-file)
-  
-  var String{1024} line
-  do
-    while not read-line(user input-file, user line, user "; @@ ")
-    common-header.concat(user line)
-    common-header.append(copy '\n')
-  var Bool not-first-line
-  do
-    while not read-line(user expected-output-file, user line, user "/// @@ ")
-    if not-first-line
-      expected-common-header.append(copy '\n')
-    else
-      not-first-line := true
-    expected-common-header.concat(user line)
-  
-  compiler-tests-passed := true
-  Sys.print.active := false
-  sys.print(user "\n  test common header... ")
-  try
-    test-global-scope(
-        user common-header, user "", user expected-common-header, copy false)
-    sys.print(user "OK")
-  catch
-    compiler-tests-passed := false
-  expected-common-header.append(copy '\n')
-  common-header-length := mock-output-file-text.length - 53
+    setup-arguments()
+    var String{256} filename
+    set-test-file-name(user filename, user "input", user "5.lm")
+    file-open-read.mocked(user filename)->(owner input-file)
+    set-test-file-name(user filename, user "expected", user "c")
+    file-open-read.mocked(user filename)->(owner expected-output-file)
+    set-test-file-name(user filename, user "actual", user "c")
+    file-open-write.mocked(user filename)->(owner actual-output-file)
+    
+    var String{1024} line
+    do
+        while not read-line(user input-file, user line, user "; @@ ")
+        common-header.concat(user line)
+        common-header.append(copy '\n')
+    var Bool not-first-line
+    do
+        while not read-line(user expected-output-file, user line, user "/// @@ ")
+        if not-first-line
+            expected-common-header.append(copy '\n')
+        else
+            not-first-line := true
+        expected-common-header.concat(user line)
+    
+    compiler-tests-passed := true
+    Sys.print.active := false
+    sys.print(user "\n  test common header... ")
+    try
+        test-global-scope(
+                user common-header, user "", user expected-common-header, copy false)
+        sys.print(user "OK")
+    catch
+        compiler-tests-passed := false
+    expected-common-header.append(copy '\n')
+    common-header-length := mock-output-file-text.length - 53
 
-  do
-    read-line(user input-file, user line, user _)
-    while line.length > 0
-    test-compiler-suite(user line)
-  
-  sys.print(user "\n  summery: ")
-  
-  file-close.mocked(owner input-file)
-  file-close.mocked(owner expected-output-file)
-  file-close.mocked(owner actual-output-file)
-  
-  assert compiler-tests-passed
+    do
+        read-line(user input-file, user line, user _)
+        while line.length > 0
+        test-compiler-suite(user line)
+    
+    sys.print(user "\n  summery: ")
+    
+    file-close.mocked(owner input-file)
+    file-close.mocked(owner expected-output-file)
+    file-close.mocked(owner actual-output-file)
+    
+    assert compiler-tests-passed
 
 
 func test-compiler-suite(user String suit-name)
-  var String{1024} line
-  sys.print(user "\n  ")
-  sys.print(user suit-name)
-  sys.print(user "... ")
-  read-line(user expected-output-file, user line, user _)
-  if not line.equal(user suit-name)
-    file-error(user suit-name, user line)
-  actual-output-file.write.mocked(user "/// @@ ")
-  actual-output-file.write.mocked(user suit-name)
-  actual-output-file.write.mocked(user "\n")
-  
-  var Char ch
-  if not read-line(user input-file, user line, user "; @ ")
-    file-error(user suit-name, user line)
-  if not read-line(user expected-output-file, user line, user "/// @ ")
-    file-error(user suit-name, user line)
-  suit-passed := true
-  do
-    test-compiler-case(user suit-name, user line)
+    var String{1024} line
+    sys.print(user "\n  ")
+    sys.print(user suit-name)
+    sys.print(user "... ")
+    read-line(user expected-output-file, user line, user _)
+    if not line.equal(user suit-name)
+        file-error(user suit-name, user line)
+    actual-output-file.write.mocked(user "/// @@ ")
+    actual-output-file.write.mocked(user suit-name)
+    actual-output-file.write.mocked(user "\n")
+    
+    var Char ch
+    if not read-line(user input-file, user line, user "; @ ")
+        file-error(user suit-name, user line)
+    if not read-line(user expected-output-file, user line, user "/// @ ")
+        file-error(user suit-name, user line)
+    suit-passed := true
+    do
+        test-compiler-case(user suit-name, user line)
+        expected-output-file.getc.mocked()->(var ch)
+        input-file.getc.mocked()->(var ch)
+        while ch = ' '
+    if suit-passed
+        sys.print(user "OK")
+    
     expected-output-file.getc.mocked()->(var ch)
-    input-file.getc.mocked()->(var ch)
-    while ch = ' '
-  if suit-passed
-    sys.print(user "OK")
-  
-  expected-output-file.getc.mocked()->(var ch)
-  if input-file.getc.mocked()->(var ch)
-    if not expected-output-file.getc.mocked()->(var ch)
-      file-error(user suit-name, user "end")
-    actual-output-file.write.mocked(user "/// @\n")
-  
+    if input-file.getc.mocked()->(var ch)
+        if not expected-output-file.getc.mocked()->(var ch)
+            file-error(user suit-name, user "end")
+        actual-output-file.write.mocked(user "/// @\n")
+    
 
 func test-compiler-case(user String suit-name, user String line)
-  var String{4096} input
-  var String{1024} second-file-input
-  var String{16384} expected
-  var String{1024} subname(user "start")
-  var Char type-char
-  var Char ch
-  var Bool is-error-test
-  var Bool append-newline
-  var Bool is-test
-  var Bool is-code-test
-  user String second-input
-  input-file.getc.mocked()->(var type-char)
-  append-newline := type-char != 'f'
-  if not append-newline
+    var String{4096} input
+    var String{1024} second-file-input
+    var String{16384} expected
+    var String{1024} subname(user "start")
+    var Char type-char
+    var Char ch
+    var Bool is-error-test
+    var Bool append-newline
+    var Bool is-test
+    var Bool is-code-test
+    user String second-input
     input-file.getc.mocked()->(var type-char)
-  is-error-test := type-char = 'e'
-  if is-error-test
-    input-file.getc.mocked()->(var type-char)
-  is-test := type-char = 't'
-  if is-test
-    input-file.getc.mocked()->(var type-char)
-    second-input := second-file-input
-  if type-char != 'g' and type-char != 'c'
-    file-error(user suit-name, user subname)
-  is-code-test := type-char = 'c'
-  input-file.getc.mocked()->(var ch)
-  if ch != ' '
-    file-error(user suit-name, user subname)
-  read-line(user input-file, user subname, user _)
-  case-name := subname
-  read-line(user expected-output-file, user line, user _)
-  if not line.equal(user subname)
-    file-error(user suit-name, user subname)
-  actual-output-file.write.mocked(user "/// @ ")
-  actual-output-file.write.mocked(user subname)
-  actual-output-file.write.mocked(user "\n")
-  
-  read-data(user input-file, user input, user "; @")
-  if is-test
-    input-file.getc.mocked()->(var ch)
-    if ch != '-'
-      file-error(user suit-name, user subname)
-    input-file.getc.mocked()->(var ch)
-    read-data(user input-file, user second-file-input, user "; @")
-  read-data(user expected-output-file, user expected, user "/// @")
-  if append-newline
-    input.append(copy '\n')
+    append-newline := type-char != 'f'
+    if not append-newline
+        input-file.getc.mocked()->(var type-char)
+    is-error-test := type-char = 'e'
+    if is-error-test
+        input-file.getc.mocked()->(var type-char)
+    is-test := type-char = 't'
     if is-test
-      second-file-input.append(copy '\n')
-  try
-    run-test(
-        user input,
-        user second-input,
-        user expected,
-        copy is-code-test,
-        copy is-error-test,
-        copy is-test)
-  catch
-    suit-passed := false
-    compiler-tests-passed := false
-    if flag-trace
-      crush-run := true
-    if crush-run
-      print-case-error()
-      run-test(
-          user input,
-          user second-input,
-          user expected,
-          copy is-code-test,
-          copy is-error-test,
-          copy is-test)
-  
-  case-name := _
+        input-file.getc.mocked()->(var type-char)
+        second-input := second-file-input
+    if type-char != 'g' and type-char != 'c'
+        file-error(user suit-name, user subname)
+    is-code-test := type-char = 'c'
+    input-file.getc.mocked()->(var ch)
+    if ch != ' '
+        file-error(user suit-name, user subname)
+    read-line(user input-file, user subname, user _)
+    case-name := subname
+    read-line(user expected-output-file, user line, user _)
+    if not line.equal(user subname)
+        file-error(user suit-name, user subname)
+    actual-output-file.write.mocked(user "/// @ ")
+    actual-output-file.write.mocked(user subname)
+    actual-output-file.write.mocked(user "\n")
+    
+    read-data(user input-file, user input, user "; @")
+    if is-test
+        input-file.getc.mocked()->(var ch)
+        if ch != '-'
+            file-error(user suit-name, user subname)
+        input-file.getc.mocked()->(var ch)
+        read-data(user input-file, user second-file-input, user "; @")
+    read-data(user expected-output-file, user expected, user "/// @")
+    if append-newline
+        input.append(copy '\n')
+        if is-test
+            second-file-input.append(copy '\n')
+    try
+        run-test(
+                user input,
+                user second-input,
+                user expected,
+                copy is-code-test,
+                copy is-error-test,
+                copy is-test)
+    catch
+        suit-passed := false
+        compiler-tests-passed := false
+        if flag-trace
+            crush-run := true
+        if crush-run
+            print-case-error()
+            run-test(
+                    user input,
+                    user second-input,
+                    user expected,
+                    copy is-code-test,
+                    copy is-error-test,
+                    copy is-test)
+    
+    case-name := _
 
 
 func run-test(
-    user String input,
-    user String second-input,
-    user String expected,
-    copy Bool is-code-test,
-    copy Bool is-error-test,
-    copy Bool is-test)
-  if is-code-test
-    if is-error-test
-      test-code-error(user input, user expected)
+        user String input,
+        user String second-input,
+        user String expected,
+        copy Bool is-code-test,
+        copy Bool is-error-test,
+        copy Bool is-test)
+    if is-code-test
+        if is-error-test
+            test-code-error(user input, user expected)
+        else
+            test-code(user input, user expected, copy true)
     else
-      test-code(user input, user expected, copy true)
-  else
-    if is-error-test
-      test-global-scope-error(
-          user input, user second-input, user expected, copy is-test)
-    else
-      test-global-scope(
-          user input, user second-input, user expected, copy is-test)
+        if is-error-test
+            test-global-scope-error(
+                    user input, user second-input, user expected, copy is-test)
+        else
+            test-global-scope(
+                    user input, user second-input, user expected, copy is-test)
 
 
 func read-line(user File file, user String line, user String prefix)->(
-    var Bool found-prefix)
-  line.clear()
-  found-prefix := false
-  var Char ch
-  do
-    while not file.getc.mocked()->(var ch)
-    while ch != '\n'
-    line.append(copy ch)
-    if prefix? and not found-prefix
-      if line.equal(user prefix)
-        found-prefix := true
-        return
+        var Bool found-prefix)
+    line.clear()
+    found-prefix := false
+    var Char ch
+    do
+        while not file.getc.mocked()->(var ch)
+        while ch != '\n'
+        line.append(copy ch)
+        if prefix? and not found-prefix
+            if line.equal(user prefix)
+                found-prefix := true
+                return
 
 
 func read-data(user File file, user String data, user String prefix)
-  data.clear()
-  var String{1024} line
-  do
-    while not read-line(user file, user line, user prefix)
-    if data.length > 0
-      data.append(copy '\n')
-    data.concat(user line)
+    data.clear()
+    var String{1024} line
+    do
+        while not read-line(user file, user line, user prefix)
+        if data.length > 0
+            data.append(copy '\n')
+        data.concat(user line)
 
 
 func file-error(user String name, user String subname)
-  sys.print(user "file format error in [")
-  sys.print(user name)
-  if subname?
-    sys.print(user "] / [")
-    sys.print(user subname)
-  sys.println(user "]")
-  raise
+    sys.print(user "file format error in [")
+    sys.print(user name)
+    if subname?
+        sys.print(user "] / [")
+        sys.print(user subname)
+    sys.println(user "]")
+    raise
 
 
 func print-case-error()
-  sys.print(user "\n    ")
-  if case-name?
-    sys.print(user case-name)
-    sys.print(user ": ")
+    sys.print(user "\n    ")
+    if case-name?
+        sys.print(user case-name)
+        sys.print(user ": ")

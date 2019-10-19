@@ -379,7 +379,7 @@ Returncode StringExpression_m_strip_multilines(StringExpression* self) {
           skip_new_line = ((self->_base.text)->values[index_read - 2]) != '\\';
         }
       }
-      Int expected = self->_base._base.code_node->parent->_base.indentation_spaces + 4;
+      Int expected = self->_base._base.code_node->parent->_base.indentation_spaces + 8;
       Int indentation = 0;
       while (true) {
         index_read += 1;

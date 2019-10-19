@@ -22,7 +22,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     self.init()
     self.parent-type := parent-type
     if ? self.parent-type
-      self.indentation-spaces := 2
+      self.indentation-spaces := 4
       if self.parent-type.is-dynamic
         user String meth-type
         read-until(user " ", copy false):(user meth-type, copy end)
@@ -42,9 +42,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     new List{TypeCount} in self.aux-variables
   
   func inst parse-body():(copy Char end)
-    self.indentation-spaces += 2
+    self.indentation-spaces += 4
     self.parse-block():(copy end)
-    self.indentation-spaces := 2
+    self.indentation-spaces := 4
   
   func inst parse-header(copy Bool is-native):(copy Char end)
     read-new(user "("):(owner self.name, copy end)
@@ -186,23 +186,23 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     #   return LUMI_err;
     # }
     self.write-block-start()
-    write(user "  Returncode LUMI_err = OK;\n")
+    write(user "    Returncode LUMI_err = OK;\n")
     base.write()
     self.write-setup()
     self.write-block-body()
     write(user "LUMI_cleanup:\n")
     self.write-cleanup()
-    write(user "  return LUMI_err;\n")
+    write(user "    return LUMI_err;\n")
     self.write-block-end()
   
   func inst write-setup()
     if self.has-user-assign
-      write(user "  Ref_Manager* aux_Ref_Manager = NULL;\n")
+      write(user "    Ref_Manager* aux_Ref_Manager = NULL;\n")
     user ListNode{Argument} node(self.arguments.parameters.first)
     do
       while ? node
       if node.item.access = ACCESS-USER
-        write(user "  LUMI_inc_ref(")
+        write(user "    LUMI_inc_ref(")
         write-cname(user node.item.get-variable().name)
         write(user "_Refman);\n")
       node := node.next
@@ -251,7 +251,7 @@ class SyntaxTreeConstructor(SyntaxTreeFunction)
   func inst parse(user TypeData parent-type):(copy Char end)
     self.init()
     self.parent-type := parent-type
-    self.indentation-spaces := 2
+    self.indentation-spaces := 4
     string-new-copy(user "new"):(owner self.name)
     self.parse-arguments(copy false):(copy end)
     self.parse-body():(copy end)

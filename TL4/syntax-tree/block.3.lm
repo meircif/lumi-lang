@@ -60,7 +60,7 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     new List{SyntaxTreeCode} in self.code-nodes
     self.parse-block-children(user _, user self):(copy end)
     if ? self.get-parent-type()
-      self.indentation-spaces -= 2
+      self.indentation-spaces -= 4
   
   func dynamic parse-child(user String keyword):(copy Char end)
     owner SyntaxTreeCode node
@@ -237,5 +237,5 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
     self.write-children(user self.code-nodes)
   
   func inst write-block-end()
-    write-spaces(copy self.indentation-spaces - 2)
+    write-spaces(copy self.indentation-spaces - 4)
     write(user "}\n")

@@ -162,7 +162,7 @@ Returncode SyntaxTreeBlock_parse_block(SyntaxTreeBlock* self, Char* end) {
   TypeData* _TypeData58;
   CHECK(62, SyntaxTreeBlock_get_parent_type(self, &(_TypeData58)) )
   if (NULL != _TypeData58) {
-    self->_base.indentation_spaces -= 2;
+    self->_base.indentation_spaces -= 4;
   }
   return OK;
 }
@@ -531,7 +531,7 @@ Returncode SyntaxTreeBlock_write_block_end(SyntaxTreeBlock* self);
 static char* _func_name_SyntaxTreeBlock_write_block_end = "SyntaxTreeBlock.write-block-end";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeBlock_write_block_end
 Returncode SyntaxTreeBlock_write_block_end(SyntaxTreeBlock* self) {
-  CHECK(240, write_spaces(self->_base.indentation_spaces - 2) )
+  CHECK(240, write_spaces(self->_base.indentation_spaces - 4) )
   CHECK(241, write(&(String){3, 2, "}\n"}) )
   return OK;
 }

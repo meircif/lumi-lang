@@ -42,7 +42,7 @@ Returncode SyntaxTreeNode_read_line_break_spaces(SyntaxTreeNode* self, Int inden
 static char* _func_name_SyntaxTreeNode_read_line_break_spaces = "SyntaxTreeNode.read-line-break-spaces";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNode_read_line_break_spaces
 Returncode SyntaxTreeNode_read_line_break_spaces(SyntaxTreeNode* self, Int indentation_spaces) {
-  Int expected_spaces = indentation_spaces + 4;
+  Int expected_spaces = indentation_spaces + 8;
   {int n; for (n = (0); n < (expected_spaces); ++n) {
     Char _Char108;
     CHECK(18, read_c(&(_Char108)) )

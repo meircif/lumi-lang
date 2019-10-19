@@ -7,6 +7,6 @@ var Global compiler
 
 ~~~ compiler main function!~~~
 main
-  compiler.root.parse()
-  compiler.root.analyze()
-  compiler.root.write()
+    compiler.root.parse()
+    compiler.root.analyze()
+    compiler.root.write()

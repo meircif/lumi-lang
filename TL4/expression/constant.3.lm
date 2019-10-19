@@ -146,7 +146,7 @@ class StringExpression(TextExpression)
           skip-new-line := self.text[index-read - 1] = '\\'
           if skip-new-line and index-read > 1
             skip-new-line := self.text[index-read - 2] != '\\'
-        var Int expected(self.code-node.parent.indentation-spaces + 4)
+        var Int expected(self.code-node.parent.indentation-spaces + 8)
         var Int indentation
         do
           index-read += 1

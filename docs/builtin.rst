@@ -110,11 +110,11 @@ String
 
       ; the same as "line\nbrake"
       s := "line
-          break"
+              break"
 
       ; the same as "linebrake"
       s := "line\
-          break"
+              break"
 
    Accessing a single character can be done using ``string[index]``.
 

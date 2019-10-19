@@ -3,200 +3,200 @@ module tl5-compiler
 
 ~~~ A single variable expression ~~~
 class VariableExpression(Expression)
-  owner String name
-  owner String module-name
-  user SyntaxTreeVariable variable
-  
-  new(user SyntaxTreeCode code-node, owner String name)
-    base(user code-node)
-    self.name := name
-  
-  func inst copy-new()->(owner VariableExpression expression)
-    expression := VariableExpression(
-        user self.code-node, owner string-new-copy(user self.name))
-    expression.module-name := self.module-name
-    expression.variable := self.variable
-    self.result-type.copy-new()->(owner expression.result-type)
-    expression.access := self.access
-    expression.assignable := self.assignable
-    expression.is-var := self.is-var
-  
-  func dynamic restructure()->(
-      owner Expression expression, owner FunctionArguments arguments)
-    if glob.module-map.find(user self.name)?
-      self.check-no-error()
-      expression := ModuleExpression(owner self.name)
-      return
+    owner String name
+    owner String module-name
+    user SyntaxTreeVariable variable
     
-    if self.code-node.find-variable(
-        user self.name, user self.module-name)->(user self.variable)?
-      self.variable.type-instance.copy-new()->(owner self.result-type)
-      self.result-type.reference-path := ReferencePath(user self.variable)
-      self.access := self.variable.access
-      self.assignable := not self.variable.constant and
-          (self.result-type.type-data.is-primitive or
-          not access-is-only-var(copy self.access))
-      self.is-var := access-is-only-var(copy self.access) and
-          self.variable.is-create
-      return
+    new(user SyntaxTreeCode code-node, owner String name)
+        base(user code-node)
+        self.name := name
     
-    user SyntaxTreeFunction function
-    if self.code-node.find-function(
-        user self.name, user self.module-name)->(user function)?
-      expression := FunctionExpression(
-          user self.code-node,
-          user function,
-          owner _,
-          copy 0,
-          copy self.error-propagated,
-          copy false,
-          copy false)
-      expression.restructure()->(owner expression, owner arguments)
-      return
+    func inst copy-new()->(owner VariableExpression expression)
+        expression := VariableExpression(
+                user self.code-node, owner string-new-copy(user self.name))
+        expression.module-name := self.module-name
+        expression.variable := self.variable
+        self.result-type.copy-new()->(owner expression.result-type)
+        expression.access := self.access
+        expression.assignable := self.assignable
+        expression.is-var := self.is-var
     
-    if self.module-name?
-      self.syntax-error2(
-          user "unknown symbol",
-          user self.name,
-          user "in module",
-          user self.module-name)
-    else
-      self.syntax-error(user "unknown symbol", user self.name)
+    func dynamic restructure()->(
+            owner Expression expression, owner FunctionArguments arguments)
+        if glob.module-map.find(user self.name)?
+            self.check-no-error()
+            expression := ModuleExpression(owner self.name)
+            return
+        
+        if self.code-node.find-variable(
+                user self.name, user self.module-name)->(user self.variable)?
+            self.variable.type-instance.copy-new()->(owner self.result-type)
+            self.result-type.reference-path := ReferencePath(user self.variable)
+            self.access := self.variable.access
+            self.assignable := not self.variable.constant and
+                    (self.result-type.type-data.is-primitive or
+                    not access-is-only-var(copy self.access))
+            self.is-var := access-is-only-var(copy self.access) and
+                    self.variable.is-create
+            return
+        
+        user SyntaxTreeFunction function
+        if self.code-node.find-function(
+                user self.name, user self.module-name)->(user function)?
+            expression := FunctionExpression(
+                    user self.code-node,
+                    user function,
+                    owner _,
+                    copy 0,
+                    copy self.error-propagated,
+                    copy false,
+                    copy false)
+            expression.restructure()->(owner expression, owner arguments)
+            return
+        
+        if self.module-name?
+            self.syntax-error2(
+                    user "unknown symbol",
+                    user self.name,
+                    user "in module",
+                    user self.module-name)
+        else
+            self.syntax-error(user "unknown symbol", user self.name)
 
-  func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
-    self.variable.order-constants(user ordered-list)
-  
-  func dynamic get-constant-value()->(var Int value, var Bool has-value)
-    self.variable.get-constant-value()->(var value, var has-value)
-      
+    func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
+        self.variable.order-constants(user ordered-list)
+    
+    func dynamic get-constant-value()->(var Int value, var Bool has-value)
+        self.variable.get-constant-value()->(var value, var has-value)
+            
 
-  func dynamic check-memory(user ReferenceMemoryList refs)
-    refs.check-reference(user self)
+    func dynamic check-memory(user ReferenceMemoryList refs)
+        refs.check-reference(user self)
 
-  func dynamic write()
-    if self.variable.is-output
-      write(user "*")
-    self.variable.write-cname()
+    func dynamic write()
+        if self.variable.is-output
+            write(user "*")
+        self.variable.write-cname()
 
-  func dynamic write-safe()
-    if self.variable.is-output
-      self.write-with-brackets()
-    else
-      self.write()
+    func dynamic write-safe()
+        if self.variable.is-output
+            self.write-with-brackets()
+        else
+            self.write()
 
-  func dynamic write-dynamic-safe()
-    if self.variable.is-output
-      write(user "(*")
-      self.variable.write-cname()
-      write(user "_Dynamic)")
-    else
-      self.write-dynamic()
+    func dynamic write-dynamic-safe()
+        if self.variable.is-output
+            write(user "(*")
+            self.variable.write-cname()
+            write(user "_Dynamic)")
+        else
+            self.write-dynamic()
 
 
 class FunctionExpression(Expression)
-  user SyntaxTreeFunction function
-  owner Expression instance
-  var Int bases
-  var Bool after-type
-  var Bool after-base
-  var Bool mock-field-used
-  var Bool ignore-mock
+    user SyntaxTreeFunction function
+    owner Expression instance
+    var Int bases
+    var Bool after-type
+    var Bool after-base
+    var Bool mock-field-used
+    var Bool ignore-mock
 
-  new(user SyntaxTreeCode code-node,
-      user SyntaxTreeFunction function,
-      owner Expression instance,
-      copy Int bases,
-      copy Bool error-propagated,
-      copy Bool after-type,
-      copy Bool after-base)
-    base(user code-node)
-    self.function := function
-    self.instance := instance
-    self.bases := bases
-    self.after-type := after-type
-    self.after-base := after-base
-    self.set-simple-type(user glob.type-func)
-    self.access := Access.VAR
-    self.error-expected := error-propagated
-    self.error-propagated := error-propagated
-    self.function.arguments.copy-new()->(owner self.result-type.arguments)
-  
-  func inst move-new()->(owner FunctionExpression expression)
-    expression := FunctionExpression(
-        user self.code-node,
-        user self.function,
-        owner self.instance,
-        copy self.bases,
-        copy self.error-propagated,
-        copy self.after-type,
-        copy self.after-base)
-    expression.mock-field-used := self.mock-field-used
-    expression.ignore-mock := self.ignore-mock
-
-  func dynamic is-mocked-function()->(var Bool is-mock)
-    is-mock := self.function.mocker-function?
-    self.mock-field-used := true
-  
-  func dynamic restructure()->(
-      owner Expression expression, owner FunctionArguments arguments)
-    self.ignore-mock := self.mock-field-used
-    if not arguments?
-      return
+    new(user SyntaxTreeCode code-node,
+            user SyntaxTreeFunction function,
+            owner Expression instance,
+            copy Int bases,
+            copy Bool error-propagated,
+            copy Bool after-type,
+            copy Bool after-base)
+        base(user code-node)
+        self.function := function
+        self.instance := instance
+        self.bases := bases
+        self.after-type := after-type
+        self.after-base := after-base
+        self.set-simple-type(user glob.type-func)
+        self.access := Access.VAR
+        self.error-expected := error-propagated
+        self.error-propagated := error-propagated
+        self.function.arguments.copy-new()->(owner self.result-type.arguments)
     
-    user Expression self-instance(user self.instance)
-    user TypeInstance actual-params
-    if self.instance? and (self.after-type or self.after-base)
-      actual-params := self.instance.result-type.parameters.first.item
-      
-    if self.instance? and not self.after-type
-      new CallArgument self-param
-      self-param.set-location()
-      self-param.access := self.function.arguments.parameters.first.item.access
-      if self.after-base
-        new VariableExpression self-var(
-            user self.instance.code-node, owner string-new-copy(user "self"))
-        self.code-node.find-variable(user self-var.name, user _)->(
-            user self-var.variable)
-        self-var.variable.type-instance.new-replace-params(
-            user actual-params)->(owner self-var.result-type)
-        self-param.value := self-var
-        self.bases += 1
-      else
-        actual-params := self.instance.result-type
-        self-param.value := self.instance
-      arguments.parameters.prepend(owner self-param)
-      
-      if self.function.is-dynamic and not self.after-base and
-          not self-instance.is-complex-field
-        if self.ignore-mock
-          self.syntax-error(
-              user "accessing mock function field in dynamic call to",
-              user self.function.name)
-        expression := DynamicCallExpression(
-            user self.code-node,
-            user self,
-            owner arguments,
-            user actual-params,
-            user self-instance)
-        return
+    func inst move-new()->(owner FunctionExpression expression)
+        expression := FunctionExpression(
+                user self.code-node,
+                user self.function,
+                owner self.instance,
+                copy self.bases,
+                copy self.error-propagated,
+                copy self.after-type,
+                copy self.after-base)
+        expression.mock-field-used := self.mock-field-used
+        expression.ignore-mock := self.ignore-mock
+
+    func dynamic is-mocked-function()->(var Bool is-mock)
+        is-mock := self.function.mocker-function?
+        self.mock-field-used := true
+    
+    func dynamic restructure()->(
+            owner Expression expression, owner FunctionArguments arguments)
+        self.ignore-mock := self.mock-field-used
+        if not arguments?
+            return
         
-    self.code-node.get-function().delete-group-builder.add-calling(
-        user self.function, user actual-params)
-    expression := FunctionCallExpression(
-        user self.code-node,
-        user self,
-        owner arguments,
-        user actual-params)
-  
-  func dynamic write()
-    if self.function.mocker-function? and not self.ignore-mock
-      self.function.mocker-function.write-cname()
-    else
-      self.function.write-cname()
+        user Expression self-instance(user self.instance)
+        user TypeInstance actual-params
+        if self.instance? and (self.after-type or self.after-base)
+            actual-params := self.instance.result-type.parameters.first.item
+            
+        if self.instance? and not self.after-type
+            new CallArgument self-param
+            self-param.set-location()
+            self-param.access := self.function.arguments.parameters.first.item.access
+            if self.after-base
+                new VariableExpression self-var(
+                        user self.instance.code-node, owner string-new-copy(user "self"))
+                self.code-node.find-variable(user self-var.name, user _)->(
+                        user self-var.variable)
+                self-var.variable.type-instance.new-replace-params(
+                        user actual-params)->(owner self-var.result-type)
+                self-param.value := self-var
+                self.bases += 1
+            else
+                actual-params := self.instance.result-type
+                self-param.value := self.instance
+            arguments.parameters.prepend(owner self-param)
+            
+            if self.function.is-dynamic and not self.after-base and
+                    not self-instance.is-complex-field
+                if self.ignore-mock
+                    self.syntax-error(
+                            user "accessing mock function field in dynamic call to",
+                            user self.function.name)
+                expression := DynamicCallExpression(
+                        user self.code-node,
+                        user self,
+                        owner arguments,
+                        user actual-params,
+                        user self-instance)
+                return
+                
+        self.code-node.get-function().delete-group-builder.add-calling(
+                user self.function, user actual-params)
+        expression := FunctionCallExpression(
+                user self.code-node,
+                user self,
+                owner arguments,
+                user actual-params)
+    
+    func dynamic write()
+        if self.function.mocker-function? and not self.ignore-mock
+            self.function.mocker-function.write-cname()
+        else
+            self.function.write-cname()
 
 
 class ModuleExpression(Expression)
-  new(owner String name)
-    self.result-type := TypeInstance()
-    self.result-type.name := name
-    self.result-type.type-data := glob.type-module
+    new(owner String name)
+        self.result-type := TypeInstance()
+        self.result-type.name := name
+        self.result-type.type-data := glob.type-module

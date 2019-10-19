@@ -1,7 +1,7 @@
 module hello-world-test
 
 mock Sys.println(user String text)
-  assert text.equal(user "hello world")
+    assert text.equal(user "hello world")
 
 test show-hello-world-test()
-  hello-world.show()
+    hello-world.show()

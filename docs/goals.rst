@@ -6,6 +6,7 @@ Lumi Language Goals and Features
 Prioritized Goals
 -----------------
 1. **Enforce safe and reliable code**, free from:
+
     * illegal memory access
     * memory corruption
     * overflows
@@ -13,12 +14,14 @@ Prioritized Goals
     * etc...
 
 2. **Allow writing of efficient code**, suitable for real-time embedded:
+
       Modern programming languages solve goal #1 by making everything
       dynamically allocated and garbage collected, but this is inefficient and
       unpredictable. Lumi will allow as much efficiency and freedom as
       possible, as long as goal #1 is not harmed.
 
 3. Be **flexible**, **easy to write**, and **easy to maintain**:
+
     This goal binds together 3 different goals:
 
     * **Flexible** - whenever possible Lumi should allow choosing from a
@@ -48,6 +51,7 @@ Features
 * Exception-like error handling implemented with return values
 * Strict coding conventions - all Lumi code should look the same
 * Built-in support for productivity features:
+
     * testing and mocking
     * documentation
     * profiling

@@ -3,68 +3,68 @@ module tl5-compiler
 
  ~~~ Enum node in the syntax tree ~~~
 class EnumData(SyntaxTreeNode)
-  owner String name
-  user ModuleMembers my-module
-  var List{String} values
-  
-  func inst parse-new()->(owner EnumData new-node)
-    new-node := EnumData()
-    new-node.parse()
-  
-  func inst parse()
-    self.set-location()
-    self.my-module := glob.current-module
-    read-new(user "")->(owner self.name)
-    if not is-legal-name(user self.name, copy NameGroup.TYPE)
-      self.syntax-error(user "illegal Enum name", user self.name)
-    if glob.find-type(user self.name)?
-      self.syntax-error(user "Enum name overrides type", user self.name)
-    if self.my-module.enum-map.find(user self.name)?
-      self.syntax-error(user "redefinition of Enum", user self.name)
-    do
-      user String value
-      var Int spaces
-      read-until(user " .([{?", copy true)->(user value, var spaces)
-      while spaces > 0
-      if spaces != INDENTATION-SPACES
-        self.syntax-error-indentation(copy spaces, copy INDENTATION-SPACES)
-      if not is-legal-name(user value, copy NameGroup.CONSTANT)
-        self.syntax-error(user "illegal constant name", user value)
-      self.expect-new-line(user value)
-      self.values.add(owner string-new-copy(user value))
-    if not self.values.first?
-      self.syntax-error-msg(user "Enum with no values")
-    glob.save-input := true
-    self.my-module.enum-map.add(user self.name, user self)
-  
-  func inst has-value(user String name)->(var Int value, var Bool has-value)
-    has-value := true
-    var Int index
-    for text in self.values.iter()
-      if name.equal(user text)
-        value := index
-        return
-      index += 1
-    if name.equal(user "length")
-      value := index
-      return
-    has-value := false
-  
-  func inst write-cname()
-    self.my-module.write-prefix()
-    write-cname(user self.name)
-  
-  func dynamic write()
-    write(user "\nenum {\n")
-    write-spaces(copy INDENTATION-SPACES)
-    for text in self.values.iter()
-      self.write-cname()
-      write(user "_")
-      write-cname(user text)
-      if text is self.values.first.item
-        write(user " = 0")
-      write(user ",\n")
-      write-spaces(copy INDENTATION-SPACES)
-    self.write-cname()
-    write(user "_length\n")
-    write(user "};\n")
+    owner String name
+    user ModuleMembers my-module
+    var List{String} values
+    
+    func inst parse-new()->(owner EnumData new-node)
+        new-node := EnumData()
+        new-node.parse()
+    
+    func inst parse()
+        self.set-location()
+        self.my-module := glob.current-module
+        read-new(user "")->(owner self.name)
+        if not is-legal-name(user self.name, copy NameGroup.TYPE)
+            self.syntax-error(user "illegal Enum name", user self.name)
+        if glob.find-type(user self.name)?
+            self.syntax-error(user "Enum name overrides type", user self.name)
+        if self.my-module.enum-map.find(user self.name)?
+            self.syntax-error(user "redefinition of Enum", user self.name)
+        do
+            user String value
+            var Int spaces
+            read-until(user " .([{?", copy true)->(user value, var spaces)
+            while spaces > 0
+            if spaces != INDENTATION-SPACES
+                self.syntax-error-indentation(copy spaces, copy INDENTATION-SPACES)
+            if not is-legal-name(user value, copy NameGroup.CONSTANT)
+                self.syntax-error(user "illegal constant name", user value)
+            self.expect-new-line(user value)
+            self.values.add(owner string-new-copy(user value))
+        if not self.values.first?
+            self.syntax-error-msg(user "Enum with no values")
+        glob.save-input := true
+        self.my-module.enum-map.add(user self.name, user self)
+    
+    func inst has-value(user String name)->(var Int value, var Bool has-value)
+        has-value := true
+        var Int index
+        for text in self.values.iter()
+            if name.equal(user text)
+                value := index
+                return
+            index += 1
+        if name.equal(user "length")
+            value := index
+            return
+        has-value := false
+    
+    func inst write-cname()
+        self.my-module.write-prefix()
+        write-cname(user self.name)
+    
+    func dynamic write()
+        write(user "\nenum {\n")
+        write-spaces(copy INDENTATION-SPACES)
+        for text in self.values.iter()
+            self.write-cname()
+            write(user "_")
+            write-cname(user text)
+            if text is self.values.first.item
+                write(user " = 0")
+            write(user ",\n")
+            write-spaces(copy INDENTATION-SPACES)
+        self.write-cname()
+        write(user "_length\n")
+        write(user "};\n")

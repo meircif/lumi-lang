@@ -87,7 +87,7 @@ Returncode TypeData_parse(TypeData* self, Bool is_dynamic, Char* end) {
     }
     CHECK(48, read_c(&((*end))) )
   }
-  self->_base._base.indentation_spaces = 2;
+  self->_base._base.indentation_spaces = 4;
   CHECK(50, SyntaxTreeBranch_parse_block_children(&(self->_base._base), self, NULL, &((*end))) )
   self->_base._base.indentation_spaces = 0;
   return OK;
@@ -467,7 +467,7 @@ Returncode TypeData_write(TypeData* self) {
   CHECK(264, write(&(String){9, 8, "\nstruct "}) )
   CHECK(265, TypeData_write_cname(self) )
   CHECK(266, write(&(String){4, 3, " {\n"}) )
-  self->_base._base.indentation_spaces = 2;
+  self->_base._base.indentation_spaces = 4;
   if (NULL != self->base_type) {
     CHECK(269, SyntaxTreeBranch_write_spaces(&(self->_base._base)) )
     CHECK(270, TypeData_write_cname(self->base_type->type_data) )
@@ -605,14 +605,14 @@ Returncode TypeData_write_methods_body(TypeData* self) {
   CHECK(356, write(&(String){6, 5, "_Del("}) )
   CHECK(357, TypeData_write_cname(self) )
   CHECK(358, write(&(String){11, 10, "* self) {\n"}) )
-  CHECK(359, write(&(String){29, 28, "  if (self == NULL) return;\n"}) )
+  CHECK(359, write(&(String){31, 30, "    if (self == NULL) return;\n"}) )
   if (NULL != self->base_type) {
-    CHECK(361, write(&(String){3, 2, "  "}) )
+    CHECK(361, write(&(String){5, 4, "    "}) )
     CHECK(362, TypeData_write_cname(self->base_type->type_data) )
     CHECK(363, write(&(String){23, 22, "_Del(&(self->_base));\n"}) )
   }
   if (self->is_delete_mocked) {
-    CHECK(365, write(&(String){18, 17, "  IGNORE_ERRORS( "}) )
+    CHECK(365, write(&(String){20, 19, "    IGNORE_ERRORS( "}) )
     CHECK(366, TypeData_write_cname(self) )
     CHECK(367, write(&(String){18, 17, "_MockDel(self) )\n"}) )
   }

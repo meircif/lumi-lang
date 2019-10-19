@@ -3,134 +3,134 @@ module tl5-compiler
 
 ~~~ The `base` method expression ~~~
 class BaseMethExpression(Expression)
-  new(user SyntaxTreeCode code-node)
-    base(user code-node)
-    self.access := Access.VAR
+    new(user SyntaxTreeCode code-node)
+        base(user code-node)
+        self.access := Access.VAR
 
-  func dynamic restructure()->(
-      owner Expression expression, owner FunctionArguments arguments)
-    user SyntaxTreeFunction parent-function
-    self.code-node.get-function()->(user parent-function)
-    if not parent-function.parent-type?
-      self.syntax-error-msg(user "\"base\" used not in method")
-    if not parent-function.parent-type.base-type?
-      self.syntax-error(
-          user "no base type for type", user parent-function.parent-type.name)
-    self.set-simple-type(user glob.type-base)
-    self.result-type.add-subtype-copy(user parent-function.parent-type)
-    
-    if not arguments?
-      return
-      
-    user SyntaxTreeFunction function
-    var Int bases
-    parent-function.parent-type.base-type.type-data.find-meth(
-        user parent-function.name)->(user function, var bases)
-    if not function?
-      self.syntax-error(
-          user "no base method for method", user parent-function.name)
-    
-    expression := FunctionExpression(
-        user self.code-node,
-        user function,
-        owner expression,
-        copy bases,
-        copy self.error-propagated,
-        copy false,
-        copy true)
-    expression.restructure()->(owner expression, owner arguments)
+    func dynamic restructure()->(
+            owner Expression expression, owner FunctionArguments arguments)
+        user SyntaxTreeFunction parent-function
+        self.code-node.get-function()->(user parent-function)
+        if not parent-function.parent-type?
+            self.syntax-error-msg(user "\"base\" used not in method")
+        if not parent-function.parent-type.base-type?
+            self.syntax-error(
+                    user "no base type for type", user parent-function.parent-type.name)
+        self.set-simple-type(user glob.type-base)
+        self.result-type.add-subtype-copy(user parent-function.parent-type)
+        
+        if not arguments?
+            return
+            
+        user SyntaxTreeFunction function
+        var Int bases
+        parent-function.parent-type.base-type.type-data.find-meth(
+                user parent-function.name)->(user function, var bases)
+        if not function?
+            self.syntax-error(
+                    user "no base method for method", user parent-function.name)
+        
+        expression := FunctionExpression(
+                user self.code-node,
+                user function,
+                owner expression,
+                copy bases,
+                copy self.error-propagated,
+                copy false,
+                copy true)
+        expression.restructure()->(owner expression, owner arguments)
 
 
 class ModuleTypeExpression(Expression)
-  owner Expression module-expression
-  
-  func inst analyze-module()
-    analyze-expression()->(owner self.module-expression)
-    if not self.module-expression.result-type?
-      self.code-node.syntax-error-msg(
-          user "expected module, got empty expression")
-    if self.module-expression.result-type.type-data is-not glob.type-module
-      self.code-node.syntax-error(
-          user "expected module, got",
-          user self.module-expression.result-type.type-data.name)
-  
-  func inst analyze-type-instance(user TypeInstance type-instance)
-    if self.module-expression?
-      self.analyze-module()
-      string-new-copy(user self.module-expression.result-type.name)->(
-          owner type-instance.module-name)
-    type-instance.analyze(user self)
+    owner Expression module-expression
+    
+    func inst analyze-module()
+        analyze-expression()->(owner self.module-expression)
+        if not self.module-expression.result-type?
+            self.code-node.syntax-error-msg(
+                    user "expected module, got empty expression")
+        if self.module-expression.result-type.type-data is-not glob.type-module
+            self.code-node.syntax-error(
+                    user "expected module, got",
+                    user self.module-expression.result-type.type-data.name)
+    
+    func inst analyze-type-instance(user TypeInstance type-instance)
+        if self.module-expression?
+            self.analyze-module()
+            string-new-copy(user self.module-expression.result-type.name)->(
+                    owner type-instance.module-name)
+        type-instance.analyze(user self)
 
 
 ~~~ Type name expression ~~~
 class TypeExpression(ModuleTypeExpression)
-  func inst parse-new(
-      owner TypeInstance type-instance, user SyntaxTreeCode code-node)->(
-      owner Expression expression)
-    new TypeExpression type-expression(user code-node)
-    type-expression.parse(owner type-instance, owner expression)
-    expression := type-expression
-  
-  func inst parse(
-      owner TypeInstance type-instance, owner Expression module-expression)
-    self.set-simple-type(user glob.type-type)
-    self.module-expression := module-expression
-    self.result-type.parameters := List{TypeInstance}()
-    self.result-type.parameters.add(owner type-instance)
-    self.access := Access.VAR
-  
-  func dynamic analyze()
-    self.check-no-error()
-    self.analyze-type-instance(user self.result-type.parameters.first.item)
+    func inst parse-new(
+            owner TypeInstance type-instance, user SyntaxTreeCode code-node)->(
+            owner Expression expression)
+        new TypeExpression type-expression(user code-node)
+        type-expression.parse(owner type-instance, owner expression)
+        expression := type-expression
+    
+    func inst parse(
+            owner TypeInstance type-instance, owner Expression module-expression)
+        self.set-simple-type(user glob.type-type)
+        self.module-expression := module-expression
+        self.result-type.parameters := List{TypeInstance}()
+        self.result-type.parameters.add(owner type-instance)
+        self.access := Access.VAR
+    
+    func dynamic analyze()
+        self.check-no-error()
+        self.analyze-type-instance(user self.result-type.parameters.first.item)
 
 
 ~~~ Enum name expression ~~~
 class EnumExpression(ModuleTypeExpression)
-  owner String name
-  owner String value
-  user EnumData enum-data
-  var Int int-value
-  
-  func inst parse-new(
-      owner String name, owner String value, user SyntaxTreeCode code-node)->(
-      owner Expression expression)
-    new EnumExpression enum-expression(user code-node)
-    enum-expression.parse(owner name, owner value, owner expression)
-    expression := enum-expression
-  
-  func inst parse(
-      owner String name,
-      owner String value,
-      owner Expression module-expression)
-    self.name := name
-    self.value := value
-    self.set-simple-type(user glob.type-int)
-    self.access := Access.VAR
-    self.module-expression := module-expression
-  
-  func dynamic analyze()
-    if self.module-expression?
-      self.analyze-module()
-      user String module-name(user self.module-expression.result-type.name)
-      if not self.code-node.find-module(user module-name).enum-map.find(
-          user self.name)->(user self.enum-data)?
-        self.syntax-error2(
-            user "unknown Enum",
-            user self.name,
-            user "in module",
-            user module-name)
-    else-if not glob.current-module.enum-map.find(user self.name)->(
-        user self.enum-data)?
-      self.syntax-error(user "unknown Enum", user self.name)
-    if not self.enum-data.has-value(user self.value)->(var self.int-value)
-      self.syntax-error2(
-          user "Enum", user self.name, user "has no value", user self.value)
-        
-  func dynamic get-constant-value()->(var Int value, var Bool has-value)
-    value := self.int-value
-    has-value := true
-  
-  func dynamic write()
-    self.enum-data.write-cname()
-    write(user "_")
-    write-cname(user self.value)
+    owner String name
+    owner String value
+    user EnumData enum-data
+    var Int int-value
+    
+    func inst parse-new(
+            owner String name, owner String value, user SyntaxTreeCode code-node)->(
+            owner Expression expression)
+        new EnumExpression enum-expression(user code-node)
+        enum-expression.parse(owner name, owner value, owner expression)
+        expression := enum-expression
+    
+    func inst parse(
+            owner String name,
+            owner String value,
+            owner Expression module-expression)
+        self.name := name
+        self.value := value
+        self.set-simple-type(user glob.type-int)
+        self.access := Access.VAR
+        self.module-expression := module-expression
+    
+    func dynamic analyze()
+        if self.module-expression?
+            self.analyze-module()
+            user String module-name(user self.module-expression.result-type.name)
+            if not self.code-node.find-module(user module-name).enum-map.find(
+                    user self.name)->(user self.enum-data)?
+                self.syntax-error2(
+                        user "unknown Enum",
+                        user self.name,
+                        user "in module",
+                        user module-name)
+        else-if not glob.current-module.enum-map.find(user self.name)->(
+                user self.enum-data)?
+            self.syntax-error(user "unknown Enum", user self.name)
+        if not self.enum-data.has-value(user self.value)->(var self.int-value)
+            self.syntax-error2(
+                    user "Enum", user self.name, user "has no value", user self.value)
+                
+    func dynamic get-constant-value()->(var Int value, var Bool has-value)
+        value := self.int-value
+        has-value := true
+    
+    func dynamic write()
+        self.enum-data.write-cname()
+        write(user "_")
+        write-cname(user self.value)

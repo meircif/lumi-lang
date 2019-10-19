@@ -4,7 +4,7 @@ user String str
 ## @ g t1
 
 
-  
+    
 
 var Int x
 ## @ g t2
@@ -23,7 +23,7 @@ var Int x
 var Int x
 ## @ g t5
 ~~~ multi 
- line  
+ line    
  documentation
  confused by ~ or ~~ or ; or ~~ ~ ?
 ~~~
@@ -34,12 +34,12 @@ var String{12} s
 user String us(user s)
 user String gs(user "global text")
 main
-  var Int x(copy 6)
-  x := 7
+    var Int x(copy 6)
+    x := 7
 ## @ tg t7
 var String{12} s
 func fun()
-  s := _
+    s := _
 ## @-
 module second
 test dummy()
@@ -49,20 +49,21 @@ error
 1 + 2
 ## @ ec te2
 return
-  i := 3
+    i := 3
 ## @ ec te3
 raise
-  i := 3
+    i := 3
 ## @ eg te4
 [; comment ;]?
 ## @ eg te5
 main(
 ## @ eg te6
-  struct Test
+    struct Test
 ## @ eg te7
 func f()
-  x :=
-    y
+    var Int x
+    x :=
+        1
 ## @ feg te8
 var Int x
 ## @ eg te9
@@ -80,24 +81,24 @@ var Int x(copy error)
 ## @@ test-struct
 ## @ g t0
 struct Test
-  var Int x
+    var Int x
 ## @ g t1
 struct Test
-  var Int x
+    var Int x
 ## @ g t2
 struct Test1
-  var Int x
+    var Int x
 struct Test2
-  var Int x
+    var Int x
 
 
 struct Test3
-  var Int x
+    var Int x
 ## @ g t3
 struct Test2(Test1)
-  var Int y
+    var Int y
 struct Test1
-  var Int x
+    var Int x
 ## @ eg te0
 struct(
 ## @ eg te1
@@ -117,70 +118,70 @@ struct Test
 struct Test(Base
 ## @ eg te8
 struct Test
-  error 
+    error 
 ## @ feg te9
 struct Test
 ## @ eg te10
 struct Error
 ## @ eg te11
 struct Error
-  new 
+    new 
 ## @ eg te12
 struct Error
-  new()
-  new()
+    new()
+    new()
 ## @ eg te13
 struct Error
-  var Int x
-  new()->(var Int x)
+    var Int x
+    new()->(var Int x)
 ## @ eg te14
 struct Error(Error)
-  var Int x
+    var Int x
 ## @ eg te15
 struct Aerror(Berror)
-  var Int x
+    var Int x
 struct Berror(Aerror)
-  var Int x
+    var Int x
 ## @@ test-class
 ## @ g t0
 class Base
-  var Int x
-  owner Base b
-  func inst stat()
-  func dynamic dyn0()
-  func dynamic dyn1()
+    var Int x
+    owner Base b
+    func inst stat()
+    func dynamic dyn0()
+    func dynamic dyn1()
 class Mid(Base)
-  var Int y
-  owner Mid m
-  func dynamic dyn0()
-  func dynamic dyn2()
+    var Int y
+    owner Mid m
+    func dynamic dyn0()
+    func dynamic dyn2()
 class Top(Mid)
-  var Int z
-  owner Top t
-  func dynamic dyn0()
-    base()
-  func dynamic dyn3()
-    base.dyn0()
+    var Int z
+    owner Top t
+    func dynamic dyn0()
+        base()
+    func dynamic dyn3()
+        base.dyn0()
 ## @ eg te0
 class(
 ## @ eg te1
 class Error
-  var Int x
+    var Int x
 ## @ eg te2
 class Error
-  func error f()
+    func error f()
 ## @ eg te3
 struct Base
-  var Int x
-  func meth()
+    var Int x
+    func meth()
 class Error(Base)
-  func dynamic meth()
+    func dynamic meth()
 ## @ eg te4
 class Base
-  var Int x
-  func dynamic meth()
+    var Int x
+    func dynamic meth()
 class Error(Base)
-  func inst meth()
+    func inst meth()
 ## @@ test-function
 ## @ g t0
 func name()
@@ -196,46 +197,46 @@ func name(user Array{Int} array)
 func name(copy Func{(copy Int x)->(var Int y)} fun)->(var Func{()} joy)
 ## @ g t6
 func name()
-  var Int x
+    var Int x
 ## @ g t7
 func name(user String self, copy Int px, user String pu, owner String po)->(
-    var String oself, var Int ox, user String ou, owner String oo)
-  var Int x
-  user String u
-  owner String o
-  var String{12} v
-  new String{12} n
-  o := String{12}()
-  u := "constant string"
-  pu := po[2:6]
+        var String oself, var Int ox, user String ou, owner String oo)
+    var Int x
+    user String u
+    owner String o
+    var String{12} v
+    new String{12} n
+    o := String{12}()
+    u := "constant string"
+    pu := po[2:6]
 ## @ g t8
 struct Struct
-  owner Struct s
-  owner Array{Struct} as
+    owner Struct s
+    owner Array{Struct} as
 class Class
-  owner Class c
-  owner Array{Class} ac
-  func dynamic meth()
+    owner Class c
+    owner Array{Class} ac
+    func dynamic meth()
 func name(
-    owner Struct ps,
-    owner Class pc,
-    owner Array{Struct} pas,
-    owner Array{Class} pac)
-  owner Struct s
-  owner Class c
-  owner Array{Struct} as
-  owner Array{Class} ac
-  owner Array{Int} ai
-  owner Array{File} af
+        owner Struct ps,
+        owner Class pc,
+        owner Array{Struct} pas,
+        owner Array{Class} pac)
+    owner Struct s
+    owner Class c
+    owner Array{Struct} as
+    owner Array{Class} ac
+    owner Array{Int} ai
+    owner Array{File} af
 ## @ g t9
 class Test
-  var Int x
-  func dynamic meth()
+    var Int x
+    func dynamic meth()
 func name()->(owner Test t)
-  t := _
+    t := _
 ## @ g tm0
 main
-  var Int x
+    var Int x
 ## @ eg te0
 func(
 ## @ eg te1
@@ -266,7 +267,7 @@ func name()-()
 func name()
 ## @ eg te13
 func name()
-    var Int x
+        var Int x
 ## @ eg te14
 func name(user Int x)
 ## @ eg te15
@@ -281,99 +282,99 @@ func name(copy Func error)
 func name(user Array{Array{Int}} error)
 ## @ eg te20
 func name(
-  copy Int x)
+    copy Int x)
 ## @@ test-members
 ## @ g t0
 struct Test
-  var Int x
-  user String str
+    var Int x
+    user String str
 ## @ g t1
 struct Test
-  var Int x
-  func name()
-    self.x := 2
+    var Int x
+    func name()
+        self.x := 2
 ## @ g t2
 struct Test
-  var Int x
-  func name()
     var Int x
-    x := self.x
-    if x > 2
-      x := 2
+    func name()
+        var Int x
+        x := self.x
+        if x > 2
+            x := 2
 ## @ g t3
 struct Test
-  ; comment
-  var Int x
+    ; comment
+    var Int x
 ## @ g t4
 struct Test
-  ~~~ documemtation ~~~
-  var Int x
+    ~~~ documemtation ~~~
+    var Int x
 ## @ g t5
 struct Test
-  [; multi 
-  line 
-  comment ;]
-  var Int x
+    [; multi 
+    line 
+    comment ;]
+    var Int x
 ## @ g t6
 struct Test
-  ~~~ multi 
-  line 
-  documemtation
-  ~~~
-  var Int x
+    ~~~ multi 
+    line 
+    documemtation
+    ~~~
+    var Int x
 ## @ g t7
 var Int name
 func fun()
 struct Test1
-  var Int name
-  func fun()
+    var Int name
+    func fun()
 struct Test2
-  var Int fun
-  func name()
+    var Int fun
+    func name()
 ## @ eg t8
 struct Test
-  var Int name
-  var Int name
+    var Int name
+    var Int name
 ## @ eg t9
 struct Test
-  func name()
-  var Int name
+    func name()
+    var Int name
 ## @ eg t10
 struct Test
-  func name()
-  func name()
+    func name()
+    func name()
 ## @ eg t11
 struct Test
-  var Int name
-  func name()
+    var Int name
+    func name()
 ## @ eg t12
 struct Test
-  var Int x
-  func meth()
-    owner Test error
-    error := self
+    var Int x
+    func meth()
+        owner Test error
+        error := self
 ## @@ test-return
 ## @ g t0
 func name()
-  return
+    return
 ## @ g t1
 func name()
-  raise
+    raise
 ## @ g t2
 func name()
-  raise "some error"
+    raise "some error"
 ## @ g t3
 func name(user Array{String} arr)
-  raise arr[3]
+    raise arr[3]
 ## @ eg te0
 func name()
-  return()
+    return()
 ## @ eg te1
 func name()
-  raise()
+    raise()
 ## @ eg te2
 func name()
-  raise 2
+    raise 2
 ## @@ test-code-variables
 ## @ c t0
 var Int x
@@ -393,7 +394,7 @@ var Array{12:Test} a
 var Array{12:String{7}} sa
 ## @ c t8
 new String{12} s
-  so := s
+    so := s
 ## @ c t9
 var Array{12:Tc} a
 ## @ ec te0
@@ -404,24 +405,24 @@ var Int Error
 var Int errorName
 ## @ ec te3
 var Int name
-  var Int name
+    var Int name
 ## @ ec te4
 var Int name
-  do
-    var Int x
     do
-      var Int name
+        var Int x
+        do
+            var Int name
 ## @ eg te5
 var Int name
 func mock()
-  var Int name
+    var Int name
 ## @ eg te6
 func name()
 func mock()
-  var Int name
+    var Int name
 ## @ eg te7
 struct Test
-  var Int x(1)
+    var Int x(1)
 ## @ ec te8
 new
 ## @ ec te9
@@ -499,9 +500,9 @@ var Bool x(var 1)
 var Int x(var 1, var 2)
 ## @ eg te19
 struct Test
-  var Int x
+    var Int x
 func mock()
-  Test(copy 1)
+    Test(copy 1)
 ## @ ec te20
 var Int x(user 3)
 ## @ ec te21
@@ -516,103 +517,103 @@ owner Test ot(owner tb)
 ## @ c t0
 ; comment
 
-  var Int x
+    var Int x
 ## @ c t1
 ~~~ documemtation ~~~
 
-  var Int x
+    var Int x
 ## @ c t2
 [; multi 
-  line 
-  comment ;]
+    line 
+    comment ;]
 
-  var Int x
+    var Int x
 ## @ c t3
 ~~~ multi 
-  line 
-  documemtation
-  ~~~
+    line 
+    documemtation
+    ~~~
 
-  var Int x
+    var Int x
 ## @@ test-if-else
 ## @ c t0
 if t.num > 3
-    i -= 2
+        i -= 2
 ## @ c t1
 if i > 3
-    i -= 2
-  else
-    i += 1
+        i -= 2
+    else
+        i += 1
 ## @ c t2
 if i > 3
-    i -= 3
-  else-if t.num > 2
-    i -= 2
-  else-if t.num > 1
-    i -= 1
-  else
-    i += 1
+        i -= 3
+    else-if t.num > 2
+        i -= 2
+    else-if t.num > 1
+        i -= 1
+    else
+        i += 1
 ## @ c t3
 if b
-    return
-  i := 3
+        return
+    i := 3
 ## @ c t4
 if b and
-      b
-    i += 1
+            b
+        i += 1
 ## @ ec te0
 if 3
 ## @ ec te1
 if b
-    error
+        error
 ## @ ec te2
 if b
-    i := 0
-  else
-    error
+        i := 0
+    else
+        error
 ## @ ec te3
 if b
-    i := 0
-  else-if b
-    error
+        i := 0
+    else-if b
+        error
 ## @ ec te4
 if b
-    return
-    i := 3
+        return
+        i := 3
 ## @ ec te5
 if()
 ## @ ec te6
 else
 ## @ ec te7
 if false
-    ; ...
-  else 
+        ; ...
+    else 
 ## @ ec te8
 else-if
 ## @ ec te9
 if false
-    ; ...
-  else-if()
+        ; ...
+    else-if()
 ## @ feg te10
 func error()
-  if b
+    if b
 ## @@ test-do-loop
 ## @ c t0
 do
-    var Int x
+        var Int x
 ## @ c t1
 do
-    break
+        break
 ## @ c t2
 do
-    while t.num > 3
+        while t.num > 3
 ## @ c t3
 do
-    continue
+        continue
 ## @ c t4
 do
-    if true
-      while false
+        if true
+            while false
 ## @ ec te0
 do(
 ## @ ec te1
@@ -621,55 +622,55 @@ while true
 continue
 ## @ ec te3
 do
-    while 2
+        while 2
 ## @ ec te4
 do
-    error
+        error
 ## @ ec te5
 do
-    var Int error
-  do
-    var Int error
+        var Int error
+    do
+        var Int error
 ## @ ec te6
 do
-    while i := 3
+        while i := 3
 ## @ ec te7
 break
 ## @ ec te8
 do
-    break 
+        break 
 ## @ ec te9
 do
-    continue 
+        continue 
 ## @@ test-for-loop
 ## @ c t0
 for n in 5
-    i += n
+        i += n
 ## @ c t1
 for n in t.num:str.length
-    i += n
+        i += n
 ## @ c t2
 for ch in str
-    c := ch
+        c := ch
 ## @ c t3
 for n in arr
-    i += n
+        i += n
 ## @ c t4
 for s in sarr
-    str := s
+        str := s
 ## @ c t5
 var Int n
-  for n in 5
-    i += n
+    for n in 5
+        i += n
 ## @ c t6
 for n in 5
-    i += n
-  for n in 7
-    i += n
+        i += n
+    for n in 7
+        i += n
 ## @ c t7
 for n in 1 +
-      2
-    i += n
+            2
+        i += n
 ## @ ec te0
 for(
 ## @ ec te1
@@ -682,11 +683,11 @@ for n in fun0()
 for n in str:8
 ## @ ec te5
 for n in 5
-    error
+        error
 ## @ ec te6
 for n in arr
-    i += n
-  for n in sarr
+        i += n
+    for n in sarr
 ## @@ test-testing
 ## @ c ta0
 assert t.num = 2
@@ -700,101 +701,101 @@ assert-error t.num, "expected error"
 assert-error fun0(), "expected error in the function"
 ## @ c ta5
 assert-error t.num,
-      "expected error in new line"
+            "expected error in new line"
 ## @ g tm0
 func fun()
-  fun()
+    fun()
 mock fun()
-  raise
+    raise
 ## @ g tm1
 mock fun()
 func fun()
-  fun()
+    fun()
 ## @ g tm2
 mock Test.meth(copy Int x)
 struct Test
-  var Int x
-  func meth(copy Int x)
-    self.meth(copy x)
+    var Int x
+    func meth(copy Int x)
+        self.meth(copy x)
 ## @ g tm3
 mock Test.meth(copy Int x)
 class Test
-  var Int x
-  func dynamic meth(copy Int x)
-    self.meth(copy x)
+    var Int x
+    func dynamic meth(copy Int x)
+        self.meth(copy x)
 ## @ g tm4
 func fun(copy Int x)->(var Int y)
 mock fun(copy Int x)->(var Int y)
-  fun.mocked(copy x)->(var y)
-  fun.active := false
-  fun(copy x)->(var y)
-  fun.active := true
+    fun.mocked(copy x)->(var y)
+    fun.active := false
+    fun(copy x)->(var y)
+    fun.active := true
 ## @ g tm5
 struct Test
-  var Int x
-  func meth(copy Int x)->(var Int y)
-    self.meth(copy x)->(var y)
+    var Int x
+    func meth(copy Int x)->(var Int y)
+        self.meth(copy x)->(var y)
 mock Test.meth(copy Int x)->(var Int y)
-  self.meth.mocked(copy x)->(var y)
-  Test.meth.mocked(user self, copy x)->(var y)
-  self.meth.active := false
-  Test.meth(user self, copy x)->(var y)
-  Test.meth.active := true
+    self.meth.mocked(copy x)->(var y)
+    Test.meth.mocked(user self, copy x)->(var y)
+    self.meth.active := false
+    Test.meth(user self, copy x)->(var y)
+    Test.meth.active := true
 ## @ g tm6
 class Test
-  var Int x
-  func dynamic meth(copy Int x)->(var Int y)
-    self.meth(copy x)->(var y)
+    var Int x
+    func dynamic meth(copy Int x)->(var Int y)
+        self.meth(copy x)->(var y)
 mock Test.meth(copy Int x)->(var Int y)
-  Test.meth.mocked(user self, copy x)->(var y)
-  Test.meth.active := false
-  Test.meth(user self, copy x)->(var y)
-  Test.meth.active := true
+    Test.meth.mocked(user self, copy x)->(var y)
+    Test.meth.active := false
+    Test.meth(user self, copy x)->(var y)
+    Test.meth.active := true
 ## @ g tm7
 func fun()
-  sys.print(user "mock print")
-  sys.print.mocked(user "really print")
-  Sys.print.active := false
-  sys.print.active := true
+    sys.print(user "mock print")
+    sys.print.mocked(user "really print")
+    Sys.print.active := false
+    sys.print.active := true
 mock Sys.print(user String text)
 ## @ tg tt0
 func fun0()
-  var Int x(copy 4)
-  x += 1
-  var Int y(copy 5)
-  y := x
-  if y > 3
-    y := 3
-  else-if y < 0
-    y := 0
-  else
-    y += 1
-  try
-    x := 0
-    sys.print(user _)
-    y := 0
-  catch
-    x := 1
-    x := 2
-  if x > 3
-    return
-  else
-    raise
-  do
-    while x > 1
-    if x = 5
-      continue
-  for n in 3
-    x += y
+    var Int x(copy 4)
+    x += 1
+    var Int y(copy 5)
+    y := x
+    if y > 3
+        y := 3
+    else-if y < 0
+        y := 0
+    else
+        y += 1
+    try
+        x := 0
+        sys.print(user _)
+        y := 0
+    catch
+        x := 1
+        x := 2
+    if x > 3
+        return
+    else
+        raise
+    do
+        while x > 1
+        if x = 5
+            continue
+    for n in 3
+        x += y
 ## @-
 module ut
 func fun1()
-  fun0()
+    fun0()
 test fun2()
-  fun1()
+    fun1()
 ## @ tg tt1
 func fun()
-  var Int x
+    var Int x
 main
 ## @-
 module second
@@ -802,30 +803,30 @@ test fun0()
 test fun1()
 ## @ g tmg0
 mock Test.delete()
-  var Ref r(copy self)
+    var Ref r(copy self)
 struct Test
-  user String s
+    user String s
 ## @ g tmg1
 mock delete()
-  var Ref r(copy self)
+    var Ref r(copy self)
 main
 ## @ g tmg2
 mock new()->(var Bool allocate-success)
-  allocate-success := false
+    allocate-success := false
 main
 ## @ c tr0
 var Ref r
 ## @ c tr1
 var Ref r
-  r := str
+    r := str
 ## @ c tr2
 var Ref r
-  r := _
+    r := _
 ## @ c tr3
 var Ref r(copy str)
 ## @ c tr4
 var Ref r
-  assert r is r
+    assert r is r
 ## @ ec te0
 assert 3
 ## @ ec te1
@@ -842,7 +843,7 @@ mock error()
 mock Error.fun()
 ## @ eg te7
 struct Test
-  var Int x
+    var Int x
 mock Test.error()
 ## @ eg te8
 mock fun(owner String s)
@@ -865,8 +866,8 @@ mock fun()
 mock fun()
 ## @ eg te15
 struct Test
-  var Int x
-  func fun()
+    var Int x
+    func fun()
 mock Test.fun()
 mock Test.fun()
 ## @ eg te16
@@ -874,7 +875,7 @@ mock delete()
 mock delete()
 ## @ eg te17
 struct Test
-  var Int x
+    var Int x
 mock Test.delete()
 mock Test.delete()
 ## @ ec te18
@@ -905,32 +906,32 @@ mock delete()->(copy Int x)
 ## @ eg te29
 func fun()
 mock fun()
-  fun.error
+    fun.error
 ## @ eg te30
 class Test
-  var Int x
-  func dynamic meth()
+    var Int x
+    func dynamic meth()
 mock Test.meth()
-  self.meth.mocked()
+    self.meth.mocked()
 ## @@ test-native
 ## @ g tf0
 native func external()
 func call()
-  external()
+    external()
 ## @ g tf1
 class Test
-  var Int x
-  func dynamic meth()
+    var Int x
+    func dynamic meth()
 native func external(copy Int i, user String s, user Test ta)->(var Int io)
 func call()
-  var Int i
-  user String s
-  user Test ta
-  external(copy 5, user s, user ta)->(var i)
+    var Int i
+    user String s
+    user Test ta
+    external(copy 5, user s, user ta)->(var i)
 ## @ g tv0
 native var Int x
 func use()
-  x := 2
+    x := 2
 ## @ g tt0
 native type Native
 native func external(copy Native n)->(var Native no)
@@ -954,38 +955,38 @@ native var String s
 ## @@ test-parameter-type
 ## @ g t0
 struct Test{Generic}
-  owner Generic item
-  user Array{Generic} arr
-  func set(owner Generic item, user Array{Generic} arr)
-    owner Generic x(owner item)
-    self.item := x
-    self.arr := arr
-    new Test{Generic} t
-    t.item := self.item
-    self.item := t.item
+    owner Generic item
+    user Array{Generic} arr
+    func set(owner Generic item, user Array{Generic} arr)
+        owner Generic x(owner item)
+        self.item := x
+        self.arr := arr
+        new Test{Generic} t
+        t.item := self.item
+        self.item := t.item
 ## @ g t1
 struct Test{Generic}
-  owner Generic item
-  func get()->(user Generic item)
-    item := self.item
+    owner Generic item
+    func get()->(user Generic item)
+        item := self.item
 ## @ g t2
 struct Test{First:Second:Third}
-  user First first
-  user Second second
-  user Third third
-  func set(user First first, user Second second, user Third third)
-    self.first := first
-    self.second := second
-    self.third := third
+    user First first
+    user Second second
+    user Third third
+    func set(user First first, user Second second, user Third third)
+        self.first := first
+        self.second := second
+        self.third := third
 func use(user String first, user Sys second, user File third)
-  var Test{String:Sys:File} t
-  t.first := first
-  t.second := second
-  t.third := third
-  t.set(user first, user second, user third)
+    var Test{String:Sys:File} t
+    t.first := first
+    t.second := second
+    t.third := third
+    t.set(user first, user second, user third)
 ## @ g t3
 struct Base
-  var Int x
+    var Int x
 struct Test{Generic}(Base)
 ## @ c t4
 d.item := str
@@ -997,20 +998,20 @@ d.arr := sarr
 str := d.arr[4]
 ## @ c t8
 var Array{5:Data{String}} ad
-  str := ad[2].item
+    str := ad[2].item
 ## @ c t9
 var Array{5:Data{String}} ad
-  str := ad[2].arr[3]
+    str := ad[2].arr[3]
 ## @ c t10
 d.set(owner _, user _)
 ## @ c t11
 var Data{Data{Data{String}}} dr
-  str := dr.item.item.item
+    str := dr.item.item.item
 ## @ c t12
 d.set(owner so, user sarr)
 ## @ c t13
 d.get()->(user str)
-  d.get().clear()
+    d.get().clear()
 ## @ c t14
 var Data dg
 ## @ c t15
@@ -1019,118 +1020,118 @@ user Data dg(user d)
 Data{String}.set(user d, owner so, user sarr)
 ## @ g t17
 struct Test{Generic}
-  user Test{Generic} next
-  func meth()
-    self.next := self
+    user Test{Generic} next
+    func meth()
+        self.next := self
 ## @ c t18
 var Data{Tb} dt
-  dt.item := tc
-  ta := dt.item
-  owner Tc otc
-  dt.set(owner otc, user _)
-  dt.get()->(user ta)
-  i := dt.get().numa
-  fun7(user dt.item)->(user dt.item)
-  user Tb tb2(user dt.item)
-  tb2 := dt.item
+    dt.item := tc
+    ta := dt.item
+    owner Tc otc
+    dt.set(owner otc, user _)
+    dt.get()->(user ta)
+    i := dt.get().numa
+    fun7(user dt.item)->(user dt.item)
+    user Tb tb2(user dt.item)
+    tb2 := dt.item
 ## @ g t19
 struct Base{Generic}
-  user Generic item
-  func get()->(user Generic item)
+    user Generic item
+    func get()->(user Generic item)
 struct Test(Base{String})
-  func set(user String text)
-    self.item := text
-    self.get()->(user text)
+    func set(user String text)
+        self.item := text
+        self.get()->(user text)
 func mock(user Test test, user String text)
-  test.item := text
-  test.set(user text)
-  text := test.item
-  test.get()->(user text)
-  test.get().clear()
+    test.item := text
+    test.set(user text)
+    text := test.item
+    test.get()->(user text)
+    test.get().clear()
 ## @ g t20
 class Base{Param}
-  user Param item
-  func dynamic set(user Param item)
-  func dynamic get()->(user Param item)
+    user Param item
+    func dynamic set(user Param item)
+    func dynamic get()->(user Param item)
 class Test{Generic}(Base{Generic})
-  func dynamic set(user Generic item)
-  func dynamic get()->(user Generic item)
+    func dynamic set(user Generic item)
+    func dynamic get()->(user Generic item)
 func mock(user Test{String} test, user String text)
-  test.set(user text)
-  test.get()->(user text)
-  test.get().clear()
+    test.set(user text)
+    test.get()->(user text)
+    test.get().clear()
 ## @ eg teg0
 struct Test{First:Second:Third
 ## @ eg teg1
 struct Test{Generic}
-  var Generic error
+    var Generic error
 ## @ eg teg2
 struct Test{Generic}
-  user Generic item
-  func meth(copy Generic error)
+    user Generic item
+    func meth(copy Generic error)
 ## @ eg teg3
 struct Test{Generic}
-  user Generic item
-  func meth(user String s)
-    self.item := s
+    user Generic item
+    func meth(user String s)
+        self.item := s
 ## @ eg teg4
 struct Test{Generic}
-  user Generic item
-  func meth(user String s)
-    s := self.item
+    user Generic item
+    func meth(user String s)
+        s := self.item
 ## @ eg teg5
 struct Test{Generic}
-  user Generic item
-  func meth()
-    var Generic error
+    user Generic item
+    func meth()
+        var Generic error
 ## @ eg teg6
 struct Test{First:Second}
-  user First first
-  user Second second
-  func meth()
-    self.first := self.second
+    user First first
+    user Second second
+    func meth()
+        self.first := self.second
 ## @ eg teg7
 struct Test{error}
-  var Int x
+    var Int x
 ## @ eg teg8
 struct Test{Generic}
-  user Array{Generic} arr
-  func meth()
-    user Generic x
-    x := self.arr[2]
+    user Array{Generic} arr
+    func meth()
+        user Generic x
+        x := self.arr[2]
 ## @ eg teg9
 struct Test{Generic}
-  user Array{Generic} arr
-  func meth()
-    var Array{12:Generic} arr
+    user Array{Generic} arr
+    func meth()
+        var Array{12:Generic} arr
 ## @ eg teg10
 struct Test{Generic}
-  user Array{Generic} arr
-  func meth()
-    self.arr := Array{12:Generic}()
+    user Array{Generic} arr
+    func meth()
+        self.arr := Array{12:Generic}()
 ## @ eg teg11
 struct Test{First:Second:Third}
-  user First first
-  user Second second
-  user Third third
+    user First first
+    user Second second
+    user Third third
 func meth(user Test{String:String} t)
-  user Test{String:String:String} error(user t)
+    user Test{String:String:String} error(user t)
 ## @ eg teg12
 struct Base{Param}
-  user Param item
+    user Param item
 struct Error(Base)
 ## @ eg teg13
 struct Base
-  user Int x
+    user Int x
 struct Error(Base{String})
 ## @ eg teg14
 struct Base{Param}
-  user Param item
+    user Param item
 struct Error(Base{String:String})
 ## @ eg teg15
 struct Base{Param0:Param1}
-  user Param0 item0
-  user Param1 item1
+    user Param0 item0
+    user Param1 item1
 struct Error(Base{String})
 ## @ ec tec0
 var Data{Int} error
@@ -1142,10 +1143,10 @@ var Data{Error} error
 var Char{String} error
 ## @ ec tec4
 var Data dg
-  str := dg.item
+    str := dg.item
 ## @ ec tec5
 var Data dg
-  d := dg
+    d := dg
 ## @ ec tec6
 t := d.item
 ## @ ec tec7
@@ -1153,456 +1154,456 @@ var Data{Array{Int}} error
 ## @@ test-parameter-inheritance
 ## @ g t0
 struct Base{Generic}
-  user Generic item
+    user Generic item
 struct Test(Base{String})
-  func set(user String s)
-    self.item := s
-    Test.set(user Test(), user s)
+    func set(user String s)
+        self.item := s
+        Test.set(user Test(), user s)
 func use(user String s)
-  var Test t
-  t.item := s
+    var Test t
+    t.item := s
 ## @ g t1
 struct Base{Generic}
-  user Generic item
+    user Generic item
 struct Test{Param}(Base{Param})
-  func set(user Param i, user String s)
-    self.item := i
-    Test{String}.set(user Test{String}(), user s, user s)
+    func set(user Param i, user String s)
+        self.item := i
+        Test{String}.set(user Test{String}(), user s, user s)
 func use(user String s)
-  var Test{String} t
-  t.item := s
+    var Test{String} t
+    t.item := s
 ## @ g t2
 struct Base{Pbase}
-  user Pbase item
-  func set(user Pbase i)
+    user Pbase item
+    func set(user Pbase i)
 struct Mid{Pmid}(Base{Pmid})
-  func set(user Pmid i)
+    func set(user Pmid i)
 struct Top(Mid{String})
-  func set(user String s)
-    base(user s)
-    self.item := s
+    func set(user String s)
+        base(user s)
+        self.item := s
 struct Test(Top)
-  func set(user String s)
-    base(user s)
-    self.item := s
-    Top.set(user Top(), user s)
-    Test.set(user Test(), user s)
-    Mid{String}.set(user Top(), user s)
+    func set(user String s)
+        base(user s)
+        self.item := s
+        Top.set(user Top(), user s)
+        Test.set(user Test(), user s)
+        Mid{String}.set(user Top(), user s)
 func use(user String s)
-  var Test t
-  t.item := s
+    var Test t
+    t.item := s
 ## @ g t3
 struct Base{Generic}
-  user Generic item
+    user Generic item
 struct Test{Generic}(Base{Generic})
-  func set(user Generic i, user String s)
-    self.item := i
-    Test{String}.set(user Test{String}(), user s, user s)
+    func set(user Generic i, user String s)
+        self.item := i
+        Test{String}.set(user Test{String}(), user s, user s)
 func use(user String s)
-  var Test{String} t
-  t.item := s
+    var Test{String} t
+    t.item := s
 ## @ g t4
 struct Base{First:Second}
-  user First first
-  user Second second
+    user First first
+    user Second second
 struct Mid{Param:Third}(Base{Param:Sys})
-  user Third third
-  func set(user Param first, user Sys second, user Third third)
-    self.first := first
-    self.second := second
-    self.third := third
+    user Third third
+    func set(user Param first, user Sys second, user Third third)
+        self.first := first
+        self.second := second
+        self.third := third
 struct Top{Generic}(Mid{Generic:File})
-  func set(user Generic first, user Sys second, user File third)
-    self.first := first
-    self.second := second
-    self.third := third
+    func set(user Generic first, user Sys second, user File third)
+        self.first := first
+        self.second := second
+        self.third := third
 struct Test(Top{String})
-  func set(user String first, user Sys second, user File third)
-    self.first := first
-    self.second := second
-    self.third := third
+    func set(user String first, user Sys second, user File third)
+        self.first := first
+        self.second := second
+        self.third := third
 func use(user String first, user Sys second, user File third)
-  var Test t
-  t.first := first
-  t.second := second
-  t.third := third
+    var Test t
+    t.first := first
+    t.second := second
+    t.third := third
 ## @ g t5
 struct First{FirstGeneric}
-  user FirstGeneric item
+    user FirstGeneric item
 struct Second{SecondGeneric}
-  user SecondGeneric item
+    user SecondGeneric item
 struct Test{Generic}(First{Second{Generic}})
-  func set(user Generic g, user Second{Generic} sg)
-    self.item := sg
-    self.item.item := g
+    func set(user Generic g, user Second{Generic} sg)
+        self.item := sg
+        self.item.item := g
 func use(user String s, user Second{String} ss)
-  var Test{String} t
-  t.item := ss
-  t.item.item := s
+    var Test{String} t
+    t.item := ss
+    t.item.item := s
 ## @ g t6
 struct BaseGen{FirstGeneric}
-  user FirstGeneric item
+    user FirstGeneric item
 struct TestGen{SecondGeneric}(BaseGen{SecondGeneric})
 struct Base
-  var Int x
+    var Int x
 struct Test(Base)
 func test()
-  user BaseGen{Base} bb
-  user BaseGen{Test} bt
-  user TestGen{Base} tb
-  user TestGen{Test} tt
-  bb := tb
-  bt := tt
-  bb := bt
-  tb := tt
-  bb := tt
+    user BaseGen{Base} bb
+    user BaseGen{Test} bt
+    user TestGen{Base} tb
+    user TestGen{Test} tt
+    bb := tb
+    bt := tt
+    bb := bt
+    tb := tt
+    bb := tt
 ## @ eg te0
 struct Base{Generic}
-  user Generic item
+    user Generic item
 struct Test{Param}(Base{Param})
-  user Generic error
+    user Generic error
 ## @ eg te1
 struct Base{Generic}
-  user Generic item
+    user Generic item
 struct Test(Base{String})
-  func set(user File error)
-    self.item := error
+    func set(user File error)
+        self.item := error
 ## @ eg te2
 struct Base{Generic}
-  user Generic item
+    user Generic item
 struct Test{Param}(Base{Param})
-  func set(user String error)
-    self.item := error
+    func set(user String error)
+        self.item := error
 ## @ eg te3
 struct Base{Pbase}
-  user Pbase item
+    user Pbase item
 struct Mid{Pmid}(Base{Pmid})
 struct Top(Mid{String})
 struct Test(Top)
-  func set(user File error)
-    self.item := error
+    func set(user File error)
+        self.item := error
 ## @@ test-error-handling
 ## @ c t0
 try
-    t.num := 1
-    fun0()
-  catch
-    i := t.num
-    fun4(copy 2)
+        t.num := 1
+        fun0()
+    catch
+        i := t.num
+        fun4(copy 2)
 ## @ c t1
 try
-    t.num := 1
-    fun0()
+        t.num := 1
+        fun0()
 ## @ c t2
 try
-    t.num := 1
-    try
-      fun0()
+        t.num := 1
+        try
+            fun0()
+        catch
+            fun4(copy 2)
     catch
-      fun4(copy 2)
-  catch
-    try
-      i := arr[3]
-    catch
-      i := t.num
+        try
+            i := arr[3]
+        catch
+            i := t.num
 ## @ ec te0
 try()
 ## @ ec te1
 catch
 ## @ ec te2
 try
-  catch()
+    catch()
 ## @ ec te3
 try
 ## @ ec te4
 try
-    i := 1
-  catch
+        i := 1
+    catch
 ## @ ec te5
 try
-    i := 1
-  i := 2
-  catch
-    i := 3
+        i := 1
+    i := 2
+    catch
+        i := 3
 ## @ ec te6
 do
-    try
-      while true
+        try
+            while true
 ## @ ec te7
 try
-    do
-      break
+        do
+            break
 ## @ ec te8
 try
-    do
-      if true
-        continue
+        do
+            if true
+                continue
 ## @ ec te9
 try
-    return
+        return
 ## @@ test-for-each
 ## @ g t0
 struct TestIterator
-  var Int counter
-  new(copy Int count)
-  func has()->(var Bool has-data)
-  func get()->(var Int num)
-  func next()
+    var Int counter
+    new(copy Int count)
+    func has()->(var Bool has-data)
+    func get()->(var Int num)
+    func next()
 func f-mock()->(var Int i)
-  for n in TestIterator(copy 6)
-    i := n
+    for n in TestIterator(copy 6)
+        i := n
 ## @ g t1
 struct TestIterator
-  user String value
-  func has()->(var Bool has-data)
-  func get()->(user String text)
-  func next()
+    user String value
+    func has()->(var Bool has-data)
+    func get()->(user String text)
+    func next()
 func f-mock(user TestIterator iter)->(user String s)
-  for t in iter
-    s := t
+    for t in iter
+        s := t
 ## @ g t2
 struct TestIterator{Generic}
-  user Generic item
-  func has()->(var Bool has-data)
-  func get()->(user Generic item)
-  func next()
+    user Generic item
+    func has()->(var Bool has-data)
+    func get()->(user Generic item)
+    func next()
 class Test
-  var Int x
-  func dynamic fun()
+    var Int x
+    func dynamic fun()
 func f-mock(user TestIterator{String} siter, user TestIterator{Test} titer)->(
-    user String os, user Test ot)
-  for s in siter
-    os := s
-  for t in titer
-    ot := t
+        user String os, user Test ot)
+    for s in siter
+        os := s
+    for t in titer
+        ot := t
 ## @ g t3
 class TestIterator{Generic}
-  user Generic item
-  func dynamic has()->(var Bool has-data)
-  func dynamic get()->(user Generic item)
-  func dynamic next()
+    user Generic item
+    func dynamic has()->(var Bool has-data)
+    func dynamic get()->(user Generic item)
+    func dynamic next()
 func f-mock(user TestIterator{String} iter)->(user String s)
-  for t in iter
-    s := t
+    for t in iter
+        s := t
 ## @ eg te0
 struct TestIterator
-  var Int num
-  func get()->(var Int num)
-  func next()
+    var Int num
+    func get()->(var Int num)
+    func next()
 func f-mock()
-  for n in TestIterator()
+    for n in TestIterator()
 ## @ eg te1
 struct TestIterator
-  var Int num
-  func has(copy Int x)->(var Bool has-data)
-  func get()->(var Int num)
-  func next()
+    var Int num
+    func has(copy Int x)->(var Bool has-data)
+    func get()->(var Int num)
+    func next()
 func f-mock()
-  for n in TestIterator()
+    for n in TestIterator()
 ## @ eg te2
 struct TestIterator
-  var Int num
-  func has()
-  func get()->(var Int num)
-  func next()
+    var Int num
+    func has()
+    func get()->(var Int num)
+    func next()
 func f-mock()
-  for n in TestIterator()
+    for n in TestIterator()
 ## @ eg te3
 struct TestIterator
-  var Int num
-  func has()->(var Bool has-data, var Int x)
-  func get()->(var Int num)
-  func next()
+    var Int num
+    func has()->(var Bool has-data, var Int x)
+    func get()->(var Int num)
+    func next()
 func f-mock()
-  for n in TestIterator()
+    for n in TestIterator()
 ## @ eg te4
 struct TestIterator
-  var Int num
-  func has()->(var Int x)
-  func get()->(var Int num)
-  func next()
+    var Int num
+    func has()->(var Int x)
+    func get()->(var Int num)
+    func next()
 func f-mock()
-  for n in TestIterator()
+    for n in TestIterator()
 ## @ eg te5
 struct TestIterator
-  var Int num
-  func has()->(var Bool has-data)
-  func next()
+    var Int num
+    func has()->(var Bool has-data)
+    func next()
 func f-mock()
-  for n in TestIterator()
+    for n in TestIterator()
 ## @ eg te6
 struct TestIterator
-  var Int num
-  func has()->(var Bool has-data)
-  func get(user Int x)->(var Int num)
-  func next()
+    var Int num
+    func has()->(var Bool has-data)
+    func get(user Int x)->(var Int num)
+    func next()
 func f-mock()
-  for n in TestIterator()
+    for n in TestIterator()
 ## @ eg te7
 struct TestIterator
-  var Int num
-  func has()->(var Bool has-data)
-  func get()
-  func next()
+    var Int num
+    func has()->(var Bool has-data)
+    func get()
+    func next()
 func f-mock()
-  for n in TestIterator()
+    for n in TestIterator()
 ## @ eg te8
 struct TestIterator
-  var Int num
-  func has()->(var Bool has-data)
-  func get()->(var Int num, var Int x)
-  func next()
+    var Int num
+    func has()->(var Bool has-data)
+    func get()->(var Int num, var Int x)
+    func next()
 func f-mock()
-  for n in TestIterator()
+    for n in TestIterator()
 ## @ eg te9
 struct TestIterator
-  var Int num
-  func has()->(var Bool has-data)
-  func get()->(owner String s)
-  func next()
+    var Int num
+    func has()->(var Bool has-data)
+    func get()->(owner String s)
+    func next()
 func f-mock()
-  for n in TestIterator()
+    for n in TestIterator()
 ## @ eg te10
 struct TestIterator
-  var Int num
-  func has()->(var Bool has-data)
-  func get()->(var Int num)
+    var Int num
+    func has()->(var Bool has-data)
+    func get()->(var Int num)
 func f-mock()
-  for n in TestIterator()
+    for n in TestIterator()
 ## @ eg te11
 struct TestIterator
-  var Int num
-  func has()->(var Bool has-data)
-  func get()->(var Int num)
-  func next(user Int x)
+    var Int num
+    func has()->(var Bool has-data)
+    func get()->(var Int num)
+    func next(user Int x)
 func f-mock()
-  for n in TestIterator()
+    for n in TestIterator()
 ## @ eg te12
 struct TestIterator
-  var Int num
-  func has()->(var Bool has-data)
-  func get()->(var Int num)
-  func next()->(var Int x)
+    var Int num
+    func has()->(var Bool has-data)
+    func get()->(var Int num)
+    func next()->(var Int x)
 func f-mock()
-  for n in TestIterator()
+    for n in TestIterator()
 ## @@ test-complex-fields
 ## @ g t0
 struct Test
-  var Bstruct b
-  func test()
-    user Bstruct b(user self.b)
-    b := self.b
-    self.b.meth()
-    Bstruct.meth(user self.b)
-    user Bstruct b2(user self.b.b)
-    b2 := self.b.b
-    self.b.b.meth()
-    self.b.b := b
-    Bstruct.meth(user self.b.b)
-    var Test t
-    self.b.x := 5
-    Astruct.meth(user self.b)
-    if self.b is b or b2 is-not self.b
+    var Bstruct b
+    func test()
+        user Bstruct b(user self.b)
+        b := self.b
+        self.b.meth()
+        Bstruct.meth(user self.b)
+        user Bstruct b2(user self.b.b)
+        b2 := self.b.b
+        self.b.b.meth()
+        self.b.b := b
+        Bstruct.meth(user self.b.b)
+        var Test t
+        self.b.x := 5
+        Astruct.meth(user self.b)
+        if self.b is b or b2 is-not self.b
 class Astruct
-  var Int x
-  func dynamic meth()
+    var Int x
+    func dynamic meth()
 class Bstruct(Astruct)
-  user Bstruct b
-  func dynamic meth()
+    user Bstruct b
+    func dynamic meth()
 ## @ eg te0
 struct Test
-  var String{12} error
+    var String{12} error
 ## @ eg te1
 struct Test
-  var Array{12:Int} error
+    var Array{12:Int} error
 ## @ eg te2
 struct Test
-  var Test error
+    var Test error
 ## @ eg te3
 struct Test
-  var Base error
+    var Base error
 struct Base
-  var Test t
+    var Test t
 ## @ eg te4
 struct Abase
-  var Berror b
+    var Berror b
 struct Aerror(Abase)
 struct Bbase
-  var Aerror a
+    var Aerror a
 struct Berror(Bbase)
 ## @ eg te5
 struct Base
-  var Int x
+    var Int x
 struct Test
-  var Base b
-  func test(user Base b)
-    self.b := b
+    var Base b
+    func test(user Base b)
+        self.b := b
 ## @ eg te6
 struct Base
-  var Int x
+    var Int x
 struct Test
-  var Base b
-  func error()
-    assert self.b?
+    var Base b
+    func error()
+        assert self.b?
 ## @@ test-enum
 ## @ g t0
 enum MyEnum
-  VALUE
-  ANOTHER-VALUE
-  LAST-VALUE
+    VALUE
+    ANOTHER-VALUE
+    LAST-VALUE
 func dummy()
-  var Int x(copy MyEnum.VALUE)
-  x += MyEnum.ANOTHER-VALUE
-  x -= MyEnum.length
+    var Int x(copy MyEnum.VALUE)
+    x += MyEnum.ANOTHER-VALUE
+    x -= MyEnum.length
 ## @ g t1
 enum MyEnum
-  VALUE
-  ANOTHER-VALUE
-  LAST-VALUE
+    VALUE
+    ANOTHER-VALUE
+    LAST-VALUE
 var Array{MyEnum.length:Int} arr
 ## @ eg te0
 enum MyEnum
-  VALUE
+    VALUE
 func dummy()
-  var Int x(copy MyEnum.ERROR)
+    var Int x(copy MyEnum.ERROR)
 ## @ ec te1
 i := Error.VALUE
 ## @ eg te2
 enum MyEnum
-  VALUE
+    VALUE
 func dummy()
-  var Int x(copy MyEnum.error)
+    var Int x(copy MyEnum.error)
 ## @ eg te3
 enum My-Enum
 ## @ eg te4
 enum MyEnum
-  Error
+    Error
 ## @ eg te5
 enum MyEnum
-  ERRoR
+    ERRoR
 ## @ eg te6
 enum
 ## @ eg te7
 enum MyEnum
-  VALUE(0)
+    VALUE(0)
 ## @ eg te8
 enum MyEnum
 ## @ eg te9
 enum MyEnum
-    VALUE
+        VALUE
 ## @ eg te10
 enum Error
-  VALUE
+    VALUE
 enum Error
 ## @ eg te11
 struct Error
-  var Int x
+    var Int x
 enum Error
 ## @ eg te12
 enum Error
-  VALUE
+    VALUE
 struct Error
-  var Int x
+    var Int x
 ## @@ test-constant
 ## @ g t0
 const Int NUMBER 12
@@ -1635,52 +1636,52 @@ const Int B-ERROR - (2 * A-ERROR) + 1
 ## @ eg te9
 const Int NUMBER 12
 func dummy()
-  NUMBER := 3
+    NUMBER := 3
 ## @ eg te10
 const Int NUMBER 12
 func dummy()->(var Int x)
-  dummy()->(var NUMBER)
+    dummy()->(var NUMBER)
 ## @@ test-module
 ## @ tg t0
 enum Enum
-  VALUE
+    VALUE
 const Int SIZE 12
 struct Test
-  var Int x
-  func meth()
+    var Int x
+    func meth()
 var Test t
 func fun()
-  t.x := Enum.VALUE + SIZE
-  fun()
-  Test.meth(user t)
-  second.t.x := second.Enum.VALUE + second.SIZE
-  second.fun()
-  second.Test.meth(user second.t)
-  new second.Test nt
+    t.x := Enum.VALUE + SIZE
+    fun()
+    Test.meth(user t)
+    second.t.x := second.Enum.VALUE + second.SIZE
+    second.fun()
+    second.Test.meth(user second.t)
+    new second.Test nt
 ## @-
 module second
 enum Enum
-  VALUE
+    VALUE
 const Int SIZE 12
 struct Test(ut.Test)
-  func meth()
+    func meth()
 var Test t
 func fun()
-  t.x := Enum.VALUE + SIZE
-  fun()
-  Test.meth(user t)
-  ut.t.x := ut.Enum.VALUE + ut.SIZE
-  ut.fun()
-  ut.Test.meth(user ut.t)
-  new ut.Test nt
+    t.x := Enum.VALUE + SIZE
+    fun()
+    Test.meth(user t)
+    ut.t.x := ut.Enum.VALUE + ut.SIZE
+    ut.fun()
+    ut.Test.meth(user ut.t)
+    new ut.Test nt
 test dummy()
 ## @ tg t1
 func fun()
 struct Test
-  var Int x
-  func meth()
-    fun()
-    self.meth()
+    var Int x
+    func meth()
+        fun()
+        self.meth()
 ## @-
 module second
 mock ut.fun()
@@ -1691,13 +1692,13 @@ native type Native
 native var Int x
 native func external()
 func fun()
-  x := 0
+    x := 0
 ## @-
 module second
 test use()
-  var Native n
-  x := 2
-  external()
+    var Native n
+    x := 2
+    external()
 ## @ ec te0
 ut.error
 ## @ eg te1

@@ -4,389 +4,389 @@ module tl5-compiler
 
 ~~~ For loop node in the syntax tree ~~~
 class SyntaxTreeForLoop(SyntaxTreeLoop)
-  var ExpressionValue start
-  var ExpressionValue iterator
-  var List{SyntaxTreeCode} code-nodes
-  owner String item-name
-  
-  new(user SyntaxTreeBlock parent)
-    base(user parent, copy false)
-  
-  func inst parse-new(user SyntaxTreeBlock parent)->(
-      owner SyntaxTreeForLoop new-node)
-    new-node := SyntaxTreeForLoop(user parent)
-    new-node.parse()
-  
-  func inst parse()
-    read-new(user " ")->(owner self.item-name)
-    self.expect-space(user self.item-name)
-    self.read-expect(user "in ")
-    self.iterator.new(user ":", user self)
-    if glob.last-char = ':'
-      self.start.expression := self.iterator.expression
-      self.iterator.new(user "", user self)
-    self.parse-block()
-  
-  func dynamic analyze()
-    owner VariableCreate variable-create
-    owner TypeInstance item-type-instance
-    owner Expression iterator-expression
-    user VariableExpression iterator-aux-variable-expression
-    var Int item-access
-    var Bool is-int-iteration
-    var Bool is-index-iteration
+    var ExpressionValue start
+    var ExpressionValue iterator
+    var List{SyntaxTreeCode} code-nodes
+    owner String item-name
     
-    new SyntaxTreeWhile while-node(user self.block)
+    new(user SyntaxTreeBlock parent)
+        base(user parent, copy false)
     
-    self.analyze-iterator()->(
-        owner item-type-instance,
-        var item-access,
-        var is-int-iteration,
-        var is-index-iteration)
+    func inst parse-new(user SyntaxTreeBlock parent)->(
+            owner SyntaxTreeForLoop new-node)
+        new-node := SyntaxTreeForLoop(user parent)
+        new-node.parse()
     
-    self.add-iterator-assign(copy is-int-iteration, user while-node)->(
-        owner iterator-expression, user iterator-aux-variable-expression)
-    self.add-item-variable(user item-type-instance, copy item-access)->(
-        owner variable-create)
-    if is-index-iteration
-      self.add-index-nodes(
-          copy is-int-iteration,
-          owner iterator-expression,
-          user iterator-aux-variable-expression,
-          user while-node)
-    else
-      self.insert-step-while-condition(
-          user item-type-instance,
-          copy item-access,
-          owner iterator-expression,
-          user while-node)
-    self.block.code-nodes.prepend(owner while-node)
-    if variable-create?
-      self.block.code-nodes.prepend(owner variable-create)
+    func inst parse()
+        read-new(user " ")->(owner self.item-name)
+        self.expect-space(user self.item-name)
+        self.read-expect(user "in ")
+        self.iterator.new(user ":", user self)
+        if glob.last-char = ':'
+            self.start.expression := self.iterator.expression
+            self.iterator.new(user "", user self)
+        self.parse-block()
     
-    self.analyze-children(user self.code-nodes)
-    base()
-  
-  func dynamic analyze-iterator()->(
-      owner TypeInstance item-type-instance,
-      var Int item-access,
-      var Bool is-int-iteration,
-      var Bool is-index-iteration)
-    item-access := Access.VAR
-    if self.start.parsed()
-      self.analyze-expression(user self.start, user glob.type-int)
-      self.start.check-no-error()
-      self.analyze-expression(user self.iterator, user glob.type-int)
-      glob.type-int.new-type-instance()->(owner item-type-instance)
-    else
-      self.iterator.analyze()
-      if not self.iterator.result-type?
-        self.syntax-error-msg(user "cannot iterate void expression")
-      if self.iterator.result-type.type-data is glob.type-int
-        glob.type-int.new-type-instance()->(owner item-type-instance)
-      else-if self.iterator.result-type.type-data is glob.type-string
-        glob.type-char.new-type-instance()->(owner item-type-instance)
-      else-if self.iterator.result-type.type-data is glob.type-array
-        self.iterator.result-type.parameters.first.item.copy-new()->(
-            owner item-type-instance)
-        if not item-type-instance.type-data.is-primitive
-          item-access := Access.USER
-      else
-        self.get-step-item-data()->(owner item-type-instance, var item-access)
+    func dynamic analyze()
+        owner VariableCreate variable-create
+        owner TypeInstance item-type-instance
+        owner Expression iterator-expression
+        user VariableExpression iterator-aux-variable-expression
+        var Int item-access
+        var Bool is-int-iteration
+        var Bool is-index-iteration
+        
+        new SyntaxTreeWhile while-node(user self.block)
+        
+        self.analyze-iterator()->(
+                owner item-type-instance,
+                var item-access,
+                var is-int-iteration,
+                var is-index-iteration)
+        
+        self.add-iterator-assign(copy is-int-iteration, user while-node)->(
+                owner iterator-expression, user iterator-aux-variable-expression)
+        self.add-item-variable(user item-type-instance, copy item-access)->(
+                owner variable-create)
+        if is-index-iteration
+            self.add-index-nodes(
+                    copy is-int-iteration,
+                    owner iterator-expression,
+                    user iterator-aux-variable-expression,
+                    user while-node)
+        else
+            self.insert-step-while-condition(
+                    user item-type-instance,
+                    copy item-access,
+                    owner iterator-expression,
+                    user while-node)
+        self.block.code-nodes.prepend(owner while-node)
+        if variable-create?
+            self.block.code-nodes.prepend(owner variable-create)
+        
+        self.analyze-children(user self.code-nodes)
+        base()
     
-    if self.iterator.result-type.type-data.is-primitive
-      self.iterator.check-no-error()
-    else
-      self.iterator.check-all-errors()
+    func dynamic analyze-iterator()->(
+            owner TypeInstance item-type-instance,
+            var Int item-access,
+            var Bool is-int-iteration,
+            var Bool is-index-iteration)
+        item-access := Access.VAR
+        if self.start.parsed()
+            self.analyze-expression(user self.start, user glob.type-int)
+            self.start.check-no-error()
+            self.analyze-expression(user self.iterator, user glob.type-int)
+            glob.type-int.new-type-instance()->(owner item-type-instance)
+        else
+            self.iterator.analyze()
+            if not self.iterator.result-type?
+                self.syntax-error-msg(user "cannot iterate void expression")
+            if self.iterator.result-type.type-data is glob.type-int
+                glob.type-int.new-type-instance()->(owner item-type-instance)
+            else-if self.iterator.result-type.type-data is glob.type-string
+                glob.type-char.new-type-instance()->(owner item-type-instance)
+            else-if self.iterator.result-type.type-data is glob.type-array
+                self.iterator.result-type.parameters.first.item.copy-new()->(
+                        owner item-type-instance)
+                if not item-type-instance.type-data.is-primitive
+                    item-access := Access.USER
+            else
+                self.get-step-item-data()->(owner item-type-instance, var item-access)
+        
+        if self.iterator.result-type.type-data.is-primitive
+            self.iterator.check-no-error()
+        else
+            self.iterator.check-all-errors()
+        
+        user TypeData iterator-type(user self.iterator.result-type.type-data)
+        is-int-iteration := iterator-type is glob.type-int
+        is-index-iteration := is-int-iteration or
+                iterator-type is glob.type-string or iterator-type is glob.type-array
+        
+    func inst get-step-item-data()->(
+            owner TypeInstance item-type-instance, var Int item-access)
+        user SyntaxTreeFunction function
+        self.iterator.result-type.type-data.find-meth(user "step")->(user function)
+        if not function?
+            self.syntax-error(
+                    user "cannot iterate type with no \"step\" named method -",
+                    user self.iterator.result-type.type-data.name)
+        if function.arguments.parameters.first.next?
+            self.syntax-error(
+                    user "iterator \"step\" method has parameters in type",
+                    user self.iterator.result-type.type-data.name)
+        user ListNode{Argument} first-output(user function.arguments.outputs.first)
+        if not first-output?
+            self.syntax-error(
+                    user "iterator \"step\" method has no outputs in type",
+                    user self.iterator.result-type.type-data.name)
+        user ListNode{Argument} second-output(user first-output.next)
+        if not second-output?
+            self.syntax-error(
+                    user "iterator \"step\" method has only one output in type",
+                    user self.iterator.result-type.type-data.name)
+        if second-output.next?
+            self.syntax-error(
+                    user "iterator \"step\" method has more than two outputs in type",
+                    user self.iterator.result-type.type-data.name)
+        if second-output.item.get-type-instance().type-data is-not glob.type-bool
+            self.syntax-error(
+                    user "iterator \"step\" method second output is not \"Bool\" in type",
+                    user self.iterator.result-type.type-data.name)
+        if function.self-access != Access.USER
+            self.syntax-error(
+                    user "iterator \"step\" method self access is not \"user\" in type",
+                    user self.iterator.result-type.type-data.name)
+        
+        if function.arguments.has-error
+            self.iterator.expression.check-error-propagated(
+                    user "ignoring iterator step function error check")
+        item-access := first-output.item.access
+        first-output.item.get-type-instance().new-replace-params(
+                user self.iterator.result-type)->(owner item-type-instance)
+        
+    func inst add-iterator-assign(
+            copy Bool is-int-iteration, user SyntaxTreeCode code-node)->(
+            owner Expression iterator-expression,
+            user VariableExpression iterator-aux-variable-expression)
+        var Int iterator-access(copy Access.USER)
+        var Int iterator-value
+        var Bool is-constant-iterator
+        if is-int-iteration
+            iterator-access := Access.VAR
+            self.iterator.get-constant-value()->(
+                    var iterator-value, var is-constant-iterator)
+        if is-constant-iterator
+            iterator-expression := self.iterator.expression
+            iterator-expression.code-node := code-node
+            return
+        
+        ; aux-iterator := iterator
+        owner VariableExpression aux-variable-expression-owner
+        new SyntaxTreeExpression iterator-assign-node(user self.parent)
+        iterator-aux-variable-expression := self.add-aux-variable(
+                copy iterator-access, copy false, user self.iterator.result-type)->(
+                owner aux-variable-expression-owner)
+        self.insert-assign(
+                user iterator-assign-node,
+                owner aux-variable-expression-owner.copy-new(),
+                owner AnalyzedExpression(owner self.iterator.expression))
+        self.code-nodes.add(owner iterator-assign-node)
+        iterator-expression := aux-variable-expression-owner
+        iterator-expression.code-node := code-node
+        
+    func inst add-item-variable(
+            user TypeInstance item-type-instance, copy Int item-access)->(
+            owner VariableCreate variable-create)
+        if not self.item-name?
+            return
+        
+        if self.item-name.equal(user "_")
+            self.item-name := _
+            return
+        
+        user SyntaxTreeVariable item-variable
+        if self.parent.find-variable(user self.item-name, user _)->(
+                user item-variable)?
+            item-type-instance.check-assign-to(
+                    copy item-variable.access,
+                    user item-variable.type-instance,
+                    copy item-variable.access,
+                    user self)
+            return
+        
+        new SyntaxTreeVariable new-item-variable(user self.block)
+        string-new-copy(user self.item-name)->(owner new-item-variable.name)
+        new-item-variable.access := item-access
+        item-type-instance.copy-new()->(owner new-item-variable.type-instance)
+        new-item-variable.is-initialized := true
+        variable-create := VariableCreate(user new-item-variable)
+        self.block.variables.add(owner new-item-variable)
     
-    user TypeData iterator-type(user self.iterator.result-type.type-data)
-    is-int-iteration := iterator-type is glob.type-int
-    is-index-iteration := is-int-iteration or
-        iterator-type is glob.type-string or iterator-type is glob.type-array
-    
-  func inst get-step-item-data()->(
-      owner TypeInstance item-type-instance, var Int item-access)
-    user SyntaxTreeFunction function
-    self.iterator.result-type.type-data.find-meth(user "step")->(user function)
-    if not function?
-      self.syntax-error(
-          user "cannot iterate type with no \"step\" named method -",
-          user self.iterator.result-type.type-data.name)
-    if function.arguments.parameters.first.next?
-      self.syntax-error(
-          user "iterator \"step\" method has parameters in type",
-          user self.iterator.result-type.type-data.name)
-    user ListNode{Argument} first-output(user function.arguments.outputs.first)
-    if not first-output?
-      self.syntax-error(
-          user "iterator \"step\" method has no outputs in type",
-          user self.iterator.result-type.type-data.name)
-    user ListNode{Argument} second-output(user first-output.next)
-    if not second-output?
-      self.syntax-error(
-          user "iterator \"step\" method has only one output in type",
-          user self.iterator.result-type.type-data.name)
-    if second-output.next?
-      self.syntax-error(
-          user "iterator \"step\" method has more than two outputs in type",
-          user self.iterator.result-type.type-data.name)
-    if second-output.item.get-type-instance().type-data is-not glob.type-bool
-      self.syntax-error(
-          user "iterator \"step\" method second output is not \"Bool\" in type",
-          user self.iterator.result-type.type-data.name)
-    if function.self-access != Access.USER
-      self.syntax-error(
-          user "iterator \"step\" method self access is not \"user\" in type",
-          user self.iterator.result-type.type-data.name)
-    
-    if function.arguments.has-error
-      self.iterator.expression.check-error-propagated(
-          user "ignoring iterator step function error check")
-    item-access := first-output.item.access
-    first-output.item.get-type-instance().new-replace-params(
-        user self.iterator.result-type)->(owner item-type-instance)
-    
-  func inst add-iterator-assign(
-      copy Bool is-int-iteration, user SyntaxTreeCode code-node)->(
-      owner Expression iterator-expression,
-      user VariableExpression iterator-aux-variable-expression)
-    var Int iterator-access(copy Access.USER)
-    var Int iterator-value
-    var Bool is-constant-iterator
-    if is-int-iteration
-      iterator-access := Access.VAR
-      self.iterator.get-constant-value()->(
-          var iterator-value, var is-constant-iterator)
-    if is-constant-iterator
-      iterator-expression := self.iterator.expression
-      iterator-expression.code-node := code-node
-      return
-    
-    ; aux-iterator := iterator
-    owner VariableExpression aux-variable-expression-owner
-    new SyntaxTreeExpression iterator-assign-node(user self.parent)
-    iterator-aux-variable-expression := self.add-aux-variable(
-        copy iterator-access, copy false, user self.iterator.result-type)->(
-        owner aux-variable-expression-owner)
-    self.insert-assign(
-        user iterator-assign-node,
-        owner aux-variable-expression-owner.copy-new(),
-        owner AnalyzedExpression(owner self.iterator.expression))
-    self.code-nodes.add(owner iterator-assign-node)
-    iterator-expression := aux-variable-expression-owner
-    iterator-expression.code-node := code-node
-    
-  func inst add-item-variable(
-      user TypeInstance item-type-instance, copy Int item-access)->(
-      owner VariableCreate variable-create)
-    if not self.item-name?
-      return
-    
-    if self.item-name.equal(user "_")
-      self.item-name := _
-      return
-    
-    user SyntaxTreeVariable item-variable
-    if self.parent.find-variable(user self.item-name, user _)->(
-        user item-variable)?
-      item-type-instance.check-assign-to(
-          copy item-variable.access,
-          user item-variable.type-instance,
-          copy item-variable.access,
-          user self)
-      return
-    
-    new SyntaxTreeVariable new-item-variable(user self.block)
-    string-new-copy(user self.item-name)->(owner new-item-variable.name)
-    new-item-variable.access := item-access
-    item-type-instance.copy-new()->(owner new-item-variable.type-instance)
-    new-item-variable.is-initialized := true
-    variable-create := VariableCreate(user new-item-variable)
-    self.block.variables.add(owner new-item-variable)
-  
-  func inst add-index-nodes(
-      copy Bool is-int-iteration,
-      owner Expression iterator-expression,
-      user VariableExpression iterator-aux-variable-expression,
-      user SyntaxTreeWhile while-node)
-    owner VariableExpression index-aux-expression
-    self.add-aux-variable(
-        copy Access.VAR,
-        copy false,
-        user glob.type-int.new-type-instance())->(
-        owner index-aux-expression)
-    
-    if self.start.expression?
-      self.add-start-assign(user index-aux-expression)
-    
-    self.add-index-inc(user index-aux-expression)
-    if self.item-name?
-      self.add-item-assign(
-          user index-aux-expression,
-          copy is-int-iteration,
-          user iterator-aux-variable-expression)
-    self.insert-index-while-condition(
-        owner index-aux-expression,
-        copy is-int-iteration,
-        owner iterator-expression,
-        user while-node)
+    func inst add-index-nodes(
+            copy Bool is-int-iteration,
+            owner Expression iterator-expression,
+            user VariableExpression iterator-aux-variable-expression,
+            user SyntaxTreeWhile while-node)
+        owner VariableExpression index-aux-expression
+        self.add-aux-variable(
+                copy Access.VAR,
+                copy false,
+                user glob.type-int.new-type-instance())->(
+                owner index-aux-expression)
+        
+        if self.start.expression?
+            self.add-start-assign(user index-aux-expression)
+        
+        self.add-index-inc(user index-aux-expression)
+        if self.item-name?
+            self.add-item-assign(
+                    user index-aux-expression,
+                    copy is-int-iteration,
+                    user iterator-aux-variable-expression)
+        self.insert-index-while-condition(
+                owner index-aux-expression,
+                copy is-int-iteration,
+                owner iterator-expression,
+                user while-node)
 
-  func inst add-start-assign(user VariableExpression index-aux-expression)
-    ; aux-index := start
-    new SyntaxTreeExpression index-assign-node(user self.parent)
-    self.start.expression.code-node := index-assign-node
-    self.insert-assign(
-        user index-assign-node,
-        owner index-aux-expression.copy-new(),
-        owner AnalyzedExpression(owner self.start.expression))
-    self.code-nodes.prepend(owner index-assign-node)
+    func inst add-start-assign(user VariableExpression index-aux-expression)
+        ; aux-index := start
+        new SyntaxTreeExpression index-assign-node(user self.parent)
+        self.start.expression.code-node := index-assign-node
+        self.insert-assign(
+                user index-assign-node,
+                owner index-aux-expression.copy-new(),
+                owner AnalyzedExpression(owner self.start.expression))
+        self.code-nodes.prepend(owner index-assign-node)
 
-  func inst add-index-inc(user VariableExpression index-aux-expression)
-    ; aux-index += 1
-    new SyntaxTreeExpression index-inc-node(user self.block)
-    self.insert-binary-expression(
-        user "+=",
-        user index-inc-node,
-        user index-inc-node.expression,
-        owner index-aux-expression.copy-new(),
-        owner IntExpression(user index-inc-node, copy 1))
-    self.block.code-nodes.prepend(owner index-inc-node)
+    func inst add-index-inc(user VariableExpression index-aux-expression)
+        ; aux-index += 1
+        new SyntaxTreeExpression index-inc-node(user self.block)
+        self.insert-binary-expression(
+                user "+=",
+                user index-inc-node,
+                user index-inc-node.expression,
+                owner index-aux-expression.copy-new(),
+                owner IntExpression(user index-inc-node, copy 1))
+        self.block.code-nodes.prepend(owner index-inc-node)
 
-  func inst add-item-assign(
-      user VariableExpression index-aux-expression,
-      copy Bool is-int-iteration,
-      user VariableExpression iterator-aux-variable-expression)
-    ; item := aux-index
-    ; item := aux-iterator[aux-index]
-    new SyntaxTreeExpression item-assign-node(user self.block)
-    owner Expression item-value
-    index-aux-expression.copy-new()->(owner item-value)
-    item-value.code-node := item-assign-node
-    if not is-int-iteration
-      new SliceExpression item-slice(user item-assign-node)
-      item-slice.force-no-checks := true
-      iterator-aux-variable-expression.copy-new()->(owner item-slice.sequence)
-      item-slice.sequence.code-node := item-assign-node
-      item-slice.index := item-value
-      item-value := item-slice
-    new VariableExpression item-expression(
-        user item-assign-node, owner string-new-copy(user self.item-name))
-    self.insert-assign(
-        user item-assign-node, owner item-expression, owner item-value)
-    self.block.code-nodes.prepend(owner item-assign-node)
-  
-  func inst insert-index-while-condition(
-      owner VariableExpression index-aux-expression,
-      copy Bool is-int-iteration,
-      owner Expression iterator-expression,
-      user SyntaxTreeWhile while-node)
-    ; aux-index < aux-iterator[.length()]
-    owner Expression max-index
-    if is-int-iteration
-      max-index := iterator-expression
-    else
-      self.make-method-call(
-          user while-node, owner iterator-expression, user "length")->(
-          owner max-index)
-    self.insert-binary-expression(
-        user "<",
-        user while-node,
-        user while-node.condition,
-        owner index-aux-expression,
-        owner max-index)
-  
-  func inst insert-step-while-condition(
-      user TypeInstance item-type-instance,
-      copy Int item-access,
-      owner Expression iterator-expression,
-      user SyntaxTreeWhile while-node)
-    ; aux-iterator.step()->(access item)
-    owner FunctionObjectCallExpression step-call-expression
-    self.make-method-call(
-        user while-node, owner iterator-expression, user "step")->(
-        owner step-call-expression)
-    step-call-expression.error-propagated := true
-    new CallArgument item-output
-    item-output.code-node := while-node
-    item-output.is-output := true
-    item-output.access := item-access
-    if self.item-name?
-      item-output.value := VariableExpression(
-          user while-node, owner string-new-copy(user self.item-name))
-    else
-      while-node.add-aux-variable(
-          copy item-access, copy false, user item-type-instance)->(
-          owner item-output.value)
-    step-call-expression.arguments.outputs.add(owner item-output)
-    while-node.condition.expression := step-call-expression
+    func inst add-item-assign(
+            user VariableExpression index-aux-expression,
+            copy Bool is-int-iteration,
+            user VariableExpression iterator-aux-variable-expression)
+        ; item := aux-index
+        ; item := aux-iterator[aux-index]
+        new SyntaxTreeExpression item-assign-node(user self.block)
+        owner Expression item-value
+        index-aux-expression.copy-new()->(owner item-value)
+        item-value.code-node := item-assign-node
+        if not is-int-iteration
+            new SliceExpression item-slice(user item-assign-node)
+            item-slice.force-no-checks := true
+            iterator-aux-variable-expression.copy-new()->(owner item-slice.sequence)
+            item-slice.sequence.code-node := item-assign-node
+            item-slice.index := item-value
+            item-value := item-slice
+        new VariableExpression item-expression(
+                user item-assign-node, owner string-new-copy(user self.item-name))
+        self.insert-assign(
+                user item-assign-node, owner item-expression, owner item-value)
+        self.block.code-nodes.prepend(owner item-assign-node)
+    
+    func inst insert-index-while-condition(
+            owner VariableExpression index-aux-expression,
+            copy Bool is-int-iteration,
+            owner Expression iterator-expression,
+            user SyntaxTreeWhile while-node)
+        ; aux-index < aux-iterator[.length()]
+        owner Expression max-index
+        if is-int-iteration
+            max-index := iterator-expression
+        else
+            self.make-method-call(
+                    user while-node, owner iterator-expression, user "length")->(
+                    owner max-index)
+        self.insert-binary-expression(
+                user "<",
+                user while-node,
+                user while-node.condition,
+                owner index-aux-expression,
+                owner max-index)
+    
+    func inst insert-step-while-condition(
+            user TypeInstance item-type-instance,
+            copy Int item-access,
+            owner Expression iterator-expression,
+            user SyntaxTreeWhile while-node)
+        ; aux-iterator.step()->(access item)
+        owner FunctionObjectCallExpression step-call-expression
+        self.make-method-call(
+                user while-node, owner iterator-expression, user "step")->(
+                owner step-call-expression)
+        step-call-expression.error-propagated := true
+        new CallArgument item-output
+        item-output.code-node := while-node
+        item-output.is-output := true
+        item-output.access := item-access
+        if self.item-name?
+            item-output.value := VariableExpression(
+                    user while-node, owner string-new-copy(user self.item-name))
+        else
+            while-node.add-aux-variable(
+                    copy item-access, copy false, user item-type-instance)->(
+                    owner item-output.value)
+        step-call-expression.arguments.outputs.add(owner item-output)
+        while-node.condition.expression := step-call-expression
 
-  func inst make-method-call(
-      user SyntaxTreeCode code-node,
-      owner Expression instance,
-      user String field)->(
-      owner FunctionObjectCallExpression call-expression)
-    call-expression := FunctionObjectCallExpression(user code-node)
-    call-expression.function-object := FieldExpression(
-        user code-node,
-        owner instance,
-        owner string-new-copy(user field))
-  
-  func inst insert-assign(
-      user SyntaxTreeExpression expression-node,
-      owner Expression target,
-      owner Expression value)
-    self.insert-binary-expression(
-        user ":=",
-        user expression-node,
-        user expression-node.expression,
-        owner target,
-        owner value)
-  
-  func inst insert-binary-expression(
-      user String operator-name,
-      user SyntaxTreeCode code-node,
-      user ExpressionValue expression-value,
-      owner Expression target,
-      owner Expression value)
-    owner BinaryExpression binary-expression
-    glob.operator-map.find(user operator-name).create-expression(
-        user code-node)->(owner binary-expression)
-    target.code-node := code-node
-    value.code-node := code-node
-    binary-expression.left-expression := target
-    binary-expression.right-expression := value
-    expression-value.expression := binary-expression
+    func inst make-method-call(
+            user SyntaxTreeCode code-node,
+            owner Expression instance,
+            user String field)->(
+            owner FunctionObjectCallExpression call-expression)
+        call-expression := FunctionObjectCallExpression(user code-node)
+        call-expression.function-object := FieldExpression(
+                user code-node,
+                owner instance,
+                owner string-new-copy(user field))
+    
+    func inst insert-assign(
+            user SyntaxTreeExpression expression-node,
+            owner Expression target,
+            owner Expression value)
+        self.insert-binary-expression(
+                user ":=",
+                user expression-node,
+                user expression-node.expression,
+                owner target,
+                owner value)
+    
+    func inst insert-binary-expression(
+            user String operator-name,
+            user SyntaxTreeCode code-node,
+            user ExpressionValue expression-value,
+            owner Expression target,
+            owner Expression value)
+        owner BinaryExpression binary-expression
+        glob.operator-map.find(user operator-name).create-expression(
+                user code-node)->(owner binary-expression)
+        target.code-node := code-node
+        value.code-node := code-node
+        binary-expression.left-expression := target
+        binary-expression.right-expression := value
+        expression-value.expression := binary-expression
 
-  func dynamic check-memory(user ReferenceMemoryList refs)
-    for code-node in self.code-nodes.iter()
-      refs.clear-line-checks()
-      code-node.check-memory(user refs)
-    base(user refs)
-  
-  func dynamic write()
-    self.write-children(user self.code-nodes)
-    base()
+    func dynamic check-memory(user ReferenceMemoryList refs)
+        for code-node in self.code-nodes.iter()
+            refs.clear-line-checks()
+            code-node.check-memory(user refs)
+        base(user refs)
+    
+    func dynamic write()
+        self.write-children(user self.code-nodes)
+        base()
 
 
 ~~~ Repeat loop node in the syntax tree ~~~
 class SyntaxTreeRepeatLoop(SyntaxTreeForLoop)
-  func inst parse-new(user SyntaxTreeBlock parent)->(
-      owner SyntaxTreeRepeatLoop new-node)
-    new-node := SyntaxTreeRepeatLoop(user parent)
-    new-node.parse()
+    func inst parse-new(user SyntaxTreeBlock parent)->(
+            owner SyntaxTreeRepeatLoop new-node)
+        new-node := SyntaxTreeRepeatLoop(user parent)
+        new-node.parse()
 
-  func inst parse()
-    self.iterator.new(user "", user self)
-    self.parse-block()
-  
-  func dynamic analyze-iterator()->(
-      owner TypeInstance item-type-instance,
-      var Int item-access,
-      var Bool is-int-iteration,
-      var Bool is-index-iteration)
-    self.analyze-expression(user self.iterator, user glob.type-int)
-    self.iterator.check-no-error()
-    glob.type-int.new-type-instance()->(owner item-type-instance)
-    item-access := Access.VAR
-    is-int-iteration := true
-    is-index-iteration := true
+    func inst parse()
+        self.iterator.new(user "", user self)
+        self.parse-block()
+    
+    func dynamic analyze-iterator()->(
+            owner TypeInstance item-type-instance,
+            var Int item-access,
+            var Bool is-int-iteration,
+            var Bool is-index-iteration)
+        self.analyze-expression(user self.iterator, user glob.type-int)
+        self.iterator.check-no-error()
+        glob.type-int.new-type-instance()->(owner item-type-instance)
+        item-access := Access.VAR
+        is-int-iteration := true
+        is-index-iteration := true

@@ -328,7 +328,7 @@ Returncode SyntaxTreeBranch_write_variable_cleanup(SyntaxTreeBranch* self, Synta
   }
   else {
     if (NULL != type_data && variable->access == ACCESS_VAR) {
-      CHECK(172, write(&(String){3, 2, "  "}) )
+      CHECK(172, write(&(String){5, 4, "    "}) )
       CHECK(173, TypeData_write_cname(item_type_data) )
       CHECK(174, write(&(String){14, 13, "_Del(&(self->"}) )
       CHECK(175, write_cname(variable->name) )
@@ -336,7 +336,7 @@ Returncode SyntaxTreeBranch_write_variable_cleanup(SyntaxTreeBranch* self, Synta
       return OK;
     }
   }
-  CHECK(178, write(&(String){8, 7, "  LUMI_"}) )
+  CHECK(178, write(&(String){10, 9, "    LUMI_"}) )
   if (variable->access == ACCESS_VAR) {
     CHECK(180, write(&(String){5, 4, "var_"}) )
   }
@@ -361,7 +361,7 @@ Returncode SyntaxTreeBranch_write_owner_reference_cleanup(SyntaxTreeBranch* self
 static char* _func_name_SyntaxTreeBranch_write_owner_reference_cleanup = "SyntaxTreeBranch.write-owner-reference-cleanup";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeBranch_write_owner_reference_cleanup
 Returncode SyntaxTreeBranch_write_owner_reference_cleanup(SyntaxTreeBranch* self, SyntaxTreeVariable* variable, TypeData* type_data, TypeData* item_type_data) {
-  CHECK(193, write(&(String){3, 2, "  "}) )
+  CHECK(193, write(&(String){5, 4, "    "}) )
   if (variable->type_instance->type_data == type_data) {
     if (type_data->is_dynamic) {
       CHECK(196, write(&(String){5, 4, "DYN_"}) )

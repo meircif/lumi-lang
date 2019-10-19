@@ -168,19 +168,19 @@ Now the C code can be used from Lumi::
 
    ; optional OOP conversion
    struct SomeStruct
-     var SomeStructProxy c-ref
+       var SomeStructProxy c-ref
 
-     func new()
-       some_struct_new()->(var self.c-ref)
+       func new()
+           some_struct_new()->(var self.c-ref)
 
-     func set-number(copy Int number)
-       some-struct-set-number(copy self.c-ref, copy number)
+       func set-number(copy Int number)
+           some-struct-set-number(copy self.c-ref, copy number)
 
-     func set-name(user String name)
-       some-struct-set-name(copy self.c-ref, user name)
+       func set-name(user String name)
+           some-struct-set-name(copy self.c-ref, user name)
 
-     func set-items(user Array{Int} items)
-       some-struct-set-items(copy self.c-ref, user items)
+       func set-items(user Array{Int} items)
+           some-struct-set-items(copy self.c-ref, user items)
 
-     func action()
-       some-struct-action-proxy(copy self.c-ref)
+       func action()
+           some-struct-action-proxy(copy self.c-ref)

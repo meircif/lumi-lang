@@ -24,8 +24,8 @@ Lumi syntax.
 Structures are declared using the ``struct`` keyword::
 
    struct ExampleStruct
-     var Int integer-variable
-     user String string-reference
+       var Int integer-variable
+       user String string-reference
 
 Members of struct can be accessed using ``.`` operator::
 
@@ -42,8 +42,8 @@ This is not supported yet in :ref:`TL4 <syntax-tl4>`.
 Global members are declared under the type scope::
 
    struct ExampleStruct
-     const Int GLOBAL-CONSTANT(12)
-     global var Int global-variable
+       const Int GLOBAL-CONSTANT(12)
+       global var Int global-variable
 
 
 Outside the type definitions they can only be accessed with the type name as
@@ -63,24 +63,24 @@ access the implicit self parameter. Constants and global variables of the type
 can be accessed using ``global`` keyword. ::
 
    struct ExampleStruct
-     var Int integer-variable
+       var Int integer-variable
 
-     const Int GLOBAL-CONSTANT(12)
-     global var Int global-variable
+       const Int GLOBAL-CONSTANT(12)
+       global var Int global-variable
 
      func method(copy Int num)
-       self.integer-variable := num + global.GLOBAL-CONSTANT
-       global.global-variable := num
+         self.integer-variable := num + global.GLOBAL-CONSTANT
+         global.global-variable := num
 
 It possible to split the function deceleration from its implementation. In this
 case the function deceleration should be followed by ``_``. This is not
 supported yet in :ref:`TL4 <syntax-tl4>`. ::
 
    struct ExampleStruct
-     func method(copy Int num) _
+       func method(copy Int num) _
 
    func ExampleStruct.method(copy Int num)
-     ; implementation...
+       ; implementation...
 
 There are two ways to call a method::
 
@@ -96,21 +96,21 @@ default initialization. A constructor is declared as a normal method with a
 dedicated name ``new``. ::
 
    struct ExampleStruct
-     new() _
+       new() _
 
    func ExampleStruct.new()
-     ; custom initialization
+       ; custom initialization
 
 A constructor cannot have outputs, and if it has parameters - they must be
 given on every object creation::
 
    struct ExampleStruct
-     new(copy Int x, user String s)
-       ; implementation
+       new(copy Int x, user String s)
+           ; implementation
 
    func usage()
-      var ExampleStruct variable(copy 4, user "some string")
-      owner ExampleStruct reference := ExampleStruct(copy 4, user "some string")
+       var ExampleStruct variable(copy 4, user "some string")
+       owner ExampleStruct reference := ExampleStruct(copy 4, user "some string")
 
 A "destructor" method can also be defined for a structure. This method will be
 called just before any object destruction. A destructor is declared as a normal
@@ -118,10 +118,10 @@ method with a dedicated name ``delete``. This is not supported yet in :ref:`TL4
 <syntax-tl4>`. ::
 
    struct ExampleStruct
-     func delete() _
+       func delete() _
 
    func ExampleStruct.delete()
-     ; destruction code
+       ; destruction code
 
 A destructor cannot have any kind of arguments.
 
@@ -130,7 +130,7 @@ Extending Structures
 In :ref:`TL4 <syntax-tl4>` a structure may only extend one other structure. ::
 
    struct ExtendingStruct(BaseStruct, OtherBaseStruct)
-     var Int additional-field
+       var Int additional-field
 
 The extending structure may be used in any place one of its base structures is
 expected::
@@ -141,21 +141,21 @@ The extending structure may overwrite a base method, the overwriting method
 arguments access and type must be identical to the base overridden method. ::
 
    struct BaseStruct
-     func method(copy Int num)
-       ; implementation...
+       func method(copy Int num)
+           ; implementation...
 
    struct ExtendingStruct(BaseStruct)
-     func method(copy Int num)
-       ; other implementation...
+       func method(copy Int num)
+           ; other implementation...
 
 An overwriting function can call the overwritten function using ``base``
 keyword. Other overwritten methods can be called using ``base.other-method``.
 ::
 
    struct ExtendingStruct(BaseStruct)
-     func method(copy Int num)
-       base(copy num)
-       base.other-method()
+       func method(copy Int num)
+           base(copy num)
+           base.other-method()
 
 Example for the **static** dispatch of structures::
 
@@ -174,9 +174,9 @@ This is not supported yet in :ref:`TL4 <syntax-tl4>`.
 Dynamics are declared using the ``dynamic`` keyword::
 
    dynamic ExampleDynamic
-     func dynamic-method(copy Int num)
-     func another-method()->(var Int result)
-     var Int dynamic-variable
+       func dynamic-method(copy Int num)
+       func another-method()->(var Int result)
+       var Int dynamic-variable
 
 Dynamics are always used as ``user`` access references, as there is nothing to
 "allocate". Because the most common implementations of dynamics are for a
@@ -202,9 +202,9 @@ members in static structures <global-members>`.
 Static methods must be declared using ``static`` prefix::
 
    dynamic ExampleDynamic
-     func dynamic-method(copy Int num)
-     static func static-method(copy Int num)
-       ; implementation
+       func dynamic-method(copy Int num)
+       static func static-method(copy Int num)
+           ; implementation
 
 
 Extending Dynamics
@@ -212,7 +212,7 @@ Extending Dynamics
 Same syntax as structures::
 
    dynamic ExtendingDynamic(BaseDynamic, OtherBaseDynamic)
-     func additional-method(copy Int num)
+       func additional-method(copy Int num)
 
 Implementing Dynamics
 +++++++++++++++++++++
@@ -223,24 +223,24 @@ can use ``self`` and ``global`` keywords to access its own members, and also
 members of the implemented dynamic. ::
 
    implement ExampleDynamic for ExampleStructure
-     func dynamic-method(copy Int num)
-       ; implementation...
-     func another-method()->(var Int result)
-       ; another implementation...
-     var Int dynamic-variable(copy 4)
+       func dynamic-method(copy Int num)
+           ; implementation...
+       func another-method()->(var Int result)
+           ; another implementation...
+       var Int dynamic-variable(copy 4)
 
 A dynamic may implement some or all of its members and its base dynamics
 members. Method implementations can use ``self`` and ``global`` keywords to
 access its own members. ::
 
    dynamic ExampleDynamic
-     func implemented-method(copy Int num) _
-     func unimplemented-method()->(var Int result)
-     var Int implemented-variable(copy 5)
-     var Int unimplemented-variable
+       func implemented-method(copy Int num) _
+       func unimplemented-method()->(var Int result)
+       var Int implemented-variable(copy 5)
+      var Int unimplemented-variable
 
    func ExampleDynamic.implemented-method(copy Int num) _
-     ; implementation...
+       ; implementation...
 
 When a dynamic implements all its and its base dynamics members, it's
 considered as implemented and can be used as a value to ``Dynamic`` references.
@@ -264,9 +264,9 @@ member belongs to: the structure or the dynamic. Global members are only
 defined under the name-space of the class. ::
 
    class ExampleClass
-     static var Int static-field  ; part of the implicit structure
-     dynamic func dynamic-method(copy Int num)  ; part of the implicit dynamic
-     global var Int global-variable  ; defined under the class name-space
+       static var Int static-field  ; part of the implicit structure
+       dynamic func dynamic-method(copy Int num)  ; part of the implicit dynamic
+       global var Int global-variable  ; defined under the class name-space
 
 In :ref:`TL4 <syntax-tl4>` this only partially implemented:
 
@@ -281,8 +281,8 @@ Extending Classes
 As all types::
 
    class ExtendingClass(BaseStruct, BaseDynamic, BaseClass)
-     static var Int addition-static-field
-     dynamic func addition-dynamic-method(copy Int num)
+       static var Int addition-static-field
+       dynamic func addition-dynamic-method(copy Int num)
 
 In :ref:`TL4 <syntax-tl4>` a class may only extend one other type.
 
@@ -306,9 +306,9 @@ naming standard of types if one of these is used, else it must conform naming
 standard of constants. ::
 
    struct ParametrizedType{Int CONSTANT-PARAMETER:Type TypeParameter:Generic GenericParameter}
-     var String{CONSTANT-PARAMETER} parametrized-sized-string
-     var TypeParameter static-parametrized-typed-variable
-     user GenericParameter dynamic-parametrized-typed-reference
+       var String{CONSTANT-PARAMETER} parametrized-sized-string
+       var TypeParameter static-parametrized-typed-variable
+       user GenericParameter dynamic-parametrized-typed-reference
 
 Whenever a parameterized type is used it must be set with appropriate values for
 each parameter ::
@@ -320,6 +320,7 @@ This is partially supported in :ref:`TL4 <syntax-tl4>`:
 * Only dynamic parameters are supported
 * Only the parameter name is needed
 * Some types are not supported as parameter values:
+
    * any primitive type
    * String
    * Array
