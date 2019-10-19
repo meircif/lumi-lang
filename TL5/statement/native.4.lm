@@ -3,182 +3,182 @@ module tl5-compiler
 
 
 struct NativeText
-  owner String text
-  
-  new(user String text)
-    string-new-copy(user text)->(owner self.text)
-
-  func parse-new(user SyntaxTreeNode node)->(owner NativeText native-text)
     owner String text
-    read-new(user "")->(owner text)
-    node.check-string(user text)
-    native-text := NativeText(user text[1:text.length - 2])
-  
-  func write(user String name)
-    if self?
-      write(user self.text)
-    else
-      write-cname(user name)
+    
+    new(user String text)
+        string-new-copy(user text)->(owner self.text)
+
+    func parse-new(user SyntaxTreeNode node)->(owner NativeText native-text)
+        owner String text
+        read-new(user "")->(owner text)
+        node.check-string(user text)
+        native-text := NativeText(user text[1:text.length - 2])
+    
+    func write(user String name)
+        if self?
+            write(user self.text)
+        else
+            write-cname(user name)
 
 
 ~~~ Native include declaration in the syntax tree ~~~
 class NativeInclude(SyntaxTreeFunction)
-  owner NativeText path
+    owner NativeText path
 
-  func inst parse-new()->(owner NativeInclude new-node)
-    new-node := NativeInclude()
-    new-node.parse()
-  
-  func inst parse()
-    NativeText.parse-new(user _, user self)->(owner self.path)
-  
-  func dynamic write()
-    write(user "\n#include <")
-    self.path.write(user _)
-    write(user ">\n")
+    func inst parse-new()->(owner NativeInclude new-node)
+        new-node := NativeInclude()
+        new-node.parse()
+    
+    func inst parse()
+        NativeText.parse-new(user _, user self)->(owner self.path)
+    
+    func dynamic write()
+        write(user "\n#include <")
+        self.path.write(user _)
+        write(user ">\n")
 
 
 ~~~ Native function declaration in the syntax tree ~~~
 class NativeFunction(SyntaxTreeFunction)
-  owner NativeText cname
-  
-  func inst parse-new()->(owner NativeFunction new-node)
-    new-node := NativeFunction()
-    new-node.parse()
-  
-  func inst parse()
-    self.my-module := glob.current-module
-    self.parse-header(copy true)
-    if glob.last-char = ' '
-      NativeText.parse-new(user _, user self)->(owner self.cname)
-    if self.arguments.has-error
-      self.syntax-error-msg(user "error raising native function")
-    if self.arguments.outputs.first?
-      if self.arguments.outputs.first.next?
-        self.syntax-error-msg(user "more than one output to native function")
-    glob.current-module.function-map.add(user self.name, user self)
-  
-  func dynamic check-memory(user ReferenceMemoryList global-refs)
-    ; do nothing
-  
-  func dynamic write-declaration()
-    ; do nothing
-  
-  func dynamic write()
-    ; do nothing
-  
-  func dynamic write-cname()
-    self.cname.write(user self.name)
+    owner NativeText cname
+    
+    func inst parse-new()->(owner NativeFunction new-node)
+        new-node := NativeFunction()
+        new-node.parse()
+    
+    func inst parse()
+        self.my-module := glob.current-module
+        self.parse-header(copy true)
+        if glob.last-char = ' '
+            NativeText.parse-new(user _, user self)->(owner self.cname)
+        if self.arguments.has-error
+            self.syntax-error-msg(user "error raising native function")
+        if self.arguments.outputs.first?
+            if self.arguments.outputs.first.next?
+                self.syntax-error-msg(user "more than one output to native function")
+        glob.current-module.function-map.add(user self.name, user self)
+    
+    func dynamic check-memory(user ReferenceMemoryList global-refs)
+        ; do nothing
+    
+    func dynamic write-declaration()
+        ; do nothing
+    
+    func dynamic write()
+        ; do nothing
+    
+    func dynamic write-cname()
+        self.cname.write(user self.name)
 
 
 ~~~ Native variable declaration in the syntax tree ~~~
 class NativeVariable(SyntaxTreeVariable)
-  owner NativeText cname
-  
-  func inst parse-new()->(owner NativeVariable new-node)
-    new-node := NativeVariable(user _)
-    new-node.parse-native()
-  
-  func inst parse-native()
-    self.is-native := true
-    self.parse(copy Access.VAR, copy false, user _)
-    if glob.last-char = ' '
-      NativeText.parse-new(user _, user self)->(owner self.cname)
-  
-  func dynamic analyze()
-    if not self.type-instance.type-data.is-primitive
-      self.syntax-error(
-          user "only primitive types supported for native variable, got",
-          user self.type-instance.type-data.name)
-    base()
-  
-  func dynamic write()
-    ; do nothing
-  
-  func dynamic write-cname()
-    self.cname.write(user self.name)
+    owner NativeText cname
+    
+    func inst parse-new()->(owner NativeVariable new-node)
+        new-node := NativeVariable(user _)
+        new-node.parse-native()
+    
+    func inst parse-native()
+        self.is-native := true
+        self.parse(copy Access.VAR, copy false, user _)
+        if glob.last-char = ' '
+            NativeText.parse-new(user _, user self)->(owner self.cname)
+    
+    func dynamic analyze()
+        if not self.type-instance.type-data.is-primitive
+            self.syntax-error(
+                    user "only primitive types supported for native variable, got",
+                    user self.type-instance.type-data.name)
+        base()
+    
+    func dynamic write()
+        ; do nothing
+    
+    func dynamic write-cname()
+        self.cname.write(user self.name)
 
 
 ~~~ Native constant declaration in the syntax tree ~~~
 class NativeConstant(SyntaxTreeConstant)
-  owner NativeText cname
-  
-  func inst parse-new()->(owner NativeConstant new-node)
-    new-node := NativeConstant(user _)
-    new-node.parse-native()
-  
-  func inst parse-native()
-    self.is-native := true
-    self.parse()
-    if glob.last-char = ' '
-      NativeText.parse-new(user _, user self)->(owner self.cname)
-    self.is-ordered := true
+    owner NativeText cname
+    
+    func inst parse-new()->(owner NativeConstant new-node)
+        new-node := NativeConstant(user _)
+        new-node.parse-native()
+    
+    func inst parse-native()
+        self.is-native := true
+        self.parse()
+        if glob.last-char = ' '
+            NativeText.parse-new(user _, user self)->(owner self.cname)
+        self.is-ordered := true
 
-  func dynamic analyze()
-    ; do nothing
-  
-  func dynamic get-constant-value()->(var Int value, var Bool has-value)
-    has-value := false
+    func dynamic analyze()
+        ; do nothing
+    
+    func dynamic get-constant-value()->(var Int value, var Bool has-value)
+        has-value := false
 
-  func dynamic write()
-    ; do nothing
-  
-  func dynamic write-cname()
-    self.cname.write(user self.name)
+    func dynamic write()
+        ; do nothing
+    
+    func dynamic write-cname()
+        self.cname.write(user self.name)
 
 
 ~~~ Native variable declaration in the syntax tree ~~~
 class NativeType(TypeData)
-  owner NativeText cname
+    owner NativeText cname
 
-  new()
-    self.set-location()
-    self.is-primitive := true
-  
-  func inst parse-new()->(owner NativeType new-node)
-    new-node := NativeType()
-    new-node.parse()
-  
-  func inst parse()
-    read-new(user " ")->(owner self.name)
-    if glob.last-char = ' '
-      NativeText.parse-new(user _, user self)->(owner self.cname)
-    self.add-type(user glob.current-module)
-  
-  func dynamic analyze()
-    ; do nothing
-  
-  func dynamic write-declaration()
-    ; do nothing
-  
-  func dynamic write-methods-declaration()
-    ; do nothing
-  
-  func dynamic write-methods-body()
-    ; do nothing
+    new()
+        self.set-location()
+        self.is-primitive := true
     
-  func dynamic write-global()
-    ; do nothing
-  
-  func dynamic write()
-    ; do nothing
-  
-  func dynamic write-cname()
-    self.cname.write(user self.name)
+    func inst parse-new()->(owner NativeType new-node)
+        new-node := NativeType()
+        new-node.parse()
+    
+    func inst parse()
+        read-new(user " ")->(owner self.name)
+        if glob.last-char = ' '
+            NativeText.parse-new(user _, user self)->(owner self.cname)
+        self.add-type(user glob.current-module)
+    
+    func dynamic analyze()
+        ; do nothing
+    
+    func dynamic write-declaration()
+        ; do nothing
+    
+    func dynamic write-methods-declaration()
+        ; do nothing
+    
+    func dynamic write-methods-body()
+        ; do nothing
+        
+    func dynamic write-global()
+        ; do nothing
+    
+    func dynamic write()
+        ; do nothing
+    
+    func dynamic write-cname()
+        self.cname.write(user self.name)
 
 
 ~~~ Native code declaration in the syntax tree ~~~
 class NativeCode(SyntaxTreeCode)
-  owner NativeText code
-  
-  func inst parse-new(user SyntaxTreeBlock parent)->(owner NativeCode new-node)
-    new-node := NativeCode(user parent)
-    NativeText.parse-new(user _, user new-node)->(owner new-node.code)
-  
-  func dynamic write()
-    if self.parent?
-      self.write-spaces()
-    else
-      write(user "\n")
-    self.code.write(user _)
-    write(user "\n")
+    owner NativeText code
+    
+    func inst parse-new(user SyntaxTreeBlock parent)->(owner NativeCode new-node)
+        new-node := NativeCode(user parent)
+        NativeText.parse-new(user _, user new-node)->(owner new-node.code)
+    
+    func dynamic write()
+        if self.parent?
+            self.write-spaces()
+        else
+            write(user "\n")
+        self.code.write(user _)
+        write(user "\n")

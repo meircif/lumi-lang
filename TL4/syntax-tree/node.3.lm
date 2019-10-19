@@ -13,7 +13,7 @@ class SyntaxTreeNode
     self.line-number := glob.line-number
   
   func inst read-line-break-spaces(copy Int indentation-spaces)
-    var Int expected-spaces(indentation-spaces + 4)
+    var Int expected-spaces(indentation-spaces + 8)
     for n in expected-spaces
       if read-c() != ' '
         self.m-syntax-error-indentation(copy n, copy expected-spaces)

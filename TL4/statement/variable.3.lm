@@ -42,10 +42,10 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     self.is-create := is-create
     new TypeInstance in self.type-instance
     if self.is-create
-      self.type-instance.parse(user " ", user self, user self, copy 2):(
+      self.type-instance.parse(user " ", user self, user self, copy 4):(
           copy end)
     else
-      self.type-instance.parse(user " ", user self, user _, copy 2):(copy end)
+      self.type-instance.parse(user " ", user self, user _, copy 4):(copy end)
     if end != ' '
       self.m-syntax-error-c(user "expected space after type, got", copy end)
     read-new(user "("):(owner self.name, copy end)
@@ -283,10 +283,6 @@ class SyntaxTreeVariable(SyntaxTreeCode)
   func inst write-dynamic()
     # `type`_Dynamic* `name`_Dynamic[ = `type`_dynamic];
     self.write-spaces()
-    # if ? self.parent
-      # self.write-spaces()
-    # else-if ? self.parent-type
-      # write(user "  ")
     self.type-instance.type-data.write-cname()
     write(user "_Dynamic* ")
     self.write-cname()

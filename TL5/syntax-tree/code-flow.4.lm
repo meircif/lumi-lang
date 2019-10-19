@@ -3,248 +3,248 @@ module tl5-compiler
 
 ~~~ Basic code flow element node in the syntax tree ~~~
 class SyntaxTreeFlowElement(SyntaxTreeCode)
-  owner SyntaxTreeBlock block
-  
-  new(user SyntaxTreeBlock parent)
-    base(user parent)
-    self.block := SyntaxTreeBlock(user self)
-    self.set-parent(user parent)
-  
-  func inst set-parent(user SyntaxTreeBlock parent)
-    self.parent := parent
-    self.block.set-parent(user parent)
-  
-  func inst parse-block()
-    self.block.parse-block()
-  
-  func dynamic link-types()
-    self.block.link-types()
-  
-  func dynamic analyze()
-    self.block.analyze()
+    owner SyntaxTreeBlock block
+    
+    new(user SyntaxTreeBlock parent)
+        base(user parent)
+        self.block := SyntaxTreeBlock(user self)
+        self.set-parent(user parent)
+    
+    func inst set-parent(user SyntaxTreeBlock parent)
+        self.parent := parent
+        self.block.set-parent(user parent)
+    
+    func inst parse-block()
+        self.block.parse-block()
+    
+    func dynamic link-types()
+        self.block.link-types()
+    
+    func dynamic analyze()
+        self.block.analyze()
 
-  func dynamic check-memory(user ReferenceMemoryList refs)
-    var ReferenceMemoryList block-refs(user refs)
-    self.block.check-memory(user block-refs)
-    refs.add-invalids(user block-refs)
-  
-  func inst write-block()
-    self.block.write-block()
-  
-  func inst write-block-body()
-    self.block.write-block-body()
-  
-  func inst write-after-block()
-    ; if (LUMI_loop_depth < `X`) goto `cleanup`;
-    self.write-spaces()
-    write(user "if (LUMI_loop_depth < ")
-    write-int(copy (2 * self.parent.loop-depth) + 1)
-    write(user ") goto ")
-    self.parent.write-cleanup-label()
-    write(user ";\n")
-  
-  func inst write-error-handling-block()
-    self.write-spaces()
-    write(user "if (LUMI_err != OK) {\n")
-    self.block.write-block-setup()
-    self.block.write-spaces()
-    write(user "LUMI_err = OK;\n")
-    self.block.write-set-loop-depth()
-    self.block.write-block-body()
-    self.block.write-block-cleanup()
-    self.block.write-block-end()
+    func dynamic check-memory(user ReferenceMemoryList refs)
+        var ReferenceMemoryList block-refs(user refs)
+        self.block.check-memory(user block-refs)
+        refs.add-invalids(user block-refs)
+    
+    func inst write-block()
+        self.block.write-block()
+    
+    func inst write-block-body()
+        self.block.write-block-body()
+    
+    func inst write-after-block()
+        ; if (LUMI_loop_depth < `X`) goto `cleanup`;
+        self.write-spaces()
+        write(user "if (LUMI_loop_depth < ")
+        write-int(copy (2 * self.parent.loop-depth) + 1)
+        write(user ") goto ")
+        self.parent.write-cleanup-label()
+        write(user ";\n")
+    
+    func inst write-error-handling-block()
+        self.write-spaces()
+        write(user "if (LUMI_err != OK) {\n")
+        self.block.write-block-setup()
+        self.block.write-spaces()
+        write(user "LUMI_err = OK;\n")
+        self.block.write-set-loop-depth()
+        self.block.write-block-body()
+        self.block.write-block-cleanup()
+        self.block.write-block-end()
 
 
 ~~~ Block statement node in the syntax tree ~~~
 class SyntaxTreeBlockNode(SyntaxTreeFlowElement)
-  func inst parse-new(user SyntaxTreeBlock parent)->(
-      owner SyntaxTreeBlockNode new-node)
-    new-node := SyntaxTreeBlockNode(user parent)
-    new-node.parse-block()
-  
-  func dynamic write()
-    self.write-spaces()
-    self.write-block()
+    func inst parse-new(user SyntaxTreeBlock parent)->(
+            owner SyntaxTreeBlockNode new-node)
+        new-node := SyntaxTreeBlockNode(user parent)
+        new-node.parse-block()
+    
+    func dynamic write()
+        self.write-spaces()
+        self.write-block()
 
 
 ~~~ If statement node in the syntax tree ~~~
 class SyntaxTreeIf(SyntaxTreeFlowElement)
-  var ExpressionValue condition
-  owner SyntaxTreeElse else-node
-  
-  func inst parse-new(user SyntaxTreeBlock parent)->(
-      owner SyntaxTreeIf new-node)
-    new-node := SyntaxTreeIf(user parent)
-    new-node.parse()
-  
-  func inst parse()
-    self.condition.new(user "", user self)
-    self.parse-block()
-  
-  func inst add-else(owner SyntaxTreeElse else-node)
-    else-node.set-parent(user self.parent)
-    self.else-node := else-node
-  
-  func inst add-else-if(
-      owner SyntaxTreeIf new-if, owner SyntaxTreeCoverage coverage-node)
-    self.else-node := SyntaxTreeElse(user self.parent)
-    if coverage-node?
-      coverage-node.parent := self.else-node.block
-      self.else-node.block.code-nodes.add(owner coverage-node)
-    new-if.set-parent(user self.else-node.block)
-    self.else-node.block.code-nodes.add(owner new-if)
-  
-  func dynamic link-types()
-    base()
-    if self.else-node?
-      self.else-node.link-types()
-  
-  func dynamic analyze()
-    self.analyze-condition()
-    self.condition.check-no-error()
-    base()
-    if self.else-node?
-      self.else-node.analyze()
-  
-  func dynamic analyze-condition()
-    self.analyze-expression(user self.condition, user glob.type-bool)
+    var ExpressionValue condition
+    owner SyntaxTreeElse else-node
+    
+    func inst parse-new(user SyntaxTreeBlock parent)->(
+            owner SyntaxTreeIf new-node)
+        new-node := SyntaxTreeIf(user parent)
+        new-node.parse()
+    
+    func inst parse()
+        self.condition.new(user "", user self)
+        self.parse-block()
+    
+    func inst add-else(owner SyntaxTreeElse else-node)
+        else-node.set-parent(user self.parent)
+        self.else-node := else-node
+    
+    func inst add-else-if(
+            owner SyntaxTreeIf new-if, owner SyntaxTreeCoverage coverage-node)
+        self.else-node := SyntaxTreeElse(user self.parent)
+        if coverage-node?
+            coverage-node.parent := self.else-node.block
+            self.else-node.block.code-nodes.add(owner coverage-node)
+        new-if.set-parent(user self.else-node.block)
+        self.else-node.block.code-nodes.add(owner new-if)
+    
+    func dynamic link-types()
+        base()
+        if self.else-node?
+            self.else-node.link-types()
+    
+    func dynamic analyze()
+        self.analyze-condition()
+        self.condition.check-no-error()
+        base()
+        if self.else-node?
+            self.else-node.analyze()
+    
+    func dynamic analyze-condition()
+        self.analyze-expression(user self.condition, user glob.type-bool)
 
-  func dynamic check-memory(user ReferenceMemoryList refs)
-    self.condition.check-memory(user refs)
-    base(user refs)
-  
-  func dynamic write()
-    ; if (`condition`) {
-    ;   `block...`
-    ; }
-    ; `else-block`
-    self.write-spaces()
-    self.condition.write-preactions()
-    write(user "if (")
-    self.condition.write()
-    write(user ") ")
-    self.write-block()
-    if self.else-node?
-      self.else-node.write()
-    self.write-after-block()
+    func dynamic check-memory(user ReferenceMemoryList refs)
+        self.condition.check-memory(user refs)
+        base(user refs)
+    
+    func dynamic write()
+        ; if (`condition`) {
+        ;     `block...`
+        ; }
+        ; `else-block`
+        self.write-spaces()
+        self.condition.write-preactions()
+        write(user "if (")
+        self.condition.write()
+        write(user ") ")
+        self.write-block()
+        if self.else-node?
+            self.else-node.write()
+        self.write-after-block()
 
 
 ~~~ Else statement node in the syntax tree ~~~
 class SyntaxTreeElse(SyntaxTreeFlowElement)
-  func inst parse-new(user SyntaxTreeBlock parent)->(
-      owner SyntaxTreeElse new-node)
-    new-node := SyntaxTreeElse(user parent)
-    new-node.parse-block()
-  
-  func dynamic write()
-    ; else {
-    ;   `block...`
-    ; }
-    self.write-spaces()
-    write(user "else ")
-    self.write-block()
+    func inst parse-new(user SyntaxTreeBlock parent)->(
+            owner SyntaxTreeElse new-node)
+        new-node := SyntaxTreeElse(user parent)
+        new-node.parse-block()
+    
+    func dynamic write()
+        ; else {
+        ;     `block...`
+        ; }
+        self.write-spaces()
+        write(user "else ")
+        self.write-block()
 
 
 ~~~ Loop node in the syntax tree ~~~
 class SyntaxTreeLoop(SyntaxTreeFlowElement)
-  var ExpressionValue limit
-  owner VariableExpression aux-counter
-  owner VariableExpression aux-limit
-  var Int limit-value
-  var Bool check-infinite
-  var Bool is-finite
+    var ExpressionValue limit
+    owner VariableExpression aux-counter
+    owner VariableExpression aux-limit
+    var Int limit-value
+    var Bool check-infinite
+    var Bool is-finite
 
-  new(user SyntaxTreeBlock parent, copy Bool check-infinite)
-    base(user parent)
-    self.check-infinite := check-infinite
-    self.block.loop-depth := parent.loop-depth + 1
-  
-  func inst parse-new(user SyntaxTreeBlock parent, copy Bool check-infinite)->(
-      owner SyntaxTreeLoop new-node)
-    new-node := SyntaxTreeLoop(user parent, copy check-infinite)
-    new-node.parse()
-  
-  func inst parse()
-    if glob.last-char != '\n'
-      if self.set-has-error()
-        self.expect-char(copy '!', user "!", user "loop")
-        read-c()
-      else-if glob.last-char = '!'
-        self.syntax-error-msg(user "using \"!\" where error is not propagated")
-      self.expect-space(user "loop")
-      self.limit.new(user "", user self)
-    self.parse-block()
+    new(user SyntaxTreeBlock parent, copy Bool check-infinite)
+        base(user parent)
+        self.check-infinite := check-infinite
+        self.block.loop-depth := parent.loop-depth + 1
+    
+    func inst parse-new(user SyntaxTreeBlock parent, copy Bool check-infinite)->(
+            owner SyntaxTreeLoop new-node)
+        new-node := SyntaxTreeLoop(user parent, copy check-infinite)
+        new-node.parse()
+    
+    func inst parse()
+        if glob.last-char != '\n'
+            if self.set-has-error()
+                self.expect-char(copy '!', user "!", user "loop")
+                read-c()
+            else-if glob.last-char = '!'
+                self.syntax-error-msg(user "using \"!\" where error is not propagated")
+            self.expect-space(user "loop")
+            self.limit.new(user "", user self)
+        self.parse-block()
 
-  func dynamic set-loop-finite(copy Bool is-return)
-    self.is-finite := true
-    if is-return
-      base(copy is-return)
-  
-  func dynamic analyze()
-    if self.limit.parsed()
-      self.analyze-expression(user self.limit, user glob.type-int)
-      self.limit.check-no-error()
-      self.add-aux-variable(
-          copy Access.VAR, copy false, user self.limit.result-type)->(
-          owner self.aux-counter)
-      if not self.limit.get-constant-value()->(var self.limit-value)
-        self.add-aux-variable(
-            copy Access.VAR, copy false, user self.limit.result-type)->(
-            owner self.aux-limit)
-    base()
-    if self.check-infinite and not self.is-finite
-      self.syntax-error-msg(user "loop is infinite")
+    func dynamic set-loop-finite(copy Bool is-return)
+        self.is-finite := true
+        if is-return
+            base(copy is-return)
+    
+    func dynamic analyze()
+        if self.limit.parsed()
+            self.analyze-expression(user self.limit, user glob.type-int)
+            self.limit.check-no-error()
+            self.add-aux-variable(
+                    copy Access.VAR, copy false, user self.limit.result-type)->(
+                    owner self.aux-counter)
+            if not self.limit.get-constant-value()->(var self.limit-value)
+                self.add-aux-variable(
+                        copy Access.VAR, copy false, user self.limit.result-type)->(
+                        owner self.aux-limit)
+        base()
+        if self.check-infinite and not self.is-finite
+            self.syntax-error-msg(user "loop is infinite")
 
-  func dynamic check-memory(user ReferenceMemoryList refs)
-    base(user refs)
-    ; check memory again for possible next iterations of the loop
-    base(user refs)
-  
-  func dynamic write()
-    ; do {
-    ;   `block...`
-    ; } while (LUMI_loop_depth >= `X`);
-    if self.aux-limit?
-      self.write-limit-assign()
-    self.write-spaces()
-    write(user "do {\n")
-    self.block.write-block-setup()
-    self.block.write-set-loop-depth()
-    if self.aux-counter?
-      self.write-limit-check()
-    self.write-block-body()
-    self.block.write-block-cleanup()
-    self.write-spaces()
-    write(user "} while (LUMI_loop_depth >= ")
-    write-int(copy 2 * self.block.loop-depth)
-    write(user ");\n")
-    self.write-after-block()
-  
-  func inst write-limit-assign()
-    ; aux-limit = limit;
-    self.write-spaces()
-    self.limit.write-preactions()
-    self.aux-limit.write()
-    write(user " = ")
-    self.limit.write()
-    write(user ";\n")
-  
-  func inst write-limit-check()
-    ; if (aux-counter >= aux-limit) RAISE()
-    ; ++aux-counter;
-    self.block.write-spaces()
-    write(user "if (")
-    self.aux-counter.write()
-    write(user " >= ")
-    if self.aux-limit?
-      self.aux-limit.write()
-    else
-      write-int(copy self.limit-value)
-    write(user ") ")
-    var SyntaxTreeCode dummy-node(user self.block)
-    dummy-node.write-raise(user "loop_limit")
-    write(user "\n")
-    self.block.write-spaces()
-    write(user "++")
-    self.aux-counter.write()
-    write(user ";\n")
+    func dynamic check-memory(user ReferenceMemoryList refs)
+        base(user refs)
+        ; check memory again for possible next iterations of the loop
+        base(user refs)
+    
+    func dynamic write()
+        ; do {
+        ;     `block...`
+        ; } while (LUMI_loop_depth >= `X`);
+        if self.aux-limit?
+            self.write-limit-assign()
+        self.write-spaces()
+        write(user "do {\n")
+        self.block.write-block-setup()
+        self.block.write-set-loop-depth()
+        if self.aux-counter?
+            self.write-limit-check()
+        self.write-block-body()
+        self.block.write-block-cleanup()
+        self.write-spaces()
+        write(user "} while (LUMI_loop_depth >= ")
+        write-int(copy 2 * self.block.loop-depth)
+        write(user ");\n")
+        self.write-after-block()
+    
+    func inst write-limit-assign()
+        ; aux-limit = limit;
+        self.write-spaces()
+        self.limit.write-preactions()
+        self.aux-limit.write()
+        write(user " = ")
+        self.limit.write()
+        write(user ";\n")
+    
+    func inst write-limit-check()
+        ; if (aux-counter >= aux-limit) RAISE()
+        ; ++aux-counter;
+        self.block.write-spaces()
+        write(user "if (")
+        self.aux-counter.write()
+        write(user " >= ")
+        if self.aux-limit?
+            self.aux-limit.write()
+        else
+            write-int(copy self.limit-value)
+        write(user ") ")
+        var SyntaxTreeCode dummy-node(user self.block)
+        dummy-node.write-raise(user "loop_limit")
+        write(user "\n")
+        self.block.write-spaces()
+        write(user "++")
+        self.aux-counter.write()
+        write(user ";\n")

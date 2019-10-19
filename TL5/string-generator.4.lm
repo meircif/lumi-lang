@@ -1,27 +1,27 @@
 module string-generator
 
 main
-  user String infile-name(user sys.argv[1])
-  user String outfile-name(user sys.argv[2])
-  owner File infile
-  owner File outfile
-  user String line-header(user "  write-global(user \"")
-  user String line-footer(user "\\n\")\n")
-  file-open-read(user infile-name)->(owner infile)
-  file-open-write(user outfile-name)->(owner outfile)
-  outfile.write(user "module tl5-compiler\n\n")
-  outfile.write(user "func write-output-header-code()\n")
-  outfile.write(user line-header)
-  do
-    var Char ch
-    while not infile.getc()->(var ch)
-    if ch = '\n'
-      outfile.write(user line-footer)
-      outfile.write(user line-header)
-    else
-      if "\"\\".has(copy ch)
-        outfile.putc(copy '\\')
-      outfile.putc(copy ch)
-  outfile.write(user line-footer)
-  file-close(owner infile)
-  file-close(owner outfile)
+    user String infile-name(user sys.argv[1])
+    user String outfile-name(user sys.argv[2])
+    owner File infile
+    owner File outfile
+    user String line-header(user "    write-global(user \"")
+    user String line-footer(user "\\n\")\n")
+    file-open-read(user infile-name)->(owner infile)
+    file-open-write(user outfile-name)->(owner outfile)
+    outfile.write(user "module tl5-compiler\n\n")
+    outfile.write(user "func write-output-header-code()\n")
+    outfile.write(user line-header)
+    do
+        var Char ch
+        while not infile.getc()->(var ch)
+        if ch = '\n'
+            outfile.write(user line-footer)
+            outfile.write(user line-header)
+        else
+            if "\"\\".has(copy ch)
+                outfile.putc(copy '\\')
+            outfile.putc(copy ch)
+    outfile.write(user line-footer)
+    file-close(owner infile)
+    file-close(owner outfile)

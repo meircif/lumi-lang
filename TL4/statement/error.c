@@ -65,7 +65,7 @@ static char* _func_name_SyntaxTreeTry_write = "SyntaxTreeTry.write";
 Returncode SyntaxTreeTry_write(SyntaxTreeTry* self) {
   CHECK(22, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
   CHECK(23, write(&(String){6, 5, "do {\n"}) )
-  self->_base._base.parent->_base.indentation_spaces += 2;
+  self->_base._base.parent->_base.indentation_spaces += 4;
   CHECK(25, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
   CHECK(26, write(&(String){28, 27, "++LUMI_trace_ignore_count;\n"}) )
   if (try_depth_count == 0) {
@@ -81,7 +81,7 @@ Returncode SyntaxTreeTry_write(SyntaxTreeTry* self) {
     CHECK(36, write(&(String){22, 21, "\n#undef RETURN_ERROR\n"}) )
     CHECK(37, write(&(String){40, 39, "#define RETURN_ERROR goto LUMI_cleanup\n"}) )
   }
-  self->_base._base.parent->_base.indentation_spaces -= 2;
+  self->_base._base.parent->_base.indentation_spaces -= 4;
   CHECK(39, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
   CHECK(40, write(&(String){18, 17, "} while (false);\n"}) )
   CHECK(41, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
@@ -149,7 +149,7 @@ Returncode SyntaxTreeCatch_write(SyntaxTreeCatch* self) {
   CHECK(62, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
   CHECK(63, write(&(String){23, 22, "if (LUMI_err != OK) {\n"}) )
   CHECK(64, SyntaxTreeCode_write_spaces(&(self->_base._base)) )
-  CHECK(65, write(&(String){18, 17, "  LUMI_err = OK;\n"}) )
+  CHECK(65, write(&(String){20, 19, "    LUMI_err = OK;\n"}) )
   CHECK(66, (self->_base.block)->_base._base._dtl[9](self->_base.block) )
   CHECK(67, SyntaxTreeBlock_write_block_end(self->_base.block) )
   return OK;

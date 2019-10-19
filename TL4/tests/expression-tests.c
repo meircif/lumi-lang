@@ -100,7 +100,7 @@ Returncode test_code(String* input_text, String* expected_output) {
   Int footer_start = 0;
   if ((expected_header->length) < 0 || (mock_output_file_text->length - expected_header->length) < 0 || (expected_header->length) + (mock_output_file_text->length - expected_header->length) > (mock_output_file_text)->length) RAISE(62)
   String* mock_output_no_header = (&(String){mock_output_file_text->length - expected_header->length, mock_output_file_text->length - expected_header->length, (mock_output_file_text)->values + (expected_header->length)});
-  CHECK(63, String_find(mock_output_no_header, &(String){18, 17, "\nLUMI_cleanup:\n  "}, &(footer_start)) )
+  CHECK(63, String_find(mock_output_no_header, &(String){20, 19, "\nLUMI_cleanup:\n    "}, &(footer_start)) )
   if (footer_start >= mock_output_no_header->length) {
     CHECK(65, Sys_print(sys, mock_output_no_header) )
     code_header_valid = false;

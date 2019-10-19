@@ -2,467 +2,467 @@
 module tl5-compiler
 
 class GlobalNodes(SyntaxTreeNamespace)
-  owner List{TypeData} types
-  
-  new()
-    self.types := List{TypeData}()
+    owner List{TypeData} types
+    
+    new()
+        self.types := List{TypeData}()
 
 
 ~~~ The syntax tree root ~~~
 class SyntaxTreeRoot(GlobalNodes)
-  var List{EnumData} enums
-  var NameMap{SyntaxTreeConstant} constants
-  var List{ModuleMembers} modules
-  var List{SyntaxTreeNode} global-nodes
-  user String output-file-name
-  owner SyntaxTreeMainFunction main-function
-  var GlobalInit global-init
-  owner Array{LineCount} line-counts
-  var Int covered-files
-  var Bool is-library
-  
-  new()
-    base()
-    self.global-init.new()
-  
-  func inst parse()
-    var Int first-file-index
-    var Int arg-test-index(copy -1)
-    var Int input-files-number
-    user Array{String} sys-argv
-    get-sys-argv()->(user sys-argv)
-    for n in 1:sys-argv.length
-      user String arg(user sys-argv[n])
-      if arg-test-index = n - 1
-        string-new-copy(user arg)->(owner glob.tested-module)
-      else-if arg.equal(user "-t") or arg.equal(user "--test")
-        arg-test-index := n
-      else-if first-file-index = 0
-        first-file-index := n
-      else
-        input-files-number += 1
+    var List{EnumData} enums
+    var NameMap{SyntaxTreeConstant} constants
+    var List{ModuleMembers} modules
+    var List{SyntaxTreeNode} global-nodes
+    user String output-file-name
+    owner SyntaxTreeMainFunction main-function
+    var GlobalInit global-init
+    owner Array{LineCount} line-counts
+    var Int covered-files
+    var Bool is-library
     
-    if input-files-number = 0 or arg-test-index = sys-argv.length - 1
-      sys.print(user "usage: tl5-compiler [-t TESTED-MODULE]")
-      sys.print(user " OUTPUT-C-FILE-NAME INPUT-TL5-FILES...\n")
-      sys.exit(copy 1)
+    new()
+        base()
+        self.global-init.new()
     
-    if glob.tested-module?
-      self.line-counts := Array{input-files-number:LineCount}()
-    
-    self.output-file-name := sys-argv[first-file-index]
-    input-files-number := 0
-    for n in first-file-index + 1:sys-argv.length
-      if n > (arg-test-index + 1) or n < arg-test-index
-        glob.input-file-name := sys-argv[n]
-        glob.input-file-index := input-files-number
-        input-files-number += 1
-        glob.line-number := 1
+    func inst parse()
+        var Int first-file-index
+        var Int arg-test-index(copy -1)
+        var Int input-files-number
+        user Array{String} sys-argv
+        get-sys-argv()->(user sys-argv)
+        for n in 1:sys-argv.length
+            user String arg(user sys-argv[n])
+            if arg-test-index = n - 1
+                string-new-copy(user arg)->(owner glob.tested-module)
+            else-if arg.equal(user "-t") or arg.equal(user "--test")
+                arg-test-index := n
+            else-if first-file-index = 0
+                first-file-index := n
+            else
+                input-files-number += 1
+        
+        if input-files-number = 0 or arg-test-index = sys-argv.length - 1
+            sys.print(user "usage: tl5-compiler [-t TESTED-MODULE]")
+            sys.print(user " OUTPUT-C-FILE-NAME INPUT-TL5-FILES...\n")
+            sys.exit(copy 1)
+        
+        if glob.tested-module?
+            self.line-counts := Array{input-files-number:LineCount}()
+        
+        self.output-file-name := sys-argv[first-file-index]
+        input-files-number := 0
+        for n in first-file-index + 1:sys-argv.length
+            if n > (arg-test-index + 1) or n < arg-test-index
+                glob.input-file-name := sys-argv[n]
+                glob.input-file-index := input-files-number
+                input-files-number += 1
+                glob.line-number := 1
+                glob.current-module := _
+                glob.file-ended := false
+                try
+                    file-open-read(user glob.input-file-name)->(owner glob.input-file)
+                catch
+                    sys.print(user "could not read file \"")
+                    sys.print(user glob.input-file-name)
+                    sys.print(user "\"\n")
+                    sys.exit(copy 1)
+                
+                self.parse-children(user _, user _)
+                
+                if glob.input-buffer.length > 0 or glob.input-spaces > 0
+                    self.set-location()
+                    self.syntax-error-msg(user "no new-line before file end")
+                
+                file-close(owner glob.input-file)
+                if self.line-counts?
+                    self.line-counts[glob.input-file-index].build-values()
+        
         glob.current-module := _
-        glob.file-ended := false
-        try
-          file-open-read(user glob.input-file-name)->(owner glob.input-file)
-        catch
-          sys.print(user "could not read file \"")
-          sys.print(user glob.input-file-name)
-          sys.print(user "\"\n")
-          sys.exit(copy 1)
+        self.line-number := 0
+    
+    func dynamic parse-if-common(
+            user String keyword,
+            user TypeData parent-type,
+            user SyntaxTreeBlock parent-block)->(
+            var Bool is-parsed)
+        is-parsed := false
+        if not glob.current-module?
+            if self.equal-and-space(user keyword, user "module")
+                user String name
+                read-until(user "", copy false)->(user name)
+                if not is-legal-name(user name, copy NameGroup.DEFAULT)
+                    self.syntax-error(user "illegal module name", user name)
+                if glob.global-module.variable-map.find(user name)?
+                    self.syntax-error(user "module name overrides variable", user name)
+                if glob.global-module.function-map.find(user name)?
+                    self.syntax-error(user "module name overrides function", user name)
+                if not glob.module-map.find(user name)->(user glob.current-module)?
+                    new ModuleMembers module-members(user name)
+                    glob.current-module := module-members
+                    self.modules.add(owner module-members)
+                is-parsed := true
+                return
+            else
+                self.syntax-error-msg(user "no \"module\" in file start")
+        base(user keyword, user parent-type, user parent-block)->(var is-parsed)
+    
+    func dynamic parse-child(user String keyword)
+        if self.parse-if-function(user keyword, user _)
+            return
         
-        self.parse-children(user _, user _)
+        if self.equal-and-space(user keyword, user "const")
+            self.variables.add(owner SyntaxTreeConstant.parse-new(user _))
+            
+        else-if self.equal-and-space(user keyword, user "struct")
+            self.types.add(owner TypeData.parse-new(user _, copy false))
+            
+        else-if self.equal-and-space(user keyword, user "class")
+            self.types.add(owner TypeData.parse-new(user _, copy true))
+            
+        else-if self.equal-and-space(user keyword, user "enum")
+            self.enums.add(owner EnumData.parse-new(user _))
+            
+        else-if self.equal-and-new-line(user keyword, user "main")
+            SyntaxTreeMainFunction.parse-new(user _)->(owner self.main-function)
+            
+        else-if self.equal-and-space(user keyword, user "native")
+            self.parse-native()
+            
+        else-if self.equal-and-space(user keyword, user "test")
+            self.functions.add(owner SyntaxTreeTestFunction.parse-new(user _))
+            
+        else-if self.equal-and-space(user keyword, user "mock")
+            self.functions.add(owner SyntaxTreeMockFunction.parse-new(user _))
+            
+        else
+            self.syntax-error(user "unknown keyword", user keyword)
+
+    ~~~ Parse "native" keyword in the root tree ~~~
+    func inst parse-native()
+        user String keyword
+        read-until(user " ", copy false)->(user keyword)
+        self.expect-space(user "native")
         
-        if glob.input-buffer.length > 0 or glob.input-spaces > 0
-          self.set-location()
-          self.syntax-error-msg(user "no new-line before file end")
+        if keyword.equal(user "include")
+            self.global-nodes.add(owner NativeInclude.parse-new(user _))
         
-        file-close(owner glob.input-file)
+        else-if keyword.equal(user "func")
+            self.functions.add(owner NativeFunction.parse-new(user _))
+            
+        else-if keyword.equal(user "var")
+            self.variables.add(owner NativeVariable.parse-new(user _))
+            
+        else-if keyword.equal(user "const")
+            self.variables.add(owner NativeConstant.parse-new(user _))
+            
+        else-if keyword.equal(user "type")
+            self.types.add(owner NativeType.parse-new(user _))
+            
+        else-if keyword.equal(user "code")
+            self.global-nodes.add(owner NativeCode.parse-new(user _, user _))
+            
+        else
+            self.syntax-error(user "unknown \"native\" keyword", user keyword)
+    
+    func dynamic link-types()
+        raise
+    
+    func dynamic analyze()
+        self.order-types()
+        base.link-types()
+        self.link-children-types(user self.types)
+        self.global-init.link-types()
+        if self.main-function?
+            self.main-function.link-types()
+        base()
+        self.analyze-children(user self.types)
+        self.global-init.analyze()
+        self.analyze-main()
+        self.order-children-constants(user self.variables, user self.constants)
+        self.check-memory(user _)
+        if self.main-function?
+            self.main-function.check-memory(user _)
         if self.line-counts?
-          self.line-counts[glob.input-file-index].build-values()
+            self.analyze-cover()
     
-    glob.current-module := _
-    self.line-number := 0
-  
-  func dynamic parse-if-common(
-      user String keyword,
-      user TypeData parent-type,
-      user SyntaxTreeBlock parent-block)->(
-      var Bool is-parsed)
-    is-parsed := false
-    if not glob.current-module?
-      if self.equal-and-space(user keyword, user "module")
-        user String name
-        read-until(user "", copy false)->(user name)
-        if not is-legal-name(user name, copy NameGroup.DEFAULT)
-          self.syntax-error(user "illegal module name", user name)
-        if glob.global-module.variable-map.find(user name)?
-          self.syntax-error(user "module name overrides variable", user name)
-        if glob.global-module.function-map.find(user name)?
-          self.syntax-error(user "module name overrides function", user name)
-        if not glob.module-map.find(user name)->(user glob.current-module)?
-          new ModuleMembers module-members(user name)
-          glob.current-module := module-members
-          self.modules.add(owner module-members)
-        is-parsed := true
-        return
-      else
-        self.syntax-error-msg(user "no \"module\" in file start")
-    base(user keyword, user parent-type, user parent-block)->(var is-parsed)
-  
-  func dynamic parse-child(user String keyword)
-    if self.parse-if-function(user keyword, user _)
-      return
-    
-    if self.equal-and-space(user keyword, user "const")
-      self.variables.add(owner SyntaxTreeConstant.parse-new(user _))
-      
-    else-if self.equal-and-space(user keyword, user "struct")
-      self.types.add(owner TypeData.parse-new(user _, copy false))
-      
-    else-if self.equal-and-space(user keyword, user "class")
-      self.types.add(owner TypeData.parse-new(user _, copy true))
-      
-    else-if self.equal-and-space(user keyword, user "enum")
-      self.enums.add(owner EnumData.parse-new(user _))
-      
-    else-if self.equal-and-new-line(user keyword, user "main")
-      SyntaxTreeMainFunction.parse-new(user _)->(owner self.main-function)
-      
-    else-if self.equal-and-space(user keyword, user "native")
-      self.parse-native()
-      
-    else-if self.equal-and-space(user keyword, user "test")
-      self.functions.add(owner SyntaxTreeTestFunction.parse-new(user _))
-      
-    else-if self.equal-and-space(user keyword, user "mock")
-      self.functions.add(owner SyntaxTreeMockFunction.parse-new(user _))
-      
-    else
-      self.syntax-error(user "unknown keyword", user keyword)
+    func inst order-types()
+        new List{TypeData} ordered-list
+        do
+            while self.types.first?
+            if self.types.first.item.order-bases(user ordered-list)
+                sys.print(user "\n")
+                sys.exit(copy 1)
+        self.types := ordered-list
 
-  ~~~ Parse "native" keyword in the root tree ~~~
-  func inst parse-native()
-    user String keyword
-    read-until(user " ", copy false)->(user keyword)
-    self.expect-space(user "native")
-    
-    if keyword.equal(user "include")
-      self.global-nodes.add(owner NativeInclude.parse-new(user _))
-    
-    else-if keyword.equal(user "func")
-      self.functions.add(owner NativeFunction.parse-new(user _))
-      
-    else-if keyword.equal(user "var")
-      self.variables.add(owner NativeVariable.parse-new(user _))
-      
-    else-if keyword.equal(user "const")
-      self.variables.add(owner NativeConstant.parse-new(user _))
-      
-    else-if keyword.equal(user "type")
-      self.types.add(owner NativeType.parse-new(user _))
-      
-    else-if keyword.equal(user "code")
-      self.global-nodes.add(owner NativeCode.parse-new(user _, user _))
-      
-    else
-      self.syntax-error(user "unknown \"native\" keyword", user keyword)
-  
-  func dynamic link-types()
-    raise
-  
-  func dynamic analyze()
-    self.order-types()
-    base.link-types()
-    self.link-children-types(user self.types)
-    self.global-init.link-types()
-    if self.main-function?
-      self.main-function.link-types()
-    base()
-    self.analyze-children(user self.types)
-    self.global-init.analyze()
-    self.analyze-main()
-    self.order-children-constants(user self.variables, user self.constants)
-    self.check-memory(user _)
-    if self.main-function?
-      self.main-function.check-memory(user _)
-    if self.line-counts?
-      self.analyze-cover()
-  
-  func inst order-types()
-    new List{TypeData} ordered-list
-    do
-      while self.types.first?
-      if self.types.first.item.order-bases(user ordered-list)
-        sys.print(user "\n")
-        sys.exit(copy 1)
-    self.types := ordered-list
+    func inst analyze-main()
+        if glob.tested-module?
+            if not glob.test-functions.first?
+                sys.print(user "General code error: no test functions\n")
+                sys.exit(copy 1)
+        else-if not self.main-function? and not self.is-library
+            sys.print(user "General code error: no main function\n")
+            sys.exit(copy 1)
+        if self.main-function?
+            self.main-function.analyze()
 
-  func inst analyze-main()
-    if glob.tested-module?
-      if not glob.test-functions.first?
-        sys.print(user "General code error: no test functions\n")
-        sys.exit(copy 1)
-    else-if not self.main-function? and not self.is-library
-      sys.print(user "General code error: no main function\n")
-      sys.exit(copy 1)
-    if self.main-function?
-      self.main-function.analyze()
-
-  func dynamic check-memory(user ReferenceMemoryList refs)
-    for type-data in self.types.iter()
-      type-data.collect-delete-group()
-    self.collect-delete-groups()
-    for type-data in self.types.iter()
-      type-data.collect-delete-groups()
-    base(user refs)
-    self.check-children-memory(user self.types, user _)
-  
-  func inst analyze-cover()
-    if not glob.module-map.find(user glob.tested-module)?
-      sys.print(user "General code error: unknown tested module \"")
-      sys.print(user glob.tested-module)
-      sys.print(user "\"\n")
-      sys.exit(copy 1)
-    var Int covered-index
-    for n in self.line-counts.length
-      user LineCount line-count(user self.line-counts[n])
-      if line-count.needs-cover
-        line-count.covered-index := covered-index
-        covered-index += 1
-    self.covered-files := covered-index
-    if self.covered-files = 0
-      sys.print(user "General code error: no code to test under module \"")
-      sys.print(user glob.tested-module)
-      sys.print(user "\"\n")
-      sys.exit(copy 1)
-  
-  ~~~ write C file in this order:
-  1. type declarations
-  2. type structs (ordered by depth)
-  3. function declarations
-  4. global variables
-  5. function bodies
-  6. main function
-  ~~~
-  func dynamic write()
-    try
-      file-open-write(user self.output-file-name)->(owner glob.output-file)
-    catch
-      sys.print(user "could not write file \"")
-      sys.print(user self.output-file-name)
-      sys.print(user "\"\n")
-      sys.exit(copy 1)
-      
-    write-output-header-code()
+    func dynamic check-memory(user ReferenceMemoryList refs)
+        for type-data in self.types.iter()
+            type-data.collect-delete-group()
+        self.collect-delete-groups()
+        for type-data in self.types.iter()
+            type-data.collect-delete-groups()
+        base(user refs)
+        self.check-children-memory(user self.types, user _)
     
-    write-global(user "\n\n/* global nodes */\n")
-    self.write-children(user self.global-nodes)
+    func inst analyze-cover()
+        if not glob.module-map.find(user glob.tested-module)?
+            sys.print(user "General code error: unknown tested module \"")
+            sys.print(user glob.tested-module)
+            sys.print(user "\"\n")
+            sys.exit(copy 1)
+        var Int covered-index
+        for n in self.line-counts.length
+            user LineCount line-count(user self.line-counts[n])
+            if line-count.needs-cover
+                line-count.covered-index := covered-index
+                covered-index += 1
+        self.covered-files := covered-index
+        if self.covered-files = 0
+            sys.print(user "General code error: no code to test under module \"")
+            sys.print(user glob.tested-module)
+            sys.print(user "\"\n")
+            sys.exit(copy 1)
     
-    write-global(user "\n\n/* types declaration */\n")
-    var TypeDeclarationWriter type-declaration-writer
-    self.write-for-type(user type-declaration-writer)
-    
-    write-global(user "\n\n/* Enums */\n")
-    self.write-children(user self.enums)
-    
-    write-global(user "\n\n/* constants */\n")
-    var NodeWriteAction node-write-action
-    for constant in self.constants.iter()
-      constant.do-action(user node-write-action)
-    
-    write-global(user "\n\n/* types struct */\n")
-    self.write-children(user self.types)
-    
-    write-global(user "\n\n/* types methods declaration */\n")
-    var TypeMethodsDeclarationWriter type-methods-declaration-writer
-    self.write-for-type(user type-methods-declaration-writer)
-    
-    write-global(user "\n\n/* global functions declaration */\n")
-    self.write-functions-declaration()
-    
-    write-global(user "\n\n/* types global variables */\n")
-    var TypeGlobalWriter type-global-writer
-    self.write-for-type(user type-global-writer)
-    
-    write-global(user "\n\n/* global variables */\n")
-    self.write-children(user self.variables)
-    
-    if self.line-counts?
-      self.write-test-coverage-data()
-    
-    write-global(user "\n\n/* types methods body */\n")
-    var TypeMethodsBodyWriter type-methods-body-writer
-    self.write-for-type(user type-methods-body-writer)
-    
-    write-global(user "\n\n/* global functions body */\n")
-    self.write-children(user self.functions)
-    
-    if glob.tested-module? or self.main-function?
-      if not glob.is-new-mocked
-        write(user "\n\nvoid new_Mock(Bool* allocate_success) { }")
-      if not glob.is-delete-mocked
-        write(user "\n\nReturncode delete_Mock(Ref self) { return OK; }")
+    ~~~ write C file in this order:
+    1. type declarations
+    2. type structs (ordered by depth)
+    3. function declarations
+    4. global variables
+    5. function bodies
+    6. main function
+    ~~~
+    func dynamic write()
+        try
+            file-open-write(user self.output-file-name)->(owner glob.output-file)
+        catch
+            sys.print(user "could not write file \"")
+            sys.print(user self.output-file-name)
+            sys.print(user "\"\n")
+            sys.exit(copy 1)
+            
+        write-output-header-code()
         
-    if glob.tested-module?
-      write-global(user "\n\n/* main test function */\n")
-      self.write-test-main()
-    else-if self.main-function?
-      write-global(user "\n\n/* main function */\n")
-      self.main-function.write()
+        write-global(user "\n\n/* global nodes */\n")
+        self.write-children(user self.global-nodes)
+        
+        write-global(user "\n\n/* types declaration */\n")
+        var TypeDeclarationWriter type-declaration-writer
+        self.write-for-type(user type-declaration-writer)
+        
+        write-global(user "\n\n/* Enums */\n")
+        self.write-children(user self.enums)
+        
+        write-global(user "\n\n/* constants */\n")
+        var NodeWriteAction node-write-action
+        for constant in self.constants.iter()
+            constant.do-action(user node-write-action)
+        
+        write-global(user "\n\n/* types struct */\n")
+        self.write-children(user self.types)
+        
+        write-global(user "\n\n/* types methods declaration */\n")
+        var TypeMethodsDeclarationWriter type-methods-declaration-writer
+        self.write-for-type(user type-methods-declaration-writer)
+        
+        write-global(user "\n\n/* global functions declaration */\n")
+        self.write-functions-declaration()
+        
+        write-global(user "\n\n/* types global variables */\n")
+        var TypeGlobalWriter type-global-writer
+        self.write-for-type(user type-global-writer)
+        
+        write-global(user "\n\n/* global variables */\n")
+        self.write-children(user self.variables)
+        
+        if self.line-counts?
+            self.write-test-coverage-data()
+        
+        write-global(user "\n\n/* types methods body */\n")
+        var TypeMethodsBodyWriter type-methods-body-writer
+        self.write-for-type(user type-methods-body-writer)
+        
+        write-global(user "\n\n/* global functions body */\n")
+        self.write-children(user self.functions)
+        
+        if glob.tested-module? or self.main-function?
+            if not glob.is-new-mocked
+                write(user "\n\nvoid new_Mock(Bool* allocate_success) { }")
+            if not glob.is-delete-mocked
+                write(user "\n\nReturncode delete_Mock(Ref self) { return OK; }")
+                
+        if glob.tested-module?
+            write-global(user "\n\n/* main test function */\n")
+            self.write-test-main()
+        else-if self.main-function?
+            write-global(user "\n\n/* main function */\n")
+            self.main-function.write()
+        
+        file-close(owner glob.output-file)
     
-    file-close(owner glob.output-file)
-  
-  func inst write-for-type(user TypeWriter type-writer)
-    for type-data in self.types.iter()
-      type-data.write-me(user type-writer)
-  
-  func inst write-test-coverage-data()
-    user LineCount line-count
-    for n in self.line-counts.length
-      line-count := self.line-counts[n]
-      if line-count.needs-cover
-        write(user "\nint LUMI_file")
-        write-int(copy line-count.covered-index)
-        write(user "_line_count[")
-        write-int(copy line-count.line-needs-cover.length)
-        write(user "] = {\n")
+    func inst write-for-type(user TypeWriter type-writer)
+        for type-data in self.types.iter()
+            type-data.write-me(user type-writer)
+    
+    func inst write-test-coverage-data()
+        user LineCount line-count
+        for n in self.line-counts.length
+            line-count := self.line-counts[n]
+            if line-count.needs-cover
+                write(user "\nint LUMI_file")
+                write-int(copy line-count.covered-index)
+                write(user "_line_count[")
+                write-int(copy line-count.line-needs-cover.length)
+                write(user "] = {\n")
+                write-spaces(copy INDENTATION-SPACES)
+                var Int modulo
+                for i in line-count.line-needs-cover.length
+                    if i > 0
+                        write(user ",")
+                    if modulo = 25
+                        write(user "\n")
+                        write-spaces(copy INDENTATION-SPACES)
+                        modulo := 1
+                    else
+                        modulo += 1
+                    if line-count.line-needs-cover[i]
+                        write(user " 0")
+                    else
+                        write(user "-1")
+                write(user "\n};")
+        write(user "\nFile_Coverage LUMI_file_coverage[")
+        write-int(copy self.covered-files)
+        write(user "] = {")
+        for n in self.line-counts.length
+            line-count := self.line-counts[n]
+            if line-count.needs-cover
+                if line-count.covered-index > 0
+                    write(user ",")
+                write(user "\n")
+                write-spaces(copy INDENTATION-SPACES)
+                write(user "{")
+                write-string-literal(user line-count.filename)
+                write(user ", ")
+                write-int(copy line-count.line-needs-cover.length)
+                write(user ", LUMI_file")
+                write-int(copy line-count.covered-index)
+                write(user "_line_count}")
+        write(user "\n};\n")
+    
+    func inst write-test-main()
+        write(user "\nUSER_MAIN_HEADER {\n")
         write-spaces(copy INDENTATION-SPACES)
-        var Int modulo
-        for i in line-count.line-needs-cover.length
-          if i > 0
-            write(user ",")
-          if modulo = 25
-            write(user "\n")
-            write-spaces(copy INDENTATION-SPACES)
-            modulo := 1
-          else
-            modulo += 1
-          if line-count.line-needs-cover[i]
-            write(user " 0")
-          else
-            write(user "-1")
-        write(user "\n};")
-    write(user "\nFile_Coverage LUMI_file_coverage[")
-    write-int(copy self.covered-files)
-    write(user "] = {")
-    for n in self.line-counts.length
-      line-count := self.line-counts[n]
-      if line-count.needs-cover
-        if line-count.covered-index > 0
-          write(user ",")
+        write(user "Returncode LUMI_err = OK;\n")
+        write-spaces(copy INDENTATION-SPACES)
+        write(user "unsigned LUMI_loop_depth = 1;\n")
+        write-spaces(copy INDENTATION-SPACES)
+        write(user "Bool LUMI_success = true;\n")
+        self.global-init.write()
         write(user "\n")
+        for test-function in glob.test-functions.iter()
+            ; LUMI_success &= LUMI_run_test("`test-func.name`", `test-func`);
+            write-spaces(copy INDENTATION-SPACES)
+            write(user "LUMI_success &= LUMI_run_test(\"")
+            write(user test-function.name)
+            write(user "\", ")
+            test-function.write-cname()
+            write(user ");\n")
+        if self.line-counts?
+            write-spaces(copy INDENTATION-SPACES)
+            write(user "LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, ")
+            write-int(copy self.covered-files)
+            write(user ");\n")
         write-spaces(copy INDENTATION-SPACES)
-        write(user "{")
-        write-string-literal(user line-count.filename)
-        write(user ", ")
-        write-int(copy line-count.line-needs-cover.length)
-        write(user ", LUMI_file")
-        write-int(copy line-count.covered-index)
-        write(user "_line_count}")
-    write(user "\n};\n")
-  
-  func inst write-test-main()
-    write(user "\nUSER_MAIN_HEADER {\n")
-    write-spaces(copy INDENTATION-SPACES)
-    write(user "Returncode LUMI_err = OK;\n")
-    write-spaces(copy INDENTATION-SPACES)
-    write(user "unsigned LUMI_loop_depth = 1;\n")
-    write-spaces(copy INDENTATION-SPACES)
-    write(user "Bool LUMI_success = true;\n")
-    self.global-init.write()
-    write(user "\n")
-    for test-function in glob.test-functions.iter()
-      ; LUMI_success &= LUMI_run_test("`test-func.name`", `test-func`);
-      write-spaces(copy INDENTATION-SPACES)
-      write(user "LUMI_success &= LUMI_run_test(\"")
-      write(user test-function.name)
-      write(user "\", ")
-      test-function.write-cname()
-      write(user ");\n")
-    if self.line-counts?
-      write-spaces(copy INDENTATION-SPACES)
-      write(user "LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, ")
-      write-int(copy self.covered-files)
-      write(user ");\n")
-    write-spaces(copy INDENTATION-SPACES)
-    write(user "return LUMI_success? LUMI_err : FAIL;\n")
-    write(user "LUMI_block0_cleanup:\n")
-    write-spaces(copy INDENTATION-SPACES)
-    write(user "return LUMI_err;\n")
-    write(user "}\n")
-    write(user "\nTEST_MAIN_FUNC\n")
+        write(user "return LUMI_success? LUMI_err : FAIL;\n")
+        write(user "LUMI_block0_cleanup:\n")
+        write-spaces(copy INDENTATION-SPACES)
+        write(user "return LUMI_err;\n")
+        write(user "}\n")
+        write(user "\nTEST_MAIN_FUNC\n")
 
 
 struct ModuleMembers
-  owner String name
-  var NameMap{TypeData} type-map
-  var NameMap{EnumData} enum-map
-  var NameMap{SyntaxTreeVariable} variable-map
-  var NameMap{SyntaxTreeFunction} function-map
-  
-  func new(user String name)
-    string-new-copy(user name)->(owner self.name)
-    if self.name?
-      glob.module-map.add(user self.name, user self)
-  
-  func write-prefix()
-    write-cname(user self.name)
-    write(user "_M_")
+    owner String name
+    var NameMap{TypeData} type-map
+    var NameMap{EnumData} enum-map
+    var NameMap{SyntaxTreeVariable} variable-map
+    var NameMap{SyntaxTreeFunction} function-map
+    
+    func new(user String name)
+        string-new-copy(user name)->(owner self.name)
+        if self.name?
+            glob.module-map.add(user self.name, user self)
+    
+    func write-prefix()
+        write-cname(user self.name)
+        write(user "_M_")
 
 
 ~~~ Main function node in the syntax tree ~~~
 class SyntaxTreeMainFunction(SyntaxTreeFunction)
-  func inst parse-new()->(owner SyntaxTreeMainFunction new-node)
-    new-node := SyntaxTreeMainFunction()
-    new-node.parse()
-  
-  func inst parse()
-    self.my-module := glob.current-module
-    string-new-copy(user "main")->(owner self.name)
-    self.arguments.has-error := true
-    self.parse-body()
-  
-  func dynamic write()
-    ; USER_MAIN_HEADER {
-    ;   `block...`
-    ; }
-    ; MAIN_FUNC
-    write(user "\nUSER_MAIN_HEADER")
-    self.write-block()
-    self.write-post-func()
-    write(user "\nMAIN_FUNC\n")
-  
-  func dynamic write-block-body()
-    glob.root.global-init.write()
-    self.write-pre-func()
-    write(user "\n")
-    base()
+    func inst parse-new()->(owner SyntaxTreeMainFunction new-node)
+        new-node := SyntaxTreeMainFunction()
+        new-node.parse()
+    
+    func inst parse()
+        self.my-module := glob.current-module
+        string-new-copy(user "main")->(owner self.name)
+        self.arguments.has-error := true
+        self.parse-body()
+    
+    func dynamic write()
+        ; USER_MAIN_HEADER {
+        ;     `block...`
+        ; }
+        ; MAIN_FUNC
+        write(user "\nUSER_MAIN_HEADER")
+        self.write-block()
+        self.write-post-func()
+        write(user "\nMAIN_FUNC\n")
+    
+    func dynamic write-block-body()
+        glob.root.global-init.write()
+        self.write-pre-func()
+        write(user "\n")
+        base()
 
 
 class GlobalInit(SyntaxTreeFunction)
-  new()
-    base()
-    self.indentation-spaces := INDENTATION-SPACES
-  
-  func dynamic write()
-    if not self.code-nodes.first?
-      return
-    self.write-setup()
-    self.write-children(user self.variables)
-    write(user "#define LUMI_FUNC_NAME \"global variable initialization\"\n")
-    self.write-block-body()
-    write(user "#undef LUMI_FUNC_NAME\n")
+    new()
+        base()
+        self.indentation-spaces := INDENTATION-SPACES
+    
+    func dynamic write()
+        if not self.code-nodes.first?
+            return
+        self.write-setup()
+        self.write-children(user self.variables)
+        write(user "#define LUMI_FUNC_NAME \"global variable initialization\"\n")
+        self.write-block-body()
+        write(user "#undef LUMI_FUNC_NAME\n")
 
 
 struct LineCount
-  user String filename
-  var Int covered-index
-  var Bool needs-cover
-  owner Array{Bool} line-needs-cover
-  
-  func build-values()
-    self.filename := glob.input-file-name
-    self.line-needs-cover := Array{glob.line-number + 1:Bool}()
+    user String filename
+    var Int covered-index
+    var Bool needs-cover
+    owner Array{Bool} line-needs-cover
+    
+    func build-values()
+        self.filename := glob.input-file-name
+        self.line-needs-cover := Array{glob.line-number + 1:Bool}()
 
 
 ~~~ proxy write function to be mocked on unit-tests ~~~
 func write-global(user String text)
-  write(user text)
+    write(user text)

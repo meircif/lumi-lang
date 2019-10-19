@@ -1,7 +1,7 @@
 module hello-world
 
 func show()
-  sys.println(user "hello world")
+    sys.println(user "hello world")
 
 main
-  show()
+    show()

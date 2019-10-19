@@ -3,49 +3,49 @@ module math
 
 ~~~ Return the absolute value of `x` ~~~
 func abs(copy Int x)->(var Int res)
-  if x >= 0
-    res := x
-  else
-    res := - x
+    if x >= 0
+        res := x
+    else
+        res := - x
 
 
 ~~~ Return `x` with the sign of `sign`,
 if sign is `0` no sign change is made to `x` ~~~
 func copysign(copy Int x, copy Int sign)->(var Int res)
-  if (x >= 0 and sign >= 0) or (x < 0 and sign <= 0)
-    res := x
-  else
-    res := - x
+    if (x >= 0 and sign >= 0) or (x < 0 and sign <= 0)
+        res := x
+    else
+        res := - x
 
 
 ~~~ Return `x` raised to power `exp`, fail if `exp` is negative,
 if `x` and `exp` are zero the result is `1` ~~~
 func power(copy Int x, copy Int exp)->(var Int res)
-  if exp < 0
-    raise "negative power exponent"
-  res := 1
-  for n in exp
-    res := res * x
+    if exp < 0
+        raise "negative power exponent"
+    res := 1
+    for n in exp
+        res := res * x
 
 
 ~~~ Return `x`!, fail if `x` is negative ~~~
 func factorial(copy Int x)->(var Int res)
-  if x < 0
-    raise "negative factorial"
-  res := 1
-  for n in 2:x + 1
-    res := res * n
+    if x < 0
+        raise "negative factorial"
+    res := 1
+    for n in 2:x + 1
+        res := res * n
 
 
 struct IntBox
-  var Int value
+    var Int value
 
-  func new(copy Int value)
-    self.value := value
+    func new(copy Int value)
+        self.value := value
 
 
 ~~~ Return the sum of all integers in `iter` ~~~
 func sum(user ds.Iterator{IntBox} iter)->(var Int res)
-  res := 0
-  for box in iter
-    res += box.value
+    res := 0
+    for box in iter
+        res += box.value

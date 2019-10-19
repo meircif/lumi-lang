@@ -3,107 +3,107 @@ module tl5-compiler
 
 ~~~ Maps from a string name to a generic object ~~~
 struct NameMap{Generic}
-  owner NameMapNode{Generic} first
-  user NameMapNode{Generic} last
-  
-  ~~~ Add `name` -> `value` mapping ~~~
-  func add(user String name, user Generic value)
-    new NameMapNode{Generic} node(user name, user value)
-    if self.last?
-      self.last.next := node
-      self.last := self.last.next
-    else
-      self.first := node
-      self.last := self.first
-  
-  ~~~ Find a value mapped from `name`, return empty if not exists ~~~
-  func find(user String name)->(user Generic value)
-    user NameMapNode{Generic} node(user self.first)
-    do
-      while node?
-      if node.name.equal(user name)
-        value := node.value
-        return
-      node := node.next
-    value := _
-  
-  func update-or-add(user String name, user Generic value)
-    user NameMapNode{Generic} node(user self.first)
-    do
-      while node?
-      if node.name.equal(user name)
-        node.value := value
-        return
-      node := node.next
-    self.add(user name, user value)
-  
-  ~~~ Add mapping only if value not exists ~~~
-  func add-if-unique-value(user String name, user Generic value)
-    user NameMapNode{Generic} node(user self.first)
-    do
-      while node?
-      if node.value is value
-        return
-      node := node.next
-    self.add(user name, user value)
-  
-  func remove(user Generic value)
-    if not self.first?
-      return
-    if self.first.value is value
-      if self.last is self.first
-        self.last := _
-      self.first := self.first.next
-      return
-    user NameMapNode{Generic} node(user self.first)
-    do
-      while node.next?
-      if node.next.value is value
-        if self.last is node.next
-          self.last := node
-        node.next := node.next.next
-        return
-      node := node.next
-  
-  func pop()->(user Generic value)
-    if not self.first?
-      value := _
-      return
-    value := self.first.value
-    self.first := self.first.next
-    if not self.first?
-      self.last := _
+    owner NameMapNode{Generic} first
+    user NameMapNode{Generic} last
     
-  func clear()
-    self.first := _
-    self.last := _
-  
-  func iter()->(owner NameMapIterator{Generic} iter)
-    iter := NameMapIterator{Generic}(user self)
+    ~~~ Add `name` -> `value` mapping ~~~
+    func add(user String name, user Generic value)
+        new NameMapNode{Generic} node(user name, user value)
+        if self.last?
+            self.last.next := node
+            self.last := self.last.next
+        else
+            self.first := node
+            self.last := self.first
+    
+    ~~~ Find a value mapped from `name`, return empty if not exists ~~~
+    func find(user String name)->(user Generic value)
+        user NameMapNode{Generic} node(user self.first)
+        do
+            while node?
+            if node.name.equal(user name)
+                value := node.value
+                return
+            node := node.next
+        value := _
+    
+    func update-or-add(user String name, user Generic value)
+        user NameMapNode{Generic} node(user self.first)
+        do
+            while node?
+            if node.name.equal(user name)
+                node.value := value
+                return
+            node := node.next
+        self.add(user name, user value)
+    
+    ~~~ Add mapping only if value not exists ~~~
+    func add-if-unique-value(user String name, user Generic value)
+        user NameMapNode{Generic} node(user self.first)
+        do
+            while node?
+            if node.value is value
+                return
+            node := node.next
+        self.add(user name, user value)
+    
+    func remove(user Generic value)
+        if not self.first?
+            return
+        if self.first.value is value
+            if self.last is self.first
+                self.last := _
+            self.first := self.first.next
+            return
+        user NameMapNode{Generic} node(user self.first)
+        do
+            while node.next?
+            if node.next.value is value
+                if self.last is node.next
+                    self.last := node
+                node.next := node.next.next
+                return
+            node := node.next
+    
+    func pop()->(user Generic value)
+        if not self.first?
+            value := _
+            return
+        value := self.first.value
+        self.first := self.first.next
+        if not self.first?
+            self.last := _
+        
+    func clear()
+        self.first := _
+        self.last := _
+    
+    func iter()->(owner NameMapIterator{Generic} iter)
+        iter := NameMapIterator{Generic}(user self)
 
 
 struct NameMapNode{Generic}
-  owner NameMapNode{Generic} next
-  user String name
-  user Generic value
-  
-  func new(user String name, user Generic value)
-    self.name := name
-    self.value := value
+    owner NameMapNode{Generic} next
+    user String name
+    user Generic value
+    
+    func new(user String name, user Generic value)
+        self.name := name
+        self.value := value
 
 
 ~~~ Iterate over a Map ~~~
 struct NameMapIterator{Generic}
-  user NameMapNode{Generic} node
-  
-  func new(user NameMap{Generic} map)
-    self.node := map.first
-  
-  func has()->(var Bool has)
-    has := self.node?
-  
-  func get()->(user Generic value)
-    value := self.node.value
-  
-  func next()
-    self.node := self.node.next
+    user NameMapNode{Generic} node
+    
+    func new(user NameMap{Generic} map)
+        self.node := map.first
+    
+    func has()->(var Bool has)
+        has := self.node?
+    
+    func get()->(user Generic value)
+        value := self.node.value
+    
+    func next()
+        self.node := self.node.next

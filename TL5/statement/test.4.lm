@@ -3,285 +3,285 @@ module tl5-compiler
 
 ~~~ Assert statement in the syntax tree ~~~
 class SyntaxTreeAssert(SyntaxTreeCode)
-  var ExpressionValue tested
-  
-  func inst parse-new(user SyntaxTreeBlock parent)->(
-      owner SyntaxTreeAssert new-node)
-    new-node := SyntaxTreeAssert(user parent)
-    new-node.parse()
-  
-  func inst parse()
-    self.tested.new(user "", user self)
-  
-  func dynamic analyze()
-    if self.set-has-error()
-      self.check-function-has-error()
-    self.analyze-expression(user self.tested, user glob.type-bool)
-    self.tested.check-no-error()
+    var ExpressionValue tested
+    
+    func inst parse-new(user SyntaxTreeBlock parent)->(
+            owner SyntaxTreeAssert new-node)
+        new-node := SyntaxTreeAssert(user parent)
+        new-node.parse()
+    
+    func inst parse()
+        self.tested.new(user "", user self)
+    
+    func dynamic analyze()
+        if self.set-has-error()
+            self.check-function-has-error()
+        self.analyze-expression(user self.tested, user glob.type-bool)
+        self.tested.check-no-error()
 
-  func dynamic check-memory(user ReferenceMemoryList refs)
-    self.tested.check-memory(user refs)
-  
-  func dynamic write()
-    ; TEST_ASSERT(`line`, `cleanp`, `tested`)
-    self.write-spaces()
-    self.tested.write-preactions()
-    write(user "TEST_ASSERT(")
-    self.write-line-num()
-    write(user ", ")
-    self.parent.write-cleanup-label()
-    write(user ", ")
-    self.tested.write()
-    write(user ")\n")
+    func dynamic check-memory(user ReferenceMemoryList refs)
+        self.tested.check-memory(user refs)
+    
+    func dynamic write()
+        ; TEST_ASSERT(`line`, `cleanp`, `tested`)
+        self.write-spaces()
+        self.tested.write-preactions()
+        write(user "TEST_ASSERT(")
+        self.write-line-num()
+        write(user ", ")
+        self.parent.write-cleanup-label()
+        write(user ", ")
+        self.tested.write()
+        write(user ")\n")
 
 ~~~ Assert-error statement in the syntax tree ~~~
 class SyntaxTreeAssertError(SyntaxTreeCode)
-  var ExpressionValue tested
-  var SyntaxTreeBlock dummy-block
-  owner String expected-error
-  var Bool has-error
-  
-  func inst parse-new(user SyntaxTreeBlock parent)->(
-      owner SyntaxTreeAssertError new-node)
-    new-node := SyntaxTreeAssertError(user parent)
-    new-node.parse()
-  
-  func inst parse()
-    self.dummy-block.set-parent(user self.parent)
-    self.dummy-block.indentation-spaces -= INDENTATION-SPACES
-    self.tested.new(user ",", user self)
-    if glob.last-char = ','
-      read-c()
-      if glob.last-char = '\n'
-        self.read-parent-line-break-spaces()
-      else
-        self.expect-space(user ",")
-      read-new(user "")->(owner self.expected-error)
-      self.check-string(user self.expected-error)
+    var ExpressionValue tested
+    var SyntaxTreeBlock dummy-block
+    owner String expected-error
+    var Bool has-error
+    
+    func inst parse-new(user SyntaxTreeBlock parent)->(
+            owner SyntaxTreeAssertError new-node)
+        new-node := SyntaxTreeAssertError(user parent)
+        new-node.parse()
+    
+    func inst parse()
+        self.dummy-block.set-parent(user self.parent)
+        self.dummy-block.indentation-spaces -= INDENTATION-SPACES
+        self.tested.new(user ",", user self)
+        if glob.last-char = ','
+            read-c()
+            if glob.last-char = '\n'
+                self.read-parent-line-break-spaces()
+            else
+                self.expect-space(user ",")
+            read-new(user "")->(owner self.expected-error)
+            self.check-string(user self.expected-error)
 
-  func dynamic set-has-error()->(var Bool need-check)
-    self.has-error := true
-    need-check := false
-  
-  func dynamic analyze()
-    if self.parent.set-has-error()
-      self.check-function-has-error()
-    self.tested.analyze()
-    if self.tested.expression.error-expected
-      self.syntax-error-msg(user "using \"!\" where error is not propagated")
-    if not self.has-error
-      self.syntax-error-msg(user "no error raised in expression")
+    func dynamic set-has-error()->(var Bool need-check)
+        self.has-error := true
+        need-check := false
+    
+    func dynamic analyze()
+        if self.parent.set-has-error()
+            self.check-function-has-error()
+        self.tested.analyze()
+        if self.tested.expression.error-expected
+            self.syntax-error-msg(user "using \"!\" where error is not propagated")
+        if not self.has-error
+            self.syntax-error-msg(user "no error raised in expression")
 
-  func dynamic check-memory(user ReferenceMemoryList refs)
-    self.tested.check-memory(user refs)
-  
-  func dynamic write()
-    if self.expected-error?
-      self.write-spaces()
-      write(user "{char* LUMI_expected_error_prev;\n")
-      self.write-spaces()
-      write(user "int LUMI_expected_error_trace_ignore_count_prev;\n")
-      self.write-spaces()
-      write(user "LUMI_expected_error_prev = LUMI_expected_error;\n")
-      self.write-spaces()
-      write(user "LUMI_expected_error_trace_ignore_count_prev =")
-      write(user " LUMI_expected_error_trace_ignore_count;\n")
-      self.write-spaces()
-      write(user "LUMI_expected_error = ")
-      write(user self.expected-error)
-      write(user ";\n")
-      self.write-spaces()
-      write(user "LUMI_expected_error_trace_ignore_count =")
-      write(user " LUMI_trace_ignore_count + 1;\n")
-    self.write-spaces()
-    write(user "++LUMI_trace_ignore_count;\n")
-    self.write-spaces()
+    func dynamic check-memory(user ReferenceMemoryList refs)
+        self.tested.check-memory(user refs)
     
-    self.parent := self.dummy-block
-    self.tested.write-preactions()
-    self.parent := self.dummy-block.parent
-    
-    write(user "--LUMI_trace_ignore_count;\n")
-    if self.expected-error?
-      self.write-spaces()
-      write(user "LUMI_expected_error_trace_ignore_count =")
-      write(user " LUMI_expected_error_trace_ignore_count_prev;\n")
-      self.write-spaces()
-      write(user "LUMI_expected_error = LUMI_expected_error_prev;\n")
-    self.write-spaces()
-    write(user "TEST_FAIL(")
-    self.write-line-num()
-    write(user ", ")
-    self.parent.write-cleanup-label()
-    write(user ", 16, \"error not raised\")\n")
-    
-    self.dummy-block.write-block-cleanup()
-    
-    self.write-spaces()
-    write(user "--LUMI_trace_ignore_count;\n")
-    if self.expected-error?
-      self.write-spaces()
-      write(user "LUMI_expected_error_trace_ignore_count =")
-      write(user " LUMI_expected_error_trace_ignore_count_prev;\n")
-      self.write-spaces()
-      write(user "if (LUMI_expected_error == NULL) {\n")
-      self.parent.indentation-spaces += INDENTATION-SPACES
-      self.write-spaces()
-      write(user "LUMI_expected_error = LUMI_expected_error_prev;\n")
-      self.write-spaces()
-      write(user "TEST_FAIL_NULL(")
-      self.parent.indentation-spaces -= INDENTATION-SPACES
-      self.write-line-num()
-      write(user ", ")
-      self.parent.write-cleanup-label()
-      write(user ")\n")
-      self.write-spaces()
-      write(user "}\n")
-      self.write-spaces()
-      write(user "LUMI_expected_error = LUMI_expected_error_prev;}\n")
-    self.write-spaces()
-    write(user "LUMI_err = OK;\n")
-    self.parent.write-set-loop-depth()
+    func dynamic write()
+        if self.expected-error?
+            self.write-spaces()
+            write(user "{char* LUMI_expected_error_prev;\n")
+            self.write-spaces()
+            write(user "int LUMI_expected_error_trace_ignore_count_prev;\n")
+            self.write-spaces()
+            write(user "LUMI_expected_error_prev = LUMI_expected_error;\n")
+            self.write-spaces()
+            write(user "LUMI_expected_error_trace_ignore_count_prev =")
+            write(user " LUMI_expected_error_trace_ignore_count;\n")
+            self.write-spaces()
+            write(user "LUMI_expected_error = ")
+            write(user self.expected-error)
+            write(user ";\n")
+            self.write-spaces()
+            write(user "LUMI_expected_error_trace_ignore_count =")
+            write(user " LUMI_trace_ignore_count + 1;\n")
+        self.write-spaces()
+        write(user "++LUMI_trace_ignore_count;\n")
+        self.write-spaces()
+        
+        self.parent := self.dummy-block
+        self.tested.write-preactions()
+        self.parent := self.dummy-block.parent
+        
+        write(user "--LUMI_trace_ignore_count;\n")
+        if self.expected-error?
+            self.write-spaces()
+            write(user "LUMI_expected_error_trace_ignore_count =")
+            write(user " LUMI_expected_error_trace_ignore_count_prev;\n")
+            self.write-spaces()
+            write(user "LUMI_expected_error = LUMI_expected_error_prev;\n")
+        self.write-spaces()
+        write(user "TEST_FAIL(")
+        self.write-line-num()
+        write(user ", ")
+        self.parent.write-cleanup-label()
+        write(user ", 16, \"error not raised\")\n")
+        
+        self.dummy-block.write-block-cleanup()
+        
+        self.write-spaces()
+        write(user "--LUMI_trace_ignore_count;\n")
+        if self.expected-error?
+            self.write-spaces()
+            write(user "LUMI_expected_error_trace_ignore_count =")
+            write(user " LUMI_expected_error_trace_ignore_count_prev;\n")
+            self.write-spaces()
+            write(user "if (LUMI_expected_error == NULL) {\n")
+            self.parent.indentation-spaces += INDENTATION-SPACES
+            self.write-spaces()
+            write(user "LUMI_expected_error = LUMI_expected_error_prev;\n")
+            self.write-spaces()
+            write(user "TEST_FAIL_NULL(")
+            self.parent.indentation-spaces -= INDENTATION-SPACES
+            self.write-line-num()
+            write(user ", ")
+            self.parent.write-cleanup-label()
+            write(user ")\n")
+            self.write-spaces()
+            write(user "}\n")
+            self.write-spaces()
+            write(user "LUMI_expected_error = LUMI_expected_error_prev;}\n")
+        self.write-spaces()
+        write(user "LUMI_err = OK;\n")
+        self.parent.write-set-loop-depth()
 
 
 ~~~ Test function in the syntax tree ~~~
 class SyntaxTreeTestFunction(SyntaxTreeFunction)
-  func inst parse-new()->(owner SyntaxTreeTestFunction new-node)
-    new-node := SyntaxTreeTestFunction()
-    new-node.parse()
-  
-  func inst parse()
-    base(user _)
-    if self.arguments.parameters.first? or self.arguments.outputs.first?
-      self.syntax-error-msg(user "test function cannot have arguments")
-    if self.arguments.has-error
-      self.syntax-error-msg(user "no need to mark test functions with \"!\"")
-    self.arguments.has-error := true
-    glob.test-functions.add(user self.name, user self)
+    func inst parse-new()->(owner SyntaxTreeTestFunction new-node)
+        new-node := SyntaxTreeTestFunction()
+        new-node.parse()
+    
+    func inst parse()
+        base(user _)
+        if self.arguments.parameters.first? or self.arguments.outputs.first?
+            self.syntax-error-msg(user "test function cannot have arguments")
+        if self.arguments.has-error
+            self.syntax-error-msg(user "no need to mark test functions with \"!\"")
+        self.arguments.has-error := true
+        glob.test-functions.add(user self.name, user self)
 
 
 ~~~ Mock function in the syntax tree ~~~
 class SyntaxTreeMockFunction(SyntaxTreeFunction)
-  owner String mock-name
-  
-  func inst parse-new()->(owner SyntaxTreeMockFunction new-node)
-    new-node := SyntaxTreeMockFunction()
-    new-node.parse()
-  
-  func inst parse()
-    base(user _)
-    self.mocker-function := self
-    if self.type-name? and self.name.equal(user "delete")
-      string-new-copy(user "MockDel")->(owner self.mock-name)
-    else
-      string-new-concat(user self.name, user " Mock")->(owner self.mock-name)
-  
-  func dynamic register-name()
-    ; do not register
-  
-  func dynamic link-types()
-    glob.current-module := self.my-module
-    if self.type-name?
-      if self.name.equal(user "delete")
-        self.find-type(user self.type-name, user self.module-name)->(
-            user self.parent-type)
-        if self.parent-type.is-delete-mocked
-          self.syntax-error(
-              user "already mocking delete of type", user self.type-name)
-        self.parent-type.is-delete-mocked := true
-        self.arguments.add-self-parameter(
-            user glob.type-ref, copy Access.COPY, copy false)
-        self.type-name := _
-    else-if self.name.equal(user "new")
-      if glob.is-new-mocked
-        self.syntax-error-msg(user "already mocking global new")
-      glob.is-new-mocked := true
-    else-if self.name.equal(user "delete")
-      if glob.is-delete-mocked
-        self.syntax-error-msg(user "already mocking global delete")
-      if self.arguments.parameters.first? or self.arguments.outputs.first?
-        self.syntax-error-msg(user "mock delete should have no arguments")
-      glob.is-delete-mocked := true
-      self.arguments.add-self-parameter(
-          user glob.type-ref, copy Access.COPY, copy false)
-    else
-      self.find-function(user self.name, user self.module-name)->(
-          user self.implemented-function)
-      if not self.implemented-function?
-        self.syntax-error(
-            user "mocking unknown function", user self.name)
-    base()
-    if self.implemented-function?
-      if self.implemented-function.mocker-function?
-        self.syntax-error(
-            user "already mocking function", user self.name)
-      self.implemented-function.mocker-function := self
-  
-  func dynamic check-already-implemented()
-    ; do not check
-  
-  func dynamic analyze()
-    glob.current-module := self.my-module
-    if not self.type-name? and self.name.equal(user "new")
-      var Bool legal-args
-      if self.arguments.outputs.first?
-        legal-args := not self.arguments.parameters.first? and
-            not self.arguments.outputs.first.next?
-      if not legal-args
-        self.syntax-error-msg(
-            user "mock new should have only single Bool output")
-      if self.arguments.outputs.first.item.get-type-instance().type-data is-not
-          glob.type-bool
-        self.syntax-error-msg(
-            user "mock new should have only single Bool output")
-      self.my-module := _
-    else-if self.name.equal(user "delete")
-      self.my-module := _
-    base()
-    self.name := self.mock-name
-    self.external-body := false
-  
-  func dynamic write-declaration()
-    base()
-    if self.implemented-function?
-      ; Bool `name`_active = true;
-      write(user "\nBool ")
-      self.write-cname()
-      write(user "_active = true;")
-  
-  func dynamic write-block-body()
-    if self.implemented-function?
-      ; if (!`name`_active) { return `name`(`arguments`); }
-      ; if (!`name`_active) { `name`(`arguments`); return; }
-      write-spaces(copy INDENTATION-SPACES)
-      write(user "if (!")
-      self.write-cname()
-      write(user "_active) { ")
-      if self.arguments.has-error
-        write(user "return ")
-      self.implemented-function.write-cname()
-      var FunctionArguments call-arguments
-      for argument in self.arguments.parameters.iter()
-        self.build-call-argument(user call-arguments.parameters, user argument)
-      for argument in self.arguments.outputs.iter()
-        self.build-call-argument(user call-arguments.outputs, user argument)
-      call-arguments.write-call()
-      if not self.arguments.has-error
-        write(user "; return")
-      write(user "; }\n")
-    base()
-  
-  func inst build-call-argument(
-      user List{Argument} list, user Argument argument)
-    new CallArgument call-argument
-    argument.copy(user call-argument)
-    new VariableExpression variable-expression(user _, owner _)
-    argument.get-variable()->(user variable-expression.variable)
-    string-new-copy(user variable-expression.variable.name)->(
-        owner variable-expression.name)
-    variable-expression.variable.type-instance.copy-new()->(
-        owner variable-expression.result-type)
-    variable-expression.result-type.copy-new()->(
-        owner call-argument.real-type)
-    call-argument.value := variable-expression
-    list.add(owner call-argument)
+    owner String mock-name
+    
+    func inst parse-new()->(owner SyntaxTreeMockFunction new-node)
+        new-node := SyntaxTreeMockFunction()
+        new-node.parse()
+    
+    func inst parse()
+        base(user _)
+        self.mocker-function := self
+        if self.type-name? and self.name.equal(user "delete")
+            string-new-copy(user "MockDel")->(owner self.mock-name)
+        else
+            string-new-concat(user self.name, user " Mock")->(owner self.mock-name)
+    
+    func dynamic register-name()
+        ; do not register
+    
+    func dynamic link-types()
+        glob.current-module := self.my-module
+        if self.type-name?
+            if self.name.equal(user "delete")
+                self.find-type(user self.type-name, user self.module-name)->(
+                        user self.parent-type)
+                if self.parent-type.is-delete-mocked
+                    self.syntax-error(
+                            user "already mocking delete of type", user self.type-name)
+                self.parent-type.is-delete-mocked := true
+                self.arguments.add-self-parameter(
+                        user glob.type-ref, copy Access.COPY, copy false)
+                self.type-name := _
+        else-if self.name.equal(user "new")
+            if glob.is-new-mocked
+                self.syntax-error-msg(user "already mocking global new")
+            glob.is-new-mocked := true
+        else-if self.name.equal(user "delete")
+            if glob.is-delete-mocked
+                self.syntax-error-msg(user "already mocking global delete")
+            if self.arguments.parameters.first? or self.arguments.outputs.first?
+                self.syntax-error-msg(user "mock delete should have no arguments")
+            glob.is-delete-mocked := true
+            self.arguments.add-self-parameter(
+                    user glob.type-ref, copy Access.COPY, copy false)
+        else
+            self.find-function(user self.name, user self.module-name)->(
+                    user self.implemented-function)
+            if not self.implemented-function?
+                self.syntax-error(
+                        user "mocking unknown function", user self.name)
+        base()
+        if self.implemented-function?
+            if self.implemented-function.mocker-function?
+                self.syntax-error(
+                        user "already mocking function", user self.name)
+            self.implemented-function.mocker-function := self
+    
+    func dynamic check-already-implemented()
+        ; do not check
+    
+    func dynamic analyze()
+        glob.current-module := self.my-module
+        if not self.type-name? and self.name.equal(user "new")
+            var Bool legal-args
+            if self.arguments.outputs.first?
+                legal-args := not self.arguments.parameters.first? and
+                        not self.arguments.outputs.first.next?
+            if not legal-args
+                self.syntax-error-msg(
+                        user "mock new should have only single Bool output")
+            if self.arguments.outputs.first.item.get-type-instance().type-data is-not
+                    glob.type-bool
+                self.syntax-error-msg(
+                        user "mock new should have only single Bool output")
+            self.my-module := _
+        else-if self.name.equal(user "delete")
+            self.my-module := _
+        base()
+        self.name := self.mock-name
+        self.external-body := false
+    
+    func dynamic write-declaration()
+        base()
+        if self.implemented-function?
+            ; Bool `name`_active = true;
+            write(user "\nBool ")
+            self.write-cname()
+            write(user "_active = true;")
+    
+    func dynamic write-block-body()
+        if self.implemented-function?
+            ; if (!`name`_active) { return `name`(`arguments`); }
+            ; if (!`name`_active) { `name`(`arguments`); return; }
+            write-spaces(copy INDENTATION-SPACES)
+            write(user "if (!")
+            self.write-cname()
+            write(user "_active) { ")
+            if self.arguments.has-error
+                write(user "return ")
+            self.implemented-function.write-cname()
+            var FunctionArguments call-arguments
+            for argument in self.arguments.parameters.iter()
+                self.build-call-argument(user call-arguments.parameters, user argument)
+            for argument in self.arguments.outputs.iter()
+                self.build-call-argument(user call-arguments.outputs, user argument)
+            call-arguments.write-call()
+            if not self.arguments.has-error
+                write(user "; return")
+            write(user "; }\n")
+        base()
+    
+    func inst build-call-argument(
+            user List{Argument} list, user Argument argument)
+        new CallArgument call-argument
+        argument.copy(user call-argument)
+        new VariableExpression variable-expression(user _, owner _)
+        argument.get-variable()->(user variable-expression.variable)
+        string-new-copy(user variable-expression.variable.name)->(
+                owner variable-expression.name)
+        variable-expression.variable.type-instance.copy-new()->(
+                owner variable-expression.result-type)
+        variable-expression.result-type.copy-new()->(
+                owner call-argument.real-type)
+        call-argument.value := variable-expression
+        list.add(owner call-argument)

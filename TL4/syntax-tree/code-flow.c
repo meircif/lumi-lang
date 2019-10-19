@@ -44,7 +44,7 @@ static char* _func_name_SyntaxTreeFlowElement_set_parent = "SyntaxTreeFlowElemen
 Returncode SyntaxTreeFlowElement_set_parent(SyntaxTreeFlowElement* self, SyntaxTreeBlock* parent) {
   self->_base.parent = parent;
   self->block->parent = parent;
-  self->block->_base.indentation_spaces = parent->_base.indentation_spaces + 2;
+  self->block->_base.indentation_spaces = parent->_base.indentation_spaces + 4;
   self->block->is_in_loop = parent->is_in_loop;
   CHECK(17, SyntaxTreeNode_set_location(&(self->block->_base._base)) )
   return OK;

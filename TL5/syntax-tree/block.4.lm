@@ -4,369 +4,369 @@ module tl5-compiler
 
 ~~~ A basic code node in the syntax tree ~~~
 class SyntaxTreeCode(SyntaxTreeNode)
-  user SyntaxTreeBlock parent
-  
-  new(user SyntaxTreeBlock parent)
-    self.set-location()
-    self.parent := parent
-  
-  func dynamic find-variable(user String name, user String module-name)->(
-      user SyntaxTreeVariable variable)
-    if self.parent? and not module-name?
-      self.parent.find-variable(user name, user _)->(user variable)
-    else
-      base(user name, user module-name)->(user variable)
-    if variable?
-      if variable.not-declared-yet
-        self.syntax-error(user "using before declaration variable", user name)
-  
-  func inst get-function()->(user SyntaxTreeFunction function)
-    self.parent.get-function()->(user function)
-  
-  func dynamic get-parent-type()->(user TypeData parent-type)
-    self.parent.get-parent-type()->(user parent-type)
+    user SyntaxTreeBlock parent
+    
+    new(user SyntaxTreeBlock parent)
+        self.set-location()
+        self.parent := parent
+    
+    func dynamic find-variable(user String name, user String module-name)->(
+            user SyntaxTreeVariable variable)
+        if self.parent? and not module-name?
+            self.parent.find-variable(user name, user _)->(user variable)
+        else
+            base(user name, user module-name)->(user variable)
+        if variable?
+            if variable.not-declared-yet
+                self.syntax-error(user "using before declaration variable", user name)
+    
+    func inst get-function()->(user SyntaxTreeFunction function)
+        self.parent.get-function()->(user function)
+    
+    func dynamic get-parent-type()->(user TypeData parent-type)
+        self.parent.get-parent-type()->(user parent-type)
 
-  func dynamic set-has-error()->(var Bool need-check)
-    self.parent.set-has-error()->(var need-check)
+    func dynamic set-has-error()->(var Bool need-check)
+        self.parent.set-has-error()->(var need-check)
 
-  func dynamic set-loop-finite(copy Bool is-return)
-    self.parent.set-loop-finite(copy is-return)
+    func dynamic set-loop-finite(copy Bool is-return)
+        self.parent.set-loop-finite(copy is-return)
+        
+    func inst check-function-has-error()
+        user SyntaxTreeFunction function
+        self.get-function()->(user function)
+        if not function.arguments.has-error
+            self.syntax-error(
+                    user "error raised inside function not declared as error raising",
+                    user function.name)
     
-  func inst check-function-has-error()
-    user SyntaxTreeFunction function
-    self.get-function()->(user function)
-    if not function.arguments.has-error
-      self.syntax-error(
-          user "error raised inside function not declared as error raising",
-          user function.name)
-  
-  func inst add-aux-variable(
-      copy Int access, copy Bool is-create, user TypeInstance type-instance)->(
-      owner VariableExpression expression)
-    user SyntaxTreeVariable variable
-    self.parent.add-aux-variable(
-        copy access, copy is-create, user type-instance)->(
-        user variable)
-    expression := VariableExpression(
-        user self, owner string-new-copy(user variable.name))
-    expression.variable := variable
-    type-instance.copy-new()->(owner expression.result-type)
-    expression.access := access
-    expression.assignable := true
-    expression.result-type.reference-path := ReferencePath(user variable)
-  
-  func dynamic check-memory(user ReferenceMemoryList refs)
-    ; do nothing
-  
-  func inst write-spaces()
-    self.parent.write-spaces()
+    func inst add-aux-variable(
+            copy Int access, copy Bool is-create, user TypeInstance type-instance)->(
+            owner VariableExpression expression)
+        user SyntaxTreeVariable variable
+        self.parent.add-aux-variable(
+                copy access, copy is-create, user type-instance)->(
+                user variable)
+        expression := VariableExpression(
+                user self, owner string-new-copy(user variable.name))
+        expression.variable := variable
+        type-instance.copy-new()->(owner expression.result-type)
+        expression.access := access
+        expression.assignable := true
+        expression.result-type.reference-path := ReferencePath(user variable)
     
-  func inst write-loop-jump(copy Int depth)
-    write(user "LUMI_loop_depth = ")
-    write-int(copy depth)
-    write(user "; goto ")
-    self.parent.write-cleanup-label()
-    write(user ";")
+    func dynamic check-memory(user ReferenceMemoryList refs)
+        ; do nothing
     
-  func inst write-loop-diff-jump(copy Int offset)
-    self.write-loop-jump(copy (2 * self.parent.loop-depth) - offset)
-  
-  func inst write-raise(user String error-message)
-    write(user "RAISE(")
-    self.write-line-num()
-    write(user ", ")
-    self.parent.write-cleanup-label()
-    write(user ", ")
-    write(user error-message)
-    write(user ")\n")
-  
-  func inst write-call(user FunctionArguments arguments)
-    arguments.write-call()
-    write(user ";\n")
-    arguments.write-postactions()
-    if arguments.has-error
-      self.write-spaces()
-      write(user "CHECK(")
-      self.write-line-num()
-      write(user ", ")
-      self.parent.write-cleanup-label()
-      write(user ")\n")
-  
-  ~~~ Read and check indentation spaces for a line break from the input file ~~~
-  func inst read-parent-line-break-spaces()
-    self.read-line-break-spaces(copy self.parent.indentation-spaces)
-  
-  func dynamic is-end-point()->(var Bool is-end)
-    is-end := false
+    func inst write-spaces()
+        self.parent.write-spaces()
+        
+    func inst write-loop-jump(copy Int depth)
+        write(user "LUMI_loop_depth = ")
+        write-int(copy depth)
+        write(user "; goto ")
+        self.parent.write-cleanup-label()
+        write(user ";")
+        
+    func inst write-loop-diff-jump(copy Int offset)
+        self.write-loop-jump(copy (2 * self.parent.loop-depth) - offset)
+    
+    func inst write-raise(user String error-message)
+        write(user "RAISE(")
+        self.write-line-num()
+        write(user ", ")
+        self.parent.write-cleanup-label()
+        write(user ", ")
+        write(user error-message)
+        write(user ")\n")
+    
+    func inst write-call(user FunctionArguments arguments)
+        arguments.write-call()
+        write(user ";\n")
+        arguments.write-postactions()
+        if arguments.has-error
+            self.write-spaces()
+            write(user "CHECK(")
+            self.write-line-num()
+            write(user ", ")
+            self.parent.write-cleanup-label()
+            write(user ")\n")
+    
+    ~~~ Read and check indentation spaces for a line break from the input file ~~~
+    func inst read-parent-line-break-spaces()
+        self.read-line-break-spaces(copy self.parent.indentation-spaces)
+    
+    func dynamic is-end-point()->(var Bool is-end)
+        is-end := false
 
 
 ~~~ A basic code block node in the syntax tree ~~~
 class SyntaxTreeBlock(SyntaxTreeBranch)
-  var List{SyntaxTreeCode} code-nodes
-  user SyntaxTreeCode code-node
-  user SyntaxTreeBlock parent
-  user SyntaxTreeIf previous-if
-  user SyntaxTreeTry previous-try
-  var Int block-index
-  var Int loop-depth
-  
-  new(user SyntaxTreeCode code-node)
-    self.code-node := code-node
-  
-  func inst set-parent(user SyntaxTreeBlock parent)
-    self.parent := parent
-    self.indentation-spaces := parent.indentation-spaces + INDENTATION-SPACES
-    self.loop-depth := parent.loop-depth
-    user SyntaxTreeFunction function(user self.get-function())
-    function.block-count += 1
-    self.block-index := function.block-count
-    self.set-location()
+    var List{SyntaxTreeCode} code-nodes
+    user SyntaxTreeCode code-node
+    user SyntaxTreeBlock parent
+    user SyntaxTreeIf previous-if
+    user SyntaxTreeTry previous-try
+    var Int block-index
+    var Int loop-depth
     
-  func inst equal-and-raise(user String keyword, user String value)->(
-      var Bool result)
-    if keyword.equal(user value)->(var result)
-      if self.set-has-error()
-        self.expect-char(copy '!', user "!", user value)
-        read-c()
-      else-if glob.last-char = '!'
-        self.syntax-error-msg(user "using \"!\" where error is not propagated")
-  
-  func inst parse-block()
-    self.parse-block-children(user _, user self)
-    if self.get-parent-type()?
-      self.indentation-spaces -= INDENTATION-SPACES
-  
-  func dynamic parse-child(user String keyword)
-    owner SyntaxTreeCode node
-    owner SyntaxTreeIf owner-if
-    user SyntaxTreeIf new-if
-    user SyntaxTreeTry new-try
+    new(user SyntaxTreeCode code-node)
+        self.code-node := code-node
     
-    if self.has-end-point()
-      self.syntax-error-msg(user "unreachable code")
-  
-    if self.equal-and-new-line(user keyword, user "block")
-      self.code-nodes.add(
-          owner SyntaxTreeBlockNode.parse-new(user _, user self))
+    func inst set-parent(user SyntaxTreeBlock parent)
+        self.parent := parent
+        self.indentation-spaces := parent.indentation-spaces + INDENTATION-SPACES
+        self.loop-depth := parent.loop-depth
+        user SyntaxTreeFunction function(user self.get-function())
+        function.block-count += 1
+        self.block-index := function.block-count
+        self.set-location()
+        
+    func inst equal-and-raise(user String keyword, user String value)->(
+            var Bool result)
+        if keyword.equal(user value)->(var result)
+            if self.set-has-error()
+                self.expect-char(copy '!', user "!", user value)
+                read-c()
+            else-if glob.last-char = '!'
+                self.syntax-error-msg(user "using \"!\" where error is not propagated")
     
-    else-if self.equal-and-space(user keyword, user "if")
-      new-if := SyntaxTreeIf.parse-new(user _, user self)->(owner owner-if)
-      self.code-nodes.add(owner owner-if)
-      
-    else-if self.equal-and-new-line(user keyword, user "else")
-      if not self.previous-if?
-        self.syntax-error-msg(user "\"else\" without a previous \"if\"")
-      self.previous-if.add-else(
-          owner SyntaxTreeElse.parse-new(user _, user self))
-      
-    else-if self.equal-and-space(user keyword, user "else-if")
-      self.add-else-if(owner SyntaxTreeIf.parse-new(user _, user self))->(
-          user new-if)
-      
-    else-if keyword.equal(user "loop")
-      self.code-nodes.add(
-          owner SyntaxTreeLoop.parse-new(user _, user self, copy true))
-  
-    else-if self.equal-and-new-line(user keyword, user "loop-infinite")
-      self.code-nodes.add(
-          owner SyntaxTreeLoop.parse-new(user _, user self, copy false))
-      
-    else-if self.equal-and-space(user keyword, user "for")
-      self.code-nodes.add(owner SyntaxTreeForLoop.parse-new(user _, user self))
-      
-    else-if self.equal-and-space(user keyword, user "repeat")
-      self.code-nodes.add(
-          owner SyntaxTreeRepeatLoop.parse-new(user _, user self))
-      
-    else-if self.equal-and-space(user keyword, user "while")
-      self.code-nodes.add(owner SyntaxTreeWhile.parse-new(user _, user self))
-      
-    else-if self.equal-and-new-line(user keyword, user "break")
-      self.code-nodes.add(owner SyntaxTreeBreak.parse-new(user _, user self))
-      
-    else-if self.equal-and-new-line(user keyword, user "continue")
-      self.code-nodes.add(owner SyntaxTreeContinue.parse-new(user _, user self))
-      
-    else-if self.equal-and-new-line(user keyword, user "return")
-      self.code-nodes.add(owner SyntaxTreeReturn(user self))
-      
-    else-if self.equal-and-raise(user keyword, user "raise")
-      if glob.last-char != ' ' and glob.last-char != '\n'
-        self.syntax-error-c(
-            user "expected space or new-line after \"raise!\", got")
-      self.code-nodes.add(owner SyntaxTreeRaise.parse-new(user _, user self))
-      
-    else-if self.equal-and-space(user keyword, user "new")
-      self.variables.add(owner SyntaxTreeVariable.parse-new(
-          user _, copy Access.OWNER, copy true, user _, user self))
-      
-    else-if self.equal-and-space(user keyword, user "if-error")
-      new-if := SyntaxTreeIfError.parse-new(user _, user self, copy false)->(
-          owner owner-if)
-      self.code-nodes.add(owner owner-if)
-  
-    else-if self.equal-and-space(user keyword, user "if-ok")
-      new-if := SyntaxTreeIfError.parse-new(user _, user self, copy true)->(
-          owner owner-if)
-      self.code-nodes.add(owner owner-if)
-  
-    else-if self.equal-and-space(user keyword, user "else-if-error")
-      self.add-else-if(
-          owner SyntaxTreeIfError.parse-new(user _, user self, copy false))->(
-          user new-if)
-  
-    else-if self.equal-and-space(user keyword, user "else-if-ok")
-      self.add-else-if(
-          owner SyntaxTreeIfError.parse-new(user _, user self, copy true))->(
-          user new-if)
-      
-    else-if self.equal-and-new-line(user keyword, user "try")
-      owner SyntaxTreeTry try-node
-      SyntaxTreeTry.parse-new(user _, user self)->(owner try-node)
-      new-try := try-node
-      self.code-nodes.add(owner try-node)
-      
-    else-if self.equal-and-new-line(user keyword, user "catch")
-      if not self.previous-try?
-        self.syntax-error-msg(user "\"catch\" without a previous \"try\"")
-      owner SyntaxTreeCatch catch-node
-      SyntaxTreeCatch.parse-new(user _, user self)->(owner catch-node)
-      self.previous-try.catch-node := catch-node
-      self.code-nodes.add(owner catch-node)
-      
-    else-if self.equal-and-raise(user keyword, user "assert")
-      self.expect-space(user "assert!")
-      self.code-nodes.add(owner SyntaxTreeAssert.parse-new(user _, user self))
-      
-    else-if self.equal-and-raise(user keyword, user "assert-error")
-      self.expect-space(user "assert-error!")
-      self.code-nodes.add(owner SyntaxTreeAssertError.parse-new(
-          user _, user self))
-          
-    else-if self.equal-and-space(user keyword, user "native")
-      self.code-nodes.add(owner NativeCode.parse-new(user _, user self))
-      
-    else
-      glob.save-input := true
-      self.code-nodes.add(
-          owner SyntaxTreeExpression.parse-new(user _, user self))
+    func inst parse-block()
+        self.parse-block-children(user _, user self)
+        if self.get-parent-type()?
+            self.indentation-spaces -= INDENTATION-SPACES
     
-    self.previous-if := new-if
-    self.previous-try := new-try
-  
-  func inst add-else-if(owner SyntaxTreeIf owner-if)->(user SyntaxTreeIf new-if)
-    if not self.previous-if?
-      self.syntax-error-msg(user "\"else-if\" without a previous \"if\"")
-    owner SyntaxTreeCoverage coverage-node
-    if glob.tested-module?
-      if glob.current-module.name.equal(user glob.tested-module)
-        coverage-node := SyntaxTreeCoverage(user _)
-        coverage-node.line-number := owner-if.line-number
-    new-if := owner-if
-    self.previous-if.add-else-if(owner owner-if, owner coverage-node)
-  
-  func inst has-end-point()->(var Bool has-end)
-    if self.code-nodes.last?
-      self.code-nodes.last.item.is-end-point()->(var has-end)
-    else
-      has-end := false
-  
-  func dynamic find-variable(user String name, user String module-name)->(
-      user SyntaxTreeVariable variable)
-    base(user name, user module-name)->(user variable)
-    if not variable? and self.parent? and not module-name?
-      self.parent.find-variable(user name, user _)->(user variable)
-  
-  func dynamic get-function()->(user SyntaxTreeFunction function)
-    self.parent.get-function()->(user function)
+    func dynamic parse-child(user String keyword)
+        owner SyntaxTreeCode node
+        owner SyntaxTreeIf owner-if
+        user SyntaxTreeIf new-if
+        user SyntaxTreeTry new-try
+        
+        if self.has-end-point()
+            self.syntax-error-msg(user "unreachable code")
+    
+        if self.equal-and-new-line(user keyword, user "block")
+            self.code-nodes.add(
+                    owner SyntaxTreeBlockNode.parse-new(user _, user self))
+        
+        else-if self.equal-and-space(user keyword, user "if")
+            new-if := SyntaxTreeIf.parse-new(user _, user self)->(owner owner-if)
+            self.code-nodes.add(owner owner-if)
+            
+        else-if self.equal-and-new-line(user keyword, user "else")
+            if not self.previous-if?
+                self.syntax-error-msg(user "\"else\" without a previous \"if\"")
+            self.previous-if.add-else(
+                    owner SyntaxTreeElse.parse-new(user _, user self))
+            
+        else-if self.equal-and-space(user keyword, user "else-if")
+            self.add-else-if(owner SyntaxTreeIf.parse-new(user _, user self))->(
+                    user new-if)
+            
+        else-if keyword.equal(user "loop")
+            self.code-nodes.add(
+                    owner SyntaxTreeLoop.parse-new(user _, user self, copy true))
+    
+        else-if self.equal-and-new-line(user keyword, user "loop-infinite")
+            self.code-nodes.add(
+                    owner SyntaxTreeLoop.parse-new(user _, user self, copy false))
+            
+        else-if self.equal-and-space(user keyword, user "for")
+            self.code-nodes.add(owner SyntaxTreeForLoop.parse-new(user _, user self))
+            
+        else-if self.equal-and-space(user keyword, user "repeat")
+            self.code-nodes.add(
+                    owner SyntaxTreeRepeatLoop.parse-new(user _, user self))
+            
+        else-if self.equal-and-space(user keyword, user "while")
+            self.code-nodes.add(owner SyntaxTreeWhile.parse-new(user _, user self))
+            
+        else-if self.equal-and-new-line(user keyword, user "break")
+            self.code-nodes.add(owner SyntaxTreeBreak.parse-new(user _, user self))
+            
+        else-if self.equal-and-new-line(user keyword, user "continue")
+            self.code-nodes.add(owner SyntaxTreeContinue.parse-new(user _, user self))
+            
+        else-if self.equal-and-new-line(user keyword, user "return")
+            self.code-nodes.add(owner SyntaxTreeReturn(user self))
+            
+        else-if self.equal-and-raise(user keyword, user "raise")
+            if glob.last-char != ' ' and glob.last-char != '\n'
+                self.syntax-error-c(
+                        user "expected space or new-line after \"raise!\", got")
+            self.code-nodes.add(owner SyntaxTreeRaise.parse-new(user _, user self))
+            
+        else-if self.equal-and-space(user keyword, user "new")
+            self.variables.add(owner SyntaxTreeVariable.parse-new(
+                    user _, copy Access.OWNER, copy true, user _, user self))
+            
+        else-if self.equal-and-space(user keyword, user "if-error")
+            new-if := SyntaxTreeIfError.parse-new(user _, user self, copy false)->(
+                    owner owner-if)
+            self.code-nodes.add(owner owner-if)
+    
+        else-if self.equal-and-space(user keyword, user "if-ok")
+            new-if := SyntaxTreeIfError.parse-new(user _, user self, copy true)->(
+                    owner owner-if)
+            self.code-nodes.add(owner owner-if)
+    
+        else-if self.equal-and-space(user keyword, user "else-if-error")
+            self.add-else-if(
+                    owner SyntaxTreeIfError.parse-new(user _, user self, copy false))->(
+                    user new-if)
+    
+        else-if self.equal-and-space(user keyword, user "else-if-ok")
+            self.add-else-if(
+                    owner SyntaxTreeIfError.parse-new(user _, user self, copy true))->(
+                    user new-if)
+            
+        else-if self.equal-and-new-line(user keyword, user "try")
+            owner SyntaxTreeTry try-node
+            SyntaxTreeTry.parse-new(user _, user self)->(owner try-node)
+            new-try := try-node
+            self.code-nodes.add(owner try-node)
+            
+        else-if self.equal-and-new-line(user keyword, user "catch")
+            if not self.previous-try?
+                self.syntax-error-msg(user "\"catch\" without a previous \"try\"")
+            owner SyntaxTreeCatch catch-node
+            SyntaxTreeCatch.parse-new(user _, user self)->(owner catch-node)
+            self.previous-try.catch-node := catch-node
+            self.code-nodes.add(owner catch-node)
+            
+        else-if self.equal-and-raise(user keyword, user "assert")
+            self.expect-space(user "assert!")
+            self.code-nodes.add(owner SyntaxTreeAssert.parse-new(user _, user self))
+            
+        else-if self.equal-and-raise(user keyword, user "assert-error")
+            self.expect-space(user "assert-error!")
+            self.code-nodes.add(owner SyntaxTreeAssertError.parse-new(
+                    user _, user self))
+                    
+        else-if self.equal-and-space(user keyword, user "native")
+            self.code-nodes.add(owner NativeCode.parse-new(user _, user self))
+            
+        else
+            glob.save-input := true
+            self.code-nodes.add(
+                    owner SyntaxTreeExpression.parse-new(user _, user self))
+        
+        self.previous-if := new-if
+        self.previous-try := new-try
+    
+    func inst add-else-if(owner SyntaxTreeIf owner-if)->(user SyntaxTreeIf new-if)
+        if not self.previous-if?
+            self.syntax-error-msg(user "\"else-if\" without a previous \"if\"")
+        owner SyntaxTreeCoverage coverage-node
+        if glob.tested-module?
+            if glob.current-module.name.equal(user glob.tested-module)
+                coverage-node := SyntaxTreeCoverage(user _)
+                coverage-node.line-number := owner-if.line-number
+        new-if := owner-if
+        self.previous-if.add-else-if(owner owner-if, owner coverage-node)
+    
+    func inst has-end-point()->(var Bool has-end)
+        if self.code-nodes.last?
+            self.code-nodes.last.item.is-end-point()->(var has-end)
+        else
+            has-end := false
+    
+    func dynamic find-variable(user String name, user String module-name)->(
+            user SyntaxTreeVariable variable)
+        base(user name, user module-name)->(user variable)
+        if not variable? and self.parent? and not module-name?
+            self.parent.find-variable(user name, user _)->(user variable)
+    
+    func dynamic get-function()->(user SyntaxTreeFunction function)
+        self.parent.get-function()->(user function)
 
-  func dynamic get-parent-type()->(user TypeData parent-type)
-    parent-type := self.get-function().parent-type
+    func dynamic get-parent-type()->(user TypeData parent-type)
+        parent-type := self.get-function().parent-type
 
-  func dynamic set-has-error()->(var Bool need-check)
-    self.code-node.set-has-error()->(var need-check)
+    func dynamic set-has-error()->(var Bool need-check)
+        self.code-node.set-has-error()->(var need-check)
 
-  func dynamic set-loop-finite(copy Bool is-return)
-    if self.code-node?
-      self.code-node.set-loop-finite(copy is-return)
-  
-  func inst add-aux-variable(
-      copy Int access, copy Bool is-create, user TypeInstance type-instance)->(
-      user SyntaxTreeVariable new-variable)
-    new SyntaxTreeVariable variable(user self)
-    variable.name := String{type-instance.type-data.name.length + 21}()
-    variable.name.new(user "aux_")
-    variable.name.concat(user type-instance.type-data.name)
-    variable.name.append(copy '_')
-    var String{16} index-str
-    self.get-function().new-aux-variable-index(user type-instance).str(
-        user index-str)
-    variable.name.concat(user index-str)
-    variable.access := access
-    variable.is-create := is-create
-    variable.is-aux := true
-    type-instance.copy-new()->(owner variable.type-instance)
-    new-variable := variable
-    self.variables.add(owner variable)
-  
-  func dynamic link-types()
-    base()
-    self.link-children-types(user self.code-nodes)
-  
-  func dynamic analyze()
-    base()
-    self.analyze-children(user self.code-nodes)
+    func dynamic set-loop-finite(copy Bool is-return)
+        if self.code-node?
+            self.code-node.set-loop-finite(copy is-return)
+    
+    func inst add-aux-variable(
+            copy Int access, copy Bool is-create, user TypeInstance type-instance)->(
+            user SyntaxTreeVariable new-variable)
+        new SyntaxTreeVariable variable(user self)
+        variable.name := String{type-instance.type-data.name.length + 21}()
+        variable.name.new(user "aux_")
+        variable.name.concat(user type-instance.type-data.name)
+        variable.name.append(copy '_')
+        var String{16} index-str
+        self.get-function().new-aux-variable-index(user type-instance).str(
+                user index-str)
+        variable.name.concat(user index-str)
+        variable.access := access
+        variable.is-create := is-create
+        variable.is-aux := true
+        type-instance.copy-new()->(owner variable.type-instance)
+        new-variable := variable
+        self.variables.add(owner variable)
+    
+    func dynamic link-types()
+        base()
+        self.link-children-types(user self.code-nodes)
+    
+    func dynamic analyze()
+        base()
+        self.analyze-children(user self.code-nodes)
 
-  func dynamic check-memory(user ReferenceMemoryList refs)
-    base(user refs)
-    for variable in self.variables.iter()
-      if not variable.is-aux
-        var ReferencePath reference-path(user variable)
-        refs.mark-invalid-reference(user reference-path, user self)
-    for code-node in self.code-nodes.iter()
-      refs.clear-line-checks()
-      code-node.check-memory(user refs)
-  
-  func inst write-set-loop-depth()
-    self.write-spaces()
-    write(user "LUMI_loop_depth = ")
-    write-int(copy (2 * self.loop-depth) + 1)
-    write(user ";\n")
-  
-  func inst write-block()
-    ; `previous-text` {
-    ;   `body...`
-    ; }
-    self.write-block-start()
-    self.write-block-setup()
-    self.write-block-body()
-    self.write-block-cleanup()
-    self.write-block-end()
-  
-  func inst write-block-start()
-    write(user "{\n")
-  
-  func dynamic write-block-body()
-    self.write-children(user self.code-nodes)
-  
-  func dynamic write-block-setup()
-    base.write()
-  
-  func dynamic write-cleanup-label()
-    write(user "LUMI_block")
-    write-int(copy self.block-index)
-    write(user "_cleanup")
-  
-  func dynamic write-block-cleanup()
-    if self.parent?
-      self.parent.write-spaces()
-    self.write-cleanup-label()
-    write(user ":\n")
-    self.write-spaces()
-    write(user "(void)0;\n")
-    self.write-cleanup(user _)
-  
-  func inst write-block-end()
-    if self.parent?
-      self.parent.write-spaces()
-    write(user "}\n")
+    func dynamic check-memory(user ReferenceMemoryList refs)
+        base(user refs)
+        for variable in self.variables.iter()
+            if not variable.is-aux
+                var ReferencePath reference-path(user variable)
+                refs.mark-invalid-reference(user reference-path, user self)
+        for code-node in self.code-nodes.iter()
+            refs.clear-line-checks()
+            code-node.check-memory(user refs)
+    
+    func inst write-set-loop-depth()
+        self.write-spaces()
+        write(user "LUMI_loop_depth = ")
+        write-int(copy (2 * self.loop-depth) + 1)
+        write(user ";\n")
+    
+    func inst write-block()
+        ; `previous-text` {
+        ;     `body...`
+        ; }
+        self.write-block-start()
+        self.write-block-setup()
+        self.write-block-body()
+        self.write-block-cleanup()
+        self.write-block-end()
+    
+    func inst write-block-start()
+        write(user "{\n")
+    
+    func dynamic write-block-body()
+        self.write-children(user self.code-nodes)
+    
+    func dynamic write-block-setup()
+        base.write()
+    
+    func dynamic write-cleanup-label()
+        write(user "LUMI_block")
+        write-int(copy self.block-index)
+        write(user "_cleanup")
+    
+    func dynamic write-block-cleanup()
+        if self.parent?
+            self.parent.write-spaces()
+        self.write-cleanup-label()
+        write(user ":\n")
+        self.write-spaces()
+        write(user "(void)0;\n")
+        self.write-cleanup(user _)
+    
+    func inst write-block-end()
+        if self.parent?
+            self.parent.write-spaces()
+        write(user "}\n")

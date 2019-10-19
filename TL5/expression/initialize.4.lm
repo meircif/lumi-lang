@@ -2,251 +2,251 @@
 module tl5-compiler
 
 class InitExpression(ModuleTypeExpression)
-  var FunctionArguments arguments
-  owner VariableExpression aux-variable
-  owner Expression assign-value
-  owner AssignExpression assign-expression
-  user SyntaxTreeFunction constructor
-  
-  func inst parse-new(
-      owner TypeInstance result-type, user SyntaxTreeCode code-node)->(
-      owner Expression expression)
-    new InitExpression expression-init(user code-node)
-    expression-init.parse(owner result-type, owner expression)
-    expression := expression-init
-  
-  new(user SyntaxTreeCode code-node)
-    base(user code-node)
-    self.arguments.new()
-  
-  func inst parse(
-      owner TypeInstance result-type, owner Expression module-expression)
-    self.result-type := result-type
-    self.module-expression := module-expression
-    if glob.last-char = '('
-      var CallArgumentFactory argument-factory
-      self.arguments.parse(
-          user argument-factory,
-          copy false,
-          user self.code-node,
-          copy self.code-node.parent.indentation-spaces)
-  
-  func dynamic analyze()
-    self.analyze-type-instance(user self.result-type)
-    if self.aux-variable?
-      self.aux-variable.result-type.analyze(user self)
-    else
-      self.code-node.add-aux-variable(
-          copy Access.OWNER, copy true, user self.result-type)->(
-          owner self.aux-variable)
-    self.access := self.aux-variable.access
-    self.result-type.reference-path := ReferencePath(
-        user self.aux-variable.variable)
+    var FunctionArguments arguments
+    owner VariableExpression aux-variable
+    owner Expression assign-value
+    owner AssignExpression assign-expression
+    user SyntaxTreeFunction constructor
     
-    if access-is-owner(copy self.aux-variable.variable.access) and
-        self.aux-variable.variable.is-create and
-        self.result-type.type-data.is-primitive
-      self.syntax-error(
-          user "dynamic allocation of primitive type",
-          user self.result-type.type-data.name)
+    func inst parse-new(
+            owner TypeInstance result-type, user SyntaxTreeCode code-node)->(
+            owner Expression expression)
+        new InitExpression expression-init(user code-node)
+        expression-init.parse(owner result-type, owner expression)
+        expression := expression-init
     
-    if not self.result-type.type-data.is-primitive and
-        self.aux-variable.variable.is-create
-      self.result-type.check-sequence(user self)
-      if self.result-type.type-data.create-disallowed
-        self.syntax-error(
-            user "cannot create objects with type",
-            user self.result-type.type-data.name)
-      self.constructor := self.result-type.type-data.constructor
-      if self.constructor?
-        self.add-self-and-check(
-            copy self.constructor.arguments.parameters.first.item.access)
-      else-if self.arguments.parameters.first?
-        if self.result-type.type-data is glob.type-string
-          self.constructor := glob.string-copy-function
-          self.add-self-and-check(copy Access.USER)
+    new(user SyntaxTreeCode code-node)
+        base(user code-node)
+        self.arguments.new()
+    
+    func inst parse(
+            owner TypeInstance result-type, owner Expression module-expression)
+        self.result-type := result-type
+        self.module-expression := module-expression
+        if glob.last-char = '('
+            var CallArgumentFactory argument-factory
+            self.arguments.parse(
+                    user argument-factory,
+                    copy false,
+                    user self.code-node,
+                    copy self.code-node.parent.indentation-spaces)
+    
+    func dynamic analyze()
+        self.analyze-type-instance(user self.result-type)
+        if self.aux-variable?
+            self.aux-variable.result-type.analyze(user self)
         else
-          self.syntax-error(
-              user "no constructor for type",
-              user self.result-type.type-data.name)
-      if self.result-type.conditional
-        self.syntax-error(
-            user "unexpected ? initializing type",
-            user self.result-type.type-data.name)
-      var Bool has-error(copy self.access != Access.VAR)
-      if not has-error and self.constructor?
-        has-error := self.constructor.arguments.has-error
-      if has-error
-        self.check-error-propagated(user "ignoring initialization error check")
-      
-    else-if self.arguments.parameters.first?
-      if self.arguments.parameters.first.next? or
-          self.arguments.outputs.first?
-        self.syntax-error-msg(
-            user "only one initialization parameter expected")
-      user Argument param(user self.arguments.parameters.first.item)
-      param.take-value()->(owner self.assign-value)
-      self.assign-value.restructure()->(owner self.assign-value)
-      self.assign-value.analyze()
-      self.assign-expression := AssignExpression(
-          user self.code-node,
-          user self.aux-variable,
-          user self.assign-value,
-          copy true)
-      self.assign-expression.analyze-value()->(owner self.assign-value)
-      if self.result-type.type-data.is-primitive and param.access != Access.COPY
-        self.syntax-error(
-            user "access should be \"copy\" for primitive types, got",
-            user glob.access-names[param.access])
-      else-if not self.result-type.type-data.is-primitive and
-          self.access != param.access
-        self.syntax-error2(
-            user "assigning into access",
-            user glob.access-names[self.access],
-            user "invalid access",
-            user glob.access-names[param.access])
-    
-    self.check-no-error()
-  
-  func inst add-self-and-check(copy Int access)
-    self.arguments.analyze()
-    new CallArgument self-param
-    self-param.set-location()
-    self-param.is-output := false
-    self-param.access := access
-    self-param.code-node := self.code-node
-    self.aux-variable.copy-new()->(owner self-param.value)
-    self.arguments.parameters.prepend(owner self-param)
-    self.arguments.check-calling(
-        user self.constructor.arguments,
-        user self.result-type,
-        copy 0)
-
-  func dynamic check-memory(user ReferenceMemoryList refs)
-    if self.assign-expression?
-      self.assign-expression.check-memory(user refs)
-    else
-      self.arguments.check-memory(user refs)
-  
-  func inst write-allocation()
-    self.arguments.write-preactions()
-    if self.result-type.type-data is glob.type-array or
-        self.result-type.type-data is glob.type-string
-      self.result-type.length.write-preactions()
-    if self.result-type.type-data is glob.type-array
-      if self.result-type.parameters.first.item.type-data is glob.type-string
-        self.result-type.parameters.first.item.length.write-preactions()
-    
-    if access-is-only-var(copy self.aux-variable.variable.access)
-      self.write-var-init()
-    else
-      self.write-new-init()
-    
-    if self.constructor?
-      self.code-node.write-spaces()
-      if self.constructor.arguments.has-error
-        write(user "LUMI_err = ")
-      self.constructor.write-cname()
-      self.code-node.write-call(user self.arguments)
-  
-  func inst write-var-init()
-    if self.result-type.type-data is-not glob.type-array and
-        self.result-type.type-data is-not glob.type-string
-      self.write-init-var-ref(user self.aux-variable)
-      return
-    
-    if self.aux-variable.access = Access.S-VAR
-      ; INIT_VAR_REFMAN(`line`, `cleanup`, `aux-variable`)
-      self.write-macro-init(user "INIT_VAR_REFMAN", user self.aux-variable)
-      write(user ")\n")
-    else
-      write(user "/* initializing ")
-      self.aux-variable.write()
-      write(user " */\n")
-  
-  func inst write-new-init()
-    if self.result-type.type-data is glob.type-array
-      self.write-new-array-init()
+            self.code-node.add-aux-variable(
+                    copy Access.OWNER, copy true, user self.result-type)->(
+                    owner self.aux-variable)
+        self.access := self.aux-variable.access
+        self.result-type.reference-path := ReferencePath(
+                user self.aux-variable.variable)
         
-    else-if self.result-type.type-data is glob.type-string
-      ; INIT_NEW_STRING(`line`, `cleanup`, `aux-variable`, `length`);
-      self.write-macro-init(user "INIT_NEW_STRING", user self.aux-variable)
-      write(user ", ")
-      self.result-type.length.write()
-      write(user ");\n")
-      
-    else
-      ; INIT_NEW(`line`, `cleanup`, `aux-variable`, `type`, 1)
-      self.write-macro-init(user "INIT_NEW", user self.aux-variable)
-      write(user ", ")
-      self.result-type.write-cname()
-      write(user ", 1);\n")
-  
-  func inst write-new-array-init()
-    ; `aux-variable`_Value_length = `length`
-    user TypeInstance data-type
-    var Int depth
-    self.result-type.get-array-data-type-depth()->(user data-type, var depth)
-    user TypeInstance sequence-type(user self.result-type)
-    for n in depth
-      sequence-type := sequence-type.parameters.first.item
-      self.aux-variable.write()
-      write-array-value-length(copy n)
-      write(user " = ")
-      sequence-type.length.write()
-      write(user ";\n")
-      self.code-node.write-spaces()
+        if access-is-owner(copy self.aux-variable.variable.access) and
+                self.aux-variable.variable.is-create and
+                self.result-type.type-data.is-primitive
+            self.syntax-error(
+                    user "dynamic allocation of primitive type",
+                    user self.result-type.type-data.name)
+        
+        if not self.result-type.type-data.is-primitive and
+                self.aux-variable.variable.is-create
+            self.result-type.check-sequence(user self)
+            if self.result-type.type-data.create-disallowed
+                self.syntax-error(
+                        user "cannot create objects with type",
+                        user self.result-type.type-data.name)
+            self.constructor := self.result-type.type-data.constructor
+            if self.constructor?
+                self.add-self-and-check(
+                        copy self.constructor.arguments.parameters.first.item.access)
+            else-if self.arguments.parameters.first?
+                if self.result-type.type-data is glob.type-string
+                    self.constructor := glob.string-copy-function
+                    self.add-self-and-check(copy Access.USER)
+                else
+                    self.syntax-error(
+                            user "no constructor for type",
+                            user self.result-type.type-data.name)
+            if self.result-type.conditional
+                self.syntax-error(
+                        user "unexpected ? initializing type",
+                        user self.result-type.type-data.name)
+            var Bool has-error(copy self.access != Access.VAR)
+            if not has-error and self.constructor?
+                has-error := self.constructor.arguments.has-error
+            if has-error
+                self.check-error-propagated(user "ignoring initialization error check")
+            
+        else-if self.arguments.parameters.first?
+            if self.arguments.parameters.first.next? or
+                    self.arguments.outputs.first?
+                self.syntax-error-msg(
+                        user "only one initialization parameter expected")
+            user Argument param(user self.arguments.parameters.first.item)
+            param.take-value()->(owner self.assign-value)
+            self.assign-value.restructure()->(owner self.assign-value)
+            self.assign-value.analyze()
+            self.assign-expression := AssignExpression(
+                    user self.code-node,
+                    user self.aux-variable,
+                    user self.assign-value,
+                    copy true)
+            self.assign-expression.analyze-value()->(owner self.assign-value)
+            if self.result-type.type-data.is-primitive and param.access != Access.COPY
+                self.syntax-error(
+                        user "access should be \"copy\" for primitive types, got",
+                        user glob.access-names[param.access])
+            else-if not self.result-type.type-data.is-primitive and
+                    self.access != param.access
+                self.syntax-error2(
+                        user "assigning into access",
+                        user glob.access-names[self.access],
+                        user "invalid access",
+                        user glob.access-names[param.access])
+        
+        self.check-no-error()
     
-    ; INIT_NEW_ARRAY(`line`, `cleanup`, `aux-variable`, `type`, `length`, `valu-size`);
-    self.write-macro-init(user "INIT_NEW_ARRAY", user self.aux-variable)
-    write(user ", ")
-    if data-type.type-data is glob.type-string
-      write(user "char")
-    else-if data-type.type-data is glob.type-func
-      data-type.arguments.write-pointer(user _)
-    else
-      data-type.write-cname()
-    write(user ", ")
-    self.result-type.length.write()
-    write(user ", ")
-    if depth > 0
-      n := 0
-      do
-        self.aux-variable.write()
-        write-array-value-length(copy n)
-        n += 1
-        while n < depth
-        write(user " * ")
-    else
-      write(user "1")
-    write(user ");\n")
+    func inst add-self-and-check(copy Int access)
+        self.arguments.analyze()
+        new CallArgument self-param
+        self-param.set-location()
+        self-param.is-output := false
+        self-param.access := access
+        self-param.code-node := self.code-node
+        self.aux-variable.copy-new()->(owner self-param.value)
+        self.arguments.parameters.prepend(owner self-param)
+        self.arguments.check-calling(
+                user self.constructor.arguments,
+                user self.result-type,
+                copy 0)
+
+    func dynamic check-memory(user ReferenceMemoryList refs)
+        if self.assign-expression?
+            self.assign-expression.check-memory(user refs)
+        else
+            self.arguments.check-memory(user refs)
     
-    if data-type.type-data is glob.type-string
-      ; `aux-variable`_String_length = LUMI_alloc(sizeof(int) * `length`);
-      self.code-node.write-spaces()
-      self.aux-variable.write()
-      write(user "_String_length = LUMI_alloc(sizeof(int) * ")
-      self.aux-variable.write()
-      write(user "_Length")
-      for n in depth - 1
-        write(user " * ")
-        self.aux-variable.write()
-        write-array-value-length(copy n)
-      write(user ");\n")
-  
-  func dynamic write-preactions()
-    self.write-allocation()
-    self.code-node.write-spaces()
-  
-  func dynamic write()
-    if self.is-statement
-      if not self.result-type.type-data.is-primitive and
-          self.aux-variable.variable.is-create
-        self.code-node.write-spaces()
+    func inst write-allocation()
+        self.arguments.write-preactions()
+        if self.result-type.type-data is glob.type-array or
+                self.result-type.type-data is glob.type-string
+            self.result-type.length.write-preactions()
+        if self.result-type.type-data is glob.type-array
+            if self.result-type.parameters.first.item.type-data is glob.type-string
+                self.result-type.parameters.first.item.length.write-preactions()
+        
+        if access-is-only-var(copy self.aux-variable.variable.access)
+            self.write-var-init()
+        else
+            self.write-new-init()
+        
+        if self.constructor?
+            self.code-node.write-spaces()
+            if self.constructor.arguments.has-error
+                write(user "LUMI_err = ")
+            self.constructor.write-cname()
+            self.code-node.write-call(user self.arguments)
+    
+    func inst write-var-init()
+        if self.result-type.type-data is-not glob.type-array and
+                self.result-type.type-data is-not glob.type-string
+            self.write-init-var-ref(user self.aux-variable)
+            return
+        
+        if self.aux-variable.access = Access.S-VAR
+            ; INIT_VAR_REFMAN(`line`, `cleanup`, `aux-variable`)
+            self.write-macro-init(user "INIT_VAR_REFMAN", user self.aux-variable)
+            write(user ")\n")
+        else
+            write(user "/* initializing ")
+            self.aux-variable.write()
+            write(user " */\n")
+    
+    func inst write-new-init()
+        if self.result-type.type-data is glob.type-array
+            self.write-new-array-init()
+                
+        else-if self.result-type.type-data is glob.type-string
+            ; INIT_NEW_STRING(`line`, `cleanup`, `aux-variable`, `length`);
+            self.write-macro-init(user "INIT_NEW_STRING", user self.aux-variable)
+            write(user ", ")
+            self.result-type.length.write()
+            write(user ");\n")
+            
+        else
+            ; INIT_NEW(`line`, `cleanup`, `aux-variable`, `type`, 1)
+            self.write-macro-init(user "INIT_NEW", user self.aux-variable)
+            write(user ", ")
+            self.result-type.write-cname()
+            write(user ", 1);\n")
+    
+    func inst write-new-array-init()
+        ; `aux-variable`_Value_length = `length`
+        user TypeInstance data-type
+        var Int depth
+        self.result-type.get-array-data-type-depth()->(user data-type, var depth)
+        user TypeInstance sequence-type(user self.result-type)
+        for n in depth
+            sequence-type := sequence-type.parameters.first.item
+            self.aux-variable.write()
+            write-array-value-length(copy n)
+            write(user " = ")
+            sequence-type.length.write()
+            write(user ";\n")
+            self.code-node.write-spaces()
+        
+        ; INIT_NEW_ARRAY(`line`, `cleanup`, `aux-variable`, `type`, `length`, `valu-size`);
+        self.write-macro-init(user "INIT_NEW_ARRAY", user self.aux-variable)
+        write(user ", ")
+        if data-type.type-data is glob.type-string
+            write(user "char")
+        else-if data-type.type-data is glob.type-func
+            data-type.arguments.write-pointer(user _)
+        else
+            data-type.write-cname()
+        write(user ", ")
+        self.result-type.length.write()
+        write(user ", ")
+        if depth > 0
+            n := 0
+            do
+                self.aux-variable.write()
+                write-array-value-length(copy n)
+                n += 1
+                while n < depth
+                write(user " * ")
+        else
+            write(user "1")
+        write(user ");\n")
+        
+        if data-type.type-data is glob.type-string
+            ; `aux-variable`_String_length = LUMI_alloc(sizeof(int) * `length`);
+            self.code-node.write-spaces()
+            self.aux-variable.write()
+            write(user "_String_length = LUMI_alloc(sizeof(int) * ")
+            self.aux-variable.write()
+            write(user "_Length")
+            for n in depth - 1
+                write(user " * ")
+                self.aux-variable.write()
+                write-array-value-length(copy n)
+            write(user ");\n")
+    
+    func dynamic write-preactions()
         self.write-allocation()
-      else-if self.assign-expression?
         self.code-node.write-spaces()
-        self.assign-expression.write-preactions()
-        self.assign-expression.write()
-    else
-      self.aux-variable.write()
+    
+    func dynamic write()
+        if self.is-statement
+            if not self.result-type.type-data.is-primitive and
+                    self.aux-variable.variable.is-create
+                self.code-node.write-spaces()
+                self.write-allocation()
+            else-if self.assign-expression?
+                self.code-node.write-spaces()
+                self.assign-expression.write-preactions()
+                self.assign-expression.write()
+        else
+            self.aux-variable.write()

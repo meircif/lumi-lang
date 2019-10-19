@@ -60,7 +60,7 @@ func test-code(user String input-text, user String expected-output)
   
   var Int footer-start
   user String mock-output-no-header(mock-output-file-text[expected-header.length:mock-output-file-text.length - expected-header.length])
-  mock-output-no-header.find(user "\nLUMI_cleanup:\n  "):(copy footer-start)
+  mock-output-no-header.find(user "\nLUMI_cleanup:\n    "):(copy footer-start)
   if footer-start >= mock-output-no-header.length
     sys.print(user mock-output-no-header)
     code-header-valid := false

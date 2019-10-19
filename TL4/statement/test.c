@@ -172,7 +172,7 @@ Returncode SyntaxTreeAssertError_write(SyntaxTreeAssertError* self) {
   }
   CHECK(74, SyntaxTreeCode_write_spaces(&(self->_base)) )
   CHECK(75, write(&(String){6, 5, "do {\n"}) )
-  self->_base.parent->_base.indentation_spaces += 2;
+  self->_base.parent->_base.indentation_spaces += 4;
   CHECK(77, SyntaxTreeCode_write_spaces(&(self->_base)) )
   CHECK(78, write(&(String){28, 27, "++LUMI_trace_ignore_count;\n"}) )
   CHECK(79, write(&(String){21, 20, "#undef RETURN_ERROR\n"}) )
@@ -194,7 +194,7 @@ Returncode SyntaxTreeAssertError_write(SyntaxTreeAssertError* self) {
   CHECK(94, write(&(String){11, 10, "TEST_FAIL("}) )
   CHECK(95, SyntaxTreeNode_write_line_num(&(self->_base._base)) )
   CHECK(96, write(&(String){27, 26, ", 16, \"error not raised\")\n"}) )
-  self->_base.parent->_base.indentation_spaces -= 2;
+  self->_base.parent->_base.indentation_spaces -= 4;
   CHECK(98, SyntaxTreeCode_write_spaces(&(self->_base)) )
   CHECK(99, write(&(String){18, 17, "} while (false);\n"}) )
   CHECK(100, SyntaxTreeCode_write_spaces(&(self->_base)) )
@@ -206,9 +206,9 @@ Returncode SyntaxTreeAssertError_write(SyntaxTreeAssertError* self) {
     CHECK(106, SyntaxTreeCode_write_spaces(&(self->_base)) )
     CHECK(107, write(&(String){36, 35, "if (LUMI_expected_error == NULL) {\n"}) )
     CHECK(108, SyntaxTreeCode_write_spaces(&(self->_base)) )
-    CHECK(109, write(&(String){51, 50, "  LUMI_expected_error = LUMI_expected_error_prev;\n"}) )
+    CHECK(109, write(&(String){53, 52, "    LUMI_expected_error = LUMI_expected_error_prev;\n"}) )
     CHECK(110, SyntaxTreeCode_write_spaces(&(self->_base)) )
-    CHECK(111, write(&(String){18, 17, "  TEST_FAIL_NULL("}) )
+    CHECK(111, write(&(String){20, 19, "    TEST_FAIL_NULL("}) )
     CHECK(112, SyntaxTreeNode_write_line_num(&(self->_base._base)) )
     CHECK(113, write(&(String){3, 2, ")\n"}) )
     CHECK(114, SyntaxTreeCode_write_spaces(&(self->_base)) )
@@ -496,7 +496,7 @@ static char* _func_name_SyntaxTreeMockFunction_write_block_body = "SyntaxTreeMoc
 Returncode SyntaxTreeMockFunction_write_block_body(SyntaxTreeMockFunction* self) {
   if (NULL != self->mocked_function) {
     /* if (!`name`_active) return `name`(`arguments`); */
-    CHECK(255, write(&(String){8, 7, "  if (!"}) )
+    CHECK(255, write(&(String){10, 9, "    if (!"}) )
     CHECK(256, SyntaxTreeFunction_write_cname(&(self->_base)) )
     CHECK(257, write(&(String){17, 16, "_active) return "}) )
     CHECK(258, SyntaxTreeFunction_write_cname(self->mocked_function) )

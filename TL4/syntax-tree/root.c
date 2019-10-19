@@ -569,14 +569,14 @@ Returncode SyntaxTreeRoot_write_test_coverage_data(SyntaxTreeRoot* self) {
       CHECK(307, write_int(line_count->covered_index) )
       CHECK(308, write(&(String){13, 12, "_line_count["}) )
       CHECK(309, write_int(line_count->line_needs_cover->length) )
-      CHECK(310, write(&(String){9, 8, "] = {\n  "}) )
+      CHECK(310, write(&(String){11, 10, "] = {\n    "}) )
       Int mod = 0;
       {int i; for (i = (0); i < (line_count->line_needs_cover->length); ++i) {
         if (i > 0) {
           CHECK(314, write(&(String){2, 1, ","}) )
         }
         if (mod == 25) {
-          CHECK(316, write(&(String){4, 3, "\n  "}) )
+          CHECK(316, write(&(String){6, 5, "\n    "}) )
           mod = 1;
         }
         else {
@@ -603,7 +603,7 @@ Returncode SyntaxTreeRoot_write_test_coverage_data(SyntaxTreeRoot* self) {
       if (line_count->covered_index > 0) {
         CHECK(332, write(&(String){2, 1, ","}) )
       }
-      CHECK(333, write(&(String){5, 4, "\n  {"}) )
+      CHECK(333, write(&(String){7, 6, "\n    {"}) )
       CHECK(334, write_string_literal(line_count->filename) )
       CHECK(335, write(&(String){3, 2, ", "}) )
       CHECK(336, write_int(line_count->line_needs_cover->length) )
@@ -624,14 +624,14 @@ static char* _func_name_SyntaxTreeRoot_write_test_main = "SyntaxTreeRoot.write-t
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeRoot_write_test_main
 Returncode SyntaxTreeRoot_write_test_main(SyntaxTreeRoot* self) {
   CHECK(343, write(&(String){21, 20, "\nUSER_MAIN_HEADER {\n"}) )
-  CHECK(344, write(&(String){29, 28, "  Returncode LUMI_err = OK;\n"}) )
-  CHECK(345, write(&(String){29, 28, "  Bool LUMI_success = true;\n"}) )
+  CHECK(344, write(&(String){31, 30, "    Returncode LUMI_err = OK;\n"}) )
+  CHECK(345, write(&(String){31, 30, "    Bool LUMI_success = true;\n"}) )
   CHECK(346, (self->global_init)->_base._base._base._base._dtl[4](self->global_init) )
   CHECK(347, write(&(String){2, 1, "\n"}) )
   NameMapNode* node = glob->test_functions->first;
   while (true) {
     /* LUMI_success &= LUMI_run_test("`test-func.name`", `test-func`); */
-    CHECK(351, write(&(String){34, 33, "  LUMI_success &= LUMI_run_test(\""}) )
+    CHECK(351, write(&(String){36, 35, "    LUMI_success &= LUMI_run_test(\""}) )
     CHECK(352, write(((SyntaxTreeTestFunction*)(node->value))->_base.name) )
     CHECK(353, write(&(String){4, 3, "\", "}) )
     CHECK(354, SyntaxTreeFunction_write_cname(&(((SyntaxTreeTestFunction*)(node->value))->_base)) )
@@ -640,11 +640,11 @@ Returncode SyntaxTreeRoot_write_test_main(SyntaxTreeRoot* self) {
     if (!(NULL != node)) break;
   }
   if (NULL != self->line_counts) {
-    CHECK(359, write(&(String){58, 57, "  LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, "}) )
+    CHECK(359, write(&(String){60, 59, "    LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, "}) )
     CHECK(360, write_int(self->covered_files) )
     CHECK(361, write(&(String){4, 3, ");\n"}) )
   }
-  CHECK(362, write(&(String){41, 40, "  return LUMI_success? LUMI_err : FAIL;\n"}) )
+  CHECK(362, write(&(String){43, 42, "    return LUMI_success? LUMI_err : FAIL;\n"}) )
   CHECK(363, write(&(String){3, 2, "}\n"}) )
   CHECK(364, write(&(String){17, 16, "\nTEST_MAIN_FUNC\n"}) )
   return OK;
@@ -817,7 +817,7 @@ Returncode GlobalInit_init(GlobalInit* self) {
   *self->_base.arguments = (FunctionArguments){FunctionArguments__dtl, NULL, 0, NULL, NULL};
   self->_base.arguments->_base._dtl = FunctionArguments__dtl;
   CHECK(425, FunctionArguments_init(self->_base.arguments) )
-  self->_base._base._base.indentation_spaces = 2;
+  self->_base._base._base.indentation_spaces = 4;
   return OK;
 }
 #undef LUMI_FUNC_NAME

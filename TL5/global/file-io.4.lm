@@ -4,21 +4,21 @@ module tl5-compiler
 
 ~~~ print `num` as text ~~~
 func print-int(copy Int num)
-  var String{64} num-str
-  num.str(user num-str)
-  sys.print(user num-str)
+    var String{64} num-str
+    num.str(user num-str)
+    sys.print(user num-str)
 
 
 ~~~ Read a single character from the input file ~~~
 func read-c()
-  if glob.got-new-line
-    glob.line-number += 1
-  if glob.input-file.getc()->(var glob.last-char)
-    glob.file-ended := true
-    glob.last-char := '\0'
-    glob.got-new-line := false
-  else
-    glob.got-new-line := glob.last-char = '\n'
+    if glob.got-new-line
+        glob.line-number += 1
+    if glob.input-file.getc()->(var glob.last-char)
+        glob.file-ended := true
+        glob.last-char := '\0'
+        glob.got-new-line := false
+    else
+        glob.got-new-line := glob.last-char = '\n'
 
 
 ~~~ Read from the input file to `text` until reached one of the characters in
@@ -28,98 +28,98 @@ It is possible to "save" previous read result by setting "glob.save-input" to
 true. Next time this function will be called it will return the saved values.
 ~~~
 func read-until(user String ends, copy Bool indent)->(
-    user String text, var Int spaces)
-  if glob.save-input
-    spaces := glob.input-spaces
-  else
-    glob.input-buffer.clear()
-    spaces := 0
-    read-c()
-    if indent
-      ; ignore and count indent
-      do
-        while glob.last-char = ' '
-        spaces += 1
+        user String text, var Int spaces)
+    if glob.save-input
+        spaces := glob.input-spaces
+    else
+        glob.input-buffer.clear()
+        spaces := 0
         read-c()
-  
-  var Char quote(copy '\0')
-  do
-    while not glob.file-ended
-    if quote = '\0'
-      while glob.last-char != '\n'
-      while not ends.has(copy glob.last-char)
-      if glob.last-char = '\'' or glob.last-char = '"' or glob.last-char = '`'
-        quote := glob.last-char
-    else-if glob.last-char = '\\'
-      glob.input-buffer.append(copy glob.last-char)
-      read-c()
-      while not glob.file-ended
-    else-if glob.last-char = quote
-      quote := '\0'
-    glob.input-buffer.append(copy glob.last-char)
-    read-c()
-  
-  glob.input-spaces := spaces
-  glob.save-input := false
-  text := glob.input-buffer
+        if indent
+            ; ignore and count indent
+            do
+                while glob.last-char = ' '
+                spaces += 1
+                read-c()
+    
+    var Char quote(copy '\0')
+    do
+        while not glob.file-ended
+        if quote = '\0'
+            while glob.last-char != '\n'
+            while not ends.has(copy glob.last-char)
+            if glob.last-char = '\'' or glob.last-char = '"' or glob.last-char = '`'
+                quote := glob.last-char
+        else-if glob.last-char = '\\'
+            glob.input-buffer.append(copy glob.last-char)
+            read-c()
+            while not glob.file-ended
+        else-if glob.last-char = quote
+            quote := '\0'
+        glob.input-buffer.append(copy glob.last-char)
+        read-c()
+    
+    glob.input-spaces := spaces
+    glob.save-input := false
+    text := glob.input-buffer
 
 
 ~~~ Return in `new-text` a new allocated string read using `read-until`. ~~~
 func read-new(user String ends)->(owner String new-text)
-  user String text
-  read-until(user ends, copy false)->(user text)
-  string-new-copy(user text)->(owner new-text)
+    user String text
+    read-until(user ends, copy false)->(user text)
+    string-new-copy(user text)->(owner new-text)
 
 
 ~~~ write a single character to the output file ~~~
 func write-c(copy Char ch)
-  glob.output-file.putc(copy ch)
+    glob.output-file.putc(copy ch)
 
 
 ~~~ write `text` to the output file ~~~
 func write(user String text)
-  glob.output-file.write(user text)
+    glob.output-file.write(user text)
 
 
 ~~~ write `name` with `-` replaced by `_` and replace C builtin names ~~~
 func write-cname(user String name)
-  if name.equal(user "stdout") or name.equal(user "stdin") or
-      name.equal(user "stderr")
-    write(user name)
-    write(user "_Cname")
-    return
-  for ch in name
-    if ch = '-' or ch = ' '
-      write-c(copy '_')
-    else
-      write-c(copy ch)
+    if name.equal(user "stdout") or name.equal(user "stdin") or
+            name.equal(user "stderr")
+        write(user name)
+        write(user "_Cname")
+        return
+    for ch in name
+        if ch = '-' or ch = ' '
+            write-c(copy '_')
+        else
+            write-c(copy ch)
 
 
 ~~~ write `text` to the output file as string literal ~~~
 func write-string-literal(user String text)
-  write-c(copy '\"')
-  user String escapes(user "'\"?\\abfnrtv0")
-  user String values(user "\'\"\?\\\a\b\f\n\r\t\v\0")
-  for ch in text
-    for n in values.length
-      if ch = values[n]
-        break
-    if n < values.length
-      write-c(copy '\\')
-      write-c(copy escapes[n])
-    else
-      write-c(copy ch)
-  write-c(copy '\"')
+    write-c(copy '\"')
+    user String escapes(user "'\"?\\abfnrtv0")
+    user String values(user "\'\"\?\\\a\b\f\n\r\t\v\0")
+    for ch in text
+        for n in values.length
+            if ch = values[n]
+                break
+        if n < values.length
+            write-c(copy '\\')
+            write-c(copy escapes[n])
+        else
+            write-c(copy ch)
+    write-c(copy '\"')
 
 
 ~~~ write `num` to the output file as text ~~~
 func write-int(copy Int num)
-  var String{64} num-str
-  num.str(user num-str)
-  write(user num-str)
+    var String{64} num-str
+    num.str(user num-str)
+    write(user num-str)
 
 
 ~~~ write `num` spaces - usefull for writing indentation ~~~
 func write-spaces(copy Int num)
-  for n in num
-    write-c(copy ' ')
+    for n in num
+        write-c(copy ' ')

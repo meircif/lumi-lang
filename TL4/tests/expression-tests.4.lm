@@ -71,17 +71,17 @@ str := "some string"
 str := "\nstring\t\"with\\formatting\n"
 ## @ c t2
 str := "line\
-      split\
-      string\
-      "
+            split\
+            string\
+            "
 ## @ c t3
 str := "multi
-      line
-      string
-      "
+            line
+            string
+            "
 ## @ c t4
 str := "line\
-       split"
+             split"
 ## @ fec te0
 str := "aaa
 ## @ fec te1
@@ -90,10 +90,10 @@ str := "
 "error"+"string"
 ## @ ec te3
 str := "indention
-    too short"
+        too short"
 ## @ ec te4
 str := "indention\
-    too short"
+        too short"
 ## @@ test-empty-expression
 ## @ c t0
 str := _
@@ -161,7 +161,7 @@ str[2:5] := str
 arr[7:2] := arr
 ## @ ec t15
 user Array{Test} at
-  at[0] := t
+    at[0] := t
 ## @@ test-call-expression
 ## @ c t0
 fun0()
@@ -171,19 +171,19 @@ fun1(copy 3, user str, owner _)
 fun2()->(owner so, var io)
 ## @ c t3
 var Int x
-  owner String s
-  fun2()->(owner s, var x)
+    owner String s
+    fun2()->(owner s, var x)
 ## @ c t4
 fun3(copy 0)->(owner so)
 ## @ c t5
 var Int x
-  fun4(copy fun5(copy 3)->(var x))
+    fun4(copy fun5(copy 3)->(var x))
 ## @ c t6
 fun6(
-      copy 2,
-      copy 3)->(
-      var io,
-      var io)
+            copy 2,
+            copy 3)->(
+            var io,
+            var io)
 ## @ c t7
 fun5(copy 4)
 ## @ c t8
@@ -208,25 +208,25 @@ t.t.meth()
 fun1(copy 3, user str, owner so)
 ## @ c t18
 fun3(copy 1)
-  fun5(copy 2)
+    fun5(copy 2)
 ## @ g t19
 class Base
-  var Int x
-  func dynamic meth(owner Base b)
+    var Int x
+    func dynamic meth(owner Base b)
 class Test(Base)
-  func dynamic meth(owner Test t)
-    base(owner t)
+    func dynamic meth(owner Test t)
+        base(owner t)
 ## @ g t20
 class Test
-  var Int x
-  func dynamic meth()
+    var Int x
+    func dynamic meth()
 func mock()->(user Test t)
-  mock()->(user t).meth()
+    mock()->(user t).meth()
 ## @ g t21
 class Test
-  var Int x
-  func dynamic meth()->(user Test t)
-    self.meth().meth()
+    var Int x
+    func dynamic meth()->(user Test t)
+        self.meth().meth()
 ## @ ec te0
 function( copy 1)
 ## @ ec te1
@@ -265,14 +265,14 @@ fun0()->(copy i)
 fun2()
 ## @ eg te18
 struct Base
-  var Int x
-  func meth(owner Base b)
+    var Int x
+    func meth(owner Base b)
 struct Test(Base)
-  func meth(owner Test t)
-    base(owner t)
+    func meth(owner Test t)
+        base(owner t)
 ## @ ec te19
 var String{16} text
-  fun1(copy 3, user str, owner text)
+    fun1(copy 3, user str, owner text)
 ## @@ test-type-expression
 ## @ c t0
 Test.meth(user t)
@@ -285,50 +285,50 @@ Error
 ## @@ test-base-expression
 ## @ g t0
 struct Base
-  var Int x
-  func methb()
+    var Int x
+    func methb()
 struct Mid(Base)
-  func methm()
+    func methm()
 struct Top(Mid)
-  func methb()
-  func methm()
-    base.methm()
+    func methb()
+    func methm()
+        base.methm()
 ## @ g t1
 struct Base
-  var Int x
-  func methb()
+    var Int x
+    func methb()
 struct Mid(Base)
-  func methm()
+    func methm()
 struct Top(Mid)
-  func methb()
-  func methm()
-    base.methb()
+    func methb()
+    func methm()
+        base.methb()
 ## @ ec te0
 base
 ## @ eg te1
 struct Test
-  var Int x
-  func mock()
-    base
+    var Int x
+    func mock()
+        base
 ## @ eg te2
 struct Base
-  var Int x
+    var Int x
 struct Test(Base)
-  var Int x
-  func mock()
-    base()
+    var Int x
+    func mock()
+        base()
 ## @ eg te3
 struct Base
-  var Int x
+    var Int x
 struct Test(Base)
-  func mock()
-    base := self
+    func mock()
+        base := self
 ## @ eg te4
 struct Base
-  var Int x
+    var Int x
 struct Test(Base)
-  func mock()->(var Int x)
-    x := base.x
+    func mock()->(var Int x)
+        x := base.x
 ## @@ test-block-expression
 ## @ c t0
 i := 2 + (123)
@@ -343,7 +343,7 @@ i := (123 * (i - 4)) + 2
 i := - i
 ## @ c t1
 i := -
-      i
+            i
 ## @ c t2
 i := - - i
 ## @ c t3
@@ -369,7 +369,7 @@ i := 23 + 54
 i += (100 * 2) - (37 div 5 mod 2)
 ## @ c t2
 i -= 12 *
-      13
+            13
 ## @ c t3
 b := 3 < 5 or 23 > 37
 ## @ c t4
@@ -382,7 +382,7 @@ b := 2 < i < 12 < 2 * i
 t := tc
 ## @ c t8
 owner String s
-  s := so
+    s := so
 ## @ c t9
 str := so
 ## @ c t10
@@ -395,17 +395,17 @@ b := fun0 is-not fun1
 b := b = b
 ## @ c t14
 owner Tc otc
-  tb := otc
+    tb := otc
 ## @ c t15
 owner Array{Test} tarr
-  tarr := _
+    tarr := _
 ## @ g t16
 struct Test
-  owner Test t
+    owner Test t
 func fun()
-  new Test t
-  t := t.t
-  t.t := t
+    new Test t
+    t := t.t
+    t.t := t
 ## @ ec te0
 345 @ 2
 ## @ ec te1
@@ -440,10 +440,10 @@ i -= b
 b := 3 is t
 ## @ ec te16
 user Array{Char} ca
-  ca := arr
+    ca := arr
 ## @ ec te17
 owner Test ot
-  ot := tb
+    ot := tb
 ## @ ec te18
 b := b is b
 ## @@ test-question-expression
@@ -482,10 +482,10 @@ ta := tc
 ta := _
 ## @ c t9
 user Array{Ta} aa
-  ta := aa[4]
+    ta := aa[4]
 ## @ c t10
 user Array{Tc} ca
-  ta := ca[4]
+    ta := ca[4]
 ## @ c t11
 ta.dyn()
 ## @ c t12
@@ -498,56 +498,56 @@ tco.dyn()
 fun7(user tc)->(user ta)
 ## @ g t16
 class Test
-  var Int x
-  func dynamic meth()
+    var Int x
+    func dynamic meth()
 func mock()->(user Test t)
-  t.meth()
+    t.meth()
 ## @ g t17
 class Base
-  var Int x
-  func dynamic meth()
+    var Int x
+    func dynamic meth()
 class Test(Base)
-  func inst fun()
-    self.meth()
+    func inst fun()
+        self.meth()
 ## @ c t18
 fun7(user _)
 ## @@ test-function-object
 ## @ c t0
 var Func{()} fun
-  fun := fun0
-  fun()
+    fun := fun0
+    fun()
 ## @ c t1
 var Func{(copy Int x)->(var Int y)} fun(copy fun5)
-  var Int x
-  fun(copy 9)->(var x)
+    var Int x
+    fun(copy 9)->(var x)
 ## @ c t2
 var Func{(user Test self)} fun(copy Test.meth)
-  fun(user t)
+    fun(user t)
 ## @ c t3
 var Func{()} fun
-  fun := _
-  b := fun?
+    fun := _
+    b := fun?
 ## @ c t4
 t.fun := fun0
-  t.fun()
+    t.fun()
 ## @ c t5
 var Array{38:Func{()}} farr
-  farr[3] := fun0
-  farr[3]()
+    farr[3] := fun0
+    farr[3]()
 ## @ c t6
 var Func{(copy Int x,
-      copy Int y)} fun
+            copy Int y)} fun
 ## @ g t7
 func fun(copy Func{(copy Int x,
-    copy Int y)} fi)->(var Func{(copy Int x,
-    copy Int y)} fo)
-  fun(copy _)
+        copy Int y)} fi)->(var Func{(copy Int x,
+        copy Int y)} fo)
+    fun(copy _)
 struct Test
-  var Func{(copy Int x,
-      copy Int y)} fun
-  func meth(copy Func{(copy Int x,
-      copy Int y)} fi)->(var Func{(copy Int x,
-      copy Int y)} fo)
+    var Func{(copy Int x,
+            copy Int y)} fun
+    func meth(copy Func{(copy Int x,
+            copy Int y)} fi)->(var Func{(copy Int x,
+            copy Int y)} fo)
 ## @ ec te0
 var Func error
 ## @ ec te1
@@ -560,7 +560,7 @@ var Func{() } error
 var Func{()} fun(copy fun1)
 ## @ ec te5
 var Func{()->(var Int x)} fun
-  fun := fun0
+    fun := fun0
 ## @@ test-builtin
 ## @ c t0
 i.str(user str)

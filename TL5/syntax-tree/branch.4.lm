@@ -3,340 +3,340 @@ module tl5-compiler
 
 ~~~ A basic branch node in the syntax tree - a node with chldren nodes ~~~
 class SyntaxTreeBranch(SyntaxTreeNode)
-  var Int indentation-spaces
-  var List{SyntaxTreeVariable} variables
-  
-  func inst equal-and-space(user String keyword, user String value)->(
-      var Bool result)
-    if keyword.equal(user value)->(var result)
-      self.expect-space(user keyword)
-      
-  func inst equal-and-new-line(user String keyword, user String value)->(
-      var Bool result)
-    if keyword.equal(user value)->(var result)
-      self.expect-new-line(user keyword)
-  
-  func inst parse-block-children(
-      user TypeData parent-type, user SyntaxTreeBlock parent-block)
-    if glob.last-char != '\n'
-      self.syntax-error-c(user "expected block in a new line, got")
-    self.parse-children(user parent-type, user parent-block)
-    if not glob.file-ended
-      glob.save-input := true
-  
-  func inst parse-children(
-      user TypeData parent-type, user SyntaxTreeBlock parent-block)
-    var Int my-line-number(copy self.line-number)
-    do
-      user String keyword
-      var Int spaces
-      read-until(user expression-ends, copy true)->(user keyword, var spaces)
-      ; ignore empty lines
-      if keyword.length > 0 or glob.last-char != '\n'
-        self.set-location()
-        
-        if not self.parse-if-comment(user keyword)
-          if spaces > self.indentation-spaces
-            self.syntax-error-indentation(
-                copy spaces, copy self.indentation-spaces)
-          
-          while spaces = self.indentation-spaces and not glob.file-ended
-          
-          if not self.parse-if-common(
-              user keyword, user parent-type, user parent-block)
-            self.parse-child(user keyword)
-        
-        while not glob.file-ended
-        if not glob.save-input and glob.last-char != '\n'
-          self.syntax-error-c(user "expected new-line in line end, got")
+    var Int indentation-spaces
+    var List{SyntaxTreeVariable} variables
     
-    self.line-number := my-line-number
-  
-  func inst parse-if-comment(user String keyword)->(var Bool is-parsed)
-    is-parsed := true
-    if keyword.equal(user ";") and glob.last-char = ' '
-      user String text
-      read-until(user "", copy false)->(user text)
-    else-if keyword.equal(user "~~~") and glob.last-char = ' '
-      var Int count
-      do
-        read-c()
-        if glob.last-char = '~'
-          count += 1
-        else
-          count := 0
-        while not glob.file-ended and count < 3
-      read-c()
-    else-if keyword.length = 0 and glob.last-char = '['
-      read-c()
-      if glob.last-char != ';'
-        self.syntax-error-msg(user "unexpected \"[\"")
-      var Char prev(copy '\0')
-      do
-        read-c()
-        while not glob.file-ended and (glob.last-char != ']' or prev != ';')
-        prev := glob.last-char
-      read-c()
-    else
-      is-parsed := false
-  
-  func dynamic parse-if-common(
-      user String keyword,
-      user TypeData parent-type,
-      user SyntaxTreeBlock parent-block)->(
-      var Bool is-parsed)
-    is-parsed := glob.last-char = ' '
+    func inst equal-and-space(user String keyword, user String value)->(
+            var Bool result)
+        if keyword.equal(user value)->(var result)
+            self.expect-space(user keyword)
+            
+    func inst equal-and-new-line(user String keyword, user String value)->(
+            var Bool result)
+        if keyword.equal(user value)->(var result)
+            self.expect-new-line(user keyword)
     
-    if parent-block? and glob.tested-module?
-      if glob.current-module.name.equal(user glob.tested-module) and
-          not keyword.equal(user "else") and not keyword.equal(user "else-if")
-        parent-block.code-nodes.add(
-            owner SyntaxTreeCoverage(user parent-block))
+    func inst parse-block-children(
+            user TypeData parent-type, user SyntaxTreeBlock parent-block)
+        if glob.last-char != '\n'
+            self.syntax-error-c(user "expected block in a new line, got")
+        self.parse-children(user parent-type, user parent-block)
+        if not glob.file-ended
+            glob.save-input := true
     
-    if not is-parsed
-      return
-    
-    else-if keyword.equal(user "var")
-      self.variables.add(owner SyntaxTreeVariable.parse-new(
-          user _,
-          copy Access.VAR,
-          copy true,
-          user parent-type,
-          user parent-block))
-    else-if keyword.equal(user "user")
-      self.variables.add(owner SyntaxTreeVariable.parse-new(
-          user _,
-          copy Access.USER,
-          copy false,
-          user parent-type,
-          user parent-block))
-    else-if keyword.equal(user "weak")
-      self.variables.add(owner SyntaxTreeVariable.parse-new(
-          user _,
-          copy Access.WEAK,
-          copy false,
-          user parent-type,
-          user parent-block))
-    else-if keyword.equal(user "owner")
-      self.variables.add(owner SyntaxTreeVariable.parse-new(
-          user _,
-          copy Access.OWNER,
-          copy false,
-          user parent-type,
-          user parent-block))
-    else-if keyword.equal(user "strong")
-      self.variables.add(owner SyntaxTreeVariable.parse-new(
-          user _,
-          copy Access.STRONG,
-          copy false,
-          user parent-type,
-          user parent-block))
-    else-if keyword.equal(user "s-var")
-      self.variables.add(owner SyntaxTreeVariable.parse-new(
-          user _,
-          copy Access.S-VAR,
-          copy true,
-          user parent-type,
-          user parent-block))
-      
-    else
-      is-parsed := false
-  
-  func dynamic parse-child(user String keyword)
-    raise
-  
-  func dynamic find-variable(user String name, user String module-name)->(
-      user SyntaxTreeVariable variable)
-    if base(user name, user module-name)->(user variable)?
-      return
-    variable := _
-    for sub-variable in self.variables.iter()
-      while not sub-variable.get-if-equal(user name)->(user variable)?
-  
-  func dynamic link-types()
-    self.link-children-types(user self.variables)
-  
-  func dynamic analyze()
-    self.analyze-children(user self.variables)
-  
-  func dynamic write()
-    self.write-children(user self.variables)
-  
-  func inst write-spaces()
-    write-spaces(copy self.indentation-spaces)
-  
-  func inst write-cleanup(user TypeData parent-type)
-    for variable in self.variables.iter-back()
-      if variable.access != Access.USER
-        self.write-variable-cleanup(user variable, user parent-type)
-  
-  func inst write-variable-cleanup(
-      user SyntaxTreeVariable variable, user TypeData parent-type)
-    user TypeInstance data-type(user variable.type-instance)
-    if data-type.type-data is glob.type-array
-      data-type.get-array-data-type-depth()->(user data-type)
-    if access-is-owner(copy variable.access) and
-        not data-type.type-data.is-primitive
-      self.write-owner-reference-cleanup(
-          user variable, user parent-type, user data-type)
-    else-if access-is-only-var(copy variable.access)
-      self.write-var-cleanup(user variable, user parent-type, user data-type)
-      if variable.access = Access.VAR
-        return
-    if parent-type?
-      write-spaces(copy INDENTATION-SPACES)
-    else
-      self.write-spaces()
-    
-    if access-has-refman(copy variable.access)
-      write(user "LUMI_")
-      if variable.access = Access.S-VAR and variable.is-create
-        write(user "var_")
-      else-if variable.access = Access.STRONG
-        write(user "owner_")
-      write(user "dec_ref(")
-      if parent-type?
-        write(user "self->")
-      write-cname(user variable.name)
-      write(user "_Refman);\n")
-    else-if variable.access = Access.OWNER
-      write(user "free(")
-      if parent-type?
-        write(user "self->")
-      write-cname(user variable.name)
-      write(user ");\n")
-  
-  func inst write-owner-reference-cleanup(
-      user SyntaxTreeVariable variable,
-      user TypeData parent-type,
-      user TypeInstance data-type)
-    if variable.type-instance.type-data is glob.type-array and
-        data-type.type-data is glob.type-string
-      write-spaces(copy INDENTATION-SPACES)
-      write(user "free(")
-      if parent-type?
-        write(user "self->")
-      write-cname(user variable.name)
-      write(user "_String_length);\n")
-      return
-    write-spaces(copy INDENTATION-SPACES)
-    if variable.type-instance.type-data is parent-type
-      write(user "SELF_REF_DEL")
-      if variable.access = Access.STRONG
-        write(user "_STR")
-      if parent-type.is-dynamic
-        write(user "_DYN")
-      write(user "(")
-      parent-type.write-cname()
-      write(user ", ")
-      if parent-type.is-dynamic
-        user TypeData base-type(user parent-type)
+    func inst parse-children(
+            user TypeData parent-type, user SyntaxTreeBlock parent-block)
+        var Int my-line-number(copy self.line-number)
         do
-          while base-type.base-type?
-          write(user "_base.")
-          base-type := base-type.base-type.type-data
-        write(user "_, ")
-      parent-type := _
-    else-if variable.type-instance.type-data.is-dynamic
-      write(user "if (")
-      if parent-type?
-        write(user "self->")
-      write-cname(user variable.name)
-      write(user "_Dynamic != NULL) ")
-      if parent-type?
-        write(user "self->")
-      write-cname(user variable.name)
-      write(user "_Dynamic->")
-      user TypeData base-data(user data-type.type-data)
-      do
-        while base-data.base-type?
-        base-data := base-data.base-type.type-data
-        while base-data.is-dynamic
-        write(user "_base.")
-      write(user "_del(")
-    else-if variable.type-instance.type-data is glob.type-array
-      write(user "ARRAY_DEL(")
-      data-type.write-cname()
-      write(user ", ")
-    else
-      data-type.write-cname()
-      write(user "_Del(")
-    if parent-type?
-      write(user "self->")
-    write-cname(user variable.name)
-    if variable.type-instance.type-data is glob.type-array
-      write(user ", ")
-      if parent-type?
-        write(user "self->")
-      write-cname(user variable.name)
-      write(user "_Length")
-      write(user ")\n")
-    else
-      write(user ");\n")
-  
-  func inst write-var-cleanup(
-      user SyntaxTreeVariable variable,
-      user TypeData parent-type,
-      user TypeInstance data-type)
-    if data-type.type-data.is-primitive or
-        data-type.type-data is glob.type-string
-      return
-    write-spaces(copy INDENTATION-SPACES)
-    if variable.type-instance.type-data is glob.type-array
-      write(user "ARRAY_DEL(")
-      data-type.write-cname()
-      write(user ", ")
-      if parent-type?
-        write(user "self->")
-      write-cname(user variable.name)
-      write(user ", ")
-      variable.type-instance.length.write()
-      user TypeInstance sequence-type(
-          user variable.type-instance.parameters.first.item)
-      do
-        while sequence-type.length?
-        write(user " * ")
-        sequence-type.length.write()
-        sequence-type := sequence-type.parameters.first.item
-      write(user ")\n")
-    else
-      data-type.write-cname()
-      write(user "_Del(")
-      if parent-type?
-        write(user "&(self->")
-      write-cname(user variable.name)
-      if parent-type?
-        write(user ")")
-      write(user ");\n")
+            user String keyword
+            var Int spaces
+            read-until(user expression-ends, copy true)->(user keyword, var spaces)
+            ; ignore empty lines
+            if keyword.length > 0 or glob.last-char != '\n'
+                self.set-location()
+                
+                if not self.parse-if-comment(user keyword)
+                    if spaces > self.indentation-spaces
+                        self.syntax-error-indentation(
+                                copy spaces, copy self.indentation-spaces)
+                    
+                    while spaces = self.indentation-spaces and not glob.file-ended
+                    
+                    if not self.parse-if-common(
+                            user keyword, user parent-type, user parent-block)
+                        self.parse-child(user keyword)
+                
+                while not glob.file-ended
+                if not glob.save-input and glob.last-char != '\n'
+                    self.syntax-error-c(user "expected new-line in line end, got")
+        
+        self.line-number := my-line-number
+    
+    func inst parse-if-comment(user String keyword)->(var Bool is-parsed)
+        is-parsed := true
+        if keyword.equal(user ";") and glob.last-char = ' '
+            user String text
+            read-until(user "", copy false)->(user text)
+        else-if keyword.equal(user "~~~") and glob.last-char = ' '
+            var Int count
+            do
+                read-c()
+                if glob.last-char = '~'
+                    count += 1
+                else
+                    count := 0
+                while not glob.file-ended and count < 3
+            read-c()
+        else-if keyword.length = 0 and glob.last-char = '['
+            read-c()
+            if glob.last-char != ';'
+                self.syntax-error-msg(user "unexpected \"[\"")
+            var Char prev(copy '\0')
+            do
+                read-c()
+                while not glob.file-ended and (glob.last-char != ']' or prev != ';')
+                prev := glob.last-char
+            read-c()
+        else
+            is-parsed := false
+    
+    func dynamic parse-if-common(
+            user String keyword,
+            user TypeData parent-type,
+            user SyntaxTreeBlock parent-block)->(
+            var Bool is-parsed)
+        is-parsed := glob.last-char = ' '
+        
+        if parent-block? and glob.tested-module?
+            if glob.current-module.name.equal(user glob.tested-module) and
+                    not keyword.equal(user "else") and not keyword.equal(user "else-if")
+                parent-block.code-nodes.add(
+                        owner SyntaxTreeCoverage(user parent-block))
+        
+        if not is-parsed
+            return
+        
+        else-if keyword.equal(user "var")
+            self.variables.add(owner SyntaxTreeVariable.parse-new(
+                    user _,
+                    copy Access.VAR,
+                    copy true,
+                    user parent-type,
+                    user parent-block))
+        else-if keyword.equal(user "user")
+            self.variables.add(owner SyntaxTreeVariable.parse-new(
+                    user _,
+                    copy Access.USER,
+                    copy false,
+                    user parent-type,
+                    user parent-block))
+        else-if keyword.equal(user "weak")
+            self.variables.add(owner SyntaxTreeVariable.parse-new(
+                    user _,
+                    copy Access.WEAK,
+                    copy false,
+                    user parent-type,
+                    user parent-block))
+        else-if keyword.equal(user "owner")
+            self.variables.add(owner SyntaxTreeVariable.parse-new(
+                    user _,
+                    copy Access.OWNER,
+                    copy false,
+                    user parent-type,
+                    user parent-block))
+        else-if keyword.equal(user "strong")
+            self.variables.add(owner SyntaxTreeVariable.parse-new(
+                    user _,
+                    copy Access.STRONG,
+                    copy false,
+                    user parent-type,
+                    user parent-block))
+        else-if keyword.equal(user "s-var")
+            self.variables.add(owner SyntaxTreeVariable.parse-new(
+                    user _,
+                    copy Access.S-VAR,
+                    copy true,
+                    user parent-type,
+                    user parent-block))
+            
+        else
+            is-parsed := false
+    
+    func dynamic parse-child(user String keyword)
+        raise
+    
+    func dynamic find-variable(user String name, user String module-name)->(
+            user SyntaxTreeVariable variable)
+        if base(user name, user module-name)->(user variable)?
+            return
+        variable := _
+        for sub-variable in self.variables.iter()
+            while not sub-variable.get-if-equal(user name)->(user variable)?
+    
+    func dynamic link-types()
+        self.link-children-types(user self.variables)
+    
+    func dynamic analyze()
+        self.analyze-children(user self.variables)
+    
+    func dynamic write()
+        self.write-children(user self.variables)
+    
+    func inst write-spaces()
+        write-spaces(copy self.indentation-spaces)
+    
+    func inst write-cleanup(user TypeData parent-type)
+        for variable in self.variables.iter-back()
+            if variable.access != Access.USER
+                self.write-variable-cleanup(user variable, user parent-type)
+    
+    func inst write-variable-cleanup(
+            user SyntaxTreeVariable variable, user TypeData parent-type)
+        user TypeInstance data-type(user variable.type-instance)
+        if data-type.type-data is glob.type-array
+            data-type.get-array-data-type-depth()->(user data-type)
+        if access-is-owner(copy variable.access) and
+                not data-type.type-data.is-primitive
+            self.write-owner-reference-cleanup(
+                    user variable, user parent-type, user data-type)
+        else-if access-is-only-var(copy variable.access)
+            self.write-var-cleanup(user variable, user parent-type, user data-type)
+            if variable.access = Access.VAR
+                return
+        if parent-type?
+            write-spaces(copy INDENTATION-SPACES)
+        else
+            self.write-spaces()
+        
+        if access-has-refman(copy variable.access)
+            write(user "LUMI_")
+            if variable.access = Access.S-VAR and variable.is-create
+                write(user "var_")
+            else-if variable.access = Access.STRONG
+                write(user "owner_")
+            write(user "dec_ref(")
+            if parent-type?
+                write(user "self->")
+            write-cname(user variable.name)
+            write(user "_Refman);\n")
+        else-if variable.access = Access.OWNER
+            write(user "free(")
+            if parent-type?
+                write(user "self->")
+            write-cname(user variable.name)
+            write(user ");\n")
+    
+    func inst write-owner-reference-cleanup(
+            user SyntaxTreeVariable variable,
+            user TypeData parent-type,
+            user TypeInstance data-type)
+        if variable.type-instance.type-data is glob.type-array and
+                data-type.type-data is glob.type-string
+            write-spaces(copy INDENTATION-SPACES)
+            write(user "free(")
+            if parent-type?
+                write(user "self->")
+            write-cname(user variable.name)
+            write(user "_String_length);\n")
+            return
+        write-spaces(copy INDENTATION-SPACES)
+        if variable.type-instance.type-data is parent-type
+            write(user "SELF_REF_DEL")
+            if variable.access = Access.STRONG
+                write(user "_STR")
+            if parent-type.is-dynamic
+                write(user "_DYN")
+            write(user "(")
+            parent-type.write-cname()
+            write(user ", ")
+            if parent-type.is-dynamic
+                user TypeData base-type(user parent-type)
+                do
+                    while base-type.base-type?
+                    write(user "_base.")
+                    base-type := base-type.base-type.type-data
+                write(user "_, ")
+            parent-type := _
+        else-if variable.type-instance.type-data.is-dynamic
+            write(user "if (")
+            if parent-type?
+                write(user "self->")
+            write-cname(user variable.name)
+            write(user "_Dynamic != NULL) ")
+            if parent-type?
+                write(user "self->")
+            write-cname(user variable.name)
+            write(user "_Dynamic->")
+            user TypeData base-data(user data-type.type-data)
+            do
+                while base-data.base-type?
+                base-data := base-data.base-type.type-data
+                while base-data.is-dynamic
+                write(user "_base.")
+            write(user "_del(")
+        else-if variable.type-instance.type-data is glob.type-array
+            write(user "ARRAY_DEL(")
+            data-type.write-cname()
+            write(user ", ")
+        else
+            data-type.write-cname()
+            write(user "_Del(")
+        if parent-type?
+            write(user "self->")
+        write-cname(user variable.name)
+        if variable.type-instance.type-data is glob.type-array
+            write(user ", ")
+            if parent-type?
+                write(user "self->")
+            write-cname(user variable.name)
+            write(user "_Length")
+            write(user ")\n")
+        else
+            write(user ");\n")
+    
+    func inst write-var-cleanup(
+            user SyntaxTreeVariable variable,
+            user TypeData parent-type,
+            user TypeInstance data-type)
+        if data-type.type-data.is-primitive or
+                data-type.type-data is glob.type-string
+            return
+        write-spaces(copy INDENTATION-SPACES)
+        if variable.type-instance.type-data is glob.type-array
+            write(user "ARRAY_DEL(")
+            data-type.write-cname()
+            write(user ", ")
+            if parent-type?
+                write(user "self->")
+            write-cname(user variable.name)
+            write(user ", ")
+            variable.type-instance.length.write()
+            user TypeInstance sequence-type(
+                    user variable.type-instance.parameters.first.item)
+            do
+                while sequence-type.length?
+                write(user " * ")
+                sequence-type.length.write()
+                sequence-type := sequence-type.parameters.first.item
+            write(user ")\n")
+        else
+            data-type.write-cname()
+            write(user "_Del(")
+            if parent-type?
+                write(user "&(self->")
+            write-cname(user variable.name)
+            if parent-type?
+                write(user ")")
+            write(user ");\n")
 
 
 ~~~ A basic namespace node in the syntax tree ~~~
 class SyntaxTreeNamespace(SyntaxTreeBranch)
-  var List{SyntaxTreeFunction} functions
-  
-  func inst parse-if-function(
-      user String keyword, user TypeData parent-type)->(var Bool is-func)
-    self.equal-and-space(user keyword, user "func")->(var is-func)
-    if is-func
-      self.functions.add(owner SyntaxTreeFunction.parse-new(
-          user _, user parent-type))
-  
-  func dynamic link-types()
-    base()
-    self.link-children-types(user self.functions)
-  
-  func dynamic analyze()
-    base()
-    self.analyze-children(user self.functions)
-  
-  func inst collect-delete-groups()
-    for function in self.functions.iter()
-      function.collect-delete-group()
+    var List{SyntaxTreeFunction} functions
+    
+    func inst parse-if-function(
+            user String keyword, user TypeData parent-type)->(var Bool is-func)
+        self.equal-and-space(user keyword, user "func")->(var is-func)
+        if is-func
+            self.functions.add(owner SyntaxTreeFunction.parse-new(
+                    user _, user parent-type))
+    
+    func dynamic link-types()
+        base()
+        self.link-children-types(user self.functions)
+    
+    func dynamic analyze()
+        base()
+        self.analyze-children(user self.functions)
+    
+    func inst collect-delete-groups()
+        for function in self.functions.iter()
+            function.collect-delete-group()
 
-  func dynamic check-memory(user ReferenceMemoryList refs)
-    base(user refs)
-    self.check-children-memory(user self.functions, user refs)
-  
-  func inst write-functions-declaration()
-    for function in self.functions.iter()
-      function.write-declaration()
+    func dynamic check-memory(user ReferenceMemoryList refs)
+        base(user refs)
+        self.check-children-memory(user self.functions, user refs)
+    
+    func inst write-functions-declaration()
+        for function in self.functions.iter()
+            function.write-declaration()

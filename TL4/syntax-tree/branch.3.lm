@@ -169,13 +169,13 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       self.write-owner-reference-cleanup(
           user variable, user type-data, user item-type-data)
     else-if ? type-data and variable.access = ACCESS-VAR
-      write(user "  ")
+      write(user "    ")
       item-type-data.write-cname()
       write(user "_Del(&(self->")
       write-cname(user variable.name)
       write(user "));\n")
       return
-    write(user "  LUMI_")
+    write(user "    LUMI_")
     if variable.access = ACCESS-VAR
       write(user "var_")
     else-if variable.access = ACCESS-OWNER
@@ -190,7 +190,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       user SyntaxTreeVariable variable,
       user TypeData type-data,
       user TypeData item-type-data)
-    write(user "  ")
+    write(user "    ")
     if variable.type-instance.type-data = type-data
       if type-data.is-dynamic
         write(user "DYN_")

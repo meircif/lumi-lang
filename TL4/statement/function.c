@@ -53,7 +53,7 @@ Returncode SyntaxTreeFunction_parse(SyntaxTreeFunction* self, TypeData* parent_t
   CHECK(22, SyntaxTreeFunction_init(self) )
   self->parent_type = parent_type;
   if (NULL != self->parent_type) {
-    self->_base._base.indentation_spaces = 2;
+    self->_base._base.indentation_spaces = 4;
     if (self->parent_type->is_dynamic) {
       String* meth_type = NULL;
       Int _Int157;
@@ -101,9 +101,9 @@ Returncode SyntaxTreeFunction_parse_body(SyntaxTreeFunction* self, Char* end);
 static char* _func_name_SyntaxTreeFunction_parse_body = "SyntaxTreeFunction.parse-body";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeFunction_parse_body
 Returncode SyntaxTreeFunction_parse_body(SyntaxTreeFunction* self, Char* end) {
-  self->_base._base.indentation_spaces += 2;
+  self->_base._base.indentation_spaces += 4;
   CHECK(46, SyntaxTreeBlock_parse_block(&(self->_base), &((*end))) )
-  self->_base._base.indentation_spaces = 2;
+  self->_base._base.indentation_spaces = 4;
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -378,13 +378,13 @@ Returncode SyntaxTreeFunction_write_block(SyntaxTreeFunction* self) {
   /*   return LUMI_err; */
   /* } */
   CHECK(188, SyntaxTreeBlock_write_block_start(&(self->_base)) )
-  CHECK(189, write(&(String){29, 28, "  Returncode LUMI_err = OK;\n"}) )
+  CHECK(189, write(&(String){31, 30, "    Returncode LUMI_err = OK;\n"}) )
   CHECK(190, SyntaxTreeBranch_write(&(self->_base._base)) )
   CHECK(191, SyntaxTreeFunction_write_setup(self) )
   CHECK(192, (self)->_base._base._base._dtl[9](self) )
   CHECK(193, write(&(String){15, 14, "LUMI_cleanup:\n"}) )
   CHECK(194, SyntaxTreeFunction_write_cleanup(self) )
-  CHECK(195, write(&(String){20, 19, "  return LUMI_err;\n"}) )
+  CHECK(195, write(&(String){22, 21, "    return LUMI_err;\n"}) )
   CHECK(196, SyntaxTreeBlock_write_block_end(&(self->_base)) )
   return OK;
 }
@@ -397,13 +397,13 @@ static char* _func_name_SyntaxTreeFunction_write_setup = "SyntaxTreeFunction.wri
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeFunction_write_setup
 Returncode SyntaxTreeFunction_write_setup(SyntaxTreeFunction* self) {
   if (self->has_user_assign) {
-    CHECK(200, write(&(String){40, 39, "  Ref_Manager* aux_Ref_Manager = NULL;\n"}) )
+    CHECK(200, write(&(String){42, 41, "    Ref_Manager* aux_Ref_Manager = NULL;\n"}) )
   }
   ListNode* node = self->arguments->parameters->first;
   while (true) {
     if (!(NULL != node)) break;
     if (((Argument*)(node->item))->access == ACCESS_USER) {
-      CHECK(205, write(&(String){16, 15, "  LUMI_inc_ref("}) )
+      CHECK(205, write(&(String){18, 17, "    LUMI_inc_ref("}) )
       SyntaxTreeVariable* _SyntaxTreeVariable166;
       CHECK(206, (((Argument*)(node->item)))->_base._dtl[9](((Argument*)(node->item)), &(_SyntaxTreeVariable166)) )
       CHECK(206, write_cname(_SyntaxTreeVariable166->name) )
@@ -530,7 +530,7 @@ static char* _func_name_SyntaxTreeConstructor_parse = "SyntaxTreeConstructor.par
 Returncode SyntaxTreeConstructor_parse(SyntaxTreeConstructor* self, TypeData* parent_type, Char* end) {
   CHECK(252, SyntaxTreeFunction_init(&(self->_base)) )
   self->_base.parent_type = parent_type;
-  self->_base._base._base.indentation_spaces = 2;
+  self->_base._base._base.indentation_spaces = 4;
   CHECK(255, string_new_copy(&(String){4, 3, "new"}, &(self->_base.name)) )
   CHECK(256, SyntaxTreeFunction_parse_arguments(&(self->_base), false, &((*end))) )
   CHECK(257, SyntaxTreeFunction_parse_body(&(self->_base), &((*end))) )

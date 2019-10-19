@@ -159,7 +159,7 @@ Returncode SyntaxTreeForLoop_get_iterator_type(SyntaxTreeForLoop* self, TypeInst
   Int _Int151;
   CHECK(91, TypeData_find_meth(self->iterator->result_type->type_data, &(String){4, 3, "has"}, &(self->has_func), &(_Int151)) )
   if (!(NULL != self->has_func)) {
-    CHECK(94, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){50, 49, "cannot iterate type with no \"has\" named method - "}, self->iterator->result_type->type_data->name) )
+    CHECK(94, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){49, 48, "cannot iterate type with no \"has\" named method -"}, self->iterator->result_type->type_data->name) )
   }
   if (NULL != self->has_func->arguments->parameters->first->next) {
     CHECK(98, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){45, 44, "iterator \"has\" method has parameters in type"}, self->iterator->result_type->type_data->name) )
@@ -179,7 +179,7 @@ Returncode SyntaxTreeForLoop_get_iterator_type(SyntaxTreeForLoop* self, TypeInst
   Int _Int153;
   CHECK(115, TypeData_find_meth(self->iterator->result_type->type_data, &(String){4, 3, "get"}, &(self->get_func), &(_Int153)) )
   if (!(NULL != self->get_func)) {
-    CHECK(118, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){50, 49, "cannot iterate type with no \"get\" named method - "}, self->iterator->result_type->type_data->name) )
+    CHECK(118, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){49, 48, "cannot iterate type with no \"get\" named method -"}, self->iterator->result_type->type_data->name) )
   }
   if (NULL != self->get_func->arguments->parameters->first->next) {
     CHECK(122, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){45, 44, "iterator \"get\" method has parameters in type"}, self->iterator->result_type->type_data->name) )
@@ -201,7 +201,7 @@ Returncode SyntaxTreeForLoop_get_iterator_type(SyntaxTreeForLoop* self, TypeInst
   Int _Int155;
   CHECK(141, TypeData_find_meth(self->iterator->result_type->type_data, &(String){5, 4, "next"}, &(self->next_func), &(_Int155)) )
   if (!(NULL != self->next_func)) {
-    CHECK(144, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){51, 50, "cannot iterate type with no \"next\" named method - "}, self->iterator->result_type->type_data->name) )
+    CHECK(144, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){50, 49, "cannot iterate type with no \"next\" named method -"}, self->iterator->result_type->type_data->name) )
   }
   if (NULL != self->next_func->arguments->parameters->first->next) {
     CHECK(148, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){46, 45, "iterator \"next\" method has parameters in type"}, self->iterator->result_type->type_data->name) )
@@ -357,9 +357,9 @@ Returncode SyntaxTreeForLoop_write_seq(SyntaxTreeForLoop* self) {
   slice->sequence = &(self->aux_symbol->_base);
   slice->index = &(index_symbol->_base);
   CHECK(249, TypeInstance_copy_new(self->item->type_instance, &(slice->_base.result_type)) )
-  self->_base._base.parent->_base.indentation_spaces += 2;
+  self->_base._base.parent->_base.indentation_spaces += 4;
   CHECK(251, SyntaxTreeForLoop_write_assign(self, self->item, &(slice->_base), self->_base.block) )
-  self->_base._base.parent->_base.indentation_spaces -= 2;
+  self->_base._base.parent->_base.indentation_spaces -= 4;
   
   CHECK(254, SyntaxTreeFlowElement_write_block_body(&(self->_base)) )
   
@@ -494,9 +494,9 @@ Returncode SyntaxTreeForLoop_write_iter_meth(SyntaxTreeForLoop* self, SyntaxTree
   }
   
   expression_node->expression = &(call->_base);
-  self->_base._base.parent->_base.indentation_spaces += 2;
+  self->_base._base.parent->_base.indentation_spaces += 4;
   CHECK(342, (expression_node)->_base._base._dtl[4](expression_node) )
-  self->_base._base.parent->_base.indentation_spaces -= 2;
+  self->_base._base.parent->_base.indentation_spaces -= 4;
   return OK;
 }
 #undef LUMI_FUNC_NAME
