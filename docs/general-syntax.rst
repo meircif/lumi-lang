@@ -8,9 +8,9 @@ General Syntax Highlights
 * strict white-spacing:
 
    - tabs are syntax errors
-   - indentation is exactly 2 spaces
+   - indentation is exactly 4 spaces
    - no spaces in line end
-   - line breaking is exactly 4 spaces
+   - extra indentation for line breaking is exactly 8 spaces
    - exactly one space around operators
    - file must end with a single newline
    - in general, any whitespace in the syntax must be used exactly

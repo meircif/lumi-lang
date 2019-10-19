@@ -7,11 +7,11 @@ If-else condition is declared using ``if``, ``else``, and ``else-if`` keywords.
 The condition expression must be boolean typed. ::
 
    if x > 4
-     ; do something
+       ; do something
    else-if x < 2
-     ; do something
+       ; do something
    else
-     ; do something
+       ; do something
 
 Switch-Case Condition
 ---------------------
@@ -24,14 +24,14 @@ default is not to fall-through. ::
 
    switch number
    case 34
-     ; do something
+       ; do something
    case 23
-     ; do something
-     fallthrough
+       ; do something
+       fallthrough
    case 45, 67, 26, 56, 67, 89, 56, 87
-     ; do something
+       ; do something
    default
-     ; do something
+       ; do something
 
 Do-While Loop
 ---------------
@@ -41,19 +41,19 @@ statement inside it is true, and stops immediately when the first ``while``
 statement inside it is false. ::
 
    do
-     ; do something
-     while number < 6
-     ; do something
-     while not boolean-variable
-     ; do something
+       ; do something
+       while number < 6
+       ; do something
+       while not boolean-variable
+       ; do something
 
 Loops can be broke immediately using a ``break`` statement::
 
    do
-     ; do something
-     if number = 0
-       break
-     ; do something
+       ; do something
+       if number = 0
+           break
+       ; do something
 
 That makes ``while condition`` the same as ``if not condition break``.
 
@@ -61,10 +61,10 @@ A ``continue`` statement can be used to only stop the current iteration and
 start over from loop beginning::
 
    do
-     ; do something
-     if num = 3
-       continue
-     ; do something
+       ; do something
+       if num = 3
+           continue
+       ; do something
 
 For Loop
 --------
@@ -74,23 +74,23 @@ set of values.
 Iterating numbers incrementally, numbers can be any integer expression::
 
    for number in 3:7
-     ; "number" will iterate 3,4,5,6
+       ; "number" will iterate 3,4,5,6
 
 Number iteration with explicit step amount, this is not supported in :ref:`TL4
 <syntax-tl4>`::
 
    for number in 9:1:-2
-     ; "number" will iterate 9,7,5,3
+       ; "number" will iterate 9,7,5,3
 
 String iteration::
 
    for character in "Example"
-     ; "character" will iterate E,x,a,m,p,l,e
+       ; "character" will iterate E,x,a,m,p,l,e
 
 Array iteration::
 
    for item in array
-     ; "item" will iterate each item of "array"
+       ; "item" will iterate each item of "array"
 
 User Defined Iterators
 ++++++++++++++++++++++
@@ -119,4 +119,4 @@ planning.
 An instance of an iterator type can be used in for loops::
 
    for item in iterator-instance
-     ; "item" will iterate as implemented by "iterator-instance" type
+       ; "item" will iterate as implemented by "iterator-instance" type

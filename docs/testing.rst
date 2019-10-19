@@ -20,7 +20,7 @@ Test Cases
 Can be written using the ``test`` keyword::
 
    test test-case-name()
-     ; test code
+       ; test code
 
 The test case is consider a success if the code runs without any assertion
 or runtime errors.
@@ -63,18 +63,18 @@ name and its arguments access an type must much the mocked function exactly.
 Whenever the mocked function is used the mocking function is called instead. ::
 
    mock mocked-module.mocked-function(copy Int input)->(var Int output)
-     ; mocking body
+       ; mocking body
 
    mock mocked-module.MockedType.mocked-method()
-     ; mocking body
+       ; mocking body
 
 Built-in functions and methods can also be mocked::
 
    mock Sys.print(user String text)
-     ; mocking body
+       ; mocking body
 
    mock file-open-read(user String filename)->(owner File file)
-     ; mocking body
+       ; mocking body
 
 The mocked function can still be called using ``mocked`` member::
 

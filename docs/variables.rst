@@ -56,9 +56,9 @@ generate automatic conversion functions between symbol names and values.
 Enumerators are declared in :ref:`TL4 <syntax-tl4>` by::
 
    enum EnumeratorName
-     FIRST-SYMBOL-NAME
-     SECOND-SYMBOL-NAME
-     THIRD-SYMBOL-NAME
+       FIRST-SYMBOL-NAME
+       SECOND-SYMBOL-NAME
+       THIRD-SYMBOL-NAME
 
 Using an enumerator is done by ``EnumeratorName.SYMBOL-NAME``.
 
@@ -103,17 +103,17 @@ using the ``?`` operator, to explicitly check for emptiness the ``is`` and
 ``is-not`` operators can be used with ``_`` as operand. ::
 
    if first-reference is second-reference
-     ; both references reference to the same object, or both are empty
+       ; both references reference to the same object, or both are empty
    if first-reference is-not second-reference
-     ; both references do not reference to the same object
+       ; both references do not reference to the same object
    if first-reference?
-     ; first-reference is usable - not empty and not outdated
+       ; first-reference is usable - not empty and not outdated
    if not first-reference?
-     ; first-reference is not usable - it is empty or outdated
+       ; first-reference is not usable - it is empty or outdated
    if first-reference is _
-     ; first-reference is empty
+       ; first-reference is empty
    if first-reference is-not _
-     ; first-reference is not empty, but may or may not be outdated
+       ; first-reference is not empty, but may or may not be outdated
 
 String and Buffer Literals
 ++++++++++++++++++++++++++
