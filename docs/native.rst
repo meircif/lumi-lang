@@ -5,12 +5,12 @@ Calling C Code
 Lumi allows calling C code directly. This is useful for using an external C
 library, or using already written C code.
 
-In :ref:`TL4 <syntax-tl4>` this is only basically implemented. It is planned to
+In :ref:`TL5 <syntax-tl5>` this is only basically implemented. It is planned to
 extend this feature greatly to make this as convenient as possible. The full
 syntax is still under planning.
 
-In :ref:`TL4 <syntax-tl4>` in order to call C code one must know how the
-various types in :ref:`TL4 <syntax-tl4>` are implemented in `lumi.4.h`_. If the
+In :ref:`TL5 <syntax-tl5>` in order to call C code one must know how the
+various types in :ref:`TL5 <syntax-tl5>` are implemented in `lumi.4.h`_. If the
 types do not match the C types needed, a :ref:`proxy C code <proxy-c>` should
 be added to convert the interface. This method should be used whenever a
 certain C item cannot be called directly.
@@ -67,7 +67,7 @@ Native types are treated as any standard Lumi **primitive** type.
 
 Proxy C Code Example
 --------------------
-In :ref:`TL4 <syntax-tl4>` calling C code is only basically implemented, so in
+In :ref:`TL5 <syntax-tl5>` calling C code is only basically implemented, so in
 many cases proxy C code must be written to connect between Lumi and C code
 needed to be used from Lumi.
 

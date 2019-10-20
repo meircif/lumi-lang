@@ -1,7 +1,7 @@
 Standard Libraries
 ==================
 
-This is not supported yet in :ref:`TL4 <syntax-tl4>`.
+This is not supported yet in :ref:`TL5 <syntax-tl5>`.
 
 Planned initial Lumi standard libraries:
 

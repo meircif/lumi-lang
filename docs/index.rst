@@ -28,8 +28,8 @@ Lumi is still under initial planning and building. Many features are already
 implemented and it is possible to write complex programs with Lumi, but some
 key elements are not, and many implemented feature may change dramatically.
 
-The latest state of the language is named ":ref:`Temporary Lumi 4
-<syntax-tl4>`", or "TL4" in short, to emphasizing the current temporary state
+The latest state of the language is named ":ref:`Temporary Lumi 5
+<syntax-tl5>`", or "TL5" in short, to emphasizing the current temporary state
 of the language.
 
 Contributing to Lumi

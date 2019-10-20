@@ -3,7 +3,7 @@
 Variables and Constants
 =======================
 
-In :ref:`TL4 <syntax-tl4>` the :ref:`Lumi memory management <memory-management>`
+In :ref:`TL5 <syntax-tl5>` the :ref:`Lumi memory management <memory-management>`
 is only partially implemented, and follows only the
 :ref:`second management form <memory-management-2>` from the 3 planned:
 
@@ -19,7 +19,7 @@ is only partially implemented, and follows only the
    to the reference is automatically prepended with a runtime check that raises
    if the used reference is empty or outdated
 4. the mechanism that prevents owner cycles is not implemented yet, making
-   :ref:`TL4 <syntax-tl4>` memory management not fully safe yet, but this is
+   :ref:`TL5 <syntax-tl5>` memory management not fully safe yet, but this is
    the only known problem - and it will be fixed soon
 
 The planned final Lumi syntax will implement the whole
@@ -27,11 +27,11 @@ The planned final Lumi syntax will implement the whole
 
 Constants
 ---------
-In :ref:`TL4 <syntax-tl4>` only global integer constants are supported. The
+In :ref:`TL5 <syntax-tl5>` only global integer constants are supported. The
 final Lumi syntax is planned to support constants from all types, and allow
 definition of constants under a specific type.
 
-Integer constants are declared in :ref:`TL4 <syntax-tl4>` by::
+Integer constants are declared in :ref:`TL5 <syntax-tl5>` by::
 
    const Int CONSTANT-NAME 12
 
@@ -48,12 +48,12 @@ Enumerators
 Enumerators are a set of constant symbols that are treated as integer constants.
 The first symbol is allocated a value of ``0``, the second is ``1`` and so on...
 
-In :ref:`TL4 <syntax-tl4>` enumerators can only be declared in the global scope.
+In :ref:`TL5 <syntax-tl5>` enumerators can only be declared in the global scope.
 The final Lumi syntax is planned to support enumerators under a specific type,
 will allow definition of specific values for the enumerator symbols, and will
 generate automatic conversion functions between symbol names and values.
 
-Enumerators are declared in :ref:`TL4 <syntax-tl4>` by::
+Enumerators are declared in :ref:`TL5 <syntax-tl5>` by::
 
    enum EnumeratorName
        FIRST-SYMBOL-NAME

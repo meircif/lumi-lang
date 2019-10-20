@@ -47,14 +47,14 @@ Character
    characters can be written with ``\`` escape character as in C: ``\' \" \? \a
    \b \f \n \r \t \v \\``.
 
-   In :ref:`TL4 <syntax-tl4>` characters can be used together with integers
+   In :ref:`TL5 <syntax-tl5>` characters can be used together with integers
    freely. In the final syntax it may not be possible without explicitly
    converting characters to and from integers using ``ord`` and ``chr``
    functions.
 
 Byte
 ----
-*planned - not supported in* :ref:`TL4 <syntax-tl4>`
+*planned - not supported in* :ref:`TL5 <syntax-tl5>`
 
 .. class:: Byte
 
@@ -65,7 +65,7 @@ Byte
 
 Real Number
 -----------
-*planned - not supported in* :ref:`TL4 <syntax-tl4>`
+*planned - not supported in* :ref:`TL5 <syntax-tl5>`
 
 .. class:: Real
 
@@ -123,7 +123,7 @@ String
    return a string reference that points to the original string.
 
    .. warning::
-      In :ref:`TL4 <syntax-tl4>` string slicing is not fully safe. It should
+      In :ref:`TL5 <syntax-tl5>` string slicing is not fully safe. It should
       only be used temporarily before any modification to the original string.
 
    .. attribute:: Int length
@@ -184,7 +184,7 @@ String
 
 Buffer
 ------
-*planned - not supported in* :ref:`TL4 <syntax-tl4>`
+*planned - not supported in* :ref:`TL5 <syntax-tl5>`
 
 .. class:: Buffer(max length)
 
@@ -212,7 +212,7 @@ Array
 -----
 .. class:: Array(length, subtype)
 
-   Sequence of any typed item with static length. In :ref:`TL4 <syntax-tl4>`
+   Sequence of any typed item with static length. In :ref:`TL5 <syntax-tl5>`
    array of arrays are not supported. It is planned to be supported in the final
    Lumi syntax.
 
@@ -231,7 +231,7 @@ Array
    return an array reference that points to the original array.
 
    .. warning::
-      In :ref:`TL4 <syntax-tl4>` array slicing is not fully safe. It should
+      In :ref:`TL5 <syntax-tl5>` array slicing is not fully safe. It should
       only be used temporarily before any modification to the original array.
 
    .. attribute:: Int length
@@ -300,7 +300,7 @@ Built-in Global Variables
 
 System
 ------
-This type is temporary in :ref:`TL4 <syntax-tl4>`, in the planned Lumi syntax
+This type is temporary in :ref:`TL5 <syntax-tl5>`, in the planned Lumi syntax
 there will be a ``sys`` module with the same interface.
 
 .. class:: Sys

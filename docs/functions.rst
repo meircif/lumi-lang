@@ -54,7 +54,7 @@ Access
 ------
 An "access" defines the memory access of the argument.
 
-In :ref:`TL4 <syntax-tl4>`:
+In :ref:`TL5 <syntax-tl5>`:
 
 * for primitive types ``copy`` must be used for parameters, and ``var`` for
   outputs.
@@ -95,7 +95,7 @@ omitted in a default usage.
 
 Return and Output
 -----------------
-In :ref:`TL4 <syntax-tl4>` output is written by setting a value to an output
+In :ref:`TL5 <syntax-tl5>` output is written by setting a value to an output
 argument::
 
    func example()->(var Int first-output, user String second-output)
@@ -121,7 +121,7 @@ Raising an error can be done using the ``raise`` statement::
    func example()
        raise
 
-In :ref:`TL4 <syntax-tl4>` an optional string expression can be raised::
+In :ref:`TL5 <syntax-tl5>` an optional string expression can be raised::
 
    func example()
        raise "error message"

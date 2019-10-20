@@ -8,7 +8,7 @@ compiler directly is possible, but it is less convenient.
 
 Latest Version - TL4 Compiler
 -----------------------------
-The :ref:`TL4 <syntax-tl4>` complier generates a single C file based on one or
+The :ref:`TL5 <syntax-tl5>` complier generates a single C file based on one or
 more Lumi files. For example ::
 
    tl4-compiler hello.c hello.4.lm other.4.lm

@@ -24,9 +24,9 @@ copyright = '2019, Lumi language contributors'
 author = 'Lumi language contributors'
 
 # The short X.Y version
-version = '0.4'
+version = '0.5'
 # The full version, including alpha/beta/rc tags
-release = 'lumi-0.4'
+release = 'lumi-0.5'
 
 highlight_language = 'lumi'
 

@@ -15,7 +15,7 @@ The condition expression must be boolean typed. ::
 
 Switch-Case Condition
 ---------------------
-This is not supported in :ref:`TL4 <syntax-tl4>`.
+This is not supported in :ref:`TL5 <syntax-tl5>`.
 
 Switch-case condition is declared using the ``switch`` keyword, contains
 multiple ``case`` blocks, and optionally one last ``default`` block. A
@@ -76,8 +76,8 @@ Iterating numbers incrementally, numbers can be any integer expression::
    for number in 3:7
        ; "number" will iterate 3,4,5,6
 
-Number iteration with explicit step amount, this is not supported in :ref:`TL4
-<syntax-tl4>`::
+Number iteration with explicit step amount, this is not supported in :ref:`TL5
+<syntax-tl5>`::
 
    for number in 9:1:-2
        ; "number" will iterate 9,7,5,3
@@ -94,7 +94,7 @@ Array iteration::
 
 User Defined Iterators
 ++++++++++++++++++++++
-A type can be made into an iterator in :ref:`TL4 <syntax-tl4>` by implementing
+A type can be made into an iterator in :ref:`TL5 <syntax-tl5>` by implementing
 theses methods:
 
 .. function:: has()->(var Bool has-another-item)

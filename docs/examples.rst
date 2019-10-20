@@ -3,7 +3,7 @@ Code Examples
 
 Hello World Program
 -------------------
-A simple "Hello World" program written in :ref:`TL4 <syntax-tl4>`:
+A simple "Hello World" program written in :ref:`TL5 <syntax-tl5>`:
 
 .. literalinclude:: hello-world.4.lm
    :caption:

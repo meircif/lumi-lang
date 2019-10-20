@@ -4,7 +4,7 @@ User Defined Types
 As explained in :ref:`type-system`, Lumi allows variety of typing styles for
 creating user defined types.
 
-In :ref:`TL4 <syntax-tl4>` only basic :ref:`structures <syntax-static>` and
+In :ref:`TL5 <syntax-tl5>` only basic :ref:`structures <syntax-static>` and
 :ref:`classes <syntax-bind>` are supported.
 
 User defined types behave like built-in complex types with :ref:`references
@@ -17,7 +17,7 @@ Static Structures
 -----------------
 Syntax for the :ref:`static structure typing style <type-system-static>`.
 
-In :ref:`TL4 <syntax-tl4>`, structures may not contain string or array
+In :ref:`TL5 <syntax-tl5>`, structures may not contain string or array
 variables, only their respected references. It will be supported in the final
 Lumi syntax.
 
@@ -37,7 +37,7 @@ Members of struct can be accessed using ``.`` operator::
 
 Global Members
 ++++++++++++++
-This is not supported yet in :ref:`TL4 <syntax-tl4>`.
+This is not supported yet in :ref:`TL5 <syntax-tl5>`.
 
 Global members are declared under the type scope::
 
@@ -74,7 +74,7 @@ can be accessed using ``global`` keyword. ::
 
 It possible to split the function deceleration from its implementation. In this
 case the function deceleration should be followed by ``_``. This is not
-supported yet in :ref:`TL4 <syntax-tl4>`. ::
+supported yet in :ref:`TL5 <syntax-tl5>`. ::
 
    struct ExampleStruct
        func method(copy Int num) _
@@ -114,8 +114,8 @@ given on every object creation::
 
 A "destructor" method can also be defined for a structure. This method will be
 called just before any object destruction. A destructor is declared as a normal
-method with a dedicated name ``delete``. This is not supported yet in :ref:`TL4
-<syntax-tl4>`. ::
+method with a dedicated name ``delete``. This is not supported yet in :ref:`TL5
+<syntax-tl5>`. ::
 
    struct ExampleStruct
        func delete() _
@@ -127,7 +127,7 @@ A destructor cannot have any kind of arguments.
 
 Extending Structures
 ++++++++++++++++++++
-In :ref:`TL4 <syntax-tl4>` a structure may only extend one other structure. ::
+In :ref:`TL5 <syntax-tl5>` a structure may only extend one other structure. ::
 
    struct ExtendingStruct(BaseStruct, OtherBaseStruct)
        var Int additional-field
@@ -169,7 +169,7 @@ Dynamic Interfaces
 ------------------
 Syntax for the :ref:`dynamic interface typing style <type-system-dynamic>`.
 
-This is not supported yet in :ref:`TL4 <syntax-tl4>`.
+This is not supported yet in :ref:`TL5 <syntax-tl5>`.
 
 Dynamics are declared using the ``dynamic`` keyword::
 
@@ -268,7 +268,7 @@ defined under the name-space of the class. ::
        dynamic func dynamic-method(copy Int num)  ; part of the implicit dynamic
        global var Int global-variable  ; defined under the class name-space
 
-In :ref:`TL4 <syntax-tl4>` this only partially implemented:
+In :ref:`TL5 <syntax-tl5>` this only partially implemented:
 
 * Only ``class`` type definition is supported, ``Bind`` is not
 * All restrictions on structures also apply to classes
@@ -284,13 +284,13 @@ As all types::
        static var Int addition-static-field
        dynamic func addition-dynamic-method(copy Int num)
 
-In :ref:`TL4 <syntax-tl4>` a class may only extend one other type.
+In :ref:`TL5 <syntax-tl5>` a class may only extend one other type.
 
 Using the Implicit Structure or Dynamic of a Class
 ++++++++++++++++++++++++++++++++++++++++++++++++++
 The implicit structure of a class can be used using the built-in ``Struct``
 type, and the implicit dynamic can be used using the built-in ``Dynamic``
-type. This is not supported in :ref:`TL4 <syntax-tl4>`. ::
+type. This is not supported in :ref:`TL5 <syntax-tl5>`. ::
 
    var Struct{ExampleClass} static-structure-only
    user Dynamic{ExampleClass} dynamic-interface-only
@@ -315,7 +315,7 @@ each parameter ::
 
    var ParametrizedType{8:Int:File} specific-variable
 
-This is partially supported in :ref:`TL4 <syntax-tl4>`:
+This is partially supported in :ref:`TL5 <syntax-tl5>`:
 
 * Only dynamic parameters are supported
 * Only the parameter name is needed
@@ -330,7 +330,7 @@ Embedded Dynamic Reference
 Syntax for the :ref:`embedded dynamic reference typing style
 <type-system-static>`.
 
-This is not supported yet in :ref:`TL4 <syntax-tl4>`.
+This is not supported yet in :ref:`TL5 <syntax-tl5>`.
 
 Embedded classes can be declared using the built-in ``Embed`` type::
 

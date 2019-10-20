@@ -19,7 +19,7 @@ The ``lumi`` command:
 * uses the ``CC`` environment variable to determine the C compiler command,
   using ``gcc`` if not exists
 
-* supports all Lumi version from TL0 to :ref:`TL4 <syntax-tl4>`
+* supports all Lumi version from TL0 to :ref:`TL5 <syntax-tl5>`
 
 .. _lumipath:
 
