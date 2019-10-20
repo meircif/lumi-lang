@@ -20,18 +20,18 @@ func copysign(copy Int x, copy Int sign)->(var Int res)
 
 ~~~ Return `x` raised to power `exp`, fail if `exp` is negative,
 if `x` and `exp` are zero the result is `1` ~~~
-func power(copy Int x, copy Int exp)->(var Int res)
+func ! power(copy Int x, copy Int exp)->(var Int res)
     if exp < 0
-        raise "negative power exponent"
+        raise! "negative power exponent"
     res := 1
     for n in exp
         res := res * x
 
 
 ~~~ Return `x`!, fail if `x` is negative ~~~
-func factorial(copy Int x)->(var Int res)
+func ! factorial(copy Int x)->(var Int res)
     if x < 0
-        raise "negative factorial"
+        raise! "negative factorial"
     res := 1
     for n in 2:x + 1
         res := res * n
@@ -40,12 +40,24 @@ func factorial(copy Int x)->(var Int res)
 struct IntBox
     var Int value
 
-    func new(copy Int value)
+    func user new(copy Int value)
         self.value := value
 
 
+class IntIterator
+    ~~~ in TL5 a class must contain at least one field. ~~~
+    var Int dummy
+
+    ~~~ Is called once before any iteration step.
+    Iteration continues only if "has" returns true, in such case
+    "value" is set to the iteration value. ~~~
+    func dynamic user? ! step()->(user IntBox? value, var Bool has)
+        value := _
+        raise! "unimplemented dynamic method 'step'"
+
+
 ~~~ Return the sum of all integers in `iter` ~~~
-func sum(user ds.Iterator{IntBox} iter)->(var Int res)
+func ! sum(user IntIterator iter)->(var Int res)
     res := 0
-    for box in iter
-        res += box.value
+    for box in iter!
+        res += box!.value

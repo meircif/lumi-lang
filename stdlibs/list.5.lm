@@ -1,0 +1,71 @@
+~~~ Generic lists ~~~
+module ds
+
+
+~~~ Generic single link list ~~~
+struct List{Generic}
+    strong ListNode?{Generic} first
+    weak ListNode?{Generic} last
+
+    ~~~ Add item to list end ~~~
+    func var ! append(owner Generic item)
+        var List{Generic} list
+        self.rotate-to(var list)!
+        new ListNode{Generic} node(owner item)!
+        node.next := list.first
+        list.first := node!
+        self.last := list.first
+        list.rotate-to(var self)!
+
+    func var ! rotate-to(var List{Generic} target)
+        loop
+            while self.first?
+            strong ListNode?{Generic} node(strong self.first)
+            self.first := node!.next
+            node!.next := target.first
+            target.first := node
+
+    ~~~ Add item to list start ~~~
+    func var ! prepend(owner Generic item)
+        new ListNode{Generic} node(owner item)!
+        node.next := self.first
+        self.first := node!
+        if self.last is _
+            self.last := self.first
+
+    func user is-empty()->(var Bool empty)
+        empty := self.first is _
+
+    ~~~ Get and remove first item, fail if list is empty ~~~
+    func var ! pop()->(owner Generic? item)
+        if not self.first?
+            raise! "list empty"
+        item := self.first!.item
+        owner ListNode?{Generic} first(owner self.first)
+        self.first := first!.next
+        if self.first is _
+            self.last := _
+
+
+~~~ Iterate over the list ~~~
+class ListIterator{Generic}
+    weak ListNode?{Generic} curr
+
+    new(user List list)
+        self.curr := list.first
+
+    func dynamic user ! step()->(user Generic? item, var Bool has-another-item)
+        has-another-item := self.curr?
+        item := _
+        if self.curr?
+            item := self.curr!.item
+            self.curr := self.curr!.next
+
+
+~~~ Single node in the list ~~~
+struct ListNode{Generic}
+    strong ListNode?{Generic} next
+    owner Generic? item
+
+    new(owner Generic item)
+        self.item := item
