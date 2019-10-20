@@ -41,7 +41,7 @@ Character
 ---------
 .. class:: Char
 
-   A single ascii character.
+   A single UTF-8 character.
 
    Character literal are surrounded with ``'`` characters: ``'a'``. Special
    characters can be written with ``\`` escape character as in C: ``\' \" \? \a
@@ -81,7 +81,7 @@ Function
 
    Holds (pointer to) a function.
 
-   :param arguments: the function in and out :ref:`arguments <arguments>`
+   :param arguments: the function input and output :ref:`arguments <arguments>`
 
    For example: ``Func{()}``, ``Func{(copy Int in)}``,
    ``Func{()->(var Int out)}`` , ``Func{(copy Int in)->(var Int out)}``.
@@ -90,12 +90,13 @@ Function
 
 String
 ------
-.. class:: String(max length)
+.. class:: String(max-length)
 
-   Sequence of :class:`Char` items with dynamic length.
+   Sequence of :class:`Char` items with dynamic length. The compiler ensures
+   that the last character is a null-terminator (``'\0'``).
 
-   :param max length: maximum length of the string and the actual allocation
-      size
+   :param max-length: maximum length of the string including the
+      null-terminator, and the actual allocation size
 
    For example: ``String{5}``, ``String{256}``.
 
@@ -105,7 +106,7 @@ String
    literal"``. Escape :ref:`characters <character>` can be used.
 
    String literals may contain line breaks, with additional indentation
-   of exactly 4 spaces. It is treated as ``\n``, or ignored if ``\`` is used
+   of exactly 8 spaces. It is treated as ``\n``, or ignored if ``\`` is used
    before it::
 
       ; the same as "line\nbrake"
@@ -120,15 +121,7 @@ String
 
    It is possible to extract a sub-string from a string by slicing:
    ``string[start-index:substring-length]``. This will not copy the string but
-   return a string reference that points to the original string.
-
-   .. warning::
-      In :ref:`TL5 <syntax-tl5>` string slicing is not fully safe. It should
-      only be used temporarily before any modification to the original string.
-
-   .. attribute:: Int length
-
-      current (dynamic) string length
+   return an ``Array{Char}`` reference that points to the original string.
 
    .. method:: new(user String text)
 
@@ -136,6 +129,14 @@ String
       empty or invalid
 
       :raises: if ``text`` is too long to fit this string
+
+   .. method:: length()->(var Int length)
+
+      returns current (dynamic) string length, not counting the null-terminator
+
+   .. method:: max-length()->(var Int max-length)
+
+      returns string maximum length, including the null-terminator
 
    .. method:: clear()
 
@@ -230,13 +231,9 @@ Array
    ``array[start-index:sub-array-length]``. This will not copy the array but
    return an array reference that points to the original array.
 
-   .. warning::
-      In :ref:`TL5 <syntax-tl5>` array slicing is not fully safe. It should
-      only be used temporarily before any modification to the original array.
+   .. method:: length()->(var Int length)
 
-   .. attribute:: Int length
-
-      (static) length of the array
+      return (static) length of the array
 
 File
 ----

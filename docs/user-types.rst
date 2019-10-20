@@ -73,8 +73,7 @@ can be accessed using ``global`` keyword. ::
          global.global-variable := num
 
 It possible to split the function deceleration from its implementation. In this
-case the function deceleration should be followed by ``_``. This is not
-supported yet in :ref:`TL5 <syntax-tl5>`. ::
+case the function deceleration should be followed by ``_``. ::
 
    struct ExampleStruct
        func method(copy Int num) _
@@ -114,13 +113,13 @@ given on every object creation::
 
 A "destructor" method can also be defined for a structure. This method will be
 called just before any object destruction. A destructor is declared as a normal
-method with a dedicated name ``delete``. This is not supported yet in :ref:`TL5
+method with a dedicated name ``cleanup``. This is not supported yet in :ref:`TL5
 <syntax-tl5>`. ::
 
    struct ExampleStruct
-       func delete() _
+       cleanup() _
 
-   func ExampleStruct.delete()
+   func ExampleStruct.cleanup()
        ; destruction code
 
 A destructor cannot have any kind of arguments.

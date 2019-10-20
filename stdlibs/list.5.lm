@@ -5,16 +5,12 @@ module ds
 ~~~ Generic single link list ~~~
 struct List{Generic}
     strong ListNode?{Generic} first
-    weak ListNode?{Generic} last
 
     ~~~ Add item to list end ~~~
     func var ! append(owner Generic item)
         var List{Generic} list
         self.rotate-to(var list)!
-        new ListNode{Generic} node(owner item)!
-        node.next := list.first
-        list.first := node!
-        self.last := list.first
+        list.prepend(owner item)!
         list.rotate-to(var self)!
 
     func var ! rotate-to(var List{Generic} target)
@@ -27,24 +23,19 @@ struct List{Generic}
 
     ~~~ Add item to list start ~~~
     func var ! prepend(owner Generic item)
-        new ListNode{Generic} node(owner item)!
-        node.next := self.first
+        new ListNode{Generic} node(owner item, strong self.first)!
         self.first := node!
-        if self.last is _
-            self.last := self.first
 
     func user is-empty()->(var Bool empty)
-        empty := self.first is _
+        empty := not self.first?
 
     ~~~ Get and remove first item, fail if list is empty ~~~
     func var ! pop()->(owner Generic? item)
-        if not self.first?
-            raise! "list empty"
-        item := self.first!.item
-        owner ListNode?{Generic} first(owner self.first)
-        self.first := first!.next
-        if self.first is _
-            self.last := _
+        owner ListNode{Generic} first
+        if-error first := self.first
+            raise "list empty"
+        self.first := first.next
+        item := first.item
 
 
 ~~~ Iterate over the list ~~~
@@ -67,5 +58,6 @@ struct ListNode{Generic}
     strong ListNode?{Generic} next
     owner Generic? item
 
-    new(owner Generic item)
+    new(owner Generic item, strong ListNode?{Generic} next)
+        self.next := next
         self.item := item

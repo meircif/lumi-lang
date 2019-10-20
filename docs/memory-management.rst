@@ -30,8 +30,8 @@ Every objects has a single "owner" entity - which is another object or a
 stack block. When an owner is destroyed it automatically destroys the
 referenced object, unless the ownership was moved to another entity. Stack and
 global variables are treated as owners - but they cannot move their ownership
-This is very similar to the memory management in
-`Rust <https://doc.rust-lang.org/stable/book/second-edition/ch04-00-understanding-ownership.html>`_.
+This has some similarities to the memory management in
+`Rust <https://doc.rust-lang.org/stable/book/ch04-00-understanding-ownership.html>`_.
 
 Owners can give the reference to multiple temporary "user" entities. Users are
 free to read and modify the referenced object - but cannot destroy it or modify
@@ -39,7 +39,8 @@ its sub-owners. Users are temporary because they cannot be used after any
 object of their type is destroyed, as the compiler cannot guarantee they are
 pointing to a legal object any more.
 
-This is not implemented yet, but in the future the syntax may look like this::
+This is :ref:`currently implemented <variables>`, but not fully optimized. In
+the future the syntax may be slightly different and look like this::
 
    owner String some-string(String{16}())  ; new owner reference
    user-func(user some-string)  ; give reference to a user
@@ -59,21 +60,22 @@ other entity without limitations. Weak references will automatically test that
 the reference is still valid before accessing it.
 
 There are several ways to implement this - but all need some extra memory to
-manage the weak references, plus the extra check if the weak reference is valid.
-Depends on the implementation of the compiler the extra overhead is small and
+manage the weak references, and some extra processing time to check if the weak
+reference is valid. In all implementations the extra overhead is small and
 predictable.
 
-.. note::
-   Strong reference counting is not supported because it can cause memory leaks
-   because of reference loops.
-
-This is :ref:`currently implemented <variables>` in a basic manner, but in the
-future the syntax may be different and look like this::
+This is :ref:`currently implemented <variables>`, but in the
+future the syntax may be slightly different and look like this::
 
    strong String some-string(String{16}())  ; new strong owner reference
    user-func(user some-string)  ; give reference to a user
    weak-func(weak some-string)  ; give weak reference
    owning-func(strong some-string)  ; move ownership
+
+.. note::
+   Strong reference counting is currently not supported because it can cause
+   memory leaks because of reference loops. It may be allowed in the future in
+   cases where the compiler can be sure no reference loop is possible.
 
 .. _memory-management-3:
 
@@ -106,8 +108,8 @@ As default, (non-weak) references always point to a legal object.
 To allow empty references, the reference type must be declared as "conditional"
 using the ``?`` sign. Empty value can be set using ``_`` sign.
 
-This is :ref:`currently implemented <variables>` in a basic manner, but in the
-future the syntax may be different and look like this::
+This is :ref:`currently implemented <variables>`, but not fully optimized.
+In the future the syntax may be slightly different and look like this::
 
    user String? cond-str  ; initialized as empty
    cond-str := some-string  ; now not empty
@@ -116,5 +118,5 @@ future the syntax may be different and look like this::
        ; can be used safely here...
    else
        ; here we know it's empty...
-   cond-str?.clear()  ; raise error if empty
+   cond-str!.clear()  ; raise error if empty
    func-with-cond(user _)  ; send empty to function

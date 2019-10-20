@@ -21,7 +21,7 @@ All user defined types in Lumi are built based on two basic typing styles:
 1. :ref:`type-system-static`
 2. :ref:`type-system-dynamic`
 
-These can be used to build the more complex typing styles:
+These can be combined to build more complex typing styles:
 
 3. :ref:`type-system-bind`
 4. :ref:`type-system-parameterized`
@@ -66,7 +66,7 @@ without any binding.
 
 Dynamic members are usually methods, but variables and references of any type
 can also be dynamic members - where each implementation initializes them with a
-different constant.
+different value.
 
 "Implementing" a dynamic means implementing each dynamic method and
 initializing each dynamic variable.

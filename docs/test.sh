@@ -15,8 +15,8 @@ DIR="$( cd -P "$( dirname "$MYDIR" )" >/dev/null && pwd )"
 if [ -z $CC ]; then
   CC=gcc
 fi
-CCW="$CC --std=c89 -Werror -Wall"
-CCA="$CCW --pedantic -Wno-unused-label"
+CCA="$CC --std=c89 -Werror -Wall -Wno-unused-variable --pedantic \
+  -Wno-unused-label"
 if [ $CC == "gcc" ]; then
   CCA="$CCA -Wno-unused-but-set-variable"
 else
@@ -28,23 +28,22 @@ mkdir -p $DIR/.test/docs
 pushd $DIR/.test
 
 
-# compile tl4-compiler
-$CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
-  ../TL4/tl4-compiler.c ../TL3/lumi.3.c -I../TL3 -I../TL4 -o docs/tl4-compiler
+# compile tl5-compiler
+$CCA ../TL5/tl5-compiler.c ../TL4/lumi.4.c -I../TL4 -o docs/tl5-compiler
 
 # compile examples
-docs/tl4-compiler docs/hello-world.c ../docs/hello-world.4.lm
-$CCA docs/hello-world.c ../TL4/lumi.4.c -I../TL4 -o docs/hello-world
-docs/tl4-compiler docs/hello-world-test.c ../docs/hello-world.4.lm \
-  ../docs/hello-world-test.4.lm -t hello-world
-$CCA docs/hello-world-test.c ../TL4/lumi.4.c -I../TL4 -o docs/hello-world-test
-docs/tl4-compiler docs/examples.c ../docs/examples.4.lm
-$CCA docs/examples.c ../TL4/lumi.4.c -I../TL4 -o docs/run-examples
+docs/tl5-compiler docs/hello-world.c ../docs/hello-world.5.lm
+$CCA docs/hello-world.c -o docs/hello-world
+docs/tl5-compiler docs/hello-world-test.c ../docs/hello-world.5.lm \
+  ../docs/hello-world-test.5.lm -t hello-world
+$CCA docs/hello-world-test.c -o docs/hello-world-test
+# docs/tl5-compiler docs/examples.c ../docs/examples.5.lm
+# $CCA docs/examples.c -o docs/run-examples
 
 # run examples
 docs/hello-world
 docs/hello-world-test
-docs/run-examples
+# docs/run-examples
 
 # run sphinx with spell checker
 sphinx-build -W -b spelling ../docs docs/spelling

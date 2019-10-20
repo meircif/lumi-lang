@@ -6,14 +6,14 @@ Using Lumi Compiler Directly
 :ref:`using-lumi-command` is recommended to compile Lumi code. Using the Lumi
 compiler directly is possible, but it is less convenient.
 
-Latest Version - TL4 Compiler
+Latest Version - TL5 Compiler
 -----------------------------
-The :ref:`TL5 <syntax-tl5>` complier generates a single C file based on one or
+The :ref:`TL5 <syntax-tl5>` compiler generates a single C file based on one or
 more Lumi files. For example ::
 
-   tl4-compiler hello.c hello.4.lm other.4.lm
+   tl5-compiler hello.c hello.5.lm other.5.lm
 
-will generate ``hello.c`` C file from ``hello.4.lm`` and ``other.4.lm`` Lumi
+will generate ``hello.c`` C file from ``hello.5.lm`` and ``other.5.lm`` Lumi
 files.
 
 Compile Testing Code
@@ -21,26 +21,31 @@ Compile Testing Code
 To generate C code that tests a specific Lumi module ``-t <tested module name>``
 should be used. For example::
 
-   tl4-compiler -t hello hello-tests.c hello.4.lm hello-tests.4.lm
+   tl5-compiler -t hello hello-tests.c hello.5.lm hello-tests.5.lm
 
-will generate ``hello-tests.c`` C file from ``hello.4.lm`` and
-``hello-tests.4.lm`` Lumi files, with C code that tests the ``hello`` module.
+will generate ``hello-tests.c`` C file from ``hello.5.lm`` and
+``hello-tests.5.lm`` Lumi files, with C code that tests the ``hello`` module.
 
 Building an Executable
 ----------------------
-The generated C file can be compiled to an executable using a C compiler
-including ``TL4/lumi.4.c`` file and ``-ITL4`` include directory from the local
-`Lumi repository`_. For example::
+The generated C file can be compiled on its own to an executable using a C
+compiler. For example::
 
-   $CC hello.c TL4/lumi.4.c -ITL4 -o hello
+   $CC hello.c -o hello
 
 will generate ``hello`` executable.
-
-.. _Lumi repository: https://github.com/meircif/lumi-lang
 
 Old Versions
 ------------
 ::
+
+   ## TL4
+   # compiling hello.4.lm to hello.c
+   tl4-compiler hello.c hello.4.lm other.4.lm
+   # compiling tests
+   tl4-compiler -t hello hello-tests.c hello.4.lm hello-tests.4.lm
+   # compiling the C code as an executable
+   $CC hello.c TL4/lumi.4.c -ITL4 -o hello
 
    ## TL3
    # compiling hello.3.lm to hello.c

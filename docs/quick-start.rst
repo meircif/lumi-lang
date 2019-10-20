@@ -12,15 +12,15 @@ https://github.com/meircif/lumi-lang.git``).
 
 Enter the repository root directory: ``cd lumi-lang``.
 
-Install it: ``sudo make install``.
+Install it: ``make install``.
 
 Hello World Program
 -------------------
 
-.. literalinclude:: hello-world.4.lm
+.. literalinclude:: hello-world.5.lm
    :caption:
 
-Compile it: ``lumi docs/hello-world.4.lm``.
+Compile it: ``lumi docs/hello-world.5.lm``.
 
 Run it:
 
@@ -32,11 +32,11 @@ Run it:
 Hello World Test
 ----------------
 
-.. literalinclude:: hello-world-test.4.lm
+.. literalinclude:: hello-world-test.5.lm
    :caption:
 
-Compile it: ``lumi -t hello-world docs/hello-world-test.4.lm
-docs/hello-world.4.lm``.
+Compile it: ``lumi -t hello-world docs/hello-world-test.5.lm
+docs/hello-world.5.lm``.
 
 Run it:
 
@@ -45,6 +45,7 @@ Run it:
    >>> docs/hello-world-test
    Running tests:
    testing show-hello-world-test... OK
+   testing show-raise-test... OK
    testing code coverage... 100%
    Tests passed
 

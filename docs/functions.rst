@@ -58,8 +58,8 @@ In :ref:`TL5 <syntax-tl5>`:
 
 * for primitive types ``copy`` must be used for parameters, and ``var`` for
   outputs.
-* for complex types ``owner`` or ``user`` must be used depends on the needed
-  :ref:`memory access <variables>`
+* for complex types one of ``owner``,``user``, ``strong``, ``weak`` must be
+  used depends on the needed :ref:`memory access <references>`
 
 ``copy`` parameter:
 
@@ -73,18 +73,18 @@ In :ref:`TL5 <syntax-tl5>`:
 * changes to the parameter will **also** change the caller variable
 * only a writable value can be given
 
-``user`` or ``owner`` parameter:
+``user``,``owner``, ``strong`` or ``weak`` parameter:
 
 * the argument is a reference to an object
 * changes to the reference itself will **not** change the called reference
 * changes to the object will change the called object
 * any expression can be given
-* ``user`` means the parameter is a weak reference
-* ``owner`` means the caller has passed the ownership of the referenced object
-  to the function, and the object will be deleted in the function end if the
-  ownership is not passed in the function body
+* ``user`` or ``weak`` means the parameter is a simple reference
+* ``owner`` or ``strong`` means the caller has passed the ownership of the
+  referenced object to the function, and the object will be deleted in the
+  function end if the ownership is not passed in the function body
 
-``user`` or ``owner`` output:
+``user``, ``owner``, ``strong`` or ``weak`` output:
 
 * the parameter is a reflection of an actual reference
 * changes to the reference itself will **also** change the called reference
@@ -118,17 +118,45 @@ Error Handling
 --------------
 Raising an error can be done using the ``raise`` statement::
 
-   func example()
-       raise
+   func ! example()
+       raise!
 
 In :ref:`TL5 <syntax-tl5>` an optional string expression can be raised::
 
-   func example()
-       raise "error message"
+   func ! example()
+       raise! "error message"
+
+Error Propagation
++++++++++++++++++
 
 Unless caught, raised error will propagate to the caller function, up until the
 main function - where uncaught errors will stop the execution of the program,
 print the raised error message if given, and print a call traceback.
+
+In the function code whenever an error may be raised and propagated to the
+caller - the ``!`` warning sign must be added. A functions that may raise an
+error should also add the ``!`` warning sign to its deceleration.
+
+Error Catching
+++++++++++++++
+
+A local error can be handled using ``if-ok`` or ``if-error``::
+
+   if-ok x := array[3]
+       ; no error raised
+   else
+       ; index out of bound handling
+   
+   if-error x := array[4]
+       ; index out of bound handling
+   else-if-ok x := array[6]
+       ; no error raised
+   else-if-error x := array[5]
+       ; index out of bound handling
+   else
+       ; no error raised
+
+.. note:: ``if-ok`` must be followed by ``else`` to ensure error is not ignored
 
 A ``try`` statement will catch an error raised inside it and break the
 execution of the rest of the block. The error will be ignored unless ``try`` is
@@ -138,7 +166,4 @@ only run if the above ``try`` statement caught an error. ::
    try
        ; do something that may raise errors
    catch
-       ;  do some error handling
-
-In the final syntax this may be different - the exact syntax is still under
-planning.
+       ; do some error handling

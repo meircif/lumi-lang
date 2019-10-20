@@ -47,12 +47,12 @@ Operators
 * arithmetic: ``+``, ``-``, ``*``, ``div``, ``mod``
 * assignment and arithmetic: ``+=``, ``-=``, ``*=``
 * bitwise: ``bnot``, ``bor``, ``band``, ``xor``, ``>>``, ``<<``
-* relational (arithmetic): ``=``, ``!=``, ``<``, ``>``, ``<=``, ``>=``
+* relational (arithmetic): ``=``, ``<>``, ``<``, ``>``, ``<=``, ``>=``
 * relational (referential): ``is``, ``is-not``, ``?``
 * logical: ``not``, ``or``, ``and``
-* miscellaneous: ``.``, ``[]``, ``[:]``, ``()``
+* miscellaneous: ``.``, ``[]``, ``[:]``, ``()``, ``:=:``
 
-Not supported yet in :ref:`TL5 <syntax-tl5>`: ``*=``, and all bitwise operators
+All bitwise operators are not supported yet in :ref:`TL5 <syntax-tl5>`.
 
 Any binary operator may be followed by a line brake with additional indentation
 of exactly 8 spaces::
@@ -74,7 +74,7 @@ Operator Precedence
    :ref:`[2] <operator-precedence-2>`
 4. ``not``
 5. ``or``, ``and``, left-to-right :ref:`[1] <operator-precedence-1>`
-6. ``:= += -= *=``, only one allowed
+6. ``:= += -= *= :=:``, only one allowed
 
 .. _operator-precedence-1:
 
