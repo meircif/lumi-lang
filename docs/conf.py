@@ -24,9 +24,9 @@ copyright = '2019, Lumi language contributors'
 author = 'Lumi language contributors'
 
 # The short X.Y version
-version = '0.4'
+version = '0.5'
 # The full version, including alpha/beta/rc tags
-release = 'lumi-0.4'
+release = 'lumi-0.5'
 
 highlight_language = 'lumi'
 
@@ -94,11 +94,12 @@ class LumiLexer(RegexLexer):
             (r'->', token.Operator),
             (r'^ *(module|func|const|struct|class|interface|main|enum|'
              r'native(?: func| type)?|test|mock|alias|for|new|return|raise|'
-             r'assert|assert-error|try|catch|if|else|else-if|do|while|break|'
+             r'assert|assert-error|try|catch|if|else|else-if|loop|while|break|'
              r'continue|switch|case|default|fallthrough|copy|user|owner|var|'
-             r'managed|weak|shared|static|dynamic|global|implement)[ \n]',
+             r's-var|strong|weak|shared|static|dynamic|global|implement|'
+             'if-ok|if-error|else-if-ok|else-if-error)[ \n]',
              token.Keyword),
-            (r'\b(copy|user|owner|var|managed|weak|shared|func|static|'
+            (r'\b(copy|user|owner|var|s-var|strong|weak|shared|func|static|'
              r'dynamic|for|in) ', token.Keyword),
             (r'(?:true|false|self|base|sys)-[a-z0-9\-]*', token.Name.Variable),
             (r'_|true|false|self|base|sys', token.Name.Builtin.Pseudo),

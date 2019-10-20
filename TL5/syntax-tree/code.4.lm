@@ -65,7 +65,8 @@ class SyntaxTreeRaise(SyntaxTreeCode)
         if self.set-has-error()
             self.check-function-has-error()
         if self.error-message.parsed()
-            self.analyze-expression(user self.error-message, user glob.type-string)
+            self.analyze-expression(
+                    user self.error-message, user glob.type-string)
             self.error-message.check-errors(copy false, copy true)
 
     func dynamic check-memory(user ReferenceMemoryList refs)
@@ -168,7 +169,10 @@ class SyntaxTreeCoverage(SyntaxTreeCode)
         self.input-file-index := glob.input-file-index
     
     func dynamic analyze()
-        user LineCount line-count(user glob.root.line-counts[self.input-file-index])
+        if self.get-function() is glob.root.main-function
+            return
+        user LineCount line-count(
+                user glob.root.line-counts[self.input-file-index])
         line-count.needs-cover := true
         line-count.line-needs-cover[self.line-number] := true
     
@@ -176,7 +180,8 @@ class SyntaxTreeCoverage(SyntaxTreeCode)
         ; ++LUMI_file_coverage[`covered-index`].line_count[`line-number`];
         self.write-spaces()
         write(user "++LUMI_file_coverage[")
-        write-int(copy glob.root.line-counts[self.input-file-index].covered-index)
+        write-int(
+                copy glob.root.line-counts[self.input-file-index].covered-index)
         write(user "].line_count[")
         write-int(copy self.line-number)
         write(user "];\n")

@@ -1,7 +1,7 @@
 Serialization
 =============
 
-This is not supported yet in :ref:`TL4 <syntax-tl4>`.
+This is not supported yet in :ref:`TL5 <syntax-tl5>`.
 
 Lumi is planned to support 3 layout types for converting structures to buffers, and
 vice versa:

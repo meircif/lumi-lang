@@ -3,7 +3,7 @@
 Thread Safety
 =============
 
-Running threads should be safe to reach :ref:`Lumi goal <goals>` +1, therefore
+Running threads should be safe to reach :ref:`Lumi goal <goals>` #1, therefore
 the compiler will enforce it.
 
 *This page explains a first suggestion to implement this.*

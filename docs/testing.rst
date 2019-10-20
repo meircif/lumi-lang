@@ -35,20 +35,20 @@ The basic assertion is the ``assert`` statement that checks whether a given
 boolean expression is true. If not, this statement will raise an assertion error
 and the test will fail. ::
 
-   assert number = 4
+   assert! number = 4
 
 Another assertion is the ``assert-error`` statement that checks whether a given
 expression raises an error. If the execution of the statement didn't raise an
 error this statement will raise an assertion error and the test will fail. ::
 
-   assert-error raising-function()
+   assert-error! raising-function()
 
-In :ref:`TL4 <syntax-tl4>` ``assert-error`` supports an optional additional
+In :ref:`TL5 <syntax-tl5>` ``assert-error`` supports an optional additional
 string literal that is the expected error message. If the raised error message
 is not exactly the same as this literal, ``assert-error`` will raise an
 assertion error and the test will fail. ::
 
-   assert-error raising-function(), "expected error message"
+   assert-error! raising-function(), "expected error message"
 
 .. _mocking:
 
@@ -56,7 +56,7 @@ Mocking
 -------
 Mocking can replace an external interface with simulated behavior.
 
-In :ref:`TL4 <syntax-tl4>`, only functions and methods can be mocked.
+In :ref:`TL5 <syntax-tl5>`, only functions and methods can be mocked.
 
 Mocking a function or method is done using the ``mock`` keyword. The function
 name and its arguments access an type must much the mocked function exactly.

@@ -1125,6 +1125,7 @@ module second
 test dummy()
 ; @ tg t8
 func fun()
+    fun()
 main
     fun()
 ; @-
@@ -2230,6 +2231,7 @@ test fun2()
 func fun()
     var Int x
 main
+    fun()
 ; @-
 module second
 test fun0()

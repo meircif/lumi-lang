@@ -3,35 +3,17 @@
 Variables and Constants
 =======================
 
-In :ref:`TL4 <syntax-tl4>` the :ref:`Lumi memory management <memory-management>`
-is only partially implemented, and follows only the
-:ref:`second management form <memory-management-2>` from the 3 planned:
-
-1. every reference is :ref:`conditional <memory-management-empty>`
-2. for each object there is only one ``owner`` reference:
-
-   * it allows creation of unlimited weak references from it
-   * when ownership is passed the old reference is automatically set as empty
-   * when an owner reference is removed the referenced data is automatically
-     deleted, and all weak references to this data are considered "outdated"
-
-3. every reference declared as ``user`` is a weak reference, and every access
-   to the reference is automatically prepended with a runtime check that raises
-   if the used reference is empty or outdated
-4. the mechanism that prevents owner cycles is not implemented yet, making
-   :ref:`TL4 <syntax-tl4>` memory management not fully safe yet, but this is
-   the only known problem - and it will be fixed soon
-
-The planned final Lumi syntax will implement the whole
-:ref:`Lumi memory management <memory-management>`.
+In :ref:`TL5 <syntax-tl5>` the :ref:`Lumi memory management <memory-management>`
+is mostly implemented, excluding the
+:ref:`third management form <memory-management-3>` from the 3 planned.
 
 Constants
 ---------
-In :ref:`TL4 <syntax-tl4>` only global integer constants are supported. The
+In :ref:`TL5 <syntax-tl5>` only global integer constants are supported. The
 final Lumi syntax is planned to support constants from all types, and allow
 definition of constants under a specific type.
 
-Integer constants are declared in :ref:`TL4 <syntax-tl4>` by::
+Integer constants are declared in :ref:`TL5 <syntax-tl5>` by::
 
    const Int CONSTANT-NAME 12
 
@@ -48,12 +30,12 @@ Enumerators
 Enumerators are a set of constant symbols that are treated as integer constants.
 The first symbol is allocated a value of ``0``, the second is ``1`` and so on...
 
-In :ref:`TL4 <syntax-tl4>` enumerators can only be declared in the global scope.
+In :ref:`TL5 <syntax-tl5>` enumerators can only be declared in the global scope.
 The final Lumi syntax is planned to support enumerators under a specific type,
 will allow definition of specific values for the enumerator symbols, and will
 generate automatic conversion functions between symbol names and values.
 
-Enumerators are declared in :ref:`TL4 <syntax-tl4>` by::
+Enumerators are declared in :ref:`TL5 <syntax-tl5>` by::
 
    enum EnumeratorName
        FIRST-SYMBOL-NAME
@@ -86,14 +68,36 @@ with each type's default initialization value:
 
 References
 ----------
-References to complex types are declared using ``owner`` or ``user`` keywords,
-depends on the needed :ref:`memory access <variables>`::
+References to complex types are declared using the wanted
+memory access keywords:
+
+* ``owner``: simple owner reference
+* ``user``: simple user reference
+* ``strong``: reference counted strong reference
+* ``weak``:  reference counted weak reference
+
+::
 
    owner String string-owner-reference
    user Array{Int} user-reference-with-initialization(user some-int-array)
+   strong String string-strong-reference
+   weak Array{Int} weak-reference-with-initialization(weak some-int-array)
 
-If no explicit initialization value given - references are initialized as empty
-(``_``).
+References must be assigned with a value before used.
+  
+Conditionals
+++++++++++++
+
+Conditional references are declared by appending ``?`` character in type end::
+
+   owner String? conditional-owner-reference
+   user Array?{Int} conditional-array-with-initialization(user some-int-array)
+
+If no explicit initialization value given - conditional references are
+initialized as empty (``_``).
+
+Comparisons
++++++++++++
 
 Comparing references by-reference is done using the ``is`` and ``is-not``
 operators.
@@ -125,10 +129,10 @@ access references to the global data.
 
 Static Allocation
 -----------------
-Static allocation of complex types is done using the ``var`` keyword::
+Static allocation of complex types is done using ``var`` or ``s-var`` keywords::
 
    var String{256} string-static-allocation
-   var Array{34:Int} static-int-array
+   s-var Array{34:Int} static-strong-int-array!
 
 Doing this in the global scope will allocate the data in the process global
 data section. Doing this in a function scope will allocate the data in the
@@ -143,8 +147,8 @@ Dynamic Allocation
 ------------------
 Dynamic allocation is done by using the type as a function::
 
-   string-owner-reference := String{256}()
-   array-owner-reference := Array{34:Int}()
+   string-owner-reference := String{256}()!
+   array-strong-reference := Array{34:Int}()!
 
 It's probably a good idea to store the returned object in an ``owner``
 reference, otherwise it will be immediately deleted.

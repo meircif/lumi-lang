@@ -15,7 +15,7 @@ The condition expression must be boolean typed. ::
 
 Switch-Case Condition
 ---------------------
-This is not supported in :ref:`TL4 <syntax-tl4>`.
+This is not supported in :ref:`TL5 <syntax-tl5>`.
 
 Switch-case condition is declared using the ``switch`` keyword, contains
 multiple ``case`` blocks, and optionally one last ``default`` block. A
@@ -33,23 +33,23 @@ default is not to fall-through. ::
    default
        ; do something
 
-Do-While Loop
----------------
-Do-while loop is declared using the ``do`` keyword and contains one or more
+Simple Loop
+-----------
+Simple loop is declared using the ``loop`` keyword and contains one or more
 ``while`` statements inside it. The loop continues while every ``while``
 statement inside it is true, and stops immediately when the first ``while``
 statement inside it is false. ::
 
-   do
+   loop
        ; do something
        while number < 6
        ; do something
        while not boolean-variable
        ; do something
 
-Loops can be broke immediately using a ``break`` statement::
+Loops can be broken immediately using a ``break`` statement::
 
-   do
+   loop
        ; do something
        if number = 0
            break
@@ -60,7 +60,7 @@ That makes ``while condition`` the same as ``if not condition break``.
 A ``continue`` statement can be used to only stop the current iteration and
 start over from loop beginning::
 
-   do
+   loop
        ; do something
        if num = 3
            continue
@@ -76,8 +76,8 @@ Iterating numbers incrementally, numbers can be any integer expression::
    for number in 3:7
        ; "number" will iterate 3,4,5,6
 
-Number iteration with explicit step amount, this is not supported in :ref:`TL4
-<syntax-tl4>`::
+Number iteration with explicit step amount, this is not supported in :ref:`TL5
+<syntax-tl5>`::
 
    for number in 9:1:-2
        ; "number" will iterate 9,7,5,3
@@ -94,24 +94,15 @@ Array iteration::
 
 User Defined Iterators
 ++++++++++++++++++++++
-A type can be made into an iterator in :ref:`TL4 <syntax-tl4>` by implementing
-theses methods:
+A type can be made into an iterator in :ref:`TL5 <syntax-tl5>` by implementing
+a ``step`` named method that has the following deceleration:
 
-.. function:: has()->(var Bool has-another-item)
+.. function:: step()->(user SomeType? value, var Bool has-another-item)
 
-   Is called before any iteration. Iteration continues only if this method
-   returns :data:`true`.
-
-.. function:: get()->(user SomeType value)
-
-   Is called before any iteration after :func:`has` returns
-   :data:`true`. Returned value is set as the iteration value. "SomeType"
-   declared in this method is used as the iterator value type.
-
-.. function:: next()
-
-   Is called after the end of any iteration. Should be used to advance the
-   iteration.
+   Is called once before any iteration. Iteration continues only
+   if ``has-another-item`` returns :data:`true`. In such case ``value`` returns
+   the next iteration value, and the iteration should advance one step.
+   ``SomeType`` declared in this method is used as the iterator value type.
 
 This interface may change in the final syntax - the exact syntax is still under
 planning.

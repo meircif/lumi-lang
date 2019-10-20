@@ -2670,14 +2670,16 @@ TEST_MAIN_FUNC
 /// @ t8
 void ut_M_fun(void);
 Returncode test_M_test_fun(void);
-int LUMI_file0_line_count[5] = {
-    -1,-1,-1, 0,-1
+int LUMI_file0_line_count[6] = {
+    -1,-1, 0,-1,-1,-1
 };
 File_Coverage LUMI_file_coverage[1] = {
-    {"mock.5.lm", 5, LUMI_file0_line_count}
+    {"mock.5.lm", 6, LUMI_file0_line_count}
 };
 void ut_M_fun(void) {
     unsigned LUMI_loop_depth = 1;
+    ++LUMI_file_coverage[0].line_count[2];
+    ut_M_fun();
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -5374,11 +5376,11 @@ TEST_MAIN_FUNC
 void ut_M_fun(void);
 Returncode second_M_fun0(void);
 Returncode second_M_fun1(void);
-int LUMI_file0_line_count[5] = {
-    -1,-1, 0,-1,-1
+int LUMI_file0_line_count[6] = {
+    -1,-1, 0,-1,-1,-1
 };
 File_Coverage LUMI_file_coverage[1] = {
-    {"mock.5.lm", 5, LUMI_file0_line_count}
+    {"mock.5.lm", 6, LUMI_file0_line_count}
 };
 void ut_M_fun(void) {
     unsigned LUMI_loop_depth = 1;

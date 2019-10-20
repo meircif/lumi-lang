@@ -1,0 +1,7 @@
+module hello-world
+
+func ! show()
+    sys.println(user "hello world")!
+
+main
+    show()!

@@ -16,7 +16,7 @@ clean:
 		rm -f $(EXECUTABLES)
 
 cp-bin: all
-		install $(EXECUTABLES) /usr/local/bin/
+		sudo install $(EXECUTABLES) /usr/local/bin/
 
 all: $(EXECUTABLES)
 

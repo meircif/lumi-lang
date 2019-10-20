@@ -3,7 +3,7 @@ Basic Syntax
 
 Comments
 --------
-In :ref:`TL4 <syntax-tl4>` Single line comments start with ``;``, multi-line
+In :ref:`TL5 <syntax-tl5>` Single line comments start with ``;``, multi-line
 comments start with ``[;``, and end with ``;]``.
 Comments that are not in line start are not supported yet - but will be
 supported in the final syntax. ::
@@ -24,7 +24,7 @@ Documentation
 Documentation have their own dedicated syntax: they start and end with ``~~~``.
 Documentation must be placed at line start and may be single or multi-line.
 
-In :ref:`TL4 <syntax-tl4>` documentation are treated as comments. In the final
+In :ref:`TL5 <syntax-tl5>` documentation are treated as comments. In the final
 syntax they must come before the element they are documenting, they could be
 used dynamically in the code, and would be used to automatically generate
 external documentation. ::
@@ -47,12 +47,12 @@ Operators
 * arithmetic: ``+``, ``-``, ``*``, ``div``, ``mod``
 * assignment and arithmetic: ``+=``, ``-=``, ``*=``
 * bitwise: ``bnot``, ``bor``, ``band``, ``xor``, ``>>``, ``<<``
-* relational (arithmetic): ``=``, ``!=``, ``<``, ``>``, ``<=``, ``>=``
+* relational (arithmetic): ``=``, ``<>``, ``<``, ``>``, ``<=``, ``>=``
 * relational (referential): ``is``, ``is-not``, ``?``
 * logical: ``not``, ``or``, ``and``
-* miscellaneous: ``.``, ``[]``, ``[:]``, ``()``
+* miscellaneous: ``.``, ``[]``, ``[:]``, ``()``, ``:=:``
 
-Not supported yet in :ref:`TL4 <syntax-tl4>`: ``*=``, and all bitwise operators
+All bitwise operators are not supported yet in :ref:`TL5 <syntax-tl5>`.
 
 Any binary operator may be followed by a line brake with additional indentation
 of exactly 8 spaces::
@@ -74,7 +74,7 @@ Operator Precedence
    :ref:`[2] <operator-precedence-2>`
 4. ``not``
 5. ``or``, ``and``, left-to-right :ref:`[1] <operator-precedence-1>`
-6. ``:= += -= *=``, only one allowed
+6. ``:= += -= *= :=:``, only one allowed
 
 .. _operator-precedence-1:
 
@@ -90,7 +90,7 @@ b < c and c < d``
 
 Modules
 -------
-In :ref:`TL4 <syntax-tl4>` each Lumi file is declared under a single module,
+In :ref:`TL5 <syntax-tl5>` each Lumi file is declared under a single module,
 multiple files may be declared under the same module.
 
 The first line of each file must declare its module using the ``module``

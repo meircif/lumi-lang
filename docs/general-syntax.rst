@@ -32,12 +32,12 @@ These temporary Lumi languages are marked as "TL[number]" where "number is the
 iteration step number. "TL0" is the initial compiler temporary Lumi language,
 the next iteration is TL1 and so on...
 
-.. _syntax-tl4:
+.. _syntax-tl5:
 
-Latest Version - TL4
+Latest Version - TL5
 --------------------
 The Lumi language is still a work in progress and the final syntax is not
-decided yet. The latest working compiler is for Temporary Lumi 4 (TL4) syntax,
+decided yet. The latest working compiler is for Temporary Lumi 5 (TL5) syntax,
 and this guide will describe it, and the differences between it and the planned
 final Lumi syntax.
 

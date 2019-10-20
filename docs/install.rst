@@ -16,15 +16,16 @@ Installing Lumi
 
 1. clone or download `Lumi repository`_: ``git clone
    https://github.com/meircif/lumi-lang.git``
-2. run ``[sudo] make install``
+2. run ``make install``
 
 or install manually:
 
 3. :ref:`build the latest Lumi compiler <build-compiler>` with a C compiler:
-   ``$CC TL4/tl4-compiler.c TL3/lumi.3.c -ITL3 -ITL4 -I. -o tl4-compiler``
+   ``$CC TL5/tl5-compiler.c TL4/lumi.4.c -ITL4 -o tl5-compiler``
 4. :ref:`build the "lumi" command <build-lumi-command>` with a C compiler:
    ``$CC lumi-command/lumi.c TL4/lumi.4.c -ITL4 -o lumi``
 5. add the Lumi compiler and the ``lumi`` command to the system path
+   (for example: ``sudo install lumi tl5-compiler /usr/local/bin/``)
 
 .. _build-compiler:
 
@@ -36,17 +37,22 @@ can then be used to generate C code from Lumi code.
 It is recommended to add the compiler executable to the system path, for
 example, in Linux move it to ``/usr/local/bin/``.
 
-Latest Version - TL4 Compiler
+Latest Version - TL5 Compiler
 +++++++++++++++++++++++++++++
 ::
 
-   make tl4-compiler
+   make tl5-compiler
    # or
-   $CC TL4/tl4-compiler.c TL3/lumi.3.c -ITL3 -ITL4 -I. -o tl4-compiler
+   $CC TL5/tl5-compiler.c TL4/lumi.4.c -ITL4 -o tl5-compiler
 
 Old Versions
 ++++++++++++
 ::
+
+   ## TL4 compiler
+   make tl4-compiler
+   # or
+   $CC TL4/tl4-compiler.c TL3/lumi.3.c -ITL3 -ITL4 -I. -o tl4-compiler
 
    ## TL3 compiler
    make tl3-compiler

@@ -1,0 +1,19 @@
+module hello-world-test
+
+var Bool println-raise
+var String{128} printed-text
+
+mock ! Sys.println(user Array{Char} text)
+    if println-raise
+        raise! "error in println"
+    printed-text.concat(user text)!
+
+test show-hello-world-test()
+    println-raise := false
+    printed-text.clear()
+    hello-world.show()!
+    assert! printed-text.equal(user "hello world")
+
+test show-raise-test()
+    println-raise := true
+    assert-error! hello-world.show(), "error in println"
