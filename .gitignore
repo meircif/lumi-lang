@@ -1,4 +1,3 @@
-build
 .test
 actual.c
 actual.txt
@@ -8,6 +7,7 @@ wip
 *.WinMerge
 docs/_*
 .tags
+*.swp
 
 # Visual-Studio files
 *.sln
@@ -28,3 +28,6 @@ CMakeLists.txt
 
 # Atom files
 .tags
+
+# Bazel
+bazel-*/
