@@ -35985,7 +35985,7 @@ void tl5_compiler_M_SyntaxTreeCode_Del(tl5_compiler_M_SyntaxTreeCode* self) {
     LUMI_dec_ref(self->parent_Refman);
 }
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeFlowElement.new"
 Returncode tl5_compiler_M_SyntaxTreeFlowElement_new(tl5_compiler_M_SyntaxTreeFlowElement* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFlowElement_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeBlock* parent, Ref_Manager* parent_Refman, tl5_compiler_M_SyntaxTreeBlock_Dynamic* parent_Dynamic) {
     Returncode LUMI_err = OK;
@@ -36031,7 +36031,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeFlowElement.set-parent"
 Returncode tl5_compiler_M_SyntaxTreeFlowElement_set_parent(tl5_compiler_M_SyntaxTreeFlowElement* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFlowElement_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeBlock* parent, Ref_Manager* parent_Refman, tl5_compiler_M_SyntaxTreeBlock_Dynamic* parent_Dynamic) {
     Returncode LUMI_err = OK;
@@ -36057,7 +36057,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeFlowElement.parse-block"
 Returncode tl5_compiler_M_SyntaxTreeFlowElement_parse_block(tl5_compiler_M_SyntaxTreeFlowElement* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFlowElement_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -36072,7 +36072,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeFlowElement.link-types"
 Returncode tl5_compiler_M_SyntaxTreeFlowElement_link_types(tl5_compiler_M_SyntaxTreeFlowElement* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFlowElement_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -36088,7 +36088,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeFlowElement.analyze"
 Returncode tl5_compiler_M_SyntaxTreeFlowElement_analyze(tl5_compiler_M_SyntaxTreeFlowElement* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFlowElement_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -36104,7 +36104,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeFlowElement.check-memory"
 Returncode tl5_compiler_M_SyntaxTreeFlowElement_check_memory(tl5_compiler_M_SyntaxTreeFlowElement* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFlowElement_Dynamic* self_Dynamic, tl5_compiler_M_ReferenceMemoryList* refs, Ref_Manager* refs_Refman) {
     Returncode LUMI_err = OK;
@@ -36131,7 +36131,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeFlowElement.write-block"
 Returncode tl5_compiler_M_SyntaxTreeFlowElement_write_block(tl5_compiler_M_SyntaxTreeFlowElement* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFlowElement_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -36146,7 +36146,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeFlowElement.write-block-body"
 Returncode tl5_compiler_M_SyntaxTreeFlowElement_write_block_body(tl5_compiler_M_SyntaxTreeFlowElement* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFlowElement_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -36162,7 +36162,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeFlowElement.write-after-block"
 Returncode tl5_compiler_M_SyntaxTreeFlowElement_write_after_block(tl5_compiler_M_SyntaxTreeFlowElement* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFlowElement_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -36205,7 +36205,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeFlowElement.write-error-handling-block"
 Returncode tl5_compiler_M_SyntaxTreeFlowElement_write_error_handling_block(tl5_compiler_M_SyntaxTreeFlowElement* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeFlowElement_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -36261,7 +36261,7 @@ void tl5_compiler_M_SyntaxTreeFlowElement_Del(tl5_compiler_M_SyntaxTreeFlowEleme
     LUMI_owner_dec_ref(self->block_Refman);
 }
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeIf.parse-new"
 Returncode tl5_compiler_M_SyntaxTreeIf_parse_new(tl5_compiler_M_SyntaxTreeIf* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeIf_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeBlock* parent, Ref_Manager* parent_Refman, tl5_compiler_M_SyntaxTreeBlock_Dynamic* parent_Dynamic, tl5_compiler_M_SyntaxTreeIf** new_node, Ref_Manager** new_node_Refman, tl5_compiler_M_SyntaxTreeIf_Dynamic** new_node_Dynamic) {
     Returncode LUMI_err = OK;
@@ -36304,7 +36304,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeIf.parse"
 Returncode tl5_compiler_M_SyntaxTreeIf_parse(tl5_compiler_M_SyntaxTreeIf* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeIf_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -36326,7 +36326,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeIf.add-else"
 Returncode tl5_compiler_M_SyntaxTreeIf_add_else(tl5_compiler_M_SyntaxTreeIf* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeIf_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeElse* else_node, Ref_Manager* else_node_Refman, tl5_compiler_M_SyntaxTreeElse_Dynamic* else_node_Dynamic) {
     Returncode LUMI_err = OK;
@@ -36363,7 +36363,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeIf.add-else-if"
 Returncode tl5_compiler_M_SyntaxTreeIf_add_else_if(tl5_compiler_M_SyntaxTreeIf* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeIf_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeIf* new_if, Ref_Manager* new_if_Refman, tl5_compiler_M_SyntaxTreeIf_Dynamic* new_if_Dynamic, tl5_compiler_M_SyntaxTreeCoverage* coverage_node, Ref_Manager* coverage_node_Refman, tl5_compiler_M_SyntaxTreeCoverage_Dynamic* coverage_node_Dynamic) {
     Returncode LUMI_err = OK;
@@ -36441,7 +36441,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeIf.link-types"
 Returncode tl5_compiler_M_SyntaxTreeIf_link_types(tl5_compiler_M_SyntaxTreeIf* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeIf_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -36462,7 +36462,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeIf.analyze"
 Returncode tl5_compiler_M_SyntaxTreeIf_analyze(tl5_compiler_M_SyntaxTreeIf* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeIf_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -36489,7 +36489,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeIf.analyze-condition"
 Returncode tl5_compiler_M_SyntaxTreeIf_analyze_condition(tl5_compiler_M_SyntaxTreeIf* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeIf_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -36505,7 +36505,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeIf.check-memory"
 Returncode tl5_compiler_M_SyntaxTreeIf_check_memory(tl5_compiler_M_SyntaxTreeIf* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeIf_Dynamic* self_Dynamic, tl5_compiler_M_ReferenceMemoryList* refs, Ref_Manager* refs_Refman) {
     Returncode LUMI_err = OK;
@@ -36524,7 +36524,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeIf.write"
 Returncode tl5_compiler_M_SyntaxTreeIf_write(tl5_compiler_M_SyntaxTreeIf* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeIf_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -37164,7 +37164,7 @@ void tl5_compiler_M_SyntaxTreeCatch_Del(tl5_compiler_M_SyntaxTreeCatch* self) {
     tl5_compiler_M_SyntaxTreeFlowElement_Del(&(self->_base));
 }
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeLoop.new"
 Returncode tl5_compiler_M_SyntaxTreeLoop_new(tl5_compiler_M_SyntaxTreeLoop* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeLoop_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeBlock* parent, Ref_Manager* parent_Refman, tl5_compiler_M_SyntaxTreeBlock_Dynamic* parent_Dynamic, Bool check_infinite) {
     Returncode LUMI_err = OK;
@@ -37186,7 +37186,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeLoop.parse-new"
 Returncode tl5_compiler_M_SyntaxTreeLoop_parse_new(tl5_compiler_M_SyntaxTreeLoop* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeLoop_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeBlock* parent, Ref_Manager* parent_Refman, tl5_compiler_M_SyntaxTreeBlock_Dynamic* parent_Dynamic, Bool check_infinite, tl5_compiler_M_SyntaxTreeLoop** new_node, Ref_Manager** new_node_Refman, tl5_compiler_M_SyntaxTreeLoop_Dynamic** new_node_Dynamic) {
     Returncode LUMI_err = OK;
@@ -37229,7 +37229,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeLoop.parse"
 Returncode tl5_compiler_M_SyntaxTreeLoop_parse(tl5_compiler_M_SyntaxTreeLoop* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeLoop_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -37293,7 +37293,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeLoop.set-loop-finite"
 Returncode tl5_compiler_M_SyntaxTreeLoop_set_loop_finite(tl5_compiler_M_SyntaxTreeLoop* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeLoop_Dynamic* self_Dynamic, Bool is_return) {
     Returncode LUMI_err = OK;
@@ -37311,7 +37311,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeLoop.analyze"
 Returncode tl5_compiler_M_SyntaxTreeLoop_analyze(tl5_compiler_M_SyntaxTreeLoop* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeLoop_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -37364,7 +37364,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeLoop.check-memory"
 Returncode tl5_compiler_M_SyntaxTreeLoop_check_memory(tl5_compiler_M_SyntaxTreeLoop* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeLoop_Dynamic* self_Dynamic, tl5_compiler_M_ReferenceMemoryList* refs, Ref_Manager* refs_Refman) {
     Returncode LUMI_err = OK;
@@ -37382,7 +37382,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeLoop.write"
 Returncode tl5_compiler_M_SyntaxTreeLoop_write(tl5_compiler_M_SyntaxTreeLoop* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeLoop_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -37448,7 +37448,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeLoop.write-limit-assign"
 Returncode tl5_compiler_M_SyntaxTreeLoop_write_limit_assign(tl5_compiler_M_SyntaxTreeLoop* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeLoop_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -37486,7 +37486,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeLoop.write-limit-check"
 Returncode tl5_compiler_M_SyntaxTreeLoop_write_limit_check(tl5_compiler_M_SyntaxTreeLoop* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeLoop_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -47805,7 +47805,7 @@ void tl5_compiler_M_SyntaxTreeCoverage_Del(tl5_compiler_M_SyntaxTreeCoverage* se
     tl5_compiler_M_SyntaxTreeCode_Del(&(self->_base));
 }
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeBlockNode.parse-new"
 Returncode tl5_compiler_M_SyntaxTreeBlockNode_parse_new(tl5_compiler_M_SyntaxTreeBlockNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeBlockNode_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeBlock* parent, Ref_Manager* parent_Refman, tl5_compiler_M_SyntaxTreeBlock_Dynamic* parent_Dynamic, tl5_compiler_M_SyntaxTreeBlockNode** new_node, Ref_Manager** new_node_Refman, tl5_compiler_M_SyntaxTreeBlockNode_Dynamic** new_node_Dynamic) {
     Returncode LUMI_err = OK;
@@ -47848,7 +47848,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeBlockNode.write"
 Returncode tl5_compiler_M_SyntaxTreeBlockNode_write(tl5_compiler_M_SyntaxTreeBlockNode* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeBlockNode_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
@@ -47869,7 +47869,7 @@ void tl5_compiler_M_SyntaxTreeBlockNode_Del(tl5_compiler_M_SyntaxTreeBlockNode* 
     tl5_compiler_M_SyntaxTreeFlowElement_Del(&(self->_base));
 }
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeElse.parse-new"
 Returncode tl5_compiler_M_SyntaxTreeElse_parse_new(tl5_compiler_M_SyntaxTreeElse* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeElse_Dynamic* self_Dynamic, tl5_compiler_M_SyntaxTreeBlock* parent, Ref_Manager* parent_Refman, tl5_compiler_M_SyntaxTreeBlock_Dynamic* parent_Dynamic, tl5_compiler_M_SyntaxTreeElse** new_node, Ref_Manager** new_node_Refman, tl5_compiler_M_SyntaxTreeElse_Dynamic** new_node_Dynamic) {
     Returncode LUMI_err = OK;
@@ -47912,7 +47912,7 @@ LUMI_cleanup:
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FILE_NAME "TL5/syntax-tree/code-flow.4.lm"
+#define LUMI_FILE_NAME "TL5/syntax-tree/flow.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeElse.write"
 Returncode tl5_compiler_M_SyntaxTreeElse_write(tl5_compiler_M_SyntaxTreeElse* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeElse_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
