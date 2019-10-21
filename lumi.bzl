@@ -17,7 +17,9 @@ lumi_generated_c = rule(
             default = Label("//TL5:compiler"),
             allow_single_file = True,
             executable = True,
-            cfg = "host",
+            # This should probably be "host", but it's makes the build much
+            # slower, and we're not cross-compiling just yet.
+            cfg = "target",
             doc = "Lumi compiler binary",
         ),
         "srcs": attr.label_list(
