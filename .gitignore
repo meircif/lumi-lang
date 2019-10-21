@@ -1,3 +1,4 @@
+build/
 .test
 actual.c
 actual.txt
