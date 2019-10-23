@@ -1,9 +1,16 @@
 module os-tests
 
-test printing()
-    user ds.List?{os.Path} files
+test check-happy()
+    owner ds.List{os.Path} files
     files := os.list-dir(user "/")!
 
-    var ds.ListIterator{os.Path} iter(user files!)
-    for item in iter!
-        sys.println(user item!.path-r!)!
+    owner String result
+    result := files.pop()!.path-r!
+    assert! result.equal(user "file0")
+    result := files.pop()!.path-r!
+    assert! result.equal(user "file1")
+    result := files.pop()!.path-r!
+    assert! result.equal(user "file2")
+
+test ilegal-dir()
+    assert-error! os.list-dir(user "illegal"), "path is not dir"

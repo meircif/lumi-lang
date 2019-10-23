@@ -54,6 +54,14 @@ stdlibs/time-tests -xml
 mkdir stdlibs/cover-time-tests
 mv cobertura.xml stdlibs/cover-time-tests
 
+# Run os stdlib tests
+stdlibs/tl5-compiler -t os stdlibs/os-tests.c ../stdlibs/os.5.lm \
+  ../stdlibs/tests/os-tests.5.lm
+$CCA stdlibs/os-tests.c -I../stdlibs/tests -o stdlibs/os-tests
+stdlibs/time-tests -xml
+mkdir stdlibs/cover-os-tests
+mv cobertura.xml stdlibs/cover-os-tests
+
 
 # Standard Libraries teardown
 if [ ! -z "$CLEAR_TEST" ]; then

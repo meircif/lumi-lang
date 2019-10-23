@@ -50,15 +50,11 @@ func ! list-dir(user String dir-path)->(
     loop
         var cdef.Pointer{Char} c-string
         ent := readdir(copy dir!)
-        ; sys.println(user ent!)!
-        if not ent?
-            sys.println(user "hello")!
-            raise! "empty"
-            break
+        while ent?
         c-string := get-dname(copy ent!)
-        var Int l
-        l := strlen(copy c-string)
-        new Path path(copy l)!
+        var Int len
+        len := strlen(copy c-string)
+        new Path path(copy len)!
         path.path-r!.copy-from-pointer(copy c-string)!
         files!.append(owner path)!
 
