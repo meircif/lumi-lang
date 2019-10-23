@@ -48,7 +48,7 @@ def lumi_binary(name, srcs, deps, **kwargs):
         name = name,
         srcs = [":" + generated_name],
         deps = [],
-	copts = [
+    copts = [
             "-Wno-unused-label",
             "-Wno-unused-variable",
             "-Wno-unused-but-set-variable",
