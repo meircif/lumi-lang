@@ -18,7 +18,7 @@ clean:
 cp-bin: all
 	sudo install $(EXECUTABLE_PATHS) $(INSTALLDIR)
 
-all: $(EXECUTABLES) tl5-compiler.c
+all: $(EXECUTABLES)
 
 build-dir:
 	mkdir -p $(BUILDDIR)
@@ -106,7 +106,7 @@ tl5-install: tl5-compiler.c tl5-compiler
 
 tl5-tests: build-dir
 	lumi -t tl5-compiler TL5/tl5-compiler.4.lm TL5/*/*.4.lm TL5/tests/ut/*.4.lm \
-		-o $(BUILDDIR)/tl5-compiler-tests -r
+		-o $(BUILDDIR)/tl5-compiler-tests -r -ra TL5/tests/ut/
 
 tl5-single-test: build-dir
 	lumi TL5/tests/integration/test0.5.lm -o $(BUILDDIR)/simple -r
