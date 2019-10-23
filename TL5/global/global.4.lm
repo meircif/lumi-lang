@@ -83,6 +83,7 @@ struct Global
 
     ~~~ built-in types ~~~
     user TypeData type-char
+    user TypeData type-byte
     user TypeData type-bool
     user TypeData type-int
     user TypeData type-empty
@@ -205,6 +206,8 @@ struct Global
     func init-builtin-types()
         self.add-global-type(user "Char", copy true)->(user self.type-char)
         self.type-char.is-int-like := true
+        self.add-global-type(user "Byte", copy true)->(user self.type-byte)
+        self.type-byte.is-int-like := true
         self.add-global-type(user "Bool", copy true)->(user self.type-bool)
         self.add-global-type(user "Int", copy true)->(user self.type-int)
         self.type-int.is-int-like := true
