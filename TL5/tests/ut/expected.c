@@ -71,6 +71,7 @@ ut_M_Tb_Dynamic ut_M_Tb_dynamic = {{(Dynamic_Del)ut_M_Tb_Del, (void (*)(ut_M_Ta*
 ut_M_Tc_Dynamic ut_M_Tc_dynamic = {{{(Dynamic_Del)ut_M_Tc_Del, (void (*)(ut_M_Ta* self, ut_M_Ta_Dynamic* self_Dynamic))ut_M_Tc_dyn}}};
 Generic_Type_Dynamic ut_M_Data_dynamic = {(Dynamic_Del)ut_M_Data_Del};
 Int ut_M_i = 0;
+Byte ut_M_bt = 0;
 Char ut_M_c = 0;
 Bool ut_M_b = 0;
 char* ut_M_str = NULL;
@@ -273,6 +274,19 @@ illegal octal number "038"
 illegal binary number "0b021"
 /// @ te4
 illegal hexadecimal number "0xadg"
+/// @@ test-byte-expression
+/// @ t0
+ut_M_bt = 0;
+/// @ t1
+ut_M_bt = 127;
+/// @ t2
+ut_M_bt = 61;
+/// @ t3
+ut_M_bt = 253;
+/// @ t4
+ut_M_bt = 253;
+/// @ t5
+ut_M_bt = 148;
 /// @@ test-char-expression
 /// @ t0
 ut_M_c = 'a';
