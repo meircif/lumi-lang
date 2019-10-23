@@ -19,6 +19,7 @@ DIR* opendir(const char* path) {
 
 int closedir(DIR* dir) {
   *dir = -1;
+  return 0;
 }
 
 struct dirent* readdir(DIR* dir) {
