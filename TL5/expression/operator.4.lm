@@ -334,7 +334,7 @@ func swap-operator-factory(
     expression := SwapOperatorExpression(user code-node, user operator)
 
 
-func non-binary-operator-factory(
+func unary-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
         owner BinaryExpression expression)
     code-node.syntax-error(user "used non-binary operator", user operator.name)
