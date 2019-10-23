@@ -1,0 +1,66 @@
+module os
+
+native include "dirent.h"
+
+native type Dir "DIR"
+
+native type Dirent "struct dirent"
+
+native func strlen(copy cdef.Pointer{Char} str)->(
+        copy Int len) "strlen"
+
+native func closedir(copy cdef.Pointer{Dir} dir)->(
+        copy Int ret) "closedir"
+
+native func opendir(copy cdef.Pointer{cdef.Char} path)->(
+        copy cdef.Pointer{Dir} dir) "opendir"
+
+native func readdir(copy cdef.Pointer{Dir} dir)->(
+        copy cdef.Pointer{Dirent} ent) "readdir"
+
+native code "
+char* get_dname(struct dirent* dir) {
+  return dir->d_name;
+}"
+
+native func get-dname(copy cdef.Pointer{Dirent} dir)->(
+        copy cdef.Pointer{cdef.Char} path) "get_dname"
+
+struct Path
+    owner String? path-r
+
+    new!(copy Int len)
+        self.path-r := String{len + 1}()!
+
+func ! list-dir(user String dir-path)->(
+        owner ds.List?{Path} files)
+
+    var cdef.Pointer?{Dir} dir
+    var cdef.Pointer?{Dirent} ent
+    var cdef.Pointer{Char} string-pointer
+    user Array{Char} bla
+
+    files := ds.List{Path}()!
+
+    bla := dir-path
+    string-pointer.set-from-array(user bla)
+    dir := opendir(copy string-pointer)
+    if not dir?
+        raise! "path is not dir"
+    loop
+        var cdef.Pointer{Char} c-string
+        ent := readdir(copy dir!)
+        ; sys.println(user ent!)!
+        if not ent?
+            sys.println(user "hello")!
+            raise! "empty"
+            break
+        c-string := get-dname(copy ent!)
+        var Int l
+        l := strlen(copy c-string)
+        new Path path(copy l)!
+        path.path-r!.copy-from-pointer(copy c-string)!
+        files!.append(owner path)!
+
+    var Int a
+    a := closedir(copy dir!)

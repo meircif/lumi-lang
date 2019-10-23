@@ -1,0 +1,9 @@
+module os-tests
+
+test printing()
+    user ds.List?{os.Path} files
+    files := os.list-dir(user "/")!
+
+    var ds.ListIterator{os.Path} iter(user files!)
+    for item in iter!
+        sys.println(user item!.path-r!)!

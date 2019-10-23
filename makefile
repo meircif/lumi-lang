@@ -18,7 +18,7 @@ clean:
 cp-bin: all
 	sudo install $(EXECUTABLE_PATHS) $(INSTALLDIR)
 
-all: $(EXECUTABLES) tl5-compiler.c
+all: $(EXECUTABLES)
 
 build-dir:
 	mkdir -p $(BUILDDIR)
