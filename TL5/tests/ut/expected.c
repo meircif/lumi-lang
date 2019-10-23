@@ -1557,6 +1557,18 @@ ut_M_Test* otarr = NULL;
 if (ut_M_i == 0) RAISE(1, LUMI_block0_cleanup, zero_division)
     if (ut_M_i == 0) RAISE(1, LUMI_block0_cleanup, zero_division)
     *io = (60 / ut_M_i) + (60 % ut_M_i);
+/// @ t17
+ut_M_i = ut_M_i | 8;
+/// @ t18
+ut_M_i = ut_M_i & 10;
+/// @ t19
+ut_M_i = ~ ut_M_i;
+/// @ t20
+ut_M_i = ut_M_i ^ 16;
+/// @ t21
+ut_M_i = ut_M_i >> 2;
+/// @ t22
+ut_M_i = ut_M_i << 1;
 /// @ te0
 unknown operator "@"
 /// @ te1

@@ -88,7 +88,7 @@ class LumiLexer(RegexLexer):
             (r'-?(?:0x[0-9a-fA-F]+|0b[0-1]+|[0-9]+)', token.Number),
             (r' [+*><=][ \n]', token.Operator),
             (r'(?:-|not)[ \n]', token.Operator),
-            (r' (?:div|mod|bnot|bor|band|xpr|>>|<<|is|is-not|or|and|'
+            (r' (?:div|mod|bnot|bor|band|xpr|shr|shl|is|is-not|or|and|'
              r'[!><:+\-*]=)[ \n]', token.Operator),
             (r'[?:.]', token.Operator),
             (r'->', token.Operator),
