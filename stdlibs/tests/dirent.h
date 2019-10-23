@@ -14,7 +14,7 @@ DIR* opendir(const char* path) {
     return NULL;
   }
   if (strcmp(path, "cant/close") == 0) {
-    // Iteration will work but close will fail.
+    /* Iteration will work but close will fail. */
     mock_state = -1;
     return &mock_state;
   }
