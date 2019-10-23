@@ -4,42 +4,42 @@ module tl5-compiler
 ~~~ An expression surrounded by brackets ~~~
 class BlockExpression(Expression)
     owner Expression expression
-    
+
     func inst parse-new(user SyntaxTreeCode code-node)->(
             owner Expression expression)
         new BlockExpression block-expression(user code-node)
         block-expression.parse()
         expression := block-expression
-    
+
     ~~~ parsing `(expression)` ~~~
     func inst parse()
         parse-new-expression(user ")", user self.code-node)->(owner self.expression)
         if glob.last-char != ')'
             self.syntax-error-c(user "expected \")\", got")
         read-c()
-    
+
     func dynamic analyze()
         analyze-expression()->(owner self.expression)
         self.expression.result-type.copy-new()->(owner self.result-type)
         self.access := self.expression.access
         self.error-expected := self.expression.error-expected
         self.error-propagated := self.expression.error-propagated
-    
+
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
         self.expression.order-constants(user ordered-list)
-    
+
     func dynamic get-constant-value()->(var Int value, var Bool has-value)
         self.expression.get-constant-value()->(var value, var has-value)
 
     func dynamic check-memory(user ReferenceMemoryList refs)
         self.expression.check-memory(user refs)
-    
+
     func dynamic write-preactions()
         self.expression.write-preactions()
-    
+
     func dynamic write()
         self.expression.write()
-        
+
     func dynamic write-safe()
         self.write-with-brackets()
 
@@ -49,20 +49,20 @@ class UnaryExpression(Expression)
     user Operator operator
     owner Expression right-expression
     var Bool safe-operand-write
-    
+
     new(user SyntaxTreeCode code-node, user Operator operator)
         base(user code-node)
         self.access := Access.VAR
         self.operator := operator
         self.safe-operand-write := true
-    
+
     func inst parse-new(
             user String ends, user Operator operator, user SyntaxTreeCode code-node)->(
             owner Expression expression, user Operator next-operator)
         new UnaryExpression unary-expression(user code-node, user operator)
         unary-expression.parse(user ends)->(user next-operator)
         expression := unary-expression
-    
+
     func inst parse(user String ends)->(user Operator next-operator)
         if glob.last-char = '\n'
             self.code-node.read-parent-line-break-spaces()
@@ -71,11 +71,11 @@ class UnaryExpression(Expression)
         Expression.parse-new(
                 user _, user ends, user self.code-node, user self.operator)->(
                 owner self.right-expression, user next-operator)
-    
+
     func dynamic analyze()
         self.analyze-operand()->(owner self.right-expression)
         self.right-expression.check-no-error()
-        if self.operator.order = 2
+        if self.operator.order = 3
             ; `not` operator
             self.test-operand-type(user self.right-expression, user glob.type-bool)
             self.set-simple-type(user glob.type-bool)
@@ -84,14 +84,14 @@ class UnaryExpression(Expression)
             self.set-simple-type(user glob.type-int)
         else
             self.syntax-error(user "not unary operator", user self.operator.name)
-    
+
     func inst analyze-operand()->(owner Expression operand)
         analyze-expression()->(owner operand)
         if not operand.result-type?
             self.syntax-error(
                     user "void expression given as operand to operator",
                     user self.operator.name)
-    
+
     func inst test-operand-type(
             user Expression operand,
             user TypeData expected-type)
@@ -103,10 +103,10 @@ class UnaryExpression(Expression)
                     user expected-type.name,
                     user "operand, got",
                     user operand.result-type.type-data.name)
-    
+
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
         self.right-expression.order-constants(user ordered-list)
-    
+
     func dynamic get-constant-value()->(var Int value, var Bool has-value)
         if self.operator.name.equal(user "-")->(var has-value)
             if self.right-expression.get-constant-value()->(var value, var has-value)
@@ -114,23 +114,23 @@ class UnaryExpression(Expression)
 
     func dynamic check-memory(user ReferenceMemoryList refs)
         self.right-expression.check-memory(user refs)
-    
+
     func dynamic write-preactions()
         self.right-expression.write-preactions()
-    
+
     func dynamic write()
         self.write-end-expression(user self.right-expression)
-    
+
     func dynamic write-safe()
         self.write-with-brackets()
-    
+
     func inst write-end-expression(user Expression right-expression)
         write(user self.operator.c-name)
         write(user " ")
         self.write-operand(user right-expression)
         if self.is-statement
             write(user ";\n")
-        
+
     func inst write-operand(user Expression expression)
         if self.safe-operand-write
             expression.write-safe()
@@ -143,7 +143,7 @@ class BinaryExpression(UnaryExpression)
     owner Expression left-expression
     user BinaryExpression binary-left-expression
     var Bool allow-right-error
-    
+
     func inst parse-new(
             user String ends,
             user Operator operator,
@@ -156,7 +156,7 @@ class BinaryExpression(UnaryExpression)
         expression.left-expression := left-expression
         expression.binary-left-expression := binary-left-expression
         expression.parse(user ends)->(user next-operator)
-    
+
     func dynamic analyze()
         self.analyze-operand()->(owner self.right-expression)
         self.analyze-operand()->(owner self.left-expression)
@@ -172,11 +172,11 @@ class BinaryExpression(UnaryExpression)
                         user self.binary-left-expression.operator.name,
                         user "and",
                         user self.operator.name)
-    
+
     func inst test-operands-type(user TypeData expected-type)
         self.test-operand-type(user self.right-expression, user expected-type)
         self.test-operand-type(user self.left-expression, user expected-type)
-    
+
     func inst test-is-reference(copy Bool is-reference, user Expression operand)
         if (not operand.result-type.type-data.is-primitive or
                 operand.result-type.type-data is glob.type-func or
@@ -186,10 +186,10 @@ class BinaryExpression(UnaryExpression)
                     user self.operator.name,
                     user "is not supported for type",
                     user operand.result-type.type-data.name)
-                
+
     func dynamic is-relational()->(var Bool is-relational)
         is-relational := false
-    
+
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
         self.left-expression.order-constants(user ordered-list)
         base(user ordered-list)
@@ -197,16 +197,16 @@ class BinaryExpression(UnaryExpression)
     func dynamic check-memory(user ReferenceMemoryList refs)
         self.left-expression.check-memory(user refs)
         base(user refs)
-    
+
     func dynamic write-preactions()
         base()
         self.left-expression.write-preactions()
-    
+
     func dynamic write()
         self.write-operand(user self.left-expression)
         write(user " ")
         self.write-end()
-    
+
     func dynamic write-end()
         self.write-end-expression(user self.right-expression)
 
@@ -214,18 +214,18 @@ class BinaryExpression(UnaryExpression)
 ~~~ An expression with the "?" operator ~~~
 class QuestionExpression(Expression)
     owner Expression tested
-    
+
     func inst parse-new(user SyntaxTreeCode code-node)->(
             owner Expression expression)
         new QuestionExpression question-expression(user code-node)
         question-expression.parse(owner expression)
         expression := question-expression
-    
+
     ~~~ parsing `tested?` ~~~
     func inst parse(owner Expression tested)
         self.tested := tested
         read-c()
-    
+
     func dynamic analyze()
         analyze-expression()->(owner self.tested)
         self.tested.check-no-error()
@@ -242,10 +242,10 @@ class QuestionExpression(Expression)
     func dynamic check-memory(user ReferenceMemoryList refs)
         self.tested.check-memory(user refs)
         refs.check-user(user self.tested)
-    
+
     func dynamic write-preactions()
         self.tested.write-preactions()
-    
+
     func dynamic write()
         ; `tested` != NULL && `tested`_Refman->value != NULL
         if self.tested.result-type.conditional
@@ -257,6 +257,6 @@ class QuestionExpression(Expression)
             write(user "(")
             self.tested.write-refman()
             write(user ")->value != NULL")
-        
+
     func dynamic write-safe()
         self.write-with-brackets()
