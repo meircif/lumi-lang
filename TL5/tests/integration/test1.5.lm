@@ -608,3 +608,17 @@ test test-constants()
     assert! TestEnum.VALUE2 = 2
     assert! TestEnum.length = 3
     assert! int-arr.length() = 63
+
+
+test test-bitwise()
+    ; unsigned is currently not supported, so making sure to only use the bottom
+    ; 7 bits of the char.
+    var cdef.Uchar c(copy 0xF0)
+    assert! c band 0x31 = 0x30
+    assert! c bor 0x0F = 0xFF
+    assert! c shr 2 = 0x3C
+    assert! 0x0F shl 4 = c
+    assert! c xor 0xA0 = 0x50
+    ; bitwise not in C is not limited to char, so we have to trim
+    assert! bnot c band 0xFF = 0x0F
+

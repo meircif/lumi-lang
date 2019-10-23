@@ -67,8 +67,8 @@ of exactly 8 spaces::
 
 Operator Precedence
 +++++++++++++++++++
-1. ``bnot``
-2. ``. [] () ?``, left-to-right
+1. ``. [] () ?``, left-to-right
+2. ``bnot``
 3. ``- +``, ``* div mod``, ``bor band xor shr shl``, left-to-right 
    :ref:`[1] <operator-precedence-1>`
 4. ``= != > < >= <= is is-not``, left-to-right 
