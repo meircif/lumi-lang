@@ -4,13 +4,16 @@ test check-happy()
     owner ds.List{os.Path} files
     files := os.list-dir(user "/")!
 
-    owner String result
-    result := files.pop()!.path-r!
-    assert! result.equal(user "file0")
-    result := files.pop()!.path-r!
-    assert! result.equal(user "file1")
-    result := files.pop()!.path-r!
-    assert! result.equal(user "file2")
+    owner os.Path result
+    result := files.pop()!
+    assert! result.path-r.equal(user "file0")
+    result := files.pop()!
+    assert! result.path-r.equal(user "file1")
+    result := files.pop()!
+    assert! result.path-r.equal(user "file2")
 
 test ilegal-dir()
     assert-error! os.list-dir(user "illegal"), "path is not dir"
+
+test close-failure()
+    assert-error! os.list-dir(user "cant/close"), "failed to close directory"

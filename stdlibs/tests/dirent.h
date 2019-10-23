@@ -10,14 +10,23 @@ DIR mock_state = -1;
 dirent cur_ent;
 
 DIR* opendir(const char* path) {
-  if (strcmp(path, "illegal")) {
+  if (strcmp(path, "illegal") == 0) {
     return NULL;
+  }
+  if (strcmp(path, "cant/close") == 0) {
+    // Iteration will work but close will fail.
+    mock_state = -1;
+    return &mock_state;
   }
   mock_state = 0;
   return &mock_state;
 }
 
 int closedir(DIR* dir) {
+  if (*dir < 0) {
+    return -1;
+  }
+
   *dir = -1;
   return 0;
 }

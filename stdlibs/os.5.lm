@@ -27,7 +27,7 @@ native func get-dname(copy cdef.Pointer{Dirent} dir)->(
         copy cdef.Pointer{cdef.Char} path) "get_dname"
 
 struct Path
-    owner String? path-r
+    owner String path-r
 
     new!(copy Int len)
         self.path-r := String{len + 1}()!
@@ -55,8 +55,10 @@ func ! list-dir(user String dir-path)->(
         var Int len
         len := strlen(copy c-string)
         new Path path(copy len)!
-        path.path-r!.copy-from-pointer(copy c-string)!
+        path.path-r.copy-from-pointer(copy c-string)!
         files!.append(owner path)!
 
-    var Int a
-    a := closedir(copy dir!)
+    var Int res
+    res := closedir(copy dir!)
+    if res <> 0
+        raise! "failed to close directory"
