@@ -1,0 +1,7 @@
+~~~ Tests for zlib functions ~~~
+module zlib-test
+native strcmp
+
+test version-test()
+    assert! strcmp(zlib.zlibVersion(),"1.0.2") = 0 
+           
