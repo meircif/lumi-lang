@@ -29,13 +29,20 @@ struct Operator
                 owner expression)
 
 
-~~~ + ~~~
 class ArithmeticOperatorExpression(BinaryExpression)
     func dynamic analyze()
         base()
         self.test-operands-type(user glob.type-int)
         self.set-simple-type(user glob.type-int)
-    
+
+
+func generic-binary-operator-factory(
+        user SyntaxTreeCode code-node, user Operator operator)->(
+        owner BinaryExpression expression)
+    expression := ArithmeticOperatorExpression(user code-node, user operator)
+        
+        
+class CompileTimeComputedArithmeticOperatorExpression(ArithmeticOperatorExpression)
     func dynamic get-constant-value()->(var Int value, var Bool has-value)
         var Int left-value
         var Int right-value
@@ -45,7 +52,13 @@ class ArithmeticOperatorExpression(BinaryExpression)
         if has-value
             self.compute-constant-value(copy left-value, copy right-value)->(
                     var value)
-            
+
+    func dynamic compute-constant-value(
+            copy Int left-value, copy Int right-value)->(var Int value)
+
+
+~~~ + ~~~
+class AdditionOperatorExpression(CompileTimeComputedArithmeticOperatorExpression)
     func dynamic compute-constant-value(
             copy Int left-value, copy Int right-value)->(var Int value)
         value := left-value + right-value
@@ -53,10 +66,10 @@ class ArithmeticOperatorExpression(BinaryExpression)
 func addition-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
         owner BinaryExpression expression)
-    expression := ArithmeticOperatorExpression(user code-node, user operator)
+    expression := AdditionOperatorExpression(user code-node, user operator)
 
 ~~~ - ~~~
-class SubtractionOperatorExpression(ArithmeticOperatorExpression)
+class SubtractionOperatorExpression(CompileTimeComputedArithmeticOperatorExpression)
     func dynamic compute-constant-value(
             copy Int left-value, copy Int right-value)->(var Int value)
         value := left-value - right-value
@@ -67,7 +80,7 @@ func subtraction-operator-factory(
     expression := SubtractionOperatorExpression(user code-node, user operator)
 
 ~~~ * ~~~
-class MultiplicationOperatorExpression(ArithmeticOperatorExpression)
+class MultiplicationOperatorExpression(CompileTimeComputedArithmeticOperatorExpression)
     func dynamic compute-constant-value(
             copy Int left-value, copy Int right-value)->(var Int value)
         value := left-value * right-value
@@ -78,7 +91,7 @@ func multiplication-operator-factory(
     expression := MultiplicationOperatorExpression(user code-node, user operator)
 
 ~~~ div ~~~
-class DivisionOperatorExpression(ArithmeticOperatorExpression)
+class DivisionOperatorExpression(CompileTimeComputedArithmeticOperatorExpression)
     func dynamic analyze()
         self.allow-right-error := true
         base()
@@ -91,7 +104,7 @@ class DivisionOperatorExpression(ArithmeticOperatorExpression)
         else
             self.right-expression.check-error-propagated(
                     user "ignoring zero division check")
-    
+
     func dynamic write-preactions()
         base()
         ; if (`right` == 0) RAISE(`line`, `cleanup`, zero_division)
@@ -126,7 +139,7 @@ func modulo-operator-factory(
 class RelationalOperatorExpression(BinaryExpression)
     ~~~ expand-and: (a > b) > c --> (a > b) && (b > c) ~~~
     var Bool expand-and
-    
+
     func dynamic analyze()
         base()
         if self.binary-left-expression?
@@ -135,13 +148,13 @@ class RelationalOperatorExpression(BinaryExpression)
         if not self.expand-and
             self.test-operand(user self.left-expression)
         self.set-simple-type(user glob.type-bool)
-    
+
     func dynamic is-relational()->(var Bool is-relational)
         is-relational := true
-    
+
     func dynamic test-operand(user Expression operand)
         self.test-operand-type(user operand, user glob.type-int)
-    
+
     func dynamic write-end()
         if self.expand-and
             write(user "&& (")
@@ -176,7 +189,7 @@ class IdentityOperatorExpression(BinaryExpression)
         self.test-is-reference(copy true, user self.left-expression)
         self.set-simple-type(user glob.type-bool)
         self.safe-operand-write := false
-    
+
     func dynamic write()
         write(user "(void*)")
         base()
@@ -193,7 +206,7 @@ class LogicalOperatorExpression(BinaryExpression)
         base()
         self.test-operands-type(user glob.type-bool)
         self.set-simple-type(user glob.type-bool)
-        
+
 
 func logical-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
@@ -209,7 +222,7 @@ class ArithmeticAssignOperatorExpression(BinaryExpression)
             self.syntax-error-msg(user "assigning into non assignable expression")
         self.analyze-assignment()
         self.safe-operand-write := false
-        
+
     func dynamic analyze-assignment()
         self.test-operands-type(user glob.type-int)
 
@@ -223,11 +236,11 @@ func arithmetic-assign-operator-factory(
 ~~~ := ~~~
 class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
     var AssignExpression assign
-    
+
     new(user SyntaxTreeCode code-node, user Operator operator)
         base(user code-node, user operator)
         self.allow-right-error := true
-    
+
     func dynamic analyze-assignment()
         self.assign.new(
                 user self.code-node,
@@ -238,7 +251,7 @@ class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
 
     func dynamic check-memory(user ReferenceMemoryList refs)
         self.assign.check-memory(user refs)
-                
+
     func dynamic write-preactions()
         self.assign.write-preactions()
 
@@ -261,7 +274,7 @@ class SwapOperatorExpression(BinaryExpression)
     var AssignExpression assign-right-to-left
     var AssignExpression assign-aux-to-right
     owner Expression aux-variable
-            
+
     func dynamic analyze()
         base()
         if not self.left-expression.assignable or
@@ -298,13 +311,13 @@ class SwapOperatorExpression(BinaryExpression)
         if self.left-expression.result-type.reference-path.equals(
                 user self.right-expression.result-type.reference-path)
             self.syntax-error-msg(user "swapping reference with itself")
-            
+
 
     func dynamic check-memory(user ReferenceMemoryList refs)
         self.assign-right-to-left.check-operands-memory(user refs)
         refs.clear-invalid-reference(
                 user self.right-expression.result-type.reference-path)
-                
+
     func dynamic write()
         self.assign-left-to-aux.write-assign()
         self.code-node.write-spaces()

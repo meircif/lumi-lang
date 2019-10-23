@@ -578,6 +578,18 @@ owner Array?{Test} otarr
 otarr := _
 ; @ c t16
 io := (60 div i!) + (60 mod i!)
+; @ c t17
+i := i bor 8
+; @ c t18
+i := i band 10
+; @ c t19
+i := bnot i
+; @ c t20
+i := i xor 16
+; @ c t21
+i := i shr 2
+; @ c t22
+i := i shl 1
 ; @ ec te0
 345 @ 2
 ; @ ec te1
