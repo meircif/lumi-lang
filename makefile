@@ -79,7 +79,11 @@ time-tests: build-dir
 	lumi -t time stdlibs/time.5.lm stdlibs/tests/time-tests.5.lm -e --std=c89 \
 		-e -Istdlibs/tests -o $(BUILDDIR)/time-tests -r
 
-stdlibs-tests: | math-tests ds-tests time-tests
+os-tests: build-dir
+   lumi -t os stdlibs/os.5.lm stdlibs/tests/os-test.5.lm -r stdlibs/list.5.lm \
+	  -e -Istdlibs/tests
+
+stdlibs-tests: | math-tests ds-tests time-tests os-tests
 
 tl0-compiler.c:
 	lumi -c TL0/tl0-compiler.0.lm
@@ -110,7 +114,7 @@ tl5-install: tl5-compiler.c tl5-compiler
 
 tl5-tests: build-dir
 	lumi -t tl5-compiler TL5/tl5-compiler.4.lm TL5/*/*.4.lm TL5/tests/ut/*.4.lm \
-		-o $(BUILDDIR)/tl5-compiler-tests -r
+		-o $(BUILDDIR)/tl5-compiler-tests -r -ra TL5/tests/ut/
 
 tl5-single-test: build-dir
 	lumi TL5/tests/integration/test0.5.lm -o $(BUILDDIR)/simple -r

@@ -54,8 +54,6 @@ Character
 
 Byte
 ----
-*planned - not supported in* :ref:`TL5 <syntax-tl5>`
-
 .. class:: Byte
 
    A single memory byte value.

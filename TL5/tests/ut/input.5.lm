@@ -33,6 +33,7 @@ func fun8(strong String? s)
 func ! fune()
 
 var Int i
+var Byte bt
 var Char c
 var Bool b
 user String? str
@@ -80,6 +81,19 @@ i := -0b100101
 0b021
 ; @ ec te4
 0xadg
+; @@ test-byte-expression
+; @ c t0
+bt := 0
+; @ c t1
+bt := 127
+; @ c t2
+bt := 075
+; @ c t3
+bt := 0xfd
+; @ c t4
+bt := 0xFD
+; @ c t5
+bt := 0b10010100
 ; @@ test-char-expression
 ; @ c t0
 c := 'a'
@@ -564,6 +578,18 @@ owner Array?{Test} otarr
 otarr := _
 ; @ c t16
 io := (60 div i!) + (60 mod i!)
+; @ c t17
+i := i bor 8
+; @ c t18
+i := i band 10
+; @ c t19
+i := bnot i
+; @ c t20
+i := i xor 16
+; @ c t21
+i := i shr 2
+; @ c t22
+i := i shl 1
 ; @ ec te0
 345 @ 2
 ; @ ec te1
