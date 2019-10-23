@@ -31,4 +31,4 @@ CMakeLists.txt
 .tags
 
 # Bazel
-bazel-*/
+bazel-*
