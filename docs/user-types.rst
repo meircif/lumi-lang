@@ -104,12 +104,17 @@ A constructor cannot have outputs, and if it has parameters - they must be
 given on every object creation::
 
    struct ExampleStruct
-       new(copy Int x, user String s)
-           ; implementation
+      var Int integer-variable
+      owner String string-reference
+
+      new(copy Int x, owner String s)
+          self.integer-variable := x
+          self.string-reference := s
 
    func usage()
-       var ExampleStruct variable(copy 4, user "some string")
-       owner ExampleStruct reference := ExampleStruct(copy 4, user "some string")
+       var ExampleStruct variable(copy 4, owner String{12}(user "some string"))
+       owner ExampleStruct reference := ExampleStruct(copy 4,
+              owner String{12}(user "some string"))
 
 A "destructor" method can also be defined for a structure. This method will be
 called just before any object destruction. A destructor is declared as a normal
