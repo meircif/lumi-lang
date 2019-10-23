@@ -75,7 +75,11 @@ time-tests: build-dir
 	lumi -t time stdlibs/time.5.lm stdlibs/tests/time-tests.5.lm -e --std=c89 \
 		-e -Istdlibs/tests -o $(BUILDDIR)/time-tests -r
 
-stdlibs-tests: | math-tests ds-tests time-tests
+os-tests: build-dir
+   lumi -t os stdlibs/os.5.lm stdlibs/tests/os-test.5.lm -r stdlibs/list.5.lm \
+	  -e -Istdlibs/tests
+
+stdlibs-tests: | math-tests ds-tests time-tests os-tests
 
 tl0-compiler.c:
 	lumi -c TL0/tl0-compiler.0.lm
