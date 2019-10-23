@@ -56,7 +56,7 @@ ln -s ../../TL5 TL5
   TL5/statement/function.4.lm TL5/statement/native.4.lm \
   TL5/statement/test.4.lm TL5/statement/type.4.lm TL5/statement/variable.4.lm \
   TL5/syntax-tree/block.4.lm TL5/syntax-tree/branch.4.lm \
-  TL5/syntax-tree/code.4.lm TL5/syntax-tree/code-flow.4.lm \
+  TL5/syntax-tree/code.4.lm TL5/syntax-tree/flow.4.lm \
   TL5/syntax-tree/node.4.lm TL5/syntax-tree/root.4.lm
 rm TL5
 popd
