@@ -52,13 +52,9 @@ func ! list-dir(user String dir-path)->(
         ent := readdir(copy dir!)
         while ent?
         c-string := get-dname(copy ent!)
-        var Int len
-        len := strlen(copy c-string)
-        new Path path(copy len)!
+        new Path path(copy strlen(copy c-string))!
         path.path-r.copy-from-pointer(copy c-string)!
         files!.append(owner path)!
 
-    var Int res
-    res := closedir(copy dir!)
-    if res <> 0
+    if closedir(copy dir!) <> 0
         raise! "failed to close directory"
