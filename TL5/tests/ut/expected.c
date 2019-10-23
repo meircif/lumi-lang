@@ -1562,7 +1562,7 @@ ut_M_i = ut_M_i | 8;
 /// @ t18
 ut_M_i = ut_M_i & 10;
 /// @ t19
-ut_M_i = ~ut_M_i;
+ut_M_i = ~ ut_M_i;
 /// @ t20
 ut_M_i = ut_M_i ^ 16;
 /// @ t21

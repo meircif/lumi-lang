@@ -75,11 +75,12 @@ class UnaryExpression(Expression)
     func dynamic analyze()
         self.analyze-operand()->(owner self.right-expression)
         self.right-expression.check-no-error()
-        if self.operator.order = 3
+        if self.operator.name.equal(user "not")
             ; `not` operator
             self.test-operand-type(user self.right-expression, user glob.type-bool)
             self.set-simple-type(user glob.type-bool)
-        else-if self.operator.name.equal(user "-")
+        else-if self.operator.name.equal(user "-") or
+                self.operator.name.equal(user "bnot")
             self.test-operand-type(user self.right-expression, user glob.type-int)
             self.set-simple-type(user glob.type-int)
         else

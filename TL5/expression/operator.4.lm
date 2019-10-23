@@ -35,6 +35,14 @@ class ArithmeticOperatorExpression(BinaryExpression)
         self.test-operands-type(user glob.type-int)
         self.set-simple-type(user glob.type-int)
 
+
+func generic-binary-operator-factory(
+        user SyntaxTreeCode code-node, user Operator operator)->(
+        owner BinaryExpression expression)
+    expression := ArithmeticOperatorExpression(user code-node, user operator)
+        
+        
+class CompileTimeComputedArithmeticOperatorExpression(ArithmeticOperatorExpression)
     func dynamic get-constant-value()->(var Int value, var Bool has-value)
         var Int left-value
         var Int right-value
@@ -47,17 +55,10 @@ class ArithmeticOperatorExpression(BinaryExpression)
 
     func dynamic compute-constant-value(
             copy Int left-value, copy Int right-value)->(var Int value)
-        value := left-value + right-value
-
-
-func generic-binary-operator-factory(
-        user SyntaxTreeCode code-node, user Operator operator)->(
-        owner BinaryExpression expression)
-    expression := ArithmeticOperatorExpression(user code-node, user operator)
 
 
 ~~~ + ~~~
-class AdditionOperatorExpression(ArithmeticOperatorExpression)
+class AdditionOperatorExpression(CompileTimeComputedArithmeticOperatorExpression)
     func dynamic compute-constant-value(
             copy Int left-value, copy Int right-value)->(var Int value)
         value := left-value + right-value
@@ -68,7 +69,7 @@ func addition-operator-factory(
     expression := AdditionOperatorExpression(user code-node, user operator)
 
 ~~~ - ~~~
-class SubtractionOperatorExpression(ArithmeticOperatorExpression)
+class SubtractionOperatorExpression(CompileTimeComputedArithmeticOperatorExpression)
     func dynamic compute-constant-value(
             copy Int left-value, copy Int right-value)->(var Int value)
         value := left-value - right-value
@@ -79,7 +80,7 @@ func subtraction-operator-factory(
     expression := SubtractionOperatorExpression(user code-node, user operator)
 
 ~~~ * ~~~
-class MultiplicationOperatorExpression(ArithmeticOperatorExpression)
+class MultiplicationOperatorExpression(CompileTimeComputedArithmeticOperatorExpression)
     func dynamic compute-constant-value(
             copy Int left-value, copy Int right-value)->(var Int value)
         value := left-value * right-value
@@ -90,7 +91,7 @@ func multiplication-operator-factory(
     expression := MultiplicationOperatorExpression(user code-node, user operator)
 
 ~~~ div ~~~
-class DivisionOperatorExpression(ArithmeticOperatorExpression)
+class DivisionOperatorExpression(CompileTimeComputedArithmeticOperatorExpression)
     func dynamic analyze()
         self.allow-right-error := true
         base()
