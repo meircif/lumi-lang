@@ -1,6 +1,6 @@
-load("//:lumi.bzl", "lumi_binary")
+load("//:lumi.bzl", "lumi_test")
 
-lumi_binary(
+lumi_test(
     name = "strings",
     srcs = ["strings.5.lm"],
     deps = ["list.5.lm"],

@@ -17,7 +17,10 @@ def _generated_c_impl(ctx):
         )
 
     elif lumi_version in (5,):
-        args = [ctx.outputs.out.path]
+        args = []
+        if ctx.attr.tested_module:
+            args += ["-t", ctx.attr.tested_module]
+        args += [ctx.outputs.out.path]
         args += [f.path for f in ctx.files.deps]
         args += [f.path for f in ctx.files.srcs]
 
@@ -26,8 +29,7 @@ def _generated_c_impl(ctx):
             outputs = [ctx.outputs.out],
             executable = ctx.file.compiler,
             arguments = args,
-            progress_message =
-                "Generating {} from Lumi.".format(ctx.outputs.out.path),
+            progress_message = "Generating {} from Lumi.".format(ctx.outputs.out.path),
         )
 
 lumi_generated_c = rule(
@@ -52,6 +54,7 @@ lumi_generated_c = rule(
             mandatory = False,
             allow_empty = True,
         ),
+        "tested_module": attr.string(mandatory = False),
     },
     implementation = _generated_c_impl,
     outputs = {"out": "%{name}.c"},
@@ -90,6 +93,29 @@ def lumi_binary(name, srcs, **kwargs):
             "-Wno-unused-but-set-variable",
             "-Wno-misleading-indentation",
             "-Wno-parentheses",
+        ],
+        **kwargs
+    )
+
+
+def lumi_test(name, srcs, deps, **kwargs):
+    generated_name = "{}.gen".format(name)
+
+    lumi_generated_c(
+        name = generated_name,
+        srcs = srcs,
+        deps = deps,
+        tested_module = name,
+    )
+
+    native.cc_test(
+        name = name,
+        srcs = [":" + generated_name],
+        deps = [],
+        copts = [
+            "-Wno-unused-label",
+            "-Wno-unused-variable",
+            "-Wno-unused-but-set-variable",
         ],
         **kwargs
     )
