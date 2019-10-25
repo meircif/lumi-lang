@@ -119,3 +119,6 @@ def lumi_test(name, srcs, deps, **kwargs):
         ],
         **kwargs
     )
+
+def lumi_library(**kwargs):
+    native.filegroup(**kwargs)
