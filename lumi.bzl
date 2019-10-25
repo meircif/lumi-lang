@@ -18,8 +18,8 @@ def _generated_c_impl(ctx):
 
     elif lumi_version in (5,):
         args = [ctx.outputs.out.path]
-        args += [f.path for f in ctx.files.srcs]
         args += [f.path for f in ctx.files.deps]
+        args += [f.path for f in ctx.files.srcs]
 
         ctx.actions.run(
             inputs = ctx.files.srcs + ctx.files.deps,
