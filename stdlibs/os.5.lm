@@ -1,5 +1,42 @@
 module os
 
+; unistd.h porting for files operations.
+; **************************************
+
+native include "unistd.h"
+
+native code "
+int const R_OK_e = R_OK;
+int const W_OK_e = W_OK;
+int const X_OK_e = X_OK;
+int const F_OK_e = F_OK;
+"
+
+native const Int R-OK
+native const Int W-OK
+native const Int X-OK
+native const Int F-OK
+
+
+native func access(copy cdef.Pointer{cdef.Char} path, copy Int amode)->(
+        copy Int res)
+
+func string-to-chars(user String str)->(var cdef.Pointer{Char} ptr)
+    user Array{Char} bla
+    bla := str
+    ptr.set-from-array(user bla)
+
+func exists(user String path)->(var Bool exist)
+    var cdef.Pointer{Char} c-path
+    c-path := string-to-chars(user path)
+    var Int res
+    res := access(copy c-path, copy F-OK)
+    exist := res <> -1
+
+
+; dirent.h porting for directory operations.
+; ******************************************
+
 native include "dirent.h"
 
 native type Dir "DIR"
@@ -38,12 +75,10 @@ func ! list-dir(user String dir-path)->(
     var cdef.Pointer?{Dir} dir
     var cdef.Pointer?{Dirent} ent
     var cdef.Pointer{Char} string-pointer
-    user Array{Char} bla
 
     files := ds.List{Path}()!
 
-    bla := dir-path
-    string-pointer.set-from-array(user bla)
+    string-pointer := string-to-chars(user dir-path)
     dir := opendir(copy string-pointer)
     if not dir?
         raise! "path is not dir"
