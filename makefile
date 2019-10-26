@@ -67,6 +67,10 @@ math-tests: build-dir
 	lumi -t math stdlibs/math.5.lm stdlibs/tests/math-tests.5.lm -o \
 		$(BUILDDIR)/math-tests -r
 
+zlib-tests: build-dir
+	lumi -t zlib stdlibs/zlib.5.lm stdlibs/tests/zlib-tests.5.lm -o \
+		$(BUILDDIR)/zlib-tests -r
+
 ds-tests: build-dir
 	lumi -t ds stdlibs/list.5.lm stdlibs/tests/ds-tests.5.lm -o \
 		$(BUILDDIR)/ds-tests -r
