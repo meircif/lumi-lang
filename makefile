@@ -68,7 +68,7 @@ math-tests: build-dir
 		$(BUILDDIR)/math-tests -r
 
 ds-tests: build-dir
-	lumi -t ds stdlibs/list.5.lm stdlibs/tests/ds-tests.5.lm -o \
+	lumi -t ds stdlibs/datasets.5.lm stdlibs/tests/ds-tests.5.lm -o \
 		$(BUILDDIR)/ds-tests -r
 
 time-tests: build-dir

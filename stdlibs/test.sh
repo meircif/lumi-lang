@@ -40,7 +40,7 @@ stdlibs/math-tests -xml
 mkdir stdlibs/cover-math-tests
 mv cobertura.xml stdlibs/cover-math-tests
 
-stdlibs/tl5-compiler -t ds stdlibs/ds-tests.c ../stdlibs/list.5.lm \
+stdlibs/tl5-compiler -t ds stdlibs/ds-tests.c ../stdlibs/datasets.5.lm \
   ../stdlibs/tests/ds-tests.5.lm
 $CCA stdlibs/ds-tests.c -o stdlibs/ds-tests
 stdlibs/ds-tests -xml
