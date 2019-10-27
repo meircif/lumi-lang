@@ -67,6 +67,10 @@ math-tests: build-dir
 	lumi -t math stdlibs/math.5.lm stdlibs/tests/math-tests.5.lm -o \
 		$(BUILDDIR)/math-tests -r
 
+zlib-tests: build-dir
+	lumi -t zlib stdlibs/zlib.5.lm stdlibs/tests/zlib-tests.5.lm -o \
+		$(BUILDDIR)/zlib-tests -r
+
 ds-tests: build-dir
 	lumi -t ds stdlibs/datasets.5.lm stdlibs/tests/ds-tests.5.lm -o \
 		$(BUILDDIR)/ds-tests -r
@@ -75,7 +79,11 @@ time-tests: build-dir
 	lumi -t time stdlibs/time.5.lm stdlibs/tests/time-tests.5.lm -e --std=c89 \
 		-e -Istdlibs/tests -o $(BUILDDIR)/time-tests -r
 
-stdlibs-tests: | math-tests ds-tests time-tests
+os-tests: build-dir
+   lumi -t os stdlibs/os.5.lm stdlibs/tests/os-test.5.lm -r stdlibs/list.5.lm \
+	  -e -Istdlibs/tests
+
+stdlibs-tests: | math-tests ds-tests time-tests os-tests
 
 tl0-compiler.c:
 	lumi -c TL0/tl0-compiler.0.lm

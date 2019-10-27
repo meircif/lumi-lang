@@ -46,7 +46,7 @@ Operators
 * assignment: ``:=``
 * arithmetic: ``+``, ``-``, ``*``, ``div``, ``mod``
 * assignment and arithmetic: ``+=``, ``-=``, ``*=``
-* bitwise: ``bnot``, ``bor``, ``band``, ``xor``, ``>>``, ``<<``
+* bitwise: ``bnot``, ``bor``, ``band``, ``xor``, ``shr``, ``shl``
 * relational (arithmetic): ``=``, ``<>``, ``<``, ``>``, ``<=``, ``>=``
 * relational (referential): ``is``, ``is-not``, ``?``
 * logical: ``not``, ``or``, ``and``
@@ -68,13 +68,14 @@ of exactly 8 spaces::
 Operator Precedence
 +++++++++++++++++++
 1. ``. [] () ?``, left-to-right
-2. ``- +``, ``* div mod``, ``bnot bor band xor >> <<``, left-to-right 
+2. ``bnot``
+3. ``- +``, ``* div mod``, ``bor band xor shr shl``, left-to-right 
    :ref:`[1] <operator-precedence-1>`
-3. ``= != > < >= <= is is-not``, left-to-right 
+4. ``= != > < >= <= is is-not``, left-to-right 
    :ref:`[2] <operator-precedence-2>`
-4. ``not``
-5. ``or``, ``and``, left-to-right :ref:`[1] <operator-precedence-1>`
-6. ``:= += -= *= :=:``, only one allowed
+5. ``not``
+6. ``or``, ``and``, left-to-right :ref:`[1] <operator-precedence-1>`
+7. ``:= += -= *= :=:``, only one allowed
 
 .. _operator-precedence-1:
 

@@ -1,0 +1,89 @@
+~~~ zlib functions for compressions and decompressions. ~~~
+module zlib
+
+native include "zlib.h"
+
+native type Stream "z_stream"
+
+native const Int ZLIB_VERSION
+
+native const Int Z_NO_FLUSH      
+native const Int Z_PARTIAL_FLUSH  
+native const Int Z_SYNC_FLUSH   
+native const Int Z_FULL_FLUSH   
+native const Int Z_FINISH        
+
+native const Int Z_OK            
+native const Int Z_STREAM_END   
+native const Int Z_NEED_DICT   
+native const Int Z_ERRNO      
+native const Int Z_STREAM_ERROR 
+native const Int Z_DATA_ERROR  
+native const Int Z_MEM_ERROR   
+native const Int Z_BUF_ERROR    
+native const Int Z_VERSION_ERROR 
+
+native const Int Z_NO_COMPRESSION    
+native const Int Z_BEST_SPEED         
+native const Int Z_BEST_COMPRESSION    
+native const Int Z_DEFAULT_COMPRESSION  
+
+native const Int Z_FILTERED            
+native const Int Z_HUFFMAN_ONLY        
+native const Int Z_DEFAULT_STRATEGY    
+
+native const Int Z_BINARY   
+native const Int Z_ASCII    
+native const Int Z_UNKNOWN  
+
+native const Int Z_DEFLATED   
+
+native const Int Z_NULL    
+;define zlib_version zlibVersion()
+
+
+native func zlibVersion()->(copy cdef.Pointer{cdef.char}) "zlibVersion"
+
+native func deflate(copy cdef.Pointer{z_stream} strm, copy Int flush)->(var Int res) "deflate"
+
+native func deflateEnd(copy cdef.Pointer{z_stream} strm)->(var Int res) "deflateEnd"
+
+native func inflate(copy cdef.Pointer{z_stream} strm, copy Int flush)->(var Int res) "inflate"
+
+native func inflateEnd(copy cdef.Pointer{z_stream} strm)->(var Int res) "inflateEnd"
+
+native func deflateSetDictionary(
+        copy cdef.Pointer{z_stream} strm,
+        copy cdef.Pointer{Bytef} dictionary,
+        copy cdef.uInt dictLength)->(var Int res) "deflateSetDictionary"
+
+native func deflateCopy(copy cdef.Pointer{z_stream} dest,
+        copy cdef.Pointer{z_stream} source)->(var Int res) "deflateCopy"
+
+native func deflateReset(copy cdef.Pointer{z_stream} strm)->(var Int res) "deflateReset"
+
+native func deflateParams(copy cdef.Pointer{z_stream} strm,
+        copy Int level,
+        copy Int strategy)->(var Int res) "deflateParams"
+
+native func inflateSetDictionary(copy cdef.Pointer{z_stream} strm,
+        copy cdef.Pointer{Bytef} dictionary,
+        copy cdef.uInt dictLength)->(var Int res) "inflateSetDictionary" 
+
+native func inflateSync(copy cdef.Pointer{z_stream} strm)->(var Int res) "inflateSync"
+
+native func inflateReset(copy cdef.Pointer{z_stream} strm)->(var Int res) "inflateReset"
+
+native func compress(copy cdef.Pointer{Bytef} dest, copy cdef.Pointer{uLongf} destLen,
+        copy cdef.Pointer{const Bytef} source, 
+        copy cdef.uLong sourceLen)->(var Int res) "compress"
+
+native func compress2(copy cdef.Pointer{Bytef} dest, copy cdef.Pointer{uLongf} destLen,
+        copy cdef.Pointer{const Bytef} source, copy cdef.uLong sourceLen,
+        copy Int level)->(var Int res) "compress2"
+
+native func uncompress(copy cdef.Pointer{Bytef} dest, copy cdef.Pointer{uLongf} destLen,
+        copy cdef.Pointer{const Bytef} source, 
+        copy cdef.uLong sourceLen)->(var Int res) "uncompress"
+
+
