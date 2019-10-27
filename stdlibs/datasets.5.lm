@@ -1,0 +1,133 @@
+~~~ Generic lists ~~~
+module ds
+
+
+~~~ Generic single link list ~~~
+struct List{Generic}
+    strong ListNode?{Generic} first
+
+    ~~~ Add item to list end ~~~
+    func var ! append(owner Generic item)
+        var List{Generic} list
+        self.rotate-to(var list)!
+        list.prepend(owner item)!
+        list.rotate-to(var self)!
+
+    func var ! rotate-to(var List{Generic} target)
+        loop
+            while self.first?
+            strong ListNode?{Generic} node(strong self.first)
+            self.first := node!.next
+            node!.next := target.first
+            target.first := node
+
+    ~~~ Add item to list start ~~~
+    func var ! prepend(owner Generic item)
+        new ListNode{Generic} node(owner item, strong self.first)!
+        self.first := node!
+
+    func user is-empty()->(var Bool empty)
+        empty := not self.first?
+
+    ~~~ Get and remove first item, fail if list is empty ~~~
+    func var ! pop()->(owner Generic? item)
+        owner ListNode{Generic} first
+        if-error first := self.first
+            raise "list empty"
+        self.first := first.next
+        item := first.item
+
+
+~~~ Iterate over the list ~~~
+class ListIterator{Generic}
+    weak ListNode?{Generic} curr
+
+    new(user List list)
+        self.curr := list.first
+
+    func dynamic user ! step()->(user Generic? item, var Bool has-another-item)
+        has-another-item := self.curr?
+        item := _
+        if self.curr?
+            item := self.curr!.item
+            self.curr := self.curr!.next
+
+
+~~~ Single node in the list ~~~
+struct ListNode{Generic}
+    strong ListNode?{Generic} next
+    owner Generic? item
+
+    new(owner Generic item, strong ListNode?{Generic} next)
+        self.next := next
+        self.item := item
+
+
+~~~ Single node with key and value ~~~
+struct DictionaryNode{ValueGeneric}
+    var Int key
+    owner ValueGeneric value
+    strong DictionaryNode?{ValueGeneric} next
+
+    new(copy Int key, owner ValueGeneric value,
+            strong DictionaryNode?{ValueGeneric} next)
+        self.key := key
+        self.value := value
+        self.next := next
+
+
+~~~ Generic dictionary ~~~
+struct Dictionary{ValueGeneric}
+    strong DictionaryNode?{ValueGeneric} first
+
+    func user is-empty()->(var Bool empty)
+        empty := not self.first?
+
+    ~~~ Return true iff the key is in the dictionary ~~~
+    func var ! find(copy Int key)->(var Bool is-in-dict)
+        is-in-dict := false
+        weak DictionaryNode?{ValueGeneric} head(weak self.first)
+        loop
+            while not is-in-dict
+            while head?
+            user DictionaryNode?{ValueGeneric} node(user head!)
+            if node!.key = key
+                is-in-dict := true
+            head := node!.next
+
+    ~~~ Add item to dictionary ~~~
+    func var ! put(copy Int key, owner ValueGeneric value)
+        if not self.find(copy key)!
+            new DictionaryNode{ValueGeneric} node(copy key, owner value,
+                    strong self.first)!
+            self.first := node!
+        else
+            raise! "Key already in dictionary"
+
+    ~~~ Add item to dictionary ~~~
+    func var ! get(copy Int key)->(user ValueGeneric? value)
+        value := _
+        if self.is-empty()
+            raise! "Dictionary is empty"
+        if not self.find(copy key)!
+            raise! "Key not in dictionary"
+        weak DictionaryNode?{ValueGeneric} head(weak self.first)
+        loop
+            while head?
+            user DictionaryNode?{ValueGeneric} node(user head!)
+            if node!.key = key
+                value := node!.value
+            head := node!.next
+
+~~~ Iterate over the list ~~~
+class DictionaryIterator{ValueGeneric}
+    weak DictionaryNode?{ValueGeneric} curr
+
+    new(user Dictionary dict)
+        self.curr := dict.first
+
+    func dynamic user ! step()->(var Int key, var Bool has-another-item)
+        has-another-item := self.curr?
+        if self.curr?
+            key := self.curr!.key
+            self.curr := self.curr!.next

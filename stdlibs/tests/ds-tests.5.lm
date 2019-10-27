@@ -1,7 +1,7 @@
-~~~ Tests for generic lists ~~~
-module list-test
+~~~ Tests for generic datasets ~~~
+module dataset-test
 
-
+~~~ Tests for generic list ~~~
 struct StringBox
     owner String value
 
@@ -10,7 +10,7 @@ struct StringBox
         self.value := value
 
 
-test append-test()
+test list-append-test()
     var ds.List{StringBox} list
     list.append(owner StringBox(user "first")!)!
     list.append(owner StringBox(user "second")!)!
@@ -26,7 +26,7 @@ test append-test()
     assert! not iter.step()->(user item)!
 
 
-test prepend-test()
+test list-prepend-test()
     var ds.List{StringBox} list
     list.prepend(owner StringBox(user "third")!)!
     list.prepend(owner StringBox(user "second")!)!
@@ -42,7 +42,7 @@ test prepend-test()
     assert! not iter.step()->(user item)!
 
 
-test mixed-test()
+test list-mixed-test()
     var ds.List{StringBox} list
     list.prepend(owner StringBox(user "first")!)!
     list.append(owner StringBox(user "second")!)!
@@ -58,7 +58,7 @@ test mixed-test()
     assert! not iter.step()->(user item)!
 
 
-test pop-test()
+test list-pop-test()
     var ds.List{StringBox} list
     list.append(owner StringBox(user "first")!)!
     list.append(owner StringBox(user "second")!)!
@@ -69,7 +69,7 @@ test pop-test()
     assert-error! list.pop(), "list empty"
 
 
-test is-empty-test()
+test list-is-empty-test()
     var ds.List{StringBox} list
     assert! list.is-empty()
     list.append(owner StringBox(user "first")!)!
@@ -97,9 +97,76 @@ test is-empty-test()
 ;     assert! not iter.step()->(user item)!
 
 
-test empty-iter-test()
+test list-empty-iter-test()
     var ds.List{StringBox} empty-list
     var ds.ListIterator{StringBox} iter(user empty-list)
     user StringBox? item
     assert! not iter.step()->(user item)!
     assert! not iter.step()->(user item)!
+
+
+~~~ Tests for generic dictionary ~~~
+test dictionary-is-empty-test()
+    var ds.Dictionary{StringBox} dict
+    assert! dict.is-empty()
+    dict.put(copy 3, owner StringBox(user "first-value")!)!
+    assert! not dict.is-empty()
+
+
+test dictionary-find-test()
+    var ds.Dictionary{StringBox} dict
+    dict.put(copy 3, owner StringBox(user "first-value")!)!
+    assert! dict.find(copy 3)!
+    assert! dict.find(copy 3)!
+    assert! not dict.find(copy 0)!
+
+
+test dictionary-get-test()
+    var ds.Dictionary{StringBox} dict
+    assert! dict.is-empty()
+    dict.put(copy 1, owner StringBox(user "first-value")!)!
+    user StringBox? item
+    dict.get(copy 1)->(user item)!
+    assert! item!.value.equal(user "first-value")
+
+
+test dictionary-get-using-iter-test()
+    var ds.Dictionary{StringBox} dict
+    assert! dict.is-empty()
+    dict.put(copy 1, owner StringBox(user "first-value")!)!
+    dict.put(copy 2, owner StringBox(user "second-value")!)!
+    var Int key
+    var ds.DictionaryIterator{StringBox} iter(user dict)
+    assert! iter.step()->(var key)!
+    assert! key = 1 or key = 2
+    assert! iter.step()->(var key)!
+    assert! key = 1 or key = 2
+
+
+test dictionary-get-fail-empty-dict-test()
+    var ds.Dictionary{StringBox} dict
+    assert! dict.is-empty()
+    user StringBox? item
+    assert-error! dict.get(copy 1)->(user item), "Dictionary is empty"
+
+
+test dictionary-get-fail-invalid-key-test()
+    var ds.Dictionary{StringBox} dict
+    assert! dict.is-empty()
+    dict.put(copy 1, owner StringBox(user "first-value")!)!
+    user StringBox? item
+    assert-error! dict.get(copy 2)->(user item), "Key not in dictionary"
+
+
+test dictionary-put-test()
+    var ds.Dictionary{StringBox} dict
+    assert! dict.is-empty()
+    dict.put(copy 1, owner StringBox(user "first-value")!)!
+    assert! not dict.is-empty()
+
+
+test dictionary-put-fail-test()
+    var ds.Dictionary{StringBox} dict
+    dict.put(copy 3, owner StringBox(user "first-value")!)!
+    assert-error! dict.put(copy 3, owner StringBox(user "none")),
+            "Key already in dictionary"
