@@ -29,6 +29,7 @@ class InitExpression(ModuleTypeExpression)
                     user argument-factory,
                     copy false,
                     user self.code-node,
+                    user self.code-node,
                     copy self.code-node.parent.indentation-spaces)
     
     func dynamic analyze()
@@ -59,8 +60,9 @@ class InitExpression(ModuleTypeExpression)
                         user self.result-type.type-data.name)
             self.constructor := self.result-type.type-data.constructor
             if self.constructor?
-                self.add-self-and-check(
-                        copy self.constructor.arguments.parameters.first.item.access)
+                user Argument first-parameter(
+                        user self.constructor.arguments.parameters.first.item)
+                self.add-self-and-check(copy first-parameter.access)
             else-if self.arguments.parameters.first?
                 if self.result-type.type-data is glob.type-string
                     self.constructor := glob.string-copy-function
@@ -77,7 +79,8 @@ class InitExpression(ModuleTypeExpression)
             if not has-error and self.constructor?
                 has-error := self.constructor.arguments.has-error
             if has-error
-                self.check-error-propagated(user "ignoring initialization error check")
+                self.check-error-propagated(
+                        user "ignoring initialization error check")
             
         else-if self.arguments.parameters.first?
             if self.arguments.parameters.first.next? or
@@ -94,9 +97,11 @@ class InitExpression(ModuleTypeExpression)
                     user self.assign-value,
                     copy true)
             self.assign-expression.analyze-value()->(owner self.assign-value)
-            if self.result-type.type-data.is-primitive and param.access != Access.COPY
+            if self.result-type.type-data.is-primitive and
+                    param.access != Access.COPY
                 self.syntax-error(
-                        user "access should be \"copy\" for primitive types, got",
+                        user "access should be \"copy\" for primitive types, \
+                        got",
                         user glob.access-names[param.access])
             else-if not self.result-type.type-data.is-primitive and
                     self.access != param.access
@@ -134,7 +139,8 @@ class InitExpression(ModuleTypeExpression)
                 self.result-type.type-data is glob.type-string
             self.result-type.length.write-preactions()
         if self.result-type.type-data is glob.type-array
-            if self.result-type.parameters.first.item.type-data is glob.type-string
+            if self.result-type.parameters.first.item.type-data is
+                    glob.type-string
                 self.result-type.parameters.first.item.length.write-preactions()
         
         if access-is-only-var(copy self.aux-variable.variable.access)
@@ -157,7 +163,8 @@ class InitExpression(ModuleTypeExpression)
         
         if self.aux-variable.access = Access.S-VAR
             ; INIT_VAR_REFMAN(`line`, `cleanup`, `aux-variable`)
-            self.write-macro-init(user "INIT_VAR_REFMAN", user self.aux-variable)
+            self.write-macro-init(
+                    user "INIT_VAR_REFMAN", user self.aux-variable)
             write(user ")\n")
         else
             write(user "/* initializing ")
@@ -170,7 +177,8 @@ class InitExpression(ModuleTypeExpression)
                 
         else-if self.result-type.type-data is glob.type-string
             ; INIT_NEW_STRING(`line`, `cleanup`, `aux-variable`, `length`);
-            self.write-macro-init(user "INIT_NEW_STRING", user self.aux-variable)
+            self.write-macro-init(
+                    user "INIT_NEW_STRING", user self.aux-variable)
             write(user ", ")
             self.result-type.length.write()
             write(user ");\n")
@@ -186,7 +194,8 @@ class InitExpression(ModuleTypeExpression)
         ; `aux-variable`_Value_length = `length`
         user TypeInstance data-type
         var Int depth
-        self.result-type.get-array-data-type-depth()->(user data-type, var depth)
+        self.result-type.get-array-data-type-depth()->(
+                user data-type, var depth)
         user TypeInstance sequence-type(user self.result-type)
         for n in depth
             sequence-type := sequence-type.parameters.first.item
@@ -197,7 +206,8 @@ class InitExpression(ModuleTypeExpression)
             write(user ";\n")
             self.code-node.write-spaces()
         
-        ; INIT_NEW_ARRAY(`line`, `cleanup`, `aux-variable`, `type`, `length`, `valu-size`);
+        ; INIT_NEW_ARRAY(`line`, `cleanup`, `aux-variable`, `type`, `length`,
+        ;     `valu-size`);
         self.write-macro-init(user "INIT_NEW_ARRAY", user self.aux-variable)
         write(user ", ")
         if data-type.type-data is glob.type-string
