@@ -216,11 +216,14 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
                     user self.name)
         self.implemented-function.external-body := true
     
+    func inst is-constructor()->(var Bool is-constructor)
+        is-constructor := self.parent-type?
+        if is-constructor
+            is-constructor := self is self.parent-type.constructor
+    
     func dynamic analyze()
-        if self.parent-type?
-            if self is self.parent-type.constructor and
-                    self.arguments.outputs.first?
-                self.syntax-error-msg(user "constructor with outputs")
+        if self.is-constructor() and self.arguments.outputs.first?
+            self.syntax-error-msg(user "constructor with outputs")
         if self.my-module?
             glob.current-module := self.my-module
         if self.implemented-function?
@@ -262,26 +265,28 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         if self.header-only
             return
         var ReferenceMemoryList refs(user global-refs)
-        if not self.check-constructor-memory(user refs)
+        if self.is-constructor()
+            self.check-constructor-memory(user refs)
+        else
             self.check-block-memory(user refs)
     
-    func inst check-constructor-memory(user ReferenceMemoryList refs)->(
-            var Bool is-constructor)
-        is-constructor := false
-        if not self.parent-type?
-            return
-        if self is-not self.parent-type.constructor
-            return
-        is-constructor := true
+    func inst check-constructor-memory(user ReferenceMemoryList refs)
         var ReferencePath reference-path(
                 user self.arguments.parameters.first.item.get-variable())
         refs.mark-invalid-reference(user reference-path, user self)
         for field in self.parent-type.variables.iter()
-            if not access-is-only-var(copy field.access) and
-                    not field.type-instance.conditional
-                reference-path.field := ReferencePath(user field)
+            reference-path.field := ReferencePath(user field)
+            if access-is-only-var(copy field.access)
+                if field.type-instance.type-data.constructor?
+                    refs.mark-invalid-reference(user reference-path, user self)
+            else-if not field.type-instance.conditional
                 refs.mark-invalid-reference(user reference-path, user self)
         self.check-block-memory(user refs)
+        self.check-field-initialized(user refs)
+
+    func inst check-field-initialized(user ReferenceMemoryList refs)
+        var ReferencePath reference-path(
+                user self.arguments.parameters.first.item.get-variable())
         for field in self.parent-type.variables.iter()
             if not field.type-instance.conditional
                 reference-path.field := ReferencePath(user field)

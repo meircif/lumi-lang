@@ -4037,6 +4037,42 @@ LUMI_block0_cleanup:
     (void)0;
     ut_M_Test_Del(t);
 }
+/// @ t21
+typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Base {
+    Int x;
+};
+struct ut_M_Test {
+    ut_M_Base _base;
+    Int y;
+};
+void ut_M_Base_new(ut_M_Base* self);
+void ut_M_Base_Del(ut_M_Base* self);
+void ut_M_Test_new(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self);
+Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Base_new(ut_M_Base* self) {
+    unsigned LUMI_loop_depth = 1;
+    self->x = 2;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Base_Del(ut_M_Base* self) {
+    if (self == NULL) return;
+}
+void ut_M_Test_new(ut_M_Test* self) {
+    unsigned LUMI_loop_depth = 1;
+    ut_M_Base_new(&(self->_base));
+    self->y = 3;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    ut_M_Base_Del(&(self->_base));
+}
 /// @ te0
 dynamic allocation of primitive type "Int"
 /// @ te1
@@ -8754,6 +8790,87 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
+/// @ tv0
+typedef struct ut_M_NoConstructor ut_M_NoConstructor;
+typedef struct ut_M_HasConstructor ut_M_HasConstructor;
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_NoConstructor {
+    char s[12];
+    int s_Length[1];
+};
+struct ut_M_HasConstructor {
+    char* s;
+    int s_Max_length;
+    int* s_Length;
+};
+struct ut_M_Test {
+    ut_M_NoConstructor vnc;
+    ut_M_HasConstructor vhc;
+    ut_M_NoConstructor svnc;
+    Ref_Manager* svnc_Refman;
+    ut_M_HasConstructor svhc;
+    Ref_Manager* svhc_Refman;
+};
+void ut_M_NoConstructor_Del(ut_M_NoConstructor* self);
+Returncode ut_M_HasConstructor_new(ut_M_HasConstructor* self);
+void ut_M_HasConstructor_Del(ut_M_HasConstructor* self);
+Returncode ut_M_Test_new(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self);
+Generic_Type_Dynamic ut_M_NoConstructor_dynamic = {(Dynamic_Del)ut_M_NoConstructor_Del};
+Generic_Type_Dynamic ut_M_HasConstructor_dynamic = {(Dynamic_Del)ut_M_HasConstructor_Del};
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_NoConstructor_Del(ut_M_NoConstructor* self) {
+    if (self == NULL) return;
+}
+Returncode ut_M_HasConstructor_new(ut_M_HasConstructor* self) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    char* aux_String_0 = NULL;
+    int aux_String_0_Max_length = 0;
+    int* aux_String_0_Length = &Lumi_empty_int;
+    INIT_NEW_STRING(6, LUMI_block0_cleanup, aux_String_0, 12);
+    String_Del(self->s);
+    free(self->s);
+    self->s_Max_length = 12;
+    self->s_Length = aux_String_0_Length;
+    self->s = aux_String_0;
+    aux_String_0 = NULL;
+    aux_String_0_Length = &Lumi_empty_int;
+LUMI_block0_cleanup:
+    (void)0;
+    String_Del(aux_String_0);
+    free(aux_String_0);
+    return LUMI_err;
+}
+void ut_M_HasConstructor_Del(ut_M_HasConstructor* self) {
+    if (self == NULL) return;
+    String_Del(self->s);
+    free(self->s);
+}
+Returncode ut_M_Test_new(ut_M_Test* self) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    String_clear(self->vnc.s, 12, self->vnc.s_Length);
+    String_clear(self->svnc.s, 12, self->svnc.s_Length);
+    LUMI_err = ut_M_HasConstructor_new(&(self->vhc));
+    CHECK(15, LUMI_block0_cleanup)
+    String_clear(self->vhc.s, self->vhc.s_Max_length, self->vhc.s_Length);
+    LUMI_err = ut_M_HasConstructor_new(&(self->svhc));
+    CHECK(17, LUMI_block0_cleanup)
+    String_clear(self->svhc.s, self->svhc.s_Max_length, self->svhc.s_Length);
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    ut_M_HasConstructor_Del(&(self->svhc));
+    LUMI_var_dec_ref(self->svhc_Refman);
+    ut_M_NoConstructor_Del(&(self->svnc));
+    LUMI_var_dec_ref(self->svnc_Refman);
+    ut_M_HasConstructor_Del(&(self->vhc));
+    ut_M_NoConstructor_Del(&(self->vnc));
+}
 /// @ tb0
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
@@ -8960,6 +9077,10 @@ assigning into an owner a non-owner access "var"
 assigning into non assignable expression
 /// @ tev3
 output "s" access should not be "var" for non-primitive type "String"
+/// @ tev4
+using invalid reference "self.t"
+/// @ tev5
+using invalid reference "self.t"
 /// @ tee0
 non-conditional reference in type without constructor "Error"
 /// @ tee1
@@ -8974,6 +9095,10 @@ using invalid reference "self"
 constructor did not initialize field "s"
 /// @ tee6
 constructor did not initialize field "s"
+/// @ tee7
+constructor did not initialize field "s"
+/// @ tee8
+constructor did not initialize field "t"
 /// @ tec0
 assigning reference into itself
 /// @ tec1

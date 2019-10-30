@@ -1744,6 +1744,16 @@ struct Test
     new(copy Int x)
 func fun()
     var Test t(copy 3)
+; @ g t21
+struct Base
+    var Int x
+    new()
+        self.x := 2
+struct Test(Base)
+    var Int y
+    new()
+        base()
+        self.y := 3
 ; @ ec te0
 Int()
 ; @ ec te1
@@ -3454,6 +3464,25 @@ func ! fun()
         user String? s
         while get()->(user s)?
         s!.clear()
+; @ g tv0
+struct NoConstructor
+    var String{12} s
+struct HasConstructor
+    owner String s
+    new!()
+        self.s := String{12}()!
+struct Test
+    var NoConstructor vnc
+    var HasConstructor vhc
+    s-var NoConstructor svnc
+    s-var HasConstructor svhc
+    new!()
+        self.vnc.s.clear()
+        self.svnc.s.clear()
+        self.vhc.new()!
+        self.vhc.s.clear()
+        self.svhc.new()!
+        self.svhc.s.clear()
 ; @ g tb0
 struct Test
     owner String? s
@@ -3918,6 +3947,26 @@ func error(var String a, owner String b)
     a := b
 ; @ eg tev3
 func error()->(var String s)
+; @ eg tev4
+struct Test
+    owner String s
+    new!()
+        self.s := String{12}()!
+struct Error
+    var Test t
+    new!()
+        self.t.s.clear()!
+; @ eg tev5
+struct Test
+    owner String s
+    new!()
+        self.s := String{12}()!
+struct Error
+    var Test t
+    new!()
+        if false
+            self.t.new()!
+        self.t.s.clear()!
 ; @ eg tee0
 struct Error
     weak String s
@@ -3958,6 +4007,21 @@ struct Error
     owner String s
     new() _
 func Error.new()
+; @ eg tee7
+struct Error
+    owner String s
+    new!()
+        if true
+            return
+        self.s := String{12}()!
+; @ eg tee8
+struct Test
+    owner String s
+    new!()
+        self.s := String{12}()!
+struct Error
+    var Test t
+    new()
 ; @ ec tec0
 str := str
 ; @ eg tec1
