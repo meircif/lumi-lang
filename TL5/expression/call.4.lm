@@ -322,8 +322,7 @@ class CallArgument(Argument)
         if not self.is-output
             refs.check-user(user self.value)
         else-if reference-path?
-            if not reference-path.variable.is-aux
-                refs.add(user reference-path.variable)
+            refs.add(user reference-path.variable)
     
     func dynamic write-preactions()
         self.value.write-preactions()

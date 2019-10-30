@@ -3434,8 +3434,12 @@ struct Test
     func user ! get()->(user String? s) _
 func ! Test.get()->(user String? s)
     s := self.s!
-func ! fun(user Test t)->(user String? s)
+func ! fun(user Test t)
+    user String? s
+    owner String? sowner(owner _)
     t.get()->(user s)!
+    s!.clear()
+    s := t.get()!
     s!.clear()
 ; @ c tu5
 user String? s(user ostr)
