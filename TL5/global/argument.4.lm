@@ -25,15 +25,18 @@ class Argument(SyntaxTreeNode)
             user String access-str,
             copy Bool is-output,
             copy Bool is-native,
+            user SyntaxTreeNode node,
             user SyntaxTreeCode code-node,
             copy Int indentation-spaces)
         self.is-output := is-output
         self.is-native := is-native
         self.get-access(user access-str)->(var self.access)
-        self.parse-value(user code-node, copy indentation-spaces)
+        self.parse-value(user node, user code-node, copy indentation-spaces)
     
     func dynamic parse-value(
-            user SyntaxTreeCode code-node, copy Int indentation-spaces)
+            user SyntaxTreeNode node,
+            user SyntaxTreeCode code-node,
+            copy Int indentation-spaces)
         raise
     
     func dynamic get-type-instance()->(user TypeInstance type-instance)
@@ -54,7 +57,10 @@ class Argument(SyntaxTreeNode)
                     user glob.access-names[self.access])
         if check-same
             self.check-same-type-as(
-                    user other, user actual-params, copy bases, copy print-error)
+                    user other,
+                    user actual-params,
+                    copy bases,
+                    copy print-error)
     
     func dynamic check-same-type-as(
             user Argument other,
@@ -113,12 +119,14 @@ class FunctionArguments(SyntaxTreeNode)
     func inst parse(
             user ArgumentFactory argument-factory,
             copy Bool is-native,
+            user SyntaxTreeNode node,
             user SyntaxTreeCode code-node,
             copy Int indentation-spaces)
         self.parse-args(
                 user self.parameters,
                 user argument-factory,
                 copy is-native,
+                user node,
                 user code-node,
                 copy indentation-spaces)
         if glob.last-char = '-'
@@ -127,6 +135,7 @@ class FunctionArguments(SyntaxTreeNode)
                     user self.outputs,
                     user argument-factory,
                     copy is-native,
+                    user node,
                     user code-node,
                     copy indentation-spaces)
     
@@ -145,6 +154,7 @@ class FunctionArguments(SyntaxTreeNode)
             user List{Argument} arguments,
             user ArgumentFactory argument-factory,
             copy Bool is-native,
+            user SyntaxTreeNode node,
             user SyntaxTreeCode code-node,
             copy Int indentation-spaces)
         owner Argument argument
@@ -164,6 +174,7 @@ class FunctionArguments(SyntaxTreeNode)
                         user access-str,
                         copy is-output,
                         copy is-native,
+                        user node,
                         user code-node,
                         copy indentation-spaces)
                 arguments.add(owner argument)
@@ -203,9 +214,11 @@ class FunctionArguments(SyntaxTreeNode)
     
     func dynamic find-variable(user String name, user String module-name)->(
             user SyntaxTreeVariable variable)
-        self.find-variable-args(user self.parameters, user name)->(user variable)
+        self.find-variable-args(user self.parameters, user name)->(
+                user variable)
         if not variable?
-            self.find-variable-args(user self.outputs, user name)->(user variable)
+            self.find-variable-args(user self.outputs, user name)->(
+                    user variable)
     
     func inst find-variable-args(
             user List{Argument} arguments, user String name)->(

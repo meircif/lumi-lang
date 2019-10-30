@@ -48,7 +48,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
                     self.is-dynamic := true
                 else-if not meth-type.equal(user "inst")
                     self.syntax-error(
-                            user "expected \"dynamic\" or \"inst\" method type, got",
+                            user "expected \"dynamic\" or \"inst\" method \
+                            type, got",
                             user meth-type)
             user String access-str
             read-until(user " ?(", copy false)->(user access-str)
@@ -108,6 +109,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         self.arguments.parse(
                 user argument-factory,
                 copy is-native,
+                user self,
                 user dummy-node,
                 copy self.indentation-spaces)
         if self.parent-type?
@@ -138,10 +140,12 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
                 self.syntax-error(
                         user "function name overrides module", user self.name)
             if glob.find-function(user self.name)?
-                self.syntax-error(user "redefinition of function", user self.name)
+                self.syntax-error(
+                        user "redefinition of function", user self.name)
             if glob.find-variable(user self.name)?
                 self.syntax-error(
-                        user "function name overrides global variable", user self.name)
+                        user "function name overrides global variable",
+                        user self.name)
             if self.my-module?
                 self.my-module.function-map.add(user self.name, user self)
     
@@ -214,7 +218,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     
     func dynamic analyze()
         if self.parent-type?
-            if self is self.parent-type.constructor and self.arguments.outputs.first?
+            if self is self.parent-type.constructor and
+                    self.arguments.outputs.first?
                 self.syntax-error-msg(user "constructor with outputs")
         if self.my-module?
             glob.current-module := self.my-module
@@ -238,13 +243,15 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         for variable in self.variables.iter()
             if access-is-var(copy variable.access) and
                     not variable.type-instance.type-data.is-primitive
-                self.delete-group-builder.add-deleting(user variable.type-instance)
+                self.delete-group-builder.add-deleting(
+                        user variable.type-instance)
         if self.my-module?
             glob.current-module := _
     
     func inst compare(user SyntaxTreeFunction other)
         if self.is-dynamic != other.is-dynamic
-            self.syntax-error(user "illegal dynamic in function", user self.name)
+            self.syntax-error(
+                    user "illegal dynamic in function", user self.name)
         
     func inst collect-delete-group()->(user DeleteGroupBuilder recursive)
         if self.delete-group?
@@ -280,7 +287,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
                 reference-path.field := ReferencePath(user field)
                 if refs.is-invalid(user reference-path)
                     self.syntax-error(
-                            user "constructor did not initialize field", user field.name)
+                            user "constructor did not initialize field",
+                            user field.name)
     
     func inst check-block-memory(user ReferenceMemoryList refs)
         self.arguments.check-memory(user refs)
@@ -359,7 +367,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         for parameter in self.arguments.parameters.iter-back()
             if access-is-owner(copy parameter.access) or
                     parameter.access = Access.WEAK
-                self.write-variable-cleanup(user parameter.get-variable(), user _)
+                self.write-variable-cleanup(
+                        user parameter.get-variable(), user _)
     
     func dynamic write-cname()
         if self.parent-type?
@@ -426,19 +435,25 @@ class SyntaxTreeConstructor(SyntaxTreeFunction)
 ~~~ Function declaration argument ~~~
 class DeclarationArgument(Argument)
     owner SyntaxTreeVariable variable
+    user SyntaxTreeNode parent-node
     
     func dynamic copy-new()->(owner DeclarationArgument new-argument)
         new-argument := DeclarationArgument()
         self.copy(user new-argument)
+        new-argument.parent-node := self.parent-node
         new-argument.variable := SyntaxTreeVariable(user _)
         new-argument.variable.access := self.variable.access
         new-argument.variable.parent-type := self.variable.parent-type
         self.variable.type-instance.copy-new()->(
                 owner new-argument.variable.type-instance)
-        string-new-copy(user self.variable.name)->(owner new-argument.variable.name)
+        string-new-copy(user self.variable.name)->(
+                owner new-argument.variable.name)
     
     func dynamic parse-value(
-            user SyntaxTreeCode code-node, copy Int indentation-spaces)
+            user SyntaxTreeNode node,
+            user SyntaxTreeCode code-node,
+            copy Int indentation-spaces)
+        self.parent-node := node
         self.variable := SyntaxTreeVariable(user _)
         self.variable.access := self.access
         self.variable.is-output := self.is-output
@@ -446,13 +461,13 @@ class DeclarationArgument(Argument)
             self.variable.parent := code-node.parent
         self.variable.type-instance := TypeInstance()
         self.variable.type-instance.parse(
-                user " ", user self, user _, copy indentation-spaces)
+                user " ", user node, user _, copy indentation-spaces)
         self.expect-space(user "type")
         read-new(user ",)")->(owner self.variable.name)
         self.variable.check-name()
     
     func dynamic get-parent-type()->(user TypeData parent-type)
-        self.variable.get-parent-type()->(user parent-type)
+        self.parent-node.get-parent-type()->(user parent-type)
     
     func dynamic link-types()
         self.variable.type-instance.link-types(user self)
@@ -460,17 +475,20 @@ class DeclarationArgument(Argument)
     func dynamic analyze()
         user TypeData type-data(user self.variable.type-instance.type-data)
         if type-data.is-primitive
-            if self.is-output and not self.is-native and self.access != Access.VAR
+            if self.is-output and not self.is-native and
+                    self.access != Access.VAR
                 self.syntax-error2(
                         user "output",
                         user self.variable.name,
-                        user "access should be \"var\" for primitive types, got",
+                        user "access should be \"var\" for primitive types, \
+                        got",
                         user glob.access-names[self.access])
             if not self.is-output and self.access != Access.COPY
                 self.syntax-error2(
                         user "parameter",
                         user self.variable.name,
-                        user "access should be \"copy\" for primitive types, got",
+                        user "access should be \"copy\" for primitive types, \
+                        got",
                         user glob.access-names[self.access])
         else-if self.access = Access.COPY
             self.syntax-error2(
@@ -483,23 +501,28 @@ class DeclarationArgument(Argument)
                 self.syntax-error2(
                         user "output",
                         user self.variable.name,
-                        user "access should not be \"var\" for non-primitive type",
+                        user "access should not be \"var\" for non-primitive \
+                        type",
                         user type-data.name)
             if not self.variable.type-instance.conditional
                 self.syntax-error(
-                        user "not yet supporting non-conditional and non-primitive output",
+                        user "not yet supporting non-conditional and \
+                        non-primitive output",
                         user self.variable.name)
         self.variable.type-instance.analyze-lengths(user self, copy false)
         if self.is-native
             if access-is-owner(copy self.access)
                 self.syntax-error-msg(user "owner argument to native function")
             if access-has-refman(copy self.access)
-                self.syntax-error-msg(user "managed argument to native function")
+                self.syntax-error-msg(
+                        user "managed argument to native function")
             if self.is-output
                 if self.access = Access.USER and (type-data.is-dynamic or
-                        type-data is glob.type-string or type-data is glob.type-array)
+                        type-data is glob.type-string or
+                        type-data is glob.type-array)
                     self.syntax-error(
-                            user "user output to native function with non struct type",
+                            user "user output to native function with non \
+                            struct type",
                             user type-data.name)
                 if self.access = Access.VAR
                     self.syntax-error-msg(user "var output to native function")
@@ -527,7 +550,8 @@ class DeclarationArgument(Argument)
         
         if self.variable.type-instance.type-data is glob.type-array
             ; `data-type`*[*] `name`, int[*] `name`_Length
-            ; [void|Returncode] (**[*] `name`)(`arguments`), int[*] `name`_Length
+            ; [void|Returncode] (**[*] `name`)(`arguments`), int[*]
+            ;    `name`_Length
             user TypeInstance data-type
             var Int depth
             self.variable.type-instance.get-array-data-type-depth()->(
@@ -568,7 +592,8 @@ class DeclarationArgument(Argument)
             ; , Ref_Manager* `name`_Refman
             self.write-name-param(user ", Ref_Manager*", user "_Refman")
         
-        if self.variable.type-instance.type-data.is-dynamic and not self.is-native
+        if self.variable.type-instance.type-data.is-dynamic and
+                not self.is-native
             ; , `type`_Dynamic*[*] `name`_Dynamic
             write(user ", ")
             self.variable.type-instance.write-cname()

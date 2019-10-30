@@ -18,7 +18,9 @@ install:
   - pip3 install --user sphinx
   - pip3 install --user -r docs/requirements.txt
 
-script: ./test.sh
+script:
+  - make all
+  - ./test.sh
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

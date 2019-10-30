@@ -51,8 +51,8 @@ lumi.c:
 	lumi -c lumi-command/lumi.4.lm
 
 lumi-tests: build-dir
-	  lumi -t lumi lumi-command/lumi.4.lm lumi-command/lumi-tests.4.lm -o \
-			$(BUILDDIR)/lumi-tests -r
+	lumi -t lumi lumi-command/lumi.4.lm lumi-command/lumi-tests.4.lm -o \
+		$(BUILDDIR)/lumi-tests -r
 
 lumi-install: lumi.c lumi
 	sudo install $(BUILDDIR)/lumi $(INSTALLDIR)
@@ -80,8 +80,8 @@ time-tests: build-dir
 		-e -Istdlibs/tests -o $(BUILDDIR)/time-tests -r
 
 os-tests: build-dir
-   lumi -t os stdlibs/os.5.lm stdlibs/tests/os-test.5.lm -r stdlibs/list.5.lm \
-	  -e -Istdlibs/tests
+	lumi -t os stdlibs/os.5.lm stdlibs/tests/os-test.5.lm -r stdlibs/list.5.lm \
+		-e -Istdlibs/tests
 
 stdlibs-tests: | math-tests ds-tests time-tests os-tests
 
@@ -120,7 +120,7 @@ tl5-single-test: build-dir
 	lumi TL5/tests/integration/test0.5.lm -o $(BUILDDIR)/simple -r
 
 tl5-single-test-output: build-dir
-	lumi TL5/tests/integration/test0.5.lm -o $(BUILDDIR)/simple -r  > \
+	lumi TL5/tests/integration/test0.5.lm -o $(BUILDDIR)/simple -r > \
 		TL5/tests/integration/single-output.txt
 
 tl5-multiple-test: build-dir
