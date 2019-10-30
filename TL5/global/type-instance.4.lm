@@ -47,7 +47,8 @@ struct TypeInstance
                 user name)
         if glob.last-char = '.'
             string-new-copy(user name)->(owner self.module-name)
-            read-until(user string-new-concat(user ends, user "?{"), copy false)->(
+            read-until(
+                    user string-new-concat(user ends, user "?{"), copy false)->(
                     user name)
         if glob.last-char = '?'
             self.conditional := true
@@ -69,11 +70,13 @@ struct TypeInstance
                     self.arguments.has-error := true
                     read-c()
                 if glob.last-char != '('
-                    node.syntax-error-c(user "expected \"(\" inside Function type, got")
+                    node.syntax-error-c(
+                            user "expected \"(\" inside Function type, got")
                 var DeclarationArgumentFactory argument-factory
                 self.arguments.parse(
                         user argument-factory,
                         copy false,
+                        user node,
                         user code-node,
                         copy indentation-spaces)
             else-if code-node? and self.name.equal(user "String")
@@ -87,7 +90,8 @@ struct TypeInstance
                     self.length := self.length-owner
                     if glob.last-char != ':' and glob.last-char != '}'
                         node.syntax-error-c(
-                                user "expected \":\" or \"} after array length\", got")
+                                user "expected \":\" or \"} after array \
+                                length\", got")
                     has-sub-type := glob.last-char = ':'
                 if has-sub-type
                     if not is-array
@@ -96,11 +100,15 @@ struct TypeInstance
                     do
                         new TypeInstance sub-type
                         sub-type.parse(
-                                user ":}", user node, user code-node, copy indentation-spaces)
+                                user ":}",
+                                user node,
+                                user code-node,
+                                copy indentation-spaces)
                         self.parameters.add(owner sub-type)
                         while glob.last-char = ':'
                         if is-array
-                            node.syntax-error-msg(user "more than one subtype for array")
+                            node.syntax-error-msg(
+                                    user "more than one subtype for array")
             if glob.last-char != '}'
                 node.syntax-error-c(user "expected \"}\" after sub-types, got")
             read-c()
@@ -117,7 +125,8 @@ struct TypeInstance
         self.analyze-part(user node, copy true, copy false, copy true)
     
     func analyze-lengths(user SyntaxTreeNode node, copy Bool constant-length)
-        self.analyze-part(user node, copy false, copy true, copy constant-length)
+        self.analyze-part(
+                user node, copy false, copy true, copy constant-length)
     
     func analyze-part(
             user SyntaxTreeNode node,
@@ -136,9 +145,11 @@ struct TypeInstance
                 if constant-length
                     var Int length-value
                     if not self.length.get-constant-value()->(var length-value)
-                        node.syntax-error-msg(user "sequence length is not constant")
+                        node.syntax-error-msg(
+                                user "sequence length is not constant")
                     if length-value <= 0
-                        node.syntax-error-msg(user "sequence length is not positive")
+                        node.syntax-error-msg(
+                                user "sequence length is not positive")
                 self.length.check-no-error()
             if self.arguments?
                 self.arguments.analyze()
@@ -184,13 +195,16 @@ struct TypeInstance
                             user "unsupported primitive parameter type",
                             user sub-type.type-data.name)
                 if sub-type.type-data is glob.type-array
-                    node.syntax-error-msg(user "array as parameter type is unsupported")
+                    node.syntax-error-msg(
+                            user "array as parameter type is unsupported")
                 if sub-type.type-data is glob.type-string
-                    node.syntax-error-msg(user "string as parameter type is unsupported")
+                    node.syntax-error-msg(
+                            user "string as parameter type is unsupported")
                 param-iter.next()
             if param-iter.has()
                 node.syntax-error(
-                        user "too few parameter given for type", user self.type-data.name)
+                        user "too few parameter given for type",
+                        user self.type-data.name)
         else-if self.type-data is glob.type-func and not self.arguments?
             node.syntax-error-msg(user "missing arguments in function type")
     
@@ -204,14 +218,17 @@ struct TypeInstance
     func check-assign-from(copy Int access, user SyntaxTreeNode node)->(
             owner Expression value)
         if value.access = Access.OWNER and access = Access.STRONG
-            value.check-error-propagated(user "ignoring initialization error check")
+            value.check-error-propagated(
+                    user "ignoring initialization error check")
         node.check-expression-errors(
-                copy not self.conditional and self.type-data is-not glob.type-ref,
+                copy not self.conditional and
+                self.type-data is-not glob.type-ref,
                 copy access != Access.WEAK)->(
                 owner value)
         var Int bases
         value.result-type.check-assign-to(
-                copy value.access, user self, copy access, user node)->(var bases)
+                copy value.access, user self, copy access, user node)->(
+                var bases)
         if bases > 0
             value := UpCastExpression(owner value, copy bases)
     
@@ -268,7 +285,8 @@ struct TypeInstance
                     user glob.access-names[self-access],
                     user "into value with access",
                     user glob.access-names[target-access])
-        if target-access = Access.WEAK and not access-has-refman(copy self-access)
+        if target-access = Access.WEAK and
+                not access-has-refman(copy self-access)
             assert node?
             node.syntax-error(
                     user "assigning into a weak reference an illegal access",
@@ -293,7 +311,8 @@ struct TypeInstance
         user TypeInstance self-type-instance(user self)
         owner TypeInstance base-type-instance
         do
-            while not target.type-data.is-same(user self-type-instance.type-data)
+            while not target.type-data.is-same(
+                    user self-type-instance.type-data)
             if not self-type-instance.type-data.base-type?
                 assert node?
                 node.syntax-error2(
@@ -303,7 +322,8 @@ struct TypeInstance
                         user target.type-data.name)
             owner TypeInstance prev-base-type-instance(owner base-type-instance)
             self-type-instance.type-data.base-type.new-replace-params-extended(
-                    user self-type-instance, copy false)->(owner base-type-instance)
+                    user self-type-instance, copy false)->(
+                    owner base-type-instance)
             self-type-instance := base-type-instance
             bases += 1
         if self.conditional and not target.conditional
@@ -356,7 +376,8 @@ struct TypeInstance
         if self.conditional != other.conditional
             assert node?
             node.syntax-error(
-                    user "conditionals not matching in type", user self.type-data.name)
+                    user "conditionals not matching in type",
+                    user self.type-data.name)
         self.check-sub-equal(user other, user node)
     
     func check-sub-equal(user TypeInstance target, user SyntaxTreeNode node)
@@ -389,7 +410,8 @@ struct TypeInstance
                 assert node?
                 node.syntax-error-msg(user "missing length for sequence")
     
-    func get-array-data-type-depth()->(user TypeInstance data-type, var Int depth)
+    func get-array-data-type-depth()->(
+            user TypeInstance data-type, var Int depth)
         data-type := self
         depth := 0
         do

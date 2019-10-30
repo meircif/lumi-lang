@@ -2569,6 +2569,13 @@ struct Test{Generic}(Base)
 d!.item := t
 ; @ c t5
 t := d!.item
+; @ g t6
+struct Test{Generic}
+    var Int x
+    var Func{(user Generic item, copy Func{(user Generic item)} fun)} fun
+    func user meth(copy Func{(user Generic item,
+            copy Func{(user Generic item)} fun)} fun)
+        var Func{(user Generic item, copy Func{(user Generic item)} funa)} funv
 ; @ c t8
 var Array{5:Data{Test}} ad
 t := ad[2].item
