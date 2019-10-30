@@ -5652,6 +5652,7 @@ void ut_M_call(void) {
     ut_M_Test_Dynamic* t_Dynamic = NULL;
     i = external(5, s, a, (void*)t);
     i = (2 * external(5, s, a, (void*)t)) + 3;
+    external(5, s, a, (void*)t);
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -5678,6 +5679,7 @@ void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
     ut_M_Test* t = NULL;
     t = ((ut_M_Test*)external());
+    external();
 LUMI_block0_cleanup:
     (void)0;
 }
