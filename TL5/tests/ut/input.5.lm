@@ -2415,6 +2415,7 @@ func call()
     user Test? t
     i := external(copy 5, user s, user a, user t)
     i := (2 * external(copy 5, user s, user a, user t)) + 3
+    external(copy 5, user s, user a, user t)
 ; @ g tf2
 native func external() "SOME_External_func"
 func call()
@@ -2426,6 +2427,7 @@ native func external()->(user Test? t)
 func call()
     user Test? t
     t := external()
+    external()
 ; @ g tv0
 native var Int x
 func use()
@@ -2569,6 +2571,13 @@ struct Test{Generic}(Base)
 d!.item := t
 ; @ c t5
 t := d!.item
+; @ g t6
+struct Test{Generic}
+    var Int x
+    var Func{(user Generic item, copy Func{(user Generic item)} fun)} fun
+    func user meth(copy Func{(user Generic item,
+            copy Func{(user Generic item)} fun)} fun)
+        var Func{(user Generic item, copy Func{(user Generic item)} funa)} funv
 ; @ c t8
 var Array{5:Data{Test}} ad
 t := ad[2].item
@@ -3425,8 +3434,12 @@ struct Test
     func user ! get()->(user String? s) _
 func ! Test.get()->(user String? s)
     s := self.s!
-func ! fun(user Test t)->(user String? s)
+func ! fun(user Test t)
+    user String? s
+    owner String? sowner(owner _)
     t.get()->(user s)!
+    s!.clear()
+    s := t.get()!
     s!.clear()
 ; @ c tu5
 user String? s(user ostr)
