@@ -14,8 +14,6 @@ cc_binary(
     srcs = [
         "tl0-compiler.c",
     ],
-    visibility = ["//visibility:public"],
-    deps = [":lumi"],
     copts = [
         "-std=c89",
         "-Wno-unused-label",
@@ -23,4 +21,6 @@ cc_binary(
         "-Wno-unused-but-set-variable",
         "-Wno-misleading-indentation",
     ],
+    visibility = ["//visibility:public"],
+    deps = [":lumi"],
 )
