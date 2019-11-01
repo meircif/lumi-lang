@@ -1,4 +1,41 @@
+"""Build rules and macros for the Lumi programming language."""
+
+
+LumiFiles = provider(fields = ["transitive_sources"])
+
+
+def get_transitive_srcs(srcs, deps):
+  """Obtain the source files for a target and its transitive dependencies.
+
+  Args:
+    srcs: a list of source files
+    deps: a list of targets that are direct dependencies
+  Returns:
+    a collection of the transitive sources
+  """
+  return depset(
+        srcs,
+        transitive = [dep[LumiFiles].transitive_sources for dep in deps])
+
+
+def _lumi_library_impl(ctx):
+    """Gather transitive srcs, don't actually compile."""
+    trans_srcs = get_transitive_srcs(ctx.files.srcs, ctx.attr.deps)
+    return [LumiFiles(transitive_sources=trans_srcs)]
+
+
+lumi_library = rule(
+    implementation = _lumi_library_impl,
+    attrs = {
+        "srcs": attr.label_list(allow_files=True),
+        "deps": attr.label_list(),
+        "c_deps": attr.label_list(),
+    },
+)
+
+
 def _generated_c_impl(ctx):
+    """Run Lumi compiler on input files to generate a C file."""
     lumi_version = ctx.attr.lumi_version
 
     if lumi_version in (0, 1):
@@ -21,16 +58,20 @@ def _generated_c_impl(ctx):
         if ctx.attr.tested_module:
             args += ["-t", ctx.attr.tested_module]
         args += [ctx.outputs.out.path]
-        args += [f.path for f in ctx.files.deps]
-        args += [f.path for f in ctx.files.srcs]
+
+        trans_srcs = get_transitive_srcs(ctx.files.srcs, ctx.attr.deps)
+        srcs_list = trans_srcs.to_list()
+        args += [src.path for src in srcs_list]
 
         ctx.actions.run(
-            inputs = ctx.files.srcs + ctx.files.deps,
+            inputs = srcs_list,
             outputs = [ctx.outputs.out],
+            tools = [ctx.file.compiler],
             executable = ctx.file.compiler,
             arguments = args,
             progress_message = "Generating {} from Lumi.".format(ctx.outputs.out.path),
         )
+
 
 lumi_generated_c = rule(
     attrs = {
@@ -50,10 +91,8 @@ lumi_generated_c = rule(
             allow_files = True,
             doc = "Lumi files to compile",
         ),
-        "deps": attr.label_list(
-            mandatory = False,
-            allow_empty = True,
-        ),
+        "deps": attr.label_list(allow_files = False),
+        "c_deps": attr.label_list(allow_files = False),
         "tested_module": attr.string(mandatory = False),
     },
     implementation = _generated_c_impl,
@@ -61,9 +100,13 @@ lumi_generated_c = rule(
     output_to_genfiles = True,
 )
 
+
 def lumi_binary(name, srcs, **kwargs):
+    """Create a binary from Lumi sources."""
     lumi_version = kwargs.pop("lumi_version", 5)
     generated_name = "{}.gen".format(name)
+    deps = kwargs.pop("deps", [])
+    c_deps = kwargs.pop("c_deps", [])
 
     lumi_generated_c(
         name = generated_name,
@@ -86,7 +129,7 @@ def lumi_binary(name, srcs, **kwargs):
     native.cc_binary(
         name = name,
         srcs = [":" + generated_name],
-        deps = deps,
+        deps = c_deps,
         copts = [
             "-Wno-unused-label",
             "-Wno-unused-variable",
@@ -98,27 +141,27 @@ def lumi_binary(name, srcs, **kwargs):
     )
 
 
-def lumi_test(name, srcs, deps, **kwargs):
+def lumi_test(name, srcs, tested_module, **kwargs):
+    """Create a test binary from Lumi sources."""
     generated_name = "{}.gen".format(name)
+    deps = kwargs.pop("deps", [])
+    c_deps = kwargs.pop("c_deps", [])
 
     lumi_generated_c(
         name = generated_name,
         srcs = srcs,
         deps = deps,
-        tested_module = name,
+        tested_module = tested_module,
     )
 
     native.cc_test(
         name = name,
         srcs = [":" + generated_name],
-        deps = [],
+        deps = c_deps,
         copts = [
             "-Wno-unused-label",
             "-Wno-unused-variable",
             "-Wno-unused-but-set-variable",
         ],
-        **kwargs
     )
 
-def lumi_library(**kwargs):
-    native.filegroup(**kwargs)

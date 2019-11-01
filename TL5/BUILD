@@ -5,4 +5,9 @@ cc_binary(
     deps = [
         "//TL4:lumi",
     ],
+        copts = [
+            "-Wno-unused-label",
+            "-Wno-unused-variable",
+            "-Wno-unused-but-set-variable",
+        ],
 )
