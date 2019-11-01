@@ -14,7 +14,13 @@ cc_binary(
     srcs = [
         "tl0-compiler.c",
     ],
-    copts = ["-std=c89"],
     visibility = ["//visibility:public"],
     deps = [":lumi"],
+    copts = [
+        "-std=c89",
+        "-Wno-unused-label",
+        "-Wno-unused-variable",
+        "-Wno-unused-but-set-variable",
+        "-Wno-misleading-indentation",
+    ],
 )

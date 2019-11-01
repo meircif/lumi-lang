@@ -4,6 +4,11 @@ cc_library(
     name = "lumi",
     srcs = ["lumi.2.c"],
     hdrs = ["lumi.2.h"],
+    copts = [
+        "-Wno-unused-label",
+        "-Wno-unused-variable",
+        "-Wno-unused-but-set-variable",
+    ],
     # This is a workaround for https://github.com/bazelbuild/bazel/issues/6337.
     includes = ["."],
     # strip_include_prefix allows dependending rules to include headers without

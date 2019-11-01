@@ -73,7 +73,7 @@ def lumi_binary(name, srcs, **kwargs):
     deps = []
     if lumi_version in (2, 3, 4):
         fail("lumi_binary does not support Lumi version {}"
-             .format(lumi_version))
+            .format(lumi_version))
 
     if lumi_version == 0:
         deps += ["//TL0:lumi"]
@@ -88,6 +88,8 @@ def lumi_binary(name, srcs, **kwargs):
             "-Wno-unused-label",
             "-Wno-unused-variable",
             "-Wno-unused-but-set-variable",
+            "-Wno-misleading-indentation",
+            "-Wno-parentheses",
         ],
         **kwargs
     )
