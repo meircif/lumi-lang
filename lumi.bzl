@@ -79,7 +79,7 @@ lumi_generated_c = rule(
             default = Label("//TL5:compiler"),
             allow_single_file = True,
             executable = True,
-            # This should probably be "host", but it's makes the build much
+            # This should probably be "host", but it makes the build much
             # slower, and we're not cross-compiling just yet.
             cfg = "target",
             doc = "Lumi compiler binary",
@@ -107,13 +107,15 @@ def lumi_binary(name, srcs, **kwargs):
     generated_name = "{}.gen".format(name)
     deps = kwargs.pop("deps", [])
     c_deps = kwargs.pop("c_deps", [])
+    tested_module = kwargs.pop("tested_module", None)
 
     lumi_generated_c(
         name = generated_name,
         srcs = srcs,
-        deps = kwargs.pop("deps", []),
+        deps = deps,
         compiler = kwargs.pop("compiler", None),
         lumi_version = lumi_version,
+        tested_module = tested_module,
     )
 
     deps = []
@@ -126,11 +128,14 @@ def lumi_binary(name, srcs, **kwargs):
     elif lumi_version == 1:
         deps += ["//TL1:lumi"]
 
-    native.cc_binary(
+    cc_rule = native.cc_test if tested_module else native.cc_binary
+
+    cc_rule(
         name = name,
         srcs = [":" + generated_name],
         deps = c_deps,
         copts = [
+            "-std=c89",
             "-Wno-unused-label",
             "-Wno-unused-variable",
             "-Wno-unused-but-set-variable",
@@ -143,25 +148,8 @@ def lumi_binary(name, srcs, **kwargs):
 
 def lumi_test(name, srcs, tested_module, **kwargs):
     """Create a test binary from Lumi sources."""
-    generated_name = "{}.gen".format(name)
-    deps = kwargs.pop("deps", [])
-    c_deps = kwargs.pop("c_deps", [])
-
-    lumi_generated_c(
-        name = generated_name,
-        srcs = srcs,
-        deps = deps,
-        tested_module = tested_module,
-    )
-
-    native.cc_test(
-        name = name,
-        srcs = [":" + generated_name],
-        deps = c_deps,
-        copts = [
-            "-Wno-unused-label",
-            "-Wno-unused-variable",
-            "-Wno-unused-but-set-variable",
-        ],
-    )
+    if not tested_module:
+        fail("lumi_test must have a valid tested_module specified.")
+    kwargs["tested_module"] = tested_module
+    lumi_binary(name, srcs, **kwargs)
 

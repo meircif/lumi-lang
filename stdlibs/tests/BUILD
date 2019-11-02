@@ -20,6 +20,12 @@ cc_library(
     strip_include_prefix = "",
 )
 
+cc_library(
+    name = "mock-dirent-lib",
+    hdrs = ["dirent.h"],
+    strip_include_prefix = "",
+)
+
 lumi_test(
     name = "time-tests",
     srcs = ["time-tests.5.lm"],
@@ -32,6 +38,7 @@ lumi_test(
     name = "os-tests",
     srcs = ["os-test.5.lm"],
     deps = ["//stdlibs:os"],
+    c_deps = [":mock-dirent-lib"],
     tested_module = "os",
 )
 

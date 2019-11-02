@@ -12,16 +12,10 @@ lumi_library(
     visibility = ["__subpackages__"],
 )
 
-cc_library(
-    name = "dirent-lib",
-    hdrs = ["dirent.h"],
-)
-
 lumi_library(
     name = "os",
     srcs = ["os.5.lm"],
     deps = [":ds"],
-    c_deps = [":dirent-lib"],
     visibility = ["__subpackages__"],
 )
 
