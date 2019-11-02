@@ -15,8 +15,8 @@ lumi_library(
 lumi_library(
     name = "os",
     srcs = ["os.5.lm"],
-    deps = [":ds"],
     visibility = ["__subpackages__"],
+    deps = [":ds"],
 )
 
 lumi_library(
@@ -28,11 +28,11 @@ lumi_library(
 lumi_library(
     name = "stdlib",
     srcs = [],
+    visibility = ["//visibility:public"],
     deps = [
-        ":math",
         ":ds",
+        ":math",
         ":os",
         ":time",
     ],
-    visibility = ["//visibility:public"],
 )

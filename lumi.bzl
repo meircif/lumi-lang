@@ -1,37 +1,33 @@
 """Build rules and macros for the Lumi programming language."""
 
-
 LumiFiles = provider(fields = ["transitive_sources"])
 
-
 def get_transitive_srcs(srcs, deps):
-  """Obtain the source files for a target and its transitive dependencies.
+    """Obtain the source files for a target and its transitive dependencies.
 
-  Args:
-    srcs: a list of source files
-    deps: a list of targets that are direct dependencies
-  Returns:
-    a collection of the transitive sources
-  """
-  return depset(
+    Args:
+      srcs: a list of source files
+      deps: a list of targets that are direct dependencies
+    Returns:
+      a collection of the transitive sources
+    """
+    return depset(
         srcs,
-        transitive = [dep[LumiFiles].transitive_sources for dep in deps])
-
+        transitive = [dep[LumiFiles].transitive_sources for dep in deps],
+    )
 
 def _lumi_library_impl(ctx):
     """Gather transitive srcs, don't actually compile."""
     trans_srcs = get_transitive_srcs(ctx.files.srcs, ctx.attr.deps)
-    return [LumiFiles(transitive_sources=trans_srcs)]
-
+    return [LumiFiles(transitive_sources = trans_srcs)]
 
 lumi_library = rule(
     implementation = _lumi_library_impl,
     attrs = {
-        "srcs": attr.label_list(allow_files=True),
+        "srcs": attr.label_list(allow_files = True),
         "deps": attr.label_list(),
     },
 )
-
 
 def _generated_c_impl(ctx):
     """Run Lumi compiler on input files to generate a C file."""
@@ -71,7 +67,6 @@ def _generated_c_impl(ctx):
             progress_message = "Generating {} from Lumi.".format(ctx.outputs.out.path),
         )
 
-
 lumi_generated_c = rule(
     attrs = {
         "compiler": attr.label(
@@ -98,7 +93,6 @@ lumi_generated_c = rule(
     outputs = {"out": "%{name}.c"},
     output_to_genfiles = True,
 )
-
 
 def lumi_binary(name, srcs, **kwargs):
     """Create a binary from Lumi sources."""
@@ -144,11 +138,9 @@ def lumi_binary(name, srcs, **kwargs):
         **kwargs
     )
 
-
 def lumi_test(name, srcs, tested_module, **kwargs):
     """Create a test binary from Lumi sources."""
     if not tested_module:
         fail("lumi_test must have a valid tested_module specified.")
     kwargs["tested_module"] = tested_module
     lumi_binary(name, srcs, **kwargs)
-
