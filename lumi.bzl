@@ -29,7 +29,6 @@ lumi_library = rule(
     attrs = {
         "srcs": attr.label_list(allow_files=True),
         "deps": attr.label_list(),
-        "c_deps": attr.label_list(),
     },
 )
 
