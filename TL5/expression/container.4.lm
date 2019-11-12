@@ -13,7 +13,8 @@ class BlockExpression(Expression)
 
     ~~~ parsing `(expression)` ~~~
     func inst parse()
-        parse-new-expression(user ")", user self.code-node)->(owner self.expression)
+        parse-new-expression(user ")", user self.code-node)->(
+                owner self.expression)
         if glob.last-char != ')'
             self.syntax-error-c(user "expected \")\", got")
         read-c()
@@ -57,7 +58,9 @@ class UnaryExpression(Expression)
         self.safe-operand-write := true
 
     func inst parse-new(
-            user String ends, user Operator operator, user SyntaxTreeCode code-node)->(
+            user String ends,
+            user Operator operator,
+            user SyntaxTreeCode code-node)->(
             owner Expression expression, user Operator next-operator)
         new UnaryExpression unary-expression(user code-node, user operator)
         unary-expression.parse(user ends)->(user next-operator)
@@ -77,14 +80,17 @@ class UnaryExpression(Expression)
         self.right-expression.check-no-error()
         if self.operator.name.equal(user "not")
             ; `not` operator
-            self.test-operand-type(user self.right-expression, user glob.type-bool)
+            self.test-operand-type(
+                    user self.right-expression, user glob.type-bool)
             self.set-simple-type(user glob.type-bool)
         else-if self.operator.name.equal(user "-") or
                 self.operator.name.equal(user "bnot")
-            self.test-operand-type(user self.right-expression, user glob.type-int)
+            self.test-operand-type(
+                    user self.right-expression, user glob.type-int)
             self.set-simple-type(user glob.type-int)
         else
-            self.syntax-error(user "not unary operator", user self.operator.name)
+            self.syntax-error(
+                    user "not unary operator", user self.operator.name)
 
     func inst analyze-operand()->(owner Expression operand)
         analyze-expression()->(owner operand)
@@ -110,7 +116,8 @@ class UnaryExpression(Expression)
 
     func dynamic get-constant-value()->(var Int value, var Bool has-value)
         if self.operator.name.equal(user "-")->(var has-value)
-            if self.right-expression.get-constant-value()->(var value, var has-value)
+            if self.right-expression.get-constant-value()->(
+                    var value, var has-value)
                 value := - value
 
     func dynamic check-memory(user ReferenceMemoryList refs)
@@ -165,7 +172,8 @@ class BinaryExpression(UnaryExpression)
         if not self.allow-right-error
             self.right-expression.check-no-error()
         if self.binary-left-expression?
-            if self.operator.order = self.binary-left-expression.operator.order and
+            if self.operator.order =
+                    self.binary-left-expression.operator.order and
                     self.operator.group-index !=
                     self.binary-left-expression.operator.group-index
                 self.syntax-error2(
@@ -235,7 +243,8 @@ class QuestionExpression(Expression)
         if not self.tested.result-type.conditional and
                 self.tested.access != Access.WEAK
             self.syntax-error(
-                    user "cannot use \"?\" on non conditional or weak reference of type",
+                    user "cannot use \"?\" on non conditional or weak \
+                    reference of type",
                     user self.tested.result-type.type-data.name)
         self.set-simple-type(user glob.type-bool)
         self.access := Access.VAR

@@ -3464,7 +3464,7 @@ func ! fun()
         user String? s
         while get()->(user s)?
         s!.clear()
-; @ g tv0
+; @ g tc0
 struct NoConstructor
     var String{12} s
 struct HasConstructor
@@ -3483,6 +3483,23 @@ struct Test
         self.vhc.s.clear()
         self.svhc.new()!
         self.svhc.s.clear()
+; @ g tc1
+func fun1()
+func fun2(copy Func{()} f)
+struct Base
+    owner String s
+    new!()
+        self.s := String{12}()!
+struct Mid(Base)
+    new!()
+        base()!
+struct Test(Mid)
+    owner Base? b
+    new!()
+        fun1()
+        fun2(copy fun1)
+        self.b!.new()!
+        base()!
 ; @ g tb0
 struct Test
     owner String? s
@@ -4021,6 +4038,20 @@ struct Test
         self.s := String{12}()!
 struct Error
     var Test t
+; @ eg tee9
+struct Test
+    owner String s
+    new!()
+        self.s := String{12}()!
+struct Error
+    var Test t
+    new()
+; @ eg tee10
+struct Base
+    owner String s
+    new!()
+        self.s := String{12}()!
+struct Test(Base)
     new()
 ; @ ec tec0
 str := str

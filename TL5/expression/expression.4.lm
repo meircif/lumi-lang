@@ -46,7 +46,8 @@ class ExpressionValue(SyntaxTreeNode)
             
     func inst check-errors(copy Bool check-conditional, copy Bool check-weak)
         self.expression.code-node.check-expression-errors(
-                copy check-conditional, copy check-weak)->(owner self.expression)
+                copy check-conditional, copy check-weak)->(
+                owner self.expression)
     
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
         self.expression.order-constants(user ordered-list)
@@ -148,16 +149,19 @@ class Expression(SyntaxTreeNode)
     
     ~~~ Parse an expression that is an operand ~~~
     func inst parse-new-operand(
-            owner String text, user String ends, user SyntaxTreeCode code-node)->(
+            owner String text,
+            user String ends,
+            user SyntaxTreeCode code-node)->(
             owner Expression expression)
         if text.length = 0
             if glob.last-char = '('
-                BlockExpression.parse-new(user _, user code-node)->(owner expression)
+                BlockExpression.parse-new(user _, user code-node)->(
+                        owner expression)
             else
                 code-node.syntax-error-c(user "expected expression, got")
         else
-            self.parse-new-init-operand(owner text, user ends, user code-node)->(
-                    owner expression)
+            self.parse-new-init-operand(
+                    owner text, user ends, user code-node)->(owner expression)
         
         do
             if glob.last-char = '!'
@@ -167,13 +171,16 @@ class Expression(SyntaxTreeNode)
                 if glob.last-char = '!'
                     code-node.syntax-error-msg(user "only one \"!\" needed")
             if glob.last-char = '?'
-                QuestionExpression.parse-new(user _, user code-node)->(owner expression)
+                QuestionExpression.parse-new(user _, user code-node)->(
+                        owner expression)
             while self.parse-new-follow-operand(user ends, user code-node)->(
                     owner expression)
     
     ~~~ Parse the initialize part of an operand expression ~~~
     func inst parse-new-init-operand(
-            owner String text, user String ends, user SyntaxTreeCode code-node)->(
+            owner String text,
+            user String ends,
+            user SyntaxTreeCode code-node)->(
             owner Expression expression)
         var Char first(copy text[0])
         var Char second(copy '\0')
@@ -189,7 +196,8 @@ class Expression(SyntaxTreeNode)
                 (first = '-' and second >= '0' and second <= '9')
             IntExpression.parse-new(user _, owner text, user code-node)->(
                     owner expression)
-        else-if first >= 'A' and first <= 'Z' and second >= 'a' and second <= 'z'
+        else-if first >= 'A' and first <= 'Z' and second >= 'a' and
+                second <= 'z'
             self.parse-type-prefix(owner text, user ends, user code-node)->(
                     owner expression)
         else-if text.length = 1 and first = '_'
@@ -217,8 +225,8 @@ class Expression(SyntaxTreeNode)
                 self.parse-type-prefix(owner text, user ends, user code-node)->(
                         owner expression)
             else
-                expression :=
-                        FieldExpression(user code-node, owner expression, owner text)
+                expression := FieldExpression(
+                        user code-node, owner expression, owner text)
         else-if glob.last-char = '['
             SliceExpression.parse-new(user _, user ends, user code-node)->(
                     owner expression)
@@ -230,14 +238,17 @@ class Expression(SyntaxTreeNode)
 
     ~~~ Parse expression with type prefix ~~~
     func inst parse-type-prefix(
-            owner String text, user String ends, user SyntaxTreeCode code-node)->(
+            owner String text,
+            user String ends,
+            user SyntaxTreeCode code-node)->(
             owner Expression expression)
         owner String value
         var Bool has-member(copy glob.last-char = '.')
         if has-member
             self.read-new-value(user ends)->(owner value)
             if value.length > 0
-                if value.equal(user "length") or (value[0] >= 'A' and value[0] <= 'Z')
+                if value.equal(user "length") or
+                        (value[0] >= 'A' and value[0] <= 'Z')
                     EnumExpression.parse-new(
                             user _, owner text, owner value, user code-node)->(
                             owner expression)
@@ -248,17 +259,21 @@ class Expression(SyntaxTreeNode)
         if code-node.parent?
             indentation-spaces := code-node.parent.indentation-spaces
         type-instance.parse-name(
-                user text, user code-node, user code-node, copy indentation-spaces)
+                user text,
+                user code-node,
+                user code-node,
+                copy indentation-spaces)
         if not has-member and glob.last-char = '('
-            InitExpression.parse-new(user _, owner type-instance, user code-node)->(
+            InitExpression.parse-new(
+                    user _, owner type-instance, user code-node)->(
                     owner expression)
             return
         
         TypeExpression.parse-new(user _, owner type-instance, user code-node)->(
                 owner expression)
         if has-member
-            expression :=
-                    FieldExpression(user code-node, owner expression, owner value)
+            expression := FieldExpression(
+                    user code-node, owner expression, owner value)
     
     ~~~ Set type instance to be a type that has no sub-type ~~~
     func inst set-simple-type(user TypeData type-data)
@@ -280,7 +295,8 @@ class Expression(SyntaxTreeNode)
             self.code-node.check-function-has-error()
             self.error-expected := false
         else-if self.error-expected
-            self.syntax-error-msg(user "using \"!\" where error is not propagated")
+            self.syntax-error-msg(
+                    user "using \"!\" where error is not propagated")
         
     func dynamic get-constant-value()->(var Int value, var Bool has-value)
         has-value := false
@@ -300,7 +316,8 @@ class Expression(SyntaxTreeNode)
         self.code-node.parent.write-cleanup-label()
         write(user ", ")
     
-    func inst write-macro-init(user String macro-name, user Expression expression)
+    func inst write-macro-init(
+            user String macro-name, user Expression expression)
         write(user macro-name)
         self.write-macro-first-params()
         expression.write()

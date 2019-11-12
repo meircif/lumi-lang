@@ -48,7 +48,8 @@ func read-until(user String ends, copy Bool indent)->(
         if quote = '\0'
             while glob.last-char != '\n'
             while not ends.has(copy glob.last-char)
-            if glob.last-char = '\'' or glob.last-char = '"' or glob.last-char = '`'
+            if glob.last-char = '\'' or glob.last-char = '"' or
+                    glob.last-char = '`'
                 quote := glob.last-char
         else-if glob.last-char = '\\'
             glob.input-buffer.append(copy glob.last-char)

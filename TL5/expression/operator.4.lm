@@ -88,7 +88,8 @@ class MultiplicationOperatorExpression(CompileTimeComputedArithmeticOperatorExpr
 func multiplication-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
         owner BinaryExpression expression)
-    expression := MultiplicationOperatorExpression(user code-node, user operator)
+    expression :=
+            MultiplicationOperatorExpression(user code-node, user operator)
 
 ~~~ div ~~~
 class DivisionOperatorExpression(CompileTimeComputedArithmeticOperatorExpression)
@@ -219,7 +220,8 @@ class ArithmeticAssignOperatorExpression(BinaryExpression)
     func dynamic analyze()
         base()
         if not self.left-expression.assignable
-            self.syntax-error-msg(user "assigning into non assignable expression")
+            self.syntax-error-msg(
+                    user "assigning into non assignable expression")
         self.analyze-assignment()
         self.safe-operand-write := false
 

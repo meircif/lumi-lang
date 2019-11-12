@@ -8790,7 +8790,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-/// @ tv0
+/// @ tc0
 typedef struct ut_M_NoConstructor ut_M_NoConstructor;
 typedef struct ut_M_HasConstructor ut_M_HasConstructor;
 typedef struct ut_M_Test ut_M_Test;
@@ -8870,6 +8870,101 @@ void ut_M_Test_Del(ut_M_Test* self) {
     LUMI_var_dec_ref(self->svnc_Refman);
     ut_M_HasConstructor_Del(&(self->vhc));
     ut_M_NoConstructor_Del(&(self->vnc));
+}
+/// @ tc1
+typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Mid ut_M_Mid;
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Base {
+    char* s;
+    int s_Max_length;
+    int* s_Length;
+};
+struct ut_M_Mid {
+    ut_M_Base _base;
+};
+struct ut_M_Test {
+    ut_M_Mid _base;
+    ut_M_Base* b;
+};
+Returncode ut_M_Base_new(ut_M_Base* self);
+void ut_M_Base_Del(ut_M_Base* self);
+Returncode ut_M_Mid_new(ut_M_Mid* self);
+void ut_M_Mid_Del(ut_M_Mid* self);
+Returncode ut_M_Test_new(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_fun1(void);
+void ut_M_fun2(void (*f)(void));
+Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
+Generic_Type_Dynamic ut_M_Mid_dynamic = {(Dynamic_Del)ut_M_Mid_Del};
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+Returncode ut_M_Base_new(ut_M_Base* self) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    char* aux_String_0 = NULL;
+    int aux_String_0_Max_length = 0;
+    int* aux_String_0_Length = &Lumi_empty_int;
+    INIT_NEW_STRING(6, LUMI_block0_cleanup, aux_String_0, 12);
+    String_Del(self->s);
+    free(self->s);
+    self->s_Max_length = 12;
+    self->s_Length = aux_String_0_Length;
+    self->s = aux_String_0;
+    aux_String_0 = NULL;
+    aux_String_0_Length = &Lumi_empty_int;
+LUMI_block0_cleanup:
+    (void)0;
+    String_Del(aux_String_0);
+    free(aux_String_0);
+    return LUMI_err;
+}
+void ut_M_Base_Del(ut_M_Base* self) {
+    if (self == NULL) return;
+    String_Del(self->s);
+    free(self->s);
+}
+Returncode ut_M_Mid_new(ut_M_Mid* self) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    LUMI_err = ut_M_Base_new(&(self->_base));
+    CHECK(9, LUMI_block0_cleanup)
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+void ut_M_Mid_Del(ut_M_Mid* self) {
+    if (self == NULL) return;
+    ut_M_Base_Del(&(self->_base));
+}
+Returncode ut_M_Test_new(ut_M_Test* self) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    ut_M_fun1();
+    ut_M_fun2(ut_M_fun1);
+    CHECK_REF(15, LUMI_block0_cleanup, self->b)
+    LUMI_err = ut_M_Base_new(self->b);
+    CHECK(15, LUMI_block0_cleanup)
+    LUMI_err = ut_M_Mid_new(&(self->_base));
+    CHECK(16, LUMI_block0_cleanup)
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    ut_M_Mid_Del(&(self->_base));
+    ut_M_Base_Del(self->b);
+    free(self->b);
+}
+void ut_M_fun1(void) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_fun2(void (*f)(void)) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
 }
 /// @ tb0
 typedef struct ut_M_Test ut_M_Test;
@@ -9098,7 +9193,11 @@ constructor did not initialize field "s"
 /// @ tee7
 constructor did not initialize field "s"
 /// @ tee8
+variable with constructor in type without constructor "Error"
+/// @ tee9
 constructor did not initialize field "t"
+/// @ tee10
+constructor did not initialize field "s"
 /// @ tec0
 assigning reference into itself
 /// @ tec1

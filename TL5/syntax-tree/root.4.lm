@@ -61,7 +61,8 @@ class SyntaxTreeRoot(GlobalNodes)
                 glob.current-module := _
                 glob.file-ended := false
                 try
-                    file-open-read(user glob.input-file-name)->(owner glob.input-file)
+                    file-open-read(user glob.input-file-name)->(
+                            owner glob.input-file)
                 catch
                     sys.print(user "could not read file \"")
                     sys.print(user glob.input-file-name)
@@ -94,10 +95,13 @@ class SyntaxTreeRoot(GlobalNodes)
                 if not is-legal-name(user name, copy NameGroup.DEFAULT)
                     self.syntax-error(user "illegal module name", user name)
                 if glob.global-module.variable-map.find(user name)?
-                    self.syntax-error(user "module name overrides variable", user name)
+                    self.syntax-error(
+                            user "module name overrides variable", user name)
                 if glob.global-module.function-map.find(user name)?
-                    self.syntax-error(user "module name overrides function", user name)
-                if not glob.module-map.find(user name)->(user glob.current-module)?
+                    self.syntax-error(
+                            user "module name overrides function", user name)
+                if not glob.module-map.find(user name)->(
+                        user glob.current-module)?
                     new ModuleMembers module-members(user name)
                     glob.current-module := module-members
                     self.modules.add(owner module-members)
@@ -229,7 +233,8 @@ class SyntaxTreeRoot(GlobalNodes)
                 covered-index += 1
         self.covered-files := covered-index
         if self.covered-files = 0
-            sys.print(user "General code error: no code to test under module \"")
+            sys.print(
+                    user "General code error: no code to test under module \"")
             sys.print(user glob.tested-module)
             sys.print(user "\"\n")
             sys.exit(copy 1)
@@ -244,7 +249,8 @@ class SyntaxTreeRoot(GlobalNodes)
     ~~~
     func dynamic write()
         try
-            file-open-write(user self.output-file-name)->(owner glob.output-file)
+            file-open-write(user self.output-file-name)->(
+                    owner glob.output-file)
         catch
             sys.print(user "could not write file \"")
             sys.print(user self.output-file-name)
@@ -299,7 +305,8 @@ class SyntaxTreeRoot(GlobalNodes)
             if not glob.is-new-mocked
                 write(user "\n\nvoid new_Mock(Bool* allocate_success) { }")
             if not glob.is-delete-mocked
-                write(user "\n\nReturncode delete_Mock(Ref self) { return OK; }")
+                write(user "\n\nReturncode delete_Mock(Ref self) \
+                        { return OK; }")
                 
         if glob.tested-module?
             write-global(user "\n\n/* main test function */\n")
@@ -379,7 +386,8 @@ class SyntaxTreeRoot(GlobalNodes)
             write(user ");\n")
         if self.line-counts?
             write-spaces(copy INDENTATION-SPACES)
-            write(user "LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, ")
+            write(user "LUMI_success &= \
+                    LUMI_test_coverage(LUMI_file_coverage, ")
             write-int(copy self.covered-files)
             write(user ");\n")
         write-spaces(copy INDENTATION-SPACES)
@@ -447,7 +455,8 @@ class GlobalInit(SyntaxTreeFunction)
             return
         self.write-setup()
         self.write-children(user self.variables)
-        write(user "#define LUMI_FUNC_NAME \"global variable initialization\"\n")
+        write(user "#define LUMI_FUNC_NAME \"global variable \
+                initialization\"\n")
         self.write-block-body()
         write(user "#undef LUMI_FUNC_NAME\n")
 

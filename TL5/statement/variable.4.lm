@@ -58,7 +58,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             if self.is-initialized
                 VariableInit.parse-new(user _, user self)
             else-if glob.last-char = '!'
-                self.syntax-error-msg(user "using \"!\" where there is no error")
+                self.syntax-error-msg(
+                        user "using \"!\" where there is no error")
             else-if self.parent is-not glob.root.global-init
                 self.parent.code-nodes.add(owner VariableCreate(user self))
         else-if glob.last-char = '!'
@@ -120,9 +121,11 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     func dynamic analyze()
         if self.my-module?
             glob.current-module := self.my-module
-        if self.type-instance.type-data.is-primitive and self.access != Access.VAR
+        if self.type-instance.type-data.is-primitive and
+                self.access != Access.VAR
             self.syntax-error(
-                    user "only \"var\" access is supported for primitive types, got",
+                    user "only \"var\" access is supported for primitive \
+                    types, got",
                     user glob.access-names[self.access])
         self.type-instance.analyze-lengths(
                 user self, copy access-is-only-var(copy self.access))
@@ -141,11 +144,18 @@ class SyntaxTreeVariable(SyntaxTreeCode)
                 self.syntax-error-msg(user "fields cannot have \"user\" access")
             if (not self.type-instance.type-data.is-primitive or
                     self.type-instance.type-data is glob.type-func) and
-                    not self.type-instance.conditional and self.access != Access.VAR and
-                    self.access != Access.S-VAR and not self.parent-type.constructor?
-                self.syntax-error(
-                        user "non-conditional reference in type without constructor",
-                        user self.parent-type.name)
+                    not self.parent-type.constructor?
+                if access-is-only-var(copy self.access)
+                    if self.type-instance.type-data.constructor?
+                        self.syntax-error(
+                                user "variable with constructor in type \
+                                without constructor",
+                                user self.parent-type.name)
+                else-if not self.type-instance.conditional
+                    self.syntax-error(
+                            user "non-conditional reference in type without \
+                            constructor",
+                            user self.parent-type.name)
         if self.my-module?
             glob.current-module := _
         
@@ -183,7 +193,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         else
             self.type-instance.write-cname()
             if not self.type-instance.type-data.is-primitive and
-                    not (self.parent-type? and access-is-only-var(copy self.access))
+                    not (self.parent-type? and
+                    access-is-only-var(copy self.access))
                 write(user "*")
             write(user " ")
             self.write-cname()
@@ -325,11 +336,14 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         do
             if type-data.base-type?
                 type-data := type-data.base-type.type-data
-            else-if access-is-only-var(copy type-data.variables.first.item.access) and
-                    not type-data.variables.first.item.type-instance.type-data.is-primitive
-                type-data := type-data.variables.first.item.type-instance.type-data
             else
-                break
+                user SyntaxTreeVariable variable(
+                        user type-data.variables.first.item)
+                if access-is-only-var(copy variable.access) and
+                        not variable.type-instance.type-data.is-primitive
+                    type-data := variable.type-instance.type-data
+                else
+                    break
             bases += 1
             write(user "{")
         write(user "0")
@@ -470,7 +484,8 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
         read-until(user " ", copy false)->(user type-name)
         if not type-name.equal(user "Int")
             self.syntax-error(
-                    user "Only \"Int\" typed constant supported, got", user type-name)
+                    user "Only \"Int\" typed constant supported, got",
+                    user type-name)
         self.expect-space(user "Int")
         read-new(user " ")->(owner self.name)
         if not is-legal-name(user self.name, copy NameGroup.CONSTANT)

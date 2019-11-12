@@ -27,7 +27,8 @@ class EnumData(SyntaxTreeNode)
             read-until(user " .([{?", copy true)->(user value, var spaces)
             while spaces > 0
             if spaces != INDENTATION-SPACES
-                self.syntax-error-indentation(copy spaces, copy INDENTATION-SPACES)
+                self.syntax-error-indentation(
+                        copy spaces, copy INDENTATION-SPACES)
             if not is-legal-name(user value, copy NameGroup.CONSTANT)
                 self.syntax-error(user "illegal constant name", user value)
             self.expect-new-line(user value)

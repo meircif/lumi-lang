@@ -131,32 +131,55 @@ class FunctionCallExpression(CallExpression)
                     user "ignoring error result check on function call")
 
     func dynamic check-memory(user ReferenceMemoryList refs)
-        self.check-constructor-var-new(user refs)
+        user SyntaxTreeVariable self-var
+        self.check-constructor-inits(user refs)->(user self-var)
         base(user refs)
+        if self-var?
+            refs.mark-invalid-reference(user ReferencePath(user self-var))
         refs.mark-illegal-types(
                 user self.function.function.delete-group, user _)
     
-    func dynamic check-constructor-var-new(user ReferenceMemoryList refs)
+    func dynamic check-constructor-inits(user ReferenceMemoryList refs)->(
+            user SyntaxTreeVariable self-var)
         ; check inside a constructor
         user SyntaxTreeFunction block-function
         self.code-node.get-function()->(user block-function)
         if not block-function.is-constructor()
             return
         ; check instance is "self.var-field.new(...)"
+        if not self.arguments.parameters.first?
+            return
         user Expression instance
         self.arguments.parameters.first.item.get-output()->(user instance)
         if not instance.result-type.reference-path?
             return
-        if not instance.result-type.reference-path.field?
+        block-function.arguments.parameters.first.item.get-variable()->(
+                user self-var)
+        if instance.result-type.reference-path.variable is-not self-var or
+                not self.function.function.is-constructor()
+            self-var := _
             return
-        if instance.result-type.reference-path.variable is-not
-                block-function.arguments.parameters.first.item.get-variable() or
-                instance.result-type.reference-path.field.field? or
-                not self.function.function.is-constructor() or
+        if not instance.result-type.reference-path.field?
+            self.clear-base-references(user refs, user self-var)
+            return
+        self-var := _
+        if instance.result-type.reference-path.field.field? or
                 not access-is-only-var(
                 copy instance.result-type.reference-path.field.variable.access)
             return
         refs.clear-invalid-reference(user instance.result-type.reference-path)
+
+    func dynamic clear-base-references(
+            user ReferenceMemoryList refs, user SyntaxTreeVariable self-var)
+        var ReferencePath reference-path(user self-var)
+        refs.clear-invalid-reference(user reference-path)
+        user TypeData type-data(user self.function.function.parent-type)
+        do
+            for field in type-data.variables.iter()
+                reference-path.field := ReferencePath(user field)
+                refs.clear-invalid-reference(user reference-path)
+            while type-data.base-type?
+            type-data := type-data.base-type.type-data
     
     func dynamic write-function()
         self.function.write()
@@ -339,7 +362,7 @@ class CallArgument(Argument)
         if access-is-owner(copy self.access) and reference-path?
             refs.check-writing-memory(user self.value)
             if not self.is-output
-                refs.mark-invalid-reference(user reference-path, user self)
+                refs.mark-invalid-reference(user reference-path)
         else
             self.value.check-memory(user refs)
         if not self.is-output

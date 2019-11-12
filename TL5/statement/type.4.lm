@@ -34,11 +34,13 @@ class TypeData(SyntaxTreeNamespace)
                 owner String name
                 read-new(user ":}")->(owner name)
                 if not is-legal-name(user name, copy NameGroup.TYPE)
-                    self.syntax-error(user "illegal type parameter name", user name)
+                    self.syntax-error(
+                            user "illegal type parameter name", user name)
                 self.parameters.add(owner name)
                 while glob.last-char = ':'
             if glob.last-char != '}'
-                self.syntax-error-c(user "expected \"}\" after type parameters, got")
+                self.syntax-error-c(user "expected \"}\" after type \
+                        parameters, got")
             read-c()
         if glob.last-char = '('
             self.base-type := TypeInstance()
@@ -71,7 +73,8 @@ class TypeData(SyntaxTreeNamespace)
         if keyword.equal(user "new")
             if self.constructor?
                 self.syntax-error(
-                        user "constructor already defined for type", user self.name)
+                        user "constructor already defined for type",
+                        user self.name)
             self.functions.add(
                     owner SyntaxTreeConstructor.parse-new(user _, user self))
         else
@@ -134,7 +137,8 @@ class TypeData(SyntaxTreeNamespace)
             return
         if self.ordering
             self.print-syntax-error-header()
-            print-msg-with-item(user "recursive declaration of type", user self.name)
+            print-msg-with-item(
+                    user "recursive declaration of type", user self.name)
             recursion-error := true
             return
         
@@ -157,10 +161,12 @@ class TypeData(SyntaxTreeNamespace)
                 variable.type-instance.link-types(user self)
                 glob.current-module := _
                 if not variable.type-instance.type-data.is-primitive and
-                        variable.type-instance.type-data is-not glob.type-generic
-                    if variable.type-instance.type-data.order-bases(user ordered-list)->(
-                            var recursion-error)
-                        print-msg-with-item(user ", variable of type", user self.name)
+                        variable.type-instance.type-data is-not
+                        glob.type-generic
+                    if variable.type-instance.type-data.order-bases(
+                            user ordered-list)->(var recursion-error)
+                        print-msg-with-item(
+                                user ", variable of type", user self.name)
                         return
         
         ordered-list.add(owner glob.root.types.remove(user self))
@@ -179,7 +185,8 @@ class TypeData(SyntaxTreeNamespace)
                 function.compare(user method)
                 if function.is-dynamic
                     function.dynamic-base-method := method.dynamic-base-method
-                    function.dynamic-base-count := method.dynamic-base-count + bases + 1
+                    function.dynamic-base-count :=
+                            method.dynamic-base-count + bases + 1
                     method.delete-group-builder.add-dynamic-override(
                             user self, user function, user method)
             else-if function.is-dynamic
@@ -211,7 +218,8 @@ class TypeData(SyntaxTreeNamespace)
             do
                 if not iter.has()
                     self.syntax-error(
-                            user "class with no dynamic methods", user self.name)
+                            user "class with no dynamic methods",
+                            user self.name)
                 while not iter.get().is-dynamic
                 iter.next()
         base()

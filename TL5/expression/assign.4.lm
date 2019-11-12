@@ -54,7 +54,7 @@ class AssignExpression(Expression)
         refs.clear-invalid-reference(user left-path)
         if is-move
             refs.check-writing-memory(user self.value)
-            refs.mark-invalid-reference(user right-path, user self)
+            refs.mark-invalid-reference(user right-path)
             refs.check-writing-memory(user self.target)
         else
             self.value.check-memory(user refs)
@@ -124,7 +124,8 @@ class AssignExpression(Expression)
         if data-type.type-data is glob.type-string
             self.target.write()
             write(user "_String_length = ")
-            self.value.write-length(user "_String_length", user "NULL", copy false)
+            self.value.write-length(
+                    user "_String_length", user "NULL", copy false)
             write(user ";\n")
             self.code-node.write-spaces()
     
@@ -137,7 +138,8 @@ class AssignExpression(Expression)
         
         self.target.write()
         write(user "_Length = ")
-        self.value.write-length(user "_Length", user "&Lumi_empty_int", copy false)
+        self.value.write-length(
+                user "_Length", user "&Lumi_empty_int", copy false)
         write(user ";\n")
         self.code-node.write-spaces()
     
@@ -198,7 +200,8 @@ class AssignExpression(Expression)
                 not self.value.is-generic-cast
             write(user "(Generic_Type_Dynamic*)")
             self.value.write-dynamic-safe()
-        else-if self.value.is-generic-cast and not self.target.is-generic-cast and
+        else-if self.value.is-generic-cast and
+                not self.target.is-generic-cast and
                 not (self.target.result-type.type-data is glob.type-generic)
             self.value.write-dynamic-safe()
         else
@@ -225,7 +228,8 @@ class AssignExpression(Expression)
             write(user "_Del(")
         else
             user TypeInstance data-type
-            self.target.result-type.get-array-data-type-depth()->(user data-type)
+            self.target.result-type.get-array-data-type-depth()->(
+                    user data-type)
             if data-type.type-data is glob.type-string
                 write(user "free(")
                 self.target.write()
@@ -264,7 +268,8 @@ class AssignExpression(Expression)
             return
         self.code-node.write-spaces()
         self.original-value.write-assign-null()
-        if self.value.access = Access.OWNER and self.target.access = Access.STRONG
+        if self.value.access = Access.OWNER and
+                self.target.access = Access.STRONG
             self.code-node.write-spaces()
             self.write-macro-init(user "INIT_NEW_REFMAN", user self.target)
             write(user ")\n")

@@ -15,7 +15,8 @@ class BaseMethExpression(Expression)
             self.syntax-error-msg(user "\"base\" used not in method")
         if not parent-function.parent-type.base-type?
             self.syntax-error(
-                    user "no base type for type", user parent-function.parent-type.name)
+                    user "no base type for type",
+                    user parent-function.parent-type.name)
         self.set-simple-type(user glob.type-base)
         self.result-type.add-subtype-copy(user parent-function.parent-type)
         
@@ -72,7 +73,8 @@ class TypeExpression(ModuleTypeExpression)
         expression := type-expression
     
     func inst parse(
-            owner TypeInstance type-instance, owner Expression module-expression)
+            owner TypeInstance type-instance,
+            owner Expression module-expression)
         self.set-simple-type(user glob.type-type)
         self.module-expression := module-expression
         self.result-type.parameters := List{TypeInstance}()
@@ -92,7 +94,9 @@ class EnumExpression(ModuleTypeExpression)
     var Int int-value
     
     func inst parse-new(
-            owner String name, owner String value, user SyntaxTreeCode code-node)->(
+            owner String name,
+            owner String value,
+            user SyntaxTreeCode code-node)->(
             owner Expression expression)
         new EnumExpression enum-expression(user code-node)
         enum-expression.parse(owner name, owner value, owner expression)
@@ -111,7 +115,8 @@ class EnumExpression(ModuleTypeExpression)
     func dynamic analyze()
         if self.module-expression?
             self.analyze-module()
-            user String module-name(user self.module-expression.result-type.name)
+            user String module-name(
+                    user self.module-expression.result-type.name)
             if not self.code-node.find-module(user module-name).enum-map.find(
                     user self.name)->(user self.enum-data)?
                 self.syntax-error2(
@@ -124,7 +129,10 @@ class EnumExpression(ModuleTypeExpression)
             self.syntax-error(user "unknown Enum", user self.name)
         if not self.enum-data.has-value(user self.value)->(var self.int-value)
             self.syntax-error2(
-                    user "Enum", user self.name, user "has no value", user self.value)
+                    user "Enum",
+                    user self.name,
+                    user "has no value",
+                    user self.value)
                 
     func dynamic get-constant-value()->(var Int value, var Bool has-value)
         value := self.int-value

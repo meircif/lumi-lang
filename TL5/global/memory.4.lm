@@ -103,7 +103,7 @@ struct ReferenceMemoryList
         
     func add-invalids(user ReferenceMemoryList child-list)
         for reference-path in child-list.added-invalid-references.iter()
-            self.mark-invalid-reference(user reference-path, user _)
+            self.mark-invalid-reference(user reference-path)
         for variable in child-list.removed-user-references.iter()
             self.remove-user-reference(user variable)
     
@@ -118,7 +118,8 @@ struct ReferenceMemoryList
             self.mark-all-illegal()
         else
             for type-instance in delete-group.deleting-types.iter()
-                self.mark-specific-illegal-type(user type-instance, user actual-params)
+                self.mark-specific-illegal-type(
+                        user type-instance, user actual-params)
     
     func mark-all-illegal()
         for variable in self.user-references.iter()
@@ -130,10 +131,12 @@ struct ReferenceMemoryList
         self.mark-specific-illegal-type(user type-instance, user _)
         if type-instance.type-data.delete-group?
             self.mark-illegal-types(
-                    user type-instance.type-data.delete-group, user type-instance)
+                    user type-instance.type-data.delete-group,
+                    user type-instance)
     
     func mark-specific-illegal-type(
-            user TypeInstance type-instance-base, user TypeInstance actual-params)
+            user TypeInstance type-instance-base,
+            user TypeInstance actual-params)
         owner TypeInstance type-instance
         if actual-params?
             type-instance-base.new-replace-params(user actual-params)->(
@@ -147,7 +150,8 @@ struct ReferenceMemoryList
             variable.type-instance.copy(user variable-type-instance)
             type-instance.conditional := false
             if variable-type-instance.can-be-assigned-to(user type-instance) or
-                    type-instance.can-be-assigned-to(user variable-type-instance)
+                    type-instance.can-be-assigned-to(
+                    user variable-type-instance)
                 to-delete.add(user variable.name, user variable)
         for variable in to-delete.iter()
             self.remove-user-reference(user variable)
@@ -157,8 +161,7 @@ struct ReferenceMemoryList
                 user variable.name, user variable)
         self.user-references.remove(user variable)
 
-    func mark-invalid-reference(
-            user ReferencePath reference-path, user SyntaxTreeNode node)
+    func mark-invalid-reference(user ReferencePath reference-path)
         if not reference-path?
             return
         if reference-path.is-conditional()
@@ -206,7 +209,8 @@ struct ReferenceMemoryList
                 return
     
     func is-invalid(user ReferencePath reference-path)->(var Bool is-invalid)
-        self.reference-inside(user reference-path, user self.invalid-references)->(
+        self.reference-inside(
+                user reference-path, user self.invalid-references)->(
                 var is-invalid)
     
     func check-reference(user Expression expression)
@@ -351,7 +355,8 @@ struct DeleteGroupBuilder(DeleteGroup)
             self.set-delete-all()
             return
         for type-instance in call.function.delete-group.deleting-types.iter()
-            type-instance.replace-type-parameters(user call.calling-type, copy true)
+            type-instance.replace-type-parameters(
+                    user call.calling-type, copy true)
             self.add-deleting(user type-instance)
     
     func merge-from(user DeleteGroupBuilder other)

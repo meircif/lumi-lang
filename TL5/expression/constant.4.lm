@@ -68,11 +68,15 @@ class IntExpression(Expression)
             else
                 number := number[2:number.length - 2]
                 if second = 'b' or second = 'B'
-                    if not get-number-value(user number, copy 2)->(var self.value)
-                        self.syntax-error(user "illegal binary number", user text)
+                    if not get-number-value(user number, copy 2)->(
+                            var self.value)
+                        self.syntax-error(
+                                user "illegal binary number", user text)
                 else-if second = 'x' or second = 'X'
-                    if not get-number-value(user number, copy 16)->(var self.value)
-                        self.syntax-error(user "illegal hexadecimal number", user text)
+                    if not get-number-value(user number, copy 16)->(
+                            var self.value)
+                        self.syntax-error(
+                                user "illegal hexadecimal number", user text)
                 else
                     self.syntax-error(user "illegal number", user text)
         else-if not get-number-value(user number, copy 10)->(var self.value)
@@ -118,10 +122,12 @@ class CharExpression(TextExpression)
             var Int value
             if ch = 'x'
                 if not get-number-value(user text[3:2], copy 16)->(var value)
-                    self.syntax-error(user "illegal character constant", user text)
+                    self.syntax-error(
+                            user "illegal character constant", user text)
             else
                 if not get-number-value(user text[2:3], copy 8)->(var value)
-                    self.syntax-error(user "illegal character constant", user text)
+                    self.syntax-error(
+                            user "illegal character constant", user text)
             self.value := value
         else
             self.syntax-error(user "illegal character constant", user text)

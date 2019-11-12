@@ -170,7 +170,8 @@ class SyntaxTreeLoop(SyntaxTreeFlowElement)
                 self.expect-char(copy '!', user "!", user "loop")
                 read-c()
             else-if glob.last-char = '!'
-                self.syntax-error-msg(user "using \"!\" where error is not propagated")
+                self.syntax-error-msg(
+                        user "using \"!\" where error is not propagated")
             self.expect-space(user "loop")
             self.limit.new(user "", user self)
         self.parse-block()
@@ -189,7 +190,9 @@ class SyntaxTreeLoop(SyntaxTreeFlowElement)
                     owner self.aux-counter)
             if not self.limit.get-constant-value()->(var self.limit-value)
                 self.add-aux-variable(
-                        copy Access.VAR, copy false, user self.limit.result-type)->(
+                        copy Access.VAR,
+                        copy false,
+                        user self.limit.result-type)->(
                         owner self.aux-limit)
         base()
         if self.check-infinite and not self.is-finite

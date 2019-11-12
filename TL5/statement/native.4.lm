@@ -55,7 +55,8 @@ class NativeFunction(SyntaxTreeFunction)
             self.syntax-error-msg(user "error raising native function")
         if self.arguments.outputs.first?
             if self.arguments.outputs.first.next?
-                self.syntax-error-msg(user "more than one output to native function")
+                self.syntax-error-msg(
+                        user "more than one output to native function")
         glob.current-module.function-map.add(user self.name, user self)
     
     func dynamic check-memory(user ReferenceMemoryList global-refs)
@@ -88,7 +89,8 @@ class NativeVariable(SyntaxTreeVariable)
     func dynamic analyze()
         if not self.type-instance.type-data.is-primitive
             self.syntax-error(
-                    user "only primitive types supported for native variable, got",
+                    user "only primitive types supported for native variable, \
+                    got",
                     user self.type-instance.type-data.name)
         base()
     
@@ -171,7 +173,8 @@ class NativeType(TypeData)
 class NativeCode(SyntaxTreeCode)
     owner NativeText code
     
-    func inst parse-new(user SyntaxTreeBlock parent)->(owner NativeCode new-node)
+    func inst parse-new(user SyntaxTreeBlock parent)->(
+            owner NativeCode new-node)
         new-node := NativeCode(user parent)
         NativeText.parse-new(user _, user new-node)->(owner new-node.code)
     

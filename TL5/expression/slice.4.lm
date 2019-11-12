@@ -103,14 +103,17 @@ class SliceExpression(Expression)
         self.need-index-check :=
                 not self.index.get-constant-value()->(var index-value)
         if not self.need-index-check and index-value < 0
-            self.syntax-error-value(user "negative slice index", copy index-value)
+            self.syntax-error-value(
+                    user "negative slice index", copy index-value)
         
         if self.second-index?
             self.need-second-index-check :=
-                    not self.second-index.get-constant-value()->(var second-index-value)
+                    not self.second-index.get-constant-value()->(
+                    var second-index-value)
             if not self.need-second-index-check and second-index-value < 1
                 self.syntax-error-value(
-                        user "non positive slice length", copy second-index-value)
+                        user "non positive slice length",
+                        copy second-index-value)
         
         if self.sequence.result-type.type-data is-not glob.type-string and
                 self.sequence.result-type.length?
@@ -126,7 +129,8 @@ class SliceExpression(Expression)
                 index-value + second-index-value > length-value
             self.print-syntax-error-header()
             self.print-msg-and-value(
-                    user "slice last index", copy index-value + second-index-value - 1)
+                    user "slice last index",
+                    copy index-value + second-index-value - 1)
             self.print-msg-and-value(
                     user " is larger than sequence size", copy length-value)
             self.syntax-error-raise()
@@ -140,7 +144,8 @@ class SliceExpression(Expression)
                         user index.result-type.type-data.name)
         else
             self.syntax-error-msg(
-                    user "expected integer index for slice, got void expression")
+                    user "expected integer index for slice, got void \
+                    expression")
     
     func inst syntax-error-value(user String header, copy Int value)
         self.print-syntax-error-header()
