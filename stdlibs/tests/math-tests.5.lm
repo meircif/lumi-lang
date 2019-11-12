@@ -1,5 +1,5 @@
 ~~~ Tests for math functions ~~~
-module math-test
+module math-tests
 
 test abs-test()
     assert! math.abs(copy 234) = 234
