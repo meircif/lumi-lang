@@ -34,7 +34,11 @@ class SyntaxTreeReturn(SyntaxTreeCode)
         is-end := true
 
     func dynamic check-memory(user ReferenceMemoryList refs)
-        self.get-function().check-outputs-memory(user refs)
+        user SyntaxTreeFunction function
+        self.get-function()->(user function)
+        function.check-outputs-memory(user refs)
+        if function.is-constructor()
+            function.check-field-initialized(user refs)
     
     func dynamic analyze()
         self.set-loop-finite(copy true)

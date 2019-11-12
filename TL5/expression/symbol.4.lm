@@ -151,14 +151,18 @@ class FunctionExpression(Expression)
         if self.instance? and not self.after-type
             new CallArgument self-param
             self-param.set-location()
-            self-param.access := self.function.arguments.parameters.first.item.access
+            self-param.access :=
+                    self.function.arguments.parameters.first.item.access
             if self.after-base
                 new VariableExpression self-var(
-                        user self.instance.code-node, owner string-new-copy(user "self"))
+                        user self.instance.code-node,
+                        owner string-new-copy(user "self"))
                 self.code-node.find-variable(user self-var.name, user _)->(
                         user self-var.variable)
                 self-var.variable.type-instance.new-replace-params(
                         user actual-params)->(owner self-var.result-type)
+                self-var.result-type.reference-path :=
+                        ReferencePath(user self-var.variable)
                 self-param.value := self-var
                 self.bases += 1
             else
@@ -170,7 +174,8 @@ class FunctionExpression(Expression)
                     not self-instance.is-complex-field
                 if self.ignore-mock
                     self.syntax-error(
-                            user "accessing mock function field in dynamic call to",
+                            user "accessing mock function field in dynamic \
+                            call to",
                             user self.function.name)
                 expression := DynamicCallExpression(
                         user self.code-node,

@@ -12,7 +12,8 @@ class SyntaxTreeNode
         self.line-number := glob.line-number
     
     func inst read-line-break-spaces(copy Int indentation-spaces)
-        var Int expected-spaces(copy indentation-spaces + (2 * INDENTATION-SPACES))
+        var Int expected-spaces(
+                copy indentation-spaces + (2 * INDENTATION-SPACES))
         for n in expected-spaces
             read-c()
             if glob.last-char != ' '
@@ -54,7 +55,10 @@ class SyntaxTreeNode
                     user type-data)?
                 return
             self.syntax-error2(
-                    user "unknown type", user name, user "in module", user module-name)
+                    user "unknown type",
+                    user name,
+                    user "in module",
+                    user module-name)
         if glob.find-type(user name)->(user type-data)?
             return
         user TypeData parent-type
@@ -90,14 +94,18 @@ class SyntaxTreeNode
             actual-text.append(copy glob.last-char)
         if not actual-text.equal(user expected-text)
             self.syntax-error2(
-                    user "expected", user expected-text, user "got", user actual-text)
+                    user "expected",
+                    user expected-text,
+                    user "got",
+                    user actual-text)
     
     func inst analyze-expression(
             user ExpressionValue expression, user TypeData expected-type)
         expression.analyze()
         if not expression.result-type?
             self.syntax-error(
-                    user "got void expression, expected", user expected-type.name)
+                    user "got void expression, expected",
+                    user expected-type.name)
         if expression.result-type.type-data is-not expected-type
             self.syntax-error2(
                     user "got",
@@ -147,7 +155,10 @@ class SyntaxTreeNode
     
     ~~~ Same as `syntax-error` but but with another `{text} "{item}" pair ~~~
     func inst syntax-error2(
-            user String text1, user String item1, user String text2, user String item2)
+            user String text1,
+            user String item1,
+            user String text2,
+            user String item2)
         self.print-syntax-error-header()
         print-msg-with-item(user text1, user item1)
         sys.print(user " ")

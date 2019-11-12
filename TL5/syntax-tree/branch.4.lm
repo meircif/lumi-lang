@@ -30,7 +30,8 @@ class SyntaxTreeBranch(SyntaxTreeNode)
         do
             user String keyword
             var Int spaces
-            read-until(user expression-ends, copy true)->(user keyword, var spaces)
+            read-until(user expression-ends, copy true)->(
+                    user keyword, var spaces)
             ; ignore empty lines
             if keyword.length > 0 or glob.last-char != '\n'
                 self.set-location()
@@ -40,7 +41,8 @@ class SyntaxTreeBranch(SyntaxTreeNode)
                         self.syntax-error-indentation(
                                 copy spaces, copy self.indentation-spaces)
                     
-                    while spaces = self.indentation-spaces and not glob.file-ended
+                    while spaces = self.indentation-spaces and
+                            not glob.file-ended
                     
                     if not self.parse-if-common(
                             user keyword, user parent-type, user parent-block)
@@ -48,7 +50,8 @@ class SyntaxTreeBranch(SyntaxTreeNode)
                 
                 while not glob.file-ended
                 if not glob.save-input and glob.last-char != '\n'
-                    self.syntax-error-c(user "expected new-line in line end, got")
+                    self.syntax-error-c(
+                            user "expected new-line in line end, got")
         
         self.line-number := my-line-number
     
@@ -74,7 +77,8 @@ class SyntaxTreeBranch(SyntaxTreeNode)
             var Char prev(copy '\0')
             do
                 read-c()
-                while not glob.file-ended and (glob.last-char != ']' or prev != ';')
+                while not glob.file-ended and
+                        (glob.last-char != ']' or prev != ';')
                 prev := glob.last-char
             read-c()
         else
@@ -89,7 +93,8 @@ class SyntaxTreeBranch(SyntaxTreeNode)
         
         if parent-block? and glob.tested-module?
             if glob.current-module.name.equal(user glob.tested-module) and
-                    not keyword.equal(user "else") and not keyword.equal(user "else-if")
+                    not keyword.equal(user "else") and
+                    not keyword.equal(user "else-if")
                 parent-block.code-nodes.add(
                         owner SyntaxTreeCoverage(user parent-block))
         
@@ -180,7 +185,8 @@ class SyntaxTreeBranch(SyntaxTreeNode)
             self.write-owner-reference-cleanup(
                     user variable, user parent-type, user data-type)
         else-if access-is-only-var(copy variable.access)
-            self.write-var-cleanup(user variable, user parent-type, user data-type)
+            self.write-var-cleanup(
+                    user variable, user parent-type, user data-type)
             if variable.access = Access.VAR
                 return
         if parent-type?
