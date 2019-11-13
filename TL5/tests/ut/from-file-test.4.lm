@@ -309,6 +309,10 @@ func read-line(user File file, user String line, user String prefix)->(
     do
         while not file.getc.mocked()->(var ch)
         while ch != '\n'
+        if ch = '#'
+            while not file.getc.mocked()->(var ch)
+            while ch != '\n'
+            line.append(copy '#')
         line.append(copy ch)
         if prefix? and not found-prefix
             if line.equal(user prefix)
