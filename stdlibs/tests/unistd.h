@@ -1,5 +1,5 @@
 
-#import <string.h>
+#include <string.h>
 
 #define F_OK 0
 #define R_OK 1
