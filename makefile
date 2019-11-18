@@ -1,5 +1,5 @@
 CC?=gcc
-BUILDDIR=build
+BUILDDIR=.build
 INSTALLDIR=/usr/local/bin/
 EXECUTABLES=lumi $(foreach n,0 1 2 3 4 5,tl$(n)-compiler)
 EXECUTABLE_PATHS=$(addprefix $(BUILDDIR)/,$(EXECUTABLES))

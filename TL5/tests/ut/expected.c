@@ -242,88 +242,88 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 /// @@ test-int-expression
-/// @ t0
+/// @ test-int-expression-0
 ut_M_i = 0;
-/// @ t1
+/// @ test-int-expression-1
 ut_M_i = 9630;
-/// @ t2
+/// @ test-int-expression-2
 ut_M_i = -9630;
-/// @ t3
+/// @ test-int-expression-3
 ut_M_i = 3920;
-/// @ t4
+/// @ test-int-expression-4
 ut_M_i = -3920;
-/// @ t5
+/// @ test-int-expression-5
 ut_M_i = 16623936;
-/// @ t6
+/// @ test-int-expression-6
 ut_M_i = -16623936;
-/// @ t7
+/// @ test-int-expression-7
 ut_M_i = 16623936;
-/// @ t8
+/// @ test-int-expression-8
 ut_M_i = -16623936;
-/// @ t9
+/// @ test-int-expression-9
 ut_M_i = 37;
-/// @ t10
+/// @ test-int-expression-10
 ut_M_i = -37;
-/// @ te0
+/// @ test-int-expression-e0
 illegal number "2a"
-/// @ te1
+/// @ test-int-expression-e1
 illegal number "0a"
-/// @ te2
+/// @ test-int-expression-e2
 illegal octal number "038"
-/// @ te3
+/// @ test-int-expression-e3
 illegal binary number "0b021"
-/// @ te4
+/// @ test-int-expression-e4
 illegal hexadecimal number "0xadg"
 /// @@ test-byte-expression
-/// @ t0
+/// @ test-byte-expression-0
 ut_M_bt = 0;
-/// @ t1
+/// @ test-byte-expression-1
 ut_M_bt = 127;
-/// @ t2
+/// @ test-byte-expression-2
 ut_M_bt = 61;
-/// @ t3
+/// @ test-byte-expression-3
 ut_M_bt = 253;
-/// @ t4
+/// @ test-byte-expression-4
 ut_M_bt = 253;
-/// @ t5
+/// @ test-byte-expression-5
 ut_M_bt = 148;
 /// @@ test-char-expression
-/// @ t0
+/// @ test-char-expression-0
 ut_M_c = 'a';
-/// @ t1
+/// @ test-char-expression-1
 ut_M_c = '\'';
-/// @ t2
+/// @ test-char-expression-2
 ut_M_c = '\n';
-/// @ t3
+/// @ test-char-expression-3
 ut_M_c = '\x0f';
-/// @ t4
+/// @ test-char-expression-4
 ut_M_c = '\xA9';
-/// @ t5
+/// @ test-char-expression-5
 ut_M_c = '\270';
-/// @ te0
+/// @ test-char-expression-e0
 illegal character constant "'''"
-/// @ te1
+/// @ test-char-expression-e1
 illegal character constant "'\'"
-/// @ te2
+/// @ test-char-expression-e2
 illegal character constant "'aa"
-/// @ te3
+/// @ test-char-expression-e3
 illegal character constant "'\c'"
-/// @ te4
+/// @ test-char-expression-e4
 illegal character constant "'aaaa'"
-/// @ te5
+/// @ test-char-expression-e5
 illegal character constant "'\x6g'"
-/// @ te6
+/// @ test-char-expression-e6
 illegal character constant "'\058'"
-/// @ te7
+/// @ test-char-expression-e7
 illegal character constant "''"
-/// @ te8
+/// @ test-char-expression-e8
 illegal character constant "'aa'"
-/// @ te9
+/// @ test-char-expression-e9
 illegal character constant "'aaa'"
-/// @ te10
+/// @ test-char-expression-e10
 illegal character constant "'aaaaa'"
 /// @@ test-string-expression
-/// @ t0
+/// @ test-string-expression-0
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
@@ -331,7 +331,7 @@ char* aux_String_0 = NULL;
     ut_M_str_Max_length = aux_String_0_Max_length;
     ut_M_str_Length = aux_String_0_Length;
     ut_M_str = aux_String_0;
-/// @ t1
+/// @ test-string-expression-1
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
@@ -339,7 +339,7 @@ char* aux_String_0 = NULL;
     ut_M_str_Max_length = aux_String_0_Max_length;
     ut_M_str_Length = aux_String_0_Length;
     ut_M_str = aux_String_0;
-/// @ t2
+/// @ test-string-expression-2
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
@@ -347,7 +347,7 @@ char* aux_String_0 = NULL;
     ut_M_str_Max_length = aux_String_0_Max_length;
     ut_M_str_Length = aux_String_0_Length;
     ut_M_str = aux_String_0;
-/// @ t3
+/// @ test-string-expression-3
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
@@ -355,7 +355,7 @@ char* aux_String_0 = NULL;
     ut_M_str_Max_length = aux_String_0_Max_length;
     ut_M_str_Length = aux_String_0_Length;
     ut_M_str = aux_String_0;
-/// @ t4
+/// @ test-string-expression-4
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
@@ -363,51 +363,51 @@ char* aux_String_0 = NULL;
     ut_M_str_Max_length = aux_String_0_Max_length;
     ut_M_str_Length = aux_String_0_Length;
     ut_M_str = aux_String_0;
-/// @ te0
+/// @ test-string-expression-e0
 no '"' around string constant ""aaa"
-/// @ te1
+/// @ test-string-expression-e1
 too short string constant """
-/// @ te2
+/// @ test-string-expression-e2
 '"' inside string constant ""error"+"string""
-/// @ te3
+/// @ test-string-expression-e3
 indentation too short, expected 12 got 8
-/// @ te4
+/// @ test-string-expression-e4
 indentation too short, expected 12 got 8
 /// @@ test-empty-expression
-/// @ t0
+/// @ test-empty-expression-0
 ut_M_str_Max_length = 0;
     ut_M_str_Length = &Lumi_empty_int;
     ut_M_str = NULL;
-/// @ t1
+/// @ test-empty-expression-1
 LUMI_inc_ref(NULL);
     LUMI_dec_ref(ut_M_t_Refman);
     ut_M_t_Refman = NULL;
     ut_M_t = NULL;
-/// @ t2
+/// @ test-empty-expression-2
 String_Del(*so);
     LUMI_owner_dec_ref(*so_Refman);
     *so_Refman = NULL;
     *so_Max_length = 0;
     *so_Length = &Lumi_empty_int;
     *so = NULL;
-/// @ t3
+/// @ test-empty-expression-3
 ut_M_b = ((void*)ut_M_t == NULL) || ((void*)ut_M_ta != NULL);
-/// @ te0
+/// @ test-empty-expression-e0
 cannot assign "Empty Symbol" into "Int"
 /// @@ test-member-expression
-/// @ t0
+/// @ test-member-expression-0
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     ut_M_i = ut_M_t->num;
-/// @ t1
+/// @ test-member-expression-1
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_tc, ut_M_tc_Refman)
     ut_M_i = ut_M_tc->_base.numb;
-/// @ t2
+/// @ test-member-expression-2
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_tc, ut_M_tc_Refman)
     ut_M_i = ut_M_tc->_base._base._base.num;
-/// @ t3
+/// @ test-member-expression-3
 CHECK_REF(1, LUMI_block0_cleanup, *to)
     ut_M_i = (*to)->num;
-/// @ t4
+/// @ test-member-expression-4
 LUMI_inc_ref(ut_M_tc_Refman);
     LUMI_dec_ref(*tco_Refman);
     *tco_Refman = ut_M_tc_Refman;
@@ -415,29 +415,29 @@ LUMI_inc_ref(ut_M_tc_Refman);
     *tco = ut_M_tc;
     CHECK_REF_REFMAN(2, LUMI_block0_cleanup, *tco, *tco_Refman)
     ut_M_i = (*tco)->_base._base._base.num;
-/// @ t5
+/// @ test-member-expression-5
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t->t, ut_M_t->t_Refman)
     ut_M_i = ut_M_t->t->num;
-/// @ t6
+/// @ test-member-expression-6
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t->t, ut_M_t->t_Refman)
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t->t->t, ut_M_t->t->t_Refman)
     ut_M_i = ut_M_t->t->t->num;
-/// @ te0
+/// @ test-member-expression-e0
 unknown symbol "error"
-/// @ te1
+/// @ test-member-expression-e1
 void expression has no member "error"
-/// @ te2
+/// @ test-member-expression-e2
 type "Test" has no member "error"
-/// @ te3
+/// @ test-member-expression-e3
 type "Int" has no member "error"
 /// @@ test-slice-expression
-/// @ t0
+/// @ test-slice-expression-0
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     if (13 >= *(ut_M_ostr_Length)) RAISE(1, LUMI_block0_cleanup, slice_index)
     ut_M_c = ut_M_ostr[13];
-/// @ t1
+/// @ test-slice-expression-1
 Char* x = NULL;
     int x_Length = 0;
     Char* aux_Array_0 = NULL;
@@ -448,11 +448,11 @@ Char* x = NULL;
     aux_Array_0_Length = 6;
     x_Length = aux_Array_0_Length;
     x = aux_Array_0;
-/// @ t2
+/// @ test-slice-expression-2
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
     if (13 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
     ut_M_i = ut_M_arr[13];
-/// @ t3
+/// @ test-slice-expression-3
 Int* x = NULL;
     int x_Length = 0;
     Int* aux_Array_0 = NULL;
@@ -463,15 +463,15 @@ Int* x = NULL;
     aux_Array_0_Length = ut_M_i;
     x_Length = aux_Array_0_Length;
     x = aux_Array_0;
-/// @ t4
+/// @ test-slice-expression-4
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     if (4 >= *(ut_M_ostr_Length)) RAISE(1, LUMI_block0_cleanup, slice_index)
     ut_M_ostr[4] = ut_M_c;
-/// @ t5
+/// @ test-slice-expression-5
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
     if (4 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
     ut_M_arr[4] = ut_M_i;
-/// @ t6
+/// @ test-slice-expression-6
 ut_M_Test* tarr = NULL;
     int tarr_Length = 0;
     Ref_Manager* tarr_Refman = NULL;
@@ -481,7 +481,7 @@ ut_M_Test* tarr = NULL;
     LUMI_dec_ref(ut_M_t_Refman);
     ut_M_t_Refman = tarr_Refman;
     ut_M_t = tarr + 3;
-/// @ t7
+/// @ test-slice-expression-7
 char vsa[8 * 5] = {0};
     int vsa_String_length[8] = {0};
     char* s = NULL;
@@ -513,7 +513,7 @@ char vsa[8 * 5] = {0};
     sa_Value_length = 5;
     sa_String_length = aux_Array_0_String_length;
     sa = aux_Array_0;
-/// @ t8
+/// @ test-slice-expression-8
 Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Refman, char* sa, int sa_Length, int sa_Value_length, int* sa_String_length, Ref_Manager* sa_Refman);
 Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Refman, char* sa, int sa_Length, int sa_Value_length, int* sa_String_length, Ref_Manager* sa_Refman) {
     Returncode LUMI_err = OK;
@@ -559,7 +559,7 @@ LUMI_block0_cleanup:
     LUMI_owner_dec_ref(sa_Refman);
     return LUMI_err;
 }
-/// @ t9
+/// @ test-slice-expression-9
 char* sa = NULL;
     int sa_Length = 0;
     int sa_Value_length = 0;
@@ -590,7 +590,7 @@ char* sa = NULL;
     sa_Value_length = 0;
     sa_String_length = NULL;
     sa = NULL;
-/// @ t10
+/// @ test-slice-expression-10
 Int* aai = NULL;
     int aai_Length = 0;
     int aai_Value_length = 0;
@@ -630,7 +630,7 @@ Int* aai = NULL;
     ua_Length = aux_Array_1_Length;
     ua_Value_length = aux_Array_1_Value_length;
     ua = aux_Array_1;
-/// @ t11
+/// @ test-slice-expression-11
 Int* aai = NULL;
     int aai_Length = 0;
     int aai_Value_length = 0;
@@ -691,7 +691,7 @@ Int* aai = NULL;
     uaa_Value_value_length = aux_Array_1_Value_value_length;
     uaa_Value_value_value_length = aux_Array_1_Value_value_value_length;
     uaa = aux_Array_1;
-/// @ t12
+/// @ test-slice-expression-12
 char* aas = NULL;
     int aas_Length = 0;
     int aas_Value_length = 0;
@@ -770,7 +770,7 @@ char* aas = NULL;
     aas_Value_value_value_length = 0;
     aas_String_length = NULL;
     aas = NULL;
-/// @ t13
+/// @ test-slice-expression-13
 Int aai[8 * 7 * 6 * 5] = {0};
     Int* ua = NULL;
     int ua_Length = 0;
@@ -809,7 +809,7 @@ Int aai[8 * 7 * 6 * 5] = {0};
     uaa_Value_value_length = 6;
     uaa_Value_value_value_length = 5;
     uaa = aux_Array_1;
-/// @ t14
+/// @ test-slice-expression-14
 char aas[8 * 7 * 6 * 5] = {0};
     int aas_String_length[8 * 7 * 6] = {0};
     char* ua = NULL;
@@ -858,7 +858,7 @@ char aas[8 * 7 * 6 * 5] = {0};
     uaa_Value_value_value_length = 5;
     uaa_String_length = aux_Array_1_String_length;
     uaa = aux_Array_1;
-/// @ t15
+/// @ test-slice-expression-15
 void ut_M_fun(void);
 void ut_M_fun(void) {
     unsigned LUMI_loop_depth = 1;
@@ -898,19 +898,19 @@ void ut_M_fun(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t16
+/// @ test-slice-expression-16
 Char* x = NULL;
     int x_Length = 0;
     x_Length = *(ut_M_ostr_Length);
     x = ut_M_ostr;
-/// @ t17
+/// @ test-slice-expression-17
 char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
     INIT_NEW_STRING(1, LUMI_block0_cleanup, s, 12);
     LUMI_err = Sys_print(sys, s, *s_Length);
     CHECK(2, LUMI_block0_cleanup)
-/// @ t18
+/// @ test-slice-expression-18
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     char* s;
@@ -937,72 +937,72 @@ LUMI_block0_cleanup:
     ARRAY_DEL(ut_M_Test, a, 6)
     ut_M_Test_Del(t);
 }
-/// @ te0
+/// @ test-slice-expression-e0
 expected "]", got "new-line"
-/// @ te1
+/// @ test-slice-expression-e1
 expected "]", got "new-line"
-/// @ te2
+/// @ test-slice-expression-e2
 cannot slice a void expression
-/// @ te3
+/// @ test-slice-expression-e3
 cannot slice type "Int"
-/// @ te4
+/// @ test-slice-expression-e4
 expected integer index for slice, got "String"
-/// @ te5
+/// @ test-slice-expression-e5
 expected integer index for slice, got "String"
-/// @ te6
+/// @ test-slice-expression-e6
 expected integer index for slice, got void expression
-/// @ te7
+/// @ test-slice-expression-e7
 assigning into non assignable expression
-/// @ te8
+/// @ test-slice-expression-e8
 assigning into non assignable expression
-/// @ te9
+/// @ test-slice-expression-e9
 assigning into non assignable expression
-/// @ te10
+/// @ test-slice-expression-e10
 assigning into an owner a non-owner access "user"
-/// @ te11
+/// @ test-slice-expression-e11
 array of type with constructor "Tc"
-/// @ te12
+/// @ test-slice-expression-e12
 array of type with constructor "Test"
-/// @ te13
+/// @ test-slice-expression-e13
 ignoring slice bounds check
-/// @ te14
+/// @ test-slice-expression-e14
 sequence length is not positive
-/// @ te15
+/// @ test-slice-expression-e15
 negative slice index [-1]
-/// @ te16
+/// @ test-slice-expression-e16
 non positive slice length [0]
-/// @ te17
+/// @ test-slice-expression-e17
 slice last index [3] is larger than sequence size [3]
 /// @@ test-call-expression
-/// @ t0
+/// @ test-call-expression-0
 ut_M_fun0();
-/// @ t1
+/// @ test-call-expression-1
 ut_M_fun1(3, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, NULL, 0, &Lumi_empty_int);
-/// @ t2
+/// @ test-call-expression-2
 ut_M_fun2(&(*so), &(*so_Max_length), &(*so_Length), &(*so_Refman), &(*io));
-/// @ t3
+/// @ test-call-expression-3
 Int x = 0;
     char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
     Ref_Manager* s_Refman = NULL;
     ut_M_fun2(&(s), &(s_Max_length), &(s_Length), &(s_Refman), &(x));
-/// @ t4
+/// @ test-call-expression-4
 ut_M_fun3(0, &(*so), &(*so_Max_length), &(*so_Length), &(*so_Refman));
-/// @ t5
+/// @ test-call-expression-5
 Int x = 0;
     ut_M_fun5(3, &(x));
     ut_M_fun4(x);
-/// @ t6
+/// @ test-call-expression-6
 ut_M_fun6(2, 3, &(*io), &(*io));
-/// @ t7
+/// @ test-call-expression-7
 Int aux_Int_0 = 0;
     ut_M_fun5(4, &(aux_Int_0));
-/// @ t8
+/// @ test-call-expression-8
 Int aux_Int_0 = 0;
     ut_M_fun5(4, &(aux_Int_0));
     *io = aux_Int_0;
-/// @ t9
+/// @ test-call-expression-9
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int* aux_String_0_Length = &Lumi_empty_int;
@@ -1017,21 +1017,21 @@ char* aux_String_0 = NULL;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
     aux_String_0_Length = &Lumi_empty_int;
-/// @ t10
+/// @ test-call-expression-10
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_t_Refman)
     ut_M_Test_meth(ut_M_t);
-/// @ t11
+/// @ test-call-expression-11
 ut_M_Test_meth(*to);
-/// @ t12
+/// @ test-call-expression-12
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_tc_Refman)
     ut_M_Tc_methc(ut_M_tc, ut_M_tc_Dynamic);
-/// @ t13
+/// @ test-call-expression-13
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_tc_Refman)
     ut_M_Tb_methb(&(ut_M_tc->_base), &(ut_M_tc_Dynamic->_base));
-/// @ t14
+/// @ test-call-expression-14
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_tc_Refman)
     ut_M_Test_meth(&(ut_M_tc->_base._base._base));
-/// @ t15
+/// @ test-call-expression-15
 LUMI_inc_ref(ut_M_tc_Refman);
     LUMI_dec_ref(*tco_Refman);
     *tco_Refman = ut_M_tc_Refman;
@@ -1039,17 +1039,17 @@ LUMI_inc_ref(ut_M_tc_Refman);
     *tco = ut_M_tc;
     CHECK_REFMAN(2, LUMI_block0_cleanup, *tco_Refman)
     ut_M_Test_meth(&((*tco)->_base._base._base));
-/// @ t16
+/// @ test-call-expression-16
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_t->t_Refman)
     ut_M_Test_meth(ut_M_t->t);
-/// @ t17
+/// @ test-call-expression-17
 LUMI_var_dec_ref(*so_Refman);
     ut_M_fun1(3, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, *so, *so_Max_length, *so_Length);
     *so = NULL;
     *so_Refman = NULL;
     *so_Length = &Lumi_empty_int;
-/// @ t18
+/// @ test-call-expression-18
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int* aux_String_0_Length = &Lumi_empty_int;
@@ -1057,7 +1057,7 @@ char* aux_String_0 = NULL;
     Int aux_Int_0 = 0;
     ut_M_fun3(1, &(aux_String_0), &(aux_String_0_Max_length), &(aux_String_0_Length), &(aux_String_0_Refman));
     ut_M_fun5(2, &(aux_Int_0));
-/// @ t19
+/// @ test-call-expression-19
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
@@ -1115,7 +1115,7 @@ void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
     ut_M_Base_Del(&(self->_base));
 }
-/// @ t20
+/// @ test-call-expression-20
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
@@ -1149,7 +1149,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-/// @ t21
+/// @ test-call-expression-21
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
@@ -1186,7 +1186,7 @@ LUMI_block0_cleanup:
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
 }
-/// @ t22
+/// @ test-call-expression-22
 void ut_M_fun(char** astr, int* astr_Length, int* astr_Value_length, int** astr_String_length);
 void ut_M_fun(char** astr, int* astr_Length, int* astr_Value_length, int** astr_String_length) {
     unsigned LUMI_loop_depth = 1;
@@ -1194,7 +1194,7 @@ void ut_M_fun(char** astr, int* astr_Length, int* astr_Value_length, int** astr_
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t23
+/// @ test-call-expression-23
 Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length);
 Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length) {
     Returncode LUMI_err = OK;
@@ -1262,7 +1262,7 @@ LUMI_block0_cleanup:
     LUMI_var_dec_ref(s_vars_Refman);
     return LUMI_err;
 }
-/// @ t24
+/// @ test-call-expression-24
 char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
@@ -1277,7 +1277,7 @@ char* s = NULL;
     s = NULL;
     s_Refman = NULL;
     s_Length = &Lumi_empty_int;
-/// @ t25
+/// @ test-call-expression-25
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int* aux_String_0_Length = &Lumi_empty_int;
@@ -1290,69 +1290,69 @@ char* aux_String_0 = NULL;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
     aux_String_0_Length = &Lumi_empty_int;
-/// @ t26
+/// @ test-call-expression-26
 LUMI_err = ut_M_fune();
     CHECK(1, LUMI_block0_cleanup)
-/// @ te0
+/// @ test-call-expression-e0
 expected access, got " "
-/// @ te1
+/// @ test-call-expression-e1
 expected space after "user", got ")"
-/// @ te2
+/// @ test-call-expression-e2
 expected space or new-line after ",", got "c"
-/// @ te3
+/// @ test-call-expression-e3
 expected "," or ")", got "new-line"
-/// @ te4
+/// @ test-call-expression-e4
 illegal access "error"
-/// @ te5
+/// @ test-call-expression-e5
 void expression is not callable
-/// @ te6
+/// @ test-call-expression-e6
 non callable type "Int"
-/// @ te7
+/// @ test-call-expression-e7
 non assignable call output
-/// @ te8
+/// @ test-call-expression-e8
 cannot assign "Tb" into "Tc"
-/// @ te9
+/// @ test-call-expression-e9
 cannot assign void expression
-/// @ te10
+/// @ test-call-expression-e10
 expected access "copy" , got "user"
-/// @ te11
+/// @ test-call-expression-e11
 assigning into an owner a non-owner access "user"
-/// @ te12
+/// @ test-call-expression-e12
 assigning into an owner a non-owner access "user"
-/// @ te13
+/// @ test-call-expression-e13
 assigning into access "weak" invalid access "strong"
-/// @ te14
+/// @ test-call-expression-e14
 too many parameters
-/// @ te15
+/// @ test-call-expression-e15
 too few parameters
-/// @ te16
+/// @ test-call-expression-e16
 too many outputs
-/// @ te17
+/// @ test-call-expression-e17
 too few outputs
-/// @ te18
+/// @ test-call-expression-e18
 passing ownership of type "Test" into static type "Base"
-/// @ te19
+/// @ test-call-expression-e19
 assigning into an owner a non-owner access "var"
-/// @ te20
+/// @ test-call-expression-e20
 assigning into a weak reference an illegal access "owner"
-/// @ te21
+/// @ test-call-expression-e21
 ignoring error result check on function call
-/// @ te22
+/// @ test-call-expression-e22
 error raised inside function not declared as error raising "fun"
 /// @@ test-type-expression
-/// @ t0
+/// @ test-type-expression-0
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_t_Refman)
     ut_M_Test_meth(ut_M_t);
-/// @ t1
+/// @ test-type-expression-1
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_tc_Refman)
     ut_M_Tb_methb(&(ut_M_tc->_base), &(ut_M_tc_Dynamic->_base));
-/// @ t2
+/// @ test-type-expression-2
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_tc_Refman)
     ut_M_Test_meth(&(ut_M_tc->_base._base._base));
-/// @ t3
+/// @ test-type-expression-3
 unknown type "Error"
 /// @@ test-base-expression
-/// @ t0
+/// @ test-base-expression-0
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Mid ut_M_Mid;
 typedef struct ut_M_Top ut_M_Top;
@@ -1407,7 +1407,7 @@ void ut_M_Top_Del(ut_M_Top* self) {
     if (self == NULL) return;
     ut_M_Mid_Del(&(self->_base));
 }
-/// @ t1
+/// @ test-base-expression-1
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Mid ut_M_Mid;
 typedef struct ut_M_Top ut_M_Top;
@@ -1462,70 +1462,70 @@ void ut_M_Top_Del(ut_M_Top* self) {
     if (self == NULL) return;
     ut_M_Mid_Del(&(self->_base));
 }
-/// @ te0
+/// @ test-base-expression-e0
 "base" used not in method
-/// @ te1
+/// @ test-base-expression-e1
 no base type for type "Test"
-/// @ te2
+/// @ test-base-expression-e2
 no base method for method "mock"
-/// @ te3
+/// @ test-base-expression-e3
 assigning into non assignable expression
-/// @ te4
+/// @ test-base-expression-e4
 calling "base" with non-method "x"
 /// @@ test-block-expression
-/// @ t0
+/// @ test-block-expression-0
 ut_M_i = 2 + (123);
-/// @ t1
+/// @ test-block-expression-1
 ut_M_i = 123;
-/// @ t2
+/// @ test-block-expression-2
 ut_M_i = (123 * (ut_M_i - 4)) + 2;
-/// @ t3
+/// @ test-block-expression-3
 expected ")", got "new-line"
 /// @@ test-unary-expression
-/// @ t0
+/// @ test-unary-expression-0
 ut_M_i = - ut_M_i;
-/// @ t1
+/// @ test-unary-expression-1
 ut_M_i = - ut_M_i;
-/// @ t2
+/// @ test-unary-expression-2
 ut_M_i = - (- ut_M_i);
-/// @ t3
+/// @ test-unary-expression-3
 ut_M_b = ! ut_M_b;
-/// @ t4
+/// @ test-unary-expression-4
 ut_M_b = ! (ut_M_i > 3);
-/// @ t5
+/// @ test-unary-expression-5
 expected expression, got "{"
-/// @ t6
+/// @ test-unary-expression-6
 expected space after "-", got "["
-/// @ t7
+/// @ test-unary-expression-7
 not unary operator "+"
-/// @ t8
+/// @ test-unary-expression-8
 void expression given as operand to operator "-"
-/// @ t9
+/// @ test-unary-expression-9
 operator "-" expected "Int" operand, got "Bool"
-/// @ t10
+/// @ test-unary-expression-10
 operator "not" expected "Bool" operand, got "Int"
 /// @@ test-binary-expression
-/// @ t0
+/// @ test-binary-expression-0
 ut_M_i = 23 + 54;
-/// @ t1
+/// @ test-binary-expression-1
 ut_M_i += (100 * 2) - 37;
     ut_M_i *= 3;
-/// @ t2
+/// @ test-binary-expression-2
 ut_M_i -= 12 * 13;
-/// @ t3
+/// @ test-binary-expression-3
 ut_M_b = (3 < 5) || (23 > 37);
-/// @ t4
+/// @ test-binary-expression-4
 ut_M_b = (3 <= 5) && (23 >= 37);
-/// @ t5
+/// @ test-binary-expression-5
 ut_M_b = (ut_M_i == 5) || (ut_M_i != 37);
-/// @ t6
+/// @ test-binary-expression-6
 ut_M_b = ((2 < ut_M_i) && (ut_M_i < 12)) && (12 == (2 * ut_M_i));
-/// @ t7
+/// @ test-binary-expression-7
 LUMI_inc_ref(ut_M_tc_Refman);
     LUMI_dec_ref(ut_M_t_Refman);
     ut_M_t_Refman = ut_M_tc_Refman;
     ut_M_t = &(ut_M_tc->_base._base._base);
-/// @ t8
+/// @ test-binary-expression-8
 char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
@@ -1538,19 +1538,19 @@ char* s = NULL;
     *so = NULL;
     *so_Refman = NULL;
     *so_Length = &Lumi_empty_int;
-/// @ t9
+/// @ test-binary-expression-9
 ut_M_str_Max_length = *so_Max_length;
     ut_M_str_Length = *so_Length;
     ut_M_str = *so;
-/// @ t10
+/// @ test-binary-expression-10
 ut_M_b = ((void*)ut_M_t == ut_M_ta) || ((void*)ut_M_tc != ut_M_tb);
-/// @ t11
+/// @ test-binary-expression-11
 ut_M_c = '0' + 4;
-/// @ t12
+/// @ test-binary-expression-12
 ut_M_b = (void*)ut_M_fun0 != ut_M_fun1;
-/// @ t13
+/// @ test-binary-expression-13
 ut_M_b = ut_M_b == ut_M_b;
-/// @ t14
+/// @ test-binary-expression-14
 ut_M_Tc* otc = NULL;
     ut_M_Tc_Dynamic* otc_Dynamic = NULL;
     if (ut_M_tb_Dynamic != NULL) ut_M_tb_Dynamic->_base._del(ut_M_tb);
@@ -1560,83 +1560,83 @@ ut_M_Tc* otc = NULL;
     otc = NULL;
     otc_Dynamic = NULL;
     INIT_NEW_REFMAN(2, LUMI_block0_cleanup, ut_M_tb)
-/// @ t15
+/// @ test-binary-expression-15
 ut_M_Test* otarr = NULL;
     int otarr_Length = 0;
     ARRAY_DEL(ut_M_Test, otarr, otarr_Length)
     free(otarr);
     otarr_Length = 0;
     otarr = NULL;
-/// @ t16
+/// @ test-binary-expression-16
 if (ut_M_i == 0) RAISE(1, LUMI_block0_cleanup, zero_division)
     if (ut_M_i == 0) RAISE(1, LUMI_block0_cleanup, zero_division)
     *io = (60 / ut_M_i) + (60 % ut_M_i);
-/// @ t17
+/// @ test-binary-expression-17
 ut_M_i = ut_M_i | 8;
-/// @ t18
+/// @ test-binary-expression-18
 ut_M_i = ut_M_i & 10;
-/// @ t19
+/// @ test-binary-expression-19
 ut_M_i = ~ ut_M_i;
-/// @ t20
+/// @ test-binary-expression-20
 ut_M_i = ut_M_i ^ 16;
-/// @ t21
+/// @ test-binary-expression-21
 ut_M_i = ut_M_i >> 2;
-/// @ t22
+/// @ test-binary-expression-22
 ut_M_i = ut_M_i << 1;
-/// @ te0
+/// @ test-binary-expression-e0
 unknown operator "@"
-/// @ te1
+/// @ test-binary-expression-e1
 expected space after "+", got "("
-/// @ te2
+/// @ test-binary-expression-e2
 ambiguous precedence between operators "+" and "*"
-/// @ te3
+/// @ test-binary-expression-e3
 ambiguous precedence between operators "or" and "and"
-/// @ te4
+/// @ test-binary-expression-e4
 used non-binary operator "not"
-/// @ te5
+/// @ test-binary-expression-e5
 assigning into non assignable expression
-/// @ te6
+/// @ test-binary-expression-e6
 assigning into non assignable expression
-/// @ te7
+/// @ test-binary-expression-e7
 assigning into non assignable expression
-/// @ te8
+/// @ test-binary-expression-e8
 assigning into an owner a non-owner access "user"
-/// @ te9
+/// @ test-binary-expression-e9
 operator "or" expected "Bool" operand, got "Int"
-/// @ te10
+/// @ test-binary-expression-e10
 operator ">" expected "Int" operand, got "Test"
-/// @ te11
+/// @ test-binary-expression-e11
 operator ">" expected "Int" operand, got "Test"
-/// @ te12
+/// @ test-binary-expression-e12
 operator "+" expected "Int" operand, got "Test"
-/// @ te13
+/// @ test-binary-expression-e13
 operator "+=" expected "Int" operand, got "Test"
-/// @ te14
+/// @ test-binary-expression-e14
 operator "-=" expected "Int" operand, got "Bool"
-/// @ te15
+/// @ test-binary-expression-e15
 operator "is" is not supported for type "Int"
-/// @ te16
+/// @ test-binary-expression-e16
 non matching subtypes "Int" and "Char"
-/// @ te17
+/// @ test-binary-expression-e17
 passing ownership of type "Tb" into static type "Test"
-/// @ te18
+/// @ test-binary-expression-e18
 operator "is" is not supported for type "Bool"
-/// @ te19
+/// @ test-binary-expression-e19
 operator "<" expected "Int" operand, got "Bool"
-/// @ te20
+/// @ test-binary-expression-e20
 assigning into a weak reference an illegal access "user"
-/// @ te21
+/// @ test-binary-expression-e21
 ignoring empty reference check
-/// @ te22
+/// @ test-binary-expression-e22
 ignoring zero division check
-/// @ te23
+/// @ test-binary-expression-e23
 ignoring zero division check
-/// @ te24
+/// @ test-binary-expression-e24
 dividing by zero
-/// @ te25
+/// @ test-binary-expression-e25
 dividing by zero
 /// @@ test-swap-expression
-/// @ t0
+/// @ test-swap-expression-0
 ut_M_Test* t1 = NULL;
     ut_M_Test* t2 = NULL;
     ut_M_Test* aux_Test_0 = NULL;
@@ -1646,7 +1646,7 @@ ut_M_Test* t1 = NULL;
     t1 = t2;
     t2 = aux_Test_0;
     aux_Test_0 = NULL;
-/// @ t1
+/// @ test-swap-expression-1
 ut_M_Test* t1 = NULL;
     Ref_Manager* t1_Refman = NULL;
     ut_M_Test* t2 = NULL;
@@ -1671,7 +1671,7 @@ ut_M_Test* t1 = NULL;
     t2 = aux_Test_0;
     aux_Test_0 = NULL;
     aux_Test_0_Refman = NULL;
-/// @ t2
+/// @ test-swap-expression-2
 ut_M_Tc* t1 = NULL;
     ut_M_Tc_Dynamic* t1_Dynamic = &ut_M_Tc_dynamic;
     ut_M_Tc* t2 = NULL;
@@ -1690,7 +1690,7 @@ ut_M_Tc* t1 = NULL;
     t2 = aux_Tc_0;
     aux_Tc_0 = NULL;
     aux_Tc_0_Dynamic = NULL;
-/// @ t3
+/// @ test-swap-expression-3
 ut_M_Tc* t1 = NULL;
     Ref_Manager* t1_Refman = NULL;
     ut_M_Tc_Dynamic* t1_Dynamic = NULL;
@@ -1730,7 +1730,7 @@ ut_M_Tc* t1 = NULL;
     aux_Tc_2 = NULL;
     aux_Tc_2_Refman = NULL;
     aux_Tc_2_Dynamic = NULL;
-/// @ t4
+/// @ test-swap-expression-4
 Int* a1 = NULL;
     int a1_Length = 0;
     Int* a2 = NULL;
@@ -1746,7 +1746,7 @@ Int* a1 = NULL;
     a2_Length = 4;
     a2 = aux_Array_0;
     aux_Array_0 = NULL;
-/// @ t5
+/// @ test-swap-expression-5
 Int* a1 = NULL;
     int a1_Length = 0;
     Ref_Manager* a1_Refman = NULL;
@@ -1781,7 +1781,7 @@ Int* a1 = NULL;
     a2 = aux_Array_2;
     aux_Array_2 = NULL;
     aux_Array_2_Refman = NULL;
-/// @ t6
+/// @ test-swap-expression-6
 char* s1 = NULL;
     int s1_Max_length = 0;
     int* s1_Length = &Lumi_empty_int;
@@ -1804,7 +1804,7 @@ char* s1 = NULL;
     s2 = aux_String_0;
     aux_String_0 = NULL;
     aux_String_0_Length = &Lumi_empty_int;
-/// @ t7
+/// @ test-swap-expression-7
 char* s1 = NULL;
     int s1_Max_length = 0;
     int* s1_Length = &Lumi_empty_int;
@@ -1852,7 +1852,7 @@ char* s1 = NULL;
     aux_String_2 = NULL;
     aux_String_2_Refman = NULL;
     aux_String_2_Length = &Lumi_empty_int;
-/// @ t8
+/// @ test-swap-expression-8
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     File* f;
@@ -1893,7 +1893,7 @@ LUMI_block0_cleanup:
     ut_M_Test_Del(t1);
     free(t1);
 }
-/// @ t9
+/// @ test-swap-expression-9
 ut_M_Test* t1 = NULL;
     ut_M_Test* t2 = NULL;
     ut_M_Test* aux_Test_0 = NULL;
@@ -1905,7 +1905,7 @@ ut_M_Test* t1 = NULL;
     t1 = t2;
     t2 = aux_Test_0;
     aux_Test_0 = NULL;
-/// @ t10
+/// @ test-swap-expression-10
 ut_M_Test* t1 = NULL;
     Ref_Manager* t1_Refman = NULL;
     ut_M_Test* t2 = NULL;
@@ -1930,12 +1930,12 @@ ut_M_Test* t1 = NULL;
     t2 = aux_Test_0;
     aux_Test_0 = NULL;
     aux_Test_0_Refman = NULL;
-/// @ t11
+/// @ test-swap-expression-11
 Int aux_Int_0 = 0;
     aux_Int_0 = ut_M_i;
     ut_M_i = *io;
     *io = aux_Int_0;
-/// @ t12
+/// @ test-swap-expression-12
 ut_M_Test* aux_Test_0 = NULL;
     Ref_Manager* aux_Test_0_Refman = NULL;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_d, ut_M_d_Refman)
@@ -1948,34 +1948,34 @@ ut_M_Test* aux_Test_0 = NULL;
     ut_M_t = aux_Test_0;
     aux_Test_0 = NULL;
     aux_Test_0_Refman = NULL;
-/// @ te0
+/// @ test-swap-expression-e0
 cannot swap access "weak" with other access "strong"
-/// @ te1
+/// @ test-swap-expression-e1
 swapping reference with itself
-/// @ te2
+/// @ test-swap-expression-e2
 conditionals not matching in type "String"
-/// @ te3
+/// @ test-swap-expression-e3
 swapping non assignable expression
-/// @ te4
+/// @ test-swap-expression-e4
 non matching types "Ta" and "Tc"
-/// @ te5
+/// @ test-swap-expression-e5
 cannot swap access "owner" with other access "strong"
 /// @@ test-question-expression
-/// @ t0
+/// @ test-question-expression-0
 ut_M_b = ut_M_ostr != NULL;
-/// @ t1
+/// @ test-question-expression-1
 ut_M_b = ! (ut_M_arr != NULL && (ut_M_arr_Refman)->value != NULL);
-/// @ t2
+/// @ test-question-expression-2
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     ut_M_b = ut_M_t->fun != NULL;
-/// @ t3
+/// @ test-question-expression-3
 ut_M_b = (*to) != NULL;
-/// @ t4
+/// @ test-question-expression-4
 ut_M_t = NULL;
     ut_M_t_Refman = NULL;
     ut_M_fun7(NULL, NULL, NULL, (void*)&(ut_M_t), &(ut_M_t_Refman), (void*)&(ut_M_t_Dynamic));
     ut_M_b = ut_M_t != NULL && (ut_M_t_Refman)->value != NULL;
-/// @ t5
+/// @ test-question-expression-5
 ut_M_Test* tt = NULL;
     Ref_Manager* tt_Refman = NULL;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_t)
@@ -1984,7 +1984,7 @@ ut_M_Test* tt = NULL;
     tt_Refman = ut_M_t_Refman;
     tt = ut_M_t;
     ut_M_b = (tt_Refman)->value != NULL;
-/// @ t6
+/// @ test-question-expression-6
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     char* s;
@@ -2005,14 +2005,14 @@ void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
     LUMI_dec_ref(self->s_Refman);
 }
-/// @ te0
+/// @ test-question-expression-e0
 cannot use "?" on void expression
-/// @ te1
+/// @ test-question-expression-e1
 cannot use "?" on non conditional or weak reference of type "Int"
-/// @ te2
+/// @ test-question-expression-e2
 cannot use "?" on non conditional or weak reference of type "Test"
 /// @@ test-exclamation-expression
-/// @ t0
+/// @ test-exclamation-expression-0
 char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
@@ -2020,22 +2020,22 @@ char* s = NULL;
     s_Max_length = ut_M_ostr_Max_length;
     s_Length = ut_M_ostr_Length;
     s = ut_M_ostr;
-/// @ t1
+/// @ test-exclamation-expression-1
 ut_M_Test* tt = NULL;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t->t, ut_M_t->t_Refman)
     tt = ut_M_t->t;
-/// @ t2
+/// @ test-exclamation-expression-2
 ut_M_Test* tu = NULL;
     ut_M_t = NULL;
     ut_M_t_Refman = NULL;
     ut_M_fun7(NULL, NULL, NULL, (void*)&(ut_M_t), &(ut_M_t_Refman), (void*)&(ut_M_t_Dynamic));
     CHECK_REFMAN(2, LUMI_block0_cleanup, ut_M_t_Refman)
     tu = &(ut_M_t->_base._base);
-/// @ t3
+/// @ test-exclamation-expression-3
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_tb)
     ut_M_i = ut_M_tb->_base._base.num;
-/// @ t4
+/// @ test-exclamation-expression-4
 ut_M_Test* tt = NULL;
     Ref_Manager* tt_Refman = NULL;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_t)
@@ -2043,7 +2043,7 @@ ut_M_Test* tt = NULL;
     LUMI_dec_ref(tt_Refman);
     tt_Refman = ut_M_t_Refman;
     tt = ut_M_t;
-/// @ t5
+/// @ test-exclamation-expression-5
 char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
@@ -2051,106 +2051,106 @@ char* s = NULL;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_str)
     String_length(ut_M_str, ut_M_str_Max_length, ut_M_str_Length, &(aux_Int_0));
     INIT_NEW_STRING(1, LUMI_block0_cleanup, s, aux_Int_0);
-/// @ te0
+/// @ test-exclamation-expression-e0
 ignoring empty reference check
-/// @ te1
+/// @ test-exclamation-expression-e1
 ignoring weak reference check
-/// @ te2
+/// @ test-exclamation-expression-e2
 ignoring empty reference check
-/// @ te3
+/// @ test-exclamation-expression-e3
 ignoring weak reference check
-/// @ te4
+/// @ test-exclamation-expression-e4
 ignoring empty reference check
-/// @ te5
+/// @ test-exclamation-expression-e5
 ignoring weak reference check
-/// @ te6
+/// @ test-exclamation-expression-e6
 ignoring empty reference check
-/// @ te7
+/// @ test-exclamation-expression-e7
 ignoring empty reference check
-/// @ te8
+/// @ test-exclamation-expression-e8
 ignoring empty reference check
-/// @ te9
+/// @ test-exclamation-expression-e9
 ignoring weak reference check
-/// @ te10
+/// @ test-exclamation-expression-e10
 ignoring empty reference check
-/// @ te11
+/// @ test-exclamation-expression-e11
 ignoring initialization error check
-/// @ teo0
+/// @ test-exclamation-expression-eo0
 only one "!" needed
-/// @ ten0
+/// @ test-exclamation-expression-en0
 using "!" where there is no error
-/// @ ten1
+/// @ test-exclamation-expression-en1
 using "!" where there is no error
-/// @ ten2
+/// @ test-exclamation-expression-en2
 using "!" where there is no error
-/// @ ten3
+/// @ test-exclamation-expression-en3
 using "!" where there is no error
-/// @ ten4
+/// @ test-exclamation-expression-en4
 using "!" where there is no error
-/// @ ten5
+/// @ test-exclamation-expression-en5
 using "!" where there is no error
-/// @ ten6
+/// @ test-exclamation-expression-en6
 using "!" where there is no error
-/// @ ten7
+/// @ test-exclamation-expression-en7
 using "!" where there is no error
-/// @ ten8
+/// @ test-exclamation-expression-en8
 using "!" where there is no error
-/// @ ten9
+/// @ test-exclamation-expression-en9
 using "!" where there is no error
-/// @ ten10
+/// @ test-exclamation-expression-en10
 using "!" where there is no error
-/// @ ten11
+/// @ test-exclamation-expression-en11
 using "!" where there is no error
-/// @ ten12
+/// @ test-exclamation-expression-en12
 using "!" where there is no error
-/// @ ten13
+/// @ test-exclamation-expression-en13
 using "!" where there is no error
-/// @ ten14
+/// @ test-exclamation-expression-en14
 using "!" where there is no error
-/// @ ten15
+/// @ test-exclamation-expression-en15
 using "!" where there is no error
-/// @ ten16
+/// @ test-exclamation-expression-en16
 using "!" where there is no error
-/// @ ten17
+/// @ test-exclamation-expression-en17
 using "!" where there is no error
-/// @ ten18
+/// @ test-exclamation-expression-en18
 using "!" where there is no error
-/// @ ten19
+/// @ test-exclamation-expression-en19
 using "!" where there is no error
-/// @ ten20
+/// @ test-exclamation-expression-en20
 using "!" where there is no error
-/// @ ten21
+/// @ test-exclamation-expression-en21
 using "!" where there is no error
-/// @ ten22
+/// @ test-exclamation-expression-en22
 using "!" where there is no error
-/// @ ten23
+/// @ test-exclamation-expression-en23
 using "!" where there is no error
-/// @ ten24
+/// @ test-exclamation-expression-en24
 using "!" where there is no error
-/// @ ten26
+/// @ test-exclamation-expression-en26
 using "!" where there is no error
-/// @ ten27
+/// @ test-exclamation-expression-en27
 using "!" where there is no error
-/// @ ten28
+/// @ test-exclamation-expression-en28
 using "!" where there is no error
-/// @ ten29
+/// @ test-exclamation-expression-en29
 using "!" where there is no error
-/// @ ten30
+/// @ test-exclamation-expression-en30
 using "!" where there is no error
-/// @ ten31
+/// @ test-exclamation-expression-en31
 using "!" where there is no error
-/// @ ten32
+/// @ test-exclamation-expression-en32
 using "!" where there is no error
 /// @@ test-dynamic
-/// @ t0
+/// @ test-dynamic-0
 ut_M_Ta a_Var = {{0}};
     ut_M_Ta* a = NULL;
     ut_M_Ta_Dynamic* a_Dynamic = &ut_M_Ta_dynamic;
     a = &a_Var;
-/// @ t1
+/// @ test-dynamic-1
 ut_M_Ta* a = NULL;
     ut_M_Ta_Dynamic* a_Dynamic = NULL;
-/// @ t2
+/// @ test-dynamic-2
 ut_M_Ta* nta = NULL;
     ut_M_Ta_Dynamic* nta_Dynamic = NULL;
     ut_M_Ta* aux_Ta_0 = NULL;
@@ -2160,41 +2160,41 @@ ut_M_Ta* nta = NULL;
     nta = aux_Ta_0;
     aux_Ta_0 = NULL;
     aux_Ta_0_Dynamic = NULL;
-/// @ t3
+/// @ test-dynamic-3
 ut_M_Ta* a = NULL;
     ut_M_Ta_Dynamic* a_Dynamic = &ut_M_Ta_dynamic;
     INIT_NEW(1, LUMI_block0_cleanup, a, ut_M_Ta, 1);
-/// @ t4
+/// @ test-dynamic-4
 ut_M_Ta* a = NULL;
     ut_M_Ta_Dynamic* a_Dynamic = NULL;
     CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_ta_Refman)
     a_Dynamic = ut_M_ta_Dynamic;
     a = ut_M_ta;
-/// @ t5
+/// @ test-dynamic-5
 ut_M_Ta* x = NULL;
     ut_M_Ta_Dynamic* x_Dynamic = NULL;
     CHECK_REFMAN(2, LUMI_block0_cleanup, ut_M_ta_Refman)
     x_Dynamic = ut_M_ta_Dynamic;
     x = ut_M_ta;
-/// @ t6
+/// @ test-dynamic-6
 LUMI_inc_ref(ut_M_tb_Refman);
     LUMI_dec_ref(ut_M_ta_Refman);
     ut_M_ta_Refman = ut_M_tb_Refman;
     ut_M_ta_Dynamic = &(ut_M_tb_Dynamic->_base);
     ut_M_ta = &(ut_M_tb->_base);
-/// @ t7
+/// @ test-dynamic-7
 LUMI_inc_ref(ut_M_tc_Refman);
     LUMI_dec_ref(ut_M_ta_Refman);
     ut_M_ta_Refman = ut_M_tc_Refman;
     ut_M_ta_Dynamic = &(ut_M_tc_Dynamic->_base._base);
     ut_M_ta = &(ut_M_tc->_base._base);
-/// @ t8
+/// @ test-dynamic-8
 LUMI_inc_ref(NULL);
     LUMI_dec_ref(ut_M_ta_Refman);
     ut_M_ta_Refman = NULL;
     ut_M_ta_Dynamic = NULL;
     ut_M_ta = NULL;
-/// @ t9
+/// @ test-dynamic-9
 ut_M_Ta* aa = NULL;
     int aa_Length = 0;
     Ref_Manager* aa_Refman = NULL;
@@ -2205,7 +2205,7 @@ ut_M_Ta* aa = NULL;
     ut_M_ta_Refman = aa_Refman;
     ut_M_ta_Dynamic = &ut_M_Ta_dynamic;
     ut_M_ta = aa + 4;
-/// @ t10
+/// @ test-dynamic-10
 ut_M_Tc* ca = NULL;
     int ca_Length = 0;
     Ref_Manager* ca_Refman = NULL;
@@ -2216,18 +2216,18 @@ ut_M_Tc* ca = NULL;
     ut_M_ta_Refman = ca_Refman;
     ut_M_ta_Dynamic = &(&ut_M_Tc_dynamic->_base._base);
     ut_M_ta = &((ca + 4)->_base._base);
-/// @ t11
+/// @ test-dynamic-11
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_ta_Refman)
     if (ut_M_ta_Dynamic == NULL) RAISE(1, LUMI_block0_cleanup, empty_object)
     ut_M_ta_Dynamic->dyn(ut_M_ta, ut_M_ta_Dynamic);
-/// @ t12
+/// @ test-dynamic-12
 if (ut_M_tb_Dynamic == NULL) RAISE(1, LUMI_block0_cleanup, empty_object)
     ut_M_tb_Dynamic->_base.dyn(&(ut_M_tb->_base), &(ut_M_tb_Dynamic->_base));
-/// @ t13
+/// @ test-dynamic-13
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_tc_Refman)
     if (ut_M_tc_Dynamic == NULL) RAISE(1, LUMI_block0_cleanup, empty_object)
     ut_M_tc_Dynamic->_base._base.dyn(&(ut_M_tc->_base._base), &(ut_M_tc_Dynamic->_base._base));
-/// @ t14
+/// @ test-dynamic-14
 LUMI_inc_ref(ut_M_tc_Refman);
     LUMI_dec_ref(*tco_Refman);
     *tco_Refman = ut_M_tc_Refman;
@@ -2236,12 +2236,12 @@ LUMI_inc_ref(ut_M_tc_Refman);
     CHECK_REFMAN(2, LUMI_block0_cleanup, *tco_Refman)
     if (*tco_Dynamic == NULL) RAISE(2, LUMI_block0_cleanup, empty_object)
     (*tco_Dynamic)->_base._base.dyn(&((*tco)->_base._base), &((*tco_Dynamic)->_base._base));
-/// @ t15
+/// @ test-dynamic-15
 ut_M_ta = NULL;
     ut_M_ta_Refman = NULL;
     ut_M_ta_Dynamic = NULL;
     ut_M_fun7(&(ut_M_tc->_base), ut_M_tc_Refman, &(ut_M_tc_Dynamic->_base), (void*)&(ut_M_ta), &(ut_M_ta_Refman), (void*)&(ut_M_ta_Dynamic));
-/// @ t16
+/// @ test-dynamic-16
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
@@ -2273,7 +2273,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-/// @ t17
+/// @ test-dynamic-17
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
@@ -2315,41 +2315,41 @@ void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
     ut_M_Base_Del(&(self->_base));
 }
-/// @ t18
+/// @ test-dynamic-18
 ut_M_Tb* aux_Tb_0 = NULL;
     Ref_Manager* aux_Tb_0_Refman = NULL;
     ut_M_Tb_Dynamic* aux_Tb_0_Dynamic = NULL;
     ut_M_fun7(NULL, NULL, NULL, &(aux_Tb_0), &(aux_Tb_0_Refman), &(aux_Tb_0_Dynamic));
-/// @ te0
+/// @ test-dynamic-e0
 ignoring empty reference check
 /// @@ test-function-object
-/// @ t0
+/// @ test-function-object-0
 void (*fun)(void) = NULL;
     fun = ut_M_fun0;
     fun();
-/// @ t1
+/// @ test-function-object-1
 void (*fun)(Int x, Int* y) = NULL;
     Int x = 0;
     fun = ut_M_fun5;
     fun(9, &(x));
-/// @ t2
+/// @ test-function-object-2
 void (*fun)(ut_M_Test* self) = NULL;
     fun = ut_M_Test_meth;
     CHECK_REFMAN(2, LUMI_block0_cleanup, ut_M_t_Refman)
     fun(ut_M_t);
-/// @ t3
+/// @ test-function-object-3
 void (*fun)(void) = NULL;
     fun = NULL;
     ut_M_b = fun != NULL;
     CHECK_REF(4, LUMI_block0_cleanup, fun)
     fun();
-/// @ t4
+/// @ test-function-object-4
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     ut_M_t->fun = ut_M_fun0;
     CHECK_REF_REFMAN(2, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_t->fun)
     ut_M_t->fun();
-/// @ t5
+/// @ test-function-object-5
 void (*farr[38])(void) = {0};
     void (**farr1)(Int x, Int* y) = NULL;
     int farr1_Length = 0;
@@ -2362,9 +2362,9 @@ void (*farr[38])(void) = {0};
     INIT_NEW_ARRAY(3, LUMI_block0_cleanup, farr2, Returncode (*)(void), 12, 1);
     farr[3] = ut_M_fun0;
     (farr[3])();
-/// @ t6
+/// @ test-function-object-6
 void (*fun)(Int x, Int y) = NULL;
-/// @ t7
+/// @ test-function-object-7
 void ut_M_mock(void (**f)(void));
 void ut_M_mock(void (**f)(void)) {
     unsigned LUMI_loop_depth = 1;
@@ -2372,7 +2372,7 @@ void ut_M_mock(void (**f)(void)) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t8
+/// @ test-function-object-8
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     void (*fun)(Int x, Int y);
@@ -2403,126 +2403,126 @@ void ut_M_afun(void (** in)(Int x, Int* y), int in_Length, Returncode (*** out)(
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t9
+/// @ test-function-object-9
 Returncode (*fun)(void) = NULL;
     fun = ut_M_fune;
     LUMI_err = fun();
     CHECK(3, LUMI_block0_cleanup)
-/// @ te0
+/// @ test-function-object-e0
 missing arguments in function type
-/// @ te1
+/// @ test-function-object-e1
 missing arguments in function type
-/// @ te2
+/// @ test-function-object-e2
 expected "(" inside Function type, got "}"
-/// @ te3
+/// @ test-function-object-e3
 expected "}" after sub-types, got " "
-/// @ te4
+/// @ test-function-object-e4
 too many parameters
-/// @ te5
+/// @ test-function-object-e5
 too few outputs
-/// @ te6
+/// @ test-function-object-e6
 using invalid reference "fun"
-/// @ te7
+/// @ test-function-object-e7
 assigning empty into non-conditional type "Func"
-/// @ te8
+/// @ test-function-object-e8
 cannot use "?" on non conditional or weak reference of type "Func"
-/// @ te9
+/// @ test-function-object-e9
 non matching error result
-/// @ te10
+/// @ test-function-object-e10
 non matching error result
 /// @@ test-builtin
-/// @ ti0
+/// @ test-builtin-i0
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = Int_str(ut_M_i, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
     CHECK(1, LUMI_block0_cleanup)
-/// @ tb0
+/// @ test-builtin-b0
 ut_M_b = true;
-/// @ tb1
+/// @ test-builtin-b1
 ut_M_b = false;
-/// @ c0
+/// @ test-builtin-0
 unknown symbol "EOF"
-/// @ ta0
+/// @ test-builtin-a0
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
     Array_length(ut_M_arr, ut_M_arr_Length, &(ut_M_i));
-/// @ ts0
+/// @ test-builtin-s0
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     String_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_i));
-/// @ ts1
+/// @ test-builtin-s1
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     String_clear(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
-/// @ ts2
+/// @ test-builtin-s2
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     String_equal(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_ostr, *ut_M_ostr_Length, &(ut_M_b));
-/// @ ts3
+/// @ test-builtin-s3
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = String_get(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_i, &(ut_M_c));
     CHECK(1, LUMI_block0_cleanup)
-/// @ ts4
+/// @ test-builtin-s4
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = String_set(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_i, ut_M_c);
     CHECK(1, LUMI_block0_cleanup)
-/// @ ts5
+/// @ test-builtin-s5
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = String_append(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_c);
     CHECK(1, LUMI_block0_cleanup)
-/// @ ts6
+/// @ test-builtin-s6
 char sv[12] = {0};
     int sv_Length[1] = {0};
     /* initializing sv */
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = String_copy(sv, 12, sv_Length, ut_M_ostr, *ut_M_ostr_Length);
     CHECK(2, LUMI_block0_cleanup)
-/// @ ts7
+/// @ test-builtin-s7
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = String_concat(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_ostr, *ut_M_ostr_Length);
     CHECK(1, LUMI_block0_cleanup)
-/// @ ts8
+/// @ test-builtin-s8
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = String_concat_int(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_i);
     CHECK(1, LUMI_block0_cleanup)
-/// @ ts9
+/// @ test-builtin-s9
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     String_find(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_ostr, *ut_M_ostr_Length, &(ut_M_i));
-/// @ ts10
+/// @ test-builtin-s10
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     String_has(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_c, &(ut_M_b));
-/// @ ts11
+/// @ test-builtin-s11
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = String_set(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, 0, 'a');
     CHECK(1, LUMI_block0_cleanup)
-/// @ ts12
+/// @ test-builtin-s12
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     String_max_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_i));
-/// @ tf0
+/// @ test-builtin-f0
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = file_open_read(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_fobj));
     CHECK(1, LUMI_block0_cleanup)
-/// @ tf1
+/// @ test-builtin-f1
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = file_open_write(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_fobj));
     CHECK(1, LUMI_block0_cleanup)
-/// @ tf2
+/// @ test-builtin-f2
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_fobj)
     LUMI_err = file_close(ut_M_fobj);
     ut_M_fobj = NULL;
     CHECK(1, LUMI_block0_cleanup)
-/// @ tf3
+/// @ test-builtin-f3
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_fobj)
     LUMI_err = File_getc(ut_M_fobj, &(ut_M_c), &(ut_M_b));
     CHECK(1, LUMI_block0_cleanup)
-/// @ tf4
+/// @ test-builtin-f4
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_fobj)
     LUMI_err = File_putc(ut_M_fobj, ut_M_c);
     CHECK(1, LUMI_block0_cleanup)
-/// @ tf5
+/// @ test-builtin-f5
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_fobj)
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = File_write(ut_M_fobj, ut_M_ostr, *ut_M_ostr_Length);
     CHECK(1, LUMI_block0_cleanup)
-/// @ ty0
+/// @ test-builtin-y0
 char* argv = NULL;
     int argv_Length = 0;
     int argv_Value_length = 0;
@@ -2531,77 +2531,77 @@ char* argv = NULL;
     argv_Value_length = sys->argv_Value_length;
     argv_String_length = sys->argv_String_length;
     argv = sys->argv;
-/// @ ty1
+/// @ test-builtin-y1
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = Sys_print(sys, ut_M_ostr, *ut_M_ostr_Length);
     CHECK(1, LUMI_block0_cleanup)
-/// @ ty2
+/// @ test-builtin-y2
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = Sys_println(sys, ut_M_ostr, *ut_M_ostr_Length);
     CHECK(1, LUMI_block0_cleanup)
-/// @ ty3
+/// @ test-builtin-y3
 Sys_getchar(sys, &(ut_M_c), &(ut_M_b));
-/// @ ty4
+/// @ test-builtin-y4
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = Sys_getline(sys, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
     CHECK(1, LUMI_block0_cleanup)
-/// @ ty5
+/// @ test-builtin-y5
 LUMI_err = Sys_exit(sys, ut_M_i);
     CHECK(1, LUMI_block0_cleanup)
-/// @ ty6
+/// @ test-builtin-y6
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = Sys_system(sys, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_i));
     CHECK(1, LUMI_block0_cleanup)
-/// @ ty7
+/// @ test-builtin-y7
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = Sys_getenv(sys, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_b));
     CHECK(1, LUMI_block0_cleanup)
-/// @ ty8
+/// @ test-builtin-y8
 LUMI_err = File_putc(sys->stdout_Cname, ut_M_c);
     CHECK(1, LUMI_block0_cleanup)
-/// @ ty9
+/// @ test-builtin-y9
 LUMI_err = File_getc(sys->stdin_Cname, &(ut_M_c), &(ut_M_b));
     CHECK(1, LUMI_block0_cleanup)
-/// @ ty10
+/// @ test-builtin-y10
 LUMI_err = File_putc(sys->stderr_Cname, ut_M_c);
     CHECK(1, LUMI_block0_cleanup)
-/// @ tef0
+/// @ test-builtin-ef0
 cannot create objects with type "File"
-/// @ tef1
+/// @ test-builtin-ef1
 cannot create objects with type "File"
-/// @ tef2
+/// @ test-builtin-ef2
 cannot create objects with type "File"
-/// @ tef3
+/// @ test-builtin-ef3
 using potentially illegal user reference "f"
-/// @ tef4
+/// @ test-builtin-ef4
 using potentially illegal user reference "f"
-/// @ tef5
+/// @ test-builtin-ef5
 using potentially illegal user reference "f"
-/// @ tef6
+/// @ test-builtin-ef6
 assigning conditional into non-conditional type "File"
-/// @ tey0
+/// @ test-builtin-ey0
 cannot create objects with type "Sys"
-/// @ tey1
+/// @ test-builtin-ey1
 cannot create objects with type "Sys"
-/// @ tey2
+/// @ test-builtin-ey2
 cannot create objects with type "Sys"
 /// @@ test-general
-/// @ t0
+/// @ test-general-0
 char* ut_M_str = NULL;
 int ut_M_str_Max_length = 0;
 int* ut_M_str_Length = &Lumi_empty_int;
-/// @ t1
+/// @ test-general-1
 Int ut_M_x = 0;
-/// @ t2
+/// @ test-general-2
 Int ut_M_x = 0;
-/// @ t3
+/// @ test-general-3
 Int ut_M_x = 0;
-/// @ t4
+/// @ test-general-4
 Int ut_M_x = 0;
-/// @ t5
+/// @ test-general-5
 Int ut_M_x = 0;
-/// @ t6
+/// @ test-general-6
 char ut_M_s[12] = {0};
 int ut_M_s_Length[1] = {0};
 char* ut_M_us = NULL;
@@ -2642,7 +2642,7 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 MAIN_FUNC
-/// @ t7
+/// @ test-general-7
 void ut_M_fun(void);
 Returncode second_M_dummy(void);
 char ut_M_s[12] = {0};
@@ -2693,7 +2693,7 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 TEST_MAIN_FUNC
-/// @ t8
+/// @ test-general-8
 void ut_M_fun(void);
 Returncode test_M_test_fun(void);
 int LUMI_file0_line_count[6] = {
@@ -2729,36 +2729,36 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 TEST_MAIN_FUNC
-/// @ te0
+/// @ test-general-e0
 unknown keyword "error"
-/// @ te1
+/// @ test-general-e1
 statement has no effect
-/// @ te2
+/// @ test-general-e2
 unreachable code
-/// @ te3
+/// @ test-general-e3
 unreachable code
-/// @ te4
+/// @ test-general-e4
 expected new-line in line end, got "?"
-/// @ te5
+/// @ test-general-e5
 expected new-line after "main", got "("
-/// @ te6
+/// @ test-general-e6
 indentation too long, expected 0 got 4
-/// @ te7
+/// @ test-general-e7
 indentation too short, expected 12 got 8
-/// @ te8
+/// @ test-general-e8
 no new-line before file end
-/// @ te9
+/// @ test-general-e9
 redefinition of global variable "name"
-/// @ te10
+/// @ test-general-e10
 variable name overrides function "name"
-/// @ te11
+/// @ test-general-e11
 unknown type "Error"
-/// @ te12
+/// @ test-general-e12
 unknown symbol "error"
-/// @ te13
+/// @ test-general-e13
 unexpected "["
 /// @@ test-struct
-/// @ t0
+/// @ test-struct-0
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -2768,7 +2768,7 @@ Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
 }
-/// @ t1
+/// @ test-struct-1
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -2778,7 +2778,7 @@ Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
 }
-/// @ t2
+/// @ test-struct-2
 typedef struct ut_M_Test1 ut_M_Test1;
 typedef struct ut_M_Test2 ut_M_Test2;
 typedef struct ut_M_Test3 ut_M_Test3;
@@ -2806,7 +2806,7 @@ void ut_M_Test2_Del(ut_M_Test2* self) {
 void ut_M_Test3_Del(ut_M_Test3* self) {
     if (self == NULL) return;
 }
-/// @ t3
+/// @ test-struct-3
 typedef struct ut_M_Test1 ut_M_Test1;
 typedef struct ut_M_Test2 ut_M_Test2;
 struct ut_M_Test1 {
@@ -2827,7 +2827,7 @@ void ut_M_Test2_Del(ut_M_Test2* self) {
     if (self == NULL) return;
     ut_M_Test1_Del(&(self->_base));
 }
-/// @ t4
+/// @ test-struct-4
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     ut_M_Test* to;
@@ -2846,40 +2846,40 @@ void ut_M_Test_Del(ut_M_Test* self) {
     SELF_REF_DEL(ut_M_Test, to);
     free(self->to);
 }
-/// @ te0
+/// @ test-struct-e0
 expected space after "struct", got "("
-/// @ te1
+/// @ test-struct-e1
 illegal type name "error"
-/// @ te2
+/// @ test-struct-e2
 illegal type name "ERror"
-/// @ te3
+/// @ test-struct-e3
 illegal type name "Error-name"
-/// @ te4
+/// @ test-struct-e4
 illegal type name "E"
-/// @ te5
+/// @ test-struct-e5
 redefinition of type "Int"
-/// @ te6
+/// @ test-struct-e6
 redefinition of type "Test"
-/// @ te7
+/// @ test-struct-e7
 expected ")" after base type, got "new-line"
-/// @ te8
+/// @ test-struct-e8
 unknown keyword "error"
-/// @ te9
+/// @ test-struct-e9
 expected block in a new line, got "end-of-file"
-/// @ te10
+/// @ test-struct-e10
 type with no fields "Error"
-/// @ te11
+/// @ test-struct-e11
 expected "(" after "new", got " "
-/// @ te12
+/// @ test-struct-e12
 constructor already defined for type "Error"
-/// @ te13
+/// @ test-struct-e13
 constructor with outputs
-/// @ te14
+/// @ test-struct-e14
 recursive declaration of type "Error", extended by type "Error"
-/// @ te15
+/// @ test-struct-e15
 recursive declaration of type "Aerror", extended by type "Berror", extended by type "Aerror"
 /// @@ test-class
-/// @ t0
+/// @ test-class-0
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Mid ut_M_Mid;
@@ -3018,7 +3018,7 @@ void ut_M_Top_Del(ut_M_Top* self) {
     SELF_REF_DEL_DYN(ut_M_Top, _base._base._, t);
     free(self->t);
 }
-/// @ t1
+/// @ test-class-1
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
@@ -3051,64 +3051,64 @@ void ut_M_Test_Del(ut_M_Test* self) {
     SELF_REF_DEL_DYN(ut_M_Test, _, to);
     free(self->to);
 }
-/// @ te0
+/// @ test-class-e0
 expected space after "class", got "("
-/// @ te1
+/// @ test-class-e1
 class with no dynamic methods "Error"
-/// @ te2
+/// @ test-class-e2
 expected "dynamic" or "inst" method type, got "error"
-/// @ te3
+/// @ test-class-e3
 illegal dynamic in function "meth"
-/// @ te4
+/// @ test-class-e4
 illegal dynamic in function "meth"
-/// @ te5
+/// @ test-class-e5
 too many parameters
-/// @ te6
+/// @ test-class-e6
 non matching error result
 /// @@ test-function
-/// @ t0
+/// @ test-function-0
 void ut_M_name(void);
 void ut_M_name(void) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t1
+/// @ test-function-1
 void ut_M_name(char* self, int self_Max_length, int* self_Length, char* text, int text_Max_length, int* text_Length, Int num);
 void ut_M_name(char* self, int self_Max_length, int* self_Length, char* text, int text_Max_length, int* text_Length, Int num) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t2
+/// @ test-function-2
 void ut_M_name(char** text, int* text_Max_length, int** text_Length, Int* num);
 void ut_M_name(char** text, int* text_Max_length, int** text_Length, Int* num) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t3
+/// @ test-function-3
 void ut_M_name(Char param, char** out, int* out_Max_length, int** out_Length);
 void ut_M_name(Char param, char** out, int* out_Max_length, int** out_Length) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t4
+/// @ test-function-4
 void ut_M_name(Int* array, int array_Length);
 void ut_M_name(Int* array, int array_Length) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t5
+/// @ test-function-5
 void ut_M_name(void (*fun)(Int x, Int* y), void (**joy)(void));
 void ut_M_name(void (*fun)(Int x, Int* y), void (**joy)(void)) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t6
+/// @ test-function-6
 void ut_M_name(void);
 void ut_M_name(void) {
     unsigned LUMI_loop_depth = 1;
@@ -3116,7 +3116,7 @@ void ut_M_name(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t7
+/// @ test-function-7
 Returncode ut_M_name(char* self, int self_Max_length, int* self_Length, Int px, Char* pu, int pu_Length, char* po, int po_Max_length, int* po_Length, char** oself, int* oself_Max_length, int** oself_Length, Ref_Manager** oself_Refman, Int* ox, char** ou, int* ou_Max_length, int** ou_Length, Ref_Manager** ou_Refman, char** oo, int* oo_Max_length, int** oo_Length);
 Returncode ut_M_name(char* self, int self_Max_length, int* self_Length, Int px, Char* pu, int pu_Length, char* po, int po_Max_length, int* po_Length, char** oself, int* oself_Max_length, int** oself_Length, Ref_Manager** oself_Refman, Int* ox, char** ou, int* ou_Max_length, int** ou_Length, Ref_Manager** ou_Refman, char** oo, int* oo_Max_length, int** oo_Length) {
     Returncode LUMI_err = OK;
@@ -3172,7 +3172,7 @@ LUMI_block0_cleanup:
     free(po);
     return LUMI_err;
 }
-/// @ t8
+/// @ test-function-8
 typedef struct ut_M_Struct ut_M_Struct;
 typedef struct ut_M_Class ut_M_Class;
 typedef struct ut_M_Class_Dynamic ut_M_Class_Dynamic;
@@ -3263,7 +3263,7 @@ LUMI_block0_cleanup:
     ut_M_Struct_Del(ps);
     free(ps);
 }
-/// @ t9
+/// @ test-function-9
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
@@ -3294,14 +3294,14 @@ void ut_M_name(ut_M_Test** t, ut_M_Test_Dynamic** t_Dynamic) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t10
+/// @ test-function-10
 void ut_M_name(char* ai, int ai_Length, int ai_Value_length, int ai_Value_value_length, int* ai_String_length, Int** ao, int* ao_Length, int* ao_Value_length);
 void ut_M_name(char* ai, int ai_Length, int ai_Value_length, int ai_Value_value_length, int* ai_String_length, Int** ao, int* ao_Length, int* ao_Value_length) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tm0
+/// @ test-function-m0
 void new_Mock(Bool* allocate_success) { }
 Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
@@ -3313,74 +3313,74 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 MAIN_FUNC
-/// @ te0
+/// @ test-function-e0
 expected space after "func", got "("
-/// @ te1
+/// @ test-function-e1
 expected "(" after function name, got "new-line"
-/// @ te2
+/// @ test-function-e2
 illegal function name "Error"
-/// @ te3
+/// @ test-function-e3
 illegal function name "error_name"
-/// @ te4
+/// @ test-function-e4
 redefinition of function "name"
-/// @ te5
+/// @ test-function-e5
 function name overrides global variable "name"
-/// @ te6
+/// @ test-function-e6
 expected access, got " "
-/// @ te7
+/// @ test-function-e7
 expected space after "user", got ")"
-/// @ te8
+/// @ test-function-e8
 expected space after "type", got "new-line"
-/// @ te9
+/// @ test-function-e9
 illegal access "error"
-/// @ te10
+/// @ test-function-e10
 expected space or new-line after ",", got "u"
-/// @ te11
+/// @ test-function-e11
 expected ">(" got "()"
-/// @ te12
+/// @ test-function-e12
 expected block in a new line, got "end-of-file"
-/// @ te13
+/// @ test-function-e13
 indentation too long, expected 4 got 8
-/// @ te14
+/// @ test-function-e14
 parameter "x" access should be "copy" for primitive types, got "user"
-/// @ te15
+/// @ test-function-e15
 output "x" access should be "var" for primitive types, got "copy"
-/// @ te16
+/// @ test-function-e16
 argument "s" access should not be "copy" for non-primitive type "String"
-/// @ te17
+/// @ test-function-e17
 missing subtype for array
-/// @ te18
+/// @ test-function-e18
 missing arguments in function type
-/// @ te20
+/// @ test-function-e20
 indentation too short, expected 8 got 4
-/// @ te21
+/// @ test-function-e21
 misplaced item "Error"
-/// @ te22
+/// @ test-function-e22
 misplaced item "error"
-/// @ te23
+/// @ test-function-e23
 redefinition of variable "error"
-/// @ te24
+/// @ test-function-e24
 redefinition of variable "error"
-/// @ te25
+/// @ test-function-e25
 redefinition of global variable "error"
-/// @ te26
+/// @ test-function-e26
 variable name overrides function "error"
-/// @ te27
+/// @ test-function-e27
 variable name overrides function "error"
-/// @ te28
+/// @ test-function-e28
 illegal variable name "Error"
-/// @ te29
+/// @ test-function-e29
 not yet supporting non-conditional and non-primitive output "s"
-/// @ te30
+/// @ test-function-e30
 error raised inside function not declared as error raising "fun"
-/// @ te31
+/// @ test-function-e31
 error raised inside function not declared as error raising "fun"
-/// @ te32
+/// @ test-function-e32
 error raised inside function not declared as error raising "fun"
-/// @ te33
+/// @ test-function-e33
 error raised inside function not declared as error raising "fun"
 /// @@ test-members
-/// @ t0
+/// @ test-members-0
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -3395,7 +3395,7 @@ void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
     LUMI_dec_ref(self->str_Refman);
 }
-/// @ t1
+/// @ test-members-1
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -3412,7 +3412,7 @@ LUMI_block0_cleanup:
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
 }
-/// @ t2
+/// @ test-members-2
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -3430,7 +3430,7 @@ LUMI_block0_cleanup:
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
 }
-/// @ t3
+/// @ test-members-3
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -3440,7 +3440,7 @@ Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
 }
-/// @ t4
+/// @ test-members-4
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -3450,7 +3450,7 @@ Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
 }
-/// @ t5
+/// @ test-members-5
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -3460,7 +3460,7 @@ Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
 }
-/// @ t6
+/// @ test-members-6
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -3470,7 +3470,7 @@ Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
 }
-/// @ t7
+/// @ test-members-7
 typedef struct ut_M_Test1 ut_M_Test1;
 typedef struct ut_M_Test2 ut_M_Test2;
 struct ut_M_Test1 {
@@ -3508,7 +3508,7 @@ void ut_M_fun(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t8
+/// @ test-members-8
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -3549,7 +3549,7 @@ LUMI_block0_cleanup:
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
 }
-/// @ t9
+/// @ test-members-9
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -3566,7 +3566,7 @@ void ut_M_Test_fun(ut_M_Test* self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t10
+/// @ test-members-10
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -3583,7 +3583,7 @@ void ut_M_Test_fun(ut_M_Test* self, char* s, int s_Max_length, int* s_Length, In
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t11
+/// @ test-members-11
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -3600,38 +3600,38 @@ void ut_M_Test_new(ut_M_Test* self, Int x) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ te0
+/// @ test-members-e0
 redefinition of field "name"
-/// @ te1
+/// @ test-members-e1
 field name overrides method "name"
-/// @ te2
+/// @ test-members-e2
 redefinition of method "name"
-/// @ te3
+/// @ test-members-e3
 method name overrides field "name"
-/// @ te4
+/// @ test-members-e4
 assigning into an owner a non-owner access "user"
-/// @ te5
+/// @ test-members-e5
 expected block in a new line, got " "
-/// @ te6
+/// @ test-members-e6
 misplaced item "error"
-/// @ te7
+/// @ test-members-e7
 type "Test" already implemented method "fun"
-/// @ te8
+/// @ test-members-e8
 type "Test" already implemented method "fun"
-/// @ te9
+/// @ test-members-e9
 expected name after ".", got "."
-/// @ te10
+/// @ test-members-e10
 field "num" is not a global member of type "Test"
-/// @ te11
+/// @ test-members-e11
 missing access before method name
-/// @ te12
+/// @ test-members-e12
 missing access before method name
-/// @ te13
+/// @ test-members-e13
 too few outputs
-/// @ te14
+/// @ test-members-e14
 non matching error result
 /// @@ test-return
-/// @ t0
+/// @ test-return-0
 void ut_M_name(void);
 void ut_M_name(void) {
     unsigned LUMI_loop_depth = 1;
@@ -3639,7 +3639,7 @@ void ut_M_name(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t1
+/// @ test-return-1
 Returncode ut_M_name(void);
 Returncode ut_M_name(void) {
     Returncode LUMI_err = OK;
@@ -3649,7 +3649,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-/// @ t2
+/// @ test-return-2
 Returncode ut_M_name(void);
 Returncode ut_M_name(void) {
     Returncode LUMI_err = OK;
@@ -3663,7 +3663,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-/// @ t3
+/// @ test-return-3
 Returncode ut_M_name(char* arr, int arr_Length, int arr_Value_length, int* arr_String_length);
 Returncode ut_M_name(char* arr, int arr_Length, int arr_Value_length, int* arr_String_length) {
     Returncode LUMI_err = OK;
@@ -3680,50 +3680,50 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-/// @ t4
+/// @ test-return-4
 char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
     Ref_Manager* s_Refman = NULL;
     CHECK_REFMAN(2, LUMI_block0_cleanup, s_Refman)
     USER_RAISE(2, LUMI_block0_cleanup, s, *(s_Length))
-/// @ te0
+/// @ test-return-e0
 expected new-line after "return", got "("
-/// @ te1
+/// @ test-return-e1
 expected space or new-line after "raise!", got "("
-/// @ te2
+/// @ test-return-e2
 got "Int" expression, expected "String"
-/// @ te3
+/// @ test-return-e3
 got "Empty Symbol" expression, expected "String"
-/// @ te4
+/// @ test-return-e4
 expected ! after "raise", got "new-line"
 /// @@ test-code-variables
-/// @ t0
+/// @ test-code-variables-0
 Int x = 0;
-/// @ t1
+/// @ test-code-variables-1
 char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
-/// @ t2
+/// @ test-code-variables-2
 Int* a = NULL;
     int a_Length = 0;
-/// @ t3
+/// @ test-code-variables-3
 ut_M_Test* tt = NULL;
-/// @ t4
+/// @ test-code-variables-4
 char s[12] = {0};
     int s_Length[1] = {0};
     /* initializing s */
-/// @ t5
+/// @ test-code-variables-5
 Int a[12] = {0};
     /* initializing a */
-/// @ t6
+/// @ test-code-variables-6
 ut_M_Test a[12] = {0};
     /* initializing a */
-/// @ t7
+/// @ test-code-variables-7
 char sa[12 * 7] = {0};
     int sa_String_length[12] = {0};
     /* initializing sa */
-/// @ t8
+/// @ test-code-variables-8
 char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
@@ -3736,14 +3736,14 @@ char* s = NULL;
     s = NULL;
     s_Length = &Lumi_empty_int;
     INIT_NEW_REFMAN(2, LUMI_block0_cleanup, *so)
-/// @ t9
+/// @ test-code-variables-9
 ut_M_Ta a[12] = {0};
     /* initializing a */
-/// @ t10
+/// @ test-code-variables-10
 Int* a = NULL;
     int a_Length = 0;
     INIT_NEW_ARRAY(1, LUMI_block0_cleanup, a, Int, 12, 1);
-/// @ t11
+/// @ test-code-variables-11
 char* sa = NULL;
     int sa_Length = 0;
     int sa_Value_length = 0;
@@ -3751,11 +3751,11 @@ char* sa = NULL;
     sa_Value_length = 7;
     INIT_NEW_ARRAY(1, LUMI_block0_cleanup, sa, char, 12, sa_Value_length);
     sa_String_length = LUMI_alloc(sizeof(int) * sa_Length);
-/// @ t12
+/// @ test-code-variables-12
 char aa[3 * 4 * 5] = {0};
     int aa_String_length[3 * 4] = {0};
     /* initializing aa */
-/// @ t13
+/// @ test-code-variables-13
 char* aa = NULL;
     int aa_Length = 0;
     int aa_Value_length = 0;
@@ -3765,7 +3765,7 @@ char* aa = NULL;
     aa_Value_value_length = 5;
     INIT_NEW_ARRAY(1, LUMI_block0_cleanup, aa, char, 3, aa_Value_length * aa_Value_value_length);
     aa_String_length = LUMI_alloc(sizeof(int) * aa_Length * aa_Value_length);
-/// @ t14
+/// @ test-code-variables-14
 Returncode ut_M_fun(void);
 Returncode ut_M_fun(void) {
     Returncode LUMI_err = OK;
@@ -3791,32 +3791,32 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-/// @ te0
+/// @ test-code-variables-e0
 expected space after "type", got "new-line"
-/// @ te1
+/// @ test-code-variables-e1
 illegal variable name "Error"
-/// @ te2
+/// @ test-code-variables-e2
 illegal variable name "errorName"
-/// @ te3
+/// @ test-code-variables-e3
 redefinition of variable "name"
-/// @ te4
+/// @ test-code-variables-e4
 redefinition of variable "name"
-/// @ te5
+/// @ test-code-variables-e5
 redefinition of global variable "name"
-/// @ te6
+/// @ test-code-variables-e6
 variable name overrides function "name"
-/// @ te7
+/// @ test-code-variables-e7
 type members cannot be initialized
-/// @ te8
+/// @ test-code-variables-e8
 expected space after "new", got "new-line"
-/// @ te9
+/// @ test-code-variables-e9
 sequence length is not constant
-/// @ te10
+/// @ test-code-variables-e10
 illegal variable name "error--name"
-/// @ te11
+/// @ test-code-variables-e11
 unexpected space after variable name
 /// @@ test-initialize
-/// @ t0
+/// @ test-initialize-0
 ut_M_Tb* aux_Tb_0 = NULL;
     ut_M_Tb_Dynamic* aux_Tb_0_Dynamic = &ut_M_Tb_dynamic;
     INIT_NEW(1, LUMI_block0_cleanup, aux_Tb_0, ut_M_Tb, 1);
@@ -3828,7 +3828,7 @@ ut_M_Tb* aux_Tb_0 = NULL;
     aux_Tb_0 = NULL;
     aux_Tb_0_Dynamic = NULL;
     INIT_NEW_REFMAN(1, LUMI_block0_cleanup, ut_M_tb)
-/// @ t1
+/// @ test-initialize-1
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int* aux_String_0_Length = &Lumi_empty_int;
@@ -3837,7 +3837,7 @@ char* aux_String_0 = NULL;
     ut_M_str_Max_length = aux_String_0_Max_length;
     ut_M_str_Length = aux_String_0_Length;
     ut_M_str = aux_String_0;
-/// @ t2
+/// @ test-initialize-2
 Int* a = NULL;
     int a_Length = 0;
     Int* aux_Array_0 = NULL;
@@ -3847,7 +3847,7 @@ Int* a = NULL;
     a_Length = aux_Array_0_Length;
     a = aux_Array_0;
     aux_Array_0 = NULL;
-/// @ t3
+/// @ test-initialize-3
 ut_M_Test* a = NULL;
     int a_Length = 0;
     ut_M_Test* aux_Array_0 = NULL;
@@ -3857,7 +3857,7 @@ ut_M_Test* a = NULL;
     a_Length = aux_Array_0_Length;
     a = aux_Array_0;
     aux_Array_0 = NULL;
-/// @ t4
+/// @ test-initialize-4
 char* sa = NULL;
     int sa_Length = 0;
     int sa_Value_length = 0;
@@ -3877,18 +3877,18 @@ char* sa = NULL;
     sa_String_length = aux_Array_0_String_length;
     sa = aux_Array_0;
     aux_Array_0 = NULL;
-/// @ t5
+/// @ test-initialize-5
 Int x = 0;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
     x = ut_M_arr[0];
-/// @ t6
+/// @ test-initialize-6
 char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
     s_Max_length = ut_M_ostr_Max_length;
     s_Length = ut_M_ostr_Length;
     s = ut_M_ostr;
-/// @ t7
+/// @ test-initialize-7
 char s[12] = {0};
     int s_Length[1] = {0};
     char* aux_String_0 = NULL;
@@ -3897,29 +3897,29 @@ char s[12] = {0};
     INIT_STRING_CONST(1, LUMI_block0_cleanup, aux_String_0, "some string");
     /* initializing s */
     LUMI_err = String_copy(s, 12, s_Length, aux_String_0, *aux_String_0_Length);
-/// @ t8
+/// @ test-initialize-8
 char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     INIT_NEW_STRING(1, LUMI_block0_cleanup, s, ut_M_i);
     LUMI_err = String_copy(s, s_Max_length, s_Length, ut_M_ostr, *ut_M_ostr_Length);
-/// @ t9
+/// @ test-initialize-9
 ut_M_Test* tt = NULL;
     CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_tc_Refman)
     tt = &(ut_M_tc->_base._base._base);
-/// @ t10
+/// @ test-initialize-10
 ut_M_Tc tt_Var = {{{{0}}}};
     ut_M_Tc* tt = NULL;
     ut_M_Tc_Dynamic* tt_Dynamic = &ut_M_Tc_dynamic;
     tt = &tt_Var;
     LUMI_err = ut_M_Tb_new(&(tt->_base), &(tt_Dynamic->_base), 3);
-/// @ t11
+/// @ test-initialize-11
 ut_M_Tc* tt = NULL;
     ut_M_Tc_Dynamic* tt_Dynamic = &ut_M_Tc_dynamic;
     INIT_NEW(1, LUMI_block0_cleanup, tt, ut_M_Tc, 1);
     LUMI_err = ut_M_Tb_new(&(tt->_base), &(tt_Dynamic->_base), 3);
-/// @ t12
+/// @ test-initialize-12
 ut_M_Tc* aux_Tc_0 = NULL;
     ut_M_Tc_Dynamic* aux_Tc_0_Dynamic = &ut_M_Tc_dynamic;
     INIT_NEW(1, LUMI_block0_cleanup, aux_Tc_0, ut_M_Tc, 1);
@@ -3931,12 +3931,12 @@ ut_M_Tc* aux_Tc_0 = NULL;
     aux_Tc_0 = NULL;
     aux_Tc_0_Dynamic = NULL;
     INIT_NEW_REFMAN(1, LUMI_block0_cleanup, ut_M_tb)
-/// @ t13
+/// @ test-initialize-13
 ut_M_Tb* tt = NULL;
     ut_M_Tb_Dynamic* tt_Dynamic = NULL;
     tt_Dynamic = ut_M_tb_Dynamic;
     tt = ut_M_tb;
-/// @ t14
+/// @ test-initialize-14
 ut_M_Ta* ota = NULL;
     ut_M_Ta_Dynamic* ota_Dynamic = NULL;
     LUMI_var_dec_ref(ut_M_tb_Refman);
@@ -3945,7 +3945,7 @@ ut_M_Ta* ota = NULL;
     ut_M_tb = NULL;
     ut_M_tb_Refman = NULL;
     ut_M_tb_Dynamic = NULL;
-/// @ t15
+/// @ test-initialize-15
 char* sa = NULL;
     int sa_Length = 0;
     int sa_Value_length = 0;
@@ -3967,7 +3967,7 @@ char* sa = NULL;
     sa_String_length = aux_Array_0_String_length;
     sa = aux_Array_0;
     aux_Array_0 = NULL;
-/// @ t16
+/// @ test-initialize-16
 void ut_M_get(File** a);
 void ut_M_get(File** a) {
     unsigned LUMI_loop_depth = 1;
@@ -3983,7 +3983,7 @@ LUMI_block0_cleanup:
     File_Del(b);
     free(b);
 }
-/// @ t17
+/// @ test-initialize-17
 ut_M_Test* ot = NULL;
     ut_M_Test* st = NULL;
     Ref_Manager* st_Refman = NULL;
@@ -3994,7 +3994,7 @@ ut_M_Test* ot = NULL;
     st = ot;
     ot = NULL;
     INIT_NEW_REFMAN(2, LUMI_block0_cleanup, st)
-/// @ t18
+/// @ test-initialize-18
 ut_M_Tc tt_Var = {{{{0}}}};
     ut_M_Tc* tt = NULL;
     Ref_Manager* tt_Refman = NULL;
@@ -4002,7 +4002,7 @@ ut_M_Tc tt_Var = {{{{0}}}};
     tt = &tt_Var;
     INIT_VAR_REFMAN(1, LUMI_block0_cleanup, tt)
     LUMI_err = ut_M_Tb_new(&(tt->_base), &(tt_Dynamic->_base), 3);
-/// @ t19
+/// @ test-initialize-19
 ut_M_Test* t1 = NULL;
     ut_M_Test t2_Var = {0};
     ut_M_Test* t2 = NULL;
@@ -4010,7 +4010,7 @@ ut_M_Test* t1 = NULL;
     INIT_NEW(1, LUMI_block0_cleanup, t1, ut_M_Test, 1);
     t2 = &t2_Var;
     INIT_VAR_REFMAN(2, LUMI_block0_cleanup, t2)
-/// @ t20
+/// @ test-initialize-20
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -4037,95 +4037,131 @@ LUMI_block0_cleanup:
     (void)0;
     ut_M_Test_Del(t);
 }
-/// @ te0
+/// @ test-initialize-21
+typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Base {
+    Int x;
+};
+struct ut_M_Test {
+    ut_M_Base _base;
+    Int y;
+};
+void ut_M_Base_new(ut_M_Base* self);
+void ut_M_Base_Del(ut_M_Base* self);
+void ut_M_Test_new(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self);
+Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Base_new(ut_M_Base* self) {
+    unsigned LUMI_loop_depth = 1;
+    self->x = 2;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Base_Del(ut_M_Base* self) {
+    if (self == NULL) return;
+}
+void ut_M_Test_new(ut_M_Test* self) {
+    unsigned LUMI_loop_depth = 1;
+    ut_M_Base_new(&(self->_base));
+    self->y = 3;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    ut_M_Base_Del(&(self->_base));
+}
+/// @ test-initialize-e0
 dynamic allocation of primitive type "Int"
-/// @ te1
+/// @ test-initialize-e1
 missing length for sequence
-/// @ te2
+/// @ test-initialize-e2
 missing length for sequence
-/// @ te3
+/// @ test-initialize-e3
 missing length for sequence
-/// @ te4
+/// @ test-initialize-e4
 missing length for sequence
-/// @ te5
+/// @ test-initialize-e5
 missing subtype for array
-/// @ te6
+/// @ test-initialize-e6
 missing subtype for array
-/// @ te7
+/// @ test-initialize-e7
 missing subtype for array
-/// @ te8
+/// @ test-initialize-e8
 missing subtype for array
-/// @ te9
+/// @ test-initialize-e9
 generic arrays not supported
-/// @ te10
+/// @ test-initialize-e10
 expected ":" or "} after array length", got "new-line"
-/// @ te11
+/// @ test-initialize-e11
 expected "}" after sub-types, got "new-line"
-/// @ te12
+/// @ test-initialize-e12
 unknown symbol "error"
-/// @ te13
+/// @ test-initialize-e13
 got "String" expression, expected "Int"
-/// @ te14
+/// @ test-initialize-e14
 only "var" access is supported for primitive types, got "user"
-/// @ te15
+/// @ test-initialize-e15
 only "var" access is supported for primitive types, got "owner"
-/// @ te16
+/// @ test-initialize-e16
 no constructor for type "Array"
-/// @ te17
+/// @ test-initialize-e17
 cannot assign "Int" into "Bool"
-/// @ te18
+/// @ test-initialize-e18
 only one initialization parameter expected
-/// @ te19
+/// @ test-initialize-e19
 no constructor for type "Test"
-/// @ te20
+/// @ test-initialize-e20
 access should be "copy" for primitive types, got "user"
-/// @ te21
+/// @ test-initialize-e21
 assigning into access "owner" invalid access "user"
-/// @ te22
+/// @ test-initialize-e22
 assigning into an owner a non-owner access "user"
-/// @ te23
+/// @ test-initialize-e23
 more than one subtype for array
-/// @ te24
+/// @ test-initialize-e24
 passing ownership of type "Tb" into static type "Test"
-/// @ te25
+/// @ test-initialize-e25
 using invalid reference "s"
-/// @ te26
+/// @ test-initialize-e26
 assigning empty into non-conditional type "String"
-/// @ te27
+/// @ test-initialize-e27
 ignoring empty reference check
-/// @ te28
+/// @ test-initialize-e28
 using before declaration variable "error"
-/// @ te29
+/// @ test-initialize-e29
 using before declaration variable "error"
-/// @ te30
+/// @ test-initialize-e30
 using before declaration variable "error"
-/// @ te31
+/// @ test-initialize-e31
 unknown symbol "error"
-/// @ te32
+/// @ test-initialize-e32
 unexpected ? initializing type "Test"
-/// @ te33
+/// @ test-initialize-e33
 cannot use "?" on non conditional or weak reference of type "Type Name"
-/// @ te34
+/// @ test-initialize-e34
 ignoring initialization error check
-/// @ te35
+/// @ test-initialize-e35
 ignoring initialization error check
-/// @ te36
+/// @ test-initialize-e36
 using "!" where there is no error
-/// @ te37
+/// @ test-initialize-e37
 using "!" where there is no error
-/// @ te38
+/// @ test-initialize-e38
 unexpected "!" after "s"
 /// @@ test-comment
-/// @ t0
+/// @ test-comment-0
 Int x = 0;
-/// @ t1
+/// @ test-comment-1
 Int x = 0;
-/// @ t2
+/// @ test-comment-2
 Int x = 0;
-/// @ t3
+/// @ test-comment-3
 Int x = 0;
 /// @@ test-block
-/// @ t0
+/// @ test-block-0
 {
         ut_M_Test* tt = NULL;
         INIT_NEW(2, LUMI_block1_cleanup, tt, ut_M_Test, 1);
@@ -4135,13 +4171,13 @@ Int x = 0;
     ut_M_Test_Del(tt);
         free(tt);
     }
-/// @ t1
+/// @ test-block-1
 {
         LUMI_loop_depth = 0; goto LUMI_block1_cleanup;
     LUMI_block1_cleanup:
         (void)0;
     }
-/// @ t2
+/// @ test-block-2
 {
         Int n = 0;
     LUMI_block1_cleanup:
@@ -4152,18 +4188,18 @@ Int x = 0;
     LUMI_block2_cleanup:
         (void)0;
     }
-/// @ te0
+/// @ test-block-e0
 expected new-line after "block", got " "
-/// @ te1
+/// @ test-block-e1
 "break" used not inside loop
-/// @ te2
+/// @ test-block-e2
 "while" used not inside loop
-/// @ te3
+/// @ test-block-e3
 unknown symbol "tt"
-/// @ te4
+/// @ test-block-e4
 using invalid reference "tt"
 /// @@ test-if-else
-/// @ t0
+/// @ test-if-else-0
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     if (ut_M_t->num > 3) {
         ut_M_i -= 2;
@@ -4171,7 +4207,7 @@ CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t1
+/// @ test-if-else-1
 if (ut_M_i > 3) {
         ut_M_i -= 2;
     LUMI_block1_cleanup:
@@ -4183,7 +4219,7 @@ if (ut_M_i > 3) {
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t2
+/// @ test-if-else-2
 if (ut_M_i > 3) {
         ut_M_i -= 3;
     LUMI_block1_cleanup:
@@ -4217,7 +4253,7 @@ if (ut_M_i > 3) {
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t3
+/// @ test-if-else-3
 if (ut_M_b) {
         LUMI_loop_depth = 0; goto LUMI_block1_cleanup;
     LUMI_block1_cleanup:
@@ -4225,14 +4261,14 @@ if (ut_M_b) {
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
     ut_M_i = 3;
-/// @ t4
+/// @ test-if-else-4
 if (ut_M_b && ut_M_b) {
         ut_M_i += 1;
     LUMI_block1_cleanup:
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t5
+/// @ test-if-else-5
 if (ut_M_b) {
         char sa[4] = {0};
         int sa_Length[1] = {0};
@@ -4287,30 +4323,30 @@ if (ut_M_b) {
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ te0
+/// @ test-if-else-e0
 got "Int" expression, expected "Bool"
-/// @ te1
+/// @ test-if-else-e1
 unknown symbol "error"
-/// @ te2
+/// @ test-if-else-e2
 unknown symbol "error"
-/// @ te3
+/// @ test-if-else-e3
 unknown symbol "error"
-/// @ te4
+/// @ test-if-else-e4
 unreachable code
-/// @ te5
+/// @ test-if-else-e5
 expected space after "if", got "("
-/// @ te6
+/// @ test-if-else-e6
 "else" without a previous "if"
-/// @ te7
+/// @ test-if-else-e7
 expected new-line after "else", got " "
-/// @ te8
+/// @ test-if-else-e8
 "else-if" without a previous "if"
-/// @ te9
+/// @ test-if-else-e9
 expected space after "else-if", got "("
-/// @ te10
+/// @ test-if-else-e10
 expected block in a new line, got "end-of-file"
 /// @@ test-loop
-/// @ t0
+/// @ test-loop-0
 do {
         Int x = 0;
         LUMI_loop_depth = 3;
@@ -4319,7 +4355,7 @@ do {
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t1
+/// @ test-loop-1
 do {
         LUMI_loop_depth = 3;
         LUMI_loop_depth = 1; goto LUMI_block1_cleanup;
@@ -4327,7 +4363,7 @@ do {
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t2
+/// @ test-loop-2
 do {
         LUMI_loop_depth = 3;
         CHECK_REF_REFMAN(2, LUMI_block1_cleanup, ut_M_t, ut_M_t_Refman)
@@ -4336,7 +4372,7 @@ do {
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t3
+/// @ test-loop-3
 do {
         LUMI_loop_depth = 3;
         LUMI_loop_depth = 2; goto LUMI_block1_cleanup;
@@ -4345,7 +4381,7 @@ do {
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t4
+/// @ test-loop-4
 do {
         LUMI_loop_depth = 3;
         if (true) {
@@ -4358,7 +4394,7 @@ do {
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t5
+/// @ test-loop-5
 do {
         char sa[4] = {0};
         int sa_Length[1] = {0};
@@ -4413,7 +4449,7 @@ do {
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t6
+/// @ test-loop-6
 Int aux_Int_0 = 0;
     do {
         LUMI_loop_depth = 3;
@@ -4424,7 +4460,7 @@ Int aux_Int_0 = 0;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t7
+/// @ test-loop-7
 {
         Int aux_Int_0 = 0;
         Int aux_Int_1 = 0;
@@ -4453,7 +4489,7 @@ Int aux_Int_0 = 0;
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t8
+/// @ test-loop-8
 do {
         LUMI_loop_depth = 3;
         ut_M_i += 1;
@@ -4461,7 +4497,7 @@ do {
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t9
+/// @ test-loop-9
 do {
         LUMI_loop_depth = 3;
         do {
@@ -4481,34 +4517,34 @@ do {
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ te0
+/// @ test-loop-e0
 expected space after "loop", got "("
-/// @ te1
+/// @ test-loop-e1
 "while" used not inside loop
-/// @ te2
+/// @ test-loop-e2
 "continue" used not inside loop
-/// @ te3
+/// @ test-loop-e3
 got "Int" expression, expected "Bool"
-/// @ te4
+/// @ test-loop-e4
 unknown symbol "error"
-/// @ te6
+/// @ test-loop-e6
 got void expression, expected "Bool"
-/// @ te7
+/// @ test-loop-e7
 expected space after "while", got "new-line"
-/// @ te8
+/// @ test-loop-e8
 expected new-line after "continue", got " "
-/// @ te9
+/// @ test-loop-e9
 "break" used not inside loop
-/// @ te10
+/// @ test-loop-e10
 expected new-line after "break", got " "
-/// @ te11
+/// @ test-loop-e11
 loop is infinite
-/// @ te12
+/// @ test-loop-e12
 loop is infinite
-/// @ te13
+/// @ test-loop-e13
 using "!" where error is not propagated
 /// @@ test-for-loop
-/// @ t0
+/// @ test-for-loop-0
 Int aux_Int_0 = 0;
     do {
         Int n = 0;
@@ -4521,7 +4557,7 @@ Int aux_Int_0 = 0;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t1
+/// @ test-for-loop-1
 Int aux_Int_0 = 0;
     Int aux_Int_1 = 0;
     Int aux_Int_2 = 0;
@@ -4541,7 +4577,7 @@ Int aux_Int_0 = 0;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t2
+/// @ test-for-loop-2
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int* aux_String_0_Length = &Lumi_empty_int;
@@ -4563,7 +4599,7 @@ char* aux_String_0 = NULL;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t3
+/// @ test-for-loop-3
 Int* aux_Array_0 = NULL;
     int aux_Array_0_Length = 0;
     Int aux_Int_0 = 0;
@@ -4583,7 +4619,7 @@ Int* aux_Array_0 = NULL;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t4
+/// @ test-for-loop-4
 char* aux_Array_0 = NULL;
     int aux_Array_0_Length = 0;
     int aux_Array_0_Value_length = 0;
@@ -4617,7 +4653,7 @@ char* aux_Array_0 = NULL;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t5
+/// @ test-for-loop-5
 Int n = 0;
     Int aux_Int_0 = 0;
     do {
@@ -4630,7 +4666,7 @@ Int n = 0;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t6
+/// @ test-for-loop-6
 Int aux_Int_0 = 0;
     Int aux_Int_1 = 0;
     do {
@@ -4655,7 +4691,7 @@ Int aux_Int_0 = 0;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t7
+/// @ test-for-loop-7
 Int aux_Int_0 = 0;
     do {
         Int n = 0;
@@ -4668,7 +4704,7 @@ Int aux_Int_0 = 0;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t8
+/// @ test-for-loop-8
 Int aux_Int_0 = 0;
     do {
         char sa[4] = {0};
@@ -4722,7 +4758,7 @@ Int aux_Int_0 = 0;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t9
+/// @ test-for-loop-9
 char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
@@ -4753,7 +4789,7 @@ char* s = NULL;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t10
+/// @ test-for-loop-10
 char sa[3 * 4] = {0};
     int sa_String_length[3] = {0};
     char* aux_Array_0 = NULL;
@@ -4789,7 +4825,7 @@ char sa[3 * 4] = {0};
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t11
+/// @ test-for-loop-11
 Int aux_Int_0 = 0;
     aux_Int_0 = 2;
     do {
@@ -4801,7 +4837,7 @@ Int aux_Int_0 = 0;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t12
+/// @ test-for-loop-12
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int* aux_String_0_Length = &Lumi_empty_int;
@@ -4821,7 +4857,7 @@ char* aux_String_0 = NULL;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t13
+/// @ test-for-loop-13
 Int aux_Int_0 = 0;
     Int aux_Int_1 = 0;
     aux_Int_0 = ut_M_i + 4;
@@ -4834,27 +4870,27 @@ Int aux_Int_0 = 0;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ te0
+/// @ test-for-loop-e0
 expected space after "for", got "("
-/// @ te1
+/// @ test-for-loop-e1
 expected space after "n", got "new-line"
-/// @ te2
+/// @ test-for-loop-e2
 expected "in " got "err"
-/// @ te3
+/// @ test-for-loop-e3
 cannot iterate void expression
-/// @ te4
+/// @ test-for-loop-e4
 got "String" expression, expected "Int"
-/// @ te5
+/// @ test-for-loop-e5
 unknown symbol "error"
-/// @ te6
+/// @ test-for-loop-e6
 cannot assign "String" into "Int"
-/// @ te7
+/// @ test-for-loop-e7
 using before declaration variable "n"
 /// @@ test-testing
-/// @ ta0
+/// @ test-testing-a0
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     TEST_ASSERT(1, LUMI_block0_cleanup, ut_M_t->num == 2)
-/// @ ta1
+/// @ test-testing-a1
 ++LUMI_trace_ignore_count;
     CHECK_REF_REFMAN(1, LUMI_block1_cleanup, ut_M_t, ut_M_t_Refman)
     --LUMI_trace_ignore_count;
@@ -4864,7 +4900,7 @@ CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     --LUMI_trace_ignore_count;
     LUMI_err = OK;
     LUMI_loop_depth = 1;
-/// @ ta2
+/// @ test-testing-a2
 ++LUMI_trace_ignore_count;
     LUMI_err = ut_M_fune();
     CHECK(1, LUMI_block1_cleanup)
@@ -4875,7 +4911,7 @@ CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     --LUMI_trace_ignore_count;
     LUMI_err = OK;
     LUMI_loop_depth = 1;
-/// @ ta3
+/// @ test-testing-a3
 {char* LUMI_expected_error_prev;
     int LUMI_expected_error_trace_ignore_count_prev;
     LUMI_expected_error_prev = LUMI_expected_error;
@@ -4899,7 +4935,7 @@ CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     LUMI_expected_error = LUMI_expected_error_prev;}
     LUMI_err = OK;
     LUMI_loop_depth = 1;
-/// @ ta4
+/// @ test-testing-a4
 {char* LUMI_expected_error_prev;
     int LUMI_expected_error_trace_ignore_count_prev;
     LUMI_expected_error_prev = LUMI_expected_error;
@@ -4924,7 +4960,7 @@ CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     LUMI_expected_error = LUMI_expected_error_prev;}
     LUMI_err = OK;
     LUMI_loop_depth = 1;
-/// @ ta5
+/// @ test-testing-a5
 {char* LUMI_expected_error_prev;
     int LUMI_expected_error_trace_ignore_count_prev;
     LUMI_expected_error_prev = LUMI_expected_error;
@@ -4948,7 +4984,7 @@ CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     LUMI_expected_error = LUMI_expected_error_prev;}
     LUMI_err = OK;
     LUMI_loop_depth = 1;
-/// @ ta6
+/// @ test-testing-a6
 if (ut_M_b) {
         char s[4] = {0};
         int s_Length[1] = {0};
@@ -4993,7 +5029,7 @@ if (ut_M_b) {
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ tm0
+/// @ test-testing-m0
 Returncode ut_M_fun(void);
 Returncode ut_M_fun_Mock(void);
 Bool ut_M_fun_Mock_active = true;
@@ -5015,7 +5051,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-/// @ tm1
+/// @ test-testing-m1
 void ut_M_fun_Mock(void);
 Bool ut_M_fun_Mock_active = true;
 void ut_M_fun(void);
@@ -5031,7 +5067,7 @@ void ut_M_fun(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tm2
+/// @ test-testing-m2
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -5056,7 +5092,7 @@ void ut_M_Test_meth_Mock(ut_M_Test* self, Int x) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tm3
+/// @ test-testing-m3
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
@@ -5086,7 +5122,7 @@ void ut_M_Test_meth_Mock(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, Int x
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tm4
+/// @ test-testing-m4
 void ut_M_fun(Int x, Int* y);
 void ut_M_fun_Mock(Int x, Int* y);
 Bool ut_M_fun_Mock_active = true;
@@ -5105,7 +5141,7 @@ void ut_M_fun_Mock(Int x, Int* y) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tm5
+/// @ test-testing-m5
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -5135,7 +5171,7 @@ void ut_M_Test_meth_Mock(ut_M_Test* self, Int x, Int* y) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tm6
+/// @ test-testing-m6
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
@@ -5169,7 +5205,7 @@ void ut_M_Test_meth_Mock(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, Int x
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tm7
+/// @ test-testing-m7
 Returncode ut_M_fun(void);
 Returncode Sys_print_Mock(Sys* self, Char* text, int text_Length);
 Bool Sys_print_Mock_active = true;
@@ -5202,7 +5238,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-/// @ tm8
+/// @ test-testing-m8
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -5237,7 +5273,7 @@ LUMI_block0_cleanup:
     (void)0;
     ut_M_Test_Del(t);
 }
-/// @ tt0
+/// @ test-testing-t0
 void ut_M_fun0(void);
 void ut_M_fun1(void);
 Returncode ut_M_fun2(void);
@@ -5398,7 +5434,7 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 TEST_MAIN_FUNC
-/// @ tt1
+/// @ test-testing-t1
 void ut_M_fun(void);
 Returncode second_M_fun0(void);
 Returncode second_M_fun1(void);
@@ -5443,7 +5479,7 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 TEST_MAIN_FUNC
-/// @ tmg0
+/// @ test-testing-mg0
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     char* s;
@@ -5466,7 +5502,7 @@ void ut_M_Test_MockDel(Ref self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tmg1
+/// @ test-testing-mg1
 void delete_Mock(Ref self);
 void delete_Mock(Ref self) {
     unsigned LUMI_loop_depth = 1;
@@ -5484,7 +5520,7 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 MAIN_FUNC
-/// @ tmg2
+/// @ test-testing-mg2
 void new_Mock(Bool* allocate_success);
 void new_Mock(Bool* allocate_success) {
     unsigned LUMI_loop_depth = 1;
@@ -5501,98 +5537,98 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 MAIN_FUNC
-/// @ tr0
+/// @ test-testing-r0
 Ref r = NULL;
-/// @ tr1
+/// @ test-testing-r1
 Ref r = NULL;
     r = ut_M_ostr;
-/// @ tr2
+/// @ test-testing-r2
 Ref r = NULL;
     r = NULL;
-/// @ tr3
+/// @ test-testing-r3
 Ref r = NULL;
     r = ut_M_ostr;
-/// @ tr4
+/// @ test-testing-r4
 Ref r = NULL;
     TEST_ASSERT(2, LUMI_block0_cleanup, (void*)r == r)
-/// @ te0
+/// @ test-testing-e0
 got "Int" expression, expected "Bool"
-/// @ te1
+/// @ test-testing-e1
 unknown symbol "error"
-/// @ te2
+/// @ test-testing-e2
 unknown symbol "error"
-/// @ te3
+/// @ test-testing-e3
 test function cannot have arguments
-/// @ te4
+/// @ test-testing-e4
 test function cannot have arguments
-/// @ te5
+/// @ test-testing-e5
 mocking unknown function "error"
-/// @ te6
+/// @ test-testing-e6
 unknown type "Error"
-/// @ te7
+/// @ test-testing-e7
 unknown method "error" of type "Test"
-/// @ te8
+/// @ test-testing-e8
 expected access "user" , got "owner"
-/// @ te9
+/// @ test-testing-e9
 non matching types "Int" and "String"
-/// @ te10
+/// @ test-testing-e10
 non matching subtypes "Char" and "Int"
-/// @ te11
+/// @ test-testing-e11
 expected ! after "assert", got " "
-/// @ te12
+/// @ test-testing-e12
 expected ! after "assert-error", got " "
-/// @ te13
+/// @ test-testing-e13
 expected space after "mock", got "("
-/// @ te14
+/// @ test-testing-e14
 already mocking function "fun"
-/// @ te15
+/// @ test-testing-e15
 already mocking function "fun"
-/// @ te16
+/// @ test-testing-e16
 already mocking global delete
-/// @ te17
+/// @ test-testing-e17
 already mocking delete of type "Test"
-/// @ te18
+/// @ test-testing-e18
 unknown operator ""
-/// @ te19
+/// @ test-testing-e19
 expected space after ",", got """
-/// @ te20
+/// @ test-testing-e20
 no '"' around string constant " "error""
-/// @ te21
+/// @ test-testing-e21
 no '"' around string constant "error"
-/// @ te22
+/// @ test-testing-e22
 already mocking global new
-/// @ te23
+/// @ test-testing-e23
 mock new should have only single Bool output
-/// @ te24
+/// @ test-testing-e24
 mock new should have only single Bool output
-/// @ te25
+/// @ test-testing-e25
 mock new should have only single Bool output
-/// @ te26
+/// @ test-testing-e26
 mock new should have only single Bool output
-/// @ te27
+/// @ test-testing-e27
 mock delete should have no arguments
-/// @ te28
+/// @ test-testing-e28
 mock delete should have no arguments
-/// @ te29
+/// @ test-testing-e29
 type "Func" has no member "error"
-/// @ te30
+/// @ test-testing-e30
 accessing mock function field in dynamic call to "meth"
-/// @ te31
+/// @ test-testing-e31
 expected space after "test", got "new-line"
-/// @ te32
+/// @ test-testing-e32
 constructor did not initialize field "s"
-/// @ te33
+/// @ test-testing-e33
 no need to mark test functions with "!"
-/// @ te34
+/// @ test-testing-e34
 no error raised in expression
-/// @ te35
+/// @ test-testing-e35
 using "!" where error is not propagated
-/// @ te36
+/// @ test-testing-e36
 using "!" where error is not propagated
 /// @@ test-native
-/// @ ti0
+/// @ test-native-i0
 #include <native.h>
-/// @ ti1
+/// @ test-native-i1
 #include <first.h>
 #include <second.h>
 typedef struct ut_M_Test ut_M_Test;
@@ -5610,7 +5646,7 @@ void ut_M_fun(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tf0
+/// @ test-native-f0
 void ut_M_call(void);
 void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
@@ -5618,7 +5654,7 @@ void ut_M_call(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tf1
+/// @ test-native-f1
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
@@ -5656,7 +5692,7 @@ void ut_M_call(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tf2
+/// @ test-native-f2
 void ut_M_call(void);
 void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
@@ -5664,7 +5700,7 @@ void ut_M_call(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tf3
+/// @ test-native-f3
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -5683,7 +5719,7 @@ void ut_M_call(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tv0
+/// @ test-native-v0
 void ut_M_use(void);
 void ut_M_use(void) {
     unsigned LUMI_loop_depth = 1;
@@ -5691,7 +5727,7 @@ void ut_M_use(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tv1
+/// @ test-native-v1
 void ut_M_use(void);
 void ut_M_use(void) {
     unsigned LUMI_loop_depth = 1;
@@ -5699,7 +5735,7 @@ void ut_M_use(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tc0
+/// @ test-native-c0
 void ut_M_get(Int* x);
 void ut_M_get(Int* x) {
     unsigned LUMI_loop_depth = 1;
@@ -5707,7 +5743,7 @@ void ut_M_get(Int* x) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tc1
+/// @ test-native-c1
 void ut_M_get(Int* x);
 void ut_M_get(Int* x) {
     unsigned LUMI_loop_depth = 1;
@@ -5715,7 +5751,7 @@ void ut_M_get(Int* x) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tt0
+/// @ test-native-t0
 void ut_M_call(void);
 void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
@@ -5724,7 +5760,7 @@ void ut_M_call(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tt1
+/// @ test-native-t1
 void ut_M_call(void);
 void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
@@ -5733,76 +5769,76 @@ void ut_M_call(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tb0
+/// @ test-native-b0
 #define HAS_SOME_DEFINE
 Int ut_M_x = 0;
 Int ut_M_y = 0;
-/// @ tb1
+/// @ test-native-b1
 #ifdef __UNIX__
     *io = 3;
     #else
     *io = 4;
     #endif
-/// @ te0
+/// @ test-native-e0
 expected space after "native", got "("
-/// @ te1
+/// @ test-native-e1
 expected space after "native", got "new-line"
-/// @ te2
+/// @ test-native-e2
 unknown "native" keyword "error"
-/// @ tei0
+/// @ test-native-ei0
 no '"' around string constant "native.h"
-/// @ tef0
+/// @ test-native-ef0
 redefinition of function "error"
-/// @ tef1
+/// @ test-native-ef1
 error raising native function
-/// @ tef2
+/// @ test-native-ef2
 more than one output to native function
-/// @ tef3
+/// @ test-native-ef3
 owner argument to native function
-/// @ tef4
+/// @ test-native-ef4
 var output to native function
-/// @ tef5
+/// @ test-native-ef5
 output "s" access should not be "var" for non-primitive type "String"
-/// @ tef6
+/// @ test-native-ef6
 managed argument to native function
-/// @ tef7
+/// @ test-native-ef7
 owner argument to native function
-/// @ tef8
+/// @ test-native-ef8
 owner argument to native function
-/// @ tef9
+/// @ test-native-ef9
 managed argument to native function
-/// @ tef10
+/// @ test-native-ef10
 owner argument to native function
-/// @ tef11
+/// @ test-native-ef11
 managed argument to native function
-/// @ tef12
+/// @ test-native-ef12
 output argument in native function call
-/// @ tef13
+/// @ test-native-ef13
 no '"' around string constant "error"
-/// @ tef14
+/// @ test-native-ef14
 user output to native function with non struct type "String"
-/// @ tef15
+/// @ test-native-ef15
 user output to native function with non struct type "Array"
-/// @ tef16
+/// @ test-native-ef16
 not yet supporting non-conditional and non-primitive output "s"
-/// @ tef17
+/// @ test-native-ef17
 user output to native function with non struct type "Error"
-/// @ tev0
+/// @ test-native-ev0
 only primitive types supported for native variable, got "String"
-/// @ tev1
+/// @ test-native-ev1
 no '"' around string constant "error"
-/// @ tec0
+/// @ test-native-ec0
 no '"' around string constant "error"
-/// @ tec1
+/// @ test-native-ec1
 sequence length is not constant
-/// @ tet0
+/// @ test-native-et0
 no '"' around string constant "error"
-/// @ teb0
+/// @ test-native-eb0
 no '"' around string constant "#define error"
-/// @ teb1
+/// @ test-native-eb1
 no '"' around string constant "#ifdef error"
 /// @@ test-parameter-type
-/// @ t0
+/// @ test-parameter-type-0
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Generic_Type* item;
@@ -5853,7 +5889,7 @@ void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
     LUMI_dec_ref(self->item_Refman);
 }
-/// @ t1
+/// @ test-parameter-type-1
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Generic_Type* item;
@@ -5874,7 +5910,7 @@ void ut_M_Test_Del(ut_M_Test* self) {
     if (self->item_Dynamic != NULL) self->item_Dynamic->_del(self->item);
     free(self->item);
 }
-/// @ t2
+/// @ test-parameter-type-2
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Generic_Type* first;
@@ -5954,7 +5990,7 @@ LUMI_block0_cleanup:
     LUMI_dec_ref(second_Refman);
     LUMI_dec_ref(first_Refman);
 }
-/// @ t3
+/// @ test-parameter-type-3
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Base {
@@ -5974,20 +6010,20 @@ void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
     ut_M_Base_Del(&(self->_base));
 }
-/// @ t4
+/// @ test-parameter-type-4
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_d, ut_M_d_Refman)
     LUMI_inc_ref(ut_M_t_Refman);
     LUMI_dec_ref(ut_M_d->item_Refman);
     ut_M_d->item_Refman = ut_M_t_Refman;
     ut_M_d->item_Dynamic = &ut_M_Test_dynamic;
     ut_M_d->item = ut_M_t;
-/// @ t5
+/// @ test-parameter-type-5
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_d, ut_M_d_Refman)
     LUMI_inc_ref(ut_M_d->item_Refman);
     LUMI_dec_ref(ut_M_t_Refman);
     ut_M_t_Refman = ut_M_d->item_Refman;
     ut_M_t = ut_M_d->item;
-/// @ t6
+/// @ test-parameter-type-6
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -6005,17 +6041,17 @@ LUMI_block0_cleanup:
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
 }
-/// @ t8
+/// @ test-parameter-type-8
 ut_M_Data ad[5] = {0};
     /* initializing ad */
     LUMI_inc_ref((ad + 2)->item_Refman);
     LUMI_dec_ref(ut_M_t_Refman);
     ut_M_t_Refman = (ad + 2)->item_Refman;
     ut_M_t = (ad + 2)->item;
-/// @ t10
+/// @ test-parameter-type-10
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_d_Refman)
     ut_M_Data_set(ut_M_d, NULL, NULL);
-/// @ t11
+/// @ test-parameter-type-11
 ut_M_Data dr_Var = {0};
     ut_M_Data* dr = NULL;
     dr = &dr_Var;
@@ -6025,13 +6061,13 @@ ut_M_Data dr_Var = {0};
     LUMI_dec_ref(ut_M_t_Refman);
     ut_M_t_Refman = ((ut_M_Data*)(((ut_M_Data*)(dr->item))->item))->item_Refman;
     ut_M_t = ((ut_M_Data*)(((ut_M_Data*)(dr->item))->item))->item;
-/// @ t12
+/// @ test-parameter-type-12
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_d_Refman)
     LUMI_var_dec_ref(*to_Refman);
     ut_M_Data_set(ut_M_d, *to, &ut_M_Test_dynamic);
     *to = NULL;
     *to_Refman = NULL;
-/// @ t13
+/// @ test-parameter-type-13
 ut_M_Test* aux_Test_0 = NULL;
     Ref_Manager* aux_Test_0_Refman = NULL;
     CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_d_Refman)
@@ -6040,21 +6076,21 @@ ut_M_Test* aux_Test_0 = NULL;
     ut_M_Data_get(ut_M_d, (void*)&(aux_Test_0), &(aux_Test_0_Refman), &dynamic_Void);
     CHECK_REFMAN(2, LUMI_block0_cleanup, aux_Test_0_Refman)
     ut_M_Test_meth(aux_Test_0);
-/// @ t14
+/// @ test-parameter-type-14
 ut_M_Data dg_Var = {0};
     ut_M_Data* dg = NULL;
     dg = &dg_Var;
-/// @ t15
+/// @ test-parameter-type-15
 ut_M_Data* dg = NULL;
     CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_d_Refman)
     dg = ut_M_d;
-/// @ t16
+/// @ test-parameter-type-16
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_d_Refman)
     LUMI_var_dec_ref(*to_Refman);
     ut_M_Data_set(ut_M_d, *to, &ut_M_Test_dynamic);
     *to = NULL;
     *to_Refman = NULL;
-/// @ t17
+/// @ test-parameter-type-17
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     ut_M_Test* next;
@@ -6079,7 +6115,7 @@ void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
     LUMI_dec_ref(self->next_Refman);
 }
-/// @ t18
+/// @ test-parameter-type-18
 ut_M_Data dt_Var = {0};
     ut_M_Data* dt = NULL;
     ut_M_Tc* otc = NULL;
@@ -6117,7 +6153,7 @@ ut_M_Data dt_Var = {0};
     CHECK_REFMAN(10, LUMI_block0_cleanup, dt->item_Refman)
     tb2_Dynamic = ((ut_M_Tb_Dynamic*)(dt->item_Dynamic));
     tb2 = dt->item;
-/// @ t19
+/// @ test-parameter-type-19
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Base {
@@ -6188,7 +6224,7 @@ LUMI_block0_cleanup:
     LUMI_dec_ref(f_Refman);
     return LUMI_err;
 }
-/// @ t20
+/// @ test-parameter-type-20
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
@@ -6273,7 +6309,7 @@ LUMI_block0_cleanup:
     LUMI_dec_ref(test_Refman);
     return LUMI_err;
 }
-/// @ t21
+/// @ test-parameter-type-21
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Generic_Type* item;
@@ -6314,52 +6350,52 @@ LUMI_block0_cleanup:
     LUMI_dec_ref(p_Refman);
     LUMI_dec_ref(in_Refman);
 }
-/// @ teg0
+/// @ test-parameter-type-eg0
 expected "}" after type parameters, got "new-line"
-/// @ teg1
+/// @ test-parameter-type-eg1
 declared variable with generic subtype "Generic"
-/// @ teg2
+/// @ test-parameter-type-eg2
 argument "error" access should not be "copy" for non-primitive type "Generic Type"
-/// @ teg3
+/// @ test-parameter-type-eg3
 cannot assign "String" into "Generic Type"
-/// @ teg4
+/// @ test-parameter-type-eg4
 cannot assign "Generic Type" into "String"
-/// @ teg5
+/// @ test-parameter-type-eg5
 declared variable with generic subtype "Generic"
-/// @ teg6
+/// @ test-parameter-type-eg6
 cannot assign generic subtype "Second" into different generic subtype "First"
-/// @ teg7
+/// @ test-parameter-type-eg7
 illegal type parameter name "error"
-/// @ teg11
+/// @ test-parameter-type-eg11
 too few parameter given for type "Test"
-/// @ teg12
+/// @ test-parameter-type-eg12
 no parameter given for type with parameters "Base"
-/// @ teg13
+/// @ test-parameter-type-eg13
 parameter given for type with no parameters "Base"
-/// @ teg14
+/// @ test-parameter-type-eg14
 too many parameters given for type "Base"
-/// @ teg15
+/// @ test-parameter-type-eg15
 too few parameter given for type "Base"
-/// @ tec0
+/// @ test-parameter-type-ec0
 unsupported primitive parameter type "Int"
-/// @ tec1
+/// @ test-parameter-type-ec1
 too many parameters given for type "Data"
-/// @ tec2
+/// @ test-parameter-type-ec2
 unknown type "Error"
-/// @ tec3
+/// @ test-parameter-type-ec3
 parameter given for type with no parameters "Char"
-/// @ tec4
+/// @ test-parameter-type-ec4
 cannot assign "Generic Type" into "String"
-/// @ tec5
+/// @ test-parameter-type-ec5
 cannot assign type "Data" with no parameter into same type with parameter "Test"
-/// @ tec6
+/// @ test-parameter-type-ec6
 cannot assign "Test" into "String"
-/// @ tec7
+/// @ test-parameter-type-ec7
 array as parameter type is unsupported
-/// @ tec8
+/// @ test-parameter-type-ec8
 string as parameter type is unsupported
 /// @@ test-parameter-inheritance
-/// @ t0
+/// @ test-parameter-inheritance-0
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Base {
@@ -6420,7 +6456,7 @@ LUMI_block0_cleanup:
     ut_M_Test_Del(t);
     LUMI_dec_ref(f_Refman);
 }
-/// @ t1
+/// @ test-parameter-inheritance-1
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Base {
@@ -6483,7 +6519,7 @@ LUMI_block0_cleanup:
     ut_M_Test_Del(t);
     LUMI_dec_ref(f_Refman);
 }
-/// @ t2
+/// @ test-parameter-inheritance-2
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Mid ut_M_Mid;
 typedef struct ut_M_Top ut_M_Top;
@@ -6605,7 +6641,7 @@ LUMI_block0_cleanup:
     ut_M_Test_Del(t);
     LUMI_dec_ref(f_Refman);
 }
-/// @ t3
+/// @ test-parameter-inheritance-3
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Base {
@@ -6668,7 +6704,7 @@ LUMI_block0_cleanup:
     ut_M_Test_Del(t);
     LUMI_dec_ref(f_Refman);
 }
-/// @ t4
+/// @ test-parameter-inheritance-4
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Mid ut_M_Mid;
 typedef struct ut_M_Top ut_M_Top;
@@ -6831,7 +6867,7 @@ LUMI_block0_cleanup:
     LUMI_dec_ref(second_Refman);
     LUMI_dec_ref(first_Refman);
 }
-/// @ t5
+/// @ test-parameter-inheritance-5
 typedef struct ut_M_First ut_M_First;
 typedef struct ut_M_Second ut_M_Second;
 typedef struct ut_M_Test ut_M_Test;
@@ -6916,7 +6952,7 @@ LUMI_block0_cleanup:
     LUMI_dec_ref(f_Refman);
     return LUMI_err;
 }
-/// @ t6
+/// @ test-parameter-inheritance-6
 typedef struct ut_M_BaseGen ut_M_BaseGen;
 typedef struct ut_M_TestGen ut_M_TestGen;
 typedef struct ut_M_Base ut_M_Base;
@@ -6973,7 +7009,7 @@ void ut_M_test(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t7
+/// @ test-parameter-inheritance-7
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Mid ut_M_Mid;
 typedef struct ut_M_Top ut_M_Top;
@@ -7018,16 +7054,16 @@ void ut_M_fun(ut_M_Top* t) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ te0
+/// @ test-parameter-inheritance-e0
 unknown type "Generic"
-/// @ te1
+/// @ test-parameter-inheritance-e1
 cannot assign "String" into "File"
-/// @ te2
+/// @ test-parameter-inheritance-e2
 cannot assign "String" into "Generic Type"
-/// @ te3
+/// @ test-parameter-inheritance-e3
 cannot assign "String" into "File"
 /// @@ test-error-handling
-/// @ t0
+/// @ test-error-handling-0
 ++LUMI_trace_ignore_count;
     CHECK_REF_REFMAN(1, LUMI_block2_cleanup, ut_M_t, ut_M_t_Refman)
     ut_M_i = ut_M_t->num;
@@ -7041,7 +7077,7 @@ LUMI_block2_cleanup:
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t1
+/// @ test-error-handling-1
 ++LUMI_trace_ignore_count;
     LUMI_err = ut_M_fune();
     CHECK(1, LUMI_block2_cleanup)
@@ -7060,7 +7096,7 @@ LUMI_block2_cleanup:
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t2
+/// @ test-error-handling-2
 ++LUMI_trace_ignore_count;
     CHECK_REF_REFMAN(1, LUMI_block2_cleanup, ut_M_t, ut_M_t_Refman)
     ut_M_i = ut_M_t->num;
@@ -7079,7 +7115,7 @@ LUMI_block2_cleanup:
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t3
+/// @ test-error-handling-3
 if (ut_M_b) {
         *io = 0;
     LUMI_block1_cleanup:
@@ -7108,7 +7144,7 @@ if (ut_M_b) {
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t4
+/// @ test-error-handling-4
 if (ut_M_b) {
         *io = 0;
     LUMI_block1_cleanup:
@@ -7137,7 +7173,7 @@ if (ut_M_b) {
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t5
+/// @ test-error-handling-5
 void ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Refman, Bool* fail);
 void ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Refman, Bool* fail) {
     Returncode LUMI_err = OK;
@@ -7160,22 +7196,22 @@ LUMI_block0_cleanup:
     (void)0;
     LUMI_dec_ref(s_Refman);
 }
-/// @ te0
+/// @ test-error-handling-e0
 statement has no effect
-/// @ te1
+/// @ test-error-handling-e1
 statement has no effect
-/// @ te2
+/// @ test-error-handling-e2
 no error raised in expression
-/// @ te3
+/// @ test-error-handling-e3
 "if-ok" without "else"
-/// @ te4
+/// @ test-error-handling-e4
 error handling with no code
-/// @ te5
+/// @ test-error-handling-e5
 error handling with no code
-/// @ te6
+/// @ test-error-handling-e6
 using "!" where error is not propagated
 /// @@ test-try-catch
-/// @ t0
+/// @ test-try-catch-0
 {
         ++LUMI_trace_ignore_count;
         CHECK_REF_REFMAN(2, LUMI_block1_cleanup, ut_M_t, ut_M_t_Refman)
@@ -7195,7 +7231,7 @@ using "!" where error is not propagated
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t1
+/// @ test-try-catch-1
 {
         ++LUMI_trace_ignore_count;
         CHECK_REF_REFMAN(2, LUMI_block1_cleanup, ut_M_t, ut_M_t_Refman)
@@ -7212,7 +7248,7 @@ using "!" where error is not propagated
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t2
+/// @ test-try-catch-2
 {
         ++LUMI_trace_ignore_count;
         CHECK_REF_REFMAN(2, LUMI_block1_cleanup, ut_M_t, ut_M_t_Refman)
@@ -7262,7 +7298,7 @@ using "!" where error is not propagated
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t3
+/// @ test-try-catch-3
 {
         char sa[4] = {0};
         int sa_Length[1] = {0};
@@ -7326,7 +7362,7 @@ using "!" where error is not propagated
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ t4
+/// @ test-try-catch-4
 void ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Refman);
 void ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Refman) {
     Returncode LUMI_err = OK;
@@ -7363,26 +7399,26 @@ LUMI_block0_cleanup:
     (void)0;
     LUMI_dec_ref(s_Refman);
 }
-/// @ te0
+/// @ test-try-catch-e0
 expected new-line after "try", got "("
-/// @ te1
+/// @ test-try-catch-e1
 "catch" without a previous "try"
-/// @ te2
+/// @ test-try-catch-e2
 expected new-line after "catch", got "("
-/// @ te3
+/// @ test-try-catch-e3
 "try" statement with no code
-/// @ te4
+/// @ test-try-catch-e4
 "catch" statement with no code
-/// @ te5
+/// @ test-try-catch-e5
 "catch" without a previous "try"
-/// @ te6
+/// @ test-try-catch-e6
 no error raised in block
-/// @ te7
+/// @ test-try-catch-e7
 using "!" where error is not propagated
-/// @ te8
+/// @ test-try-catch-e8
 using "!" where error is not propagated
 /// @@ test-for-each
-/// @ t0
+/// @ test-for-each-0
 typedef struct ut_M_TestIterator ut_M_TestIterator;
 struct ut_M_TestIterator {
     Int counter;
@@ -7433,7 +7469,7 @@ LUMI_block0_cleanup:
     free(aux_TestIterator_0);
     return LUMI_err;
 }
-/// @ t1
+/// @ test-for-each-1
 typedef struct ut_M_TestIterator ut_M_TestIterator;
 struct ut_M_TestIterator {
     char* value;
@@ -7482,7 +7518,7 @@ void ut_M_fun(ut_M_TestIterator* iter) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t2
+/// @ test-for-each-2
 typedef struct ut_M_TestIterator ut_M_TestIterator;
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
@@ -7567,7 +7603,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-/// @ t3
+/// @ test-for-each-3
 typedef struct ut_M_TestIterator ut_M_TestIterator;
 typedef struct ut_M_TestIterator_Dynamic ut_M_TestIterator_Dynamic;
 struct ut_M_TestIterator {
@@ -7621,7 +7657,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-/// @ t4
+/// @ test-for-each-4
 typedef struct ut_M_TestIterator ut_M_TestIterator;
 struct ut_M_TestIterator {
     char* value;
@@ -7711,7 +7747,7 @@ LUMI_block0_cleanup:
     String_Del(s);
     free(s);
 }
-/// @ t5
+/// @ test-for-each-5
 typedef struct ut_M_TestIterator ut_M_TestIterator;
 struct ut_M_TestIterator {
     char* value;
@@ -7756,24 +7792,24 @@ void ut_M_fun(ut_M_TestIterator* iter) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ te0
+/// @ test-for-each-e0
 cannot iterate type with no "step" named method - "TestIterator"
-/// @ te1
+/// @ test-for-each-e1
 iterator "step" method has parameters in type "TestIterator"
-/// @ te2
+/// @ test-for-each-e2
 iterator "step" method has no outputs in type "TestIterator"
-/// @ te3
+/// @ test-for-each-e3
 iterator "step" method has only one output in type "TestIterator"
-/// @ te4
+/// @ test-for-each-e4
 iterator "step" method has more than two outputs in type "TestIterator"
-/// @ te5
+/// @ test-for-each-e5
 iterator "step" method second output is not "Bool" in type "TestIterator"
-/// @ te6
+/// @ test-for-each-e6
 iterator "step" method self access is not "user" in type "TestIterator"
-/// @ te7
+/// @ test-for-each-e7
 ignoring iterator step function error check
 /// @@ test-complex-fields
-/// @ t0
+/// @ test-complex-fields-0
 typedef struct ut_M_Astruct ut_M_Astruct;
 typedef struct ut_M_Astruct_Dynamic ut_M_Astruct_Dynamic;
 typedef struct ut_M_Bstruct ut_M_Bstruct;
@@ -7893,7 +7929,7 @@ void ut_M_Test_Del(ut_M_Test* self) {
     LUMI_var_dec_ref(self->sb_Refman);
     ut_M_Bstruct_Del(&(self->b));
 }
-/// @ t1
+/// @ test-complex-fields-1
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Base {
@@ -7981,22 +8017,22 @@ void ut_M_Test_Del(ut_M_Test* self) {
     ARRAY_DEL(ut_M_Base, self->aab, 4 * 5 * 6)
     ARRAY_DEL(ut_M_Base, self->ab, 12)
 }
-/// @ te0
+/// @ test-complex-fields-e0
 sequence length is not constant
-/// @ te1
+/// @ test-complex-fields-e1
 sequence length is not constant
-/// @ te2
+/// @ test-complex-fields-e2
 recursive declaration of type "Test", variable of type "Test"
-/// @ te3
+/// @ test-complex-fields-e3
 recursive declaration of type "Test", variable of type "Base", variable of type "Test"
-/// @ te4
+/// @ test-complex-fields-e4
 recursive declaration of type "Abase", extended by type "Aerror", variable of type "Bbase", extended by type "Berror", variable of type "Abase"
-/// @ te5
+/// @ test-complex-fields-e5
 assigning into non assignable expression
-/// @ te6
+/// @ test-complex-fields-e6
 cannot use "?" on non conditional or weak reference of type "Base"
 /// @@ test-enum
-/// @ t0
+/// @ test-enum-0
 enum {
     ut_M_MyEnum_VALUE = 0,
     ut_M_MyEnum_ANOTHER_VALUE,
@@ -8013,7 +8049,7 @@ void ut_M_dummy(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t1
+/// @ test-enum-1
 enum {
     ut_M_MyEnum_VALUE = 0,
     ut_M_MyEnum_ANOTHER_VALUE,
@@ -8021,36 +8057,36 @@ enum {
     ut_M_MyEnum_length
 };
 Int ut_M_arr[ut_M_MyEnum_length] = {0};
-/// @ te0
+/// @ test-enum-e0
 Enum "MyEnum" has no value "ERROR"
-/// @ te1
+/// @ test-enum-e1
 unknown Enum "Error"
-/// @ te2
+/// @ test-enum-e2
 unknown type "MyEnum"
-/// @ te3
+/// @ test-enum-e3
 illegal Enum name "My-Enum"
-/// @ te4
+/// @ test-enum-e4
 illegal constant name "Error"
-/// @ te5
+/// @ test-enum-e5
 illegal constant name "ERRoR"
-/// @ te6
+/// @ test-enum-e6
 expected space after "enum", got "new-line"
-/// @ te7
+/// @ test-enum-e7
 expected new-line after "VALUE", got "("
-/// @ te8
+/// @ test-enum-e8
 Enum with no values
-/// @ te9
+/// @ test-enum-e9
 indentation too long, expected 4 got 8
-/// @ te10
+/// @ test-enum-e10
 redefinition of Enum "Error"
-/// @ te11
+/// @ test-enum-e11
 Enum name overrides type "Error"
-/// @ te12
+/// @ test-enum-e12
 type name overrides Enum "Error"
 /// @@ test-constant
-/// @ t0
+/// @ test-constant-0
 enum { ut_M_NUMBER = 12 };
-/// @ t1
+/// @ test-constant-1
 enum { ut_M_SIZE = 12 };
 void ut_M_fun(Int* a, int a_Length);
 Int ut_M_arr[ut_M_SIZE + 3] = {0};
@@ -8060,42 +8096,42 @@ void ut_M_fun(Int* a, int a_Length) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ t2
+/// @ test-constant-2
 enum { ut_M_SMALL = 7 };
 enum { ut_M_LARGE = 15 };
-/// @ t3
+/// @ test-constant-3
 enum {
     ut_M_MyEnum_VALUE = 0,
     ut_M_MyEnum_length
 };
 enum { ut_M_NUMBER = 0 };
-/// @ t4
+/// @ test-constant-4
 enum { ut_M_NUMBER = 2 };
 enum { ut_M_D_CHAR = 100 };
-/// @ te0
+/// @ test-constant-e0
 expected space after "const", got "new-line"
-/// @ te1
+/// @ test-constant-e1
 Only "Int" typed constant supported, got "Bool"
-/// @ te2
+/// @ test-constant-e2
 expected space after "Int", got "new-line"
-/// @ te3
+/// @ test-constant-e3
 illegal constant name "Error"
-/// @ te4
+/// @ test-constant-e4
 expected space after "ERROR", got "new-line"
-/// @ te5
+/// @ test-constant-e5
 got "Bool" expression, expected "Int"
-/// @ te6
+/// @ test-constant-e6
 value is not constant
-/// @ te7
+/// @ test-constant-e7
 recursive dependency in constant "ERROR"
-/// @ te8
+/// @ test-constant-e8
 recursive dependency in constant "A-ERROR"
-/// @ te9
+/// @ test-constant-e9
 assigning into non assignable expression
-/// @ te10
+/// @ test-constant-e10
 non assignable call output
 /// @@ test-module
-/// @ t0
+/// @ test-module-0
 typedef struct ut_M_Test ut_M_Test;
 typedef struct second_M_Test second_M_Test;
 enum {
@@ -8223,7 +8259,7 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 TEST_MAIN_FUNC
-/// @ t1
+/// @ test-module-1
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     Int x;
@@ -8292,7 +8328,7 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 TEST_MAIN_FUNC
-/// @ t2
+/// @ test-module-2
 void ut_M_fun(void);
 Returncode second_M_use(void);
 int LUMI_file0_line_count[7] = {
@@ -8331,34 +8367,34 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 TEST_MAIN_FUNC
-/// @ te0
+/// @ test-module-e0
 unknown symbol "error" in module "ut"
-/// @ te1
+/// @ test-module-e1
 variable name overrides module "ut"
-/// @ te2
+/// @ test-module-e2
 function name overrides module "ut"
-/// @ te3
+/// @ test-module-e3
 unknown module "error"
-/// @ te4
+/// @ test-module-e4
 unknown type "Error" in module "ut"
-/// @ te5
+/// @ test-module-e5
 expected space after "module", got "("
-/// @ te6
+/// @ test-module-e6
 illegal module name "Error"
-/// @ te7
+/// @ test-module-e7
 module name overrides variable "true"
-/// @ te8
+/// @ test-module-e8
 module name overrides function "file-open-read"
-/// @ te9
+/// @ test-module-e9
 no "module" in file start
-/// @ te10
+/// @ test-module-e10
 expected module, got empty expression
-/// @ te11
+/// @ test-module-e11
 expected module, got "Int"
-/// @ te12
+/// @ test-module-e12
 unknown Enum "Error" in module "ut"
 /// @@ test-memory
-/// @ to0
+/// @ test-memory-o0
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     char* s;
@@ -8485,7 +8521,7 @@ LUMI_block0_cleanup:
     free(s);
     return LUMI_err;
 }
-/// @ tu0
+/// @ test-memory-u0
 void ut_M_deleting(char** s, int* s_Max_length, int** s_Length);
 void ut_M_fun(char* s, int s_Max_length, int* s_Length, char** so, int* so_Max_length, int** so_Length);
 void ut_M_deleting(char** s, int* s_Max_length, int** s_Length) {
@@ -8505,7 +8541,7 @@ void ut_M_fun(char* s, int s_Max_length, int* s_Length, char** so, int* so_Max_l
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ tu1
+/// @ test-memory-u1
 void ut_M_deleting(char** s, int* s_Max_length, int** s_Length, Ref_Manager** s_Refman);
 Returncode ut_M_fun(void);
 void ut_M_deleting(char** s, int* s_Max_length, int** s_Length, Ref_Manager** s_Refman) {
@@ -8553,7 +8589,7 @@ LUMI_block0_cleanup:
     LUMI_owner_dec_ref(so_Refman);
     return LUMI_err;
 }
-/// @ tu2
+/// @ test-memory-u2
 void ut_M_deleting(char** s, int* s_Max_length, int** s_Length, Ref_Manager** s_Refman);
 Returncode ut_M_fun(void);
 void ut_M_deleting(char** s, int* s_Max_length, int** s_Length, Ref_Manager** s_Refman) {
@@ -8606,7 +8642,7 @@ LUMI_block0_cleanup:
     LUMI_owner_dec_ref(so_Refman);
     return LUMI_err;
 }
-/// @ tu3
+/// @ test-memory-u3
 char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
@@ -8621,7 +8657,7 @@ char* s = NULL;
     s = *so;
     CHECK_REF(4, LUMI_block0_cleanup, s)
     String_clear(s, s_Max_length, s_Length);
-/// @ tu4
+/// @ test-memory-u4
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     char* s;
@@ -8680,7 +8716,7 @@ LUMI_block0_cleanup:
     free(sowner);
     return LUMI_err;
 }
-/// @ tu5
+/// @ test-memory-u5
 char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
@@ -8723,7 +8759,7 @@ char* s = NULL;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ tu6
+/// @ test-memory-u6
 void ut_M_get(char** s, int* s_Max_length, int** s_Length);
 Returncode ut_M_fun(void);
 void ut_M_get(char** s, int* s_Max_length, int** s_Length) {
@@ -8754,7 +8790,183 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-/// @ tb0
+/// @ test-memory-c0
+typedef struct ut_M_NoConstructor ut_M_NoConstructor;
+typedef struct ut_M_HasConstructor ut_M_HasConstructor;
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_NoConstructor {
+    char s[12];
+    int s_Length[1];
+};
+struct ut_M_HasConstructor {
+    char* s;
+    int s_Max_length;
+    int* s_Length;
+};
+struct ut_M_Test {
+    ut_M_NoConstructor vnc;
+    ut_M_HasConstructor vhc;
+    ut_M_NoConstructor svnc;
+    Ref_Manager* svnc_Refman;
+    ut_M_HasConstructor svhc;
+    Ref_Manager* svhc_Refman;
+};
+void ut_M_NoConstructor_Del(ut_M_NoConstructor* self);
+Returncode ut_M_HasConstructor_new(ut_M_HasConstructor* self);
+void ut_M_HasConstructor_Del(ut_M_HasConstructor* self);
+Returncode ut_M_Test_new(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self);
+Generic_Type_Dynamic ut_M_NoConstructor_dynamic = {(Dynamic_Del)ut_M_NoConstructor_Del};
+Generic_Type_Dynamic ut_M_HasConstructor_dynamic = {(Dynamic_Del)ut_M_HasConstructor_Del};
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_NoConstructor_Del(ut_M_NoConstructor* self) {
+    if (self == NULL) return;
+}
+Returncode ut_M_HasConstructor_new(ut_M_HasConstructor* self) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    char* aux_String_0 = NULL;
+    int aux_String_0_Max_length = 0;
+    int* aux_String_0_Length = &Lumi_empty_int;
+    INIT_NEW_STRING(6, LUMI_block0_cleanup, aux_String_0, 12);
+    String_Del(self->s);
+    free(self->s);
+    self->s_Max_length = 12;
+    self->s_Length = aux_String_0_Length;
+    self->s = aux_String_0;
+    aux_String_0 = NULL;
+    aux_String_0_Length = &Lumi_empty_int;
+LUMI_block0_cleanup:
+    (void)0;
+    String_Del(aux_String_0);
+    free(aux_String_0);
+    return LUMI_err;
+}
+void ut_M_HasConstructor_Del(ut_M_HasConstructor* self) {
+    if (self == NULL) return;
+    String_Del(self->s);
+    free(self->s);
+}
+Returncode ut_M_Test_new(ut_M_Test* self) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    String_clear(self->vnc.s, 12, self->vnc.s_Length);
+    String_clear(self->svnc.s, 12, self->svnc.s_Length);
+    LUMI_err = ut_M_HasConstructor_new(&(self->vhc));
+    CHECK(15, LUMI_block0_cleanup)
+    String_clear(self->vhc.s, self->vhc.s_Max_length, self->vhc.s_Length);
+    LUMI_err = ut_M_HasConstructor_new(&(self->svhc));
+    CHECK(17, LUMI_block0_cleanup)
+    String_clear(self->svhc.s, self->svhc.s_Max_length, self->svhc.s_Length);
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    ut_M_HasConstructor_Del(&(self->svhc));
+    LUMI_var_dec_ref(self->svhc_Refman);
+    ut_M_NoConstructor_Del(&(self->svnc));
+    LUMI_var_dec_ref(self->svnc_Refman);
+    ut_M_HasConstructor_Del(&(self->vhc));
+    ut_M_NoConstructor_Del(&(self->vnc));
+}
+/// @ test-memory-c1
+typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Mid ut_M_Mid;
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Base {
+    char* s;
+    int s_Max_length;
+    int* s_Length;
+};
+struct ut_M_Mid {
+    ut_M_Base _base;
+};
+struct ut_M_Test {
+    ut_M_Mid _base;
+    ut_M_Base* b;
+};
+Returncode ut_M_Base_new(ut_M_Base* self);
+void ut_M_Base_Del(ut_M_Base* self);
+Returncode ut_M_Mid_new(ut_M_Mid* self);
+void ut_M_Mid_Del(ut_M_Mid* self);
+Returncode ut_M_Test_new(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_fun1(void);
+void ut_M_fun2(void (*f)(void));
+Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
+Generic_Type_Dynamic ut_M_Mid_dynamic = {(Dynamic_Del)ut_M_Mid_Del};
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+Returncode ut_M_Base_new(ut_M_Base* self) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    char* aux_String_0 = NULL;
+    int aux_String_0_Max_length = 0;
+    int* aux_String_0_Length = &Lumi_empty_int;
+    INIT_NEW_STRING(6, LUMI_block0_cleanup, aux_String_0, 12);
+    String_Del(self->s);
+    free(self->s);
+    self->s_Max_length = 12;
+    self->s_Length = aux_String_0_Length;
+    self->s = aux_String_0;
+    aux_String_0 = NULL;
+    aux_String_0_Length = &Lumi_empty_int;
+LUMI_block0_cleanup:
+    (void)0;
+    String_Del(aux_String_0);
+    free(aux_String_0);
+    return LUMI_err;
+}
+void ut_M_Base_Del(ut_M_Base* self) {
+    if (self == NULL) return;
+    String_Del(self->s);
+    free(self->s);
+}
+Returncode ut_M_Mid_new(ut_M_Mid* self) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    LUMI_err = ut_M_Base_new(&(self->_base));
+    CHECK(9, LUMI_block0_cleanup)
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+void ut_M_Mid_Del(ut_M_Mid* self) {
+    if (self == NULL) return;
+    ut_M_Base_Del(&(self->_base));
+}
+Returncode ut_M_Test_new(ut_M_Test* self) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    ut_M_fun1();
+    ut_M_fun2(ut_M_fun1);
+    CHECK_REF(15, LUMI_block0_cleanup, self->b)
+    LUMI_err = ut_M_Base_new(self->b);
+    CHECK(15, LUMI_block0_cleanup)
+    LUMI_err = ut_M_Mid_new(&(self->_base));
+    CHECK(16, LUMI_block0_cleanup)
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    ut_M_Mid_Del(&(self->_base));
+    ut_M_Base_Del(self->b);
+    free(self->b);
+}
+void ut_M_fun1(void) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_fun2(void (*f)(void)) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+/// @ test-memory-b0
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     char* s;
@@ -8788,7 +9000,7 @@ LUMI_block0_cleanup:
     ut_M_Test_Del(to);
     free(to);
 }
-/// @ tb1
+/// @ test-memory-b1
 char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
@@ -8802,184 +9014,196 @@ char* s = NULL;
     s = *so;
     CHECK_REFMAN(3, LUMI_block0_cleanup, s_Refman)
     String_clear(s, s_Max_length, s_Length);
-/// @ teo0
+/// @ test-memory-eo0
 cannot modify owner field "s" in non-owner reference "t.s"
-/// @ teo1
+/// @ test-memory-eo1
 cannot modify owner field "a" in non-owner reference "b.a"
-/// @ teo2
+/// @ test-memory-eo2
 cannot modify owner field "a" in non-owner reference "b.a"
-/// @ teo3
+/// @ test-memory-eo3
 cannot modify owner field "s" in non-owner reference "b.a.s"
-/// @ teo4
+/// @ test-memory-eo4
 cannot modify owner field "s" in non-owner reference "t.s"
-/// @ teo5
+/// @ test-memory-eo5
 cannot modify owner field "s" in non-owner reference "{anonymous}.s"
-/// @ teo6
+/// @ test-memory-eo6
 cannot move non-conditional owner field "t.s"
-/// @ teo7
+/// @ test-memory-eo7
 cannot move non-conditional owner field "t.s"
-/// @ teo8
+/// @ test-memory-eo8
 cannot move non-conditional owner field "t.s"
-/// @ teo9
+/// @ test-memory-eo9
 using invalid reference "s"
-/// @ teo10
+/// @ test-memory-eo10
 using modified reference "t"
-/// @ teo11
+/// @ test-memory-eo11
 using modified reference "t"
-/// @ teo12
+/// @ test-memory-eo12
 using invalid reference "t"
-/// @ teo13
+/// @ test-memory-eo13
 using invalid reference "t.t"
-/// @ teo14
+/// @ test-memory-eo14
 cannot modify owner field "s" in non-owner reference "tu.s"
-/// @ teo15
+/// @ test-memory-eo15
 using invalid reference "s"
-/// @ teo16
+/// @ test-memory-eo16
 using invalid reference "tbad"
-/// @ teo17
+/// @ test-memory-eo17
 using invalid reference "s"
-/// @ teo18
+/// @ test-memory-eo18
 using modified reference "s"
-/// @ teo19
+/// @ test-memory-eo19
 using modified reference "s"
-/// @ teo20
+/// @ test-memory-eo20
 using modified reference "s"
-/// @ teo21
+/// @ test-memory-eo21
 using invalid reference "t"
-/// @ teo22
+/// @ test-memory-eo22
 using modified reference "t"
-/// @ teo23
+/// @ test-memory-eo23
 using invalid reference "s"
-/// @ teo24
+/// @ test-memory-eo24
 using invalid reference "s"
-/// @ teo25
+/// @ test-memory-eo25
 cannot modify owner field "s" in non-owner reference "{anonymous}.s"
-/// @ teu0
+/// @ test-memory-eu0
 using potentially illegal user reference "s"
-/// @ teu1
+/// @ test-memory-eu1
 using potentially illegal user reference "s"
-/// @ teu2
+/// @ test-memory-eu2
 using potentially illegal user reference "s"
-/// @ teu3
+/// @ test-memory-eu3
 using potentially illegal user reference "s"
-/// @ teu4
+/// @ test-memory-eu4
 using potentially illegal user reference "s"
-/// @ teu5
+/// @ test-memory-eu5
 using potentially illegal user reference "s"
-/// @ teu6
+/// @ test-memory-eu6
 using potentially illegal user reference "s"
-/// @ teu7
+/// @ test-memory-eu7
 using potentially illegal user reference "s"
-/// @ teu8
+/// @ test-memory-eu8
 using potentially illegal user reference "s"
-/// @ teu9
+/// @ test-memory-eu9
 using potentially illegal user reference "s"
-/// @ teu10
+/// @ test-memory-eu10
 using potentially illegal user reference "s"
-/// @ teu11
+/// @ test-memory-eu11
 using potentially illegal user reference "s"
-/// @ teu12
+/// @ test-memory-eu12
 using potentially illegal user reference "s"
-/// @ teu13
+/// @ test-memory-eu13
 using potentially illegal user reference "a"
-/// @ teu14
+/// @ test-memory-eu14
 using potentially illegal user reference "s"
-/// @ teu15
+/// @ test-memory-eu15
 using potentially illegal user reference "s"
-/// @ teu16
+/// @ test-memory-eu16
 using potentially illegal user reference "tt"
-/// @ teu17
+/// @ test-memory-eu17
 using potentially illegal user reference "f"
-/// @ teu18
+/// @ test-memory-eu18
 using potentially illegal user reference "t"
-/// @ teu19
+/// @ test-memory-eu19
 using potentially illegal user reference "b"
-/// @ teu20
+/// @ test-memory-eu20
 using potentially illegal user reference "s"
-/// @ teu21
+/// @ test-memory-eu21
 using potentially illegal user reference "s"
-/// @ teu22
+/// @ test-memory-eu22
 using potentially illegal user reference "s"
-/// @ teu23
+/// @ test-memory-eu23
 using potentially illegal user reference "s"
-/// @ teu24
+/// @ test-memory-eu24
 using potentially illegal user reference "s"
-/// @ teu25
+/// @ test-memory-eu25
 returning potentially illegal user output "s"
-/// @ teu26
+/// @ test-memory-eu26
 returning potentially illegal user output "s"
-/// @ teu27
+/// @ test-memory-eu27
 returning potentially illegal user output "s"
-/// @ teu28
+/// @ test-memory-eu28
 returning potentially illegal user output "s"
-/// @ teu29
+/// @ test-memory-eu29
 using potentially illegal user reference "s"
-/// @ teu30
+/// @ test-memory-eu30
 using potentially illegal user reference "s"
-/// @ teu31
+/// @ test-memory-eu31
 using potentially illegal user reference "s"
-/// @ teu32
+/// @ test-memory-eu32
 using potentially illegal user reference "s"
-/// @ teu33
+/// @ test-memory-eu33
 using potentially illegal user reference "f"
-/// @ teu34
+/// @ test-memory-eu34
 using potentially illegal user reference "f"
-/// @ teu35
+/// @ test-memory-eu35
 using potentially illegal user reference "su"
-/// @ teu36
+/// @ test-memory-eu36
 using potentially illegal user reference "str"
-/// @ teu37
+/// @ test-memory-eu37
 using potentially illegal user reference "str"
-/// @ teu38
+/// @ test-memory-eu38
 using potentially illegal user reference "str"
-/// @ teu39
+/// @ test-memory-eu39
 using potentially illegal user reference "str"
-/// @ teu40
+/// @ test-memory-eu40
 using potentially illegal user reference "str"
-/// @ teu41
+/// @ test-memory-eu41
 using potentially illegal user reference "str"
-/// @ teu42
+/// @ test-memory-eu42
 using potentially illegal user reference "str"
-/// @ teu43
+/// @ test-memory-eu43
 using potentially illegal user reference "str"
-/// @ teu44
+/// @ test-memory-eu44
 using potentially illegal user reference "str"
-/// @ teu45
+/// @ test-memory-eu45
 using potentially illegal user reference "str"
-/// @ teu46
+/// @ test-memory-eu46
 returning potentially illegal user output "sout"
-/// @ teu47
+/// @ test-memory-eu47
 returning potentially illegal user output "sout"
-/// @ teu48
+/// @ test-memory-eu48
 using potentially illegal user reference "{anonymous}"
-/// @ tev0
+/// @ test-memory-ev0
 cannot assign value with access "user" into value with access "var"
-/// @ tev1
+/// @ test-memory-ev1
 assigning into an owner a non-owner access "var"
-/// @ tev2
+/// @ test-memory-ev2
 assigning into non assignable expression
-/// @ tev3
+/// @ test-memory-ev3
 output "s" access should not be "var" for non-primitive type "String"
-/// @ tee0
+/// @ test-memory-ev4
+using invalid reference "self.t"
+/// @ test-memory-ev5
+using invalid reference "self.t"
+/// @ test-memory-ee0
 non-conditional reference in type without constructor "Error"
-/// @ tee1
+/// @ test-memory-ee1
 constructor did not initialize field "s"
-/// @ tee2
+/// @ test-memory-ee2
 using invalid reference "self.s"
-/// @ tee3
+/// @ test-memory-ee3
 using invalid reference "self"
-/// @ tee4
+/// @ test-memory-ee4
 using invalid reference "self"
-/// @ tee5
+/// @ test-memory-ee5
 constructor did not initialize field "s"
-/// @ tee6
+/// @ test-memory-ee6
 constructor did not initialize field "s"
-/// @ tec0
+/// @ test-memory-ee7
+constructor did not initialize field "s"
+/// @ test-memory-ee8
+variable with constructor in type without constructor "Error"
+/// @ test-memory-ee9
+constructor did not initialize field "t"
+/// @ test-memory-ee10
+constructor did not initialize field "s"
+/// @ test-memory-ec0
 assigning reference into itself
-/// @ tec1
+/// @ test-memory-ec1
 fields cannot have "user" access
 /// @@ test-c-objects
-/// @ t0
+/// @ test-c-objects-0
 cdef_M_Char c_char = 0;
     cdef_M_Uchar c_uchar = 0;
     cdef_M_Short c_short = 0;
@@ -9016,7 +9240,7 @@ cdef_M_Char c_char = 0;
     ut_M_i = c_double;
     c_long_double = ut_M_i;
     ut_M_i = c_long_double;
-/// @ t1
+/// @ test-c-objects-1
 void* p_void = 0;
     cdef_M_Char* p_char = 0;
     cdef_M_Uint* p_uint = 0;
@@ -9026,7 +9250,7 @@ void* p_void = 0;
     p_void = p_char;
     p_uint = p_void;
     p_char = p_uint;
-/// @ t2
+/// @ test-c-objects-2
 cdef_M_Int int = 0;
     cdef_M_Int* p_int = 0;
     cdef_M_Int** pp_int = 0;
@@ -9050,7 +9274,7 @@ cdef_M_Int int = 0;
     cdef_M_Pointer_set_from_array(p_test, arr_test, arr_test_Length);
     cdef_M_Pointer_set_from_ref(p_test, test, &ut_M_Test_dynamic);
     u_test = ((ut_M_Test*)cdef_M_Pointer_get_ref_at(p_test, 5));
-/// @ t3
+/// @ test-c-objects-3
 Char* p_char = 0;
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_ostr)
     cdef_M_Pointer_set_from_array(p_char, ut_M_ostr, *ut_M_ostr_Length);
@@ -9059,10 +9283,10 @@ Char* p_char = 0;
     CHECK(3, LUMI_block0_cleanup)
     CHECK_REF(4, LUMI_block0_cleanup, ut_M_ostr)
     String_set_null_term_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
-/// @ te0
+/// @ test-c-objects-e0
 dynamic pointed type "Ta"
-/// @ te1
+/// @ test-c-objects-e1
 cannot assign value with access "user" into value with access "var"
-/// @ te2
+/// @ test-c-objects-e2
 assigning into non assignable expression
 /// @

@@ -134,7 +134,8 @@ test test-compiler()
         common-header.append(copy '\n')
     var Bool not-first-line
     do
-        while not read-line(user expected-output-file, user line, user "/// @@ ")
+        while not read-line(
+                user expected-output-file, user line, user "/// @@ ")
         if not-first-line
             expected-common-header.append(copy '\n')
         else
@@ -146,7 +147,10 @@ test test-compiler()
     sys.print(user "\n  test common header... ")
     try
         test-global-scope(
-                user common-header, user "", user expected-common-header, copy false)
+                user common-header,
+                user "",
+                user expected-common-header,
+                copy false)
         sys.print(user "OK")
     catch
         compiler-tests-passed := false
@@ -305,6 +309,10 @@ func read-line(user File file, user String line, user String prefix)->(
     do
         while not file.getc.mocked()->(var ch)
         while ch != '\n'
+        if ch = '#'
+            while not file.getc.mocked()->(var ch)
+            while ch != '\n'
+            line.append(copy '#')
         line.append(copy ch)
         if prefix? and not found-prefix
             if line.equal(user prefix)

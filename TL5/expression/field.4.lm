@@ -25,13 +25,15 @@ class FieldExpression(Expression)
         if instance-type?
             typed-expression := instance-type.type-data?
         if not typed-expression
-            self.syntax-error(user "void expression has no member", user self.name)
+            self.syntax-error(
+                    user "void expression has no member", user self.name)
         var Bool after-type(copy instance-type.type-data is glob.type-type)
         var Bool after-base(copy instance-type.type-data is glob.type-base)
         if after-type
             instance-type := instance-type.parameters.first.item
         else-if after-base
-            instance-type := instance-type.parameters.first.item.type-data.base-type
+            instance-type :=
+                    instance-type.parameters.first.item.type-data.base-type
         
         if instance-type.type-data is glob.type-module
             new VariableExpression variable-expression(
@@ -57,13 +59,14 @@ class FieldExpression(Expression)
             self.is-complex-field := (self.variable.access = Access.VAR and
                     not self.variable.type-instance.type-data.is-primitive) or
                     self.variable.access = Access.S-VAR
-            self.variable.type-instance.new-replace-params(user instance-type)->(
-                    owner self.result-type)
-            instance-type.reference-path.copy-and-add-field(user self.variable)->(
-                    owner self.result-type.reference-path)
+            self.variable.type-instance.new-replace-params(
+                    user instance-type)->(owner self.result-type)
+            instance-type.reference-path.copy-and-add-field(
+                    user self.variable)->(owner self.result-type.reference-path)
             if self.is-complex-field and
                     access-has-refman(copy self.instance.access) and
-                    not self.variable.type-instance.type-data is glob.type-string
+                    not self.variable.type-instance.type-data is
+                    glob.type-string
                 self.access := Access.S-VAR
             else
                 self.access := self.variable.access
@@ -79,7 +82,8 @@ class FieldExpression(Expression)
         if not function?
             if self.instance.is-mocked-function()
                 if self.name.equal(user "mocked")
-                    self.instance.restructure()->(owner expression, owner arguments)
+                    self.instance.restructure()->(
+                            owner expression, owner arguments)
                     return
                 if self.name.equal(user "active")
                     self.instance.check-no-error()
@@ -112,10 +116,11 @@ class FieldExpression(Expression)
     func inst is-constructor-field()->(var Bool is-field)
         is-field := false
         user SyntaxTreeFunction function(user self.code-node.get-function())
-        if not function.parent-type? or
-                self.result-type.reference-path.field.variable is-not self.variable
+        if not function.parent-type?
             return
-        is-field := self.result-type.reference-path.variable is
+        ; check instance is "self."
+        is-field := not self.result-type.reference-path.field.field? and
+                self.result-type.reference-path.variable is
                 function.arguments.parameters.first.item.get-variable()
 
     func dynamic write-preactions()

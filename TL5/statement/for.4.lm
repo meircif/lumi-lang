@@ -45,7 +45,8 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
                 var is-index-iteration)
         
         self.add-iterator-assign(copy is-int-iteration, user while-node)->(
-                owner iterator-expression, user iterator-aux-variable-expression)
+                owner iterator-expression,
+                user iterator-aux-variable-expression)
         self.add-item-variable(user item-type-instance, copy item-access)->(
                 owner variable-create)
         if is-index-iteration
@@ -92,7 +93,8 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
                 if not item-type-instance.type-data.is-primitive
                     item-access := Access.USER
             else
-                self.get-step-item-data()->(owner item-type-instance, var item-access)
+                self.get-step-item-data()->(
+                        owner item-type-instance, var item-access)
         
         if self.iterator.result-type.type-data.is-primitive
             self.iterator.check-no-error()
@@ -102,12 +104,14 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
         user TypeData iterator-type(user self.iterator.result-type.type-data)
         is-int-iteration := iterator-type is glob.type-int
         is-index-iteration := is-int-iteration or
-                iterator-type is glob.type-string or iterator-type is glob.type-array
+                iterator-type is glob.type-string or
+                iterator-type is glob.type-array
         
     func inst get-step-item-data()->(
             owner TypeInstance item-type-instance, var Int item-access)
         user SyntaxTreeFunction function
-        self.iterator.result-type.type-data.find-meth(user "step")->(user function)
+        self.iterator.result-type.type-data.find-meth(user "step")->(
+                user function)
         if not function?
             self.syntax-error(
                     user "cannot iterate type with no \"step\" named method -",
@@ -116,7 +120,8 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
             self.syntax-error(
                     user "iterator \"step\" method has parameters in type",
                     user self.iterator.result-type.type-data.name)
-        user ListNode{Argument} first-output(user function.arguments.outputs.first)
+        user ListNode{Argument} first-output(
+                user function.arguments.outputs.first)
         if not first-output?
             self.syntax-error(
                     user "iterator \"step\" method has no outputs in type",
@@ -128,15 +133,19 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
                     user self.iterator.result-type.type-data.name)
         if second-output.next?
             self.syntax-error(
-                    user "iterator \"step\" method has more than two outputs in type",
+                    user "iterator \"step\" method has more than two outputs \
+                    in type",
                     user self.iterator.result-type.type-data.name)
-        if second-output.item.get-type-instance().type-data is-not glob.type-bool
+        if second-output.item.get-type-instance().type-data is-not
+                glob.type-bool
             self.syntax-error(
-                    user "iterator \"step\" method second output is not \"Bool\" in type",
+                    user "iterator \"step\" method second output is not \
+                    \"Bool\" in type",
                     user self.iterator.result-type.type-data.name)
         if function.self-access != Access.USER
             self.syntax-error(
-                    user "iterator \"step\" method self access is not \"user\" in type",
+                    user "iterator \"step\" method self access is not \
+                    \"user\" in type",
                     user self.iterator.result-type.type-data.name)
         
         if function.arguments.has-error
@@ -166,7 +175,9 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
         owner VariableExpression aux-variable-expression-owner
         new SyntaxTreeExpression iterator-assign-node(user self.parent)
         iterator-aux-variable-expression := self.add-aux-variable(
-                copy iterator-access, copy false, user self.iterator.result-type)->(
+                copy iterator-access,
+                copy false,
+                user self.iterator.result-type)->(
                 owner aux-variable-expression-owner)
         self.insert-assign(
                 user iterator-assign-node,
@@ -265,12 +276,14 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
         if not is-int-iteration
             new SliceExpression item-slice(user item-assign-node)
             item-slice.force-no-checks := true
-            iterator-aux-variable-expression.copy-new()->(owner item-slice.sequence)
+            iterator-aux-variable-expression.copy-new()->(
+                    owner item-slice.sequence)
             item-slice.sequence.code-node := item-assign-node
             item-slice.index := item-value
             item-value := item-slice
         new VariableExpression item-expression(
-                user item-assign-node, owner string-new-copy(user self.item-name))
+                user item-assign-node,
+                owner string-new-copy(user self.item-name))
         self.insert-assign(
                 user item-assign-node, owner item-expression, owner item-value)
         self.block.code-nodes.prepend(owner item-assign-node)
@@ -286,7 +299,9 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
             max-index := iterator-expression
         else
             self.make-method-call(
-                    user while-node, owner iterator-expression, user "length")->(
+                    user while-node,
+                    owner iterator-expression,
+                    user "length")->(
                     owner max-index)
         self.insert-binary-expression(
                 user "<",

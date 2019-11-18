@@ -68,7 +68,8 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
             self.check-function-has-error()
         self.tested.analyze()
         if self.tested.expression.error-expected
-            self.syntax-error-msg(user "using \"!\" where error is not propagated")
+            self.syntax-error-msg(
+                    user "using \"!\" where error is not propagated")
         if not self.has-error
             self.syntax-error-msg(user "no error raised in expression")
 
@@ -155,7 +156,8 @@ class SyntaxTreeTestFunction(SyntaxTreeFunction)
         if self.arguments.parameters.first? or self.arguments.outputs.first?
             self.syntax-error-msg(user "test function cannot have arguments")
         if self.arguments.has-error
-            self.syntax-error-msg(user "no need to mark test functions with \"!\"")
+            self.syntax-error-msg(
+                    user "no need to mark test functions with \"!\"")
         self.arguments.has-error := true
         glob.test-functions.add(user self.name, user self)
 
@@ -174,7 +176,8 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
         if self.type-name? and self.name.equal(user "delete")
             string-new-copy(user "MockDel")->(owner self.mock-name)
         else
-            string-new-concat(user self.name, user " Mock")->(owner self.mock-name)
+            string-new-concat(user self.name, user " Mock")->(
+                    owner self.mock-name)
     
     func dynamic register-name()
         ; do not register
@@ -187,7 +190,8 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
                         user self.parent-type)
                 if self.parent-type.is-delete-mocked
                     self.syntax-error(
-                            user "already mocking delete of type", user self.type-name)
+                            user "already mocking delete of type",
+                            user self.type-name)
                 self.parent-type.is-delete-mocked := true
                 self.arguments.add-self-parameter(
                         user glob.type-ref, copy Access.COPY, copy false)
@@ -200,7 +204,8 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
             if glob.is-delete-mocked
                 self.syntax-error-msg(user "already mocking global delete")
             if self.arguments.parameters.first? or self.arguments.outputs.first?
-                self.syntax-error-msg(user "mock delete should have no arguments")
+                self.syntax-error-msg(
+                        user "mock delete should have no arguments")
             glob.is-delete-mocked := true
             self.arguments.add-self-parameter(
                     user glob.type-ref, copy Access.COPY, copy false)
@@ -230,8 +235,10 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
             if not legal-args
                 self.syntax-error-msg(
                         user "mock new should have only single Bool output")
-            if self.arguments.outputs.first.item.get-type-instance().type-data is-not
-                    glob.type-bool
+            user TypeInstance first-type-instance
+            self.arguments.outputs.first.item.get-type-instance()->(
+                    user first-type-instance)
+            if first-type-instance.type-data is-not glob.type-bool
                 self.syntax-error-msg(
                         user "mock new should have only single Bool output")
             self.my-module := _
@@ -262,9 +269,11 @@ class SyntaxTreeMockFunction(SyntaxTreeFunction)
             self.implemented-function.write-cname()
             var FunctionArguments call-arguments
             for argument in self.arguments.parameters.iter()
-                self.build-call-argument(user call-arguments.parameters, user argument)
+                self.build-call-argument(
+                        user call-arguments.parameters, user argument)
             for argument in self.arguments.outputs.iter()
-                self.build-call-argument(user call-arguments.outputs, user argument)
+                self.build-call-argument(
+                        user call-arguments.outputs, user argument)
             call-arguments.write-call()
             if not self.arguments.has-error
                 write(user "; return")
