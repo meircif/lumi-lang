@@ -17,3 +17,8 @@ test ilegal-dir()
 
 test close-failure()
     assert-error! os.list-dir(user "cant/close"), "failed to close directory"
+
+test check-exists()
+    var Bool res
+    res := os.exists(user "/some/path")
+    assert! res
