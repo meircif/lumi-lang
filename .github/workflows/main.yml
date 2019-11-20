@@ -3,6 +3,9 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        c-compiler: [gcc, clang]
     steps:
     - uses: actions/checkout@v1
     - name: Install package dependencies
@@ -12,10 +15,15 @@ jobs:
         sudo apt-get install python3-enchant
     - name: Install Python dependencies
       run: |
+        python3 -m pip install --upgrade pip
         pip3 install --user setuptools
         pip3 install --user sphinx
         pip3 install --user -r docs/requirements.txt
-    - name: Make all binaries
+    - name: Make all binaries with ${{ matrix.c-compiler }}
+      env:
+          CC: ${{ matrix.c-compiler }}
       run: make all
-    - name: Run all tests
+    - name: Run all tests with ${{ matrix.c-compiler }}
+      env:
+          CC: ${{ matrix.c-compiler }}
       run: ./test.sh
