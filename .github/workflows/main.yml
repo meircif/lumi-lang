@@ -17,7 +17,7 @@ jobs:
     - name: Install Python dependencies
       run: |
         pip3 install --user setuptools wheel virtualenv
-        pip3 insatll --user sphinx
+        pip3 install --user sphinx
         pip3 install --user -r docs/requirements.txt
         sphinx-build -h
     - name: Make all binaries with ${{ matrix.c-compiler }}
