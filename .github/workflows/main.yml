@@ -1,0 +1,21 @@
+name: CI
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install package dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install valgrind
+        sudo apt-get install python3-enchant
+    - name: Install Python dependencies
+      run: |
+        pip3 install --user setuptools
+        pip3 install --user sphinx
+        pip3 install --user -r docs/requirements.txt
+    - name: Make all binaries
+      run: make all
+    - name: Run all tests
+      run: ./test.sh
