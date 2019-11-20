@@ -19,7 +19,7 @@ jobs:
       run: |
         pip3 install --user setuptools wheel virtualenv
         pip3 install --user -r docs/requirements.txt
-        pip3 uninstall --user sphinx
+        pip3 uninstall -y sphinx
         pip3 install --user sphinx
         sphinx-build -h
     - name: Make all binaries with ${{ matrix.c-compiler }}
