@@ -15,7 +15,7 @@ jobs:
         sudo apt-get install python3-enchant
     - name: Install Python dependencies
       run: |
-        python3 -m pip install --upgrade pip
+        pip3 install --user --upgrade pip
         pip3 install --user setuptools
         pip3 install --user sphinx
         pip3 install --user -r docs/requirements.txt
