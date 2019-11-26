@@ -1,6 +1,7 @@
+[![CI Status](https://github.com/meircif/lumi-lang/workflows/CI/badge.svg)](https://github.com/meircif/lumi-lang/actions)
 [![Build Status](https://travis-ci.org/meircif/lumi-lang.svg?branch=master)](https://travis-ci.org/meircif/lumi-lang)
 [![Build status](https://ci.appveyor.com/api/projects/status/wtam4i4gh28aw7su?svg=true)](https://ci.appveyor.com/project/meircif/lumi-lang)
-[![codecov](https://codecov.io/gh/meircif/lumi-lang/branch/master/graph/badge.svg)](https://codecov.io/gh/meircif/lumi-lang)
+[![codecov Status](https://codecov.io/gh/meircif/lumi-lang/branch/master/graph/badge.svg)](https://codecov.io/gh/meircif/lumi-lang)
 [![Documentation Status](https://readthedocs.org/projects/lumi-lang/badge/?version=latest)](http://lumi-lang.readthedocs.io/en/latest/?badge=latest)
 
 # Lumi programming language
