@@ -16,16 +16,13 @@ jobs:
     - uses: actions/checkout@v1
     - uses: actions/setup-python@v1
       with:
-        python-version: '3.x'
+        python-version: '3.6'
     - name: Install ubuntu dependencies
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
         sudo apt-get install valgrind
         sudo apt-get install python3-enchant
-    - name: Install macos dependencies
-      if: matrix.os == 'macos-latest'
-      run: brew install enchant
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
