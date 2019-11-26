@@ -24,6 +24,12 @@ jobs:
         sudo apt-get install valgrind
         sudo apt-get install python3-enchant
     - name: Install Python dependencies
+      if: matrix.os != 'ubuntu-latest'
+      run: |
+        python -m pip install --upgrade pip
+        pip install --only-binary pyenchant -r docs/requirements.txt
+    - name: Install Python dependencies on ubuntu
+      if: matrix.os == 'ubuntu-latest'
       run: |
         python -m pip install --upgrade pip
         pip install --prefer-binary -r docs/requirements.txt
