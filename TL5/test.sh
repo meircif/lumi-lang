@@ -40,8 +40,8 @@ TL5/string-generator ../TL5/lumi.5.c TL5/header-string.4.lm
 diff ../TL5/global/header-string.4.lm TL5/header-string.4.lm
 
 # test tl5-compiler C file
+cp -r ../TL5 TL5/
 pushd TL5
-ln -s ../../TL5 TL5
 ./tl4-compiler tl5-compiler.c TL5/tl5-compiler.4.lm \
   TL5/expression/assign.4.lm TL5/expression/base-type.4.lm \
   TL5/expression/call.4.lm TL5/expression/constant.4.lm \
@@ -58,7 +58,6 @@ ln -s ../../TL5 TL5
   TL5/syntax-tree/block.4.lm TL5/syntax-tree/branch.4.lm \
   TL5/syntax-tree/code.4.lm TL5/syntax-tree/flow.4.lm \
   TL5/syntax-tree/node.4.lm TL5/syntax-tree/root.4.lm
-rm TL5
 popd
 diff ../TL5/tl5-compiler.c TL5/tl5-compiler.c
 
@@ -76,7 +75,7 @@ mv cobertura.xml TL5/ut/
 diff TL5/ut/actual.c TL5/ut/expected.c
 
 # run tl5-compiler single-file integration test
-ln -s ../../TL5/tests TL5/tests
+cp -r ../TL5/tests TL5/
 TL5/tl5-compiler TL5/test-single.c TL5/tests/integration/test0.5.lm
 $CCA TL5/test-single.c -o TL5/test-single
 TL5/test-single > TL5/test-single-output.txt
@@ -114,7 +113,6 @@ TL5/tl5-compiler -t error TL5/test-error.c TL5/tests/integration/error-test.5.lm
 $CCA TL5/test-error.c -o TL5/test-error
 ! TL5/test-error > TL5/test-error-output.txt
 diff TL5/tests/integration/error-output.txt TL5/test-error-output.txt
-rm TL5/tests
 
 
 # TL5 teardown

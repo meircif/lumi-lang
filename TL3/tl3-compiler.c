@@ -122,120 +122,121 @@ static char* _func_name_f_create_global_var_map = "f-create-global-var-map";
 Returncode f_create_global_var_map() {
   Var_map* map = malloc(sizeof(Var_map));
   if (map == NULL) RAISE(64)
+  CHECK(65, Name_map_init(&(map->_base)));
   glob->var_map = map;
   Mfunc* meth;
   
   /* Int */
-  CHECK(69, add_global_func(glob->type_int, &(String){4, 3, "str"}, &(meth)));
-  CHECK(70, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){4, 3, "str"}));
-  CHECK(71, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_int, &(String){5, 4, "self"}));
+  CHECK(70, add_global_func(glob->type_int, &(String){4, 3, "str"}, &(meth)));
+  CHECK(71, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){4, 3, "str"}));
+  CHECK(72, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_int, &(String){5, 4, "self"}));
   
   /* Bool */
-  CHECK(74, add_glob_var(glob->type_bool, &(String){5, 4, "true"}));
-  CHECK(75, add_glob_var(glob->type_bool, &(String){6, 5, "false"}));
+  CHECK(75, add_glob_var(glob->type_bool, &(String){5, 4, "true"}));
+  CHECK(76, add_glob_var(glob->type_bool, &(String){6, 5, "false"}));
   
   /* Char */
-  CHECK(78, add_glob_var(glob->type_char, &(String){4, 3, "EOF"}));
+  CHECK(79, add_glob_var(glob->type_char, &(String){4, 3, "EOF"}));
   
   /* String */
-  CHECK(81, add_member(glob->type_string, &(String){7, 6, "length"}, glob->type_int));
+  CHECK(82, add_member(glob->type_string, &(String){7, 6, "length"}, glob->type_int));
   
-  CHECK(83, add_global_func(glob->type_string, &(String){6, 5, "clear"}, &(meth)));
-  CHECK(84, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
+  CHECK(84, add_global_func(glob->type_string, &(String){6, 5, "clear"}, &(meth)));
+  CHECK(85, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
   
-  CHECK(86, add_global_func(glob->type_string, &(String){6, 5, "equal"}, &(meth)));
-  CHECK(87, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_bool, &(String){6, 5, "equal"}));
-  CHECK(88, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){8, 7, "pattern"}));
-  CHECK(89, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
+  CHECK(87, add_global_func(glob->type_string, &(String){6, 5, "equal"}, &(meth)));
+  CHECK(88, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_bool, &(String){6, 5, "equal"}));
+  CHECK(89, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){8, 7, "pattern"}));
+  CHECK(90, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
   
-  CHECK(91, add_global_func(glob->type_string, &(String){4, 3, "get"}, &(meth)));
-  CHECK(92, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_char, &(String){3, 2, "ch"}));
-  CHECK(93, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_int, &(String){6, 5, "index"}));
-  CHECK(94, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
+  CHECK(92, add_global_func(glob->type_string, &(String){4, 3, "get"}, &(meth)));
+  CHECK(93, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_char, &(String){3, 2, "ch"}));
+  CHECK(94, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_int, &(String){6, 5, "index"}));
+  CHECK(95, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
   
-  CHECK(96, add_global_func(glob->type_string, &(String){7, 6, "append"}, &(meth)));
-  CHECK(97, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_char, &(String){3, 2, "ch"}));
-  CHECK(98, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
+  CHECK(97, add_global_func(glob->type_string, &(String){7, 6, "append"}, &(meth)));
+  CHECK(98, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_char, &(String){3, 2, "ch"}));
+  CHECK(99, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
   
-  CHECK(100, add_global_func(glob->type_string, &(String){5, 4, "copy"}, &(meth)));
-  CHECK(101, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){6, 5, "other"}));
-  CHECK(102, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
+  CHECK(101, add_global_func(glob->type_string, &(String){5, 4, "copy"}, &(meth)));
+  CHECK(102, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){6, 5, "other"}));
+  CHECK(103, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
   
-  CHECK(104, add_global_func(glob->type_string, &(String){7, 6, "concat"}, &(meth)));
-  CHECK(105, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){6, 5, "other"}));
-  CHECK(106, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
+  CHECK(105, add_global_func(glob->type_string, &(String){7, 6, "concat"}, &(meth)));
+  CHECK(106, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){6, 5, "other"}));
+  CHECK(107, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
   
-  CHECK(108, add_global_func(glob->type_string, &(String){11, 10, "concat-int"}, &(meth)));
-  CHECK(109, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_int, &(String){7, 6, "number"}));
-  CHECK(110, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
+  CHECK(109, add_global_func(glob->type_string, &(String){11, 10, "concat-int"}, &(meth)));
+  CHECK(110, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_int, &(String){7, 6, "number"}));
+  CHECK(111, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
   
-  CHECK(112, add_global_func(glob->type_string, &(String){5, 4, "find"}, &(meth)));
-  CHECK(113, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_int, &(String){6, 5, "index"}));
-  CHECK(114, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){8, 7, "pattern"}));
-  CHECK(115, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
+  CHECK(113, add_global_func(glob->type_string, &(String){5, 4, "find"}, &(meth)));
+  CHECK(114, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_int, &(String){6, 5, "index"}));
+  CHECK(115, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){8, 7, "pattern"}));
+  CHECK(116, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
   
-  CHECK(117, add_global_func(glob->type_string, &(String){8, 7, "replace"}, &(meth)));
-  CHECK(118, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_char, &(String){6, 5, "newch"}));
-  CHECK(119, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_char, &(String){6, 5, "oldch"}));
-  CHECK(120, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
+  CHECK(118, add_global_func(glob->type_string, &(String){8, 7, "replace"}, &(meth)));
+  CHECK(119, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_char, &(String){6, 5, "newch"}));
+  CHECK(120, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_char, &(String){6, 5, "oldch"}));
+  CHECK(121, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
   
-  CHECK(122, add_global_func(glob->type_string, &(String){4, 3, "has"}, &(meth)));
-  CHECK(123, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_bool, &(String){6, 5, "equal"}));
-  CHECK(124, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_char, &(String){3, 2, "ch"}));
-  CHECK(125, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
+  CHECK(123, add_global_func(glob->type_string, &(String){4, 3, "has"}, &(meth)));
+  CHECK(124, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_bool, &(String){6, 5, "equal"}));
+  CHECK(125, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_char, &(String){3, 2, "ch"}));
+  CHECK(126, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_string, &(String){5, 4, "self"}));
   
   /* Array */
-  CHECK(128, add_member(glob->type_array, &(String){7, 6, "length"}, glob->type_int));
+  CHECK(129, add_member(glob->type_array, &(String){7, 6, "length"}, glob->type_int));
   
   /* File */
-  CHECK(131, add_global_func(glob->type_file, &(String){6, 5, "close"}, &(meth)));
-  CHECK(132, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_file, &(String){5, 4, "self"}));
+  CHECK(132, add_global_func(glob->type_file, &(String){6, 5, "close"}, &(meth)));
+  CHECK(133, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_file, &(String){5, 4, "self"}));
   
-  CHECK(134, add_global_func(glob->type_file, &(String){5, 4, "getc"}, &(meth)));
-  CHECK(135, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_char, &(String){3, 2, "ch"}));
-  CHECK(136, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_file, &(String){5, 4, "self"}));
+  CHECK(135, add_global_func(glob->type_file, &(String){5, 4, "getc"}, &(meth)));
+  CHECK(136, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_char, &(String){3, 2, "ch"}));
+  CHECK(137, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_file, &(String){5, 4, "self"}));
   
-  CHECK(138, add_global_func(glob->type_file, &(String){5, 4, "putc"}, &(meth)));
-  CHECK(139, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_char, &(String){3, 2, "ch"}));
-  CHECK(140, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_file, &(String){5, 4, "self"}));
+  CHECK(139, add_global_func(glob->type_file, &(String){5, 4, "putc"}, &(meth)));
+  CHECK(140, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_char, &(String){3, 2, "ch"}));
+  CHECK(141, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_file, &(String){5, 4, "self"}));
   
-  CHECK(142, add_global_func(glob->type_file, &(String){6, 5, "write"}, &(meth)));
-  CHECK(143, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){5, 4, "text"}));
-  CHECK(144, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_file, &(String){5, 4, "self"}));
+  CHECK(143, add_global_func(glob->type_file, &(String){6, 5, "write"}, &(meth)));
+  CHECK(144, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){5, 4, "text"}));
+  CHECK(145, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_file, &(String){5, 4, "self"}));
   
-  CHECK(146, add_global_func(NULL, &(String){15, 14, "file-open-read"}, &(meth)));
-  CHECK(147, Arg_list_add_out(meth->args, ACCESS_OWNER, glob->type_file, &(String){5, 4, "file"}));
-  CHECK(148, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){5, 4, "name"}));
+  CHECK(147, add_global_func(NULL, &(String){15, 14, "file-open-read"}, &(meth)));
+  CHECK(148, Arg_list_add_out(meth->args, ACCESS_OWNER, glob->type_file, &(String){5, 4, "file"}));
+  CHECK(149, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){5, 4, "name"}));
   
-  CHECK(150, add_global_func(NULL, &(String){16, 15, "file-open-write"}, &(meth)));
-  CHECK(151, Arg_list_add_out(meth->args, ACCESS_OWNER, glob->type_file, &(String){5, 4, "file"}));
-  CHECK(152, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){5, 4, "name"}));
+  CHECK(151, add_global_func(NULL, &(String){16, 15, "file-open-write"}, &(meth)));
+  CHECK(152, Arg_list_add_out(meth->args, ACCESS_OWNER, glob->type_file, &(String){5, 4, "file"}));
+  CHECK(153, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){5, 4, "name"}));
   
   /* Sys */
-  CHECK(155, add_global_func(glob->type_sys, &(String){6, 5, "print"}, &(meth)));
-  CHECK(156, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){5, 4, "text"}));
-  CHECK(157, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_sys, &(String){5, 4, "self"}));
+  CHECK(156, add_global_func(glob->type_sys, &(String){6, 5, "print"}, &(meth)));
+  CHECK(157, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){5, 4, "text"}));
+  CHECK(158, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_sys, &(String){5, 4, "self"}));
   
-  CHECK(159, add_global_func(glob->type_sys, &(String){10, 9, "print-raw"}, &(meth)));
-  CHECK(160, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){5, 4, "text"}));
-  CHECK(161, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_sys, &(String){5, 4, "self"}));
+  CHECK(160, add_global_func(glob->type_sys, &(String){10, 9, "print-raw"}, &(meth)));
+  CHECK(161, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){5, 4, "text"}));
+  CHECK(162, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_sys, &(String){5, 4, "self"}));
   
-  CHECK(163, add_global_func(glob->type_sys, &(String){5, 4, "exit"}, &(meth)));
-  CHECK(164, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_int, &(String){7, 6, "status"}));
-  CHECK(165, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_sys, &(String){5, 4, "self"}));
+  CHECK(164, add_global_func(glob->type_sys, &(String){5, 4, "exit"}, &(meth)));
+  CHECK(165, Arg_list_add_param(meth->args, ACCESS_COPY, glob->type_int, &(String){7, 6, "status"}));
+  CHECK(166, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_sys, &(String){5, 4, "self"}));
   
-  CHECK(167, add_global_func(glob->type_sys, &(String){7, 6, "system"}, &(meth)));
-  CHECK(168, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_int, &(String){7, 6, "status"}));
-  CHECK(169, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){8, 7, "command"}));
-  CHECK(170, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_sys, &(String){5, 4, "self"}));
+  CHECK(168, add_global_func(glob->type_sys, &(String){7, 6, "system"}, &(meth)));
+  CHECK(169, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_int, &(String){7, 6, "status"}));
+  CHECK(170, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){8, 7, "command"}));
+  CHECK(171, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_sys, &(String){5, 4, "self"}));
   
-  CHECK(172, add_global_func(glob->type_sys, &(String){7, 6, "getenv"}, &(meth)));
-  CHECK(173, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_bool, &(String){7, 6, "exists"}));
-  CHECK(174, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){6, 5, "value"}));
-  CHECK(175, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){5, 4, "name"}));
-  CHECK(176, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_sys, &(String){5, 4, "self"}));
+  CHECK(173, add_global_func(glob->type_sys, &(String){7, 6, "getenv"}, &(meth)));
+  CHECK(174, Arg_list_add_out(meth->args, ACCESS_COPY, glob->type_bool, &(String){7, 6, "exists"}));
+  CHECK(175, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){6, 5, "value"}));
+  CHECK(176, Arg_list_add_param(meth->args, ACCESS_USER, glob->type_string, &(String){5, 4, "name"}));
+  CHECK(177, Arg_list_add_param(meth->args, ACCESS_VAR, glob->type_sys, &(String){5, 4, "self"}));
   
-  CHECK(178, add_glob_var(glob->type_sys, &(String){4, 3, "sys"}));
+  CHECK(179, add_glob_var(glob->type_sys, &(String){4, 3, "sys"}));
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -244,9 +245,9 @@ Returncode f_create_global_var_map() {
 static char* _func_name_init_global_data = "init-global-data";
 #define LUMI_FUNC_NAME _func_name_init_global_data
 Returncode init_global_data() {
-  CHECK(182, Global_data_init(glob));
-  CHECK(183, f_create_key_word_map());
-  CHECK(184, f_create_global_var_map());
+  CHECK(183, Global_data_init(glob));
+  CHECK(184, f_create_key_word_map());
+  CHECK(185, f_create_global_var_map());
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -255,23 +256,23 @@ Returncode init_global_data() {
 static char* _func_name_func = "func";
 #define LUMI_FUNC_NAME _func_name_func
 Returncode func(Array* argv) {
-  CHECK(188, Sys_print(sys, &(String){19, 18, "TL3 compiler start"}));
+  CHECK(189, Sys_print(sys, &(String){19, 18, "TL3 compiler start"}));
   
   if (argv->length < 2) {
-    CHECK(191, Sys_print(sys, &(String){42, 41, "usage: tl3-compiler [input Lumi files]..."}));
+    CHECK(192, Sys_print(sys, &(String){42, 41, "usage: tl3-compiler [input Lumi files]..."}));
     return OK;
   }
   
-  CHECK(194, init_global_data());
+  CHECK(195, init_global_data());
   St_root* root = &(St_root){0};
   *((Func**)(root)) = St_root__dtl;
-  CHECK(196, St_root_init(root, argv));
+  CHECK(197, St_root_init(root, argv));
   
-  CHECK(198, (*((Func**)(root)))[0](root));
-  CHECK(199, (*((Func**)(root)))[2](root));
-  CHECK(200, (*((Func**)(root)))[3](root));
+  CHECK(199, (*((Func**)(root)))[0](root));
+  CHECK(200, (*((Func**)(root)))[2](root));
+  CHECK(201, (*((Func**)(root)))[3](root));
   
-  CHECK(202, Sys_print(sys, &(String){17, 16, "TL3 compiler end"}));
+  CHECK(203, Sys_print(sys, &(String){17, 16, "TL3 compiler end"}));
   return OK;
 }
 #undef LUMI_FUNC_NAME

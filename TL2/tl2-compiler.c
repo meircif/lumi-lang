@@ -2193,7 +2193,10 @@ Returncode add_meth(String* header, Type_attrs* func_type, Name_map** members) {
   Char end;
   CHECK(f_new_substing(header, &(String){3, 2, "()"}, &mpath->name, &index, &end))
   st_func->path = mpath;
+  st_func->is_dynamic = false;
   st_func->last = NULL;
+  st_func->params = NULL;
+  st_func->outputs = NULL;
   if (end == '(') {
     CHECK(add_args(header, &st_func->params, &index, &end))
   }

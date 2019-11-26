@@ -33,10 +33,9 @@ $CCW -Wno-unused-variable -Wno-missing-braces -Wno-typedef-redefinition \
   ../TL4/tl4-compiler.c ../TL3/lumi.3.c -I../TL3 -I../TL4 -o lumi/tl4-compiler
 
 # test lumi command C file
+cp -r ../lumi-command lumi/
 pushd lumi
-ln -s ../../lumi-command lumi-command
 ./tl4-compiler lumi.c lumi-command/lumi.4.lm
-rm lumi-command
 popd
 diff $MYDIR/lumi.c lumi/lumi.c
 
@@ -51,8 +50,8 @@ lumi/lumi-tests -xml
 mv cobertura.xml lumi/
 
 # run lumi command on TL4 integration tests
+cp -r ../TL4/tests lumi/
 pushd lumi
-ln -s ../../TL4/tests tests
 PATH="$PATH:$DIR/.test/lumi" LUMIPATH="$DIR/" ./lumi \
   tests/integration-test0.4.lm -o test-single
 diff ../../TL4/tests/integration-expected-single.c test-single.c
@@ -64,7 +63,6 @@ PATH="$PATH:$DIR/.test/lumi" LUMIPATH="$DIR/" ./lumi -t covered \
 diff ../../TL4/tests/integration-expected-multiple.c test-multiple.c
 ./test-multiple > multiple-output.txt
 diff ../../TL4/tests/integration-multiple-output.txt multiple-output.txt
-rm tests
 popd
   
 
