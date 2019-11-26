@@ -23,9 +23,13 @@ jobs:
         sudo apt-get update
         sudo apt-get install valgrind
         sudo apt-get install python3-enchant
+    - name: Install windows dependencies
+      if: matrix.os == 'windows-latest'
+      run: |
+        python -m pip install --upgrade pip
+        pip install --only-binary any pyenchant
     - name: Install Python dependencies
       run: |
-        python --version
         python -m pip install --upgrade pip
         pip install -r docs/requirements.txt
     - name: Make all binaries with ${{ matrix.c-compiler }}
