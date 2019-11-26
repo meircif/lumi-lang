@@ -6,7 +6,9 @@
 
 #define CLOCKS_PER_SEC 100
 
+#ifndef _TIME_T_DEFINED
 typedef int time_t;
+#endif
 
 typedef struct tm {
    int tm_sec;

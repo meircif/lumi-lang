@@ -62,6 +62,7 @@ func add-glob-var(user Mtype mtype, user String name)
 
 func f-create-global-var-map()
   new Var-map map
+  map.init()
   glob.var-map := map
   owner Mfunc meth
   

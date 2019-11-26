@@ -931,7 +931,7 @@ func write-func-last(user St-func st-func, user Var-attrs var-attrs)
     f-new-copy(user dec-out.typename): owner arg.typename
     f-new-copy(user dec-out.access): owner arg.access
     if call-prev-out = NULL
-      st-func.outputs = arg
+      st-func.outputs := arg
     
     else
       call-prev-out.next := arg
@@ -2191,7 +2191,10 @@ func add-meth(user String header, user Type-attrs func-type): owner Name-map mem
   var Char end
   f-new-substing(user header, user "()"): owner mpath.name, copy index, copy end
   st-func.path := mpath
+  st-func.is-dynamic := false
   st-func.last := NULL
+  st-func.params := NULL
+  st-func.outputs := NULL
   if end = '('
     add-args(user header): owner st-func.params, copy index, copy end
   

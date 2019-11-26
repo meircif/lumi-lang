@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "lumi.1.h"
 
 typedef FILE* File;

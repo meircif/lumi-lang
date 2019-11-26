@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "lumi.2.h"
 
 #define LUMI_FILE_NAME __FILE__

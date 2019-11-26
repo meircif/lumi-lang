@@ -1,6 +1,10 @@
 module tl5-compiler
 
 func write-output-header-code()
+    write-global(user "#ifdef _MSC_VER\n")
+    write-global(user "#define _CRT_SECURE_NO_WARNINGS\n")
+    write-global(user "#endif\n")
+    write-global(user "\n")
     write-global(user "#include <stdio.h>\n")
     write-global(user "#include <stdlib.h>\n")
     write-global(user "#include <string.h>\n")

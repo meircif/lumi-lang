@@ -16,6 +16,7 @@ func test-code-setup(user String input-text)
     code-header.getc():(copy ch)
     while ch != EOF
     mock-input-file-text.append(copy ch)
+  code-header.close()
   mock-input-line-reset-index := mock-input-file-text.length
   mock-input-file-text.concat(user input-text)
 
@@ -37,6 +38,7 @@ func test-code(user String input-text, user String expected-output)
     code-header.getc():(copy ch)
     while ch != EOF
     expected-header.append(copy ch)
+  code-header.close()
   
   f-assert-string-slice(
       user expected-header,

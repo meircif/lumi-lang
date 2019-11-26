@@ -1,4 +1,6 @@
+Sphinx>=2.2.0
 sphinx-rtd-theme>=0.3.0
 Pygments>=2.2.0
+pyenchant>=2.0.0
 sphinxcontrib-spelling
 sphinx-autobuild

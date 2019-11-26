@@ -7,7 +7,6 @@ wip
 .gitattributes
 *.WinMerge
 docs/_*
-.tags
 *.swp
 
 # Visual-Studio files
@@ -28,7 +27,7 @@ cmake-build-debug/
 CMakeLists.txt
 
 # Atom files
-.tags
+.tags*
 
 # Bazel
 bazel-*
