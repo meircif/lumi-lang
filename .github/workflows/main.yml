@@ -31,7 +31,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
         python -c "import distutils.util; print(distutils.util.get_platform())"
-        pip uninstall pyenchant
+        pip uninstall pyenchant -y
         pip install --only-binary pyenchant --platfrom win32 -r docs/requirements.txt
     - name: Make all binaries with ${{ matrix.c-compiler }}
       env:
