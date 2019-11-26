@@ -20,7 +20,10 @@ jobs:
         sudo apt-get install python3-enchant
     - name: Install macos dependencies
       if: matrix.os == 'macos-latest'
+      env:
+          CC: ${{ matrix.c-compiler }}
       run: |
+        $CC --version
         brew install enchant
     - name: Install Python dependencies
       run: |
