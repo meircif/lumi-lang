@@ -9,6 +9,8 @@ jobs:
         exclude:
           - os: macos-latest
             c-compiler: gcc
+          - os: windows-latest
+            c-compiler: clang
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v1
@@ -32,7 +34,6 @@ jobs:
       env:
           CC: ${{ matrix.c-compiler }}
       run: make all
-      shell: bash
     - name: Run all tests with ${{ matrix.c-compiler }}
       env:
           CC: ${{ matrix.c-compiler }}
