@@ -49,7 +49,7 @@ if spelling_lang not in enchant_langs:
     print('enchant.list_languages() is {}'.format(enchant_langs))
     spelling_lang = 'en_GB'
     if spelling_lang not in enchant_langs:
-        spelling_lang = langs[0]
+        spelling_lang = enchant_langs[0]
 
 
 # Add any paths that contain templates here, relative to this directory.
