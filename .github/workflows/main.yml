@@ -13,13 +13,13 @@ jobs:
       with:
         python-version: '3.x'
     - name: Install ubuntu dependencies
-      if: ${{ matrix.os }} == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
         sudo apt-get install valgrind
         sudo apt-get install python3-enchant
     - name: Install macos dependencies
-      if: ${{ matrix.os }} == 'ubuntu-macos'
+      if: matrix.os == 'ubuntu-macos'
       run: |
         brew install valgrind
         brew install enchant
