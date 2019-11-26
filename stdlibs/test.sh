@@ -15,11 +15,8 @@ DIR="$( cd -P "$( dirname "$MYDIR" )" >/dev/null && pwd )"
 if [ -z $CC ]; then
   CC=gcc
 fi
-CCA="$CC --std=c89 -Werror -Wall -Wno-unused-variable --pedantic \
-  -Wno-unused-label"
-if [ $CC == "gcc" ]; then
-  CCA="$CCA -Wno-unused-but-set-variable"
-else
+CCA="$CC --std=c89 -Werror -Wall -Wno-unused -Wno-missing-braces --pedantic"
+if [ $CC == "clang" ]; then
   CCA="$CCA -Wno-self-assign"
 fi
 
@@ -54,7 +51,6 @@ stdlibs/time-tests -xml
 mkdir stdlibs/cover-time-tests
 mv cobertura.xml stdlibs/cover-time-tests
 
-# Run os stdlib tests
 stdlibs/tl5-compiler -t os stdlibs/os-tests.c ../stdlibs/os.5.lm \
   ../stdlibs/tests/os-test.5.lm ../stdlibs/list.5.lm
 $CCA stdlibs/os-tests.c -I../stdlibs/tests -o stdlibs/os-tests
