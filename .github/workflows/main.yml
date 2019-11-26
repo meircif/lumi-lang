@@ -25,6 +25,7 @@ jobs:
         sudo apt-get install python3-enchant
     - name: Install Python dependencies
       run: |
+        python --version
         python -m pip install --upgrade pip
         pip install -r docs/requirements.txt
     - name: Make all binaries with ${{ matrix.c-compiler }}
