@@ -15,14 +15,11 @@ DIR="$( cd -P "$( dirname "$MYDIR" )" >/dev/null && pwd )"
 if [ -z $CC ]; then
   CC=gcc
 fi
-CC3="$CC --std=c89 -Werror -Wall -Wno-unused-variable -Wno-missing-braces"
-CC4="$CC3 --pedantic -Wno-unused-label"
-if [ $CC == "gcc" ]; then
-  CC4="$CC4 -Wno-unused-but-set-variable"
-else
-  CC4="$CC4 -Wno-self-assign"
+CCW="$CC --std=c89 -Werror -Wall -Wno-unused -Wno-missing-braces"
+CCA="$CCW --pedantic"
+if [ $CC == "clang" ]; then
+  CCA="$CCA -Wno-self-assign"
 fi
-CCA=$CC4
 if which valgrind > /dev/null; then
   HAS_VALGRIND=1
 fi
@@ -33,12 +30,12 @@ pushd $DIR/.test
 
 
 # compile tl4-compiler
-$CC3 -Wno-typedef-redefinition ../TL4/tl4-compiler.c ../TL3/lumi.3.c \
+$CCW -Wno-typedef-redefinition ../TL4/tl4-compiler.c ../TL3/lumi.3.c \
   -I../TL3 -I../TL4 -o TL5/tl4-compiler
 
 # test generated tl5-compiler sources
 TL5/tl4-compiler TL5/string-generator.c ../TL5/string-generator.4.lm
-$CC4 TL5/string-generator.c ../TL4/lumi.4.c -I../TL4 -o TL5/string-generator
+$CCA TL5/string-generator.c ../TL4/lumi.4.c -I../TL4 -o TL5/string-generator
 TL5/string-generator ../TL5/lumi.5.c TL5/header-string.4.lm
 diff ../TL5/global/header-string.4.lm TL5/header-string.4.lm
 
@@ -66,12 +63,12 @@ popd
 diff ../TL5/tl5-compiler.c TL5/tl5-compiler.c
 
 # compile tl5-compiler
-$CC4 ../TL5/tl5-compiler.c ../TL4/lumi.4.c -I../TL4 -o TL5/tl5-compiler
+$CCA ../TL5/tl5-compiler.c ../TL4/lumi.4.c -I../TL4 -o TL5/tl5-compiler
 
 # run tl5-compiler unit-tests
 TL5/tl4-compiler -t tl5-compiler TL5/tl5-compiler-tests.c \
   ../TL5/tl5-compiler.4.lm ../TL5/*/*.4.lm ../TL5/tests/ut/*.4.lm
-$CC4 TL5/tl5-compiler-tests.c ../TL4/lumi.4.c -I../TL4 -o \
+$CCA TL5/tl5-compiler-tests.c ../TL4/lumi.4.c -I../TL4 -o \
   TL5/tl5-compiler-tests
 cp -r ../TL5/tests/ut TL5/
 TEST_DIR=TL5/ut/ TL5/tl5-compiler-tests -xml
