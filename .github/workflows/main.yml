@@ -24,15 +24,15 @@ jobs:
         sudo apt-get install valgrind
         sudo apt-get install python3-enchant
     - name: Install Python dependencies
-      if: matrix.os != 'ubuntu-latest'
       run: |
         python -m pip install --upgrade pip
-        pip install --only-binary pyenchant -r docs/requirements.txt
-    - name: Install Python dependencies on ubuntu
-      if: matrix.os == 'ubuntu-latest'
+        pip install -r docs/requirements.txt
+    - name: Install Python dependencies on windows
+      if: matrix.os == 'windows-latest'
       run: |
-        python -m pip install --upgrade pip
-        pip install --prefer-binary -r docs/requirements.txt
+        python -c "import distutils.util; print(distutils.util.get_platform())"
+        pip uninstall pyenchant
+        pip install --only-binary pyenchant --platfrom win32 -r docs/requirements.txt
     - name: Make all binaries with ${{ matrix.c-compiler }}
       env:
           CC: ${{ matrix.c-compiler }}
