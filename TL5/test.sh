@@ -20,8 +20,8 @@ CCA="$CCW --pedantic"
 if [ $CC == "clang" ]; then
   CCA="$CCA -Wno-self-assign"
 fi
-if which valgrind > /dev/null; then
-  HAS_VALGRIND=1
+if ! which valgrind > /dev/null; then
+  SKIP_VALGRIND="y"
 fi
 
 rm -rf $DIR/.test/TL5
@@ -81,7 +81,7 @@ TL5/tl5-compiler TL5/test-single.c TL5/tests/integration/test0.5.lm
 $CCA TL5/test-single.c -o TL5/test-single
 TL5/test-single > TL5/test-single-output.txt
 diff TL5/tests/integration/single-output.txt TL5/test-single-output.txt
-if [ -n $HAS_VALGRIND ]; then
+if [ -z $SKIP_VALGRIND ]; then
   valgrind -q --leak-check=full --error-exitcode=1 TL5/test-single > /dev/null
 fi
 
@@ -96,7 +96,7 @@ mkdir TL5/cover-tests
 mv cobertura.xml TL5/cover-tests/
 diff TL5/tests/integration/multiple-output.txt TL5/test-multiple-output.txt
 diff TL5/tests/integration/expected-cobertura.xml TL5/cover-tests/cobertura.xml
-if [ -n $HAS_VALGRIND ]; then
+if [ -z $SKIP_VALGRIND ]; then
   valgrind -q --leak-check=full --error-exitcode=1 TL5/test-multiple > /dev/null
 fi
 
