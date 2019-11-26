@@ -8,16 +8,18 @@ jobs:
         c-compiler: [gcc, clang]
     steps:
     - uses: actions/checkout@v1
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
     - name: Install package dependencies
       run: |
         sudo apt-get update
         sudo apt-get install valgrind
-        sudo apt-get install python3-pip
         sudo apt-get install python3-enchant
     - name: Install Python dependencies
       run: |
-        pip3 install --user setuptools wheel virtualenv
-        pip3 install --user -r docs/requirements.txt
+        python -m pip install --upgrade pip
+        pip install -r docs/requirements.txt
     - name: Make all binaries with ${{ matrix.c-compiler }}
       env:
           CC: ${{ matrix.c-compiler }}
