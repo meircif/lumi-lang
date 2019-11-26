@@ -21,8 +21,6 @@ jobs:
     - name: Install macos dependencies
       if: matrix.os == 'macos-latest'
       run: |
-        brew update
-        brew install --HEAD valgrind
         brew install enchant
     - name: Install Python dependencies
       run: |
