@@ -514,8 +514,8 @@ char vsa[8 * 5] = {0};
     sa_String_length = aux_Array_0_String_length;
     sa = aux_Array_0;
 /// @ test-slice-expression-8
-Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Refman, char* sa, int sa_Length, int sa_Value_length, int* sa_String_length, Ref_Manager* sa_Refman);
-Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Refman, char* sa, int sa_Length, int sa_Value_length, int* sa_String_length, Ref_Manager* sa_Refman) {
+Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, char* sa, int sa_Length, int sa_Value_length, int* sa_String_length, Ref_Manager* sa_Refman);
+Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, char* sa, int sa_Length, int sa_Value_length, int* sa_String_length, Ref_Manager* sa_Refman) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     Char c = 0;
@@ -526,7 +526,6 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Ref
     int* si_Length = &Lumi_empty_int;
     Char* aux_Array_0 = NULL;
     int aux_Array_0_Length = 0;
-    Ref_Manager* aux_Array_0_Refman = NULL;
     char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int* aux_String_0_Length = &Lumi_empty_int;
@@ -536,9 +535,6 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Ref
     if (4 + 2 > *(s_Length)) RAISE(3, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = s + 4;
     aux_Array_0_Length = 2;
-    aux_Array_0_Refman = s_Refman;
-    LUMI_inc_ref(aux_Array_0_Refman);
-    CHECK_REFMAN(3, LUMI_block0_cleanup, aux_Array_0_Refman)
     part_Length = aux_Array_0_Length;
     part = aux_Array_0;
     if (3 >= sa_Length) RAISE(4, LUMI_block0_cleanup, slice_index)
@@ -554,7 +550,6 @@ Returncode ut_M_fun(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Ref
 LUMI_block0_cleanup:
     (void)0;
     LUMI_dec_ref(aux_String_0_Refman);
-    LUMI_dec_ref(aux_Array_0_Refman);
     free(sa_String_length);
     LUMI_owner_dec_ref(sa_Refman);
     return LUMI_err;
@@ -5798,7 +5793,7 @@ owner argument to native function
 /// @ test-native-ef4
 var output to native function
 /// @ test-native-ef5
-output "s" access should not be "var" for non-primitive type "String"
+argument "s" access should not be "s-var" for non-primitive type "String"
 /// @ test-native-ef6
 managed argument to native function
 /// @ test-native-ef7
@@ -5810,7 +5805,7 @@ managed argument to native function
 /// @ test-native-ef10
 owner argument to native function
 /// @ test-native-ef11
-managed argument to native function
+argument "s" access should not be "s-var" for non-primitive type "String"
 /// @ test-native-ef12
 output argument in native function call
 /// @ test-native-ef13
@@ -8977,31 +8972,40 @@ LUMI_block0_cleanup:
     free(to);
 }
 /// @ test-memory-temp-1
-char* s = NULL;
-    int s_Max_length = 0;
-    int* s_Length = &Lumi_empty_int;
-    Ref_Manager* s_Refman = NULL;
-    CHECK_REF(2, LUMI_block0_cleanup, *so)
-    LUMI_inc_ref(*so_Refman);
-    LUMI_dec_ref(s_Refman);
-    s_Refman = *so_Refman;
-    s_Max_length = *so_Max_length;
-    s_Length = *so_Length;
-    s = *so;
-    CHECK_REFMAN(3, LUMI_block0_cleanup, s_Refman)
-    String_clear(s, s_Max_length, s_Length);
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    char* s;
+    int s_Max_length;
+    int* s_Length;
+};
+void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_fun(ut_M_Test* to);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    String_Del(self->s);
+    free(self->s);
+}
+void ut_M_fun(ut_M_Test* to) {
+    unsigned LUMI_loop_depth = 1;
+    ut_M_Test* t = NULL;
+    t = to;
+    String_Del(t->s);
+    free(t->s);
+    t->s_Max_length = 0;
+    t->s_Length = &Lumi_empty_int;
+    t->s = NULL;
+LUMI_block0_cleanup:
+    (void)0;
+        ut_M_Test_Del(to);
+    free(to);
+}
 /// @ test-memory-temp-e0
-cannot assign value with access "user" into value with access "var"
+cannot assign value with access "user" into value with access "temp"
 /// @ test-memory-temp-e1
-assigning into an owner a non-owner access "var"
+assigning into an owner a non-owner access "temp"
 /// @ test-memory-temp-e2
-assigning into non assignable expression
-/// @ test-memory-temp-e3
-output "s" access should not be "var" for non-primitive type "String"
-/// @ test-memory-temp-e4
-using invalid reference "self.t"
-/// @ test-memory-temp-e5
-using invalid reference "self.t"
+output "s" access should not be "temp" for non-primitive type "String"
 /// @@ test-memory-constructor
 /// @ test-memory-constructor-0
 typedef struct ut_M_NoConstructor ut_M_NoConstructor;
@@ -9201,11 +9205,21 @@ variable with constructor in type without constructor "Error"
 constructor did not initialize field "t"
 /// @ test-memory-constructor-e10
 constructor did not initialize field "s"
+/// @ test-memory-constructor-e11
+using invalid reference "self.t"
+/// @ test-memory-constructor-e12
+using invalid reference "self.t"
 /// @@ test-memory-error
 /// @ test-memory-error-e0
 assigning reference into itself
 /// @ test-memory-error-e1
-fields cannot have "user" access
+fields cannot have access "user"
+/// @ test-memory-error-e2
+fields cannot have access "temp"
+/// @ test-memory-error-e3
+argument "s" access should not be "var" for non-primitive type "String"
+/// @ test-memory-error-e4
+argument "s" access should not be "var" for non-primitive type "String"
 /// @@ test-c-objects
 /// @ test-c-objects-0
 cdef_M_Char c_char = 0;

@@ -217,7 +217,7 @@ var Array{8:String{5}} vsa
 user String s(user vsa[3])
 user Array{String} sa(user vsa[2:4])
 ; @ g test-slice-expression-8
-func ! fun(s-var String s, strong Array{String} sa)
+func ! fun(temp String s, strong Array{String} sa)
     var Char c(copy s[5]!)
     user Array{Char} part(user s[4:2]!)
     user String si(user sa[3]!)
@@ -374,17 +374,17 @@ class Test
 func fun()->(owner Array?{String} astr)
     fun()->(owner astr)
 ; @ g test-call-expression-23
-func ! fun(var String s)
+func ! fun(temp String s)
     var String{12} vars
     s-var String{12} s-vars!
     owner String owners(owner String{12}()!)
     strong String strongs(strong String{12}()!)
     user String users(user s)
-    fun(var s)!
-    fun(var vars)!
-    fun(var s-vars)!
-    fun(var owners)!
-    fun(var strongs)!
+    fun(temp s)!
+    fun(temp vars)!
+    fun(temp s-vars)!
+    fun(temp owners)!
+    fun(temp strongs)!
     s.clear()
 ; @ c test-call-expression-24
 strong String? s
@@ -3909,47 +3909,26 @@ for n in str!
 ; @ g test-memory-temp-0
 struct Test
     owner String? s
-func fun(var Test t)
+func fun(temp Test t)
     t.s := _
 func use(owner Test to)
-    fun(var to)
-; @ c test-memory-temp-1
-weak String s
-s := so!
-s!.clear()
+    fun(temp to)
+; @ g test-memory-temp-1
+struct Test
+    owner String? s
+func fun(owner Test to)
+    temp Test t(temp to)
+    t.s := _
 ; @ eg test-memory-temp-e0
-func fun(var String s)
+func fun(temp String s)
 func error(user String s)
-    fun(var s)
+    fun(temp s)
 ; @ eg test-memory-temp-e1
 func fun(owner String s)
-func error(var String s)
+func error(temp String s)
     fun(owner s)
 ; @ eg test-memory-temp-e2
-func error(var String a, owner String b)
-    a := b
-; @ eg test-memory-temp-e3
-func error()->(var String s)
-; @ eg test-memory-temp-e4
-struct Test
-    owner String s
-    new!()
-        self.s := String{12}()!
-struct Error
-    var Test t
-    new!()
-        self.t.s.clear()!
-; @ eg test-memory-temp-e5
-struct Test
-    owner String s
-    new!()
-        self.s := String{12}()!
-struct Error
-    var Test t
-    new!()
-        if false
-            self.t.new()!
-        self.t.s.clear()!
+func error()->(temp String s)
 ; @@ test-memory-constructor
 ; @ g test-memory-constructor-0
 struct NoConstructor
@@ -4056,12 +4035,39 @@ struct Base
         self.s := String{12}()!
 struct Test(Base)
     new()
+; @ eg test-memory-constructor-e11
+struct Test
+    owner String s
+    new!()
+        self.s := String{12}()!
+struct Error
+    var Test t
+    new!()
+        self.t.s.clear()!
+; @ eg test-memory-constructor-e12
+struct Test
+    owner String s
+    new!()
+        self.s := String{12}()!
+struct Error
+    var Test t
+    new!()
+        if false
+            self.t.new()!
+        self.t.s.clear()!
 ; @@ test-memory-error
 ; @ ec test-memory-error-e0
 str := str
 ; @ eg test-memory-error-e1
 struct Error
-    user String s
+    user String? s
+; @ eg test-memory-error-e2
+struct Error
+    temp String? s
+; @ eg test-memory-error-e3
+func error(var String s)
+; @ eg test-memory-error-e4
+func error()->(var String s)
 ; @@ test-c-objects
 ; @ c test-c-objects-0
 var cdef.Char c-char

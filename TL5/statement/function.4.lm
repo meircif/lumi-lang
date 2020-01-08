@@ -432,7 +432,7 @@ class SyntaxTreeConstructor(SyntaxTreeFunction)
     func inst parse(user TypeData parent-type)
         self.parent-type := parent-type
         self.indentation-spaces := INDENTATION-SPACES
-        self.self-access := Access.VAR
+        self.self-access := Access.TEMP
         self.self-conditional := false
         self.parent-type.constructor := self
         if glob.last-char = '!'
@@ -503,18 +503,21 @@ class DeclarationArgument(Argument)
                         user "access should be \"copy\" for primitive types, \
                         got",
                         user glob.access-names[self.access])
-        else-if self.access = Access.COPY
-            self.syntax-error2(
+        else-if self.access = Access.COPY or
+                access-is-only-var(copy self.access)
+            self.syntax-error3(
                     user "argument",
                     user self.variable.name,
-                    user "access should not be \"copy\" for non-primitive type",
+                    user "access should not be",
+                    user glob.access-names[self.access],
+                    user "for non-primitive type",
                     user type-data.name)
         else-if self.is-output
-            if access-is-only-var(copy self.access)
+            if self.access = Access.TEMP
                 self.syntax-error2(
                         user "output",
                         user self.variable.name,
-                        user "access should not be \"var\" for non-primitive \
+                        user "access should not be \"temp\" for non-primitive \
                         type",
                         user type-data.name)
             if not self.variable.type-instance.conditional

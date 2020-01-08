@@ -140,8 +140,10 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         if access-is-only-var(copy self.access)
             self.type-instance.check-sequence(user self)
         if self.parent-type?
-            if self.access = Access.USER
-                self.syntax-error-msg(user "fields cannot have \"user\" access")
+            if self.access = Access.USER or self.access = Access.TEMP
+                self.syntax-error(
+                        user "fields cannot have access",
+                        user glob.access-names[self.access])
             if (not self.type-instance.type-data.is-primitive or
                     self.type-instance.type-data is glob.type-func) and
                     not self.parent-type.constructor?

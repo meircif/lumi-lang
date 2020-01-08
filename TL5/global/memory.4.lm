@@ -69,7 +69,7 @@ struct ReferencePath
             while path?
             var Bool is-owner
             if path.variable?
-                access-is-var(copy path.variable.access)->(var is-owner)
+                access-is-temp(copy path.variable.access)->(var is-owner)
             if is-owner
                 if not pure-owner
                     node.syntax-error-item-ref(
