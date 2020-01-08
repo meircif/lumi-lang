@@ -8393,8 +8393,8 @@ expected module, got empty expression
 expected module, got "Int"
 /// @ test-module-e12
 unknown Enum "Error" in module "ut"
-/// @@ test-memory
-/// @ test-memory-o0
+/// @@ test-memory-owner
+/// @ test-memory-owner-0
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     char* s;
@@ -8521,7 +8521,60 @@ LUMI_block0_cleanup:
     free(s);
     return LUMI_err;
 }
-/// @ test-memory-u0
+/// @ test-memory-owner-e0
+cannot modify owner field "s" in non-owner reference "t.s"
+/// @ test-memory-owner-e1
+cannot modify owner field "a" in non-owner reference "b.a"
+/// @ test-memory-owner-e2
+cannot modify owner field "a" in non-owner reference "b.a"
+/// @ test-memory-owner-e3
+cannot modify owner field "s" in non-owner reference "b.a.s"
+/// @ test-memory-owner-e4
+cannot modify owner field "s" in non-owner reference "t.s"
+/// @ test-memory-owner-e5
+cannot modify owner field "s" in non-owner reference "{anonymous}.s"
+/// @ test-memory-owner-e6
+cannot move non-conditional owner field "t.s"
+/// @ test-memory-owner-e7
+cannot move non-conditional owner field "t.s"
+/// @ test-memory-owner-e8
+cannot move non-conditional owner field "t.s"
+/// @ test-memory-owner-e9
+using invalid reference "s"
+/// @ test-memory-owner-e10
+using modified reference "t"
+/// @ test-memory-owner-e11
+using modified reference "t"
+/// @ test-memory-owner-e12
+using invalid reference "t"
+/// @ test-memory-owner-e13
+using invalid reference "t.t"
+/// @ test-memory-owner-e14
+cannot modify owner field "s" in non-owner reference "tu.s"
+/// @ test-memory-owner-e15
+using invalid reference "s"
+/// @ test-memory-owner-e16
+using invalid reference "tbad"
+/// @ test-memory-owner-e17
+using invalid reference "s"
+/// @ test-memory-owner-e18
+using modified reference "s"
+/// @ test-memory-owner-e19
+using modified reference "s"
+/// @ test-memory-owner-e20
+using modified reference "s"
+/// @ test-memory-owner-e21
+using invalid reference "t"
+/// @ test-memory-owner-e22
+using modified reference "t"
+/// @ test-memory-owner-e23
+using invalid reference "s"
+/// @ test-memory-owner-e24
+using invalid reference "s"
+/// @ test-memory-owner-e25
+cannot modify owner field "s" in non-owner reference "{anonymous}.s"
+/// @@ test-memory-user
+/// @ test-memory-user-0
 void ut_M_deleting(char** s, int* s_Max_length, int** s_Length);
 void ut_M_fun(char* s, int s_Max_length, int* s_Length, char** so, int* so_Max_length, int** so_Length);
 void ut_M_deleting(char** s, int* s_Max_length, int** s_Length) {
@@ -8541,7 +8594,7 @@ void ut_M_fun(char* s, int s_Max_length, int* s_Length, char** so, int* so_Max_l
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ test-memory-u1
+/// @ test-memory-user-1
 void ut_M_deleting(char** s, int* s_Max_length, int** s_Length, Ref_Manager** s_Refman);
 Returncode ut_M_fun(void);
 void ut_M_deleting(char** s, int* s_Max_length, int** s_Length, Ref_Manager** s_Refman) {
@@ -8589,7 +8642,7 @@ LUMI_block0_cleanup:
     LUMI_owner_dec_ref(so_Refman);
     return LUMI_err;
 }
-/// @ test-memory-u2
+/// @ test-memory-user-2
 void ut_M_deleting(char** s, int* s_Max_length, int** s_Length, Ref_Manager** s_Refman);
 Returncode ut_M_fun(void);
 void ut_M_deleting(char** s, int* s_Max_length, int** s_Length, Ref_Manager** s_Refman) {
@@ -8642,7 +8695,7 @@ LUMI_block0_cleanup:
     LUMI_owner_dec_ref(so_Refman);
     return LUMI_err;
 }
-/// @ test-memory-u3
+/// @ test-memory-user-3
 char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
@@ -8657,7 +8710,7 @@ char* s = NULL;
     s = *so;
     CHECK_REF(4, LUMI_block0_cleanup, s)
     String_clear(s, s_Max_length, s_Length);
-/// @ test-memory-u4
+/// @ test-memory-user-4
 typedef struct ut_M_Test ut_M_Test;
 struct ut_M_Test {
     char* s;
@@ -8716,7 +8769,7 @@ LUMI_block0_cleanup:
     free(sowner);
     return LUMI_err;
 }
-/// @ test-memory-u5
+/// @ test-memory-user-5
 char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
@@ -8759,7 +8812,7 @@ char* s = NULL;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-/// @ test-memory-u6
+/// @ test-memory-user-6
 void ut_M_get(char** s, int* s_Max_length, int** s_Length);
 Returncode ut_M_fun(void);
 void ut_M_get(char** s, int* s_Max_length, int** s_Length) {
@@ -8790,7 +8843,167 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-/// @ test-memory-c0
+/// @ test-memory-user-e0
+using potentially illegal user reference "s"
+/// @ test-memory-user-e1
+using potentially illegal user reference "s"
+/// @ test-memory-user-e2
+using potentially illegal user reference "s"
+/// @ test-memory-user-e3
+using potentially illegal user reference "s"
+/// @ test-memory-user-e4
+using potentially illegal user reference "s"
+/// @ test-memory-user-e5
+using potentially illegal user reference "s"
+/// @ test-memory-user-e6
+using potentially illegal user reference "s"
+/// @ test-memory-user-e7
+using potentially illegal user reference "s"
+/// @ test-memory-user-e8
+using potentially illegal user reference "s"
+/// @ test-memory-user-e9
+using potentially illegal user reference "s"
+/// @ test-memory-user-e10
+using potentially illegal user reference "s"
+/// @ test-memory-user-e11
+using potentially illegal user reference "s"
+/// @ test-memory-user-e12
+using potentially illegal user reference "s"
+/// @ test-memory-user-e13
+using potentially illegal user reference "a"
+/// @ test-memory-user-e14
+using potentially illegal user reference "s"
+/// @ test-memory-user-e15
+using potentially illegal user reference "s"
+/// @ test-memory-user-e16
+using potentially illegal user reference "tt"
+/// @ test-memory-user-e17
+using potentially illegal user reference "f"
+/// @ test-memory-user-e18
+using potentially illegal user reference "t"
+/// @ test-memory-user-e19
+using potentially illegal user reference "b"
+/// @ test-memory-user-e20
+using potentially illegal user reference "s"
+/// @ test-memory-user-e21
+using potentially illegal user reference "s"
+/// @ test-memory-user-e22
+using potentially illegal user reference "s"
+/// @ test-memory-user-e23
+using potentially illegal user reference "s"
+/// @ test-memory-user-e24
+using potentially illegal user reference "s"
+/// @ test-memory-user-e25
+returning potentially illegal user output "s"
+/// @ test-memory-user-e26
+returning potentially illegal user output "s"
+/// @ test-memory-user-e27
+returning potentially illegal user output "s"
+/// @ test-memory-user-e28
+returning potentially illegal user output "s"
+/// @ test-memory-user-e29
+using potentially illegal user reference "s"
+/// @ test-memory-user-e30
+using potentially illegal user reference "s"
+/// @ test-memory-user-e31
+using potentially illegal user reference "s"
+/// @ test-memory-user-e32
+using potentially illegal user reference "s"
+/// @ test-memory-user-e33
+using potentially illegal user reference "f"
+/// @ test-memory-user-e34
+using potentially illegal user reference "f"
+/// @ test-memory-user-e35
+using potentially illegal user reference "su"
+/// @ test-memory-user-e36
+using potentially illegal user reference "str"
+/// @ test-memory-user-e37
+using potentially illegal user reference "str"
+/// @ test-memory-user-e38
+using potentially illegal user reference "str"
+/// @ test-memory-user-e39
+using potentially illegal user reference "str"
+/// @ test-memory-user-e40
+using potentially illegal user reference "str"
+/// @ test-memory-user-e41
+using potentially illegal user reference "str"
+/// @ test-memory-user-e42
+using potentially illegal user reference "str"
+/// @ test-memory-user-e43
+using potentially illegal user reference "str"
+/// @ test-memory-user-e44
+using potentially illegal user reference "str"
+/// @ test-memory-user-e45
+using potentially illegal user reference "str"
+/// @ test-memory-user-e46
+returning potentially illegal user output "sout"
+/// @ test-memory-user-e47
+returning potentially illegal user output "sout"
+/// @ test-memory-user-e48
+using potentially illegal user reference "{anonymous}"
+/// @@ test-memory-temp
+/// @ test-memory-temp-0
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    char* s;
+    int s_Max_length;
+    int* s_Length;
+};
+void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_fun(ut_M_Test* t);
+void ut_M_use(ut_M_Test* to);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    String_Del(self->s);
+    free(self->s);
+}
+void ut_M_fun(ut_M_Test* t) {
+    unsigned LUMI_loop_depth = 1;
+    String_Del(t->s);
+    free(t->s);
+    t->s_Max_length = 0;
+    t->s_Length = &Lumi_empty_int;
+    t->s = NULL;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_use(ut_M_Test* to) {
+    unsigned LUMI_loop_depth = 1;
+    ut_M_fun(to);
+LUMI_block0_cleanup:
+    (void)0;
+    ut_M_Test_Del(to);
+    free(to);
+}
+/// @ test-memory-temp-1
+char* s = NULL;
+    int s_Max_length = 0;
+    int* s_Length = &Lumi_empty_int;
+    Ref_Manager* s_Refman = NULL;
+    CHECK_REF(2, LUMI_block0_cleanup, *so)
+    LUMI_inc_ref(*so_Refman);
+    LUMI_dec_ref(s_Refman);
+    s_Refman = *so_Refman;
+    s_Max_length = *so_Max_length;
+    s_Length = *so_Length;
+    s = *so;
+    CHECK_REFMAN(3, LUMI_block0_cleanup, s_Refman)
+    String_clear(s, s_Max_length, s_Length);
+/// @ test-memory-temp-e0
+cannot assign value with access "user" into value with access "var"
+/// @ test-memory-temp-e1
+assigning into an owner a non-owner access "var"
+/// @ test-memory-temp-e2
+assigning into non assignable expression
+/// @ test-memory-temp-e3
+output "s" access should not be "var" for non-primitive type "String"
+/// @ test-memory-temp-e4
+using invalid reference "self.t"
+/// @ test-memory-temp-e5
+using invalid reference "self.t"
+/// @@ test-memory-constructor
+/// @ test-memory-constructor-0
 typedef struct ut_M_NoConstructor ut_M_NoConstructor;
 typedef struct ut_M_HasConstructor ut_M_HasConstructor;
 typedef struct ut_M_Test ut_M_Test;
@@ -8871,7 +9084,7 @@ void ut_M_Test_Del(ut_M_Test* self) {
     ut_M_HasConstructor_Del(&(self->vhc));
     ut_M_NoConstructor_Del(&(self->vnc));
 }
-/// @ test-memory-c1
+/// @ test-memory-constructor-1
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Mid ut_M_Mid;
 typedef struct ut_M_Test ut_M_Test;
@@ -8966,241 +9179,32 @@ void ut_M_fun2(void (*f)(void)) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ test-memory-b0
-typedef struct ut_M_Test ut_M_Test;
-struct ut_M_Test {
-    char* s;
-    int s_Max_length;
-    int* s_Length;
-};
-void ut_M_Test_Del(ut_M_Test* self);
-void ut_M_fun(ut_M_Test* t);
-void ut_M_use(ut_M_Test* to);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
-    if (self == NULL) return;
-    String_Del(self->s);
-    free(self->s);
-}
-void ut_M_fun(ut_M_Test* t) {
-    unsigned LUMI_loop_depth = 1;
-    String_Del(t->s);
-    free(t->s);
-    t->s_Max_length = 0;
-    t->s_Length = &Lumi_empty_int;
-    t->s = NULL;
-LUMI_block0_cleanup:
-    (void)0;
-}
-void ut_M_use(ut_M_Test* to) {
-    unsigned LUMI_loop_depth = 1;
-    ut_M_fun(to);
-LUMI_block0_cleanup:
-    (void)0;
-    ut_M_Test_Del(to);
-    free(to);
-}
-/// @ test-memory-b1
-char* s = NULL;
-    int s_Max_length = 0;
-    int* s_Length = &Lumi_empty_int;
-    Ref_Manager* s_Refman = NULL;
-    CHECK_REF(2, LUMI_block0_cleanup, *so)
-    LUMI_inc_ref(*so_Refman);
-    LUMI_dec_ref(s_Refman);
-    s_Refman = *so_Refman;
-    s_Max_length = *so_Max_length;
-    s_Length = *so_Length;
-    s = *so;
-    CHECK_REFMAN(3, LUMI_block0_cleanup, s_Refman)
-    String_clear(s, s_Max_length, s_Length);
-/// @ test-memory-eo0
-cannot modify owner field "s" in non-owner reference "t.s"
-/// @ test-memory-eo1
-cannot modify owner field "a" in non-owner reference "b.a"
-/// @ test-memory-eo2
-cannot modify owner field "a" in non-owner reference "b.a"
-/// @ test-memory-eo3
-cannot modify owner field "s" in non-owner reference "b.a.s"
-/// @ test-memory-eo4
-cannot modify owner field "s" in non-owner reference "t.s"
-/// @ test-memory-eo5
-cannot modify owner field "s" in non-owner reference "{anonymous}.s"
-/// @ test-memory-eo6
-cannot move non-conditional owner field "t.s"
-/// @ test-memory-eo7
-cannot move non-conditional owner field "t.s"
-/// @ test-memory-eo8
-cannot move non-conditional owner field "t.s"
-/// @ test-memory-eo9
-using invalid reference "s"
-/// @ test-memory-eo10
-using modified reference "t"
-/// @ test-memory-eo11
-using modified reference "t"
-/// @ test-memory-eo12
-using invalid reference "t"
-/// @ test-memory-eo13
-using invalid reference "t.t"
-/// @ test-memory-eo14
-cannot modify owner field "s" in non-owner reference "tu.s"
-/// @ test-memory-eo15
-using invalid reference "s"
-/// @ test-memory-eo16
-using invalid reference "tbad"
-/// @ test-memory-eo17
-using invalid reference "s"
-/// @ test-memory-eo18
-using modified reference "s"
-/// @ test-memory-eo19
-using modified reference "s"
-/// @ test-memory-eo20
-using modified reference "s"
-/// @ test-memory-eo21
-using invalid reference "t"
-/// @ test-memory-eo22
-using modified reference "t"
-/// @ test-memory-eo23
-using invalid reference "s"
-/// @ test-memory-eo24
-using invalid reference "s"
-/// @ test-memory-eo25
-cannot modify owner field "s" in non-owner reference "{anonymous}.s"
-/// @ test-memory-eu0
-using potentially illegal user reference "s"
-/// @ test-memory-eu1
-using potentially illegal user reference "s"
-/// @ test-memory-eu2
-using potentially illegal user reference "s"
-/// @ test-memory-eu3
-using potentially illegal user reference "s"
-/// @ test-memory-eu4
-using potentially illegal user reference "s"
-/// @ test-memory-eu5
-using potentially illegal user reference "s"
-/// @ test-memory-eu6
-using potentially illegal user reference "s"
-/// @ test-memory-eu7
-using potentially illegal user reference "s"
-/// @ test-memory-eu8
-using potentially illegal user reference "s"
-/// @ test-memory-eu9
-using potentially illegal user reference "s"
-/// @ test-memory-eu10
-using potentially illegal user reference "s"
-/// @ test-memory-eu11
-using potentially illegal user reference "s"
-/// @ test-memory-eu12
-using potentially illegal user reference "s"
-/// @ test-memory-eu13
-using potentially illegal user reference "a"
-/// @ test-memory-eu14
-using potentially illegal user reference "s"
-/// @ test-memory-eu15
-using potentially illegal user reference "s"
-/// @ test-memory-eu16
-using potentially illegal user reference "tt"
-/// @ test-memory-eu17
-using potentially illegal user reference "f"
-/// @ test-memory-eu18
-using potentially illegal user reference "t"
-/// @ test-memory-eu19
-using potentially illegal user reference "b"
-/// @ test-memory-eu20
-using potentially illegal user reference "s"
-/// @ test-memory-eu21
-using potentially illegal user reference "s"
-/// @ test-memory-eu22
-using potentially illegal user reference "s"
-/// @ test-memory-eu23
-using potentially illegal user reference "s"
-/// @ test-memory-eu24
-using potentially illegal user reference "s"
-/// @ test-memory-eu25
-returning potentially illegal user output "s"
-/// @ test-memory-eu26
-returning potentially illegal user output "s"
-/// @ test-memory-eu27
-returning potentially illegal user output "s"
-/// @ test-memory-eu28
-returning potentially illegal user output "s"
-/// @ test-memory-eu29
-using potentially illegal user reference "s"
-/// @ test-memory-eu30
-using potentially illegal user reference "s"
-/// @ test-memory-eu31
-using potentially illegal user reference "s"
-/// @ test-memory-eu32
-using potentially illegal user reference "s"
-/// @ test-memory-eu33
-using potentially illegal user reference "f"
-/// @ test-memory-eu34
-using potentially illegal user reference "f"
-/// @ test-memory-eu35
-using potentially illegal user reference "su"
-/// @ test-memory-eu36
-using potentially illegal user reference "str"
-/// @ test-memory-eu37
-using potentially illegal user reference "str"
-/// @ test-memory-eu38
-using potentially illegal user reference "str"
-/// @ test-memory-eu39
-using potentially illegal user reference "str"
-/// @ test-memory-eu40
-using potentially illegal user reference "str"
-/// @ test-memory-eu41
-using potentially illegal user reference "str"
-/// @ test-memory-eu42
-using potentially illegal user reference "str"
-/// @ test-memory-eu43
-using potentially illegal user reference "str"
-/// @ test-memory-eu44
-using potentially illegal user reference "str"
-/// @ test-memory-eu45
-using potentially illegal user reference "str"
-/// @ test-memory-eu46
-returning potentially illegal user output "sout"
-/// @ test-memory-eu47
-returning potentially illegal user output "sout"
-/// @ test-memory-eu48
-using potentially illegal user reference "{anonymous}"
-/// @ test-memory-ev0
-cannot assign value with access "user" into value with access "var"
-/// @ test-memory-ev1
-assigning into an owner a non-owner access "var"
-/// @ test-memory-ev2
-assigning into non assignable expression
-/// @ test-memory-ev3
-output "s" access should not be "var" for non-primitive type "String"
-/// @ test-memory-ev4
-using invalid reference "self.t"
-/// @ test-memory-ev5
-using invalid reference "self.t"
-/// @ test-memory-ee0
+/// @ test-memory-constructor-e0
 non-conditional reference in type without constructor "Error"
-/// @ test-memory-ee1
+/// @ test-memory-constructor-e1
 constructor did not initialize field "s"
-/// @ test-memory-ee2
+/// @ test-memory-constructor-e2
 using invalid reference "self.s"
-/// @ test-memory-ee3
+/// @ test-memory-constructor-e3
 using invalid reference "self"
-/// @ test-memory-ee4
+/// @ test-memory-constructor-e4
 using invalid reference "self"
-/// @ test-memory-ee5
+/// @ test-memory-constructor-e5
 constructor did not initialize field "s"
-/// @ test-memory-ee6
+/// @ test-memory-constructor-e6
 constructor did not initialize field "s"
-/// @ test-memory-ee7
+/// @ test-memory-constructor-e7
 constructor did not initialize field "s"
-/// @ test-memory-ee8
+/// @ test-memory-constructor-e8
 variable with constructor in type without constructor "Error"
-/// @ test-memory-ee9
+/// @ test-memory-constructor-e9
 constructor did not initialize field "t"
-/// @ test-memory-ee10
+/// @ test-memory-constructor-e10
 constructor did not initialize field "s"
-/// @ test-memory-ec0
+/// @@ test-memory-error
+/// @ test-memory-error-e0
 assigning reference into itself
-/// @ test-memory-ec1
+/// @ test-memory-error-e1
 fields cannot have "user" access
 /// @@ test-c-objects
 /// @ test-c-objects-0
