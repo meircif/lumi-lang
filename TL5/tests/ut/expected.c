@@ -8946,7 +8946,7 @@ struct ut_M_Test {
 };
 void ut_M_Test_Del(ut_M_Test* self);
 void ut_M_fun(ut_M_Test* t);
-void ut_M_use(ut_M_Test* to);
+void ut_M_use(ut_M_Test* t);
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
@@ -8963,13 +8963,16 @@ void ut_M_fun(ut_M_Test* t) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_use(ut_M_Test* to) {
+void ut_M_use(ut_M_Test* t) {
     unsigned LUMI_loop_depth = 1;
-    ut_M_fun(to);
+    ut_M_Test* tc = NULL;
+    ut_M_fun(t);
+    ut_M_fun(t);
+    tc = NULL;
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(to);
-    free(to);
+    ut_M_Test_Del(t);
+    free(t);
 }
 /// @ test-memory-temp-1
 typedef struct ut_M_Test ut_M_Test;
@@ -8997,7 +9000,74 @@ void ut_M_fun(ut_M_Test* to) {
     t->s = NULL;
 LUMI_block0_cleanup:
     (void)0;
-        ut_M_Test_Del(to);
+    ut_M_Test_Del(to);
+    free(to);
+}
+/// @ test-memory-temp-2
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    char* s;
+    int s_Max_length;
+    int* s_Length;
+};
+void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_fun(ut_M_Test* to);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    String_Del(self->s);
+    free(self->s);
+}
+void ut_M_fun(ut_M_Test* to) {
+    unsigned LUMI_loop_depth = 1;
+    ut_M_Test* t3 = NULL;
+    if (to->s != NULL) {
+        ut_M_Test* t1 = NULL;
+        String_Del(to->s);
+        free(to->s);
+        to->s_Max_length = 0;
+        to->s_Length = &Lumi_empty_int;
+        to->s = NULL;
+        t1 = to;
+        String_Del(t1->s);
+        free(t1->s);
+        t1->s_Max_length = 0;
+        t1->s_Length = &Lumi_empty_int;
+        t1->s = NULL;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    else {
+        ut_M_Test* t2 = NULL;
+        String_Del(to->s);
+        free(to->s);
+        to->s_Max_length = 0;
+        to->s_Length = &Lumi_empty_int;
+        to->s = NULL;
+        t2 = to;
+        String_Del(t2->s);
+        free(t2->s);
+        t2->s_Max_length = 0;
+        t2->s_Length = &Lumi_empty_int;
+        t2->s = NULL;
+    LUMI_block3_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+    String_Del(to->s);
+    free(to->s);
+    to->s_Max_length = 0;
+    to->s_Length = &Lumi_empty_int;
+    to->s = NULL;
+    t3 = to;
+    String_Del(t3->s);
+    free(t3->s);
+    t3->s_Max_length = 0;
+    t3->s_Length = &Lumi_empty_int;
+    t3->s = NULL;
+LUMI_block0_cleanup:
+    (void)0;
+    ut_M_Test_Del(to);
     free(to);
 }
 /// @ test-memory-temp-e0
@@ -9006,6 +9076,22 @@ cannot assign value with access "user" into value with access "temp"
 assigning into an owner a non-owner access "temp"
 /// @ test-memory-temp-e2
 output "s" access should not be "temp" for non-primitive type "String"
+/// @ test-memory-temp-e3
+using modified reference "s"
+/// @ test-memory-temp-e4
+using modified reference "s"
+/// @ test-memory-temp-e5
+using modified reference "s"
+/// @ test-memory-temp-e6
+using modified reference "x"
+/// @ test-memory-temp-e7
+using invalid reference "so"
+/// @ test-memory-temp-e8
+using invalid reference "so"
+/// @ test-memory-temp-e9
+cannot assigning temporal into other temporal
+/// @ test-memory-temp-e10
+cannot assigning temporal into other temporal
 /// @@ test-memory-constructor
 /// @ test-memory-constructor-0
 typedef struct ut_M_NoConstructor ut_M_NoConstructor;

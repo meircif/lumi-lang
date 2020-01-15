@@ -3911,14 +3911,32 @@ struct Test
     owner String? s
 func fun(temp Test t)
     t.s := _
-func use(owner Test to)
-    fun(temp to)
+func use(owner Test t)
+    fun(temp t)
+    fun(temp t)
+    temp Test? tc
+    tc := _
 ; @ g test-memory-temp-1
 struct Test
     owner String? s
 func fun(owner Test to)
     temp Test t(temp to)
     t.s := _
+; @ g test-memory-temp-2
+struct Test
+    owner String? s
+func fun(owner Test to)
+    if to.s?
+        to.s := _
+        temp Test t1(temp to)
+        t1.s := _
+    else
+        to.s := _
+        temp Test t2(temp to)
+        t2.s := _
+    to.s := _
+    temp Test t3(temp to)
+    t3.s := _
 ; @ eg test-memory-temp-e0
 func fun(temp String s)
 func error(user String s)
@@ -3929,6 +3947,44 @@ func error(temp String s)
     fun(owner s)
 ; @ eg test-memory-temp-e2
 func error()->(temp String s)
+; @ eg test-memory-temp-e3
+func fun(temp String s1, temp String s2)
+func error(owner String s)
+    fun(temp s, temp s)
+; @ eg test-memory-temp-e4
+func fun(owner String so, temp String st)
+func error(owner String s)
+    fun(owner s, temp s)
+; @ eg test-memory-temp-e5
+func fun(temp String st, owner String so)
+func error(owner String s)
+    fun(temp s, owner s)
+; @ eg test-memory-temp-e6
+struct Sa
+    owner Sb? sb
+struct Sb
+    owner Sa? sa
+func fun(temp Sb sb, temp Sb x)
+    sb.sa := x.sa
+func ! error(owner Sb x)
+    x.sa := Sa()!
+    x.sa!.sb := Sb()!
+    fun(temp x.sa!.sb!, temp x)
+; @ ec test-memory-temp-e7
+temp String? s1(temp so)
+temp String? s2(temp so)
+; @ ec test-memory-temp-e8
+temp String? s(temp so)
+so!.clear()
+; @ ec test-memory-temp-e9
+temp String? s1(temp so)
+temp String? s2(temp s1)
+s1!.clear()
+; @ ec test-memory-temp-e10
+temp String? s
+if true
+    temp String? si(temp so)
+    s := si
 ; @@ test-memory-constructor
 ; @ g test-memory-constructor-0
 struct NoConstructor

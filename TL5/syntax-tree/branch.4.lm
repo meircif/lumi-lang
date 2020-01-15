@@ -140,7 +140,8 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     
     func inst write-cleanup(user TypeData parent-type)
         for variable in self.variables.iter-back()
-            if variable.access != Access.USER
+            if variable.access != Access.USER and
+                    variable.access != Access.TEMP
                 self.write-variable-cleanup(user variable, user parent-type)
     
     func inst write-variable-cleanup(

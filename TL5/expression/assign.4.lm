@@ -34,27 +34,33 @@ class AssignExpression(Expression)
                     user self.target.result-type)
     
     func dynamic check-memory(user ReferenceMemoryList refs)
-        user ReferencePath left-path(
+        user ReferencePath target-path(
                 user self.target.result-type.reference-path)
         if access-is-owner(copy self.target.access)
             refs.mark-illegal-type(user self.target.result-type)
         self.check-operands-memory(user refs)
         refs.check-user(user self.value)
-        if left-path?
-            if not left-path.field?
-                refs.add(user left-path.variable)
+        if target-path?
+            if not target-path.field?
+                refs.add(user target-path.variable)
 
     func inst check-operands-memory(user ReferenceMemoryList refs)
-        var Bool is-move(copy access-is-owner(copy self.target.access))
-        user ReferencePath left-path(
+        user ReferencePath target-path(
                 user self.target.result-type.reference-path)
-        user ReferencePath right-path(
+        user ReferencePath value-path(
                 user self.value.result-type.reference-path)
-        var Bool was-left-invalid(copy refs.is-invalid(user left-path))
-        refs.clear-invalid-reference(user left-path)
-        if is-move
+        var Bool was-left-invalid(copy refs.is-invalid(user target-path))
+        refs.clear-invalid-reference(user target-path)
+        if access-is-owner(copy self.target.access)
             refs.check-writing-memory(user self.value)
-            refs.mark-invalid-reference(user right-path)
+            refs.mark-invalid-reference(user value-path)
+            refs.check-writing-memory(user self.target)
+        else-if self.target.access = Access.TEMP
+            if self.value.access = Access.TEMP
+                self.syntax-error-msg(
+                        user "cannot assigning temporal into other temporal")
+            refs.check-writing-memory(user self.value)
+            refs.mark-block-invalid(user value-path)
             refs.check-writing-memory(user self.target)
         else
             self.value.check-memory(user refs)

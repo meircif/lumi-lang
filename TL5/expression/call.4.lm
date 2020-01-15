@@ -363,6 +363,10 @@ class CallArgument(Argument)
             refs.check-writing-memory(user self.value)
             if not self.is-output
                 refs.mark-invalid-reference(user reference-path)
+        else-if access-is-temp(copy self.value.access) and
+                self.access = Access.TEMP
+            refs.check-writing-memory(user self.value)
+            refs.mark-temp-invalid(user reference-path)
         else
             self.value.check-memory(user refs)
         if not self.is-output

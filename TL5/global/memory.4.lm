@@ -88,6 +88,7 @@ struct ReferenceMemoryList
     var List{ReferencePath} added-invalid-references
     var List{ReferencePath} read-owner-references
     var List{ReferencePath} written-owner-references
+    var List{ReferencePath} temp-invalid-references
     var NameMap{SyntaxTreeVariable} user-references
     var NameMap{SyntaxTreeVariable} removed-user-references
     
@@ -170,6 +171,17 @@ struct ReferenceMemoryList
         self.invalid-references.add(owner reference-path.copy-new())
         self.added-invalid-references.add(owner reference-path.copy-new())
 
+    func mark-block-invalid(user ReferencePath reference-path)
+        if not reference-path?
+            return
+        self.invalid-references.add(owner reference-path.copy-new())
+
+    func mark-temp-invalid(user ReferencePath reference-path)
+        if not reference-path?
+            return
+        self.invalid-references.add(owner reference-path.copy-new())
+        self.temp-invalid-references.add(owner reference-path.copy-new())
+
     func clear-invalid-reference(user ReferencePath reference-path)
         if not reference-path?
             return
@@ -196,6 +208,10 @@ struct ReferenceMemoryList
     func clear-line-checks()
         self.read-owner-references.clear()
         self.written-owner-references.clear()
+        do
+            while not self.temp-invalid-references.is-empty()
+            self.clear-invalid-reference(
+                    user self.temp-invalid-references.pop())
     
     func reference-inside(
             user ReferencePath reference-path, user List{ReferencePath} list)->(
