@@ -29,7 +29,8 @@ compile time.
 Every objects has a single "owner" entity - which is another object or a
 stack block. When an owner is destroyed it automatically destroys the
 referenced object, unless the ownership was moved to another entity. Stack and
-global variables are treated as owners - but they cannot move their ownership
+global variables are treated as owners - but they cannot move their ownership.
+
 This has some similarities to the memory management in
 `Rust <https://doc.rust-lang.org/stable/book/ch04-00-understanding-ownership.html>`_.
 
@@ -39,11 +40,18 @@ its sub-owners. Users are temporary because they cannot be used after any
 object of their type is destroyed, as the compiler cannot guarantee they are
 pointing to a legal object any more.
 
+Owners can "borrow" the reference to a single temporary owner that
+automatically returns the ownership back to the original owner at the end of
+its code block. While borrowing the original owner cannot be used.
+The temporary owner has full control over the reference, except the ability to
+destroy it.
+
 This is :ref:`currently implemented <variables>`, but not fully optimized. In
 the future the syntax may be slightly different and look like this::
 
    owner String some-string(String{16}())  ; new owner reference
    user-func(user some-string)  ; give reference to a user
+   borrowing-func(temp some-string)  ; borrow ownership to a temporary owner
    owning-func(owner some-string)  ; move ownership, cannot be used anymore
 
 .. _memory-management-2:
@@ -69,13 +77,14 @@ future the syntax may be slightly different and look like this::
 
    strong String some-string(String{16}())  ; new strong owner reference
    user-func(user some-string)  ; give reference to a user
+   borrowing-func(temp some-string)  ; borrow ownership to a temporary owner
    weak-func(weak some-string)  ; give weak reference
    owning-func(strong some-string)  ; move ownership
 
 .. note::
    Strong reference counting is currently not supported because it can cause
    memory leaks because of reference loops. It may be allowed in the future in
-   cases where the compiler can be sure no reference loop is possible.
+   cases where the compiler can ensure no reference loop is possible.
 
 .. _memory-management-3:
 

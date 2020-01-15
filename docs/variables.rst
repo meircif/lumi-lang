@@ -73,6 +73,7 @@ memory access keywords:
 
 * ``owner``: simple owner reference
 * ``user``: simple user reference
+* ``temp``: simple temporary owner reference
 * ``strong``: reference counted strong reference
 * ``weak``:  reference counted weak reference
 
@@ -80,6 +81,7 @@ memory access keywords:
 
    owner String string-owner-reference
    user Array{Int} user-reference-with-initialization(user some-int-array)
+   temp String temporary-owner-reference
    strong String string-strong-reference
    weak Array{Int} weak-reference-with-initialization(weak some-int-array)
 
@@ -110,14 +112,14 @@ using the ``?`` operator, to explicitly check for emptiness the ``is`` and
        ; both references reference to the same object, or both are empty
    if first-reference is-not second-reference
        ; both references do not reference to the same object
-   if first-reference?
-       ; first-reference is usable - not empty and not outdated
-   if not first-reference?
-       ; first-reference is not usable - it is empty or outdated
-   if first-reference is _
-       ; first-reference is empty
-   if first-reference is-not _
-       ; first-reference is not empty, but may or may not be outdated
+   if reference?
+       ; reference is usable - not empty and not outdated
+   if not reference?
+       ; reference is not usable - it is empty or outdated
+   if reference is _
+       ; reference is empty
+   if reference is-not _
+       ; reference is not empty, but may or may not be outdated
 
 String and Buffer Literals
 ++++++++++++++++++++++++++
@@ -151,4 +153,4 @@ Dynamic allocation is done by using the type as a function::
    array-strong-reference := Array{34:Int}()!
 
 It's probably a good idea to store the returned object in an ``owner``
-reference, otherwise it will be immediately deleted.
+reference, otherwise it will be deleted in the end of the block.
