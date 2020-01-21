@@ -101,51 +101,19 @@ class SyntaxTreeBranch(SyntaxTreeNode)
         if not is-parsed
             return
         
-        else-if keyword.equal(user "var")
-            self.variables.add(owner SyntaxTreeVariable.parse-new(
-                    user _,
-                    copy Access.VAR,
-                    copy true,
-                    user parent-type,
-                    user parent-block))
-        else-if keyword.equal(user "user")
-            self.variables.add(owner SyntaxTreeVariable.parse-new(
-                    user _,
-                    copy Access.USER,
-                    copy false,
-                    user parent-type,
-                    user parent-block))
-        else-if keyword.equal(user "weak")
-            self.variables.add(owner SyntaxTreeVariable.parse-new(
-                    user _,
-                    copy Access.WEAK,
-                    copy false,
-                    user parent-type,
-                    user parent-block))
-        else-if keyword.equal(user "owner")
-            self.variables.add(owner SyntaxTreeVariable.parse-new(
-                    user _,
-                    copy Access.OWNER,
-                    copy false,
-                    user parent-type,
-                    user parent-block))
-        else-if keyword.equal(user "strong")
-            self.variables.add(owner SyntaxTreeVariable.parse-new(
-                    user _,
-                    copy Access.STRONG,
-                    copy false,
-                    user parent-type,
-                    user parent-block))
-        else-if keyword.equal(user "s-var")
-            self.variables.add(owner SyntaxTreeVariable.parse-new(
-                    user _,
-                    copy Access.S-VAR,
-                    copy true,
-                    user parent-type,
-                    user parent-block))
-            
-        else
-            is-parsed := false
+        for access in Access.length
+            if access = Access.UNDEFINED or access = Access.COPY
+                continue
+            if keyword.equal(user glob.access-names[access])
+                self.variables.add(owner SyntaxTreeVariable.parse-new(
+                        user _,
+                        copy access,
+                        copy access-is-only-var(copy access),
+                        user parent-type,
+                        user parent-block))
+                return
+        
+        is-parsed := false
     
     func dynamic parse-child(user String keyword)
         raise
@@ -172,7 +140,8 @@ class SyntaxTreeBranch(SyntaxTreeNode)
     
     func inst write-cleanup(user TypeData parent-type)
         for variable in self.variables.iter-back()
-            if variable.access != Access.USER
+            if variable.access != Access.USER and
+                    variable.access != Access.TEMP
                 self.write-variable-cleanup(user variable, user parent-type)
     
     func inst write-variable-cleanup(

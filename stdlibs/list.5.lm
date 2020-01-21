@@ -7,22 +7,19 @@ struct List{Generic}
     strong ListNode?{Generic} first
 
     ~~~ Add item to list end ~~~
-    func var ! append(owner Generic item)
-        var List{Generic} list
-        self.rotate-to(var list)!
-        list.prepend(owner item)!
-        list.rotate-to(var self)!
-
-    func var ! rotate-to(var List{Generic} target)
-        loop
-            while self.first?
-            strong ListNode?{Generic} node(strong self.first)
-            self.first := node!.next
-            node!.next := target.first
-            target.first := node
+    func temp ! append(owner Generic item)
+        temp ListNode{Generic} last
+        if-error last := self.first
+            self.prepend(owner item)
+        else
+            loop
+                temp ListNode?{Generic} next(temp last.next)
+                if-error last := next
+                    break
+            last.next := ListNode{Generic}(owner item, strong _)!
 
     ~~~ Add item to list start ~~~
-    func var ! prepend(owner Generic item)
+    func temp ! prepend(owner Generic item)
         new ListNode{Generic} node(owner item, strong self.first)!
         self.first := node!
 
@@ -30,7 +27,7 @@ struct List{Generic}
         empty := not self.first?
 
     ~~~ Get and remove first item, fail if list is empty ~~~
-    func var ! pop()->(owner Generic? item)
+    func temp ! pop()->(owner Generic? item)
         owner ListNode{Generic} first
         if-error first := self.first
             raise "list empty"

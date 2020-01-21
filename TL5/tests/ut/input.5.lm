@@ -217,7 +217,7 @@ var Array{8:String{5}} vsa
 user String s(user vsa[3])
 user Array{String} sa(user vsa[2:4])
 ; @ g test-slice-expression-8
-func ! fun(s-var String s, strong Array{String} sa)
+func ! fun(temp String s, strong Array{String} sa)
     var Char c(copy s[5]!)
     user Array{Char} part(user s[4:2]!)
     user String si(user sa[3]!)
@@ -374,17 +374,17 @@ class Test
 func fun()->(owner Array?{String} astr)
     fun()->(owner astr)
 ; @ g test-call-expression-23
-func ! fun(var String s)
+func ! fun(temp String s)
     var String{12} vars
     s-var String{12} s-vars!
     owner String owners(owner String{12}()!)
     strong String strongs(strong String{12}()!)
     user String users(user s)
-    fun(var s)!
-    fun(var vars)!
-    fun(var s-vars)!
-    fun(var owners)!
-    fun(var strongs)!
+    fun(temp s)!
+    fun(temp vars)!
+    fun(temp s-vars)!
+    fun(temp owners)!
+    fun(temp strongs)!
     s.clear()
 ; @ c test-call-expression-24
 strong String? s
@@ -3387,8 +3387,8 @@ fun0().Error
 i.Error
 ; @ ec test-module-e12
 ut.Error.VALUE
-; @@ test-memory
-; @ g test-memory-o0
+; @@ test-memory-owner
+; @ g test-memory-owner-0
 struct Test
     owner String? s
     owner String str
@@ -3411,13 +3411,173 @@ func ! fun(owner String? s, user Test tu, owner Test to)
     loop
         give()->(owner s)
         while s?
-; @ g test-memory-u0
+; @ eg test-memory-owner-e0
+struct Test
+    owner String s
+    new()
+func ! fun(user Test t)
+    t.s := String{12}()!
+; @ eg test-memory-owner-e1
+struct Aa
+    var Int x
+struct Bb
+    owner Aa? a
+func fun(user Bb b)
+    owner Aa? a(owner b.a)
+; @ eg test-memory-owner-e2
+struct Aa
+    var Int x
+struct Bb
+    owner Aa? a
+func take(owner Aa? a)
+func fun(user Bb b)
+    take(owner b.a)
+; @ eg test-memory-owner-e3
+struct Aa
+    owner String? s
+struct Bb
+    weak Aa? a
+func ! fun(owner Array{Bb} b)
+    b[3]!.a!.s := _
+; @ eg test-memory-owner-e4
+struct Test
+    owner String? s
+func get-user()->(weak Test? t)
+func ! fun()
+    weak Test? t
+    get-user()->(weak t)!.s := _
+; @ eg test-memory-owner-e5
+struct Test
+    owner String? s
+func get-weak()->(weak Test? t)
+func ! fun()
+    get-weak()!.s := _
+; @ eg test-memory-owner-e6
+struct Test
+    owner String s
+    new()
+func fun(owner Test t)->(owner String? s)
+    s := t.s
+; @ eg test-memory-owner-e7
+struct Test
+    owner String s
+    new()
+func fun(owner Test t)
+    owner String s(owner t.s)
+; @ eg test-memory-owner-e8
+struct Test
+    owner String s
+    new()
+func take(owner String s)
+func fun(owner Test t)->(owner String? s)
+    take(owner t.s)
+; @ ec test-memory-owner-e9
+new String{12} s!
+new String{12} sg!
+ostr := sg
+sg := s
+ostr!.clear()
+sg.clear()
+s.clear()
+; @ eg test-memory-owner-e10
+struct Test
+    owner Test? t
+func ! fun()->(owner Test? t, owner Test? x)
+    t := x!.t
+    t := t!.t
+; @ eg test-memory-owner-e11
+struct Test
+    owner Test? t
+func ! fun(owner Test? t)
+    t := t!.t
+; @ eg test-memory-owner-e12
+struct Test
+    owner Test? t
+func ! fun(owner Test? t)
+    t!.t := t
+; @ eg test-memory-owner-e13
+struct Test
+    owner Test? t
+func ! fun(owner Test? t)
+    t!.t!.t := t!.t
+; @ eg test-memory-owner-e14
+struct Test
+    owner String s
+    new()
+func fun(owner Test t, user Test tu, owner String s, user String su)
+    t.s :=: s
+    su.clear()
+    s.clear()
+    t.s.clear()
+    tu.s :=: s
+; @ ec test-memory-owner-e15
+fun8(strong so)
+so!.clear()
+new String{12} s!
+fun8(strong s)
+s.clear()
+; @ ec test-memory-owner-e16
+new Test tgood!
+owner Test tbad
+if b
+    tgood := to!
+tgood.meth()
+if b
+    tbad := to!
+tbad.meth()
+; @ ec test-memory-owner-e17
+new String{12} s!
+repeat 12
+    s.clear()
+    ostr := s
+    if b
+        continue
+    s := String{12}()!
+; @ eg test-memory-owner-e18
+func fun(owner String? s, owner String? s2)
+    fun(owner s, owner s)
+; @ eg test-memory-owner-e19
+func fun()->(owner String? s, owner String? s2)
+    fun()->(owner s, owner s2)
+    fun()->(owner s, owner s)
+; @ eg test-memory-owner-e20
+func fun(owner String? s)->(owner String? s2)
+    fun(owner s)->(owner s)
+; @ eg test-memory-owner-e21
+struct Test
+    var Int x
+func ! fun(owner Test? t)->(var Int x)
+    x := fun(owner t)! + t!.x
+; @ eg test-memory-owner-e22
+struct Test
+    var Int x
+func ! fun(owner Test? t)->(var Int x)
+    x := t!.x + fun(owner t)!
+; @ eg test-memory-owner-e23
+func ! fun(owner String s)->(var Int x)
+    for _ in fun(owner s)!:s.length()
+; @ ec test-memory-owner-e24
+new String{12} s!
+try
+    owner String s2(owner s)
+    if b
+        raise
+    s := s2
+s.clear()
+; @ eg test-memory-owner-e25
+struct Test
+    owner String? s
+func error()
+    var cdef.Pointer{Test} pt
+    pt.get-ref-at(copy 0).s := _
+; @@ test-memory-user
+; @ g test-memory-user-0
 func deleting()->(owner String? s)
     s := _
 func fun(user String s)->(owner String? so)
     s.clear()
     deleting()->(owner so)
-; @ g test-memory-u1
+; @ g test-memory-user-1
 func deleting()->(strong String? s)
     s := _
 func ! fun()
@@ -3425,7 +3585,7 @@ func ! fun()
     user String? s(user so)
     s!.clear()
     deleting()->(strong so)
-; @ g test-memory-u2
+; @ g test-memory-user-2
 func deleting()->(strong String? s)
     s := _
 func ! fun()
@@ -3433,12 +3593,12 @@ func ! fun()
     weak String? s(weak so)
     deleting()->(strong so)
     s!.clear()
-; @ c test-memory-u3
+; @ c test-memory-user-3
 user String? s
 so := _
 s := so
 s!.clear()
-; @ g test-memory-u4
+; @ g test-memory-user-4
 struct Test
     weak String? s
     func user ! get()->(user String? s) _
@@ -3451,12 +3611,12 @@ func ! fun(user Test t)
     s!.clear()
     s := t.get()!
     s!.clear()
-; @ c test-memory-u5
+; @ c test-memory-user-5
 user String? s(user ostr)
 ostr := _
 for s in sarr!
     s!.clear()
-; @ g test-memory-u6
+; @ g test-memory-user-6
 func get()->(user String? s)
     s := _
 func ! fun()
@@ -3464,7 +3624,389 @@ func ! fun()
         user String? s
         while get()->(user s)?
         s!.clear()
-; @ g test-memory-c0
+; @ ec test-memory-user-e0
+user String? s
+so := _
+c := s![2]!
+; @ ec test-memory-user-e1
+user String? s
+user String? s2
+so := _
+s2 := s
+; @ ec test-memory-user-e2
+user String? s
+so := _
+s!.length()->(var i)
+; @ ec test-memory-user-e3
+user String? s
+so := _
+String.clear(user s!)
+; @ ec test-memory-user-e4
+user String? s
+so := _
+b := not (false or s!.length() > 3)
+; @ eg test-memory-user-e5
+func deleting(owner String? s)
+func fun(user String s)
+    deleting(owner _)
+    s.clear()
+; @ eg test-memory-user-e6
+func deleting()->(owner String? s)
+    s := _
+func proxy()
+    deleting()
+func fun(user String s)
+    proxy()
+    s.clear()
+; @ eg test-memory-user-e7
+func deleting()->(owner String? s)
+    proxy()
+    s := _
+func proxy()
+    deleting()
+func fun(user String s)
+    proxy()
+    s.clear()
+; @ eg test-memory-user-e8
+struct Test
+    var Int x
+    func user deleting()->(owner String? s)
+        s := _
+    func user fun(user String s)
+        self.deleting()
+        s.clear()
+; @ eg test-memory-user-e9
+func deleting()->(owner String? s)
+    s := _
+func fun(user String s)
+    deleting()
+    s.clear()
+; @ eg test-memory-user-e10
+func deleting()
+    owner String? s
+func fun(user String s)
+    deleting()
+    s.clear()
+; @ eg test-memory-user-e11
+func deleting()
+    var String{12} s
+func fun(user String s)
+    deleting()
+    s.clear()
+; @ eg test-memory-user-e12
+func deleting()
+    strong String? s
+func fun(user String s)
+    deleting()
+    s.clear()
+; @ ec test-memory-user-e13
+user Array{Char} a(user ostr!)
+ostr := _
+c := a[2]!
+; @ eg test-memory-user-e14
+func ! deleting()
+    var Int x(copy String{12}()!.length())
+func ! fun(user String s)
+    deleting()!
+    s.clear()
+; @ eg test-memory-user-e15
+struct Test
+    owner String? s
+func ! deleting(owner Test? ta, owner Test? tb)
+    ta!.s := tb!.s
+func ! fun(user String s)
+    deleting(owner _, owner _)!
+    s.clear()
+; @ ec test-memory-user-e16
+user Test? tt
+d!.set(owner _)
+tt.meth()
+; @ eg test-memory-user-e17
+struct Base{Atype}
+    var Int x
+    func user fun(owner Atype? a)
+struct Test{Btype}(Base{Btype})
+    func user fun()
+        base(owner _)
+func ! fun(user File f)
+    var Test{File} t
+    t.fun()
+    f.putc(copy 'a')!
+; @ eg test-memory-user-e18
+struct Base
+    var Int x
+struct Test(Base)
+func deleting(owner Base? b)
+func fun(user Test t)
+    deleting(owner _)
+    t.x := 0
+; @ eg test-memory-user-e19
+struct Base
+    var Int x
+struct Test(Base)
+struct Other(Base)
+func deleting(owner Test? t)
+func fun(user Base b, user Other o)
+    deleting(owner _)
+    o.x := 0
+    b.x := 0
+; @ eg test-memory-user-e20
+class Base
+    var Int x
+    func dynamic user fun()
+class Test(Base)
+    func dynamic user fun()
+        owner String? s
+func fun(user String s, user Base b)
+    b.fun()
+    s.clear()
+; @ eg test-memory-user-e21
+class Base
+    var Int x
+    func dynamic user fun()
+class Test{Generic}(Base)
+    func dynamic user fun()
+func fun(user String s, user Base b)
+    b.fun()
+    s.clear()
+; @ eg test-memory-user-e22
+class Base
+    var Int x
+    func dynamic user? fun(owner Base? b)
+        recursive()
+class Test{Generic}(Base)
+    func dynamic user? fun(owner Base? b)
+func recursive()
+    Base.fun(user _, owner _)
+func fun(user String s)
+    recursive()
+    s.clear()
+; @ ec test-memory-user-e23
+user String? s
+t!.fun!()
+s!.clear()
+; @ eg test-memory-user-e24
+func ! deleting(copy Func?{()} f)
+    f!()
+func ! fun(user String s)
+    deleting(copy _)!
+    s.clear()
+; @ eg test-memory-user-e25
+func fun()->(user String? s)
+; @ eg test-memory-user-e26
+func deleting()
+    owner String? s
+func fun()->(user String? s)
+    s := _
+    deleting()
+; @ eg test-memory-user-e27
+func fun(owner String so)->(user String? s)
+    s := _
+; @ eg test-memory-user-e28
+func fun()->(user String? s)
+    owner String? so
+    s := _
+; @ eg test-memory-user-e29
+struct Test
+    owner String? s
+func fun(owner Test? t, user String s)
+    t := _
+    s.clear()
+; @ eg test-memory-user-e30
+struct Other
+    owner String? s
+struct Test
+    owner Other? o
+func fun(owner Test? t, user String s)
+    t := _
+    s.clear()
+; @ eg test-memory-user-e31
+struct Base
+    owner String? s
+struct Test(Base)
+struct Other(Base)
+    owner File? f
+func ! fun(owner Test? t, user String s, user File f)
+    t := _
+    f.putc(copy 'a')!
+    s.clear()
+; @ eg test-memory-user-e32
+struct Base
+    var Int x
+struct Test(Base)
+    owner String? s
+func fun(owner Base? b, user String s)
+    b := _
+    s.clear()
+; @ eg test-memory-user-e33
+struct Test{Generic}
+    owner Generic? x
+func ! fun(owner Test?{File} t, user File f)
+    t := _
+    f.putc(copy 'a')!
+; @ eg test-memory-user-e34
+struct Base{Generic}
+    owner Generic? x
+struct Test{Data}(Base{Data})
+func ! fun(owner Test?{File} t, user File f)
+    t := _
+    f.putc(copy 'a')!
+; @ eg test-memory-user-e35
+main
+    owner String? so(owner String{12}()!)
+    user String? su(user so)
+    so := _
+    su!.clear()
+; @ ec test-memory-user-e36
+assert! str?
+; @ ec test-memory-user-e37
+assert-error! str.clear()
+; @ ec test-memory-user-e38
+if str?
+; @ ec test-memory-user-e39
+for _ in str!.length():2
+; @ ec test-memory-user-e40
+for _ in 2:str!.length()
+; @ ec test-memory-user-e41
+for _ in str!
+; @ ec test-memory-user-e42
+if b
+    str!.clear()
+; @ ec test-memory-user-e43
+if false
+    str := ostr
+str!.clear()
+; @ ec test-memory-user-e44
+str := ostr
+repeat 12
+    str!.clear()
+    ostr := _
+    if b
+        continue
+    str := ostr
+; @ ec test-memory-user-e45
+str := ostr
+try
+    ostr := _
+    if b
+        raise
+    str := ostr
+str!.clear()
+; @ eg test-memory-user-e46
+func fun(user String sin)->(user String? sout)
+    if false
+        sout := sin
+; @ eg test-memory-user-e47
+func fun(user String sin)->(user String? sout)
+    if true
+        return
+    sout := sin
+; @ ec test-memory-user-e48
+str := ostr
+for n in str!
+    ostr := _
+; @@ test-memory-temp
+; @ g test-memory-temp-0
+struct Test
+    owner String? s
+func fun(temp Test t)
+    t.s := _
+func use(owner Test t)
+    fun(temp t)
+    fun(temp t)
+    temp Test tt(temp t)
+    fun(temp tt)
+    fun(temp tt)
+    temp Test? tc
+    tc := _
+; @ g test-memory-temp-1
+struct Test
+    owner String? s
+func fun(owner Test to)
+    temp Test t(temp to)
+    t.s := _
+; @ g test-memory-temp-2
+struct Test
+    owner String? s
+func fun(owner Test to, owner String s, owner String s2)
+    temp String so(temp s)
+    temp String so2(temp s2)
+    if to.s?
+        to.s := _
+        temp Test t1(temp to)
+        t1.s := _
+        so.clear()
+        so2 := so
+        so2.clear()
+        temp String si(temp so2)
+    else
+        to.s := _
+        temp Test t2(temp to)
+        t2.s := _
+        so.clear()
+        temp String si(temp so)
+        so2 := si
+        so2.clear()
+    to.s := _
+    temp Test t3(temp to)
+    t3.s := _
+    so.clear()
+; @ eg test-memory-temp-e0
+func fun(temp String s)
+func error(user String s)
+    fun(temp s)
+; @ eg test-memory-temp-e1
+func fun(owner String s)
+func error(temp String s)
+    fun(owner s)
+; @ eg test-memory-temp-e2
+func error()->(temp String s)
+; @ eg test-memory-temp-e3
+func fun(temp String s1, temp String s2)
+func error(owner String s)
+    fun(temp s, temp s)
+; @ eg test-memory-temp-e4
+func fun(owner String so, temp String st)
+func error(owner String s)
+    fun(owner s, temp s)
+; @ eg test-memory-temp-e5
+func fun(temp String st, owner String so)
+func error(owner String s)
+    fun(temp s, owner s)
+; @ eg test-memory-temp-e6
+struct Sa
+    owner Sb? sb
+struct Sb
+    owner Sa? sa
+func fun(temp Sb sb, temp Sb x)
+    sb.sa := x.sa
+func ! error(owner Sb x)
+    x.sa := Sa()!
+    x.sa!.sb := Sb()!
+    fun(temp x.sa!.sb!, temp x)
+; @ ec test-memory-temp-e7
+temp String? s1(temp so)
+temp String? s2(temp so)
+; @ ec test-memory-temp-e8
+temp String? s(temp so)
+so!.clear()
+; @ ec test-memory-temp-e9
+temp String? s1(temp so)
+temp String? s2(temp s1)
+s1!.clear()
+; @ ec test-memory-temp-e10
+temp String? s
+if true
+    s := so
+s!.clear()
+; @ ec test-memory-temp-e11
+temp String? s
+if true
+    temp String? si(temp so)
+    s := si
+s!.clear()
+; @@ test-memory-constructor
+; @ g test-memory-constructor-0
 struct NoConstructor
     var String{12} s
 struct HasConstructor
@@ -3483,7 +4025,7 @@ struct Test
         self.vhc.s.clear()
         self.svhc.new()!
         self.svhc.s.clear()
-; @ g test-memory-c1
+; @ g test-memory-constructor-1
 func fun1()
 func fun2(copy Func{()} f)
 struct Base
@@ -3500,471 +4042,76 @@ struct Test(Mid)
         fun2(copy fun1)
         self.b!.new()!
         base()!
-; @ g test-memory-b0
-struct Test
-    owner String? s
-func fun(var Test t)
-    t.s := _
-func use(owner Test to)
-    fun(var to)
-; @ c test-memory-b1
-weak String s
-s := so!
-s!.clear()
-; @ eg test-memory-eo0
-struct Test
+; @ eg test-memory-constructor-e0
+struct Error
+    weak String s
+; @ eg test-memory-constructor-e1
+struct Error
     owner String s
     new()
-func ! fun(user Test t)
-    t.s := String{12}()!
-; @ eg test-memory-eo1
-struct Aa
-    var Int x
-struct Bb
-    owner Aa? a
-func fun(user Bb b)
-    owner Aa? a(owner b.a)
-; @ eg test-memory-eo2
-struct Aa
-    var Int x
-struct Bb
-    owner Aa? a
-func take(owner Aa? a)
-func fun(user Bb b)
-    take(owner b.a)
-; @ eg test-memory-eo3
-struct Aa
-    owner String? s
-struct Bb
-    weak Aa? a
-func ! fun(owner Array{Bb} b)
-    b[3]!.a!.s := _
-; @ eg test-memory-eo4
-struct Test
-    owner String? s
-func get-user()->(weak Test? t)
-func ! fun()
-    weak Test? t
-    get-user()->(weak t)!.s := _
-; @ eg test-memory-eo5
-struct Test
-    owner String? s
-func get-weak()->(weak Test? t)
-func ! fun()
-    get-weak()!.s := _
-; @ eg test-memory-eo6
-struct Test
+; @ eg test-memory-constructor-e2
+struct Error
+    weak String s
+    new!(strong String s)
+        self.s!.clear()
+        self.s := s
+; @ eg test-memory-constructor-e3
+struct Error
     owner String s
-    new()
-func fun(owner Test t)->(owner String? s)
-    s := t.s
-; @ eg test-memory-eo7
-struct Test
-    owner String s
-    new()
-func fun(owner Test t)
-    owner String s(owner t.s)
-; @ eg test-memory-eo8
-struct Test
-    owner String s
-    new()
-func take(owner String s)
-func fun(owner Test t)->(owner String? s)
-    take(owner t.s)
-; @ ec test-memory-eo9
-new String{12} s!
-new String{12} sg!
-ostr := sg
-sg := s
-ostr!.clear()
-sg.clear()
-s.clear()
-; @ eg test-memory-eo10
-struct Test
-    owner Test? t
-func ! fun()->(owner Test? t, owner Test? x)
-    t := x!.t
-    t := t!.t
-; @ eg test-memory-eo11
-struct Test
-    owner Test? t
-func ! fun(owner Test? t)
-    t := t!.t
-; @ eg test-memory-eo12
-struct Test
-    owner Test? t
-func ! fun(owner Test? t)
-    t!.t := t
-; @ eg test-memory-eo13
-struct Test
-    owner Test? t
-func ! fun(owner Test? t)
-    t!.t!.t := t!.t
-; @ eg test-memory-eo14
-struct Test
-    owner String s
-    new()
-func fun(owner Test t, user Test tu, owner String s, user String su)
-    t.s :=: s
-    su.clear()
-    s.clear()
-    t.s.clear()
-    tu.s :=: s
-; @ ec test-memory-eo15
-fun8(strong so)
-so!.clear()
-new String{12} s!
-fun8(strong s)
-s.clear()
-; @ ec test-memory-eo16
-new Test tgood!
-owner Test tbad
-if b
-    tgood := to!
-tgood.meth()
-if b
-    tbad := to!
-tbad.meth()
-; @ ec test-memory-eo17
-new String{12} s!
-repeat 12
-    s.clear()
-    ostr := s
-    if b
-        continue
-    s := String{12}()!
-; @ eg test-memory-eo18
-func fun(owner String? s, owner String? s2)
-    fun(owner s, owner s)
-; @ eg test-memory-eo19
-func fun()->(owner String? s, owner String? s2)
-    fun()->(owner s, owner s2)
-    fun()->(owner s, owner s)
-; @ eg test-memory-eo20
-func fun(owner String? s)->(owner String? s2)
-    fun(owner s)->(owner s)
-; @ eg test-memory-eo21
-struct Test
-    var Int x
-func ! fun(owner Test? t)->(var Int x)
-    x := fun(owner t)! + t!.x
-; @ eg test-memory-eo22
-struct Test
-    var Int x
-func ! fun(owner Test? t)->(var Int x)
-    x := t!.x + fun(owner t)!
-; @ eg test-memory-eo23
-func ! fun(owner String s)->(var Int x)
-    for _ in fun(owner s)!:s.length()
-; @ ec test-memory-eo24
-new String{12} s!
-try
-    owner String s2(owner s)
-    if b
-        raise
-    s := s2
-s.clear()
-; @ eg test-memory-eo25
-struct Test
-    owner String? s
-func error()
-    var cdef.Pointer{Test} pt
-    pt.get-ref-at(copy 0).s := _
-; @ ec test-memory-eu0
-user String? s
-so := _
-c := s![2]!
-; @ ec test-memory-eu1
-user String? s
-user String? s2
-so := _
-s2 := s
-; @ ec test-memory-eu2
-user String? s
-so := _
-s!.length()->(var i)
-; @ ec test-memory-eu3
-user String? s
-so := _
-String.clear(user s!)
-; @ ec test-memory-eu4
-user String? s
-so := _
-b := not (false or s!.length() > 3)
-; @ eg test-memory-eu5
-func deleting(owner String? s)
-func fun(user String s)
-    deleting(owner _)
-    s.clear()
-; @ eg test-memory-eu6
-func deleting()->(owner String? s)
-    s := _
-func proxy()
-    deleting()
-func fun(user String s)
-    proxy()
-    s.clear()
-; @ eg test-memory-eu7
-func deleting()->(owner String? s)
-    proxy()
-    s := _
-func proxy()
-    deleting()
-func fun(user String s)
-    proxy()
-    s.clear()
-; @ eg test-memory-eu8
-struct Test
-    var Int x
-    func user deleting()->(owner String? s)
-        s := _
-    func user fun(user String s)
-        self.deleting()
-        s.clear()
-; @ eg test-memory-eu9
-func deleting()->(owner String? s)
-    s := _
-func fun(user String s)
-    deleting()
-    s.clear()
-; @ eg test-memory-eu10
-func deleting()
-    owner String? s
-func fun(user String s)
-    deleting()
-    s.clear()
-; @ eg test-memory-eu11
-func deleting()
-    var String{12} s
-func fun(user String s)
-    deleting()
-    s.clear()
-; @ eg test-memory-eu12
-func deleting()
-    strong String? s
-func fun(user String s)
-    deleting()
-    s.clear()
-; @ ec test-memory-eu13
-user Array{Char} a(user ostr!)
-ostr := _
-c := a[2]!
-; @ eg test-memory-eu14
-func ! deleting()
-    var Int x(copy String{12}()!.length())
-func ! fun(user String s)
-    deleting()!
-    s.clear()
-; @ eg test-memory-eu15
-struct Test
-    owner String? s
-func ! deleting(owner Test? ta, owner Test? tb)
-    ta!.s := tb!.s
-func ! fun(user String s)
-    deleting(owner _, owner _)!
-    s.clear()
-; @ ec test-memory-eu16
-user Test? tt
-d!.set(owner _)
-tt.meth()
-; @ eg test-memory-eu17
-struct Base{Atype}
-    var Int x
-    func user fun(owner Atype? a)
-struct Test{Btype}(Base{Btype})
+    new!()
+        self.fun()
+        self.s := String{12}()!
     func user fun()
-        base(owner _)
-func ! fun(user File f)
-    var Test{File} t
-    t.fun()
-    f.putc(copy 'a')!
-; @ eg test-memory-eu18
-struct Base
-    var Int x
-struct Test(Base)
-func deleting(owner Base? b)
-func fun(user Test t)
-    deleting(owner _)
-    t.x := 0
-; @ eg test-memory-eu19
-struct Base
-    var Int x
-struct Test(Base)
-struct Other(Base)
-func deleting(owner Test? t)
-func fun(user Base b, user Other o)
-    deleting(owner _)
-    o.x := 0
-    b.x := 0
-; @ eg test-memory-eu20
-class Base
-    var Int x
-    func dynamic user fun()
-class Test(Base)
-    func dynamic user fun()
-        owner String? s
-func fun(user String s, user Base b)
-    b.fun()
-    s.clear()
-; @ eg test-memory-eu21
-class Base
-    var Int x
-    func dynamic user fun()
-class Test{Generic}(Base)
-    func dynamic user fun()
-func fun(user String s, user Base b)
-    b.fun()
-    s.clear()
-; @ eg test-memory-eu22
-class Base
-    var Int x
-    func dynamic user? fun(owner Base? b)
-        recursive()
-class Test{Generic}(Base)
-    func dynamic user? fun(owner Base? b)
-func recursive()
-    Base.fun(user _, owner _)
-func fun(user String s)
-    recursive()
-    s.clear()
-; @ ec test-memory-eu23
-user String? s
-t!.fun!()
-s!.clear()
-; @ eg test-memory-eu24
-func ! deleting(copy Func?{()} f)
-    f!()
-func ! fun(user String s)
-    deleting(copy _)!
-    s.clear()
-; @ eg test-memory-eu25
-func fun()->(user String? s)
-; @ eg test-memory-eu26
-func deleting()
-    owner String? s
-func fun()->(user String? s)
-    s := _
-    deleting()
-; @ eg test-memory-eu27
-func fun(owner String so)->(user String? s)
-    s := _
-; @ eg test-memory-eu28
-func fun()->(user String? s)
-    owner String? so
-    s := _
-; @ eg test-memory-eu29
+        self.s.clear()
+; @ eg test-memory-constructor-e4
+struct Error
+    owner String s
+    new!()
+        error(user self)
+        self.s := String{12}()!
+func error(user Error e)
+    e.s.clear()
+; @ eg test-memory-constructor-e5
+struct Error
+    owner String s
+    new!()
+        if false
+            self.s := String{12}()!
+; @ eg test-memory-constructor-e6
+struct Error
+    owner String s
+    new() _
+func Error.new()
+; @ eg test-memory-constructor-e7
+struct Error
+    owner String s
+    new!()
+        if true
+            return
+        self.s := String{12}()!
+; @ eg test-memory-constructor-e8
 struct Test
-    owner String? s
-func fun(owner Test? t, user String s)
-    t := _
-    s.clear()
-; @ eg test-memory-eu30
-struct Other
-    owner String? s
+    owner String s
+    new!()
+        self.s := String{12}()!
+struct Error
+    var Test t
+; @ eg test-memory-constructor-e9
 struct Test
-    owner Other? o
-func fun(owner Test? t, user String s)
-    t := _
-    s.clear()
-; @ eg test-memory-eu31
+    owner String s
+    new!()
+        self.s := String{12}()!
+struct Error
+    var Test t
+    new()
+; @ eg test-memory-constructor-e10
 struct Base
-    owner String? s
+    owner String s
+    new!()
+        self.s := String{12}()!
 struct Test(Base)
-struct Other(Base)
-    owner File? f
-func ! fun(owner Test? t, user String s, user File f)
-    t := _
-    f.putc(copy 'a')!
-    s.clear()
-; @ eg test-memory-eu32
-struct Base
-    var Int x
-struct Test(Base)
-    owner String? s
-func fun(owner Base? b, user String s)
-    b := _
-    s.clear()
-; @ eg test-memory-eu33
-struct Test{Generic}
-    owner Generic? x
-func ! fun(owner Test?{File} t, user File f)
-    t := _
-    f.putc(copy 'a')!
-; @ eg test-memory-eu34
-struct Base{Generic}
-    owner Generic? x
-struct Test{Data}(Base{Data})
-func ! fun(owner Test?{File} t, user File f)
-    t := _
-    f.putc(copy 'a')!
-; @ eg test-memory-eu35
-main
-    owner String? so(owner String{12}()!)
-    user String? su(user so)
-    so := _
-    su!.clear()
-; @ ec test-memory-eu36
-assert! str?
-; @ ec test-memory-eu37
-assert-error! str.clear()
-; @ ec test-memory-eu38
-if str?
-; @ ec test-memory-eu39
-for _ in str!.length():2
-; @ ec test-memory-eu40
-for _ in 2:str!.length()
-; @ ec test-memory-eu41
-for _ in str!
-; @ ec test-memory-eu42
-if b
-    str!.clear()
-; @ ec test-memory-eu43
-if false
-    str := ostr
-str!.clear()
-; @ ec test-memory-eu44
-str := ostr
-repeat 12
-    str!.clear()
-    ostr := _
-    if b
-        continue
-    str := ostr
-; @ ec test-memory-eu45
-str := ostr
-try
-    ostr := _
-    if b
-        raise
-    str := ostr
-str!.clear()
-; @ eg test-memory-eu46
-func fun(user String sin)->(user String? sout)
-    if false
-        sout := sin
-; @ eg test-memory-eu47
-func fun(user String sin)->(user String? sout)
-    if true
-        return
-    sout := sin
-; @ ec test-memory-eu48
-str := ostr
-for n in str!
-    ostr := _
-; @ eg test-memory-ev0
-func fun(var String s)
-func error(user String s)
-    fun(var s)
-; @ eg test-memory-ev1
-func fun(owner String s)
-func error(var String s)
-    fun(owner s)
-; @ eg test-memory-ev2
-func error(var String a, owner String b)
-    a := b
-; @ eg test-memory-ev3
-func error()->(var String s)
-; @ eg test-memory-ev4
+    new()
+; @ eg test-memory-constructor-e11
 struct Test
     owner String s
     new!()
@@ -3973,7 +4120,7 @@ struct Error
     var Test t
     new!()
         self.t.s.clear()!
-; @ eg test-memory-ev5
+; @ eg test-memory-constructor-e12
 struct Test
     owner String s
     new!()
@@ -3984,80 +4131,19 @@ struct Error
         if false
             self.t.new()!
         self.t.s.clear()!
-; @ eg test-memory-ee0
-struct Error
-    weak String s
-; @ eg test-memory-ee1
-struct Error
-    owner String s
-    new()
-; @ eg test-memory-ee2
-struct Error
-    weak String s
-    new!(strong String s)
-        self.s!.clear()
-        self.s := s
-; @ eg test-memory-ee3
-struct Error
-    owner String s
-    new!()
-        self.fun()
-        self.s := String{12}()!
-    func user fun()
-        self.s.clear()
-; @ eg test-memory-ee4
-struct Error
-    owner String s
-    new!()
-        error(user self)
-        self.s := String{12}()!
-func error(user Error e)
-    e.s.clear()
-; @ eg test-memory-ee5
-struct Error
-    owner String s
-    new!()
-        if false
-            self.s := String{12}()!
-; @ eg test-memory-ee6
-struct Error
-    owner String s
-    new() _
-func Error.new()
-; @ eg test-memory-ee7
-struct Error
-    owner String s
-    new!()
-        if true
-            return
-        self.s := String{12}()!
-; @ eg test-memory-ee8
-struct Test
-    owner String s
-    new!()
-        self.s := String{12}()!
-struct Error
-    var Test t
-; @ eg test-memory-ee9
-struct Test
-    owner String s
-    new!()
-        self.s := String{12}()!
-struct Error
-    var Test t
-    new()
-; @ eg test-memory-ee10
-struct Base
-    owner String s
-    new!()
-        self.s := String{12}()!
-struct Test(Base)
-    new()
-; @ ec test-memory-ec0
+; @@ test-memory-error
+; @ ec test-memory-error-e0
 str := str
-; @ eg test-memory-ec1
+; @ eg test-memory-error-e1
 struct Error
-    user String s
+    user String? s
+; @ eg test-memory-error-e2
+struct Error
+    temp String? s
+; @ eg test-memory-error-e3
+func error(var String s)
+; @ eg test-memory-error-e4
+func error()->(var String s)
 ; @@ test-c-objects
 ; @ c test-c-objects-0
 var cdef.Char c-char

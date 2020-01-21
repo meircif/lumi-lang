@@ -631,12 +631,12 @@ func ! test-complex-field()
     sys.println(user "")!
 
 
-func ! set-borrow(var TestStruct t)
+func ! set-temp(temp TestStruct t)
     t.ts := TestStruct(copy 2, user _)!
 
-func ! test-borrow()
+func ! test-temp()
     var TestStruct t(copy 1, user _)!
-    set-borrow(var t)!
+    set-temp(temp t)!
     assert! t.ts!.num = 2
 
 func ! test-switch()
@@ -653,5 +653,5 @@ main
     test-error-handling(user _)!
     test-for-each()!
     test-complex-field()!
-    test-borrow()!
+    test-temp()!
     test-switch()!

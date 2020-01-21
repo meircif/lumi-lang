@@ -276,7 +276,7 @@ struct TypeInstance
                     node.syntax-error-ref(
                             user "cannot move non-conditional owner field",
                             user self.reference-path)
-        if (access-is-only-var(copy target-access) and
+        if (not access-is-user(copy target-access) and
                 access-is-user(copy self-access)) or
                 (target-access = Access.S-VAR and self-access = Access.VAR)
             assert node?

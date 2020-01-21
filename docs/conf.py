@@ -99,8 +99,8 @@ class LumiLexer(RegexLexer):
              r's-var|strong|weak|shared|static|dynamic|global|implement|'
              'if-ok|if-error|else-if-ok|else-if-error)[ \n]',
              token.Keyword),
-            (r'\b(copy|user|owner|var|s-var|strong|weak|shared|func|static|'
-             r'dynamic|for|in) ', token.Keyword),
+            (r'\b(copy|user|temp|owner|var|s-var|strong|weak|shared|func|'
+             r'static|dynamic|for|in) ', token.Keyword),
             (r'(?:true|false|self|base|sys)-[a-z0-9\-]*', token.Name.Variable),
             (r'_|true|false|self|base|sys', token.Name.Builtin.Pseudo),
             (r'[A-Z][A-Z0-9\-]+', token.Name.Constant),
