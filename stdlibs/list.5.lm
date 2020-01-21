@@ -8,18 +8,15 @@ struct List{Generic}
 
     ~~~ Add item to list end ~~~
     func temp ! append(owner Generic item)
-        var List{Generic} list
-        self.rotate-to(temp list)!
-        list.prepend(owner item)!
-        list.rotate-to(temp self)!
-
-    func temp ! rotate-to(temp List{Generic} target)
-        loop
-            while self.first?
-            strong ListNode?{Generic} node(strong self.first)
-            self.first := node!.next
-            node!.next := target.first
-            target.first := node
+        temp ListNode{Generic} last
+        if-error last := self.first
+            self.prepend(owner item)
+        else
+            loop
+                temp ListNode?{Generic} next(temp last.next)
+                if-error last := next
+                    break
+            last.next := ListNode{Generic}(owner item, strong _)!
 
     ~~~ Add item to list start ~~~
     func temp ! prepend(owner Generic item)

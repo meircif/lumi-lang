@@ -3914,6 +3914,9 @@ func fun(temp Test t)
 func use(owner Test t)
     fun(temp t)
     fun(temp t)
+    temp Test tt(temp t)
+    fun(temp tt)
+    fun(temp tt)
     temp Test? tc
     tc := _
 ; @ g test-memory-temp-1
@@ -3925,18 +3928,29 @@ func fun(owner Test to)
 ; @ g test-memory-temp-2
 struct Test
     owner String? s
-func fun(owner Test to)
+func fun(owner Test to, owner String s, owner String s2)
+    temp String so(temp s)
+    temp String so2(temp s2)
     if to.s?
         to.s := _
         temp Test t1(temp to)
         t1.s := _
+        so.clear()
+        so2 := so
+        so2.clear()
+        temp String si(temp so2)
     else
         to.s := _
         temp Test t2(temp to)
         t2.s := _
+        so.clear()
+        temp String si(temp so)
+        so2 := si
+        so2.clear()
     to.s := _
     temp Test t3(temp to)
     t3.s := _
+    so.clear()
 ; @ eg test-memory-temp-e0
 func fun(temp String s)
 func error(user String s)
@@ -3983,8 +3997,14 @@ s1!.clear()
 ; @ ec test-memory-temp-e10
 temp String? s
 if true
+    s := so
+s!.clear()
+; @ ec test-memory-temp-e11
+temp String? s
+if true
     temp String? si(temp so)
     s := si
+s!.clear()
 ; @@ test-memory-constructor
 ; @ g test-memory-constructor-0
 struct NoConstructor

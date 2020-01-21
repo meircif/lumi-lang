@@ -121,6 +121,7 @@ class InitExpression(ModuleTypeExpression)
         self-param.access := access
         self-param.code-node := self.code-node
         self.aux-variable.copy-new()->(owner self-param.value)
+        self-param.value.result-type.reference-path := _
         self.arguments.parameters.prepend(owner self-param)
         self.arguments.check-calling(
                 user self.constructor.arguments,

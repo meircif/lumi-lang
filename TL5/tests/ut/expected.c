@@ -8965,9 +8965,13 @@ LUMI_block0_cleanup:
 }
 void ut_M_use(ut_M_Test* t) {
     unsigned LUMI_loop_depth = 1;
+    ut_M_Test* tt = NULL;
     ut_M_Test* tc = NULL;
     ut_M_fun(t);
     ut_M_fun(t);
+    tt = t;
+    ut_M_fun(tt);
+    ut_M_fun(tt);
     tc = NULL;
 LUMI_block0_cleanup:
     (void)0;
@@ -9011,18 +9015,33 @@ struct ut_M_Test {
     int* s_Length;
 };
 void ut_M_Test_Del(ut_M_Test* self);
-void ut_M_fun(ut_M_Test* to);
+void ut_M_fun(ut_M_Test* to, char* s, int s_Max_length, int* s_Length, char* s2, int s2_Max_length, int* s2_Length);
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
     String_Del(self->s);
     free(self->s);
 }
-void ut_M_fun(ut_M_Test* to) {
+void ut_M_fun(ut_M_Test* to, char* s, int s_Max_length, int* s_Length, char* s2, int s2_Max_length, int* s2_Length) {
     unsigned LUMI_loop_depth = 1;
+    char* so = NULL;
+    int so_Max_length = 0;
+    int* so_Length = &Lumi_empty_int;
+    char* so2 = NULL;
+    int so2_Max_length = 0;
+    int* so2_Length = &Lumi_empty_int;
     ut_M_Test* t3 = NULL;
+    so_Max_length = s_Max_length;
+    so_Length = s_Length;
+    so = s;
+    so2_Max_length = s2_Max_length;
+    so2_Length = s2_Length;
+    so2 = s2;
     if (to->s != NULL) {
         ut_M_Test* t1 = NULL;
+        char* si = NULL;
+        int si_Max_length = 0;
+        int* si_Length = &Lumi_empty_int;
         String_Del(to->s);
         free(to->s);
         to->s_Max_length = 0;
@@ -9034,11 +9053,22 @@ void ut_M_fun(ut_M_Test* to) {
         t1->s_Max_length = 0;
         t1->s_Length = &Lumi_empty_int;
         t1->s = NULL;
+        String_clear(so, so_Max_length, so_Length);
+        so2_Max_length = so_Max_length;
+        so2_Length = so_Length;
+        so2 = so;
+        String_clear(so2, so2_Max_length, so2_Length);
+        si_Max_length = so2_Max_length;
+        si_Length = so2_Length;
+        si = so2;
     LUMI_block1_cleanup:
         (void)0;
     }
     else {
         ut_M_Test* t2 = NULL;
+        char* si = NULL;
+        int si_Max_length = 0;
+        int* si_Length = &Lumi_empty_int;
         String_Del(to->s);
         free(to->s);
         to->s_Max_length = 0;
@@ -9050,6 +9080,14 @@ void ut_M_fun(ut_M_Test* to) {
         t2->s_Max_length = 0;
         t2->s_Length = &Lumi_empty_int;
         t2->s = NULL;
+        String_clear(so, so_Max_length, so_Length);
+        si_Max_length = so_Max_length;
+        si_Length = so_Length;
+        si = so;
+        so2_Max_length = si_Max_length;
+        so2_Length = si_Length;
+        so2 = si;
+        String_clear(so2, so2_Max_length, so2_Length);
     LUMI_block3_cleanup:
         (void)0;
     }
@@ -9065,8 +9103,13 @@ void ut_M_fun(ut_M_Test* to) {
     t3->s_Max_length = 0;
     t3->s_Length = &Lumi_empty_int;
     t3->s = NULL;
+    String_clear(so, so_Max_length, so_Length);
 LUMI_block0_cleanup:
     (void)0;
+    String_Del(s2);
+    free(s2);
+    String_Del(s);
+    free(s);
     ut_M_Test_Del(to);
     free(to);
 }
@@ -9089,9 +9132,11 @@ using invalid reference "so"
 /// @ test-memory-temp-e8
 using invalid reference "so"
 /// @ test-memory-temp-e9
-cannot assigning temporal into other temporal
+using invalid reference "s1"
 /// @ test-memory-temp-e10
-cannot assigning temporal into other temporal
+using invalid reference "s"
+/// @ test-memory-temp-e11
+using invalid reference "s"
 /// @@ test-memory-constructor
 /// @ test-memory-constructor-0
 typedef struct ut_M_NoConstructor ut_M_NoConstructor;

@@ -165,7 +165,8 @@ struct ReferenceMemoryList
     func mark-invalid-reference(user ReferencePath reference-path)
         if not reference-path?
             return
-        if reference-path.is-conditional()
+        if reference-path.is-conditional() and
+                not reference-path.variable.access = Access.TEMP
             return
         self.clear-invalid-reference(user reference-path)
         self.invalid-references.add(owner reference-path.copy-new())

@@ -1047,8 +1047,10 @@ struct Global
         self.global-module.type-map.find(user name)->(user type-data)
 
     func find-variable(user String name)->(user SyntaxTreeVariable variable)
-        if self.current-module.variable-map.find(user name)->(user variable)?
-            return
+        if self.current-module?
+            if self.current-module.variable-map.find(user name)->(
+                    user variable)?
+                return
         self.global-module.variable-map.find(user name)->(user variable)
 
     func find-function(user String name)->(user SyntaxTreeFunction function)

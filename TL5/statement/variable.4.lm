@@ -431,6 +431,8 @@ class VariableInit(VariableCreate)
         self.expression-init.aux-variable.access := self.variable.access
         self.expression-init.aux-variable.is-var := self.variable.is-create and
                 access-is-only-var(copy self.variable.access)
+        self.expression-init.aux-variable.result-type.reference-path :=
+                ReferencePath(user self.variable)
             
     func inst check-error-mark()
         if glob.last-char = '!'

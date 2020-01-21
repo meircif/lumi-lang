@@ -50,15 +50,14 @@ class AssignExpression(Expression)
         user ReferencePath value-path(
                 user self.value.result-type.reference-path)
         var Bool was-left-invalid(copy refs.is-invalid(user target-path))
+        if self.target.access = Access.TEMP
+            refs.mark-invalid-reference(user target-path)
         refs.clear-invalid-reference(user target-path)
         if access-is-owner(copy self.target.access)
             refs.check-writing-memory(user self.value)
             refs.mark-invalid-reference(user value-path)
             refs.check-writing-memory(user self.target)
         else-if self.target.access = Access.TEMP
-            if self.value.access = Access.TEMP
-                self.syntax-error-msg(
-                        user "cannot assigning temporal into other temporal")
             refs.check-writing-memory(user self.value)
             refs.mark-block-invalid(user value-path)
             refs.check-writing-memory(user self.target)
