@@ -172,10 +172,10 @@ struct ReferenceMemoryList
         self.invalid-references.add(owner reference-path.copy-new())
         self.added-invalid-references.add(owner reference-path.copy-new())
 
-    func mark-block-invalid(user ReferencePath reference-path)
-        if not reference-path?
-            return
-        self.invalid-references.add(owner reference-path.copy-new())
+    func mark-full-path-block-invalid(user ReferencePath reference-path)
+        if reference-path?
+            self.invalid-references.add(owner ReferencePath(
+                    user reference-path.variable))
 
     func mark-temp-invalid(user ReferencePath reference-path)
         if not reference-path?

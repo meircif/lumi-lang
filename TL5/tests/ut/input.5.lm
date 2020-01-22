@@ -3411,6 +3411,24 @@ func ! fun(owner String? s, user Test tu, owner Test to)
     loop
         give()->(owner s)
         while s?
+; @ g test-memory-owner-1
+struct TestStruct
+    owner TestStruct? next
+class TestClass
+    strong TestClass? next
+    func dynamic user fun()
+func ! fun(
+        owner TestStruct t,
+        strong TestClass c,
+        strong TestStruct tx,
+        owner TestClass cx)
+    t := t.next!
+    t := t.next!.next!.next!
+    t.next := t.next!.next!.next
+    t.next!.next := t.next!.next!.next
+    c := c.next!
+    tx := tx.next!
+    cx := cx.next!
 ; @ eg test-memory-owner-e0
 struct Test
     owner String s
@@ -3479,17 +3497,6 @@ sg := s
 ostr!.clear()
 sg.clear()
 s.clear()
-; @ eg test-memory-owner-e10
-struct Test
-    owner Test? t
-func ! fun()->(owner Test? t, owner Test? x)
-    t := x!.t
-    t := t!.t
-; @ eg test-memory-owner-e11
-struct Test
-    owner Test? t
-func ! fun(owner Test? t)
-    t := t!.t
 ; @ eg test-memory-owner-e12
 struct Test
     owner Test? t
@@ -3951,6 +3958,14 @@ func fun(owner Test to, owner String s, owner String s2)
     temp Test t3(temp to)
     t3.s := _
     so.clear()
+; @ g test-memory-temp-3
+struct Test
+    owner Test? next
+func ! fun(owner Test to)
+    temp Test t(temp to)
+    loop
+        while t.next?
+        t := t.next!
 ; @ eg test-memory-temp-e0
 func fun(temp String s)
 func error(user String s)
@@ -4005,6 +4020,18 @@ if true
     temp String? si(temp so)
     s := si
 s!.clear()
+; @ eg test-memory-temp-e12
+struct Test
+    owner Test? next
+func ! fun(owner Test t)
+    temp Test x(temp t.next!.next!)
+    x.next := t
+; @ eg test-memory-temp-e13
+struct Test
+    owner Test? next
+func ! fun(owner Test t)
+    temp Test x(temp t.next!.next!)
+    x.next := t.next
 ; @@ test-memory-constructor
 ; @ g test-memory-constructor-0
 struct NoConstructor
