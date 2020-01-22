@@ -33,6 +33,9 @@ struct List{Generic}
             raise "list empty"
         self.first := first.next
         item := first.item
+    
+    func user ! iter()->(owner ListIterator?{Generic} iterator)
+        iterator := ListIterator{Generic}(user self)!
 
 
 ~~~ Iterate over the list ~~~

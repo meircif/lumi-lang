@@ -70,12 +70,12 @@ Any help, suggestion, comment or questions is welcome! See Lumi repository
    flow
    testing
    native
+   standard-library
    examples
 
 .. toctree::
    :maxdepth: 2
    :caption: Future
 
-   standard-libraries
    serialization
    async-io

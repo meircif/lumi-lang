@@ -5,7 +5,7 @@ INSTALLDIR?=/usr/local/bin/
 EXECUTABLES=lumi $(foreach n,0 1 2 3 4 5,tl$(n)-compiler)
 EXECUTABLE_PATHS=$(addprefix $(BUILDDIR)/,$(EXECUTABLES))
 
-.PHONY: install uninstall all clean cp-bin stdlibs-tests tl5-integration \
+.PHONY: install uninstall all clean cp-bin stdlib-tests tl5-integration \
 	tl5-integration-output
 
 install: | cp-bin clean
@@ -65,26 +65,26 @@ docs-tests: build-dir
 		$(BUILDDIR)/hello-world-test -r
 
 math-tests: build-dir
-	lumi -t math stdlibs/math.5.lm stdlibs/tests/math-tests.5.lm -o \
+	lumi -t math stdlib/math.5.lm stdlib/tests/math-tests.5.lm -o \
 		$(BUILDDIR)/math-tests -r
 
 zlib-tests: build-dir
-	lumi -t zlib stdlibs/zlib.5.lm stdlibs/tests/zlib-tests.5.lm -o \
+	lumi -t zlib stdlib/zlib.5.lm stdlib/tests/zlib-tests.5.lm -o \
 		$(BUILDDIR)/zlib-tests -r
 
 ds-tests: build-dir
-	lumi -t ds stdlibs/list.5.lm stdlibs/tests/ds-tests.5.lm -o \
-		$(BUILDDIR)/ds-tests -r
+	lumi -t ds stdlib/list.5.lm stdlib/dict.5.lm stdlib/tests/list-tests.5.lm \
+		stdlib/tests/dict-tests.5.lm -o $(BUILDDIR)/ds-tests -r
 
 time-tests: build-dir
-	lumi -t time stdlibs/time.5.lm stdlibs/tests/time-tests.5.lm -e --std=c89 \
-		-e -Istdlibs/tests -o $(BUILDDIR)/time-tests -r
+	lumi -t time stdlib/time.5.lm stdlib/tests/time-tests.5.lm -e --std=c89 \
+		-e -Istdlib/tests -o $(BUILDDIR)/time-tests -r
 
 os-tests: build-dir
-	lumi -t os stdlibs/os.5.lm stdlibs/tests/os-test.5.lm stdlibs/list.5.lm \
-		-e -Istdlibs/tests -o $(BUILDDIR)/os-tests -r
+	lumi -t os stdlib/os.5.lm stdlib/tests/os-test.5.lm stdlib/list.5.lm \
+		-e -Istdlib/tests -o $(BUILDDIR)/os-tests -r
 
-stdlibs-tests: | math-tests ds-tests time-tests os-tests
+stdlib-tests: | math-tests ds-tests time-tests os-tests
 
 tl0-compiler.c:
 	lumi -c TL0/tl0-compiler.0.lm
