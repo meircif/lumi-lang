@@ -3,6 +3,7 @@ module tl5-compiler
 
 ~~~ Assign expression (:=) ~~~
 class AssignExpression(Expression)
+    owner VariableExpression aux-variable
     user Expression target
     user Expression value
     user Expression original-value
@@ -50,20 +51,50 @@ class AssignExpression(Expression)
         user ReferencePath value-path(
                 user self.value.result-type.reference-path)
         var Bool was-left-invalid(copy refs.is-invalid(user target-path))
-        if self.target.access = Access.TEMP
+        var Bool is-forward-move
+        self.check-forward-move()->(var is-forward-move)
+        if self.target.access = Access.TEMP and not is-forward-move
             refs.mark-invalid-reference(user target-path)
         refs.clear-invalid-reference(user target-path)
-        if access-is-owner(copy self.target.access)
+        if access-is-owner(copy self.target.access) or
+                self.target.access = Access.TEMP
             refs.check-writing-memory(user self.value)
-            refs.mark-invalid-reference(user value-path)
-            refs.check-writing-memory(user self.target)
-        else-if self.target.access = Access.TEMP
-            refs.check-writing-memory(user self.value)
-            refs.mark-block-invalid(user value-path)
-            refs.check-writing-memory(user self.target)
+            if not is-forward-move
+                if self.target.access = Access.TEMP
+                    refs.mark-full-path-block-invalid(user value-path)
+                else
+                    refs.mark-invalid-reference(user value-path)
+                refs.check-writing-memory(user self.target)
         else
             self.value.check-memory(user refs)
             self.target.check-memory(user refs)
+    
+    func inst check-forward-move()->(var Bool res)
+        res := false
+        user ReferencePath target-path(
+                user self.target.result-type.reference-path)
+        user ReferencePath value-path(
+                user self.value.result-type.reference-path)
+        if not target-path? or not value-path?
+            return
+        if not access-is-owner(copy self.target.access) and
+                not self.target.access = Access.TEMP
+            return
+        do
+            if target-path.variable is-not value-path.variable
+                return
+            if not value-path.field?
+                return
+            while target-path.field?
+            target-path := target-path.field
+            value-path := value-path.field
+        if access-is-owner(copy self.target.access)
+            self.code-node.add-aux-variable(
+                    copy self.value.access,
+                    copy false,
+                    user self.target.result-type)->(
+                    owner self.aux-variable)
+        res := true
     
     func dynamic write-preactions()
         self.value.write-preactions()
@@ -168,6 +199,19 @@ class AssignExpression(Expression)
 
     func inst write-owner-assign-preactions()
         if not self.is-initialization
+            if self.aux-variable?
+                var AssignExpression assign(
+                        user self.code-node,
+                        user self.aux-variable,
+                        user self.original-value,
+                        copy false)
+                assign.value := self.value
+                assign.write-assign-preactions(copy false)
+                assign.write-main-assign()
+                assign.write-owner-null()
+                self.code-node.write-spaces()
+                self.original-value := self.aux-variable
+                self.value := self.aux-variable
             self.write-left-delete()
             self.code-node.write-spaces()
         

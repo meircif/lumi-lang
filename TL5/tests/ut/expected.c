@@ -8516,6 +8516,154 @@ LUMI_block0_cleanup:
     free(s);
     return LUMI_err;
 }
+/// @ test-memory-owner-1
+typedef struct ut_M_TestStruct ut_M_TestStruct;
+typedef struct ut_M_TestClass ut_M_TestClass;
+typedef struct ut_M_TestClass_Dynamic ut_M_TestClass_Dynamic;
+struct ut_M_TestStruct {
+    ut_M_TestStruct* next;
+};
+struct ut_M_TestClass {
+    ut_M_TestClass* next;
+    Ref_Manager* next_Refman;
+    ut_M_TestClass_Dynamic* next_Dynamic;
+};
+struct ut_M_TestClass_Dynamic {
+    Dynamic_Del _del;
+    void (*fun)(ut_M_TestClass* self, ut_M_TestClass_Dynamic* self_Dynamic);
+};
+void ut_M_TestStruct_Del(ut_M_TestStruct* self);
+void ut_M_TestClass_fun(ut_M_TestClass* self, ut_M_TestClass_Dynamic* self_Dynamic);
+void ut_M_TestClass_Del(ut_M_TestClass* self);
+Returncode ut_M_fun(ut_M_TestStruct* t, ut_M_TestClass* c, Ref_Manager* c_Refman, ut_M_TestClass_Dynamic* c_Dynamic, ut_M_TestStruct* tx, Ref_Manager* tx_Refman, ut_M_TestClass* cx, ut_M_TestClass_Dynamic* cx_Dynamic);
+Generic_Type_Dynamic ut_M_TestStruct_dynamic = {(Dynamic_Del)ut_M_TestStruct_Del};
+ut_M_TestClass_Dynamic ut_M_TestClass_dynamic = {(Dynamic_Del)ut_M_TestClass_Del, ut_M_TestClass_fun};
+void ut_M_TestStruct_Del(ut_M_TestStruct* self) {
+    if (self == NULL) return;
+    SELF_REF_DEL(ut_M_TestStruct, next);
+    free(self->next);
+}
+void ut_M_TestClass_fun(ut_M_TestClass* self, ut_M_TestClass_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_TestClass_Del(ut_M_TestClass* self) {
+    if (self == NULL) return;
+    SELF_REF_DEL_STR_DYN(ut_M_TestClass, _, next);
+    LUMI_owner_dec_ref(self->next_Refman);
+}
+Returncode ut_M_fun(ut_M_TestStruct* t, ut_M_TestClass* c, Ref_Manager* c_Refman, ut_M_TestClass_Dynamic* c_Dynamic, ut_M_TestStruct* tx, Ref_Manager* tx_Refman, ut_M_TestClass* cx, ut_M_TestClass_Dynamic* cx_Dynamic) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    ut_M_TestStruct* aux_TestStruct_0 = NULL;
+    ut_M_TestStruct* aux_TestStruct_1 = NULL;
+    ut_M_TestStruct* aux_TestStruct_2 = NULL;
+    ut_M_TestStruct* aux_TestStruct_3 = NULL;
+    ut_M_TestClass* aux_TestClass_0 = NULL;
+    Ref_Manager* aux_TestClass_0_Refman = NULL;
+    ut_M_TestClass_Dynamic* aux_TestClass_0_Dynamic = NULL;
+    ut_M_TestStruct* aux_TestStruct_4 = NULL;
+    ut_M_TestClass* aux_TestClass_1 = NULL;
+    Ref_Manager* aux_TestClass_1_Refman = NULL;
+    ut_M_TestClass_Dynamic* aux_TestClass_1_Dynamic = NULL;
+    CHECK_REF(11, LUMI_block0_cleanup, t->next)
+    aux_TestStruct_0 = t->next;
+    t->next = NULL;
+    ut_M_TestStruct_Del(t);
+    free(t);
+    t = aux_TestStruct_0;
+    aux_TestStruct_0 = NULL;
+    CHECK_REF(12, LUMI_block0_cleanup, t->next)
+    CHECK_REF(12, LUMI_block0_cleanup, t->next->next)
+    CHECK_REF(12, LUMI_block0_cleanup, t->next->next->next)
+    aux_TestStruct_1 = t->next->next->next;
+    t->next->next->next = NULL;
+    ut_M_TestStruct_Del(t);
+    free(t);
+    t = aux_TestStruct_1;
+    aux_TestStruct_1 = NULL;
+    CHECK_REF(13, LUMI_block0_cleanup, t->next)
+    CHECK_REF(13, LUMI_block0_cleanup, t->next->next)
+    aux_TestStruct_2 = t->next->next->next;
+    t->next->next->next = NULL;
+    ut_M_TestStruct_Del(t->next);
+    free(t->next);
+    t->next = aux_TestStruct_2;
+    aux_TestStruct_2 = NULL;
+    CHECK_REF(14, LUMI_block0_cleanup, t->next)
+    CHECK_REF(14, LUMI_block0_cleanup, t->next->next)
+    CHECK_REF(14, LUMI_block0_cleanup, t->next)
+    aux_TestStruct_3 = t->next->next->next;
+    t->next->next->next = NULL;
+    ut_M_TestStruct_Del(t->next->next);
+    free(t->next->next);
+    t->next->next = aux_TestStruct_3;
+    aux_TestStruct_3 = NULL;
+    CHECK_REF(15, LUMI_block0_cleanup, c->next)
+    aux_TestClass_0_Refman = c->next_Refman;
+    aux_TestClass_0_Dynamic = c->next_Dynamic;
+    aux_TestClass_0 = c->next;
+    c->next = NULL;
+    c->next_Refman = NULL;
+    c->next_Dynamic = NULL;
+    if (c_Dynamic != NULL) c_Dynamic->_del(c);
+    LUMI_owner_dec_ref(c_Refman);
+    c_Refman = aux_TestClass_0_Refman;
+    c_Dynamic = aux_TestClass_0_Dynamic;
+    c = aux_TestClass_0;
+    aux_TestClass_0 = NULL;
+    aux_TestClass_0_Refman = NULL;
+    aux_TestClass_0_Dynamic = NULL;
+    CHECK_REF(16, LUMI_block0_cleanup, tx->next)
+    aux_TestStruct_4 = tx->next;
+    tx->next = NULL;
+    ut_M_TestStruct_Del(tx);
+    LUMI_owner_dec_ref(tx_Refman);
+    tx = aux_TestStruct_4;
+    aux_TestStruct_4 = NULL;
+    INIT_NEW_REFMAN(16, LUMI_block0_cleanup, tx)
+    CHECK_REF(17, LUMI_block0_cleanup, cx->next)
+    aux_TestClass_1_Refman = cx->next_Refman;
+    aux_TestClass_1_Dynamic = cx->next_Dynamic;
+    aux_TestClass_1 = cx->next;
+    cx->next = NULL;
+    cx->next_Refman = NULL;
+    cx->next_Dynamic = NULL;
+    if (cx_Dynamic != NULL) cx_Dynamic->_del(cx);
+    free(cx);
+    LUMI_var_dec_ref(aux_TestClass_1_Refman);
+    cx_Dynamic = aux_TestClass_1_Dynamic;
+    cx = aux_TestClass_1;
+    aux_TestClass_1 = NULL;
+    aux_TestClass_1_Refman = NULL;
+    aux_TestClass_1_Dynamic = NULL;
+LUMI_block0_cleanup:
+    (void)0;
+    if (aux_TestClass_1_Dynamic != NULL) aux_TestClass_1_Dynamic->_del(aux_TestClass_1);
+    LUMI_owner_dec_ref(aux_TestClass_1_Refman);
+    ut_M_TestStruct_Del(aux_TestStruct_4);
+    free(aux_TestStruct_4);
+    if (aux_TestClass_0_Dynamic != NULL) aux_TestClass_0_Dynamic->_del(aux_TestClass_0);
+    LUMI_owner_dec_ref(aux_TestClass_0_Refman);
+    ut_M_TestStruct_Del(aux_TestStruct_3);
+    free(aux_TestStruct_3);
+    ut_M_TestStruct_Del(aux_TestStruct_2);
+    free(aux_TestStruct_2);
+    ut_M_TestStruct_Del(aux_TestStruct_1);
+    free(aux_TestStruct_1);
+    ut_M_TestStruct_Del(aux_TestStruct_0);
+    free(aux_TestStruct_0);
+    if (cx_Dynamic != NULL) cx_Dynamic->_del(cx);
+    free(cx);
+    ut_M_TestStruct_Del(tx);
+    LUMI_owner_dec_ref(tx_Refman);
+    if (c_Dynamic != NULL) c_Dynamic->_del(c);
+    LUMI_owner_dec_ref(c_Refman);
+    ut_M_TestStruct_Del(t);
+    free(t);
+    return LUMI_err;
+}
 /// @ test-memory-owner-e0
 cannot modify owner field "s" in non-owner reference "t.s"
 /// @ test-memory-owner-e1
@@ -8536,10 +8684,6 @@ cannot move non-conditional owner field "t.s"
 cannot move non-conditional owner field "t.s"
 /// @ test-memory-owner-e9
 using invalid reference "s"
-/// @ test-memory-owner-e10
-using modified reference "t"
-/// @ test-memory-owner-e11
-using modified reference "t"
 /// @ test-memory-owner-e12
 using invalid reference "t"
 /// @ test-memory-owner-e13
@@ -9113,6 +9257,39 @@ LUMI_block0_cleanup:
     ut_M_Test_Del(to);
     free(to);
 }
+/// @ test-memory-temp-3
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    ut_M_Test* next;
+};
+void ut_M_Test_Del(ut_M_Test* self);
+Returncode ut_M_fun(ut_M_Test* to);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+    SELF_REF_DEL(ut_M_Test, next);
+    free(self->next);
+}
+Returncode ut_M_fun(ut_M_Test* to) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    ut_M_Test* t = NULL;
+    t = to;
+    do {
+        LUMI_loop_depth = 3;
+        if (!(t->next != NULL)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        CHECK_REF(7, LUMI_block1_cleanup, t->next)
+        t = t->next;
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+LUMI_block0_cleanup:
+    (void)0;
+    ut_M_Test_Del(to);
+    free(to);
+    return LUMI_err;
+}
 /// @ test-memory-temp-e0
 cannot assign value with access "user" into value with access "temp"
 /// @ test-memory-temp-e1
@@ -9137,6 +9314,10 @@ using invalid reference "s1"
 using invalid reference "s"
 /// @ test-memory-temp-e11
 using invalid reference "s"
+/// @ test-memory-temp-e12
+using invalid reference "t"
+/// @ test-memory-temp-e13
+using invalid reference "t"
 /// @@ test-memory-constructor
 /// @ test-memory-constructor-0
 typedef struct ut_M_NoConstructor ut_M_NoConstructor;
