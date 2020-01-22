@@ -8,14 +8,13 @@ struct List{Generic}
 
     ~~~ Add item to list end ~~~
     func temp ! append(owner Generic item)
-        temp ListNode{Generic} last
-        if-error last := self.first
-            self.prepend(owner item)
+        if not self.first?
+            self.prepend(owner item)!
         else
+            temp ListNode{Generic} last(temp self.first!)
             loop
-                temp ListNode?{Generic} next(temp last.next)
-                if-error last := next
-                    break
+                while last.next?
+                last := last.next!
             last.next := ListNode{Generic}(owner item, strong _)!
 
     ~~~ Add item to list start ~~~
