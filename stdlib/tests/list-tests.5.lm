@@ -10,7 +10,7 @@ struct StringBox
         self.value := value
 
 
-test append-test()
+test list-append-test()
     var ds.List{StringBox} list
     list.append(owner StringBox(user "first")!)!
     list.append(owner StringBox(user "second")!)!
@@ -26,7 +26,7 @@ test append-test()
     assert! not iter.step()->(user item)!
 
 
-test prepend-test()
+test list-prepend-test()
     var ds.List{StringBox} list
     list.prepend(owner StringBox(user "third")!)!
     list.prepend(owner StringBox(user "second")!)!
@@ -42,7 +42,7 @@ test prepend-test()
     assert! not iter.step()->(user item)!
 
 
-test mixed-test()
+test list-mixed-test()
     var ds.List{StringBox} list
     list.prepend(owner StringBox(user "first")!)!
     list.append(owner StringBox(user "second")!)!
@@ -58,7 +58,7 @@ test mixed-test()
     assert! not iter.step()->(user item)!
 
 
-test pop-test()
+test list-pop-test()
     var ds.List{StringBox} list
     list.append(owner StringBox(user "first")!)!
     list.append(owner StringBox(user "second")!)!
@@ -69,7 +69,7 @@ test pop-test()
     assert-error! list.pop(), "list empty"
 
 
-test is-empty-test()
+test list-is-empty-test()
     var ds.List{StringBox} list
     assert! list.is-empty()
     list.append(owner StringBox(user "first")!)!
@@ -78,26 +78,24 @@ test is-empty-test()
     assert! list.is-empty()
 
 
-; test generic-iter-test()
-;     var ds.List{StringBox} list
-;     list.append(owner StringBox(user "first"))
-;     list.append(owner StringBox(user "second"))
-;     list.append(owner StringBox(user "third"))
-;     var ds.ListIterator{StringBox} list-iter(user list)
-;     user ds.Iterator{StringBox} iter(user list-iter)
-;     assert! iter.step()->(user item)!
-;     assert! item!.value.equal(user "first")
-;     iter.next()
-;     assert! iter.step()->(user item)!
-;     assert! item!.value.equal(user "second")
-;     iter.next()
-;     assert! iter.step()->(user item)!
-;     assert! item!.value.equal(user "third")
-;     iter.next()
-;     assert! not iter.step()->(user item)!
+test list-iter-test()
+    var ds.List{StringBox} list
+    list.append(owner StringBox(user "first")!)!
+    list.append(owner StringBox(user "second")!)!
+    list.append(owner StringBox(user "third")!)!
+    owner ds.ListIterator{StringBox} iter
+    iter := list.iter()!
+    user StringBox? item
+    assert! iter.step()->(user item)!
+    assert! item!.value.equal(user "first")
+    assert! iter.step()->(user item)!
+    assert! item!.value.equal(user "second")
+    assert! iter.step()->(user item)!
+    assert! item!.value.equal(user "third")
+    assert! not iter.step()->(user item)!
 
 
-test empty-iter-test()
+test list-empty-iter-test()
     var ds.List{StringBox} empty-list
     var ds.ListIterator{StringBox} iter(user empty-list)
     user StringBox? item

@@ -73,8 +73,8 @@ zlib-tests: build-dir
 		$(BUILDDIR)/zlib-tests -r
 
 ds-tests: build-dir
-	lumi -t ds stdlib/list.5.lm stdlib/tests/ds-tests.5.lm -o \
-		$(BUILDDIR)/ds-tests -r
+	lumi -t ds stdlib/list.5.lm stdlib/dict.5.lm stdlib/tests/list-tests.5.lm \
+		stdlib/tests/dict-tests.5.lm -o $(BUILDDIR)/ds-tests -r
 
 time-tests: build-dir
 	lumi -t time stdlib/time.5.lm stdlib/tests/time-tests.5.lm -e --std=c89 \

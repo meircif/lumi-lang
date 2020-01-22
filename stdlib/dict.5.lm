@@ -1,0 +1,90 @@
+~~~ Generic dictionaries ~~~
+module ds
+
+
+~~~ Key-value pair ~~~
+struct KeyValue{ValueGeneric}
+    var Int key
+    owner ValueGeneric value
+
+    new(copy Int key, owner ValueGeneric value)
+        self.key := key
+        self.value := value
+
+
+~~~ Generic dictionary ~~~
+struct Dictionary{ValueGeneric}
+    var List{KeyValue{ValueGeneric}} items
+
+    func user is-empty()->(var Bool empty)
+        self.items.is-empty()->(var empty)
+
+    ~~~ Return true iff the key is in the dictionary ~~~
+    func user ! find(copy Int key)->(var Bool is-in-dict)
+        for key-value in self.items.iter()!
+            if key-value!.key = key
+                is-in-dict := true
+                return
+        is-in-dict := false
+    
+    ~~~ Add item to dictionary ~~~
+    func temp ! put(copy Int key, owner ValueGeneric value)
+        if not self.find(copy key)!
+            self.items.prepend(
+                    owner KeyValue{ValueGeneric}(copy key, owner value)!)!
+        else
+            raise! "Key already in dictionary"
+
+    ~~~ Add item to dictionary ~~~
+    func user ! get(copy Int key)->(user ValueGeneric? value)
+        value := _
+        for key-value in self.items.iter()!
+            if key-value!.key = key
+                value := key-value!.value
+                return
+        raise! "Key not in dictionary"
+    
+    func user ! iter()->(owner DictionaryIterator?{ValueGeneric} iterator)
+        iterator := DictionaryIterator{ValueGeneric}(user self)!
+    
+    func user ! iter-keys()->(
+            owner DictionaryKeyIterator?{ValueGeneric} iterator)
+        iterator := DictionaryKeyIterator{ValueGeneric}(user self)!
+    
+    func user ! iter-values()->(
+            owner DictionaryValueIterator?{ValueGeneric} iterator)
+        iterator := DictionaryValueIterator{ValueGeneric}(user self)!
+
+
+~~~ Iterate over key-value pairs of the dictionary ~~~
+class DictionaryIterator{ValueGeneric}(ListIterator{KeyValue{ValueGeneric}})
+    new(user Dictionary dict)
+        base.new(user dict.items)
+
+
+class DictionaryKeyIterator{ValueGeneric}
+    owner ListIterator{KeyValue{ValueGeneric}} iterator
+    
+    new!(user Dictionary dict)
+        ; self.iterator.new(user dict.items)
+        self.iterator := ListIterator{KeyValue{ValueGeneric}}(user dict.items)!
+    
+    func dynamic user ! step()->(var Int key, var Bool has-another-item)
+        user KeyValue?{ValueGeneric} key-value
+        if self.iterator.step()->(user key-value, var has-another-item)!
+            key := key-value!.key
+
+
+class DictionaryValueIterator{ValueGeneric}
+    owner ListIterator{KeyValue{ValueGeneric}} iterator
+    
+    new!(user Dictionary dict)
+        ; self.iterator.new(user dict.items)
+        self.iterator := ListIterator{KeyValue{ValueGeneric}}(user dict.items)!
+    
+    func dynamic user ! step()->(
+            user ValueGeneric? value, var Bool has-another-item)
+        value := _
+        user KeyValue?{ValueGeneric} key-value
+        if self.iterator.step()->(user key-value, var has-another-item)!
+            value := key-value!.value

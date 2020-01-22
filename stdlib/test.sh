@@ -38,7 +38,8 @@ mkdir stdlib/cover-math-tests
 mv cobertura.xml stdlib/cover-math-tests
 
 stdlib/tl5-compiler -t ds stdlib/ds-tests.c ../stdlib/list.5.lm \
-  ../stdlib/tests/ds-tests.5.lm
+   ../stdlib/dict.5.lm ../stdlib/tests/list-tests.5.lm  \
+   ../stdlib/tests/dict-tests.5.lm
 $CCA stdlib/ds-tests.c -o stdlib/ds-tests
 stdlib/ds-tests -xml
 mkdir stdlib/cover-ds-tests
