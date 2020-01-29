@@ -59,6 +59,11 @@ class AssignExpression(Expression)
         if access-is-owner(copy self.target.access) or
                 self.target.access = Access.TEMP
             refs.check-writing-memory(user self.value)
+            if self.target.access = Access.TEMP and value-path?
+                if not value-path.variable.parent?
+                    self.syntax-error(
+                            user "cannot take temporary owner from global",
+                            user value-path.variable.name)
             if not is-forward-move
                 if self.target.access = Access.TEMP
                     refs.mark-full-path-block-invalid(user value-path)

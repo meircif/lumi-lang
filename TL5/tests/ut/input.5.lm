@@ -36,7 +36,6 @@ var Int i
 var Byte bt
 var Char c
 var Bool b
-user String? str
 owner String? ostr
 weak Array?{Int} arr
 owner File? fobj
@@ -47,7 +46,7 @@ weak Tc? tc
 weak Data?{Test} d
 weak Array?{String} sarr
 
-func ! mock()->(strong String? so, var Int io, strong Test? to, weak Tc? tco)
+func ! mock(user String? str)->(strong String? so, var Int io, strong Test? to, weak Tc? tco)
 ; @@ test-int-expression
 ; @ c test-int-expression-0
 i := 0
@@ -716,6 +715,14 @@ ta :=: tc
 new Test t1!
 strong Test t2(strong to!)
 t1 :=: t2
+; @ ec test-swap-expression-e6
+new String{4} valid!
+owner String invalid
+valid :=: invalid
+; @ ec test-swap-expression-e7
+new String{4} valid!
+owner String invalid
+invalid :=: valid
 ; @@ test-question-expression
 ; @ c test-question-expression-0
 b := ostr?
@@ -1105,7 +1112,7 @@ new Sys error!
 Sys()
 ; @@ test-general
 ; @ g test-general-0
-user String str
+owner String? str
 ; @ g test-general-1
 
 
@@ -1136,14 +1143,17 @@ var Int x
 var Int x
 ; @ g test-general-6
 var String{12} s
-user String us(user s)
-user String gs(user "global text")
-main
+s-var String{12} svs!
+owner String cs(owner String{12}(user "global text")!)
+strong String us(strong String{12}(user s)!)
+weak String gs(weak us)
+main!
     var Int x(copy 6)
     x := 7
+    new String{12} ls!
+    ls :=: cs
 ; @ tg test-general-7
 var String{12} s
-user String us(user s)
 func fun()
     s.clear()
 ; @-
@@ -1186,11 +1196,27 @@ var Int name
 func name()
 var Int name
 ; @ eg test-general-e11
-user Error error
+user Error? error
 ; @ eg test-general-e12
 var Int x(copy error)
 ; @ eg test-general-e13
 [ ; error
+; @ eg test-general-e14
+user String? error
+; @ eg test-general-e15
+temp String? error
+; @ eg test-general-e16
+weak String error
+; @ eg test-general-e17
+owner String error(owner String{12}()!)
+func fun()->(owner String? s)
+    s := error
+main!
+; @ eg test-general-e18
+owner String error(owner String{12}()!)
+func fun(owner String s)
+main!
+    fun(owner error)
 ; @@ test-struct
 ; @ g test-struct-0
 struct Test
@@ -1383,6 +1409,14 @@ func name(user Array{Array{String}} ai)->(owner Array?{Array{Int}} ao)
 ; @ g test-function-m0
 main
     var Int x
+; @ g test-function-m1
+main!
+    owner String? s
+    s!.clear()
+; @ eg test-function-me0
+main
+    owner String? s
+    s!.clear()
 ; @ eg test-function-e0
 func(
 ; @ eg test-function-e1
@@ -3510,7 +3544,8 @@ func ! fun(owner Test? t)
 ; @ eg test-memory-owner-e14
 struct Test
     owner String s
-    new()
+    new!()
+        self.s := String{4}()!
 func fun(owner Test t, user Test tu, owner String s, user String su)
     t.s :=: s
     su.clear()
@@ -3859,27 +3894,35 @@ func ! fun(owner Test?{File} t, user File f)
     t := _
     f.putc(copy 'a')!
 ; @ eg test-memory-user-e35
-main
+main!
     owner String? so(owner String{12}()!)
     user String? su(user so)
     so := _
     su!.clear()
 ; @ ec test-memory-user-e36
+so := _
 assert! str?
 ; @ ec test-memory-user-e37
+so := _
 assert-error! str.clear()
 ; @ ec test-memory-user-e38
+so := _
 if str?
 ; @ ec test-memory-user-e39
+so := _
 for _ in str!.length():2
 ; @ ec test-memory-user-e40
+so := _
 for _ in 2:str!.length()
 ; @ ec test-memory-user-e41
+so := _
 for _ in str!
 ; @ ec test-memory-user-e42
+so := _
 if b
     str!.clear()
 ; @ ec test-memory-user-e43
+so := _
 if false
     str := ostr
 str!.clear()
@@ -4032,6 +4075,14 @@ struct Test
 func ! fun(owner Test t)
     temp Test x(temp t.next!.next!)
     x.next := t.next
+; @ ec test-memory-temp-e14
+temp String? s(temp ostr)
+; @ eg test-memory-temp-e15
+struct Test
+    owner String? s
+owner Test? t
+func ! error()
+    temp String? s(temp t!.s)
 ; @@ test-memory-constructor
 ; @ g test-memory-constructor-0
 struct NoConstructor

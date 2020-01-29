@@ -316,9 +316,12 @@ class SwapOperatorExpression(BinaryExpression)
 
 
     func dynamic check-memory(user ReferenceMemoryList refs)
-        self.assign-right-to-left.check-operands-memory(user refs)
-        refs.clear-invalid-reference(
-                user self.right-expression.result-type.reference-path)
+        if access-is-temp(copy self.left-expression.access)
+            refs.check-writing-memory(user self.left-expression)
+            refs.check-writing-memory(user self.right-expression)
+        else
+            self.left-expression.check-memory(user refs)
+            self.right-expression.check-memory(user refs)
 
     func dynamic write()
         self.assign-left-to-aux.write-assign()

@@ -139,6 +139,16 @@ class SyntaxTreeVariable(SyntaxTreeCode)
                     user self.type-instance.type-data.name)
         if access-is-only-var(copy self.access)
             self.type-instance.check-sequence(user self)
+        if not self.parent? and not self.parent-type?
+            if self.access = Access.USER or self.access = Access.TEMP
+                self.syntax-error(
+                        user "global variables cannot have access",
+                        user glob.access-names[self.access])
+            if not self.type-instance.type-data.is-primitive and
+                    not self.type-instance.conditional and
+                    not self.is-initialized
+                self.syntax-error-msg(
+                        user "non-conditional global variable not initialized")
         if self.parent-type?
             if self.access = Access.USER or self.access = Access.TEMP
                 self.syntax-error(

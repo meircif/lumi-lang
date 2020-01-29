@@ -17,7 +17,7 @@ comment
 
 ; Test global variables
 var Int global-int(copy 23)
-user String global-string(user "a constant string")
+owner String global-string(owner String{32}(user "a constant string")!)
 
 var Array{TestEnum.length + LENGTH:Int} int-arr
 const Int LENGTH SIZE * 5
@@ -647,7 +647,7 @@ func ! test-switch()
     sys.println(user s2)!
 
 
-main
+main!
     test-simple-function()!
     test-ref-count()!
     test-error-handling(user _)!
