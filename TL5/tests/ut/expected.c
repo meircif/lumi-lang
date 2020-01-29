@@ -64,7 +64,7 @@ void ut_M_fun6(Int x, Int y, Int* n, Int* m);
 void ut_M_fun7(ut_M_Tb* tb, Ref_Manager* tb_Refman, ut_M_Tb_Dynamic* tb_Dynamic, ut_M_Tb** tbo, Ref_Manager** tbo_Refman, ut_M_Tb_Dynamic** tbo_Dynamic);
 void ut_M_fun8(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Refman);
 Returncode ut_M_fune(void);
-Returncode ut_M_mock(char** so, int* so_Max_length, int** so_Length, Ref_Manager** so_Refman, Int* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic);
+Returncode ut_M_mock(char* str, int str_Max_length, int* str_Length, char** so, int* so_Max_length, int** so_Length, Ref_Manager** so_Refman, Int* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic);
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 ut_M_Ta_Dynamic ut_M_Ta_dynamic = {(Dynamic_Del)ut_M_Ta_Del, ut_M_Ta_dyn};
 ut_M_Tb_Dynamic ut_M_Tb_dynamic = {{(Dynamic_Del)ut_M_Tb_Del, (void (*)(ut_M_Ta* self, ut_M_Ta_Dynamic* self_Dynamic))ut_M_Tb_dyn}};
@@ -74,9 +74,6 @@ Int ut_M_i = 0;
 Byte ut_M_bt = 0;
 Char ut_M_c = 0;
 Bool ut_M_b = 0;
-char* ut_M_str = NULL;
-int ut_M_str_Max_length = 0;
-int* ut_M_str_Length = &Lumi_empty_int;
 char* ut_M_ostr = NULL;
 int ut_M_ostr_Max_length = 0;
 int* ut_M_ostr_Length = &Lumi_empty_int;
@@ -234,7 +231,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-Returncode ut_M_mock(char** so, int* so_Max_length, int** so_Length, Ref_Manager** so_Refman, Int* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic) {
+Returncode ut_M_mock(char* str, int str_Max_length, int* str_Length, char** so, int* so_Max_length, int** so_Length, Ref_Manager** so_Refman, Int* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
@@ -328,41 +325,41 @@ char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
     INIT_STRING_CONST(1, LUMI_block0_cleanup, aux_String_0, "some string");
-    ut_M_str_Max_length = aux_String_0_Max_length;
-    ut_M_str_Length = aux_String_0_Length;
-    ut_M_str = aux_String_0;
+    str_Max_length = aux_String_0_Max_length;
+    str_Length = aux_String_0_Length;
+    str = aux_String_0;
 /// @ test-string-expression-1
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
     INIT_STRING_CONST(1, LUMI_block0_cleanup, aux_String_0, "\nstring\t\"with\\formatting\n");
-    ut_M_str_Max_length = aux_String_0_Max_length;
-    ut_M_str_Length = aux_String_0_Length;
-    ut_M_str = aux_String_0;
+    str_Max_length = aux_String_0_Max_length;
+    str_Length = aux_String_0_Length;
+    str = aux_String_0;
 /// @ test-string-expression-2
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
     INIT_STRING_CONST(4, LUMI_block0_cleanup, aux_String_0, "linesplitstring");
-    ut_M_str_Max_length = aux_String_0_Max_length;
-    ut_M_str_Length = aux_String_0_Length;
-    ut_M_str = aux_String_0;
+    str_Max_length = aux_String_0_Max_length;
+    str_Length = aux_String_0_Length;
+    str = aux_String_0;
 /// @ test-string-expression-3
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
     INIT_STRING_CONST(4, LUMI_block0_cleanup, aux_String_0, "multi\nline\nstring\n");
-    ut_M_str_Max_length = aux_String_0_Max_length;
-    ut_M_str_Length = aux_String_0_Length;
-    ut_M_str = aux_String_0;
+    str_Max_length = aux_String_0_Max_length;
+    str_Length = aux_String_0_Length;
+    str = aux_String_0;
 /// @ test-string-expression-4
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
     INIT_STRING_CONST(2, LUMI_block0_cleanup, aux_String_0, "line split");
-    ut_M_str_Max_length = aux_String_0_Max_length;
-    ut_M_str_Length = aux_String_0_Length;
-    ut_M_str = aux_String_0;
+    str_Max_length = aux_String_0_Max_length;
+    str_Length = aux_String_0_Length;
+    str = aux_String_0;
 /// @ test-string-expression-e0
 no '"' around string constant ""aaa"
 /// @ test-string-expression-e1
@@ -375,9 +372,9 @@ indentation too short, expected 12 got 8
 indentation too short, expected 12 got 8
 /// @@ test-empty-expression
 /// @ test-empty-expression-0
-ut_M_str_Max_length = 0;
-    ut_M_str_Length = &Lumi_empty_int;
-    ut_M_str = NULL;
+str_Max_length = 0;
+    str_Length = &Lumi_empty_int;
+    str = NULL;
 /// @ test-empty-expression-1
 LUMI_inc_ref(NULL);
     LUMI_dec_ref(ut_M_t_Refman);
@@ -1534,9 +1531,9 @@ char* s = NULL;
     *so_Refman = NULL;
     *so_Length = &Lumi_empty_int;
 /// @ test-binary-expression-9
-ut_M_str_Max_length = *so_Max_length;
-    ut_M_str_Length = *so_Length;
-    ut_M_str = *so;
+str_Max_length = *so_Max_length;
+    str_Length = *so_Length;
+    str = *so;
 /// @ test-binary-expression-10
 ut_M_b = ((void*)ut_M_t == ut_M_ta) || ((void*)ut_M_tc != ut_M_tb);
 /// @ test-binary-expression-11
@@ -2047,8 +2044,8 @@ char* s = NULL;
     int s_Max_length = 0;
     int* s_Length = &Lumi_empty_int;
     Int aux_Int_0 = 0;
-    CHECK_REF(1, LUMI_block0_cleanup, ut_M_str)
-    String_length(ut_M_str, ut_M_str_Max_length, ut_M_str_Length, &(aux_Int_0));
+    CHECK_REF(1, LUMI_block0_cleanup, str)
+    String_length(str, str_Max_length, str_Length, &(aux_Int_0));
     INIT_NEW_STRING(1, LUMI_block0_cleanup, s, aux_Int_0);
 /// @ test-exclamation-expression-e0
 ignoring empty reference check
@@ -2603,12 +2600,20 @@ Int ut_M_x = 0;
 /// @ test-general-6
 char ut_M_s[12] = {0};
 int ut_M_s_Length[1] = {0};
+char ut_M_svs[12] = {0};
+int ut_M_svs_Length[1] = {0};
+Ref_Manager* ut_M_svs_Refman = NULL;
+char* ut_M_cs = NULL;
+int ut_M_cs_Max_length = 0;
+int* ut_M_cs_Length = &Lumi_empty_int;
 char* ut_M_us = NULL;
 int ut_M_us_Max_length = 0;
 int* ut_M_us_Length = &Lumi_empty_int;
+Ref_Manager* ut_M_us_Refman = NULL;
 char* ut_M_gs = NULL;
 int ut_M_gs_Max_length = 0;
 int* ut_M_gs_Length = &Lumi_empty_int;
+Ref_Manager* ut_M_gs_Refman = NULL;
 void new_Mock(Bool* allocate_success) { }
 Returncode delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
@@ -2617,21 +2622,47 @@ USER_MAIN_HEADER {
     Int x = 0;
     char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
-    int aux_String_0_Length[1] = {0};
+    int* aux_String_0_Length = &Lumi_empty_int;
+    char* aux_String_1 = NULL;
+    int aux_String_1_Max_length = 0;
+    int aux_String_1_Length[1] = {0};
+    char* aux_String_2 = NULL;
+    int aux_String_2_Max_length = 0;
+    int* aux_String_2_Length = &Lumi_empty_int;
 #define LUMI_FUNC_NAME "global variable initialization"
 #define LUMI_FILE_NAME "mock.5.lm"
     /* initializing ut_M_s */
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "mock.5.lm"
-    ut_M_us_Max_length = 12;
-    ut_M_us_Length = ut_M_s_Length;
-    ut_M_us = ut_M_s;
+    INIT_VAR_REFMAN(2, LUMI_block0_cleanup, ut_M_svs)
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "mock.5.lm"
-    INIT_STRING_CONST(3, LUMI_block0_cleanup, aux_String_0, "global text");
-    ut_M_gs_Max_length = aux_String_0_Max_length;
-    ut_M_gs_Length = aux_String_0_Length;
-    ut_M_gs = aux_String_0;
+    INIT_STRING_CONST(3, LUMI_block0_cleanup, aux_String_1, "global text");
+    INIT_NEW_STRING(3, LUMI_block0_cleanup, aux_String_0, 12);
+    LUMI_err = String_copy(aux_String_0, 12, aux_String_0_Length, aux_String_1, *aux_String_1_Length);
+    ut_M_cs_Max_length = 12;
+    ut_M_cs_Length = aux_String_0_Length;
+    ut_M_cs = aux_String_0;
+    aux_String_0 = NULL;
+    aux_String_0_Length = &Lumi_empty_int;
+#undef LUMI_FILE_NAME
+#define LUMI_FILE_NAME "mock.5.lm"
+    INIT_NEW_STRING(4, LUMI_block0_cleanup, aux_String_2, 12);
+    LUMI_err = String_copy(aux_String_2, 12, aux_String_2_Length, ut_M_s, *ut_M_s_Length);
+    ut_M_us_Max_length = 12;
+    ut_M_us_Length = aux_String_2_Length;
+    ut_M_us = aux_String_2;
+    aux_String_2 = NULL;
+    aux_String_2_Length = &Lumi_empty_int;
+    INIT_NEW_REFMAN(4, LUMI_block0_cleanup, ut_M_us)
+#undef LUMI_FILE_NAME
+#define LUMI_FILE_NAME "mock.5.lm"
+    LUMI_inc_ref(ut_M_us_Refman);
+    LUMI_dec_ref(ut_M_gs_Refman);
+    ut_M_gs_Refman = ut_M_us_Refman;
+    ut_M_gs_Max_length = ut_M_us_Max_length;
+    ut_M_gs_Length = ut_M_us_Length;
+    ut_M_gs = ut_M_us;
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
     x = 6;
@@ -2646,18 +2677,15 @@ void ut_M_fun(void);
 Returncode second_M_dummy(void);
 char ut_M_s[12] = {0};
 int ut_M_s_Length[1] = {0};
-char* ut_M_us = NULL;
-int ut_M_us_Max_length = 0;
-int* ut_M_us_Length = &Lumi_empty_int;
-int LUMI_file0_line_count[6] = {
-    -1,-1,-1,-1, 0,-1
+int LUMI_file0_line_count[5] = {
+    -1,-1,-1, 0,-1
 };
 File_Coverage LUMI_file_coverage[1] = {
-    {"mock.5.lm", 6, LUMI_file0_line_count}
+    {"mock.5.lm", 5, LUMI_file0_line_count}
 };
 void ut_M_fun(void) {
     unsigned LUMI_loop_depth = 1;
-    ++LUMI_file_coverage[0].line_count[4];
+    ++LUMI_file_coverage[0].line_count[3];
     String_clear(ut_M_s, 12, ut_M_s_Length);
 LUMI_block0_cleanup:
     (void)0;
@@ -2678,11 +2706,6 @@ USER_MAIN_HEADER {
 #define LUMI_FUNC_NAME "global variable initialization"
 #define LUMI_FILE_NAME "mock.5.lm"
     /* initializing ut_M_s */
-#undef LUMI_FILE_NAME
-#define LUMI_FILE_NAME "mock.5.lm"
-    ut_M_us_Max_length = 12;
-    ut_M_us_Length = ut_M_s_Length;
-    ut_M_us = ut_M_s;
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
     LUMI_success &= LUMI_run_test("dummy", second_M_dummy);
@@ -2756,6 +2779,10 @@ unknown type "Error"
 unknown symbol "error"
 /// @ test-general-e13
 unexpected "["
+/// @ test-general-e14
+global variables cannot have access "user"
+/// @ test-general-e15
+global variables cannot have access "temp"
 /// @@ test-struct
 /// @ test-struct-0
 typedef struct ut_M_Test ut_M_Test;
@@ -3312,6 +3339,26 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 MAIN_FUNC
+/// @ test-function-m1
+void new_Mock(Bool* allocate_success) { }
+Returncode delete_Mock(Ref self) { return OK; }
+USER_MAIN_HEADER {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    char* s = NULL;
+    int s_Max_length = 0;
+    int* s_Length = &Lumi_empty_int;
+    CHECK_REF(3, LUMI_block0_cleanup, s)
+    String_clear(s, s_Max_length, s_Length);
+LUMI_block0_cleanup:
+    (void)0;
+    String_Del(s);
+    free(s);
+    return LUMI_err;
+}
+MAIN_FUNC
+/// @ test-function-me0
+error raised inside function not declared as error raising "main"
 /// @ test-function-e0
 expected space after "func", got "("
 /// @ test-function-e1
@@ -3833,9 +3880,9 @@ char* aux_String_0 = NULL;
     int* aux_String_0_Length = &Lumi_empty_int;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
     INIT_NEW_STRING(1, LUMI_block0_cleanup, aux_String_0, ut_M_arr[0]);
-    ut_M_str_Max_length = aux_String_0_Max_length;
-    ut_M_str_Length = aux_String_0_Length;
-    ut_M_str = aux_String_0;
+    str_Max_length = aux_String_0_Max_length;
+    str_Length = aux_String_0_Length;
+    str = aux_String_0;
 /// @ test-initialize-2
 Int* a = NULL;
     int a_Length = 0;

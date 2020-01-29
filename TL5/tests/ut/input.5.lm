@@ -36,7 +36,6 @@ var Int i
 var Byte bt
 var Char c
 var Bool b
-user String? str
 owner String? ostr
 weak Array?{Int} arr
 owner File? fobj
@@ -47,7 +46,7 @@ weak Tc? tc
 weak Data?{Test} d
 weak Array?{String} sarr
 
-func ! mock()->(strong String? so, var Int io, strong Test? to, weak Tc? tco)
+func ! mock(user String? str)->(strong String? so, var Int io, strong Test? to, weak Tc? tco)
 ; @@ test-int-expression
 ; @ c test-int-expression-0
 i := 0
@@ -1113,7 +1112,7 @@ new Sys error!
 Sys()
 ; @@ test-general
 ; @ g test-general-0
-user String str
+owner String? str
 ; @ g test-general-1
 
 
@@ -1144,14 +1143,15 @@ var Int x
 var Int x
 ; @ g test-general-6
 var String{12} s
-user String us(user s)
-user String gs(user "global text")
-main
+s-var String{12} svs!
+owner String cs(owner String{12}(user "global text")!)
+strong String us(strong String{12}(user s)!)
+weak String gs(weak us)
+main!
     var Int x(copy 6)
     x := 7
 ; @ tg test-general-7
 var String{12} s
-user String us(user s)
 func fun()
     s.clear()
 ; @-
@@ -1199,6 +1199,10 @@ user Error error
 var Int x(copy error)
 ; @ eg test-general-e13
 [ ; error
+; @ eg test-general-e14
+user String error
+; @ eg test-general-e15
+temp String error
 ; @@ test-struct
 ; @ g test-struct-0
 struct Test
@@ -1391,6 +1395,14 @@ func name(user Array{Array{String}} ai)->(owner Array?{Array{Int}} ao)
 ; @ g test-function-m0
 main
     var Int x
+; @ g test-function-m1
+main!
+    owner String? s
+    s!.clear()
+; @ eg test-function-me0
+main
+    owner String? s
+    s!.clear()
 ; @ eg test-function-e0
 func(
 ; @ eg test-function-e1
@@ -3868,27 +3880,35 @@ func ! fun(owner Test?{File} t, user File f)
     t := _
     f.putc(copy 'a')!
 ; @ eg test-memory-user-e35
-main
+main!
     owner String? so(owner String{12}()!)
     user String? su(user so)
     so := _
     su!.clear()
 ; @ ec test-memory-user-e36
+so := _
 assert! str?
 ; @ ec test-memory-user-e37
+so := _
 assert-error! str.clear()
 ; @ ec test-memory-user-e38
+so := _
 if str?
 ; @ ec test-memory-user-e39
+so := _
 for _ in str!.length():2
 ; @ ec test-memory-user-e40
+so := _
 for _ in 2:str!.length()
 ; @ ec test-memory-user-e41
+so := _
 for _ in str!
 ; @ ec test-memory-user-e42
+so := _
 if b
     str!.clear()
 ; @ ec test-memory-user-e43
+so := _
 if false
     str := ostr
 str!.clear()

@@ -127,7 +127,7 @@ class SyntaxTreeRoot(GlobalNodes)
         else-if self.equal-and-space(user keyword, user "enum")
             self.enums.add(owner EnumData.parse-new(user _))
             
-        else-if self.equal-and-new-line(user keyword, user "main")
+        else-if keyword.equal(user "main")
             SyntaxTreeMainFunction.parse-new(user _)->(owner self.main-function)
             
         else-if self.equal-and-space(user keyword, user "native")
@@ -425,7 +425,11 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
     func inst parse()
         self.my-module := glob.current-module
         string-new-copy(user "main")->(owner self.name)
-        self.arguments.has-error := true
+        if glob.last-char = '!'
+            self.arguments.has-error := true
+            glob.root.global-init.arguments.has-error := true
+            read-c()
+        self.expect-new-line(user "main")
         self.parse-body()
     
     func dynamic write()
@@ -434,6 +438,7 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
         ; }
         ; MAIN_FUNC
         write(user "\nUSER_MAIN_HEADER")
+        self.arguments.has-error := true
         self.write-block()
         self.write-post-func()
         write(user "\nMAIN_FUNC\n")
