@@ -44,15 +44,15 @@ struct Dictionary{ValueGeneric}
                 return
         raise! "Key not in dictionary"
     
-    func user ! iter()->(owner DictionaryIterator?{ValueGeneric} iterator)
+    func user ! iter()->(owner DictionaryIterator{ValueGeneric} iterator)
         iterator := DictionaryIterator{ValueGeneric}(user self)!
     
     func user ! iter-keys()->(
-            owner DictionaryKeyIterator?{ValueGeneric} iterator)
+            owner DictionaryKeyIterator{ValueGeneric} iterator)
         iterator := DictionaryKeyIterator{ValueGeneric}(user self)!
     
     func user ! iter-values()->(
-            owner DictionaryValueIterator?{ValueGeneric} iterator)
+            owner DictionaryValueIterator{ValueGeneric} iterator)
         iterator := DictionaryValueIterator{ValueGeneric}(user self)!
 
 
