@@ -236,10 +236,13 @@ struct ReferenceMemoryList
     
     func check-node-reference(
             user ReferencePath reference-path, user SyntaxTreeNode node)
-        if self.is-invalid(user reference-path) or self.reference-inside(
-                user reference-path, user self.written-owner-references)
+        if self.is-invalid(user reference-path)
             node.syntax-error-ref(
                     user "using invalid reference", user reference-path)
+        if self.reference-inside(
+                user reference-path, user self.written-owner-references)
+            node.syntax-error-ref(
+                    user "using modified reference", user reference-path)
         if reference-path?
             self.read-owner-references.add(owner reference-path.copy-new())
     

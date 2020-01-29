@@ -716,6 +716,14 @@ ta :=: tc
 new Test t1!
 strong Test t2(strong to!)
 t1 :=: t2
+; @ ec test-swap-expression-e6
+new String{4} valid!
+owner String invalid
+valid :=: invalid
+; @ ec test-swap-expression-e7
+new String{4} valid!
+owner String invalid
+invalid :=: valid
 ; @@ test-question-expression
 ; @ c test-question-expression-0
 b := ostr?
@@ -3510,7 +3518,8 @@ func ! fun(owner Test? t)
 ; @ eg test-memory-owner-e14
 struct Test
     owner String s
-    new()
+    new!()
+        self.s := String{4}()!
 func fun(owner Test t, user Test tu, owner String s, user String su)
     t.s :=: s
     su.clear()

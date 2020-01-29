@@ -1955,6 +1955,10 @@ swapping non assignable expression
 non matching types "Ta" and "Tc"
 /// @ test-swap-expression-e5
 cannot swap access "owner" with other access "strong"
+/// @ test-swap-expression-e6
+using invalid reference "invalid"
+/// @ test-swap-expression-e7
+using invalid reference "invalid"
 /// @@ test-question-expression
 /// @ test-question-expression-0
 ut_M_b = ut_M_ostr != NULL;
@@ -8685,9 +8689,9 @@ cannot move non-conditional owner field "t.s"
 /// @ test-memory-owner-e9
 using invalid reference "s"
 /// @ test-memory-owner-e12
-using invalid reference "t"
+using modified reference "t"
 /// @ test-memory-owner-e13
-using invalid reference "t.t"
+using modified reference "t.t"
 /// @ test-memory-owner-e14
 cannot modify owner field "s" in non-owner reference "tu.s"
 /// @ test-memory-owner-e15
@@ -8703,7 +8707,7 @@ using modified reference "s"
 /// @ test-memory-owner-e20
 using modified reference "s"
 /// @ test-memory-owner-e21
-using invalid reference "t"
+using modified reference "t"
 /// @ test-memory-owner-e22
 using modified reference "t"
 /// @ test-memory-owner-e23
