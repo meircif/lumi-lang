@@ -154,8 +154,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
                 self.syntax-error(
                         user "fields cannot have access",
                         user glob.access-names[self.access])
-            if (not self.type-instance.type-data.is-primitive or
-                    self.type-instance.type-data is glob.type-func) and
+            if self.type-instance.type-data.is-ref() and
                     not self.parent-type.constructor?
                 if access-is-only-var(copy self.access)
                     if self.type-instance.type-data.constructor?
@@ -212,12 +211,10 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             self.write-cname()
         
         if not self.parent-type? and not self.is-native
-            if self.type-instance.type-data.is-primitive and
-                    self.type-instance.type-data is-not glob.type-func and
-                    self.type-instance.type-data is-not glob.type-ref
-                write(user " = 0")
-            else
+            if self.type-instance.type-data.is-ref()
                 write(user " = NULL")
+            else
+                write(user " = 0")
         
         write(user ";\n")
         

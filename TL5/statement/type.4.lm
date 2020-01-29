@@ -57,6 +57,10 @@ class TypeData(SyntaxTreeNamespace)
         if self.base-type?
             base-dynamic := self.base-type.type-data.is-dynamic
     
+    func inst is-ref()->(var Bool is-reference)
+        is-reference := not self.is-primitive or self is glob.type-func or
+                self is glob.type-ref
+    
     func inst add-type(user ModuleMembers my-module)
         if not is-legal-name(user self.name, copy NameGroup.TYPE)
             self.syntax-error(user "illegal type name", user self.name)

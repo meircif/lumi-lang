@@ -242,9 +242,7 @@ struct TypeInstance
         if not self?
             assert node?
             node.syntax-error-msg(user "cannot assign void expression")
-        if self.type-data is glob.type-empty and
-                (not target.type-data.is-primitive or
-                target.type-data is glob.type-func)
+        if self.type-data is glob.type-empty and target.type-data.is-ref()
             if not target.conditional
                 assert node?
                 node.syntax-error(
