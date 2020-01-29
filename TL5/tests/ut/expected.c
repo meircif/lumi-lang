@@ -2361,9 +2361,16 @@ void (*farr[38])(void) = {0};
 /// @ test-function-object-6
 void (*fun)(Int x, Int y) = NULL;
 /// @ test-function-object-7
+void ut_M_fun(void);
 void ut_M_mock(void (**f)(void));
+void ut_M_fun(void) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
 void ut_M_mock(void (**f)(void)) {
     unsigned LUMI_loop_depth = 1;
+    *f = ut_M_fun;
     (*f)();
 LUMI_block0_cleanup:
     (void)0;
@@ -2374,23 +2381,33 @@ struct ut_M_Test {
     void (*fun)(Int x, Int y);
     Returncode (*afun[4])(Int x, Int* y);
 };
-void ut_M_Test_meth(ut_M_Test* self, Returncode (*fi)(Int x, Int y), void (**fo)(Int x, Int y));
+void ut_M_Test_meth(ut_M_Test* self, Returncode (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y));
 void ut_M_Test_Del(ut_M_Test* self);
-void ut_M_fun(void (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y));
+Returncode ut_M_fun(Int x, Int y);
+void ut_M_mock(void (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y));
 void ut_M_afun(void (** in)(Int x, Int* y), int in_Length, Returncode (*** out)(void), int* out_Length);
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_meth(ut_M_Test* self, Returncode (*fi)(Int x, Int y), void (**fo)(Int x, Int y)) {
+void ut_M_Test_meth(ut_M_Test* self, Returncode (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y)) {
     unsigned LUMI_loop_depth = 1;
+    *fo = ut_M_fun;
 LUMI_block0_cleanup:
     (void)0;
 }
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
 }
-void ut_M_fun(void (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y)) {
+Returncode ut_M_fun(Int x, Int y) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+void ut_M_mock(void (*fi)(Int x, Int y), Returncode (**fo)(Int x, Int y)) {
     unsigned LUMI_loop_depth = 1;
     Returncode (*aux_Func_0)(Int x, Int y) = NULL;
-    ut_M_fun(NULL, &(aux_Func_0));
+    ut_M_mock(NULL, &(aux_Func_0));
+    *fo = ut_M_fun;
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -3156,9 +3173,16 @@ LUMI_block0_cleanup:
     (void)0;
 }
 /// @ test-function-5
+void ut_M_some(void);
 void ut_M_name(void (*fun)(Int x, Int* y), void (**joy)(void));
+void ut_M_some(void) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
 void ut_M_name(void (*fun)(Int x, Int* y), void (**joy)(void)) {
     unsigned LUMI_loop_depth = 1;
+    *joy = ut_M_some;
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -3355,6 +3379,28 @@ void ut_M_name(char* ai, int ai_Length, int ai_Value_length, int ai_Value_value_
 LUMI_block0_cleanup:
     (void)0;
 }
+/// @ test-function-11
+Returncode ut_M_name(char** so, int* so_Max_length, int** so_Length);
+Returncode ut_M_name(char** so, int* so_Max_length, int** so_Length) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    char* aux_String_0 = NULL;
+    int aux_String_0_Max_length = 0;
+    int* aux_String_0_Length = &Lumi_empty_int;
+    INIT_NEW_STRING(2, LUMI_block0_cleanup, aux_String_0, 12);
+    String_Del(*so);
+    free(*so);
+    *so_Max_length = 12;
+    *so_Length = aux_String_0_Length;
+    *so = aux_String_0;
+    aux_String_0 = NULL;
+    aux_String_0_Length = &Lumi_empty_int;
+LUMI_block0_cleanup:
+    (void)0;
+    String_Del(aux_String_0);
+    free(aux_String_0);
+    return LUMI_err;
+}
 /// @ test-function-m0
 void new_Mock(Bool* allocate_success) { }
 Returncode delete_Mock(Ref self) { return OK; }
@@ -3444,14 +3490,12 @@ variable name overrides function "error"
 /// @ test-function-e28
 illegal variable name "Error"
 /// @ test-function-e29
-not yet supporting non-conditional and non-primitive output "s"
+error raised inside function not declared as error raising "fun"
 /// @ test-function-e30
 error raised inside function not declared as error raising "fun"
 /// @ test-function-e31
 error raised inside function not declared as error raising "fun"
 /// @ test-function-e32
-error raised inside function not declared as error raising "fun"
-/// @ test-function-e33
 error raised inside function not declared as error raising "fun"
 /// @@ test-members
 /// @ test-members-0
@@ -5894,8 +5938,6 @@ user output to native function with non struct type "String"
 /// @ test-native-ef15
 user output to native function with non struct type "Array"
 /// @ test-native-ef16
-not yet supporting non-conditional and non-primitive output "s"
-/// @ test-native-ef17
 user output to native function with non struct type "Error"
 /// @ test-native-ev0
 only primitive types supported for native variable, got "String"
@@ -9111,14 +9153,6 @@ using potentially illegal user reference "s"
 using potentially illegal user reference "s"
 /// @ test-memory-user-e24
 using potentially illegal user reference "s"
-/// @ test-memory-user-e25
-returning potentially illegal user output "s"
-/// @ test-memory-user-e26
-returning potentially illegal user output "s"
-/// @ test-memory-user-e27
-returning potentially illegal user output "s"
-/// @ test-memory-user-e28
-returning potentially illegal user output "s"
 /// @ test-memory-user-e29
 using potentially illegal user reference "s"
 /// @ test-memory-user-e30
@@ -9154,10 +9188,6 @@ using potentially illegal user reference "str"
 /// @ test-memory-user-e45
 using potentially illegal user reference "str"
 /// @ test-memory-user-e46
-returning potentially illegal user output "sout"
-/// @ test-memory-user-e47
-returning potentially illegal user output "sout"
-/// @ test-memory-user-e48
 using potentially illegal user reference "{anonymous}"
 /// @@ test-memory-temp
 /// @ test-memory-temp-0
@@ -9401,6 +9431,50 @@ using invalid reference "t"
 cannot take temporary owner from global "ostr"
 /// @ test-memory-temp-e15
 cannot take temporary owner from global "t"
+/// @@ test-memory-output
+/// @ test-memory-output-0
+Returncode ut_M_fun(char** s, int* s_Max_length, int** s_Length);
+Returncode ut_M_fun(char** s, int* s_Max_length, int** s_Length) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    char* aux_String_0 = NULL;
+    int aux_String_0_Max_length = 0;
+    int* aux_String_0_Length = &Lumi_empty_int;
+    INIT_NEW_STRING(2, LUMI_block0_cleanup, aux_String_0, 12);
+    String_Del(*s);
+    free(*s);
+    *s_Max_length = 12;
+    *s_Length = aux_String_0_Length;
+    *s = aux_String_0;
+    aux_String_0 = NULL;
+    aux_String_0_Length = &Lumi_empty_int;
+    String_clear(*s, *s_Max_length, *s_Length);
+LUMI_block0_cleanup:
+    (void)0;
+    String_Del(aux_String_0);
+    free(aux_String_0);
+    return LUMI_err;
+}
+/// @ test-memory-output-e0
+returning potentially illegal user output "s"
+/// @ test-memory-output-e1
+returning potentially illegal user output "s"
+/// @ test-memory-output-e2
+returning potentially illegal user output "s"
+/// @ test-memory-output-e3
+returning potentially illegal user output "s"
+/// @ test-memory-output-e4
+returning potentially illegal user output "sout"
+/// @ test-memory-output-e5
+returning potentially illegal user output "sout"
+/// @ test-memory-output-e6
+using invalid reference "s"
+/// @ test-memory-output-e7
+potentially not returning output "s"
+/// @ test-memory-output-e8
+potentially not returning output "s"
+/// @ test-memory-output-e9
+potentially not returning output "s"
 /// @@ test-memory-constructor
 /// @ test-memory-constructor-0
 typedef struct ut_M_NoConstructor ut_M_NoConstructor;

@@ -306,6 +306,11 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     func inst check-block-memory(user ReferenceMemoryList refs)
         self.arguments.check-memory(user refs)
         self.check-children-memory(user self.variables, user refs)
+        var ReferencePath reference-path(user _)
+        for output in self.arguments.outputs.iter()
+            output.get-variable()->(user reference-path.variable)
+            if reference-path.variable.type-instance.type-data.is-ref()
+                refs.mark-invalid-reference(user reference-path)
         base.check-memory(user refs)
         for parameter in self.arguments.parameters.iter()
             if access-is-owner(copy parameter.access)
@@ -512,19 +517,13 @@ class DeclarationArgument(Argument)
                     user glob.access-names[self.access],
                     user "for non-primitive type",
                     user type-data.name)
-        else-if self.is-output
-            if self.access = Access.TEMP
-                self.syntax-error2(
-                        user "output",
-                        user self.variable.name,
-                        user "access should not be \"temp\" for non-primitive \
-                        type",
-                        user type-data.name)
-            if not self.variable.type-instance.conditional
-                self.syntax-error(
-                        user "not yet supporting non-conditional and \
-                        non-primitive output",
-                        user self.variable.name)
+        else-if self.is-output and self.access = Access.TEMP
+            self.syntax-error2(
+                    user "output",
+                    user self.variable.name,
+                    user "access should not be \"temp\" for non-primitive \
+                    type",
+                    user type-data.name)
         self.variable.type-instance.analyze-lengths(user self, copy false)
         if self.is-native
             if access-is-owner(copy self.access)

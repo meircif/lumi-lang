@@ -26,14 +26,14 @@ struct List{Generic}
         empty := not self.first?
 
     ~~~ Get and remove first item, fail if list is empty ~~~
-    func temp ! pop()->(owner Generic? item)
+    func temp ! pop()->(owner Generic item)
         owner ListNode{Generic} first
         if-error first := self.first
             raise "list empty"
         self.first := first.next
-        item := first.item
+        item := first.item!
     
-    func user ! iter()->(owner ListIterator?{Generic} iterator)
+    func user ! iter()->(owner ListIterator{Generic} iterator)
         iterator := ListIterator{Generic}(user self)!
 
 

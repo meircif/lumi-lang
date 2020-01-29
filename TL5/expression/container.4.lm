@@ -187,9 +187,7 @@ class BinaryExpression(UnaryExpression)
         self.test-operand-type(user self.left-expression, user expected-type)
 
     func inst test-is-reference(copy Bool is-reference, user Expression operand)
-        if (not operand.result-type.type-data.is-primitive or
-                operand.result-type.type-data is glob.type-func or
-                operand.result-type.type-data is glob.type-ref) != is-reference
+        if operand.result-type.type-data.is-ref() != is-reference
             self.syntax-error2(
                     user "operator",
                     user self.operator.name,

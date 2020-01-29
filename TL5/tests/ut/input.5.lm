@@ -965,13 +965,17 @@ farr[3]()
 var Func{(copy Int x,
         copy Int y)} fun
 ; @ g test-function-object-7
+func fun()
 func mock()->(var Func{()} f)
+    f := fun
     f()
 ; @ g test-function-object-8
-func fun(copy Func?{(copy Int x,
+func ! fun(copy Int x, copy Int y)
+func mock(copy Func?{(copy Int x,
         copy Int y)} fi)->(var Func{:(copy Int x,
         copy Int y)} fo)
-    fun(copy _)
+    mock(copy _)
+    fo := fun
 func afun(user Array{Func{(copy Int x)->(var Int y)}} in)->(
         owner Array?{Func{:()}} out)
 struct Test
@@ -979,8 +983,9 @@ struct Test
             copy Int y)} fun
     var Array{4:Func{:(copy Int x)->(var Int y)}} afun
     func user meth(copy Func{:(copy Int x,
-            copy Int y)} fi)->(var Func{(copy Int x,
+            copy Int y)} fi)->(var Func{:(copy Int x,
             copy Int y)} fo)
+        fo := fun
 ; @ c test-function-object-9
 var Func{:()} fun
 fun := fune
@@ -1362,7 +1367,9 @@ func name(copy Char param)->(owner String? out)
 ; @ g test-function-4
 func name(user Array{Int} array)
 ; @ g test-function-5
+func some()
 func name(copy Func{(copy Int x)->(var Int y)} fun)->(var Func{()} joy)
+    joy := some
 ; @ g test-function-6
 func name()
     var Int x
@@ -1406,6 +1413,9 @@ func name()->(owner Test? t)
     t := _
 ; @ g test-function-10
 func name(user Array{Array{String}} ai)->(owner Array?{Array{Int}} ao)
+; @ g test-function-11
+func ! name()->(owner String so)
+    so := String{12}()!
 ; @ g test-function-m0
 main
     var Int x
@@ -1480,17 +1490,15 @@ func error(copy Int error)
 ; @ eg test-function-e28
 func name(copy Int Error)
 ; @ eg test-function-e29
-func name()->(owner String s)
-; @ eg test-function-e30
 func fun(weak String s)
     s!.clear()
-; @ eg test-function-e31
+; @ eg test-function-e30
 func fun()
     raise!
-; @ eg test-function-e32
+; @ eg test-function-e31
 func fun()
     assert! 1 = 2
-; @ eg test-function-e33
+; @ eg test-function-e32
 func fun()
     assert-error! 1 = 2
 ; @@ test-members
@@ -2325,7 +2333,7 @@ var Ref r
 var Ref r
 r := ostr
 ; @ c test-testing-r2
-var Ref r
+var Ref? r
 r := _
 ; @ c test-testing-r3
 var Ref r(copy ostr)
@@ -2554,10 +2562,6 @@ native func error()->(user String? s)
 ; @ eg test-native-ef15
 native func error()->(user Array?{Int} a)
 ; @ eg test-native-ef16
-struct Error
-    var Int x
-native func error()->(user Error s)
-; @ eg test-native-ef17
 class Error
     var Int x
     func dynamic user meth()
@@ -3833,21 +3837,6 @@ func ! deleting(copy Func?{()} f)
 func ! fun(user String s)
     deleting(copy _)!
     s.clear()
-; @ eg test-memory-user-e25
-func fun()->(user String? s)
-; @ eg test-memory-user-e26
-func deleting()
-    owner String? s
-func fun()->(user String? s)
-    s := _
-    deleting()
-; @ eg test-memory-user-e27
-func fun(owner String so)->(user String? s)
-    s := _
-; @ eg test-memory-user-e28
-func fun()->(user String? s)
-    owner String? so
-    s := _
 ; @ eg test-memory-user-e29
 struct Test
     owner String? s
@@ -3942,16 +3931,7 @@ try
         raise
     str := ostr
 str!.clear()
-; @ eg test-memory-user-e46
-func fun(user String sin)->(user String? sout)
-    if false
-        sout := sin
-; @ eg test-memory-user-e47
-func fun(user String sin)->(user String? sout)
-    if true
-        return
-    sout := sin
-; @ ec test-memory-user-e48
+; @ ec test-memory-user-e46
 str := ostr
 for n in str!
     ostr := _
@@ -4083,6 +4063,49 @@ struct Test
 owner Test? t
 func ! error()
     temp String? s(temp t!.s)
+; @@ test-memory-output
+; @ g test-memory-output-0
+func ! fun()->(owner String s)
+    s := String{12}()!
+    s.clear()
+; @ eg test-memory-output-e0
+func fun()->(user String s)
+; @ eg test-memory-output-e1
+func deleting()
+    owner String? s
+func fun()->(user String? s)
+    s := _
+    deleting()
+; @ eg test-memory-output-e2
+func fun(owner String so)->(user String? s)
+    s := _
+; @ eg test-memory-output-e3
+func fun()->(user String? s)
+    owner String? so
+    s := _
+; @ eg test-memory-output-e4
+func fun(user String sin)->(user String sout)
+    if false
+        sout := sin
+; @ eg test-memory-output-e5
+func fun(user String sin)->(user String sout)
+    if true
+        return
+    sout := sin
+; @ eg test-memory-output-e6
+func fun()->(owner String s)
+    s.clear()
+; @ eg test-memory-output-e7
+func fun()->(owner String s)
+; @ eg test-memory-output-e8
+func ! fun()->(owner String s)
+    if true
+        s := String{4}()!
+; @ eg test-memory-output-e9
+func ! fun()->(owner String s)
+    if false
+        return
+    s := String{4}()!
 ; @@ test-memory-constructor
 ; @ g test-memory-constructor-0
 struct NoConstructor
