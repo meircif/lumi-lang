@@ -2620,6 +2620,12 @@ USER_MAIN_HEADER {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     Int x = 0;
+    char* ls = NULL;
+    int ls_Max_length = 0;
+    int* ls_Length = &Lumi_empty_int;
+    char* aux_String_0 = NULL;
+    int aux_String_0_Max_length = 0;
+    int* aux_String_0_Length = &Lumi_empty_int;
     char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int* aux_String_0_Length = &Lumi_empty_int;
@@ -2667,8 +2673,24 @@ USER_MAIN_HEADER {
 #undef LUMI_FUNC_NAME
     x = 6;
     x = 7;
+    INIT_NEW_STRING(9, LUMI_block0_cleanup, ls, 12);
+    aux_String_0_Max_length = 12;
+    aux_String_0_Length = ls_Length;
+    aux_String_0 = ls;
+    ls_Max_length = ut_M_cs_Max_length;
+    ls_Length = ut_M_cs_Length;
+    ls = ut_M_cs;
+    ut_M_cs_Max_length = 12;
+    ut_M_cs_Length = aux_String_0_Length;
+    ut_M_cs = aux_String_0;
+    aux_String_0 = NULL;
+    aux_String_0_Length = &Lumi_empty_int;
 LUMI_block0_cleanup:
     (void)0;
+    String_Del(aux_String_0);
+    free(aux_String_0);
+    String_Del(ls);
+    free(ls);
     return LUMI_err;
 }
 MAIN_FUNC
@@ -2783,6 +2805,12 @@ unexpected "["
 global variables cannot have access "user"
 /// @ test-general-e15
 global variables cannot have access "temp"
+/// @ test-general-e16
+non-conditional global variable not initialized
+/// @ test-general-e17
+cannot move non-conditional global owner "error"
+/// @ test-general-e18
+cannot move non-conditional global owner "error"
 /// @@ test-struct
 /// @ test-struct-0
 typedef struct ut_M_Test ut_M_Test;
@@ -9369,6 +9397,10 @@ using invalid reference "s"
 using invalid reference "t"
 /// @ test-memory-temp-e13
 using invalid reference "t"
+/// @ test-memory-temp-e14
+cannot take temporary owner from global "ostr"
+/// @ test-memory-temp-e15
+cannot take temporary owner from global "t"
 /// @@ test-memory-constructor
 /// @ test-memory-constructor-0
 typedef struct ut_M_NoConstructor ut_M_NoConstructor;

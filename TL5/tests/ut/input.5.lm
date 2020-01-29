@@ -1150,6 +1150,8 @@ weak String gs(weak us)
 main!
     var Int x(copy 6)
     x := 7
+    new String{12} ls!
+    ls :=: cs
 ; @ tg test-general-7
 var String{12} s
 func fun()
@@ -1194,15 +1196,27 @@ var Int name
 func name()
 var Int name
 ; @ eg test-general-e11
-user Error error
+user Error? error
 ; @ eg test-general-e12
 var Int x(copy error)
 ; @ eg test-general-e13
 [ ; error
 ; @ eg test-general-e14
-user String error
+user String? error
 ; @ eg test-general-e15
-temp String error
+temp String? error
+; @ eg test-general-e16
+weak String error
+; @ eg test-general-e17
+owner String error(owner String{12}()!)
+func fun()->(owner String? s)
+    s := error
+main!
+; @ eg test-general-e18
+owner String error(owner String{12}()!)
+func fun(owner String s)
+main!
+    fun(owner error)
 ; @@ test-struct
 ; @ g test-struct-0
 struct Test
@@ -4061,6 +4075,14 @@ struct Test
 func ! fun(owner Test t)
     temp Test x(temp t.next!.next!)
     x.next := t.next
+; @ ec test-memory-temp-e14
+temp String? s(temp ostr)
+; @ eg test-memory-temp-e15
+struct Test
+    owner String? s
+owner Test? t
+func ! error()
+    temp String? s(temp t!.s)
 ; @@ test-memory-constructor
 ; @ g test-memory-constructor-0
 struct NoConstructor
