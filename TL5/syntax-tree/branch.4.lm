@@ -230,7 +230,10 @@ class SyntaxTreeBranch(SyntaxTreeNode)
                 write(user "_base.")
             write(user "_del(")
         else-if variable.type-instance.type-data is glob.type-array
-            write(user "ARRAY_DEL(")
+            write(user "ARRAY_DEL")
+            if data-type.type-data.is-dynamic
+                write(user "_DYN")
+            write(user "(")
             data-type.write-cname()
             write(user ", ")
         else
@@ -239,6 +242,12 @@ class SyntaxTreeBranch(SyntaxTreeNode)
         if parent-type?
             write(user "self->")
         write-cname(user variable.name)
+        if variable.type-instance.type-data.is-dynamic
+            write(user ", ")
+            if parent-type?
+                write(user "self->")
+            write-cname(user variable.name)
+            write(user "_Dynamic")
         if variable.type-instance.type-data is glob.type-array
             write(user ", ")
             if parent-type?
@@ -258,7 +267,10 @@ class SyntaxTreeBranch(SyntaxTreeNode)
             return
         write-spaces(copy INDENTATION-SPACES)
         if variable.type-instance.type-data is glob.type-array
-            write(user "ARRAY_DEL(")
+            write(user "ARRAY_DEL")
+            if data-type.type-data.is-dynamic
+                write(user "_DYN")
+            write(user "(")
             data-type.write-cname()
             write(user ", ")
             if parent-type?
@@ -282,6 +294,10 @@ class SyntaxTreeBranch(SyntaxTreeNode)
             write-cname(user variable.name)
             if parent-type?
                 write(user ")")
+            if data-type.type-data.is-dynamic
+                write(user ", &")
+                data-type.write-cname()
+                write(user "_dynamic")
             write(user ");\n")
 
 

@@ -40,7 +40,7 @@ func ! factorial(copy Int x)->(var Int res)
 struct IntBox
     var Int value
 
-    func user new(copy Int value)
+    func user set(copy Int value)
         self.value := value
 
 

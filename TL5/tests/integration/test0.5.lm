@@ -647,6 +647,31 @@ func ! test-switch()
     sys.println(user s2)!
 
 
+class BaseString
+    owner String s
+    func dynamic user ! print()
+        sys.println(user self.s)!
+    new!()
+        self.s := String{16}(user "BaseString")!
+    cleanup()
+        try
+            self.print()
+
+class TestString(BaseString)
+    func dynamic user ! print()
+        sys.println(user "TestString print")!
+        base()!
+    new!()
+        self.s := String{16}(user "TestString")!
+    cleanup()
+        try
+            sys.println(user "TestString cleanup")
+
+func ! test-cleanup()
+    owner BaseString? bs(owner TestString()!)
+    bs := _
+
+
 main!
     test-simple-function()!
     test-ref-count()!
@@ -655,3 +680,4 @@ main!
     test-complex-field()!
     test-temp()!
     test-switch()!
+    test-cleanup()!

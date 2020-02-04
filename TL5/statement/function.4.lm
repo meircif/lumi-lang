@@ -135,6 +135,10 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
             if field?
                 self.syntax-error(
                         user "method name overrides field", user self.name)
+            if self.name.equal(user "new") or self.name.equal(user "cleanup")
+                self.syntax-error(
+                        user "using reserved method name", user self.name)
+        
         else
             if glob.module-map.find(user self.name)?
                 self.syntax-error(
@@ -222,8 +226,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
             is-constructor := self is self.parent-type.constructor
     
     func dynamic analyze()
-        if self.is-constructor() and self.arguments.outputs.first?
-            self.syntax-error-msg(user "constructor with outputs")
         if self.my-module?
             glob.current-module := self.my-module
         if self.implemented-function?
@@ -427,18 +429,28 @@ struct TypeCount
     var Int count
 
 
-~~~ Constructor declaration in the syntax tree ~~~
-class SyntaxTreeConstructor(SyntaxTreeFunction)
-    func inst parse-new(user TypeData parent-type)->(
-            owner SyntaxTreeConstructor new-node)
-        new-node := SyntaxTreeConstructor()
-        new-node.parse(user parent-type)
-    
+class SyntaxTreeSpecialMethod(SyntaxTreeFunction)
     func inst parse(user TypeData parent-type)
         self.parent-type := parent-type
         self.indentation-spaces := INDENTATION-SPACES
         self.self-access := Access.TEMP
         self.self-conditional := false
+        self.parse-special()
+        self.parse-arguments(copy false)
+        self.parse-body()
+    
+    func dynamic parse-special()
+        raise
+
+
+~~~ Constructor declaration in the syntax tree ~~~
+class SyntaxTreeConstructor(SyntaxTreeSpecialMethod)
+    func inst parse-new(user TypeData parent-type)->(
+            owner SyntaxTreeConstructor new-node)
+        new-node := SyntaxTreeConstructor()
+        new-node.parse(user parent-type)
+    
+    func dynamic parse-special()
         self.parent-type.constructor := self
         if glob.last-char = '!'
             self.arguments.has-error := true
@@ -446,8 +458,31 @@ class SyntaxTreeConstructor(SyntaxTreeFunction)
         if glob.last-char != '('
             self.syntax-error-c(user "expected \"(\" after \"new\", got")
         string-new-copy(user "new")->(owner self.name)
-        self.parse-arguments(copy false)
-        self.parse-body()
+
+    func dynamic analyze()
+        if self.arguments.outputs.first?
+            self.syntax-error-msg(user "constructor with outputs")
+        base()
+
+
+~~~ Cleanup declaration in the syntax tree ~~~
+class SyntaxTreeCleanup(SyntaxTreeSpecialMethod)
+    func inst parse-new(user TypeData parent-type)->(
+            owner SyntaxTreeCleanup new-node)
+        new-node := SyntaxTreeCleanup()
+        new-node.parse(user parent-type)
+    
+    func dynamic parse-special(user TypeData parent-type)
+        self.parent-type.cleanup := self
+        if glob.last-char != '('
+            self.syntax-error-c(user "expected \"(\" after \"cleanup\", got")
+        string-new-copy(user "cleanup")->(owner self.name)
+
+    func dynamic analyze()
+        if self.arguments.parameters.first.next? or
+                self.arguments.outputs.first?
+            self.syntax-error-msg(user "cleanup with arguments")
+        base()
 
 
 ~~~ Function declaration argument ~~~

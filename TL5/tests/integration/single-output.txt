@@ -20,3 +20,6 @@ items[
 complex fields: $$$$$$ a1 a2 a3
 second string
 first string
+TestString cleanup
+TestString print
+TestString

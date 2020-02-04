@@ -31,4 +31,4 @@ test_script:
   - "dir /B tl4-compiler.exe >nul"
   - "dir /B tl5-compiler.exe >nul"
   - "dir /B lumi.exe >nul"
-  - tl5-compiler-tests.exe TL5\tests\ut\
+  - if NOT [%CC%]==[gcc] tl5-compiler-tests.exe TL5\tests\ut\
