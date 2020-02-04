@@ -64,7 +64,7 @@ typedef float cdef_M_Float;
 typedef double cdef_M_Double;
 typedef long double cdef_M_LongDouble;
 
-typedef void (*Dynamic_Del)(void*);
+typedef void (*Dynamic_Del)(void*, void*);
 
 typedef void Generic_Type;
 typedef struct Generic_Type_Dynamic { Dynamic_Del _del; } Generic_Type_Dynamic;
@@ -171,6 +171,12 @@ typedef struct Error_Messages {
     Type##_Del(array + LUMI_n); \
   }
 
+#define ARRAY_DEL_DYN(Type, array, length) if (array != NULL) { \
+  int LUMI_n = 0; \
+  for (; LUMI_n < length; ++LUMI_n) \
+    Type##_Del(array + LUMI_n, &Type##_dynamic); \
+  }
+
 #define SELF_REF_DEL(Type, field) \
 while (self->field != NULL) { \
   Type* value = self->field; \
@@ -192,30 +198,30 @@ while (self->field != NULL) { \
   LUMI_owner_dec_ref(value_Refman); \
 }
 
-#define SELF_REF_DEL_DYN(Type, bases, field) \
+#define SELF_REF_DEL_DYN(Type, bases, field, field_Dynamic) \
 while (self->field != NULL) { \
   Type* value = self->field; \
-  Type##_Dynamic* value_Dynamic = self->field##_Dynamic; \
+  Type##_Dynamic* value_Dynamic = self->field_Dynamic; \
   self->field = value->field; \
-  self->field##_Dynamic = value->field##_Dynamic; \
+  self->field_Dynamic = value->field_Dynamic; \
   value->field = NULL; \
-  value->field##_Dynamic = NULL; \
-  value_Dynamic->bases##del(value); \
+  value->field_Dynamic = NULL; \
+  value_Dynamic->bases##del(value, value_Dynamic); \
   free(value); \
 }
 
-#define SELF_REF_DEL_STR_DYN(Type, bases, field) \
+#define SELF_REF_DEL_STR_DYN(Type, bases, field, field_Dynamic) \
 while (self->field != NULL) { \
   Type* value = self->field; \
   Ref_Manager* value_Refman = self->field##_Refman; \
-  Type##_Dynamic* value_Dynamic = self->field##_Dynamic; \
+  Type##_Dynamic* value_Dynamic = self->field_Dynamic; \
   self->field = value->field; \
   self->field##_Refman = value->field##_Refman; \
-  self->field##_Dynamic = value->field##_Dynamic; \
+  self->field_Dynamic = value->field_Dynamic; \
   value->field = NULL; \
   value->field##_Refman = NULL; \
-  value->field##_Dynamic = NULL; \
-  value_Dynamic->bases##del(value); \
+  value->field_Dynamic = NULL; \
+  value_Dynamic->bases##del(value, value_Dynamic); \
   LUMI_owner_dec_ref(value_Refman); \
 }
 

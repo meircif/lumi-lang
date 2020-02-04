@@ -153,6 +153,8 @@ test test-illegal-call()
     assert-error tw.write(user _)
     var tl5-compiler.CallExpression call(user _)
     assert-error call.write-function()
+    var tl5-compiler.SyntaxTreeSpecialMethod special-meth
+    assert-error special-meth.parse-special()
 
 test test-mocked-functions()
     setup-test()

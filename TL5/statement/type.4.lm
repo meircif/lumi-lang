@@ -10,6 +10,7 @@ class TypeData(SyntaxTreeNamespace)
     owner NameMap{SyntaxTreeFunction} dynamic-base-methods
     owner DeleteGroup delete-group
     user SyntaxTreeFunction constructor
+    user SyntaxTreeCleanup cleanup
     var Bool is-primitive
     var Bool is-dynamic
     var Bool is-int-like
@@ -81,6 +82,14 @@ class TypeData(SyntaxTreeNamespace)
                         user self.name)
             self.functions.add(
                     owner SyntaxTreeConstructor.parse-new(user _, user self))
+        
+        else-if keyword.equal(user "cleanup")
+            if self.cleanup?
+                self.syntax-error(
+                        user "cleanup already defined for type",
+                        user self.name)
+            self.functions.add(
+                    owner SyntaxTreeCleanup.parse-new(user _, user self))
         else
             self.syntax-error(user "unknown keyword", user keyword)
     
@@ -302,12 +311,21 @@ class TypeData(SyntaxTreeNamespace)
     
     func dynamic write-methods-declaration()
         self.write-functions-declaration()
-        ; void `cname`_Del(`cname`* self);
+        self.write-del-header()
+        write(user ";\n")
+    
+    func inst write-del-header()
+        ; void `cname`_Del(`cname`* self[, `cname`_Dynamic* self_Dynamic]);
         write(user "\nvoid ")
         self.write-cname()
         write(user "_Del(")
         self.write-cname()
-        write(user "* self);\n")
+        write(user "* self")
+        if self.is-dynamic
+            write(user ", ")
+            self.write-cname()
+            write(user "_Dynamic* self_Dynamic")
+        write(user ")")
     
     func dynamic write-global()
         write(user "\n")
@@ -353,22 +371,29 @@ class TypeData(SyntaxTreeNamespace)
     
     func dynamic write-methods-body()
         self.write-children(user self.functions)
-        ; void `cname`_Del(`cname`* self) {
+        ; void `cname`_Del(`cname`* self[, `cname`_Dynamic* self_Dynamic]) {
         ;     if (self == NULL) return;
-        ;     `base`_Del(self);
+        ;     `base`_Del(&(self->_base)[, &(self_Dynamic->_base))]);
         ;     ...
         ; }
-        write(user "\nvoid ")
-        self.write-cname()
-        write(user "_Del(")
-        self.write-cname()
-        write(user "* self) {\n")
+        self.write-del-header()
+        write(user " {\n")
         write-spaces(copy INDENTATION-SPACES)
         write(user "if (self == NULL) return;\n")
+        if self.cleanup?
+            write-spaces(copy INDENTATION-SPACES)
+            self.cleanup.write-cname()
+            write(user "(self")
+            if self.is-dynamic
+                write(user ", self_Dynamic")
+            write(user ");\n")
         if self.base-type?
             write-spaces(copy INDENTATION-SPACES)
             self.base-type.write-cname()
-            write(user "_Del(&(self->_base));\n")
+            write(user "_Del(&(self->_base)")
+            if self.is-dynamic
+                write(user ", &(self_Dynamic->_base)")
+            write(user ");\n")
         if self.is-delete-mocked
             write-spaces(copy INDENTATION-SPACES)
             write(user "IGNORE_ERRORS( ")

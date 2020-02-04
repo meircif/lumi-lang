@@ -1284,9 +1284,12 @@ struct Error
     var Int x
     new()->(var Int x)
 ; @ eg test-struct-e14
+struct Error
+    func temp new()
+; @ eg test-struct-e15
 struct Error(Error)
     var Int x
-; @ eg test-struct-e15
+; @ eg test-struct-e16
 struct Aerror(Berror)
     var Int x
 struct Berror(Aerror)
@@ -4324,4 +4327,46 @@ i := p-int.get-ref-at(copy 5)
 var Test tv
 var cdef.Pointer{Test} p-test
 tv := p-test.get-pointed-at(copy 0)
+; @@ test-cleanup-function
+; @ g test-cleanup-function-0
+struct Test
+    owner String? s
+    cleanup()
+        try
+            self.s.clear()
+; @ g test-cleanup-function-1
+class Base
+    var Int x
+    func dynamic user meth()
+    cleanup()
+        self.meth()
+class Test(Base)
+    cleanup()
+        self.meth()
+; @ eg test-cleanup-function-e0
+struct Test
+    var Int x
+    cleanup()
+    cleanup()
+; @ eg test-cleanup-function-e1
+struct Test
+    var Int x
+    cleanup!()
+; @ eg test-cleanup-function-e2
+struct Test
+    owner String? s
+    cleanup()
+        self.s!.clear()
+; @ eg test-cleanup-function-e3
+struct Test
+    var Int x
+    cleanup(copy Int error)
+; @ eg test-cleanup-function-e4
+struct Test
+    var Int x
+    cleanup()->(var Int error)
+; @ eg test-cleanup-function-e5
+struct Test
+    var Int x
+    func temp cleanup()
 ; @

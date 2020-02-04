@@ -46,10 +46,10 @@ test factorial-test()
 test sum-test()
     s-var Array{4:math.IntBox} array!
     var MockIntIterator iter(weak array)
-    array[0]!.new(copy 3)
-    array[1]!.new(copy 0)
-    array[2]!.new(copy -1)
-    array[3]!.new(copy 34)
+    array[0]!.set(copy 3)
+    array[1]!.set(copy 0)
+    array[2]!.set(copy -1)
+    array[3]!.set(copy 34)
     assert! math.sum(user iter)! = 36
     user math.IntBox? item
     iter.new(weak array)
