@@ -34,19 +34,17 @@ typedef struct File {
   FILE* fobj;
 } File;
 
-typedef struct Sys {
-  char* argv;
-  int argv_Length;
-  int argv_Value_length;
-  int* argv_String_length;
-  Ref_Manager* argv_Refman;
-  File* stdout_Cname;
-  Ref_Manager* stdout_Cname_Refman;
-  File* stdin_Cname;
-  Ref_Manager* stdin_Cname_Refman;
-  File* stderr_Cname;
-  Ref_Manager* stderr_Cname_Refman;
-} Sys;
+char* sys_M_argv = NULL;
+int sys_M_argv_Length = 0;
+int sys_M_argv_Value_length;
+int* sys_M_argv_String_length = NULL;
+Ref_Manager* sys_M_argv_Refman = NULL;
+File* sys_M_stdout = NULL;
+Ref_Manager* sys_M_stdout_Refman = NULL;
+File* sys_M_stdin = NULL;
+Ref_Manager* sys_M_stdin_Refman = NULL;
+File* sys_M_stderr = NULL;
+Ref_Manager* sys_M_stderr_Refman = NULL;
 
 typedef void* Ref;
 
@@ -283,8 +281,6 @@ char* LUMI_expected_error = NULL;
 int LUMI_expected_error_trace_ignore_count = 0;
 Generic_Type_Dynamic* dynamic_Void = NULL;
 
-Sys* sys = NULL;
-Ref_Manager* sys_Refman = NULL;
 int Lumi_empty_int = 0;
 
 #define ERROR_MESAGE(message) {message, sizeof(message) - 1}
@@ -494,9 +490,9 @@ Bool LUMI_test_coverage(File_Coverage* files_coverage, int files_number) {
   int n;
   int coverage;
   Bool generate_xml = false;
-  if (sys->argv != NULL && sys->argv_Refman->value != NULL &&
-      sys->argv_Length > 1 && sys->argv_String_length[1] > 1) {
-    char* arg = sys->argv + sys->argv_Value_length;
+  if (sys_M_argv != NULL && sys_M_argv_Refman->value != NULL &&
+      sys_M_argv_Length > 1 && sys_M_argv_String_length[1] > 1) {
+    char* arg = sys_M_argv + sys_M_argv_Value_length;
     generate_xml = arg[0] == '-' && arg[1] == 'x';
   }
   printf("testing code coverage... ");
@@ -944,59 +940,51 @@ Returncode File_write(File* file, char* text, int text_length) {
 
 int set_sys(int argc, char* argv[]) {
   int arg;
-  sys = LUMI_alloc(sizeof(Sys));
-  sys_Refman = LUMI_new_ref(sys);
-  if (sys != NULL) {
-    int max_length = 0;
-    sys->stdout_Cname = LUMI_alloc(sizeof(File));
-    sys->stdout_Cname_Refman = LUMI_new_ref(sys->stdout_Cname);
-    sys->stdin_Cname = LUMI_alloc(sizeof(File));
-    sys->stdin_Cname_Refman = LUMI_new_ref(sys->stdin_Cname);
-    sys->stderr_Cname = LUMI_alloc(sizeof(File));
-    sys->stderr_Cname_Refman = LUMI_new_ref(sys->stderr_Cname);
-    sys->argv_Length = argc;
-    sys->argv_Value_length = 0;
-    sys->argv_String_length = LUMI_alloc(sizeof(int) * argc);
-    for (arg = 0; arg < argc; ++arg) {
-      int length = cstring_length(argv[arg], 1024);
-      if (sys->argv_String_length != NULL) {
-        sys->argv_String_length[arg] = length;
-      }
-      if (length > sys->argv_Value_length) {
-        sys->argv_Value_length = length;
-      }
+  int max_length = 0;
+  sys_M_stdout = LUMI_alloc(sizeof(File));
+  sys_M_stdout_Refman = LUMI_new_ref(sys_M_stdout);
+  sys_M_stdin = LUMI_alloc(sizeof(File));
+  sys_M_stdin_Refman = LUMI_new_ref(sys_M_stdin);
+  sys_M_stderr = LUMI_alloc(sizeof(File));
+  sys_M_stderr_Refman = LUMI_new_ref(sys_M_stderr);
+  sys_M_argv_Length = argc;
+  sys_M_argv_Value_length = 0;
+  sys_M_argv_String_length = LUMI_alloc(sizeof(int) * argc);
+  for (arg = 0; arg < argc; ++arg) {
+    int length = cstring_length(argv[arg], 1024);
+    if (sys_M_argv_String_length != NULL) {
+      sys_M_argv_String_length[arg] = length;
     }
-    ++sys->argv_Value_length;
-    sys->argv = LUMI_alloc(sys->argv_Value_length * sys->argv_Length);
-    sys->argv_Refman = LUMI_new_ref(sys->argv);
+    if (length > sys_M_argv_Value_length) {
+      sys_M_argv_Value_length = length;
+    }
   }
-  if (sys == NULL || sys_Refman == NULL || sys->argv == NULL ||
-    sys->argv_Refman == NULL || sys->argv_String_length == NULL ||
-    sys->stdout_Cname == NULL || sys->stdout_Cname_Refman == NULL ||
-    sys->stdin_Cname == NULL || sys->stdin_Cname_Refman == NULL ||
-    sys->stderr_Cname == NULL || sys->stderr_Cname_Refman == NULL) {
+  ++sys_M_argv_Value_length;
+  sys_M_argv = LUMI_alloc(sys_M_argv_Value_length * sys_M_argv_Length);
+  sys_M_argv_Refman = LUMI_new_ref(sys_M_argv);
+  if (sys_M_argv == NULL || sys_M_argv_Refman == NULL ||
+    sys_M_argv_String_length == NULL ||
+    sys_M_stdout == NULL || sys_M_stdout_Refman == NULL ||
+    sys_M_stdin == NULL || sys_M_stdin_Refman == NULL ||
+    sys_M_stderr == NULL || sys_M_stderr_Refman == NULL) {
     fprintf(stderr, "insufficient memory\n");
     return ERR;
   }
-  ++sys_Refman->count;
-  ++sys->argv_Refman->count;
-  ++sys->stdout_Cname_Refman->count;
-  ++sys->stdin_Cname_Refman->count;
-  ++sys->stderr_Cname_Refman->count;
-  sys->stdout_Cname->fobj = stdout;
-  sys->stdin_Cname->fobj = stdin;
-  sys->stderr_Cname->fobj = stderr;
+  ++sys_M_argv_Refman->count;
+  ++sys_M_stdout_Refman->count;
+  ++sys_M_stdin_Refman->count;
+  ++sys_M_stderr_Refman->count;
+  sys_M_stdout->fobj = stdout;
+  sys_M_stdin->fobj = stdin;
+  sys_M_stderr->fobj = stderr;
   for (arg = 0; arg < argc; ++arg) {
-    strncpy(sys->argv + sys->argv_Value_length * arg, argv[arg], sys->argv_Length);
+    strncpy(sys_M_argv + sys_M_argv_Value_length * arg, argv[arg], sys_M_argv_Length);
   }
   return OK;
 }
 
-void Sys_Del(Sys* self) {}
-Generic_Type_Dynamic Sys_dynamic = { (Dynamic_Del)Sys_Del };
-
-#define LUMI_FUNC_NAME "Sys.print"
-Returncode Sys_print(Sys* _, char* text, int text_length) {
+#define LUMI_FUNC_NAME "sys.print"
+Returncode sys_M_print(char* text, int text_length) {
   int n, ch, res;
   for (n = 0; n < text_length; ++n) {
     ch = text[n];
@@ -1009,9 +997,9 @@ Returncode Sys_print(Sys* _, char* text, int text_length) {
 }
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FUNC_NAME "Sys.println"
-Returncode Sys_println(Sys* _, char* text, int text_length) {
-  Sys_print(NULL, text, text_length);
+#define LUMI_FUNC_NAME "sys.println"
+Returncode sys_M_println(char* text, int text_length) {
+  sys_M_print(text, text_length);
   if (putchar('\n') != '\n') {
     CRAISE(LUMI_error_messages.file_write_failed.str)
   }
@@ -1019,13 +1007,13 @@ Returncode Sys_println(Sys* _, char* text, int text_length) {
 }
 #undef LUMI_FUNC_NAME
 
-void Sys_getchar(Sys* _, char* out_char, Bool* is_eof) {
+void sys_M_getchar(char* out_char, Bool* is_eof) {
   *is_eof = getc_is_eof(getchar(), out_char);
 }
 
-#define LUMI_FUNC_NAME "Sys.getline"
-Returncode Sys_getline(
-    Sys* _, char* line, int line_max_length, int* line_length) {
+#define LUMI_FUNC_NAME "sys.getline"
+Returncode sys_M_getline(
+    char* line, int line_max_length, int* line_length) {
   int ch = 0;
   *line_length = 0;
   if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {
@@ -1046,8 +1034,8 @@ Returncode Sys_getline(
 }
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FUNC_NAME "Sys.exit"
-Returncode Sys_exit(Sys* _, Int status) {
+#define LUMI_FUNC_NAME "sys.exit"
+Returncode sys_M_exit(Int status) {
   if (lumi_debug_value != LUMI_DEBUG_FAIL) {
     exit(status);
   }
@@ -1055,9 +1043,8 @@ Returncode Sys_exit(Sys* _, Int status) {
 }
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FUNC_NAME "Sys.system"
-Returncode Sys_system(
-    Sys* _,
+#define LUMI_FUNC_NAME "sys.system"
+Returncode sys_M_system(
     char* command, int command_max_length, int *command_length,
     Int* status) {
   int res = -1;
@@ -1072,8 +1059,7 @@ Returncode Sys_system(
 }
 #undef LUMI_FUNC_NAME
 
-Returncode Sys_getenv(
-    Sys* _,
+Returncode sys_M_getenv(
     char* name, int name_max_length, int *name_length,
     char* value, int value_max_length, int* value_length,
     Bool* exists) {

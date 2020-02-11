@@ -99,7 +99,6 @@ struct Global
     user TypeData type-generic
     user TypeData type-module
     user TypeData type-file
-    user TypeData type-sys
     user TypeData type-pointer
     user TypeData type-c-char
 
@@ -317,8 +316,6 @@ struct Global
                 user self.type-module)
         self.add-global-type(user "File", copy false)->(user self.type-file)
         self.type-file.create-disallowed := true
-        self.add-global-type(user "Sys", copy false)->(user self.type-sys)
-        self.type-sys.create-disallowed := true
 
         ; cdef types
         new ModuleMembers cdef-module(user "cdef")
@@ -452,8 +449,16 @@ struct Global
                 user "str")
 
         ; Bool
-        self.add-builtin-global-variable(user self.type-bool, user "true")
-        self.add-builtin-global-variable(user self.type-bool, user "false")
+        self.add-builtin-global-variable(
+                user self.global-module,
+                user self.type-bool,
+                user _,
+                user "true")
+        self.add-builtin-global-variable(
+                user self.global-module,
+                user self.type-bool,
+                user _,
+                user "false")
 
         ; Array
         ; self.add-builtin-field(
@@ -645,7 +650,8 @@ struct Global
                 user "equal")
 
         ; File
-        self.add-builtin-global-function(user "file-open-read", copy true)->(
+        self.add-builtin-global-function(
+                user self.global-module, user "file-open-read", copy true)->(
                 user function)
         self.add-builtin-parameter(
                 user function,
@@ -658,7 +664,8 @@ struct Global
                 user self.type-file,
                 user "file")
 
-        self.add-builtin-global-function(user "file-open-write", copy true)->(
+        self.add-builtin-global-function(
+                user self.global-module, user "file-open-write", copy true)->(
                 user function)
         self.add-builtin-parameter(
                 user function,
@@ -671,7 +678,8 @@ struct Global
                 user self.type-file,
                 user "file")
 
-        self.add-builtin-global-function(user "file-close", copy true)->(
+        self.add-builtin-global-function(
+                user self.global-module, user "file-close", copy true)->(
                 user function)
         self.add-builtin-parameter(
                 user function,
@@ -712,54 +720,43 @@ struct Global
                 user function, copy false, copy Access.USER, user "text")
 
         ; Sys
-        self.add-builtin-field(
-                user self.type-sys,
-                user "argv",
+        new ModuleMembers sys-module(user "sys")
+        self.add-builtin-global-variable(
+                user sys-module,
                 user self.type-array,
-                user self.type-string)
+                user self.type-string,
+                user "argv")
 
-        self.add-builtin-field(
-                user self.type-sys,
-                user "stdout",
+        self.add-builtin-global-variable(
+                user sys-module,
                 user self.type-file,
-                user _)
+                user _,
+                user "stdout")
 
-        self.add-builtin-field(
-                user self.type-sys,
-                user "stdin",
+        self.add-builtin-global-variable(
+                user sys-module,
                 user self.type-file,
-                user _)
+                user _,
+                user "stdin")
 
-        self.add-builtin-field(
-                user self.type-sys,
-                user "stderr",
+        self.add-builtin-global-variable(
+                user sys-module,
                 user self.type-file,
-                user _)
+                user _,
+                user "stderr")
 
-        self.add-builtin-method(
-                user self.type-sys,
-                user "print",
-                copy true,
-                copy Access.USER)->(
-                user function)
+        self.add-builtin-global-function(
+                user sys-module, user "print", copy true)->(user function)
         self.add-builtin-char-array-argument(
                 user function, copy false, copy Access.USER, user "text")
 
-        self.add-builtin-method(
-                user self.type-sys,
-                user "println",
-                copy true,
-                copy Access.USER)->(
-                user function)
+        self.add-builtin-global-function(
+                user sys-module, user "println", copy true)->(user function)
         self.add-builtin-char-array-argument(
                 user function, copy false, copy Access.USER, user "text")
 
-        self.add-builtin-method(
-                user self.type-sys,
-                user "getchar",
-                copy false,
-                copy Access.USER)->(
-                user function)
+        self.add-builtin-global-function(
+                user sys-module, user "getchar", copy false)->(user function)
         self.add-builtin-output(
                 user function, copy Access.VAR, user self.type-char, user "ch")
         self.add-builtin-output(
@@ -768,33 +765,24 @@ struct Global
                 user self.type-bool,
                 user "is-eof")
 
-        self.add-builtin-method(
-                user self.type-sys,
-                user "getline",
-                copy true,
-                copy Access.USER)->(
-                user function)
+        self.add-builtin-global-function(
+                user sys-module, user "getline", copy true)->(user function)
         self.add-builtin-parameter(
                 user function,
                 copy Access.USER,
                 user self.type-string,
                 user "line")
 
-        self.add-builtin-method(
-                user self.type-sys, user "exit", copy true, copy Access.USER)->(
-                user function)
+        self.add-builtin-global-function(
+                user sys-module, user "exit", copy true)->(user function)
         self.add-builtin-parameter(
                 user function,
                 copy Access.COPY,
                 user self.type-int,
                 user "status")
 
-        self.add-builtin-method(
-                user self.type-sys,
-                user "system",
-                copy true,
-                copy Access.USER)->(
-                user function)
+        self.add-builtin-global-function(
+                user sys-module, user "system", copy true)->(user function)
         self.add-builtin-parameter(
                 user function,
                 copy Access.USER,
@@ -806,12 +794,8 @@ struct Global
                 user self.type-int,
                 user "status")
 
-        self.add-builtin-method(
-                user self.type-sys,
-                user "getenv",
-                copy true,
-                copy Access.USER)->(
-                user function)
+        self.add-builtin-global-function(
+                user sys-module, user "getenv", copy true)->(user function)
         self.add-builtin-parameter(
                 user function,
                 copy Access.USER,
@@ -827,8 +811,8 @@ struct Global
                 copy Access.VAR,
                 user self.type-bool,
                 user "exists")
-
-        self.add-builtin-global-variable(user self.type-sys, user "sys")
+        
+        self.root.modules.add(owner sys-module)
 
     func add-global-type(user String name, copy Bool is-primitive)->(
             user TypeData type-data)
@@ -861,27 +845,32 @@ struct Global
         self.builtins.types.add(owner new-type)
 
     func add-builtin-global-variable(
-            user TypeData variable-type, user String name)
+            user ModuleMembers module,
+            user TypeData variable-type,
+            user TypeData variable-subtype,
+            user String name)
         self.add-builtin-variable(
                 user name,
                 user variable-type,
-                user _,
+                user variable-subtype,
                 user _,
                 user self.builtins)
         user SyntaxTreeVariable variable(user self.builtins.variables.last.item)
-        self.global-module.variable-map.add(user variable.name, user variable)
+        if module is-not self.global-module
+            variable.my-module := module
+        module.variable-map.add(user variable.name, user variable)
 
-    func add-builtin-field(
-            user TypeData builtin-type,
-            user String name,
-            user TypeData field-type,
-            user TypeData field-subtype)
-        self.add-builtin-variable(
-                user name,
-                user field-type,
-                user field-subtype,
-                user builtin-type,
-                user builtin-type)
+    ; func add-builtin-field(
+    ;         user TypeData builtin-type,
+    ;         user String name,
+    ;         user TypeData field-type,
+    ;         user TypeData field-subtype)
+    ;     self.add-builtin-variable(
+    ;             user name,
+    ;             user field-type,
+    ;             user field-subtype,
+    ;             user builtin-type,
+    ;             user builtin-type)
 
     func add-builtin-variable(
             user String name,
@@ -901,7 +890,10 @@ struct Global
         variable.parent-type := parent-type
         branch.variables.add(owner variable)
 
-    func add-builtin-global-function(user String name, copy Bool has-error)->(
+    func add-builtin-global-function(
+            user ModuleMembers module,
+            user String name,
+            copy Bool has-error)->(
             user SyntaxTreeFunction function)
         self.add-builtin-function(
                 user name,
@@ -910,7 +902,9 @@ struct Global
                 user _,
                 user self.builtins)->(
                 user function)
-        self.global-module.function-map.add(user function.name, user function)
+        if module is-not self.global-module
+            function.my-module := module
+        module.function-map.add(user function.name, user function)
 
     func add-builtin-method(
             user TypeData builtin-type,

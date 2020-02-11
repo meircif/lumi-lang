@@ -1109,12 +1109,6 @@ f!.putc(copy 'a')!
 ; @ ec test-builtin-ef6
 owner File f(owner fobj!)
 file-open-read(user "name")->(owner f)!
-; @ ec test-builtin-ey0
-var Sys error
-; @ ec test-builtin-ey1
-new Sys error!
-; @ ec test-builtin-ey2
-Sys()
 ; @@ test-general
 ; @ g test-general-0
 owner String? str
@@ -2263,9 +2257,9 @@ mock Test.meth(copy Int x)->(var Int y)
 func ! fun()
     sys.print(user "mock print")!
     sys.print.mocked(user "really print")!
-    Sys.print.active := false
+    sys.print.active := false
     sys.print.active := true
-mock ! Sys.print(user Array{Char} text)
+mock ! sys.print(user Array{Char} text)
 ; @ g test-testing-m8
 struct Test
     var Int x
@@ -2600,6 +2594,8 @@ struct Test{Generic}
     func user get()->(user Generic? item)
         item := self.item
 ; @ g test-parameter-type-2
+struct MyStruct
+    var Int x
 struct Test{First:Second:Third}
     weak First? first
     weak Second? second
@@ -2608,8 +2604,8 @@ struct Test{First:Second:Third}
         self.first := first
         self.second := second
         self.third := third
-func use(weak File first, weak Sys second, weak File third)
-    var Test{File:Sys:File} t
+func use(weak File first, weak MyStruct second, weak File third)
+    var Test{File:MyStruct:File} t
     t.first := first
     t.second := second
     t.third := third
@@ -2829,26 +2825,28 @@ func use(weak File f)
     var Test{File} t
     t.item := f
 ; @ g test-parameter-inheritance-4
+struct MyStruct
+    var Int x
 struct Base{First:Second}
     weak First? first
     weak Second? second
-struct Mid{Param:Third}(Base{Param:Sys})
+struct Mid{Param:Third}(Base{Param:MyStruct})
     weak Third? third
-    func user set(weak Param first, weak Sys second, weak Third third)
+    func user set(weak Param first, weak MyStruct second, weak Third third)
         self.first := first
         self.second := second
         self.third := third
 struct Top{Generic}(Mid{Generic:File})
-    func user set(weak Generic first, weak Sys second, weak File third)
+    func user set(weak Generic first, weak MyStruct second, weak File third)
         self.first := first
         self.second := second
         self.third := third
 struct Test(Top{File})
-    func user set(weak File first, weak Sys second, weak File third)
+    func user set(weak File first, weak MyStruct second, weak File third)
         self.first := first
         self.second := second
         self.third := third
-func use(weak File first, weak Sys second, weak File third)
+func use(weak File first, weak MyStruct second, weak File third)
     var Test t
     t.first := first
     t.second := second
@@ -2884,13 +2882,15 @@ func test()
     tb := tt
     bb := tt
 ; @ g test-parameter-inheritance-7
+struct MyStruct
+    var Int x
 struct Base{Generic}
     weak Generic? first
 struct Mid{First:Second}(Base{First})
     weak Second? second
-struct Top{Generic}(Mid{Sys:Generic})
+struct Top{Generic}(Mid{MyStruct:Generic})
 func fun(user Top?{File} t)
-    user Mid?{Sys:File} m
+    user Mid?{MyStruct:File} m
     m := t
 ; @ eg test-parameter-inheritance-e0
 struct Base{Generic}

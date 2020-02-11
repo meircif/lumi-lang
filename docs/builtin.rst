@@ -279,8 +279,13 @@ Built-in Global Functions
    Create a new :class:`File` object that is capable of **writing** to
    ``filename`` file.
 
-Built-in Global Variables
-+++++++++++++++++++++++++
+Built-in ``sys`` Module
++++++++++++++++++++++++
+
+.. data:: Array{String} argv
+
+   holds program arguments
+
 .. data:: File stdin
 
    can be used to **read** from the standard input stream
@@ -293,79 +298,58 @@ Built-in Global Variables
 
    can be used to **write** to the standard error stream
 
-System
-------
-This type is temporary in :ref:`TL5 <syntax-tl5>`, in the planned Lumi syntax
-there will be a ``sys`` module with the same interface.
+.. function:: print(user String text)
 
-.. class:: Sys
+   print ``text`` to the standard output stream, same as calling
+   ``sys.stdout.write``
 
-   The type of the built-in :data:`sys` object, can be used to access system
-   data and functionality.
+   :raises: if writing failed
 
-   .. attribute:: Array{String} argv
+.. function:: println(user String text)
 
-      holds program arguments
+   print ``text`` appended with new-line character to the standard output
+   stream
 
-   .. method:: print(user String text)
+   :raises: if writing failed
 
-      print ``text`` to the standard output stream, same as calling
-      ``stdout.write``
+.. function:: getchar()->(var Char character, var Bool is-eof)
 
-      :raises: if writing failed
+   read one character from the standard input stream
 
-   .. method:: println(user String text)
+   if the standard input stream is not closed, has more data, and data read
+   succeeded - return :data:`false` in ``is-eof`` and next character read
+   from the standard input stream in ``character``, else - return
+   :data:`true` in ``is-eof`` and do nothing with ``character``
 
-      print ``text`` appended with new-line character to the standard output
-      stream
+.. function:: getline(user String text)
 
-      :raises: if writing failed
+   read one line from the standard input stream into ``text``, the line-end
+   character is not written into ``text``
 
-   .. method:: getchar()->(var Char character, var Bool is-eof)
+   does nothing if could not read data
 
-      read one character from the standard input stream
+.. function:: exit(copy Int status)
 
-      if the standard input stream is not closed, has more data, and data read
-      succeeded - return :data:`false` in ``is-eof`` and next character read
-      from the standard input stream in ``character``, else - return
-      :data:`true` in ``is-eof`` and do nothing with ``character``
+   terminates execution of the program immediately with ``status`` as the
+   exit status value
 
-   .. method:: getline(user String text)
+   calls C ``exit`` function
 
-      read one line from the standard input stream into ``text``, the line-end
-      character is not written into ``text``
+.. function:: system(user String command)->(var Int status)
 
-      does nothing if could not read data
+   execute ``command`` by the host command processor and return the return
+   status of the command
 
-   .. method:: exit(copy Int status)
+   calls C ``system`` function
 
-      terminates execution of the program immediately with ``status`` as the
-      exit status value
+   :raises: if ``command`` is empty or outdated, or if command fails to
+      execute
 
-      calls C ``exit`` function
+.. function:: getenv(user String name)->(user String value, var Bool exists)
 
-   .. method:: system(user String command)->(var Int status)
+   get an environment variable
 
-      execute ``command`` by the host command processor and return the return
-      status of the command
-
-      calls C ``system`` function
-
-      :raises: if ``command`` is empty or outdated, or if command fails to
-         execute
-
-   .. method:: getenv(user String name)->(user String value, var Bool exists)
-
-      get an environment variable
-
-      if environment variable named ``name`` exists - copy into ``value`` the
-      value of the environment variable and return :data:`true` in
-      ``exists``, else - return :data:`false` in ``exists`` and do nothing
-      with ``value``
-
-Built-in Global Variables
-+++++++++++++++++++++++++
-.. data:: Sys sys
-
-   Only this variable should be be used to access system data and functionality
-   as exposed by the :class:`Sys` type interface.
+   if environment variable named ``name`` exists - copy into ``value`` the
+   value of the environment variable and return :data:`true` in
+   ``exists``, else - return :data:`false` in ``exists`` and do nothing
+   with ``value``
