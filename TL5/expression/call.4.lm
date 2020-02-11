@@ -396,7 +396,7 @@ class CallArgument(Argument)
             write(user "&(")
         else-if self.is-native and not self.real-type.type-data.is-primitive and
                 not self.real-type.type-data is glob.type-array and
-                not self.real-type.type-data is glob.type-string
+                not self.real-type.type-data.is-sequence()
             write(user "(void*)")
         self.value.write-cast()
         if self.is-output
@@ -405,15 +405,14 @@ class CallArgument(Argument)
         if self.real-type.type-data is glob.type-array and not self.is-native
             ; , [*][&(]`value`_Length[)]
             write(user ", ")
-            if self.value.result-type.type-data is glob.type-string
+            if self.value.result-type.type-data.is-sequence()
                 write(user "*")
             if self.is-output
                 write(user "&(")
             self.value.write-length(
                     user "_Length",
                     user "0",
-                    copy self.value.result-type.type-data is-not
-                    glob.type-string)
+                    copy not self.value.result-type.type-data.is-sequence())
             if self.is-output
                 write(user ")")
             user TypeInstance data-type
@@ -429,18 +428,17 @@ class CallArgument(Argument)
                 write-array-value-length(copy n)
                 if self.is-output
                     write(user ")")
-            if data-type.type-data is glob.type-string
-                ; , [&(]`value`_String_length[)]
+            if data-type.type-data.is-sequence()
+                ; , [&(]`value`_Seq_length[)]
                 write(user ", ")
                 if self.is-output
                     write(user "&(")
                 self.value.write-length(
-                        user "_String_length", user "NULL", copy false)
+                        user "_Seq_length", user "NULL", copy false)
                 if self.is-output
                     write(user ")")
         
-        else-if self.real-type.type-data is glob.type-string and
-                not self.is-native
+        else-if self.real-type.type-data.is-sequence() and not self.is-native
             ; , [&(]`value`_Max_length[)], [&(]`value`_Length[)]
             write(user ", ")
             if self.is-output

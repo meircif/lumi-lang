@@ -34,9 +34,12 @@ class SliceExpression(Expression)
         if not self.sequence.result-type?
             self.syntax-error-msg(user "cannot slice a void expression")
         self.check-expression-all-errors()->(owner self.sequence)
-        if self.sequence.result-type.type-data is glob.type-string
+        if self.sequence.result-type.type-data.is-sequence()
             if not self.second-index?
-                self.set-simple-type(user glob.type-char)
+                if self.sequence.result-type.type-data is glob.type-string
+                    self.set-simple-type(user glob.type-char)
+                else
+                    self.set-simple-type(user glob.type-byte)
         else-if self.sequence.result-type.type-data is glob.type-array
             if not self.second-index?
                 self.sequence.result-type.parameters.first.item.copy-new()->(
@@ -63,11 +66,15 @@ class SliceExpression(Expression)
         if self.second-index?
             analyze-expression()->(owner self.second-index)
             self.check-index(user self.second-index)
-            if self.sequence.result-type.type-data is glob.type-string
+            if self.sequence.result-type.type-data.is-sequence()
                 glob.type-array.new-type-instance()->(owner self.result-type)
                 self.result-type.parameters := List{TypeInstance}()
-                self.result-type.parameters.add(
-                        owner glob.type-char.new-type-instance())
+                if self.sequence.result-type.type-data is glob.type-string
+                    self.result-type.parameters.add(
+                            owner glob.type-char.new-type-instance())
+                else
+                    self.result-type.parameters.add(
+                            owner glob.type-byte.new-type-instance())
             else
                 self.sequence.result-type.copy-new()->(owner self.result-type)
             self.result-type.length := _
@@ -89,7 +96,7 @@ class SliceExpression(Expression)
             self.access := Access.USER
         
         if self.result-type.type-data is glob.type-array or
-                self.result-type.type-data is glob.type-string
+                self.result-type.type-data.is-sequence()
             self.code-node.add-aux-variable(
                     copy self.access, copy false, user self.result-type)->(
                     owner self.slice-variable)
@@ -115,7 +122,7 @@ class SliceExpression(Expression)
                         user "non positive slice length",
                         copy second-index-value)
         
-        if self.sequence.result-type.type-data is-not glob.type-string and
+        if not self.sequence.result-type.type-data.is-sequence() and
                 self.sequence.result-type.length?
             self.sequence.result-type.length.get-constant-value()->(
                     var length-value, var has-length-value)
@@ -176,7 +183,7 @@ class SliceExpression(Expression)
         if self.second-index?
             self.write-preactions-second-index()
         else-if self.result-type.type-data is glob.type-array or
-                self.result-type.type-data is glob.type-string
+                self.result-type.type-data.is-sequence()
             self.write-preactions-slice-value()
             
     func inst write-preactions-bounds-check()
@@ -204,11 +211,11 @@ class SliceExpression(Expression)
                 self.sequence.result-type.length?
             self.sequence.result-type.length.write()
         else
-            if self.sequence.result-type.type-data is glob.type-string
+            if self.sequence.result-type.type-data.is-sequence()
                 write(user "*(")
             self.sequence.write()
             write(user "_Length")
-            if self.sequence.result-type.type-data is glob.type-string
+            if self.sequence.result-type.type-data.is-sequence()
                 write(user ")")
         write(user ") ")
         self.code-node.write-raise(user "slice_index")
@@ -294,11 +301,11 @@ class SliceExpression(Expression)
             self.code-node.write-spaces()
 
     func inst write-preactions-string-value()
-        ; symbol_Length = seq_String_length + index;
+        ; symbol_Length = seq_Seq_length + index;
         self.slice-variable.write()
         write(user "_Length = ")
         self.sequence.write()
-        write(user "_String_length + ")
+        write(user "_Seq_length + ")
         self.index.write()
         write(user ";\n")
         self.code-node.write-spaces()
@@ -319,13 +326,13 @@ class SliceExpression(Expression)
                 write-array-value-length(copy n + offset)
             write(user ";\n")
             self.code-node.write-spaces()
-        if data-type.type-data is glob.type-string
-            ; symbol_String_length = seq_String_length + (index)
+        if data-type.type-data.is-sequence()
+            ; symbol_Seq_length = seq_Seq_length + (index)
             ;     [ * seq_Value_[value_]length]...;
             self.slice-variable.write()
-            write(user "_String_length = ")
+            write(user "_Seq_length = ")
             self.sequence.write()
-            write(user "_String_length")
+            write(user "_Seq_length")
             self.write-index(user self.sequence.result-type, copy depth - 1)
             self.code-node.write-spaces()
 

@@ -37,12 +37,12 @@ typedef struct File {
 char* sys_M_argv = NULL;
 int sys_M_argv_Length = 0;
 int sys_M_argv_Value_length;
-int* sys_M_argv_String_length = NULL;
+int* sys_M_argv_Seq_length = NULL;
 Ref_Manager* sys_M_argv_Refman = NULL;
-File* sys_M_stdout = NULL;
-Ref_Manager* sys_M_stdout_Refman = NULL;
 File* sys_M_stdin = NULL;
 Ref_Manager* sys_M_stdin_Refman = NULL;
+File* sys_M_stdout = NULL;
+Ref_Manager* sys_M_stdout_Refman = NULL;
 File* sys_M_stderr = NULL;
 Ref_Manager* sys_M_stderr_Refman = NULL;
 
@@ -243,9 +243,9 @@ while (self->field != NULL) { \
   name##_Length = length; \
   INIT_NEW(line, cleanup, name, type, name##_Length * value_size)
 
-#define INIT_NEW_STRING(line, cleanup, name, size) \
+#define INIT_NEW_SEQUENCE(line, cleanup, name, type, size) \
   name##_Max_length = size; \
-  INIT_NEW(line, cleanup, name, char, name##_Max_length) \
+  INIT_NEW(line, cleanup, name, type, name##_Max_length) \
   name##_Length = LUMI_alloc(sizeof(int)); \
   if (name##_Length == NULL) { \
     name##_Length = &Lumi_empty_int; \
@@ -491,7 +491,7 @@ Bool LUMI_test_coverage(File_Coverage* files_coverage, int files_number) {
   int coverage;
   Bool generate_xml = false;
   if (sys_M_argv != NULL && sys_M_argv_Refman->value != NULL &&
-      sys_M_argv_Length > 1 && sys_M_argv_String_length[1] > 1) {
+      sys_M_argv_Length > 1 && sys_M_argv_Seq_length[1] > 1) {
     char* arg = sys_M_argv + sys_M_argv_Value_length;
     generate_xml = arg[0] == '-' && arg[1] == 'x';
   }
@@ -941,19 +941,19 @@ Returncode File_write(File* file, char* text, int text_length) {
 int set_sys(int argc, char* argv[]) {
   int arg;
   int max_length = 0;
-  sys_M_stdout = LUMI_alloc(sizeof(File));
-  sys_M_stdout_Refman = LUMI_new_ref(sys_M_stdout);
   sys_M_stdin = LUMI_alloc(sizeof(File));
   sys_M_stdin_Refman = LUMI_new_ref(sys_M_stdin);
+  sys_M_stdout = LUMI_alloc(sizeof(File));
+  sys_M_stdout_Refman = LUMI_new_ref(sys_M_stdout);
   sys_M_stderr = LUMI_alloc(sizeof(File));
   sys_M_stderr_Refman = LUMI_new_ref(sys_M_stderr);
   sys_M_argv_Length = argc;
   sys_M_argv_Value_length = 0;
-  sys_M_argv_String_length = LUMI_alloc(sizeof(int) * argc);
+  sys_M_argv_Seq_length = LUMI_alloc(sizeof(int) * argc);
   for (arg = 0; arg < argc; ++arg) {
     int length = cstring_length(argv[arg], 1024);
-    if (sys_M_argv_String_length != NULL) {
-      sys_M_argv_String_length[arg] = length;
+    if (sys_M_argv_Seq_length != NULL) {
+      sys_M_argv_Seq_length[arg] = length;
     }
     if (length > sys_M_argv_Value_length) {
       sys_M_argv_Value_length = length;
@@ -963,19 +963,19 @@ int set_sys(int argc, char* argv[]) {
   sys_M_argv = LUMI_alloc(sys_M_argv_Value_length * sys_M_argv_Length);
   sys_M_argv_Refman = LUMI_new_ref(sys_M_argv);
   if (sys_M_argv == NULL || sys_M_argv_Refman == NULL ||
-    sys_M_argv_String_length == NULL ||
-    sys_M_stdout == NULL || sys_M_stdout_Refman == NULL ||
+    sys_M_argv_Seq_length == NULL ||
     sys_M_stdin == NULL || sys_M_stdin_Refman == NULL ||
+    sys_M_stdout == NULL || sys_M_stdout_Refman == NULL ||
     sys_M_stderr == NULL || sys_M_stderr_Refman == NULL) {
     fprintf(stderr, "insufficient memory\n");
     return ERR;
   }
   ++sys_M_argv_Refman->count;
-  ++sys_M_stdout_Refman->count;
   ++sys_M_stdin_Refman->count;
+  ++sys_M_stdout_Refman->count;
   ++sys_M_stderr_Refman->count;
-  sys_M_stdout->fobj = stdout;
   sys_M_stdin->fobj = stdin;
+  sys_M_stdout->fobj = stdout;
   sys_M_stderr->fobj = stderr;
   for (arg = 0; arg < argc; ++arg) {
     strncpy(sys_M_argv + sys_M_argv_Value_length * arg, argv[arg], sys_M_argv_Length);
