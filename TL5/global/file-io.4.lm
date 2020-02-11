@@ -84,11 +84,6 @@ func write(user String text)
 
 ~~~ write `name` with `-` replaced by `_` and replace C builtin names ~~~
 func write-cname(user String name)
-    if name.equal(user "stdout") or name.equal(user "stdin") or
-            name.equal(user "stderr")
-        write(user name)
-        write(user "_Cname")
-        return
     for ch in name
         if ch = '-' or ch = ' '
             write-c(copy '_')

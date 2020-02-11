@@ -3,7 +3,7 @@ module hello-world-test
 var Bool println-raise
 var String{128} printed-text
 
-mock ! Sys.println(user Array{Char} text)
+mock ! sys.println(user Array{Char} text)
     if println-raise
         raise! "error in println"
     printed-text.concat(user text)!

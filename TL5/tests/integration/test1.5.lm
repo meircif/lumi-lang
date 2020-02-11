@@ -402,7 +402,7 @@ func ! cleanup-test(user Array{Ref} refs)
         strong Link la(strong Link()!)
         refs[0] := la
         if false
-            ; 
+            ; pass
         else
             strong Link lb(strong Link()!)
             refs[1]! := lb
@@ -589,7 +589,7 @@ test test-builtin-errors()
     assert-error! sys.exit(copy 0), "exit failed"
     assert-error! sys.system(user "aaa"), "command execution failed"
 
-mock ! Sys.println(user Array{Char} text)
+mock ! sys.println(user Array{Char} text)
     assert! text.length() > 0
 
 test test-cover-all()

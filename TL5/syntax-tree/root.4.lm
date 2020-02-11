@@ -408,8 +408,7 @@ struct ModuleMembers
     
     func new(user String name)
         string-new-copy(user name)->(owner self.name)
-        if self.name?
-            glob.module-map.add(user self.name, user self)
+        glob.module-map.add(user self.name, user self)
     
     func write-prefix()
         write-cname(user self.name)
