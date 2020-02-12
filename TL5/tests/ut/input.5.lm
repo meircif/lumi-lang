@@ -1116,23 +1116,37 @@ Buffer.set(user buff!, copy 0, copy bt)!
 ; @ c test-builtin-buffer11
 buff!.max-length()->(var i)
 ; @ c test-builtin-file0
-var FileReadText f(user ostr!)!
-f.get()->(var c, var b)!
-f.close()!
+try
+    s-var FileReadText f(user ostr)
+    f.get()->(var c, var b)
+    f.getline(user ostr)->(var b)
+    f.close()
+    var Data{FileReadText} df
+    df.item := f
 ; @ c test-builtin-file1
-new FileReadBinary f(user ostr!)!
-f.get()->(var bt, var b)!
-f.close()!
+try
+    new FileReadBinary f(user ostr)
+    f.get()->(var bt, var b)
+    f.read(user buff)->(var i)
+    f.close()
+    var Data{FileReadBinary} df
+    df.set(owner f)
 ; @ c test-builtin-file2
-owner FileWriteText f(owner FileWriteText(user ostr!)!)
-f.put(copy c)!
-f.write(user ostr!)!
-f.close()!
+try
+    owner FileWriteText f(owner FileWriteText(user ostr))
+    f.put(copy c)
+    f.write(user ostr)->(var i)
+    f.close()
+    var Data{FileWriteText} df
+    df.set(owner f)
 ; @ c test-builtin-file3
-strong FileWriteBinary f(strong FileWriteBinary(user ostr!)!)
-f.put(copy bt)!
-f.write(user buff!)!
-f.close()!
+try
+    strong FileWriteBinary f(strong FileWriteBinary(user ostr))
+    f.put(copy bt)
+    f.write(user buff)->(var i)
+    f.close()
+    var Data{FileWriteBinary} df
+    df.item := f
 ; @ c test-builtin-sys0
 user Array{String} argv(user sys.argv)
 ; @ c test-builtin-sys1
@@ -1140,9 +1154,9 @@ sys.print(user ostr!)!
 ; @ c test-builtin-sys2
 sys.println(user ostr!)!
 ; @ c test-builtin-sys3
-sys.getchar()->(var c, var b)
+sys.getchar()->(var c, var b)!
 ; @ c test-builtin-sys4
-sys.getline(user ostr!)!
+sys.getline(user ostr!)->(var b)!
 ; @ c test-builtin-sys5
 sys.exit(copy i)!
 ; @ c test-builtin-sys6
@@ -4443,6 +4457,9 @@ var cdef.Pointer{Char} p-char
 p-char.set-from-array(user ostr!)
 ostr!.copy-from-pointer(copy p-char)!
 ostr!.set-null-term-length()
+; @ c test-c-objects-4
+var cdef.Pointer{Byte} p-byte
+buff!.copy-from-pointer(copy p-byte, copy 4)!
 ; @ ec test-c-objects-e0
 var cdef.Pointer{Ta} error
 ; @ ec test-c-objects-e1

@@ -494,6 +494,21 @@ struct Global
 
         self.add-builtin-method(
                 user self.type-string,
+                user "copy-from-pointer",
+                copy true,
+                copy Access.USER)->(
+                user function)
+        self.add-builtin-argument(
+                user function,
+                user function.arguments.parameters,
+                copy false,
+                copy Access.COPY,
+                user self.type-pointer,
+                user self.type-char,
+                user "pointer")
+
+        self.add-builtin-method(
+                user self.type-string,
                 user "set-null-term-length",
                 copy false,
                 copy Access.USER)->(
@@ -516,6 +531,26 @@ struct Global
                 user self.type-buffer, user self.type-byte)->(
                 user self.buffer-copy-function)
 
+        self.add-builtin-method(
+                user self.type-buffer,
+                user "copy-from-pointer",
+                copy true,
+                copy Access.USER)->(
+                user function)
+        self.add-builtin-argument(
+                user function,
+                user function.arguments.parameters,
+                copy false,
+                copy Access.COPY,
+                user self.type-pointer,
+                user self.type-byte,
+                user "pointer")
+        self.add-builtin-parameter(
+                user function,
+                copy Access.COPY,
+                user self.type-int,
+                user "length")
+
         ; File
         self.add-file-methods(
                 user self.type-file-read-text, copy false, user self.type-char)
@@ -529,6 +564,41 @@ struct Global
                 user self.type-file-write-binary,
                 copy true,
                 user self.type-byte)
+
+        self.add-builtin-method(
+                user self.type-file-read-text,
+                user "getline",
+                copy true,
+                copy Access.USER)->(
+                user function)
+        self.add-builtin-parameter(
+                user function,
+                copy Access.USER,
+                user self.type-string,
+                user "line")
+        self.add-builtin-output(
+                user function,
+                copy Access.VAR,
+                user self.type-bool,
+                user "is-eof")
+
+        self.add-builtin-method(
+                user self.type-file-read-binary,
+                user "read",
+                copy true,
+                copy Access.USER)->(
+                user function)
+        self.add-builtin-array-argument(
+                user function,
+                user self.type-byte,
+                copy false,
+                copy Access.USER,
+                user "data")
+        self.add-builtin-output(
+                user function,
+                copy Access.VAR,
+                user glob.type-int,
+                user "bytes-read")
 
         ; Sys
         new ModuleMembers sys-module(user "sys")
@@ -575,7 +645,7 @@ struct Global
                 user "text")
 
         self.add-builtin-global-function(
-                user sys-module, user "getchar", copy false)->(user function)
+                user sys-module, user "getchar", copy true)->(user function)
         self.add-builtin-output(
                 user function, copy Access.VAR, user self.type-char, user "ch")
         self.add-builtin-output(
@@ -591,6 +661,11 @@ struct Global
                 copy Access.USER,
                 user self.type-string,
                 user "line")
+        self.add-builtin-output(
+                user function,
+                copy Access.VAR,
+                user self.type-bool,
+                user "is-eof")
 
         self.add-builtin-global-function(
                 user sys-module, user "exit", copy true)->(user function)
@@ -683,21 +758,6 @@ struct Global
                 copy Access.USER,
                 user "other")
         copy-function := function
-
-        self.add-builtin-method(
-                user seq-type,
-                user "copy-from-pointer",
-                copy true,
-                copy Access.USER)->(
-                user function)
-        self.add-builtin-argument(
-                user function,
-                user function.arguments.parameters,
-                copy false,
-                copy Access.COPY,
-                user self.type-pointer,
-                user value-type,
-                user "pointer")
 
         self.add-builtin-method(
                 user seq-type, user "clear", copy false, copy Access.USER)->(
@@ -827,6 +887,11 @@ struct Global
                     copy false,
                     copy Access.USER,
                     user "data")
+            self.add-builtin-output(
+                    user function,
+                    copy Access.VAR,
+                    user glob.type-int,
+                    user "written")
         else
             self.add-builtin-method(
                     user file-type, user "get", copy true, copy Access.USER)->(

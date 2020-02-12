@@ -543,35 +543,46 @@ test test-assert-error-message()
 
 native var Int lumi-debug-value
 
+enum LumiDebug
+    NOTHING
+    FAIL
+    SUCCESS
+
 test test-builtin-errors()
     var String{4} too-long(user "abc")!
     
-    owner File? file
-    var String{4} filename
+    var String{4} strg
+    var Buffer{4} buff
     user String? empty
-    assert-error! file-open-read(user empty)->(owner file), "empty object used"
-    lumi-debug-value := 1
-    assert-error! file-open-write(user filename)->(owner file), "open file failed"
-    lumi-debug-value := 2
-    new-fail-countdown := 1
-    assert-error! file-open-read(user filename)->(owner file),
-            "insufficient memory for object dynamic allocation"
-    new-fail-countdown := 1
-    assert-error! file-open-write(user filename)->(owner file),
-            "insufficient memory for object dynamic allocation"
-    lumi-debug-value := 2
-    file-open-read(user filename)->(owner file)!
-    lumi-debug-value := 1
-    assert-error! file-close(owner file), "close file failed"
+    var Int i
     var Char ch
-    lumi-debug-value := 2
-    file-open-read(user filename)->(owner file)!
-    assert-error! file.getc()->(var ch), "file not opened"
-    assert-error! file.putc(copy 'a'), "file not opened"
-    assert-error! file.write(user "aa"), "file not opened"
-    lumi-debug-value := 1
-    assert-error! file.putc(copy 'a'), "file write failed"
-    assert-error! file.write(user "aa"), "file write failed"
+    var Byte bt
+    lumi-debug-value := LumiDebug.SUCCESS
+    var FileReadText file-read-text(user strg)!
+    var FileReadBinary file-read-binary(user strg)!
+    var FileWriteText file-write-text(user strg)!
+    var FileWriteBinary file-write-binary(user strg)!
+    lumi-debug-value := LumiDebug.NOTHING
+    assert-error! FileReadText(user empty), "empty object used"
+    assert-error! file-read-text.get()->(var ch), "file not opened"
+    assert-error! file-read-text.getline(user strg), "file not opened"
+    assert-error! file-read-binary.get()->(var bt), "file not opened"
+    assert-error! file-read-binary.read(user buff), "file not opened"
+    assert-error! file-write-text.put(copy ch), "file not opened"
+    assert-error! file-write-text.write(user strg), "file not opened"
+    assert-error! file-write-binary.put(copy bt), "file not opened"
+    assert-error! file-write-binary.write(user buff), "file not opened"
+    lumi-debug-value := LumiDebug.FAIL
+    assert-error! FileWriteBinary(user strg), "open file failed"
+    assert-error! file-read-text.close(), "close file failed"
+    assert-error! file-read-text.get()->(var ch), "file read failed"
+    assert-error! file-read-text.getline(user strg), "file read failed"
+    assert-error! file-read-binary.get()->(var bt), "file read failed"
+    assert-error! file-read-binary.read(user buff), "file read failed"
+    assert-error! file-write-text.put(copy ch), "file write failed"
+    assert-error! file-write-text.write(user strg), "file write failed"
+    assert-error! file-write-binary.put(copy bt), "file write failed"
+    assert-error! file-write-binary.write(user buff), "file write failed"
     
     assert-error! "aa".get(copy 2), "slice index out of bounds"
     assert-error! too-long.append(copy 'a'), "string too long"
@@ -583,9 +594,9 @@ test test-builtin-errors()
     charp.set-from-array(user "aaaaa")
     assert-error! short-str.copy-from-pointer(copy charp), "string too long"
     
-    lumi-debug-value := 2
+    lumi-debug-value := LumiDebug.SUCCESS
     assert-error! sys.getline(user short-str), "string too long"
-    lumi-debug-value := 1
+    lumi-debug-value := LumiDebug.FAIL
     assert-error! sys.exit(copy 0), "exit failed"
     assert-error! sys.system(user "aaa"), "command execution failed"
 

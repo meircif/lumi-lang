@@ -339,43 +339,72 @@ func ! test-code-flow(user Array{Int} arr)->(var Int res)
 
 
 func ! test-builtins(
-        copy Int i, copy Char c, copy Bool b, weak String s, user Array{Int} a)
-    var Int iv
-    var Char cv
-    var Bool bv
-    new String{12} so!
-    i.str(user so)!
-    bv := true or false
-    a.length()->(var iv)
-    s!.length()->(var iv)
-    so.clear()
-    s!.equal(user s!)->(var bv)
-    s!.get(copy i)->(var cv)!
-    s!.set(copy i, copy cv)!
-    so.append(copy c)!
-    so.copy(user s!)!
-    so.concat(user s!)!
-    so.concat-int(copy i)!
-    s!.find(user s!)->(var iv)
-    s!.has(copy c)->(var bv)
-    owner File? f
-    file-open-read(user s!)->(owner f)!
-    file-open-write(user s!)->(owner f)!
-    f!.getc()->(var cv, var bv)!
-    f!.putc(copy c)!
-    f!.write(user s!)!
-    file-close(owner f!)!
+        temp String s,
+        temp Buffer buff,
+        temp Array{Int} a)
+    var Int i
+    var Char c
+    var Byte y
+    var Bool b
+    i.str(user s)!
+    b := true or false
+    a.length()->(var i)
+    
+    s.length()->(var i)
+    s.max-length()->(var i)
+    s.clear()
+    s.equal(user s)->(var b)
+    s.get(copy i)->(var c)!
+    s.set(copy i, copy c)!
+    s.append(copy c)!
+    s.copy(user s)!
+    s.concat(user s)!
+    s.concat-int(copy i)!
+    s.find(user s)->(var i)
+    s.has(copy c)->(var b)
+    
+    a.length()->(var i)
+    
+    buff.length()->(var i)
+    buff.max-length()->(var i)
+    buff.clear()
+    buff.equal(user buff)->(var b)
+    buff.get(copy i)->(var y)!
+    buff.set(copy i, copy y)!
+    buff.append(copy y)!
+    buff.copy(user buff)!
+    buff.concat(user buff)!
+    buff.find(user buff)->(var i)
+    buff.has(copy y)->(var b)
+    
+    new FileReadText frt(user s)!
+    frt.get()->(var c, var b)!
+    frt.getline(user s)->(var b)!
+    frt.close()!
+    new FileReadBinary frb(user s)!
+    frb.get()->(var y, var b)!
+    frb.read(user buff)->(var i)!
+    frb.close()!
+    new FileWriteText fwt(user s)!
+    fwt.put(copy c)!
+    fwt.write(user s)->(var i)!
+    fwt.close()!
+    new FileWriteBinary fwb(user s)!
+    fwb.put(copy y)!
+    fwb.write(user buff)->(var i)!
+    fwb.close()!
+    
     user String arg(user sys.argv[1]!)
-    sys.print(user s!)!
-    sys.println(user s!)!
-    sys.getchar()->(var cv, var bv)
-    sys.getline(user so)!
-    sys.getenv(user s!, user so)->(var bv)!
-    sys.system(user s!)->(var iv)!
+    sys.print(user s)!
+    sys.println(user s)!
+    sys.getchar()->(var c, var b)!
+    sys.getline(user s)->(var b)!
+    sys.getenv(user s, user s)->(var b)!
+    sys.system(user s)->(var i)!
     sys.exit(copy i)!
-    sys.stdout.putc(copy c)!
-    sys.stdin.getc()->(var cv, var bv)!
-    sys.stderr.putc(copy c)!
+    sys.stdin.get()->(var c, var b)!
+    sys.stdout.put(copy c)!
+    sys.stderr.put(copy c)!
 
 
 func ! test-ref-count()
