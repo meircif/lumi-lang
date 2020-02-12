@@ -297,7 +297,7 @@ Error_Messages LUMI_error_messages = {
   ERROR_MESAGE("insufficient memory for object dynamic allocation"),
   ERROR_MESAGE("insufficient memory for managed object"),
   ERROR_MESAGE("slice index out of bounds"),
-  ERROR_MESAGE("string too long"),
+  ERROR_MESAGE("sequence too long"),
   ERROR_MESAGE("file not opened"),
   ERROR_MESAGE("file read failed"),
   ERROR_MESAGE("file write failed"),
@@ -757,19 +757,25 @@ Returncode Buffer_append(Byte* self, int max_length, int* length, Byte value) {
 #undef LUMI_FUNC_NAME
 
 #define LUMI_FUNC_NAME "Buffer.concat"
-Returncode Buffer_concat(
+Returncode Buffer_concat_internal(
     void* self, int max_length, int* length, void* ext, int ext_length) {
   if (*length + ext_length > max_length)
     CRAISE(LUMI_error_messages.sequence_too_long.str)
-  memcpy(self + *length, ext, ext_length);
+  memcpy(self, ext, ext_length);
   *length += ext_length;
   return OK;
 }
 #undef LUMI_FUNC_NAME
 
+Returncode Buffer_concat(
+    Byte* self, int max_length, int* length, Byte* ext, int ext_length) {
+  return Buffer_concat_internal(
+      self + (*length), max_length, length, ext, ext_length);
+}
+
 void Buffer_find(
-    void* self, int max_length, int *length,
-    void* pattern, int pattern_length,
+    Byte* self, int max_length, int *length,
+    Byte* pattern, int pattern_length,
     Int* out_index) {
   int n;
   for (n = 0; n <= *length - pattern_length; ++n) {
@@ -873,7 +879,8 @@ Returncode String_append(char* self, int max_length, int* length, Char ch) {
 #define LUMI_FUNC_NAME "String.concat"
 Returncode String_concat(
     char* self, int max_length, int* length, char* ext, int ext_length) {
-  CCHECK(Buffer_concat(self, max_length - 1, length, ext, ext_length))
+  CCHECK(Buffer_concat_internal(
+      self + (*length), max_length - 1, length, ext, ext_length))
   self[*length] = '\0';
   return OK;
 }
@@ -987,7 +994,8 @@ Bool getc_is_not_ok(int get, char* ch) {
   }
 }
 
-#define CHECK_READ(self, is_eof, read_fail) if (read_fail) { \
+#define CHECK_READ(self, is_eof, read_fail) \
+  if (lumi_debug_value == LUMI_DEBUG_FAIL || read_fail) { \
     if (lumi_debug_value == LUMI_DEBUG_FAIL || feof(self->fobj) != 0) \
       CRAISE(LUMI_error_messages.file_read_failed.str); \
     is_eof = true; }
@@ -1015,11 +1023,13 @@ Returncode FileReadText_getline_internal(
     char* line, int line_max_length, int* line_length,
     Bool* is_eof,
     int (*char_getter)(FileReadText*)) {
-  int ch = 0;
+  int ch = EOF;
   *line_length = 0;
   line[0] = '\0';
-  if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {
+  if (lumi_debug_value == LUMI_DEBUG_NOTHING) {
     ch = char_getter(self);
+  } else if (lumi_debug_value == LUMI_DEBUG_SUCCESS) {
+    ch = 'a';
   }
   while (ch != EOF && ch != '\n') {
     if (*line_length + 1 >= line_max_length)
@@ -1164,11 +1174,11 @@ int set_sys(int argc, char* argv[]) {
 
 #define LUMI_FUNC_NAME "sys.print"
 Returncode sys_M_print(char* text, int text_length) {
-  int n, ch, res;
+  int n, ch;
   for (n = 0; n < text_length; ++n) {
     ch = text[n];
-    res = putchar(ch);
-    if (ch != res) CRAISE(LUMI_error_messages.file_write_failed.str)
+    if (lumi_debug_value == LUMI_DEBUG_FAIL || ch != putchar(ch))
+      CRAISE(LUMI_error_messages.file_write_failed.str)
   }
   return OK;
 }
@@ -1177,7 +1187,8 @@ Returncode sys_M_print(char* text, int text_length) {
 #define LUMI_FUNC_NAME "sys.println"
 Returncode sys_M_println(char* text, int text_length) {
   sys_M_print(text, text_length);
-  if (putchar('\n') != '\n') CRAISE(LUMI_error_messages.file_write_failed.str)
+  if (lumi_debug_value == LUMI_DEBUG_FAIL || putchar('\n') != '\n')
+    CRAISE(LUMI_error_messages.file_write_failed.str)
   return OK;
 }
 #undef LUMI_FUNC_NAME
