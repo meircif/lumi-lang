@@ -264,7 +264,8 @@ struct TypeInstance
             if self.type-data is-not target.type-data and
                     self.type-data is-not glob.type-empty and
                     not target.type-data.is-primitive and
-                    not target.type-data.is-dynamic
+                    not target.type-data.is-dynamic and
+                    not target.type-data is glob.type-file
                 assert node?
                 node.syntax-error2(
                         user "passing ownership of type",
@@ -298,6 +299,22 @@ struct TypeInstance
             node.syntax-error(
                     user "assigning into a weak reference an illegal access",
                     user glob.access-names[self-access])
+        if self.type-data is glob.type-file-read-write-text and
+                (target.type-data is glob.type-file or
+                target.type-data is glob.type-file-read-text or
+                target.type-data is glob.type-file-write-text)
+            return
+        if self.type-data is glob.type-file-read-write-binary and
+                (target.type-data is glob.type-file or
+                target.type-data is glob.type-file-read-binary or
+                target.type-data is glob.type-file-write-binary)
+            return
+        if target.type-data is glob.type-file and
+                (self.type-data is glob.type-file-read-text or
+                self.type-data is glob.type-file-read-binary or
+                self.type-data is glob.type-file-write-text or
+                self.type-data is glob.type-file-write-binary)
+            return
         if self.type-data is glob.type-pointer and
                 target.type-data is glob.type-pointer
             return

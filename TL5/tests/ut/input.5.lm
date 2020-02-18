@@ -1120,6 +1120,11 @@ try
     s-var FileReadText f(user ostr)
     f.get()->(var c, var b)
     f.getline(user ostr)->(var b)
+    f.tell()->(var i)
+    f.seek-set(copy i)
+    f.seek-cur(copy i)
+    f.seek-end(copy i)
+    f.flush()
     f.close()
     var Data{FileReadText} df
     df.item := f
@@ -1128,25 +1133,110 @@ try
     new FileReadBinary f(user ostr)
     f.get()->(var bt, var b)
     f.read(user buff)->(var i)
+    f.tell()->(var i)
+    f.seek-set(copy i)
+    f.seek-cur(copy i)
+    f.seek-end(copy i)
+    f.flush()
     f.close()
     var Data{FileReadBinary} df
     df.set(owner f)
 ; @ c test-builtin-file2
 try
-    owner FileWriteText f(owner FileWriteText(user ostr))
+    owner FileWriteText f(owner FileWriteText(user ostr, copy false))
     f.put(copy c)
     f.write(user ostr)->(var i)
+    f.tell()->(var i)
+    f.seek-set(copy i)
+    f.seek-cur(copy i)
+    f.seek-end(copy i)
+    f.flush()
     f.close()
     var Data{FileWriteText} df
     df.set(owner f)
 ; @ c test-builtin-file3
 try
-    strong FileWriteBinary f(strong FileWriteBinary(user ostr))
+    strong FileWriteBinary f(strong FileWriteBinary(user ostr, copy true))
     f.put(copy bt)
     f.write(user buff)->(var i)
+    f.tell()->(var i)
+    f.seek-set(copy i)
+    f.seek-cur(copy i)
+    f.seek-end(copy i)
+    f.flush()
     f.close()
     var Data{FileWriteBinary} df
     df.item := f
+; @ c test-builtin-file4
+try
+    s-var FileReadWriteText f(user ostr, copy true, copy true)
+    f.get()->(var c, var b)
+    f.getline(user ostr)->(var b)
+    f.put(copy c)
+    f.write(user ostr)->(var i)
+    f.tell()->(var i)
+    f.seek-set(copy i)
+    f.seek-cur(copy i)
+    f.seek-end(copy i)
+    f.flush()
+    f.close()
+    var Data{FileReadWriteText} df
+    df.item := f
+; @ c test-builtin-file5
+try
+    new FileReadWriteBinary f(user ostr, copy false, copy false)
+    f.get()->(var bt, var b)
+    f.read(user buff)->(var i)
+    f.put(copy bt)
+    f.write(user buff)->(var i)
+    f.tell()->(var i)
+    f.seek-set(copy i)
+    f.seek-cur(copy i)
+    f.seek-end(copy i)
+    f.flush()
+    f.close()
+    var Data{FileReadWriteBinary} df
+    df.set(owner f)
+; @ g test-builtin-file6
+struct Data{Generic}
+    weak Generic? item
+    func user? set(owner Generic? item)
+func ! fun(
+        user File f,
+        user FileReadText frt,
+        user FileReadBinary frb,
+        user FileWriteText fwt,
+        user FileWriteBinary fwb,
+        user FileReadWriteText frwt,
+        user FileReadWriteBinary frwb)
+    f := frt
+    f := frb
+    f := fwt
+    f := fwb
+    f := frwt
+    f := frwb
+    frt := frwt
+    frb := frwb
+    fwt := frwt
+    fwb := frwb
+    fun(
+            user frt,
+            user frwt,
+            user frwb,
+            user frwt,
+            user frwb,
+            user frwt,
+            user frwb)!
+    var Data{File} df
+    owner File fo(owner FileWriteBinary(user "name", copy false)!)
+    var Int i
+    fo.tell()->(var i)!
+    fo.seek-set(copy i)!
+    fo.seek-cur(copy i)!
+    fo.seek-end(copy i)!
+    fo.flush()!
+    fo.close()!
+    df.set(owner fo)
 ; @ c test-builtin-sys0
 user Array{String} argv(user sys.argv)
 ; @ c test-builtin-sys1

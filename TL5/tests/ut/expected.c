@@ -2875,8 +2875,18 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         CHECK_REF(4, LUMI_block1_cleanup, ut_M_ostr)
         LUMI_err = FileReadText_getline(f, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_b));
         CHECK(4, LUMI_block1_cleanup)
-        LUMI_err = FileReadText_close(f);
+        LUMI_err = FileReadText_tell(f, &(ut_M_i));
         CHECK(5, LUMI_block1_cleanup)
+        LUMI_err = FileReadText_seek_set(f, ut_M_i);
+        CHECK(6, LUMI_block1_cleanup)
+        LUMI_err = FileReadText_seek_cur(f, ut_M_i);
+        CHECK(7, LUMI_block1_cleanup)
+        LUMI_err = FileReadText_seek_end(f, ut_M_i);
+        CHECK(8, LUMI_block1_cleanup)
+        LUMI_err = FileReadText_flush(f);
+        CHECK(9, LUMI_block1_cleanup)
+        LUMI_err = FileReadText_close(f);
+        CHECK(10, LUMI_block1_cleanup)
         df = &df_Var;
         LUMI_inc_ref(f_Refman);
         LUMI_dec_ref(df->item_Refman);
@@ -2912,8 +2922,18 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         CHECK_REF(4, LUMI_block1_cleanup, ut_M_buff)
         LUMI_err = FileReadBinary_read(f, ut_M_buff, *ut_M_buff_Length, &(ut_M_i));
         CHECK(4, LUMI_block1_cleanup)
-        LUMI_err = FileReadBinary_close(f);
+        LUMI_err = FileReadBinary_tell(f, &(ut_M_i));
         CHECK(5, LUMI_block1_cleanup)
+        LUMI_err = FileReadBinary_seek_set(f, ut_M_i);
+        CHECK(6, LUMI_block1_cleanup)
+        LUMI_err = FileReadBinary_seek_cur(f, ut_M_i);
+        CHECK(7, LUMI_block1_cleanup)
+        LUMI_err = FileReadBinary_seek_end(f, ut_M_i);
+        CHECK(8, LUMI_block1_cleanup)
+        LUMI_err = FileReadBinary_flush(f);
+        CHECK(9, LUMI_block1_cleanup)
+        LUMI_err = FileReadBinary_close(f);
+        CHECK(10, LUMI_block1_cleanup)
         df = &df_Var;
         ut_M_Data_set(df, f, &FileReadBinary_dynamic);
         f = NULL;
@@ -2940,7 +2960,7 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         ++LUMI_trace_ignore_count;
         CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
         INIT_NEW(2, LUMI_block1_cleanup, aux_FileWriteText_0, FileWriteText, 1);
-        LUMI_err = FileWriteText_new(aux_FileWriteText_0, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
+        LUMI_err = FileWriteText_new(aux_FileWriteText_0, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, false);
         CHECK(2, LUMI_block1_cleanup)
         f = aux_FileWriteText_0;
         aux_FileWriteText_0 = NULL;
@@ -2949,8 +2969,18 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         CHECK_REF(4, LUMI_block1_cleanup, ut_M_ostr)
         LUMI_err = FileWriteText_write(f, ut_M_ostr, *ut_M_ostr_Length, &(ut_M_i));
         CHECK(4, LUMI_block1_cleanup)
-        LUMI_err = FileWriteText_close(f);
+        LUMI_err = FileWriteText_tell(f, &(ut_M_i));
         CHECK(5, LUMI_block1_cleanup)
+        LUMI_err = FileWriteText_seek_set(f, ut_M_i);
+        CHECK(6, LUMI_block1_cleanup)
+        LUMI_err = FileWriteText_seek_cur(f, ut_M_i);
+        CHECK(7, LUMI_block1_cleanup)
+        LUMI_err = FileWriteText_seek_end(f, ut_M_i);
+        CHECK(8, LUMI_block1_cleanup)
+        LUMI_err = FileWriteText_flush(f);
+        CHECK(9, LUMI_block1_cleanup)
+        LUMI_err = FileWriteText_close(f);
+        CHECK(10, LUMI_block1_cleanup)
         df = &df_Var;
         ut_M_Data_set(df, f, &FileWriteText_dynamic);
         f = NULL;
@@ -2980,7 +3010,7 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         ++LUMI_trace_ignore_count;
         CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
         INIT_NEW(2, LUMI_block1_cleanup, aux_FileWriteBinary_0, FileWriteBinary, 1);
-        LUMI_err = FileWriteBinary_new(aux_FileWriteBinary_0, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
+        LUMI_err = FileWriteBinary_new(aux_FileWriteBinary_0, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, true);
         CHECK(2, LUMI_block1_cleanup)
         f = aux_FileWriteBinary_0;
         aux_FileWriteBinary_0 = NULL;
@@ -2990,8 +3020,18 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         CHECK_REF(4, LUMI_block1_cleanup, ut_M_buff)
         LUMI_err = FileWriteBinary_write(f, ut_M_buff, *ut_M_buff_Length, &(ut_M_i));
         CHECK(4, LUMI_block1_cleanup)
-        LUMI_err = FileWriteBinary_close(f);
+        LUMI_err = FileWriteBinary_tell(f, &(ut_M_i));
         CHECK(5, LUMI_block1_cleanup)
+        LUMI_err = FileWriteBinary_seek_set(f, ut_M_i);
+        CHECK(6, LUMI_block1_cleanup)
+        LUMI_err = FileWriteBinary_seek_cur(f, ut_M_i);
+        CHECK(7, LUMI_block1_cleanup)
+        LUMI_err = FileWriteBinary_seek_end(f, ut_M_i);
+        CHECK(8, LUMI_block1_cleanup)
+        LUMI_err = FileWriteBinary_flush(f);
+        CHECK(9, LUMI_block1_cleanup)
+        LUMI_err = FileWriteBinary_close(f);
+        CHECK(10, LUMI_block1_cleanup)
         df = &df_Var;
         LUMI_inc_ref(f_Refman);
         LUMI_dec_ref(df->item_Refman);
@@ -3014,6 +3054,185 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ test-builtin-file4
+{
+        FileReadWriteText f_Var = {0};
+        FileReadWriteText* f = NULL;
+        Ref_Manager* f_Refman = NULL;
+        ut_M_Data df_Var = {0};
+        ut_M_Data* df = NULL;
+        ++LUMI_trace_ignore_count;
+        CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
+        f = &f_Var;
+        INIT_VAR_REFMAN(2, LUMI_block1_cleanup, f)
+        LUMI_err = FileReadWriteText_new(f, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, true, true);
+        CHECK(2, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteText_get(f, &(ut_M_c), &(ut_M_b));
+        CHECK(3, LUMI_block1_cleanup)
+        CHECK_REF(4, LUMI_block1_cleanup, ut_M_ostr)
+        LUMI_err = FileReadWriteText_getline(f, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_b));
+        CHECK(4, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteText_put(f, ut_M_c);
+        CHECK(5, LUMI_block1_cleanup)
+        CHECK_REF(6, LUMI_block1_cleanup, ut_M_ostr)
+        LUMI_err = FileReadWriteText_write(f, ut_M_ostr, *ut_M_ostr_Length, &(ut_M_i));
+        CHECK(6, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteText_tell(f, &(ut_M_i));
+        CHECK(7, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteText_seek_set(f, ut_M_i);
+        CHECK(8, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteText_seek_cur(f, ut_M_i);
+        CHECK(9, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteText_seek_end(f, ut_M_i);
+        CHECK(10, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteText_flush(f);
+        CHECK(11, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteText_close(f);
+        CHECK(12, LUMI_block1_cleanup)
+        df = &df_Var;
+        LUMI_inc_ref(f_Refman);
+        LUMI_dec_ref(df->item_Refman);
+        df->item_Refman = f_Refman;
+        df->item_Dynamic = &FileReadWriteText_dynamic;
+        df->item = f;
+    LUMI_block1_cleanup:
+        (void)0;
+    ut_M_Data_Del(df);
+    FileReadWriteText_Del(f);
+        LUMI_var_dec_ref(f_Refman);
+    }
+    --LUMI_trace_ignore_count;
+    if (LUMI_err != OK) {
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+    LUMI_block2_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ test-builtin-file5
+{
+        FileReadWriteBinary* f = NULL;
+        ut_M_Data df_Var = {0};
+        ut_M_Data* df = NULL;
+        ++LUMI_trace_ignore_count;
+        CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
+        INIT_NEW(2, LUMI_block1_cleanup, f, FileReadWriteBinary, 1);
+        LUMI_err = FileReadWriteBinary_new(f, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, false, false);
+        CHECK(2, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteBinary_get(f, &(ut_M_bt), &(ut_M_b));
+        CHECK(3, LUMI_block1_cleanup)
+        CHECK_REF(4, LUMI_block1_cleanup, ut_M_buff)
+        LUMI_err = FileReadWriteBinary_read(f, ut_M_buff, *ut_M_buff_Length, &(ut_M_i));
+        CHECK(4, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteBinary_put(f, ut_M_bt);
+        CHECK(5, LUMI_block1_cleanup)
+        CHECK_REF(6, LUMI_block1_cleanup, ut_M_buff)
+        LUMI_err = FileReadWriteBinary_write(f, ut_M_buff, *ut_M_buff_Length, &(ut_M_i));
+        CHECK(6, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteBinary_tell(f, &(ut_M_i));
+        CHECK(7, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteBinary_seek_set(f, ut_M_i);
+        CHECK(8, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteBinary_seek_cur(f, ut_M_i);
+        CHECK(9, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteBinary_seek_end(f, ut_M_i);
+        CHECK(10, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteBinary_flush(f);
+        CHECK(11, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteBinary_close(f);
+        CHECK(12, LUMI_block1_cleanup)
+        df = &df_Var;
+        ut_M_Data_set(df, f, &FileReadWriteBinary_dynamic);
+        f = NULL;
+    LUMI_block1_cleanup:
+        (void)0;
+    ut_M_Data_Del(df);
+    FileReadWriteBinary_Del(f);
+        free(f);
+    }
+    --LUMI_trace_ignore_count;
+    if (LUMI_err != OK) {
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+    LUMI_block2_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ test-builtin-file6
+typedef struct ut_M_Data ut_M_Data;
+struct ut_M_Data {
+    Generic_Type* item;
+    Ref_Manager* item_Refman;
+    Generic_Type_Dynamic* item_Dynamic;
+};
+void ut_M_Data_set(ut_M_Data* self, Generic_Type* item, Generic_Type_Dynamic* item_Dynamic);
+void ut_M_Data_Del(ut_M_Data* self);
+Returncode ut_M_fun(File* f, FileReadText* frt, FileReadBinary* frb, FileWriteText* fwt, FileWriteBinary* fwb, FileReadWriteText* frwt, FileReadWriteBinary* frwb);
+Generic_Type_Dynamic ut_M_Data_dynamic = {(Dynamic_Del)ut_M_Data_Del};
+void ut_M_Data_set(ut_M_Data* self, Generic_Type* item, Generic_Type_Dynamic* item_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+    if (item_Dynamic != NULL) item_Dynamic->_del(item, item_Dynamic);
+    free(item);
+}
+void ut_M_Data_Del(ut_M_Data* self) {
+    if (self == NULL) return;
+    LUMI_dec_ref(self->item_Refman);
+}
+Returncode ut_M_fun(File* f, FileReadText* frt, FileReadBinary* frb, FileWriteText* fwt, FileWriteBinary* fwb, FileReadWriteText* frwt, FileReadWriteBinary* frwb) {
+    Returncode LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    ut_M_Data df_Var = {0};
+    ut_M_Data* df = NULL;
+    File* fo = NULL;
+    Int i = 0;
+    FileWriteBinary* aux_FileWriteBinary_0 = NULL;
+    char* aux_String_0 = NULL;
+    int aux_String_0_Max_length = 0;
+    int aux_String_0_Length[1] = {0};
+    f = frt;
+    f = frb;
+    f = fwt;
+    f = fwb;
+    f = frwt;
+    f = frwb;
+    frt = frwt;
+    frb = frwb;
+    fwt = frwt;
+    fwb = frwb;
+    LUMI_err = ut_M_fun(frt, frwt, frwb, frwt, frwb, frwt, frwb);
+    CHECK(22, LUMI_block0_cleanup)
+    df = &df_Var;
+    INIT_STRING_CONST(31, LUMI_block0_cleanup, aux_String_0, "name");
+    INIT_NEW(31, LUMI_block0_cleanup, aux_FileWriteBinary_0, FileWriteBinary, 1);
+    LUMI_err = FileWriteBinary_new(aux_FileWriteBinary_0, aux_String_0, aux_String_0_Max_length, aux_String_0_Length, false);
+    CHECK(31, LUMI_block0_cleanup)
+    fo = aux_FileWriteBinary_0;
+    aux_FileWriteBinary_0 = NULL;
+    LUMI_err = File_tell(fo, &(i));
+    CHECK(33, LUMI_block0_cleanup)
+    LUMI_err = File_seek_set(fo, i);
+    CHECK(34, LUMI_block0_cleanup)
+    LUMI_err = File_seek_cur(fo, i);
+    CHECK(35, LUMI_block0_cleanup)
+    LUMI_err = File_seek_end(fo, i);
+    CHECK(36, LUMI_block0_cleanup)
+    LUMI_err = File_flush(fo);
+    CHECK(37, LUMI_block0_cleanup)
+    LUMI_err = File_close(fo);
+    CHECK(38, LUMI_block0_cleanup)
+    ut_M_Data_set(df, fo, &File_dynamic);
+    fo = NULL;
+LUMI_block0_cleanup:
+    (void)0;
+    FileWriteBinary_Del(aux_FileWriteBinary_0);
+    free(aux_FileWriteBinary_0);
+    File_Del(fo);
+    free(fo);
+    ut_M_Data_Del(df);
+    return LUMI_err;
+}
 /// @ test-builtin-sys0
 char* argv = NULL;
     int argv_Length = 0;

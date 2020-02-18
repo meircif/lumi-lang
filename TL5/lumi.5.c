@@ -38,6 +38,8 @@ typedef File FileReadText;
 typedef File FileReadBinary;
 typedef File FileWriteText;
 typedef File FileWriteBinary;
+typedef File FileReadWriteText;
+typedef File FileReadWriteBinary;
 
 char* sys_M_argv = NULL;
 int sys_M_argv_Length = 0;
@@ -935,12 +937,16 @@ void File_Del(File* self) {
 #define FileReadBinary_Del(self) File_Del(self)
 #define FileWriteText_Del(self) File_Del(self)
 #define FileWriteBinary_Del(self) File_Del(self)
+#define FileReadWriteText_Del(self) File_Del(self)
+#define FileReadWriteBinary_Del(self) File_Del(self)
 
 Generic_Type_Dynamic File_dynamic = { (Dynamic_Del)File_Del };
 #define FileReadText_dynamic File_dynamic
 #define FileReadBinary_dynamic File_dynamic
 #define FileWriteText_dynamic File_dynamic
 #define FileWriteBinary_dynamic File_dynamic
+#define FileReadWriteText_dynamic File_dynamic
+#define FileReadWriteBinary_dynamic File_dynamic
 
 #define LUMI_FUNC_NAME "File.close"
 Returncode File_close(File* self) {
@@ -956,6 +962,8 @@ Returncode File_close(File* self) {
 #define FileReadBinary_close(self) File_close(self)
 #define FileWriteText_close(self) File_close(self)
 #define FileWriteBinary_close(self) File_close(self)
+#define FileReadWriteText_close(self) File_close(self)
+#define FileReadWriteBinary_close(self) File_close(self)
 
 #define LUMI_FUNC_NAME "File.new"
 Returncode File_new(File* self, char* name, char* mode) {
@@ -975,14 +983,88 @@ Returncode File_new(File* self, char* name, char* mode) {
   File_new(self, name, "r")
 #define FileReadBinary_new(self, name, name_max_length, name_length) \
   File_new(self, name, "rb")
-#define FileWriteText_new(self, name, name_max_length, name_length) \
-  File_new(self, name, "w")
-#define FileWriteBinary_new(self, name, name_max_length, name_length) \
-  File_new(self, name, "wb")
+#define FileWriteText_new(self, name, name_max_length, name_length, append) \
+  File_new(self, name, append? "a": "w")
+#define FileWriteBinary_new(self, name, name_max_length, name_length, append) \
+  File_new(self, name, append? "ab": "wb")
+#define FileReadWriteText_new(self, name, name_max_length, name_length, append, exist) \
+  File_new(self, name, append? "a+": exist? "r+": "w+")
+#define FileReadWriteBinary_new(self, name, name_max_length, name_length, append, exist) \
+  File_new(self, name, append? "ab+": exist? "rb+": "wb+")
 
 #define CHECK_OPEN(self) \
   if (lumi_debug_value != LUMI_DEBUG_FAIL && self->fobj == NULL) \
     CRAISE(LUMI_error_messages.file_not_opened.str)
+
+#define LUMI_FUNC_NAME "File.tell"
+Returncode File_tell(File* self, Int* offset) {
+  long ret = -1;
+  CHECK_OPEN(self)
+  if (lumi_debug_value != LUMI_DEBUG_FAIL) {
+    ret = ftell(self->fobj);
+  }
+  if (ret < 0) CRAISE("getting file offset failed")
+  *offset = ret;
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+#define FileReadText_tell(self, offset) File_tell(self, offset)
+#define FileReadBinary_tell(self, offset) File_tell(self, offset)
+#define FileWriteText_tell(self, offset) File_tell(self, offset)
+#define FileWriteBinary_tell(self, offset) File_tell(self, offset)
+#define FileReadWriteText_tell(self, offset) File_tell(self, offset)
+#define FileReadWriteBinary_tell(self, offset) File_tell(self, offset)
+
+#define LUMI_FUNC_NAME "File.seek"
+Returncode File_seek(File* self, Int offset, int whence) {
+  int ret = -1;
+  CHECK_OPEN(self)
+  if (lumi_debug_value != LUMI_DEBUG_FAIL) {
+    ret = fseek(self->fobj, offset, whence);
+  }
+  if (ret != 0) CRAISE("setting file offset failed")
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+#define File_seek_set(self, offset) File_seek(self, offset, SEEK_SET)
+#define File_seek_cur(self, offset) File_seek(self, offset, SEEK_CUR)
+#define File_seek_end(self, offset) File_seek(self, offset, SEEK_END)
+#define FileReadText_seek_set(self, offset) File_seek_set(self, offset)
+#define FileReadBinary_seek_set(self, offset) File_seek_set(self, offset)
+#define FileWriteText_seek_set(self, offset) File_seek_set(self, offset)
+#define FileWriteBinary_seek_set(self, offset) File_seek_set(self, offset)
+#define FileReadWriteText_seek_set(self, offset) File_seek_set(self, offset)
+#define FileReadWriteBinary_seek_set(self, offset) File_seek_set(self, offset)
+#define FileReadText_seek_cur(self, offset) File_seek_cur(self, offset)
+#define FileReadBinary_seek_cur(self, offset) File_seek_cur(self, offset)
+#define FileWriteText_seek_cur(self, offset) File_seek_cur(self, offset)
+#define FileWriteBinary_seek_cur(self, offset) File_seek_cur(self, offset)
+#define FileReadWriteText_seek_cur(self, offset) File_seek_cur(self, offset)
+#define FileReadWriteBinary_seek_cur(self, offset) File_seek_cur(self, offset)
+#define FileReadText_seek_end(self, offset) File_seek_end(self, offset)
+#define FileReadBinary_seek_end(self, offset) File_seek_end(self, offset)
+#define FileWriteText_seek_end(self, offset) File_seek_end(self, offset)
+#define FileWriteBinary_seek_end(self, offset) File_seek_end(self, offset)
+#define FileReadWriteText_seek_end(self, offset) File_seek_end(self, offset)
+#define FileReadWriteBinary_seek_end(self, offset) File_seek_end(self, offset)
+
+#define LUMI_FUNC_NAME "File.flush"
+Returncode File_flush(File* self) {
+  int ret = EOF;
+  CHECK_OPEN(self)
+  if (lumi_debug_value != LUMI_DEBUG_FAIL) {
+    ret = fflush(self->fobj);
+  }
+  if (ret != 0) CRAISE("flush file failed")
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+#define FileReadText_flush(self) File_flush(self)
+#define FileReadBinary_flush(self) File_flush(self)
+#define FileWriteText_flush(self) File_flush(self)
+#define FileWriteBinary_flush(self) File_flush(self)
+#define FileReadWriteText_flush(self) File_flush(self)
+#define FileReadWriteBinary_flush(self) File_flush(self)
 
 Bool getc_is_not_ok(int get, char* ch) {
   if (get == EOF) {
@@ -1007,6 +1089,8 @@ Returncode FileReadText_get(FileReadText* self, Char* out_char, Bool* is_eof) {
   return OK;
 }
 #undef LUMI_FUNC_NAME
+#define FileReadWriteText_get(self, out_char, is_eof) \
+  FileReadText_get(self, out_char, is_eof)
 
 #define LUMI_FUNC_NAME "FileReadBinary.get"
 Returncode FileReadBinary_get(
@@ -1016,6 +1100,8 @@ Returncode FileReadBinary_get(
   return OK;
 }
 #undef LUMI_FUNC_NAME
+#define FileReadWriteBinary_get(self, out_byte, is_eof) \
+  FileReadBinary_get(self, out_byte, is_eof)
 
 #define LUMI_FUNC_NAME "FileReadText.getline-internal"
 Returncode FileReadText_getline_internal(
@@ -1061,6 +1147,8 @@ Returncode FileReadText_getline(
   return OK;
 }
 #undef LUMI_FUNC_NAME
+#define FileReadWriteText_getline(self, line, line_max_length, line_length, is_eof) \
+  FileReadText_getline(self, line, line_max_length, line_length, is_eof)
 
 #define LUMI_FUNC_NAME "FileReadBinary.read"
 Returncode FileReadBinary_read(
@@ -1075,6 +1163,8 @@ Returncode FileReadBinary_read(
   return OK;
 }
 #undef LUMI_FUNC_NAME
+#define FileReadWriteBinary_read(self, data, data_length, bytes_read) \
+  FileReadBinary_read(self, data, data_length, bytes_read)
 
 #define LUMI_FUNC_NAME "FileWriteText.put"
 Returncode FileWriteText_put(FileWriteText* self, Char ch) {
@@ -1084,6 +1174,7 @@ Returncode FileWriteText_put(FileWriteText* self, Char ch) {
   return OK;
 }
 #undef LUMI_FUNC_NAME
+#define FileReadWriteText_put(self, ch) FileWriteText_put(self, ch)
 
 #define LUMI_FUNC_NAME "FileWriteBinary.put"
 Returncode FileWriteBinary_put(FileWriteBinary* self, Byte value) {
@@ -1094,6 +1185,7 @@ Returncode FileWriteBinary_put(FileWriteBinary* self, Byte value) {
   return OK;
 }
 #undef LUMI_FUNC_NAME
+#define FileReadWriteBinary_put(self, value) FileWriteBinary_put(self, value)
 
 #define LUMI_FUNC_NAME "FileWriteText.write"
 Returncode FileWriteText_write(
@@ -1110,6 +1202,8 @@ Returncode FileWriteText_write(
   return OK;
 }
 #undef LUMI_FUNC_NAME
+#define FileReadWriteText_write(self, text, text_length, written) \
+  FileWriteText_write(self, text, text_length, written)
 
 #define LUMI_FUNC_NAME "FileWriteBinary.write"
 Returncode FileWriteBinary_write(
@@ -1123,6 +1217,8 @@ Returncode FileWriteBinary_write(
   return OK;
 }
 #undef LUMI_FUNC_NAME
+#define FileReadWriteBinary_write(self, data, data_length, written) \
+  FileWriteBinary_write(self, data, data_length, written)
 
 
 /* system */

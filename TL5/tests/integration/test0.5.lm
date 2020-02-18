@@ -380,19 +380,74 @@ func ! test-builtins(
     new FileReadText frt(user s)!
     frt.get()->(var c, var b)!
     frt.getline(user s)->(var b)!
+    frt.tell()->(var i)!
+    frt.seek-set(copy i)!
+    frt.seek-cur(copy i)!
+    frt.seek-end(copy i)!
+    frt.flush()!
     frt.close()!
     new FileReadBinary frb(user s)!
     frb.get()->(var y, var b)!
     frb.read(user buff)->(var i)!
+    frb.tell()->(var i)!
+    frb.seek-set(copy i)!
+    frb.seek-cur(copy i)!
+    frb.seek-end(copy i)!
+    frb.flush()!
     frb.close()!
-    new FileWriteText fwt(user s)!
+    new FileWriteText fwt(user s, copy true)!
     fwt.put(copy c)!
     fwt.write(user s)->(var i)!
+    fwt.tell()->(var i)!
+    fwt.seek-set(copy i)!
+    fwt.seek-cur(copy i)!
+    fwt.seek-end(copy i)!
+    fwt.flush()!
     fwt.close()!
-    new FileWriteBinary fwb(user s)!
+    new FileWriteBinary fwb(user s, copy false)!
     fwb.put(copy y)!
     fwb.write(user buff)->(var i)!
+    fwb.tell()->(var i)!
+    fwb.seek-set(copy i)!
+    fwb.seek-cur(copy i)!
+    fwb.seek-end(copy i)!
+    fwb.flush()!
     fwb.close()!
+    new FileReadWriteText frwt(user s, copy false, copy true)!
+    frwt.get()->(var c, var b)!
+    frwt.getline(user s)->(var b)!
+    frwt.put(copy c)!
+    frwt.write(user s)->(var i)!
+    frwt.tell()->(var i)!
+    frwt.seek-set(copy i)!
+    frwt.seek-cur(copy i)!
+    frwt.seek-end(copy i)!
+    frwt.flush()!
+    frwt.close()!
+    new FileReadWriteBinary frwb(user s, copy true, copy false)!
+    frwb.get()->(var y, var b)!
+    frwb.read(user buff)->(var i)!
+    frwb.put(copy y)!
+    frwb.write(user buff)->(var i)!
+    frwb.tell()->(var i)!
+    frwb.seek-set(copy i)!
+    frwb.seek-cur(copy i)!
+    frwb.seek-end(copy i)!
+    frwb.flush()!
+    frwb.close()!
+    new FileReadWriteText frwt1(user s, copy false, copy false)!
+    new FileReadWriteText frwt2(user s, copy true, copy false)!
+    new FileReadWriteText frwt3(user s, copy true, copy true)!
+    new FileReadWriteBinary frwb1(user s, copy false, copy false)!
+    new FileReadWriteBinary frwb2(user s, copy false, copy true)!
+    new FileReadWriteBinary frwb3(user s, copy true, copy true)!
+    owner File f(owner frt)
+    f.tell()->(var i)!
+    f.seek-set(copy i)!
+    f.seek-cur(copy i)!
+    f.seek-end(copy i)!
+    f.flush()!
+    f.close()!
     
     user String arg(user sys.argv[1]!)
     sys.print(user s)!

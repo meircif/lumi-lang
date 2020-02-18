@@ -99,10 +99,13 @@ struct Global
     user TypeData type-base
     user TypeData type-generic
     user TypeData type-module
+    user TypeData type-file
     user TypeData type-file-read-text
     user TypeData type-file-read-binary
     user TypeData type-file-write-text
     user TypeData type-file-write-binary
+    user TypeData type-file-read-write-text
+    user TypeData type-file-read-write-binary
     user TypeData type-pointer
     user TypeData type-c-char
 
@@ -320,6 +323,7 @@ struct Global
         self.type-generic.is-dynamic := true
         self.add-global-type(user "Module Name", copy false)->(
                 user self.type-module)
+        self.add-global-type(user "File", copy false)->(user self.type-file)
         self.add-global-type(user "FileReadText", copy false)->(
                 user self.type-file-read-text)
         self.add-global-type(user "FileReadBinary", copy false)->(
@@ -328,6 +332,10 @@ struct Global
                 user self.type-file-write-text)
         self.add-global-type(user "FileWriteBinary", copy false)->(
                 user self.type-file-write-binary)
+        self.add-global-type(user "FileReadWriteText", copy false)->(
+                user self.type-file-read-write-text)
+        self.add-global-type(user "FileReadWriteBinary", copy false)->(
+                user self.type-file-read-write-binary)
 
         ; cdef types
         new ModuleMembers cdef-module(user "cdef")
@@ -553,52 +561,40 @@ struct Global
 
         ; File
         self.add-file-methods(
-                user self.type-file-read-text, copy false, user self.type-char)
+                user self.type-file,
+                copy false,
+                copy false,
+                user _)
+        self.add-file-methods(
+                user self.type-file-read-text,
+                copy true,
+                copy false,
+                user self.type-char)
         self.add-file-methods(
                 user self.type-file-read-binary,
+                copy true,
                 copy false,
                 user self.type-byte)
         self.add-file-methods(
-                user self.type-file-write-text, copy true, user self.type-char)
+                user self.type-file-write-text,
+                copy false,
+                copy true,
+                user self.type-char)
         self.add-file-methods(
                 user self.type-file-write-binary,
+                copy false,
                 copy true,
                 user self.type-byte)
-
-        self.add-builtin-method(
-                user self.type-file-read-text,
-                user "getline",
+        self.add-file-methods(
+                user self.type-file-read-write-text,
                 copy true,
-                copy Access.USER)->(
-                user function)
-        self.add-builtin-parameter(
-                user function,
-                copy Access.USER,
-                user self.type-string,
-                user "line")
-        self.add-builtin-output(
-                user function,
-                copy Access.VAR,
-                user self.type-bool,
-                user "is-eof")
-
-        self.add-builtin-method(
-                user self.type-file-read-binary,
-                user "read",
                 copy true,
-                copy Access.USER)->(
-                user function)
-        self.add-builtin-array-argument(
-                user function,
-                user self.type-byte,
-                copy false,
-                copy Access.USER,
-                user "data")
-        self.add-builtin-output(
-                user function,
-                copy Access.VAR,
-                user glob.type-int,
-                user "bytes-read")
+                user self.type-char)
+        self.add-file-methods(
+                user self.type-file-read-write-binary,
+                copy true,
+                copy true,
+                user self.type-byte)
 
         ; Sys
         new ModuleMembers sys-module(user "sys")
@@ -844,6 +840,7 @@ struct Global
 
     func add-file-methods(
             user TypeData file-type,
+            copy Bool is-read,
             copy Bool is-write,
             user TypeData value-type)
         user SyntaxTreeFunction function
@@ -851,19 +848,131 @@ struct Global
         self.add-builtin-field(
                 user file-type, user _, user self.type-ref, user _)
         
-        self.add-builtin-method(
-                user file-type, user "new", copy true, copy Access.TEMP)->(
-                user function)
-        self.add-builtin-parameter(
-                user function,
-                copy Access.USER,
-                user self.type-string,
-                user "name")
+        if value-type?
+            self.add-builtin-method(
+                    user file-type, user "new", copy true, copy Access.TEMP)->(
+                    user function)
+            self.add-builtin-parameter(
+                    user function,
+                    copy Access.USER,
+                    user self.type-string,
+                    user "name")
+        if is-write
+            self.add-builtin-parameter(
+                    user function,
+                    copy Access.COPY,
+                    user self.type-bool,
+                    user "append")
+            if is-read
+                self.add-builtin-parameter(
+                        user function,
+                        copy Access.COPY,
+                        user self.type-bool,
+                        user "exist")
         file-type.constructor := function
 
         self.add-builtin-method(
                 user file-type, user "close", copy true, copy Access.USER)->(
                 user function)
+
+        self.add-builtin-method(
+                user file-type, user "tell", copy true, copy Access.USER)->(
+                user function)
+        self.add-builtin-output(
+                user function,
+                copy Access.VAR,
+                user self.type-int,
+                user "offset")
+
+        self.add-builtin-method(
+                user file-type,
+                user "seek-set",
+                copy true,
+                copy Access.USER)->(
+                user function)
+        self.add-builtin-parameter(
+                user function,
+                copy Access.COPY,
+                user self.type-int,
+                user "offset")
+
+        self.add-builtin-method(
+                user file-type,
+                user "seek-cur",
+                copy true,
+                copy Access.USER)->(
+                user function)
+        self.add-builtin-parameter(
+                user function,
+                copy Access.COPY,
+                user self.type-int,
+                user "offset")
+
+        self.add-builtin-method(
+                user file-type,
+                user "seek-end",
+                copy true,
+                copy Access.USER)->(
+                user function)
+        self.add-builtin-parameter(
+                user function,
+                copy Access.COPY,
+                user self.type-int,
+                user "offset")
+
+        self.add-builtin-method(
+                user file-type, user "flush", copy true, copy Access.USER)->(
+                user function)
+        
+        if is-read
+            self.add-builtin-method(
+                    user file-type, user "get", copy true, copy Access.USER)->(
+                    user function)
+            self.add-builtin-output(
+                    user function,
+                    copy Access.VAR,
+                    user value-type,
+                    user "value")
+            self.add-builtin-output(
+                    user function,
+                    copy Access.VAR,
+                    user self.type-bool,
+                    user "is-eof")
+            if value-type is glob.type-char
+                self.add-builtin-method(
+                        user file-type,
+                        user "getline",
+                        copy true,
+                        copy Access.USER)->(
+                        user function)
+                self.add-builtin-parameter(
+                        user function,
+                        copy Access.USER,
+                        user self.type-string,
+                        user "line")
+                self.add-builtin-output(
+                        user function,
+                        copy Access.VAR,
+                        user self.type-bool,
+                        user "is-eof")
+            else
+                self.add-builtin-method(
+                        user file-type,
+                        user "read",
+                        copy true,
+                        copy Access.USER)->(
+                        user function)
+                self.add-builtin-array-argument(
+                        user function,
+                        user value-type,
+                        copy false,
+                        copy Access.USER,
+                        user "data")
+                self.add-builtin-output(
+                        user function,
+                        copy Access.VAR,
+                        user glob.type-int,
+                        user "bytes-read")
         
         if is-write
             self.add-builtin-method(
@@ -892,20 +1001,6 @@ struct Global
                     copy Access.VAR,
                     user glob.type-int,
                     user "written")
-        else
-            self.add-builtin-method(
-                    user file-type, user "get", copy true, copy Access.USER)->(
-                    user function)
-            self.add-builtin-output(
-                    user function,
-                    copy Access.VAR,
-                    user value-type,
-                    user "value")
-            self.add-builtin-output(
-                    user function,
-                    copy Access.VAR,
-                    user self.type-bool,
-                    user "is-eof")
     
     func add-global-type(user String name, copy Bool is-primitive)->(
             user TypeData type-data)

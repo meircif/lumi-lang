@@ -559,8 +559,8 @@ test test-builtin-errors()
     lumi-debug-value := LumiDebug.SUCCESS
     var FileReadText file-read-text(user strg)!
     var FileReadBinary file-read-binary(user strg)!
-    var FileWriteText file-write-text(user strg)!
-    var FileWriteBinary file-write-binary(user strg)!
+    var FileWriteText file-write-text(user strg, copy false)!
+    var FileWriteBinary file-write-binary(user strg, copy false)!
     lumi-debug-value := LumiDebug.NOTHING
     assert-error! FileReadText(user empty), "empty object used"
     assert-error! file-read-text.get()->(var ch), "file not opened"
@@ -571,11 +571,20 @@ test test-builtin-errors()
     assert-error! file-write-text.write(user strg), "file not opened"
     assert-error! file-write-binary.put(copy bt), "file not opened"
     assert-error! file-write-binary.write(user buff), "file not opened"
+    assert-error! file-read-text.tell(), "file not opened"
+    assert-error! file-read-text.seek-set(copy 0), "file not opened"
+    assert-error! file-read-text.seek-cur(copy 0), "file not opened"
+    assert-error! file-read-text.seek-end(copy 0), "file not opened"
+    assert-error! file-read-text.flush(), "file not opened"
     lumi-debug-value := LumiDebug.FAIL
-    assert-error! FileWriteBinary(user strg), "open file failed"
+    assert-error! FileReadText(user strg), "open file failed"
     assert-error! FileReadBinary(user strg), "open file failed"
-    assert-error! FileWriteText(user strg), "open file failed"
-    assert-error! FileWriteBinary(user strg), "open file failed"
+    assert-error! FileWriteText(user strg, copy true), "open file failed"
+    assert-error! FileWriteBinary(user strg, copy true), "open file failed"
+    assert-error! FileReadWriteText(user strg, copy true, copy true),
+            "open file failed"
+    assert-error! FileReadWriteBinary(user strg, copy true, copy true),
+            "open file failed"
     assert-error! file-read-text.close(), "close file failed"
     assert-error! file-read-text.get()->(var ch), "file read failed"
     assert-error! file-read-text.getline(user strg), "file read failed"
@@ -587,6 +596,11 @@ test test-builtin-errors()
     assert-error! file-write-binary.put(copy bt), "file write failed"
     buff.append(copy 12)!
     assert-error! file-write-binary.write(user buff), "file write failed"
+    assert-error! file-read-text.tell(), "getting file offset failed"
+    assert-error! file-read-text.seek-set(copy 0), "setting file offset failed"
+    assert-error! file-read-text.seek-cur(copy 0), "setting file offset failed"
+    assert-error! file-read-text.seek-end(copy 0), "setting file offset failed"
+    assert-error! file-read-text.flush(), "flush file failed"
     lumi-debug-value := LumiDebug.SUCCESS
     assert-error! sys.getline(user short-str), "sequence too long"
     lumi-debug-value := LumiDebug.NOTHING
