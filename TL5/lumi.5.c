@@ -260,11 +260,6 @@ while (self->field != NULL) { \
     free(name); name = NULL; \
     RAISE(line, cleanup, object_memory) }
 
-#define INIT_SEQUENCE_CONST(line, cleanup, name, data) \
-  name = (void*)data; \
-  name##_Max_length = sizeof(data); \
-  *name##_Length = sizeof(data) - 1;
-
 
 #define Buffer_Del(name) do { if (name##_Length != &Lumi_empty_int) { \
   free(name##_Length); \

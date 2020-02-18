@@ -96,7 +96,7 @@ class SyntaxTreeCode(SyntaxTreeNode)
             self.parent.write-cleanup-label()
             write(user ")\n")
     
-    ~~~ 
+    ~~~ ~
     Read and check indentation spaces for a line break from the input file
     ~~~
     func inst read-parent-line-break-spaces()
@@ -311,6 +311,14 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
             user TypeInstance type-instance)->(
             user SyntaxTreeVariable new-variable)
         new SyntaxTreeVariable variable(user self)
+        variable.access := access
+        variable.is-create := is-create
+        new-variable := variable
+        self.set-aux-variable(owner variable, user type-instance)
+    
+    func inst set-aux-variable(
+            owner SyntaxTreeVariable variable,
+            user TypeInstance type-instance)
         variable.name := String{type-instance.type-data.name.length + 21}()
         variable.name.new(user "aux_")
         variable.name.concat(user type-instance.type-data.name)
@@ -319,11 +327,8 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
         self.get-function().new-aux-variable-index(user type-instance).str(
                 user index-str)
         variable.name.concat(user index-str)
-        variable.access := access
-        variable.is-create := is-create
         variable.is-aux := true
         type-instance.copy-new()->(owner variable.type-instance)
-        new-variable := variable
         self.variables.add(owner variable)
     
     func dynamic link-types()

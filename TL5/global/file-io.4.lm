@@ -21,6 +21,13 @@ func read-c()
         glob.got-new-line := glob.last-char = '\n'
 
 
+func append-input-buffer()
+    if glob.input-buffer.length = glob.input-buffer.max-length
+        new String{2 * glob.input-buffer.max-length} new-buffer(
+                user glob.input-buffer)
+        glob.input-buffer := new-buffer
+    glob.input-buffer.append(copy glob.last-char)
+
 ~~~ Read from the input file to `text` until reached one of the characters in
 `ends`, a new-line, or the file ended.
 If `indent` is true, ignore and count leading spaces.
@@ -52,12 +59,12 @@ func read-until(user String ends, copy Bool indent)->(
                     glob.last-char = '`'
                 quote := glob.last-char
         else-if glob.last-char = '\\'
-            glob.input-buffer.append(copy glob.last-char)
+            append-input-buffer()
             read-c()
             while not glob.file-ended
         else-if glob.last-char = quote
             quote := '\0'
-        glob.input-buffer.append(copy glob.last-char)
+        append-input-buffer()
         read-c()
     
     glob.input-spaces := spaces
