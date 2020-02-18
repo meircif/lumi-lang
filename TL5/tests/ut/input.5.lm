@@ -4545,11 +4545,11 @@ u-test := p-test.get-ref-at(copy 5)
 ; @ c test-c-objects-3
 var cdef.Pointer{Char} p-char
 p-char.set-from-array(user ostr!)
-ostr!.copy-from-pointer(copy p-char)!
-ostr!.set-null-term-length()
+cdef.copy-to-string(copy p-char, user ostr!)!
+cdef.set-null-term-length(user ostr!)
 ; @ c test-c-objects-4
 var cdef.Pointer{Byte} p-byte
-buff!.copy-from-pointer(copy p-byte, copy 4)!
+cdef.copy-to-buffer(copy p-byte, copy 4, user buff!)!
 ; @ ec test-c-objects-e0
 var cdef.Pointer{Ta} error
 ; @ ec test-c-objects-e1

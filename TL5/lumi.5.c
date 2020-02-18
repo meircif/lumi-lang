@@ -696,9 +696,9 @@ Returncode Buffer_copy(
 }
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FUNC_NAME "Buffer.copy-from-pointer"
-Returncode Buffer_copy_from_pointer(
-    void* self, int max_length, int* length, void* source, int source_length) {
+#define LUMI_FUNC_NAME "cdef.copy-to-buffer"
+Returncode cdef_M_copy_to_buffer(
+    void* source, int source_length, void* self, int max_length, int* length) {
   if (source == NULL) {
     *length = 0;
     return OK;
@@ -820,17 +820,17 @@ Returncode String_copy(
 }
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FUNC_NAME "String.copy-from-pointer"
-Returncode String_copy_from_pointer(
-    char* self, int max_length, int* length, char* source) {
-  CCHECK(Buffer_copy_from_pointer(
-      self, max_length - 1, length, source, cstring_length(source, max_length)))
+#define LUMI_FUNC_NAME "cdef.copy-to-string"
+Returncode cdef_M_copy_to_string(
+    char* source, char* self, int max_length, int* length) {
+  CCHECK(cdef_M_copy_to_buffer(
+      source, cstring_length(source, max_length), self, max_length - 1, length))
   self[*length] = '\0';
   return OK;
 }
 #undef LUMI_FUNC_NAME
 
-void String_set_null_term_length(char* self, int max_length, int* length) {
+void cdef_M_set_null_term_length(char* self, int max_length, int* length) {
   *length = cstring_length(self, max_length);
 }
 

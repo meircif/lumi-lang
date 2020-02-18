@@ -10830,14 +10830,14 @@ Char* p_char = 0;
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_ostr)
     cdef_M_Pointer_set_from_array(p_char, ut_M_ostr, *ut_M_ostr_Length);
     CHECK_REF(3, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = String_copy_from_pointer(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, p_char);
+    LUMI_err = cdef_M_copy_to_string(p_char, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
     CHECK(3, LUMI_block0_cleanup)
     CHECK_REF(4, LUMI_block0_cleanup, ut_M_ostr)
-    String_set_null_term_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
+    cdef_M_set_null_term_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
 /// @ test-c-objects-4
 Byte* p_byte = 0;
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_buff)
-    LUMI_err = Buffer_copy_from_pointer(ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length, p_byte, 4);
+    LUMI_err = cdef_M_copy_to_buffer(p_byte, 4, ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length);
     CHECK(2, LUMI_block0_cleanup)
 /// @ test-c-objects-e0
 dynamic pointed type "Ta"

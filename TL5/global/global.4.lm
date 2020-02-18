@@ -300,6 +300,13 @@ struct Global
                 copy factory)
 
     func init-builtin-types()
+        self.init-primitive-types()
+        self.init-slice-types()
+        self.init-file-types()
+        self.init-sys-module()
+        self.init-cdef-module()
+
+    func init-primitive-types()
         self.add-global-type(user "Char", copy true)->(user self.type-char)
         self.type-char.is-int-like := true
         self.add-global-type(user "Byte", copy true)->(user self.type-byte)
@@ -307,13 +314,11 @@ struct Global
         self.add-global-type(user "Bool", copy true)->(user self.type-bool)
         self.add-global-type(user "Int", copy true)->(user self.type-int)
         self.type-int.is-int-like := true
+        
         self.add-global-type(user "Empty Symbol", copy false)->(
                 user self.type-empty)
         self.add-global-type(user "Func", copy true)->(user self.type-func)
         self.add-global-type(user "Ref", copy true)->(user self.type-ref)
-        self.add-global-type(user "Array", copy false)->(user self.type-array)
-        self.add-global-type(user "String", copy false)->(user self.type-string)
-        self.add-global-type(user "Buffer", copy false)->(user self.type-buffer)
         self.add-global-type(user "Type Name", copy false)->(
                 user self.type-type)
         self.add-global-type(user "Base Symbol", copy false)->(
@@ -323,150 +328,6 @@ struct Global
         self.type-generic.is-dynamic := true
         self.add-global-type(user "Module Name", copy false)->(
                 user self.type-module)
-        self.add-global-type(user "File", copy false)->(user self.type-file)
-        self.add-global-type(user "FileReadText", copy false)->(
-                user self.type-file-read-text)
-        self.add-global-type(user "FileReadBinary", copy false)->(
-                user self.type-file-read-binary)
-        self.add-global-type(user "FileWriteText", copy false)->(
-                user self.type-file-write-text)
-        self.add-global-type(user "FileWriteBinary", copy false)->(
-                user self.type-file-write-binary)
-        self.add-global-type(user "FileReadWriteText", copy false)->(
-                user self.type-file-read-write-text)
-        self.add-global-type(user "FileReadWriteBinary", copy false)->(
-                user self.type-file-read-write-binary)
-
-        ; cdef types
-        new ModuleMembers cdef-module(user "cdef")
-        self.add-cint-type(user cdef-module, user "Char")->(
-                user self.type-c-char)
-        self.add-cint-type(user cdef-module, user "Uchar")
-        self.add-cint-type(user cdef-module, user "Short")
-        self.add-cint-type(user cdef-module, user "Ushort")
-        self.add-cint-type(user cdef-module, user "Int")
-        self.add-cint-type(user cdef-module, user "Uint")
-        self.add-cint-type(user cdef-module, user "Long")
-        self.add-cint-type(user cdef-module, user "Ulong")
-        self.add-cint-type(user cdef-module, user "Size")
-        self.add-cint-type(user cdef-module, user "Float")
-        self.add-cint-type(user cdef-module, user "Double")
-        self.add-cint-type(user cdef-module, user "LongDouble")
-        self.add-cdef-type(user cdef-module, user "Pointer")->(
-                user self.type-pointer)
-        self.type-pointer.parameters := List{String}()
-        self.type-pointer.parameters.add(owner string-new-copy(user "Pointed"))
-        self.root.modules.add(owner cdef-module)
-        user SyntaxTreeFunction function
-        user TypeInstance argument-type-instance
-
-        ; Pointer
-        self.add-builtin-method(
-                user self.type-pointer,
-                user "set-point-to",
-                copy false,
-                copy Access.COPY)->(
-                user function)
-        self.add-builtin-parameter(
-                user function,
-                copy Access.VAR,
-                user self.type-generic,
-                user "pointed")
-        function.arguments.parameters.last.item.get-type-instance()->(
-                user argument-type-instance)
-        string-new-copy(user self.type-pointer.parameters.first.item)->(
-                owner argument-type-instance.name)
-
-        self.add-builtin-method(
-                user self.type-pointer,
-                user "set-from-ref",
-                copy false,
-                copy Access.COPY)->(
-                user function)
-        self.add-builtin-parameter(
-                user function,
-                copy Access.USER,
-                user self.type-generic,
-                user "ref")
-        function.arguments.parameters.last.item.get-type-instance()->(
-                user argument-type-instance)
-        string-new-copy(user self.type-pointer.parameters.first.item)->(
-                owner argument-type-instance.name)
-
-        self.add-builtin-method(
-                user self.type-pointer,
-                user "set-from-array",
-                copy false,
-                copy Access.COPY)->(
-                user function)
-        self.add-builtin-argument(
-                user function,
-                user function.arguments.parameters,
-                copy false,
-                copy Access.USER,
-                user self.type-array,
-                user self.type-generic,
-                user "array")
-        function.arguments.parameters.last.item.get-type-instance()->(
-                user argument-type-instance)
-        string-new-copy(user self.type-pointer.parameters.first.item)->(
-                owner argument-type-instance.parameters.first.item.name)
-
-        self.add-builtin-method-native(
-                user self.type-pointer,
-                user "get-pointed-at",
-                copy false,
-                user "cdef_M_Pointer_get_pointed_at",
-                copy Access.COPY)->(
-                user function)
-        self.add-builtin-parameter(
-                user function,
-                copy Access.COPY,
-                user self.type-int,
-                user "index")
-        self.add-builtin-output(
-                user function,
-                copy Access.TEMP,
-                user self.type-generic,
-                user "pointed")
-        function.arguments.outputs.last.item.get-type-instance()->(
-                user argument-type-instance)
-        argument-type-instance.conditional := false
-        string-new-copy(user self.type-pointer.parameters.first.item)->(
-                owner argument-type-instance.name)
-
-        self.add-builtin-method-native(
-                user self.type-pointer,
-                user "get-ref-at",
-                copy false,
-                user "cdef_M_Pointer_get_ref_at",
-                copy Access.COPY)->(
-                user function)
-        self.add-builtin-parameter(
-                user function,
-                copy Access.COPY,
-                user self.type-int,
-                user "index")
-        self.add-builtin-output(
-                user function,
-                copy Access.USER,
-                user self.type-generic,
-                user "pointed")
-        function.arguments.outputs.last.item.get-type-instance()->(
-                user argument-type-instance)
-        argument-type-instance.conditional := false
-        string-new-copy(user self.type-pointer.parameters.first.item)->(
-                owner argument-type-instance.name)
-
-        ; Int
-        self.add-builtin-method(
-                user self.type-int, user "str", copy true, copy Access.COPY)->(
-                user function)
-        self.add-builtin-parameter(
-                user function,
-                copy Access.USER,
-                user self.type-string,
-                user "str")
 
         ; Bool
         self.add-builtin-global-variable(
@@ -480,6 +341,22 @@ struct Global
                 user _,
                 user "false")
 
+    func init-slice-types()
+        self.add-global-type(user "Array", copy false)->(user self.type-array)
+        self.add-global-type(user "String", copy false)->(user self.type-string)
+        self.add-global-type(user "Buffer", copy false)->(user self.type-buffer)
+        
+        user SyntaxTreeFunction function
+        ; Int
+        self.add-builtin-method(
+                user self.type-int, user "str", copy true, copy Access.COPY)->(
+                user function)
+        self.add-builtin-parameter(
+                user function,
+                copy Access.USER,
+                user self.type-string,
+                user "str")
+        
         ; Array
         ; self.add-builtin-field(
         ;     user self.type-array, user "length", user self.type-int, user _)
@@ -502,28 +379,6 @@ struct Global
 
         self.add-builtin-method(
                 user self.type-string,
-                user "copy-from-pointer",
-                copy true,
-                copy Access.USER)->(
-                user function)
-        self.add-builtin-argument(
-                user function,
-                user function.arguments.parameters,
-                copy false,
-                copy Access.COPY,
-                user self.type-pointer,
-                user self.type-char,
-                user "pointer")
-
-        self.add-builtin-method(
-                user self.type-string,
-                user "set-null-term-length",
-                copy false,
-                copy Access.USER)->(
-                user function)
-
-        self.add-builtin-method(
-                user self.type-string,
                 user "concat-int",
                 copy true,
                 copy Access.USER)->(
@@ -538,171 +393,6 @@ struct Global
         self.add-sequence-methods(
                 user self.type-buffer, user self.type-byte)->(
                 user self.buffer-copy-function)
-
-        self.add-builtin-method(
-                user self.type-buffer,
-                user "copy-from-pointer",
-                copy true,
-                copy Access.USER)->(
-                user function)
-        self.add-builtin-argument(
-                user function,
-                user function.arguments.parameters,
-                copy false,
-                copy Access.COPY,
-                user self.type-pointer,
-                user self.type-byte,
-                user "pointer")
-        self.add-builtin-parameter(
-                user function,
-                copy Access.COPY,
-                user self.type-int,
-                user "length")
-
-        ; File
-        self.add-file-methods(
-                user self.type-file,
-                copy false,
-                copy false,
-                user _)
-        self.add-file-methods(
-                user self.type-file-read-text,
-                copy true,
-                copy false,
-                user self.type-char)
-        self.add-file-methods(
-                user self.type-file-read-binary,
-                copy true,
-                copy false,
-                user self.type-byte)
-        self.add-file-methods(
-                user self.type-file-write-text,
-                copy false,
-                copy true,
-                user self.type-char)
-        self.add-file-methods(
-                user self.type-file-write-binary,
-                copy false,
-                copy true,
-                user self.type-byte)
-        self.add-file-methods(
-                user self.type-file-read-write-text,
-                copy true,
-                copy true,
-                user self.type-char)
-        self.add-file-methods(
-                user self.type-file-read-write-binary,
-                copy true,
-                copy true,
-                user self.type-byte)
-
-        ; Sys
-        new ModuleMembers sys-module(user "sys")
-        self.add-builtin-global-variable(
-                user sys-module,
-                user self.type-array,
-                user self.type-string,
-                user "argv")
-
-        self.add-builtin-global-variable(
-                user sys-module,
-                user self.type-file-read-text,
-                user _,
-                user "stdin")
-
-        self.add-builtin-global-variable(
-                user sys-module,
-                user self.type-file-write-text,
-                user _,
-                user "stdout")
-
-        self.add-builtin-global-variable(
-                user sys-module,
-                user self.type-file-write-text,
-                user _,
-                user "stderr")
-
-        self.add-builtin-global-function(
-                user sys-module, user "print", copy true)->(user function)
-        self.add-builtin-array-argument(
-                user function,
-                user self.type-char,
-                copy false,
-                copy Access.USER,
-                user "text")
-
-        self.add-builtin-global-function(
-                user sys-module, user "println", copy true)->(user function)
-        self.add-builtin-array-argument(
-                user function,
-                user self.type-char,
-                copy false,
-                copy Access.USER,
-                user "text")
-
-        self.add-builtin-global-function(
-                user sys-module, user "getchar", copy true)->(user function)
-        self.add-builtin-output(
-                user function, copy Access.VAR, user self.type-char, user "ch")
-        self.add-builtin-output(
-                user function,
-                copy Access.VAR,
-                user self.type-bool,
-                user "is-eof")
-
-        self.add-builtin-global-function(
-                user sys-module, user "getline", copy true)->(user function)
-        self.add-builtin-parameter(
-                user function,
-                copy Access.USER,
-                user self.type-string,
-                user "line")
-        self.add-builtin-output(
-                user function,
-                copy Access.VAR,
-                user self.type-bool,
-                user "is-eof")
-
-        self.add-builtin-global-function(
-                user sys-module, user "exit", copy true)->(user function)
-        self.add-builtin-parameter(
-                user function,
-                copy Access.COPY,
-                user self.type-int,
-                user "status")
-
-        self.add-builtin-global-function(
-                user sys-module, user "system", copy true)->(user function)
-        self.add-builtin-parameter(
-                user function,
-                copy Access.USER,
-                user self.type-string,
-                user "command")
-        self.add-builtin-output(
-                user function,
-                copy Access.VAR,
-                user self.type-int,
-                user "status")
-
-        self.add-builtin-global-function(
-                user sys-module, user "getenv", copy true)->(user function)
-        self.add-builtin-parameter(
-                user function,
-                copy Access.USER,
-                user self.type-string,
-                user "name")
-        self.add-builtin-parameter(
-                user function,
-                copy Access.USER,
-                user self.type-string,
-                user "value")
-        self.add-builtin-output(
-                user function,
-                copy Access.VAR,
-                user self.type-bool,
-                user "exists")
-        
-        self.root.modules.add(owner sys-module)
     
     func add-sequence-methods(
             user TypeData seq-type, user TypeData value-type)->(
@@ -837,6 +527,57 @@ struct Global
                 copy Access.VAR,
                 user self.type-bool,
                 user "equal")
+
+    func init-file-types()
+        self.add-global-type(user "File", copy false)->(user self.type-file)
+        self.add-global-type(user "FileReadText", copy false)->(
+                user self.type-file-read-text)
+        self.add-global-type(user "FileReadBinary", copy false)->(
+                user self.type-file-read-binary)
+        self.add-global-type(user "FileWriteText", copy false)->(
+                user self.type-file-write-text)
+        self.add-global-type(user "FileWriteBinary", copy false)->(
+                user self.type-file-write-binary)
+        self.add-global-type(user "FileReadWriteText", copy false)->(
+                user self.type-file-read-write-text)
+        self.add-global-type(user "FileReadWriteBinary", copy false)->(
+                user self.type-file-read-write-binary)
+        
+        self.add-file-methods(
+                user self.type-file,
+                copy false,
+                copy false,
+                user _)
+        self.add-file-methods(
+                user self.type-file-read-text,
+                copy true,
+                copy false,
+                user self.type-char)
+        self.add-file-methods(
+                user self.type-file-read-binary,
+                copy true,
+                copy false,
+                user self.type-byte)
+        self.add-file-methods(
+                user self.type-file-write-text,
+                copy false,
+                copy true,
+                user self.type-char)
+        self.add-file-methods(
+                user self.type-file-write-binary,
+                copy false,
+                copy true,
+                user self.type-byte)
+        self.add-file-methods(
+                user self.type-file-read-write-text,
+                copy true,
+                copy true,
+                user self.type-char)
+        self.add-file-methods(
+                user self.type-file-read-write-binary,
+                copy true,
+                copy true,
+                user self.type-byte)
 
     func add-file-methods(
             user TypeData file-type,
@@ -1001,6 +742,286 @@ struct Global
                     copy Access.VAR,
                     user glob.type-int,
                     user "written")
+
+    func init-sys-module()
+        new ModuleMembers sys-module(user "sys")
+        self.add-builtin-global-variable(
+                user sys-module,
+                user self.type-array,
+                user self.type-string,
+                user "argv")
+
+        self.add-builtin-global-variable(
+                user sys-module,
+                user self.type-file-read-text,
+                user _,
+                user "stdin")
+
+        self.add-builtin-global-variable(
+                user sys-module,
+                user self.type-file-write-text,
+                user _,
+                user "stdout")
+
+        self.add-builtin-global-variable(
+                user sys-module,
+                user self.type-file-write-text,
+                user _,
+                user "stderr")
+
+        user SyntaxTreeFunction function
+        self.add-builtin-global-function(
+                user sys-module, user "print", copy true)->(user function)
+        self.add-builtin-array-argument(
+                user function,
+                user self.type-char,
+                copy false,
+                copy Access.USER,
+                user "text")
+
+        self.add-builtin-global-function(
+                user sys-module, user "println", copy true)->(user function)
+        self.add-builtin-array-argument(
+                user function,
+                user self.type-char,
+                copy false,
+                copy Access.USER,
+                user "text")
+
+        self.add-builtin-global-function(
+                user sys-module, user "getchar", copy true)->(user function)
+        self.add-builtin-output(
+                user function, copy Access.VAR, user self.type-char, user "ch")
+        self.add-builtin-output(
+                user function,
+                copy Access.VAR,
+                user self.type-bool,
+                user "is-eof")
+
+        self.add-builtin-global-function(
+                user sys-module, user "getline", copy true)->(user function)
+        self.add-builtin-parameter(
+                user function,
+                copy Access.USER,
+                user self.type-string,
+                user "line")
+        self.add-builtin-output(
+                user function,
+                copy Access.VAR,
+                user self.type-bool,
+                user "is-eof")
+
+        self.add-builtin-global-function(
+                user sys-module, user "exit", copy true)->(user function)
+        self.add-builtin-parameter(
+                user function,
+                copy Access.COPY,
+                user self.type-int,
+                user "status")
+
+        self.add-builtin-global-function(
+                user sys-module, user "system", copy true)->(user function)
+        self.add-builtin-parameter(
+                user function,
+                copy Access.USER,
+                user self.type-string,
+                user "command")
+        self.add-builtin-output(
+                user function,
+                copy Access.VAR,
+                user self.type-int,
+                user "status")
+
+        self.add-builtin-global-function(
+                user sys-module, user "getenv", copy true)->(user function)
+        self.add-builtin-parameter(
+                user function,
+                copy Access.USER,
+                user self.type-string,
+                user "name")
+        self.add-builtin-parameter(
+                user function,
+                copy Access.USER,
+                user self.type-string,
+                user "value")
+        self.add-builtin-output(
+                user function,
+                copy Access.VAR,
+                user self.type-bool,
+                user "exists")
+        
+        self.root.modules.add(owner sys-module)
+
+    func init-cdef-module()
+        ; cdef types
+        new ModuleMembers cdef-module(user "cdef")
+        self.add-cint-type(user cdef-module, user "Char")->(
+                user self.type-c-char)
+        self.add-cint-type(user cdef-module, user "Uchar")
+        self.add-cint-type(user cdef-module, user "Short")
+        self.add-cint-type(user cdef-module, user "Ushort")
+        self.add-cint-type(user cdef-module, user "Int")
+        self.add-cint-type(user cdef-module, user "Uint")
+        self.add-cint-type(user cdef-module, user "Long")
+        self.add-cint-type(user cdef-module, user "Ulong")
+        self.add-cint-type(user cdef-module, user "Size")
+        self.add-cint-type(user cdef-module, user "Float")
+        self.add-cint-type(user cdef-module, user "Double")
+        self.add-cint-type(user cdef-module, user "LongDouble")
+        self.add-cdef-type(user cdef-module, user "Pointer")->(
+                user self.type-pointer)
+        self.type-pointer.parameters := List{String}()
+        self.type-pointer.parameters.add(owner string-new-copy(user "Pointed"))
+
+        user SyntaxTreeFunction function
+        user TypeInstance argument-type-instance
+
+        self.add-builtin-method(
+                user self.type-pointer,
+                user "set-point-to",
+                copy false,
+                copy Access.COPY)->(
+                user function)
+        self.add-builtin-parameter(
+                user function,
+                copy Access.VAR,
+                user self.type-generic,
+                user "pointed")
+        function.arguments.parameters.last.item.get-type-instance()->(
+                user argument-type-instance)
+        string-new-copy(user self.type-pointer.parameters.first.item)->(
+                owner argument-type-instance.name)
+
+        self.add-builtin-method(
+                user self.type-pointer,
+                user "set-from-ref",
+                copy false,
+                copy Access.COPY)->(
+                user function)
+        self.add-builtin-parameter(
+                user function,
+                copy Access.USER,
+                user self.type-generic,
+                user "ref")
+        function.arguments.parameters.last.item.get-type-instance()->(
+                user argument-type-instance)
+        string-new-copy(user self.type-pointer.parameters.first.item)->(
+                owner argument-type-instance.name)
+
+        self.add-builtin-method(
+                user self.type-pointer,
+                user "set-from-array",
+                copy false,
+                copy Access.COPY)->(
+                user function)
+        self.add-builtin-argument(
+                user function,
+                user function.arguments.parameters,
+                copy false,
+                copy Access.USER,
+                user self.type-array,
+                user self.type-generic,
+                user "array")
+        function.arguments.parameters.last.item.get-type-instance()->(
+                user argument-type-instance)
+        string-new-copy(user self.type-pointer.parameters.first.item)->(
+                owner argument-type-instance.parameters.first.item.name)
+
+        self.add-builtin-method-native(
+                user self.type-pointer,
+                user "get-pointed-at",
+                copy false,
+                user "cdef_M_Pointer_get_pointed_at",
+                copy Access.COPY)->(
+                user function)
+        self.add-builtin-parameter(
+                user function,
+                copy Access.COPY,
+                user self.type-int,
+                user "index")
+        self.add-builtin-output(
+                user function,
+                copy Access.TEMP,
+                user self.type-generic,
+                user "pointed")
+        function.arguments.outputs.last.item.get-type-instance()->(
+                user argument-type-instance)
+        argument-type-instance.conditional := false
+        string-new-copy(user self.type-pointer.parameters.first.item)->(
+                owner argument-type-instance.name)
+
+        self.add-builtin-method-native(
+                user self.type-pointer,
+                user "get-ref-at",
+                copy false,
+                user "cdef_M_Pointer_get_ref_at",
+                copy Access.COPY)->(
+                user function)
+        self.add-builtin-parameter(
+                user function,
+                copy Access.COPY,
+                user self.type-int,
+                user "index")
+        self.add-builtin-output(
+                user function,
+                copy Access.USER,
+                user self.type-generic,
+                user "pointed")
+        function.arguments.outputs.last.item.get-type-instance()->(
+                user argument-type-instance)
+        argument-type-instance.conditional := false
+        string-new-copy(user self.type-pointer.parameters.first.item)->(
+                owner argument-type-instance.name)
+
+        self.add-builtin-global-function(
+                user cdef-module, user "copy-to-string", copy true)->(
+                user function)
+        self.add-builtin-argument(
+                user function,
+                user function.arguments.parameters,
+                copy false,
+                copy Access.COPY,
+                user self.type-pointer,
+                user self.type-char,
+                user "pointer")
+        self.add-builtin-parameter(
+                user function,
+                copy Access.USER,
+                user self.type-string,
+                user "target")
+
+        self.add-builtin-global-function(
+                user cdef-module, user "set-null-term-length", copy false)->(
+                user function)
+        self.add-builtin-parameter(
+                user function,
+                copy Access.USER,
+                user self.type-string,
+                user "target")
+
+        self.add-builtin-global-function(
+                user cdef-module, user "copy-to-buffer", copy true)->(
+                user function)
+        self.add-builtin-argument(
+                user function,
+                user function.arguments.parameters,
+                copy false,
+                copy Access.COPY,
+                user self.type-pointer,
+                user self.type-byte,
+                user "pointer")
+        self.add-builtin-parameter(
+                user function,
+                copy Access.COPY,
+                user self.type-int,
+                user "length")
+        self.add-builtin-parameter(
+                user function,
+                copy Access.USER,
+                user self.type-buffer,
+                user "target")
+        
+        self.root.modules.add(owner cdef-module)
     
     func add-global-type(user String name, copy Bool is-primitive)->(
             user TypeData type-data)

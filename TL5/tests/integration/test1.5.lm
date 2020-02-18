@@ -196,10 +196,10 @@ test test-pointer()
     var String{16} strb(user "---")!
     var cdef.Pointer{Char} pc
     pc.set-from-array(user stra)
-    strb.copy-from-pointer(copy pc)!
+    cdef.copy-to-string(copy pc, user strb)!
     assert! strb.equal(user stra)
     stra[2]! := '\0'
-    stra.set-null-term-length()
+    cdef.set-null-term-length(user stra)
     assert! stra.equal(user "aa")
 
 
@@ -614,7 +614,8 @@ test test-builtin-errors()
     assert-error! short-str.copy(user "aaaaa"), "sequence too long"
     var cdef.Pointer{Char} charp
     charp.set-from-array(user "aaaaa")
-    assert-error! short-str.copy-from-pointer(copy charp), "sequence too long"
+    assert-error! cdef.copy-to-string(copy charp, user short-str),
+            "sequence too long"
     
     var Buffer{1} full-buffer
     full-buffer.append(copy 52)!
@@ -626,7 +627,7 @@ test test-builtin-errors()
     assert-error! full-buffer.copy(user buff), "sequence too long"
     var cdef.Pointer{Byte} bytep
     bytep.set-from-array(user buff)
-    assert-error! full-buffer.copy-from-pointer(copy bytep, copy 2),
+    assert-error! cdef.copy-to-buffer(copy bytep, copy 2, user full-buffer),
             "sequence too long"
     
     lumi-debug-value := LumiDebug.FAIL
