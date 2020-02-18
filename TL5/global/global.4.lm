@@ -117,7 +117,7 @@ struct Global
         glob := self
         self.builtins.new()
         self.root.new()
-        self.input-buffer := String{1024}()
+        self.input-buffer := String{256}()
         self.global-module.new(user _)
         self.init-operator-map()
         self.init-access-names()

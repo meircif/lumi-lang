@@ -30,7 +30,7 @@ func write-syntax-tree(copy Bool is-test)
 func write-syntax-tree-success(copy Bool is-test)
     if crush-run
         write-syntax-tree(copy is-test)
-        raise
+        raise "not crushing in the second run"
     sys-exit := false
     Sys.print.active := true
     try
