@@ -117,13 +117,13 @@ class AssignExpression(Expression)
             self.write-assign-dynamic()
         if self.target.result-type.type-data is glob.type-array
             self.write-array-preactions()
-        else-if self.target.result-type.type-data is glob.type-string
-            self.write-string-preactions()
+        else-if self.target.result-type.type-data.is-sequence()
+            self.write-sequence-preactions()
     
     func inst write-array-preactions()
         self.target.write()
         write(user "_Length = ")
-        if self.value.result-type.type-data is glob.type-string
+        if self.value.result-type.type-data.is-sequence()
             write(user "*(")
             self.value.write()
             write(user "_Length)")
@@ -162,15 +162,15 @@ class AssignExpression(Expression)
             write(user ";\n")
             self.code-node.write-spaces()
         
-        if data-type.type-data is glob.type-string
+        if data-type.type-data.is-sequence()
             self.target.write()
-            write(user "_String_length = ")
+            write(user "_Seq_length = ")
             self.value.write-length(
-                    user "_String_length", user "NULL", copy false)
+                    user "_Seq_length", user "NULL", copy false)
             write(user ";\n")
             self.code-node.write-spaces()
     
-    func inst write-string-preactions()
+    func inst write-sequence-preactions()
         self.target.write()
         write(user "_Max_length = ")
         self.value.write-length(user "_Max_length", user "0", copy true)
@@ -284,10 +284,10 @@ class AssignExpression(Expression)
             user TypeInstance data-type
             self.target.result-type.get-array-data-type-depth()->(
                     user data-type)
-            if data-type.type-data is glob.type-string
+            if data-type.type-data.is-sequence()
                 write(user "free(")
                 self.target.write()
-                write(user "_String_length);\n")
+                write(user "_Seq_length);\n")
             else-if not data-type.type-data.is-primitive
                 write(user "ARRAY_DEL(")
                 data-type.write-cname()

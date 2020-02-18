@@ -133,10 +133,6 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             self.syntax-error(
                     user "declared variable with generic subtype",
                     user self.type-instance.name)
-        if self.is-create and self.type-instance.type-data.create-disallowed
-            self.syntax-error(
-                    user "cannot create objects with type",
-                    user self.type-instance.type-data.name)
         if access-is-only-var(copy self.access)
             self.type-instance.check-sequence(user self)
         if not self.parent? and not self.parent-type?
@@ -188,7 +184,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             write(user "\n")
         
         if self.type-instance.type-data is glob.type-array or
-                self.type-instance.type-data is glob.type-string
+                self.type-instance.type-data.is-sequence()
             self.write-sequence()
             return
         
@@ -239,6 +235,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
                 user data-type, var sequence-depth)
         if data-type.type-data is glob.type-string
             write(user "char")
+        else-if data-type.type-data is glob.type-buffer
+            write(user "Byte")
         else-if data-type.type-data is glob.type-func
             data-type.arguments.write-pointer-start()
         else
@@ -276,7 +274,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             write(user " ")
             self.write-cname()
             write(user "_")
-            if self.type-instance.type-data is glob.type-string
+            if self.type-instance.type-data.is-sequence()
                 write(user "Max_length")
             else
                 write(user "Length")
@@ -294,11 +292,11 @@ class SyntaxTreeVariable(SyntaxTreeCode)
                     write(user " = 0")
                 write(user ";\n")
         
-        if data-type.type-data is glob.type-string
+        if data-type.type-data.is-sequence()
             ; int `name`_Length[1][ = {0}];
             ; int* `name`_Length[ = &Lumi_empty_int];
-            ; int `name`_String_length[`strings`][ = {0}];
-            ; int* `name`_String_length[ = NULL];
+            ; int `name`_Seq_length[`strings`][ = {0}];
+            ; int* `name`_Seq_length[ = NULL];
             self.write-spaces()
             write(user "int")
             if not is-new-or-aux-var
@@ -306,7 +304,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             write(user " ")
             self.write-cname()
             if sequence-depth > 0
-                write(user "_String_length")
+                write(user "_Seq_length")
             else
                 write(user "_Length")
             if is-new-or-aux-var

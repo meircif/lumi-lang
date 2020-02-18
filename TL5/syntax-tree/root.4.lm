@@ -97,9 +97,9 @@ class SyntaxTreeRoot(GlobalNodes)
                 if glob.global-module.variable-map.find(user name)?
                     self.syntax-error(
                             user "module name overrides variable", user name)
-                if glob.global-module.function-map.find(user name)?
-                    self.syntax-error(
-                            user "module name overrides function", user name)
+                ; if glob.global-module.function-map.find(user name)?
+                ;     self.syntax-error(
+                ;             user "module name overrides function", user name)
                 if not glob.module-map.find(user name)->(
                         user glob.current-module)?
                     new ModuleMembers module-members(user name)

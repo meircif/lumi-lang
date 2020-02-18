@@ -37,16 +37,17 @@ var Byte bt
 var Char c
 var Bool b
 owner String? ostr
+owner Buffer? buff
 weak Array?{Int} arr
-owner File? fobj
 weak Test? t
 weak Ta? ta
 strong Tb? tb
 weak Tc? tc
 weak Data?{Test} d
 weak Array?{String} sarr
+weak Array?{Buffer} barr
 
-func ! mock(user String? str)->(strong String? so, var Int io, strong Test? to, weak Tc? tco)
+func ! mock(user String? str, user Buffer? bfr)->(strong String? so, var Int io, strong Test? to, weak Tc? tco)
 ; @@ test-int-expression
 ; @ c test-int-expression-0
 i := 0
@@ -158,6 +159,31 @@ str := "indention
 ; @ ec test-string-expression-e4
 str := "indention\
     too short"
+; @@ test-buffer-expression
+; @ c test-buffer-expression-0
+bfr := `4a00e2ff59`
+; @ c test-buffer-expression-1
+bfr := `4a00
+        e2ff
+        59a8`
+; @ c test-buffer-expression-2
+bfr := `
+        4a00
+        e2ff
+        59a8
+        `
+; @ fec test-buffer-expression-e0
+bfr := `0000
+; @ fec test-buffer-expression-e1
+bfr := `
+; @ ec test-buffer-expression-e2
+bfr := `4a00
+    e2ff
+    59a8`
+; @ ec test-buffer-expression-e3
+bfr := `4a00e2fg59a8`
+; @ ec test-buffer-expression-e4
+bfr := `4a00e2ff59a`
 ; @@ test-empty-expression
 ; @ c test-empty-expression-0
 str := _
@@ -196,9 +222,12 @@ t.error
 ; @@ test-slice-expression
 ; @ c test-slice-expression-0
 c := ostr![13]!
+bt := buff![13]!
 ; @ c test-slice-expression-1
 user Array?{Char} x
 x := ostr![2:6]!
+user Array?{Byte} y
+y := buff![2:6]!
 ; @ c test-slice-expression-2
 i := arr![13]!
 ; @ c test-slice-expression-3
@@ -206,6 +235,7 @@ user Array?{Int} x
 x := arr![2:i]!
 ; @ c test-slice-expression-4
 ostr![4]! := c
+buff![4]! := bt
 ; @ c test-slice-expression-5
 arr![4]! := i
 ; @ c test-slice-expression-6
@@ -215,15 +245,28 @@ t := tarr![3]!
 var Array{8:String{5}} vsa
 user String s(user vsa[3])
 user Array{String} sa(user vsa[2:4])
+var Array{8:Buffer{5}} vba
+user Buffer bf(user vba[3])
+user Array{Buffer} ba(user vba[2:4])
 ; @ g test-slice-expression-8
-func ! fun(temp String s, strong Array{String} sa)
+func ! fun(
+        temp String s,
+        strong Array{String} sa,
+        temp Buffer b,
+        strong Array{Buffer} ba)
     var Char c(copy s[5]!)
-    user Array{Char} part(user s[4:2]!)
+    user Array{Char} spart(user s[4:2]!)
     user String si(user sa[3]!)
+    var Byte y(copy b[5]!)
+    user Array{Byte} bpart(user b[4:2]!)
+    user Buffer bi(user ba[3]!)
 ; @ c test-slice-expression-9
 strong Array?{String} sa
 sa![3]!.copy(user "text")!
 sa := _
+strong Array?{Buffer} ba
+ba![3]!.copy(user `beef`)!
+ba := _
 ; @ c test-slice-expression-10
 strong Array?{Array{Int}} aai
 arr := aai![3]!
@@ -234,8 +277,12 @@ weak Array?{Array{Array{Int}}} ua(weak aai![3]!)
 weak Array?{Array{Array{Array{Int}}}} uaa(weak aai![2:4]!)
 ; @ c test-slice-expression-12
 strong Array?{Array{Array{String}}} aas
-weak Array?{Array{String}} ua(weak aas![3]!)
-weak Array?{Array{Array{String}}} uaa(weak aas![2:4]!)
+weak Array?{Array{String}} wsa(weak aas![3]!)
+weak Array?{Array{Array{String}}} wsaa(weak aas![2:4]!)
+aas := _
+strong Array?{Array{Array{Buffer}}} aab
+weak Array?{Array{Buffer}} wba(weak aab![3]!)
+weak Array?{Array{Array{Buffer}}} wbaa(weak aab![2:4]!)
 aas := _
 ; @ c test-slice-expression-13
 var Array{8:Array{7:Array{6:Array{5:Int}}}} aai
@@ -243,21 +290,30 @@ user Array?{Array{Array{Int}}} ua(user aai[3])
 user Array?{Array{Array{Array{Int}}}} uaa(user aai[2:4])
 ; @ c test-slice-expression-14
 var Array{8:Array{7:Array{6:String{5}}}} aas
-user Array?{Array{String}} ua(user aas[i]!)
-user Array?{Array{Array{String}}} uaa(user aas[2:4])
+user Array?{Array{String}} usa(user aas[i]!)
+user Array?{Array{Array{String}}} usaa(user aas[2:4])
+var Array{8:Array{7:Array{6:Buffer{5}}}} aab
+user Array?{Array{Buffer}} uba(user aab[i]!)
+user Array?{Array{Array{Buffer}}} ubaa(user aab[2:4])
 ; @ g test-slice-expression-15
 func fun()
     var Array{8:Array{7:Array{6:String{5}}}} aas
     user String s(user aas[4][3][2])
+    var Array{8:Array{7:Array{6:Buffer{5}}}} aab
+    user Buffer b(user aab[4][3][2])
 ; @ c test-slice-expression-16
 user Array?{Char} x
 x := ostr
+user Array?{Byte} y
+y := buff
 ; @ c test-slice-expression-17
 new String{12} s!
 sys.print(user s)!
+new Buffer{12} bf!
 ; @ g test-slice-expression-18
 struct Test
     owner String? s
+    owner Buffer? b
 func fun()
     var Test t
     var Array{6:Test} a
@@ -448,6 +504,9 @@ fune()
 func ! fune()
 func fun()
     fune()!
+; @ ec test-call-expression-e23
+strong String s
+fun3(copy 0)->(strong s)
 ; @@ test-type-expression
 ; @ c test-type-expression-0
 Test.meth(user t!)
@@ -680,9 +739,11 @@ strong String s1(strong String{4}()!)
 strong String s2(strong String{6}()!)
 s1 :=: s2
 ; @ g test-swap-expression-8
+struct MyStruct
+    var Int x
 struct Test
-    owner File f
-    new(owner File f)
+    owner MyStruct f
+    new(owner MyStruct f)
         self.f := f
 func fun(owner Test t1, owner Test t2)
     t1.f :=: t2.f
@@ -875,6 +936,8 @@ raise! "error"!
 raise! str!
 ; @ ec test-exclamation-expression-en32
 var String{23!} s
+; @ ec test-exclamation-expression-en33
+`beaf`!.clear()
 ; @@ test-dynamic
 ; @ c test-dynamic-0
 var Ta a
@@ -1017,98 +1080,218 @@ var Func{()} fun(copy fune)
 ; @ ec test-function-object-e10
 var Func{:()} fun(copy fun0)
 ; @@ test-builtin
-; @ c test-builtin-i0
+; @ c test-builtin-int0
 i.str(user ostr!)!
-; @ c test-builtin-b0
+; @ c test-builtin-bool0
 b := true
-; @ c test-builtin-b1
+; @ c test-builtin-bool1
 b := false
-; @ ec test-builtin-0
+; @ ec test-builtin-char0
 c := EOF
-; @ c test-builtin-a0
+; @ c test-builtin-array0
 arr!.length()->(var i)
-; @ c test-builtin-s0
+; @ c test-builtin-string0
 ostr!.length()->(var i)
-; @ c test-builtin-s1
+; @ c test-builtin-string1
 ostr!.clear()
-; @ c test-builtin-s2
+; @ c test-builtin-string2
 ostr!.equal(user ostr!)->(var b)
-; @ c test-builtin-s3
+; @ c test-builtin-string3
 ostr!.get(copy i)->(var c)!
-; @ c test-builtin-s4
+; @ c test-builtin-string4
 ostr!.set(copy i, copy c)!
-; @ c test-builtin-s5
+; @ c test-builtin-string5
 ostr!.append(copy c)!
-; @ c test-builtin-s6
+; @ c test-builtin-string6
 var String{12} sv
 sv.copy(user ostr!)!
-; @ c test-builtin-s7
+; @ c test-builtin-string7
 ostr!.concat(user ostr!)!
-; @ c test-builtin-s8
+; @ c test-builtin-string8
 ostr!.concat-int(copy i)!
-; @ c test-builtin-s9
+; @ c test-builtin-string9
 ostr!.find(user ostr!)->(var i)
-; @ c test-builtin-s10
+; @ c test-builtin-string10
 ostr!.has(copy c)->(var b)
-; @ c test-builtin-s11
+; @ c test-builtin-string11
 String.set(user ostr!, copy 0, copy 'a')!
-; @ c test-builtin-s12
+; @ c test-builtin-string12
 ostr!.max-length()->(var i)
-; @ c test-builtin-f0
-file-open-read(user ostr!)->(owner fobj)!
-; @ c test-builtin-f1
-file-open-write(user ostr!)->(owner fobj)!
-; @ c test-builtin-f2
-file-close(owner fobj!)!
-; @ c test-builtin-f3
-fobj!.getc()->(var c, var b)!
-; @ c test-builtin-f4
-fobj!.putc(copy c)!
-; @ c test-builtin-f5
-fobj!.write(user ostr!)!
-; @ c test-builtin-y0
+; @ c test-builtin-buffer0
+buff!.length()->(var i)
+; @ c test-builtin-buffer1
+buff!.clear()
+; @ c test-builtin-buffer2
+buff!.equal(user buff!)->(var b)
+; @ c test-builtin-buffer3
+buff!.get(copy i)->(var bt)!
+; @ c test-builtin-buffer4
+buff!.set(copy i, copy bt)!
+; @ c test-builtin-buffer5
+buff!.append(copy bt)!
+; @ c test-builtin-buffer6
+var Buffer{12} bv
+bv.copy(user buff!)!
+; @ c test-builtin-buffer7
+buff!.concat(user buff!)!
+; @ c test-builtin-buffer8
+buff!.find(user buff!)->(var i)
+; @ c test-builtin-buffer9
+buff!.has(copy bt)->(var b)
+; @ c test-builtin-buffer10
+Buffer.set(user buff!, copy 0, copy bt)!
+; @ c test-builtin-buffer11
+buff!.max-length()->(var i)
+; @ c test-builtin-file0
+try
+    s-var FileReadText f(user ostr)
+    f.get()->(var c, var b)
+    f.getline(user ostr)->(var b)
+    f.tell()->(var i)
+    f.seek-set(copy i)
+    f.seek-cur(copy i)
+    f.seek-end(copy i)
+    f.flush()
+    f.close()
+    var Data{FileReadText} df
+    df.item := f
+; @ c test-builtin-file1
+try
+    new FileReadBinary f(user ostr)
+    f.get()->(var bt, var b)
+    f.read(user buff)->(var i)
+    f.tell()->(var i)
+    f.seek-set(copy i)
+    f.seek-cur(copy i)
+    f.seek-end(copy i)
+    f.flush()
+    f.close()
+    var Data{FileReadBinary} df
+    df.set(owner f)
+; @ c test-builtin-file2
+try
+    owner FileWriteText f(owner FileWriteText(user ostr, copy false))
+    f.put(copy c)
+    f.write(user ostr)->(var i)
+    f.tell()->(var i)
+    f.seek-set(copy i)
+    f.seek-cur(copy i)
+    f.seek-end(copy i)
+    f.flush()
+    f.close()
+    var Data{FileWriteText} df
+    df.set(owner f)
+; @ c test-builtin-file3
+try
+    strong FileWriteBinary f(strong FileWriteBinary(user ostr, copy true))
+    f.put(copy bt)
+    f.write(user buff)->(var i)
+    f.tell()->(var i)
+    f.seek-set(copy i)
+    f.seek-cur(copy i)
+    f.seek-end(copy i)
+    f.flush()
+    f.close()
+    var Data{FileWriteBinary} df
+    df.item := f
+; @ c test-builtin-file4
+try
+    s-var FileReadWriteText f(user ostr, copy true, copy true)
+    f.get()->(var c, var b)
+    f.getline(user ostr)->(var b)
+    f.put(copy c)
+    f.write(user ostr)->(var i)
+    f.tell()->(var i)
+    f.seek-set(copy i)
+    f.seek-cur(copy i)
+    f.seek-end(copy i)
+    f.flush()
+    f.close()
+    var Data{FileReadWriteText} df
+    df.item := f
+; @ c test-builtin-file5
+try
+    new FileReadWriteBinary f(user ostr, copy false, copy false)
+    f.get()->(var bt, var b)
+    f.read(user buff)->(var i)
+    f.put(copy bt)
+    f.write(user buff)->(var i)
+    f.tell()->(var i)
+    f.seek-set(copy i)
+    f.seek-cur(copy i)
+    f.seek-end(copy i)
+    f.flush()
+    f.close()
+    var Data{FileReadWriteBinary} df
+    df.set(owner f)
+; @ g test-builtin-file6
+struct Data{Generic}
+    weak Generic? item
+    func user? set(owner Generic? item)
+func ! fun(
+        user File f,
+        user FileReadText frt,
+        user FileReadBinary frb,
+        user FileWriteText fwt,
+        user FileWriteBinary fwb,
+        user FileReadWriteText frwt,
+        user FileReadWriteBinary frwb)
+    f := frt
+    f := frb
+    f := fwt
+    f := fwb
+    f := frwt
+    f := frwb
+    frt := frwt
+    frb := frwb
+    fwt := frwt
+    fwb := frwb
+    fun(
+            user frt,
+            user frwt,
+            user frwb,
+            user frwt,
+            user frwb,
+            user frwt,
+            user frwb)!
+    var Data{File} df
+    owner File fo(owner FileWriteBinary(user "name", copy false)!)
+    var Int i
+    fo.tell()->(var i)!
+    fo.seek-set(copy i)!
+    fo.seek-cur(copy i)!
+    fo.seek-end(copy i)!
+    fo.flush()!
+    fo.close()!
+    df.set(owner fo)
+; @ c test-builtin-sys0
 user Array{String} argv(user sys.argv)
-; @ c test-builtin-y1
+; @ c test-builtin-sys1
 sys.print(user ostr!)!
-; @ c test-builtin-y2
+; @ c test-builtin-sys2
 sys.println(user ostr!)!
-; @ c test-builtin-y3
-sys.getchar()->(var c, var b)
-; @ c test-builtin-y4
-sys.getline(user ostr!)!
-; @ c test-builtin-y5
+; @ c test-builtin-sys3
+sys.getchar()->(var c, var b)!
+; @ c test-builtin-sys4
+sys.getline(user ostr!)->(var b)!
+; @ c test-builtin-sys5
 sys.exit(copy i)!
-; @ c test-builtin-y6
+; @ c test-builtin-sys6
 sys.system(user ostr!)->(var i)!
-; @ c test-builtin-y7
+; @ c test-builtin-sys7
 sys.getenv(user ostr!, user ostr!)->(var b)!
-; @ c test-builtin-y8
-sys.stdout.putc(copy c)!
-; @ c test-builtin-y9
-sys.stdin.getc()->(var c, var b)!
-; @ c test-builtin-y10
-sys.stderr.putc(copy c)!
-; @ ec test-builtin-ef0
-var File error
-; @ ec test-builtin-ef1
-new File error!
-; @ ec test-builtin-ef2
-File()
-; @ ec test-builtin-ef3
-user File? f
-file-open-read(user "name")->(owner fobj)!
-f!.putc(copy 'a')!
-; @ ec test-builtin-ef4
-user File? f
-file-open-write(user "name")->(owner fobj)!
-f!.putc(copy 'a')!
-; @ ec test-builtin-ef5
-user File? f
-file-close(owner fobj!)!
-f!.putc(copy 'a')!
-; @ ec test-builtin-ef6
-owner File f(owner fobj!)
-file-open-read(user "name")->(owner f)!
+; @ c test-builtin-sys8
+sys.stdin.get()->(var c, var b)!
+; @ c test-builtin-sys9
+sys.stdout.put(copy c)!
+; @ c test-builtin-sys10
+sys.stderr.put(copy c)!
+; @ ec test-builtin-file-e0
+var FileReadText error
+; @ ec test-builtin-file-e1
+new FileReadText error!
+; @ ec test-builtin-file-e2
+FileReadText()
 ; @@ test-general
 ; @ g test-general-0
 owner String? str
@@ -1144,6 +1327,7 @@ var Int x
 var String{12} s
 s-var String{12} svs!
 owner String cs(owner String{12}(user "global text")!)
+owner Buffer cb(owner Buffer{12}(user `fade00beaf`)!)
 strong String us(strong String{12}(user s)!)
 weak String gs(weak us)
 main!
@@ -1375,11 +1559,13 @@ func ! name(user String self, copy Int px, user Array{Char} pu, owner String po)
         strong String? oself, var Int ox, weak String? ou, owner String? oo)
     var Int x
     user String? u
+    user Buffer? b
     owner String? o
     var String{12} v
     new String{12} n!
     o := String{12}()!
     u := "constant string"
+    b := `beef`
     pu := po[2:6]!
 ; @ g test-function-8
 struct Struct
@@ -1400,7 +1586,6 @@ func name(
     owner Array?{Struct} as
     owner Array?{Class} ac
     owner Array?{Int} ai
-    owner Array?{File} af
     owner Array?{String} astr
 ; @ g test-function-9
 class Test
@@ -1738,20 +1923,25 @@ var Int x #
 tb := Tb(copy i)!
 ; @ c test-initialize-1
 str := String{arr![0]}()!
+buff := Buffer{arr![0]}()!
 ; @ c test-initialize-2
 owner Array{Int} a(owner Array{arr![0]:Int}()!)
 ; @ c test-initialize-3
 owner Array{Test} a(owner Array{arr![0]:Test}()!)
 ; @ c test-initialize-4
 owner Array{String} sa(owner Array{arr![0]:String{arr![1]!}}()!)
+owner Array{Buffer} ba(owner Array{arr![0]:Buffer{arr![1]!}}()!)
 ; @ c test-initialize-5
 var Int x(copy arr![0])
 ; @ c test-initialize-6
 user String? s(user ostr)
+user Buffer? bf(user buff)
 ; @ c test-initialize-7
 var String{12} s(user "some string")!
+var Buffer{12} bf(user `fade00beaf`)!
 ; @ c test-initialize-8
 new String{i} s(user ostr!)!
+new Buffer{i} bf(user buff!)!
 ; @ c test-initialize-9
 user Test? tt(user tc!)
 ; @ c test-initialize-10
@@ -1766,9 +1956,12 @@ user Tb? tt(user tb)
 owner Ta? ota(owner tb)
 ; @ c test-initialize-15
 owner Array{Array{String}} sa(owner Array{arr![0]:Array{arr![1]!:String{arr![2]!}}}()!)
+owner Array{Array{Buffer}} ba(owner Array{arr![0]:Array{arr![1]!:Buffer{arr![2]!}}}()!)
 ; @ g test-initialize-16
-func get()->(owner File? a)
-    owner File? b(owner get())
+struct MyStruct
+    var Int x
+func get()->(owner MyStruct? a)
+    owner MyStruct? b(owner get())
 ; @ c test-initialize-17
 owner Test? ot(owner to)
 strong Test? st(strong ot!)
@@ -2112,12 +2305,16 @@ for n in t!.num:ostr!.length() + 2
 ; @ c test-for-loop-2
 for ch in ostr!
     c := ch
+for y in buff!
+    bt := y
 ; @ c test-for-loop-3
 for n in arr!
     i += n
 ; @ c test-for-loop-4
 for s in sarr!
     s.clear()
+for bf in barr!
+    bf.clear()
 ; @ c test-for-loop-5
 var Int n
 for n in 5
@@ -2148,15 +2345,23 @@ for n in 6
 user String s(user "text")
 for ch in s
     c := ch
+user Buffer bf(user `beaf`)
+for y in bf
+    bt := y
 ; @ c test-for-loop-10
 var Array{3:String{4}} sa
 for s in sa
     s.clear()
+var Array{3:Buffer{4}} ba
+for bf in ba
+    bf.clear()
 ; @ c test-for-loop-11
 for _ in 2:6
     i += 1
 ; @ c test-for-loop-12
 for _ in ostr!
+    i += 1
+for _ in buff!
     i += 1
 ; @ c test-for-loop-13
 repeat i + 4
@@ -2594,7 +2799,11 @@ struct Test{Generic}
     func user get()->(user Generic? item)
         item := self.item
 ; @ g test-parameter-type-2
-struct MyStruct
+struct StructA
+    var Int x
+struct StructB
+    var Int x
+struct StructC
     var Int x
 struct Test{First:Second:Third}
     weak First? first
@@ -2604,8 +2813,8 @@ struct Test{First:Second:Third}
         self.first := first
         self.second := second
         self.third := third
-func use(weak File first, weak MyStruct second, weak File third)
-    var Test{File:MyStruct:File} t
+func use(weak StructA first, weak StructB second, weak StructC third)
+    var Test{StructA:StructB:StructC} t
     t.first := first
     t.second := second
     t.third := third
@@ -2662,20 +2871,26 @@ fun7(weak dt.item)->(weak dt.item)
 user Tb? tb2(user dt.item!)
 tb2 := dt.item!
 ; @ g test-parameter-type-19
+struct MyStruct
+    var Int x
+    func user meth()
 struct Base{Generic}
     weak Generic? item
     func user get()->(weak Generic? item)
-struct Test(Base{File})
-    func user set(weak File? f)
+struct Test(Base{MyStruct})
+    func user set(weak MyStruct? f)
         self.item := f
         self.get()->(weak f)
-func ! fun(user Test test, weak File? f)
+func ! fun(user Test test, weak MyStruct? f)
     test.item := f
     test.set(weak f)
     f := test.item
     test.get()->(weak f)
-    test.get()!.putc(copy 'a')!
+    test.get()!.meth()
 ; @ g test-parameter-type-20
+struct MyStruct
+    var Int x
+    func user meth()
 class Base{Param}
     weak Param? item
     func dynamic user set(weak Param? item)
@@ -2683,10 +2898,10 @@ class Base{Param}
 class Test{Generic}(Base{Generic})
     func dynamic user set(weak Generic? item)
     func dynamic user get()->(weak Generic? item)
-func ! mock(weak Test{File} test, weak File? f)
+func ! mock(weak Test{MyStruct} test, weak MyStruct? f)
     test!.set(weak f)
     test!.get()->(weak f)
-    test!.get()!.putc(copy 'a')!
+    test!.get()!.meth()
 ; @ g test-parameter-type-21
 struct Test{Param}
     weak Param? item
@@ -2730,37 +2945,45 @@ struct Test{First:Second}
 struct Test{error}
     var Int x
 ; @ eg test-parameter-type-eg11
+struct MyStruct
+    var Int x
 struct Test{First:Second:Third}
     weak First first
     weak Second second
     weak Third third
-func meth(user Test{File:File} t)
-    user Test{File:File:File} error(user t)
+func meth(user Test{MyStruct:MyStruct} t)
+    user Test{MyStruct:MyStruct:MyStruct} error(user t)
 ; @ eg test-parameter-type-eg12
 struct Base{Param}
     weak Param item
 struct Error(Base)
 ; @ eg test-parameter-type-eg13
+struct MyStruct
+    var Int x
 struct Base
     weak Int x
-struct Error(Base{File})
+struct Error(Base{MyStruct})
 ; @ eg test-parameter-type-eg14
+struct MyStruct
+    var Int x
 struct Base{Param}
     weak Param item
-struct Error(Base{File:File})
+struct Error(Base{MyStruct:MyStruct})
 ; @ eg test-parameter-type-eg15
+struct MyStruct
+    var Int x
 struct Base{Param0:Param1}
     weak Param0 item0
     weak Param1 item1
-struct Error(Base{File})
+struct Error(Base{MyStruct})
 ; @ ec test-parameter-type-ec0
 var Data{Int} error
 ; @ ec test-parameter-type-ec1
-var Data{File:File} error
+var Data{Test:Test} error
 ; @ ec test-parameter-type-ec2
 var Data{Error} error
 ; @ ec test-parameter-type-ec3
-var Char{File} error
+var Char{Test} error
 ; @ ec test-parameter-type-ec4
 var Data dg
 str := dg.item!
@@ -2773,85 +2996,101 @@ str := d!.item!
 var Data{Array{Int}} error
 ; @ ec test-parameter-type-ec8
 var Data{String} error
+; @ ec test-parameter-type-ec8
+var Data{Buffer} error
 ; @@ test-parameter-inheritance
 ; @ g test-parameter-inheritance-0
+struct MyStruct
+    var Int x
 struct Base{Generic}
     weak Generic? item
-struct Test(Base{File})
-    func user ! set(weak File f)
+struct Test(Base{MyStruct})
+    func user ! set(weak MyStruct f)
         self.item := f
         Test.set(user Test()!, weak f)!
-func use(weak File f)
+func use(weak MyStruct f)
     var Test t
     t.item := f
 ; @ g test-parameter-inheritance-1
+struct MyStruct
+    var Int x
 struct Base{Generic}
     weak Generic? item
 struct Test{Param}(Base{Param})
-    func user ! set(weak Param i, weak File f)
+    func user ! set(weak Param i, weak MyStruct f)
         self.item := i
-        Test{File}.set(user Test{File}()!, weak f, weak f)!
-func use(weak File f)
-    var Test{File} t
+        Test{MyStruct}.set(user Test{MyStruct}()!, weak f, weak f)!
+func use(weak MyStruct f)
+    var Test{MyStruct} t
     t.item := f
 ; @ g test-parameter-inheritance-2
+struct MyStruct
+    var Int x
 struct Base{Pbase}
     weak Pbase? item
     func user set(weak Pbase i)
 struct Mid{Pmid}(Base{Pmid})
     func user set(weak Pmid i)
-struct Top(Mid{File})
-    func user set(weak File f)
+struct Top(Mid{MyStruct})
+    func user set(weak MyStruct f)
         base(weak f)
         self.item := f
 struct Test(Top)
-    func user ! set(weak File f)
+    func user ! set(weak MyStruct f)
         base(weak f)
         self.item := f
         Top.set(user Top()!, weak f)
         Test.set(user Test()!, weak f)!
-        Mid{File}.set(user Top()!, weak f)
-func use(weak File f)
+        Mid{MyStruct}.set(user Top()!, weak f)
+func use(weak MyStruct f)
     var Test t
     t.item := f
 ; @ g test-parameter-inheritance-3
+struct MyStruct
+    var Int x
 struct Base{Generic}
     weak Generic? item
 struct Test{Generic}(Base{Generic})
-    func user ! set(weak Generic i, weak File f)
+    func user ! set(weak Generic i, weak MyStruct f)
         self.item := i
-        Test{File}.set(user Test{File}()!, weak f, weak f)!
-func use(weak File f)
-    var Test{File} t
+        Test{MyStruct}.set(user Test{MyStruct}()!, weak f, weak f)!
+func use(weak MyStruct f)
+    var Test{MyStruct} t
     t.item := f
 ; @ g test-parameter-inheritance-4
-struct MyStruct
+struct StructA
+    var Int x
+struct StructB
+    var Int x
+struct StructC
     var Int x
 struct Base{First:Second}
     weak First? first
     weak Second? second
-struct Mid{Param:Third}(Base{Param:MyStruct})
+struct Mid{Param:Third}(Base{Param:StructB})
     weak Third? third
-    func user set(weak Param first, weak MyStruct second, weak Third third)
+    func user set(weak Param first, weak StructB second, weak Third third)
         self.first := first
         self.second := second
         self.third := third
-struct Top{Generic}(Mid{Generic:File})
-    func user set(weak Generic first, weak MyStruct second, weak File third)
+struct Top{Generic}(Mid{Generic:StructC})
+    func user set(weak Generic first, weak StructB second, weak StructC third)
         self.first := first
         self.second := second
         self.third := third
-struct Test(Top{File})
-    func user set(weak File first, weak MyStruct second, weak File third)
+struct Test(Top{StructA})
+    func user set(weak StructA first, weak StructB second, weak StructC third)
         self.first := first
         self.second := second
         self.third := third
-func use(weak File first, weak MyStruct second, weak File third)
+func use(weak StructA first, weak StructB second, weak StructC third)
     var Test t
     t.first := first
     t.second := second
     t.third := third
 ; @ g test-parameter-inheritance-5
+struct MyStruct
+    var Int x
 struct First{FirstGeneric}
     weak FirstGeneric? item
 struct Second{SecondGeneric}
@@ -2860,8 +3099,8 @@ struct Test{Generic}(First{Second{Generic}})
     func user ! set(weak Generic g, weak Second{Generic} sg)
         self.item := sg
         self.item!.item := g
-func ! use(weak File f, weak Second{File} ff)
-    var Test{File} t
+func ! use(weak MyStruct f, weak Second{MyStruct} ff)
+    var Test{MyStruct} t
     t.item := ff
     t.item!.item := f
 ; @ g test-parameter-inheritance-6
@@ -2889,8 +3128,8 @@ struct Base{Generic}
 struct Mid{First:Second}(Base{First})
     weak Second? second
 struct Top{Generic}(Mid{MyStruct:Generic})
-func fun(user Top?{File} t)
-    user Mid?{MyStruct:File} m
+func fun(user Top?{MyStruct} t)
+    user Mid?{MyStruct:MyStruct} m
     m := t
 ; @ eg test-parameter-inheritance-e0
 struct Base{Generic}
@@ -2898,9 +3137,11 @@ struct Base{Generic}
 struct Test{Param}(Base{Param})
     weak Generic error
 ; @ eg test-parameter-inheritance-e1
+struct MyStruct
+    var Int x
 struct Base{Generic}
     weak Generic? item
-struct Test(Base{File})
+struct Test(Base{MyStruct})
     func user set(weak String error)
         self.item := error
 ; @ eg test-parameter-inheritance-e2
@@ -2910,10 +3151,12 @@ struct Test{Param}(Base{Param})
     func user set(weak String error)
         self.item := error
 ; @ eg test-parameter-inheritance-e3
+struct MyStruct
+    var Int x
 struct Base{Pbase}
     weak Pbase? item
 struct Mid{Pmid}(Base{Pmid})
-struct Top(Mid{File})
+struct Top(Mid{MyStruct})
 struct Test(Top)
     func user set(weak String error)
         self.item := error
@@ -3062,6 +3305,8 @@ func fun(user TestIterator iter)
     for t in iter
         s := t
 ; @ g test-for-each-2
+struct MyStruct
+    var Int x
 struct TestIterator{Generic}
     weak Generic? item
     func user ! step()->(user Generic? item, var Bool has-data)
@@ -3069,20 +3314,22 @@ struct TestIterator{Generic}
 class Test
     var Int x
     func dynamic user fun()
-func ! fun(user TestIterator{File} fiter, user TestIterator{Test} titer)
-    user File? of
+func ! fun(user TestIterator{MyStruct} fiter, user TestIterator{Test} titer)
+    user MyStruct? of
     user Test? ot
     for f in fiter!
         of := f
     for t in titer!
         ot := t
 ; @ g test-for-each-3
+struct MyStruct
+    var Int x
 class TestIterator{Generic}
     weak Generic? item
     func dynamic user ! step()->(user Generic? item, var Bool has-data)
         item := self.item!
-func ! f-mock(user TestIterator{File} iter)
-    user File? f
+func ! f-mock(user TestIterator{MyStruct} iter)
+    user MyStruct? f
     for t in iter!
         f := t
 ; @ g test-for-each-4
@@ -3418,7 +3665,7 @@ module Error
 module true
 ; @ etg test-module-e8
 ; @-
-module file-open-read
+module ; some global function
 ; @ etg test-module-e9
 ; @-
 func fun()
@@ -3771,16 +4018,19 @@ user Test? tt
 d!.set(owner _)
 tt.meth()
 ; @ eg test-memory-user-e17
+struct MyStruct
+    var Int x
+    func user meth()
 struct Base{Atype}
     var Int x
     func user fun(owner Atype? a)
 struct Test{Btype}(Base{Btype})
     func user fun()
         base(owner _)
-func ! fun(user File f)
-    var Test{File} t
+func fun(user MyStruct f)
+    var Test{MyStruct} t
     t.fun()
-    f.putc(copy 'a')!
+    f.meth()
 ; @ eg test-memory-user-e18
 struct Base
     var Int x
@@ -3855,14 +4105,17 @@ func fun(owner Test? t, user String s)
     t := _
     s.clear()
 ; @ eg test-memory-user-e31
+struct MyStruct
+    var Int x
+    func user meth()
 struct Base
     owner String? s
 struct Test(Base)
 struct Other(Base)
-    owner File? f
-func ! fun(owner Test? t, user String s, user File f)
+    owner MyStruct? f
+func fun(owner Test? t, user String s, user MyStruct f)
     t := _
-    f.putc(copy 'a')!
+    f.meth()
     s.clear()
 ; @ eg test-memory-user-e32
 struct Base
@@ -3873,18 +4126,24 @@ func fun(owner Base? b, user String s)
     b := _
     s.clear()
 ; @ eg test-memory-user-e33
+struct MyStruct
+    var Int x
+    func user meth()
 struct Test{Generic}
     owner Generic? x
-func ! fun(owner Test?{File} t, user File f)
+func fun(owner Test?{MyStruct} t, user MyStruct f)
     t := _
-    f.putc(copy 'a')!
+    f.meth()
 ; @ eg test-memory-user-e34
+struct MyStruct
+    var Int x
+    func user meth()
 struct Base{Generic}
     owner Generic? x
 struct Test{Data}(Base{Data})
-func ! fun(owner Test?{File} t, user File f)
+func ! fun(owner Test?{MyStruct} t, user MyStruct f)
     t := _
-    f.putc(copy 'a')!
+    f.meth()
 ; @ eg test-memory-user-e35
 main!
     owner String? so(owner String{12}()!)
@@ -4316,8 +4575,11 @@ u-test := p-test.get-ref-at(copy 5)
 ; @ c test-c-objects-3
 var cdef.Pointer{Char} p-char
 p-char.set-from-array(user ostr!)
-ostr!.copy-from-pointer(copy p-char)!
-ostr!.set-null-term-length()
+cdef.copy-to-string(copy p-char, user ostr!)!
+cdef.set-null-term-length(user ostr!)
+; @ c test-c-objects-4
+var cdef.Pointer{Byte} p-byte
+cdef.copy-to-buffer(copy p-byte, copy 4, user buff!)!
 ; @ ec test-c-objects-e0
 var cdef.Pointer{Ta} error
 ; @ ec test-c-objects-e1

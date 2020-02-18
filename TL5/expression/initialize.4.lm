@@ -54,10 +54,6 @@ class InitExpression(ModuleTypeExpression)
         if not self.result-type.type-data.is-primitive and
                 self.aux-variable.variable.is-create
             self.result-type.check-sequence(user self)
-            if self.result-type.type-data.create-disallowed
-                self.syntax-error(
-                        user "cannot create objects with type",
-                        user self.result-type.type-data.name)
             self.constructor := self.result-type.type-data.constructor
             if self.constructor?
                 user Argument first-parameter(
@@ -66,6 +62,9 @@ class InitExpression(ModuleTypeExpression)
             else-if self.arguments.parameters.first?
                 if self.result-type.type-data is glob.type-string
                     self.constructor := glob.string-copy-function
+                    self.add-self-and-check(copy Access.USER)
+                else-if self.result-type.type-data is glob.type-buffer
+                    self.constructor := glob.buffer-copy-function
                     self.add-self-and-check(copy Access.USER)
                 else
                     self.syntax-error(
@@ -137,11 +136,10 @@ class InitExpression(ModuleTypeExpression)
     func inst write-allocation()
         self.arguments.write-preactions()
         if self.result-type.type-data is glob.type-array or
-                self.result-type.type-data is glob.type-string
+                self.result-type.type-data.is-sequence()
             self.result-type.length.write-preactions()
         if self.result-type.type-data is glob.type-array
-            if self.result-type.parameters.first.item.type-data is
-                    glob.type-string
+            if self.result-type.parameters.first.item.type-data.is-sequence()
                 self.result-type.parameters.first.item.length.write-preactions()
         
         if access-is-only-var(copy self.aux-variable.variable.access)
@@ -153,12 +151,13 @@ class InitExpression(ModuleTypeExpression)
             self.code-node.write-spaces()
             if self.constructor.arguments.has-error
                 write(user "LUMI_err = ")
+                self.arguments.has-error := true
             self.constructor.write-cname()
             self.code-node.write-call(user self.arguments)
     
     func inst write-var-init()
         if self.result-type.type-data is-not glob.type-array and
-                self.result-type.type-data is-not glob.type-string
+                not self.result-type.type-data.is-sequence()
             self.write-init-var-ref(user self.aux-variable)
             return
         
@@ -176,16 +175,21 @@ class InitExpression(ModuleTypeExpression)
         if self.result-type.type-data is glob.type-array
             self.write-new-array-init()
                 
-        else-if self.result-type.type-data is glob.type-string
-            ; INIT_NEW_STRING(`line`, `cleanup`, `aux-variable`, `length`);
+        else-if self.result-type.type-data.is-sequence()
+            ; INIT_NEW_SEQUENCE(..., `type`, `length`);
             self.write-macro-init(
-                    user "INIT_NEW_STRING", user self.aux-variable)
+                    user "INIT_NEW_SEQUENCE", user self.aux-variable)
+            write(user ", ")
+            if self.result-type.type-data is glob.type-string
+                write(user "char")
+            else
+                write(user "Byte")
             write(user ", ")
             self.result-type.length.write()
             write(user ");\n")
             
         else
-            ; INIT_NEW(`line`, `cleanup`, `aux-variable`, `type`, 1)
+            ; INIT_NEW(..., `type`, 1)
             self.write-macro-init(user "INIT_NEW", user self.aux-variable)
             write(user ", ")
             self.result-type.write-cname()
@@ -213,6 +217,8 @@ class InitExpression(ModuleTypeExpression)
         write(user ", ")
         if data-type.type-data is glob.type-string
             write(user "char")
+        else-if data-type.type-data is glob.type-buffer
+            write(user "Byte")
         else-if data-type.type-data is glob.type-func
             data-type.arguments.write-pointer(user _)
         else
@@ -232,11 +238,11 @@ class InitExpression(ModuleTypeExpression)
             write(user "1")
         write(user ");\n")
         
-        if data-type.type-data is glob.type-string
-            ; `aux-variable`_String_length = LUMI_alloc(sizeof(int) * `length`);
+        if data-type.type-data.is-sequence()
+            ; `aux-variable`_Seq_length = LUMI_alloc(sizeof(int) * `length`);
             self.code-node.write-spaces()
             self.aux-variable.write()
-            write(user "_String_length = LUMI_alloc(sizeof(int) * ")
+            write(user "_Seq_length = LUMI_alloc(sizeof(int) * ")
             self.aux-variable.write()
             write(user "_Length")
             for n in depth - 1

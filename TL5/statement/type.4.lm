@@ -17,7 +17,6 @@ class TypeData(SyntaxTreeNamespace)
     var Bool is-ordered
     var Bool is-delete-mocked
     var Bool ordering
-    var Bool create-disallowed
     
     func inst parse-new(copy Bool is-dynamic)->(owner TypeData new-node)
         new-node := TypeData()
@@ -61,6 +60,9 @@ class TypeData(SyntaxTreeNamespace)
     func inst is-ref()->(var Bool is-reference)
         is-reference := not self.is-primitive or self is glob.type-func or
                 self is glob.type-ref
+        
+    func inst is-sequence()->(var Bool is-sequence)
+        is-sequence := self is glob.type-string or self is glob.type-buffer
     
     func inst add-type(user ModuleMembers my-module)
         if not is-legal-name(user self.name, copy NameGroup.TYPE)

@@ -79,7 +79,8 @@ struct TypeInstance
                         user node,
                         user code-node,
                         copy indentation-spaces)
-            else-if code-node? and self.name.equal(user "String")
+            else-if code-node? and (self.name.equal(user "String") or
+                    self.name.equal(user "Buffer"))
                 self.length-owner.new(user "}", user code-node)
                 self.length := self.length-owner
             else
@@ -200,6 +201,9 @@ struct TypeInstance
                 if sub-type.type-data is glob.type-string
                     node.syntax-error-msg(
                             user "string as parameter type is unsupported")
+                if sub-type.type-data is glob.type-buffer
+                    node.syntax-error-msg(
+                            user "buffer as parameter type is unsupported")
                 param-iter.next()
             if param-iter.has()
                 node.syntax-error(
@@ -260,7 +264,8 @@ struct TypeInstance
             if self.type-data is-not target.type-data and
                     self.type-data is-not glob.type-empty and
                     not target.type-data.is-primitive and
-                    not target.type-data.is-dynamic
+                    not target.type-data.is-dynamic and
+                    not target.type-data is glob.type-file
                 assert node?
                 node.syntax-error2(
                         user "passing ownership of type",
@@ -294,6 +299,22 @@ struct TypeInstance
             node.syntax-error(
                     user "assigning into a weak reference an illegal access",
                     user glob.access-names[self-access])
+        if self.type-data is glob.type-file-read-write-text and
+                (target.type-data is glob.type-file or
+                target.type-data is glob.type-file-read-text or
+                target.type-data is glob.type-file-write-text)
+            return
+        if self.type-data is glob.type-file-read-write-binary and
+                (target.type-data is glob.type-file or
+                target.type-data is glob.type-file-read-binary or
+                target.type-data is glob.type-file-write-binary)
+            return
+        if target.type-data is glob.type-file and
+                (self.type-data is glob.type-file-read-text or
+                self.type-data is glob.type-file-read-binary or
+                self.type-data is glob.type-file-write-text or
+                self.type-data is glob.type-file-write-binary)
+            return
         if self.type-data is glob.type-pointer and
                 target.type-data is glob.type-pointer
             return
@@ -306,10 +327,13 @@ struct TypeInstance
                         user self.name,
                         user "into different generic subtype",
                         user target.name)
-        if self.type-data is glob.type-string and
-                target.type-data is glob.type-array and target.parameters? and
+        if target.type-data is glob.type-array and target.parameters? and
                 not access-is-owner(copy target-access)
-            if target.parameters.first.item.type-data is glob.type-char
+            if self.type-data is glob.type-string and
+                    target.parameters.first.item.type-data is glob.type-char
+                return
+            if self.type-data is glob.type-buffer and
+                    target.parameters.first.item.type-data is glob.type-byte
                 return
         user TypeInstance self-type-instance(user self)
         owner TypeInstance base-type-instance
@@ -404,11 +428,11 @@ struct TypeInstance
         
     func check-sequence(user SyntaxTreeNode node)
         if (self.type-data is glob.type-array or
-                self.type-data is glob.type-string) and not self.length?
+                self.type-data.is-sequence()) and not self.length?
             assert node?
             node.syntax-error-msg(user "missing length for sequence")
         if self.type-data is glob.type-array
-            if self.parameters.first.item.type-data is glob.type-string and
+            if self.parameters.first.item.type-data.is-sequence() and
                     not self.parameters.first.item.length?
                 assert node?
                 node.syntax-error-msg(user "missing length for sequence")
@@ -422,7 +446,7 @@ struct TypeInstance
             while data-type.parameters?
             data-type := data-type.parameters.first.item
             while data-type.type-data is glob.type-array or
-                    data-type.type-data is glob.type-string
+                    data-type.type-data.is-sequence()
             depth += 1
     
     ~~~ Create a copy of self type-instance with generic parameters replaced by

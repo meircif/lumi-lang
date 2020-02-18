@@ -87,6 +87,8 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
                 glob.type-int.new-type-instance()->(owner item-type-instance)
             else-if self.iterator.result-type.type-data is glob.type-string
                 glob.type-char.new-type-instance()->(owner item-type-instance)
+            else-if self.iterator.result-type.type-data is glob.type-buffer
+                glob.type-byte.new-type-instance()->(owner item-type-instance)
             else-if self.iterator.result-type.type-data is glob.type-array
                 self.iterator.result-type.parameters.first.item.copy-new()->(
                         owner item-type-instance)
@@ -104,8 +106,7 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
         user TypeData iterator-type(user self.iterator.result-type.type-data)
         is-int-iteration := iterator-type is glob.type-int
         is-index-iteration := is-int-iteration or
-                iterator-type is glob.type-string or
-                iterator-type is glob.type-array
+                iterator-type.is-sequence() or iterator-type is glob.type-array
         
     func inst get-step-item-data()->(
             owner TypeInstance item-type-instance, var Int item-access)

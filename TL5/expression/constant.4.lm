@@ -1,7 +1,7 @@
 ~~~ TL5 compiler - Constant expressions ~~~
 module tl5-compiler
 
-~~~ 
+~~~ ~
 Convert text to number based on given `int-base`.
 Return whether conversion succeeded
 ~~~
@@ -153,44 +153,109 @@ class CharExpression(TextExpression)
         has-value := true
 
 
-~~~ Constant string expression ~~~
-class StringExpression(TextExpression)
+~~~ Constant buffer expression ~~~
+class BufferExpression(TextExpression)
     owner VariableExpression aux-variable
     
     func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
             owner Expression expression)
-        new StringExpression string-expression(user code-node)
-        string-expression.parse(owner text)
-        expression := string-expression
+        new BufferExpression buffer-expression(user code-node)
+        buffer-expression.parse(owner text, user glob.type-buffer)
+        expression := buffer-expression
     
-    ~~~ parsing `"some string"` ~~~
-    func inst parse(owner String text)
-        self.check-string(user text)
-        self.set-simple-type(user glob.type-string)
+    func inst parse(owner String text, user TypeData sequence-type)
+        self.text := text
+        self.check-and-modify-text()
+        self.set-simple-type(user sequence-type)
         self.access := Access.VAR
         self.is-var := true
-        self.text := text
-        self.strip-multilines()
     
-    func inst strip-multilines()
+    func dynamic check-and-modify-text()
+        if self.text.length < 2
+            self.syntax-error(user "too short buffer constant", user self.text)
+        if self.text[0] != '`' or self.text[self.text.length - 1] != '`'
+            self.syntax-error(
+                    user "no '`' around buffer constant", user self.text)
+        var Int index-write(copy 0)
+        for index-read in 1:self.text.length - 1
+            var Char ch(copy self.text[index-read])
+            if ch = '\n'
+                self.check-indentation()->(var index-read)
+            else-if (ch < 'a' or ch > 'f') and (ch < 'A' or ch > 'F') and
+                    (ch < '0' or ch > '9')
+                var String{2} char-str
+                char-str.append(copy ch)
+                self.syntax-error(user "illegal buffer data", user char-str)
+            else
+                self.text[index-write] := ch
+                index-write += 1
+        if index-write < self.text.length - 1
+            self.text[index-write] := '\0'
+            self.text.length := index-write
+        if self.text.length mod 2 != 0
+            self.syntax-error-msg(user "odd buffer data length")
+        
+    func inst check-indentation()->(var Int index-read)
+        var Int expected(copy self.code-node.parent.indentation-spaces +
+                (2 * INDENTATION-SPACES))
+        var Int indentation(copy 0)
+        do
+            index-read += 1
+            while index-read < self.text.length - 1
+            while self.text[index-read] = ' '
+            indentation += 1
+            while indentation < expected
+        if indentation < expected
+            self.code-node.syntax-error-indentation(
+                    copy indentation, copy expected)
+    
+    func dynamic analyze()
+        self.code-node.add-aux-variable(
+                copy Access.VAR, copy true, user self.result-type)->(
+                owner self.aux-variable)
+    
+    func dynamic write-preactions()
+        ; INIT_SEQUENCE_CONST(`line`, `cleanup`, `symbol`, `text`)
+        write(user "INIT_SEQUENCE_CONST(")
+        self.write-line-num()
+        write(user ", ")
+        self.code-node.parent.write-cleanup-label()
+        write(user ", ")
+        self.aux-variable.write()
+        write(user ", ")
+        self.write-data()
+        write(user ");\n")
+        self.code-node.write-spaces()
+
+    func dynamic write-data()
+        write-c(copy '"')
+        for n in self.text.length div 2
+            write(user "\\x")
+            write-c(copy self.text[2 * n])
+            write-c(copy self.text[(2 * n) + 1])
+        write-c(copy '"')
+    
+    func dynamic write()
+        self.aux-variable.write()
+
+
+~~~ Constant string expression ~~~
+class StringExpression(BufferExpression)
+    func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
+            owner Expression expression)
+        new StringExpression string-expression(user code-node)
+        string-expression.parse(owner text, user glob.type-string)
+        expression := string-expression
+    
+    func dynamic check-and-modify-text()
+        self.check-string(user self.text)
         var Int index-write(copy 1)
         for index-read in 1:self.text.length - 1
             if self.text[index-read] = '\n'
                 var Bool skip-new-line
                 if index-read > 0
                     skip-new-line := self.text[index-read - 1] = '\\'
-                var Int expected(copy self.code-node.parent.indentation-spaces +
-                        (2 * INDENTATION-SPACES))
-                var Int indentation(copy 0)
-                do
-                    index-read += 1
-                    while index-read < self.text.length - 1
-                    while self.text[index-read] = ' '
-                    indentation += 1
-                    while indentation < expected
-                if indentation < expected
-                    self.code-node.syntax-error-indentation(
-                            copy indentation, copy expected)
+                self.check-indentation()->(var index-read)
                 if skip-new-line
                     index-write -= 1
                 else
@@ -206,27 +271,9 @@ class StringExpression(TextExpression)
             index-write += 1
             self.text[index-write] := '\0'
             self.text.length := index-write
-    
-    func dynamic analyze()
-        self.code-node.add-aux-variable(
-                copy Access.VAR, copy true, user self.result-type)->(
-                owner self.aux-variable)
-    
-    func dynamic write-preactions()
-        ; INIT_STRING_CONST(`line`, `cleanup`, `symbol`, `text`)
-        write(user "INIT_STRING_CONST(")
-        self.write-line-num()
-        write(user ", ")
-        self.code-node.parent.write-cleanup-label()
-        write(user ", ")
-        self.aux-variable.write()
-        write(user ", ")
+
+    func dynamic write-data()
         write(user self.text)
-        write(user ");\n")
-        self.code-node.write-spaces()
-    
-    func dynamic write()
-        self.aux-variable.write()
 
 
 ~~~ Constant empty expression `_` ~~~
