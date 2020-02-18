@@ -201,6 +201,13 @@ test test-pointer()
     stra[2]! := '\0'
     cdef.set-null-term-length(user stra)
     assert! stra.equal(user "aa")
+    
+    var Buffer{16} buffa(user `fade00beaf`)!
+    var Buffer{16} buffb(user `000000`)!
+    var cdef.Pointer{Byte} pbt
+    pbt.set-from-array(user buffa)
+    cdef.copy-to-buffer(copy pbt, copy 5, user buffb)!
+    assert! buffb.equal(user buffa)
 
 
 test test-dynamic-type-parameters()

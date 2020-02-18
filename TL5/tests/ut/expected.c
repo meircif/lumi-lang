@@ -64,7 +64,7 @@ void ut_M_fun6(Int x, Int y, Int* n, Int* m);
 void ut_M_fun7(ut_M_Tb* tb, Ref_Manager* tb_Refman, ut_M_Tb_Dynamic* tb_Dynamic, ut_M_Tb** tbo, Ref_Manager** tbo_Refman, ut_M_Tb_Dynamic** tbo_Dynamic);
 void ut_M_fun8(char* s, int s_Max_length, int* s_Length, Ref_Manager* s_Refman);
 Returncode ut_M_fune(void);
-Returncode ut_M_mock(char* str, int str_Max_length, int* str_Length, char** so, int* so_Max_length, int** so_Length, Ref_Manager** so_Refman, Int* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic);
+Returncode ut_M_mock(char* str, int str_Max_length, int* str_Length, Byte* bfr, int bfr_Max_length, int* bfr_Length, char** so, int* so_Max_length, int** so_Length, Ref_Manager** so_Refman, Int* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic);
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 ut_M_Ta_Dynamic ut_M_Ta_dynamic = {(Dynamic_Del)ut_M_Ta_Del, ut_M_Ta_dyn};
 ut_M_Tb_Dynamic ut_M_Tb_dynamic = {{(Dynamic_Del)ut_M_Tb_Del, (void (*)(ut_M_Ta* self, ut_M_Ta_Dynamic* self_Dynamic))ut_M_Tb_dyn}};
@@ -238,7 +238,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-Returncode ut_M_mock(char* str, int str_Max_length, int* str_Length, char** so, int* so_Max_length, int** so_Length, Ref_Manager** so_Refman, Int* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic) {
+Returncode ut_M_mock(char* str, int str_Max_length, int* str_Length, Byte* bfr, int bfr_Max_length, int* bfr_Length, char** so, int* so_Max_length, int** so_Length, Ref_Manager** so_Refman, Int* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic) {
     Returncode LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
@@ -331,7 +331,7 @@ illegal character constant "'aaaaa'"
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
-    INIT_STRING_CONST(1, LUMI_block0_cleanup, aux_String_0, "some string");
+    INIT_SEQUENCE_CONST(1, LUMI_block0_cleanup, aux_String_0, "some string");
     str_Max_length = aux_String_0_Max_length;
     str_Length = aux_String_0_Length;
     str = aux_String_0;
@@ -339,7 +339,7 @@ char* aux_String_0 = NULL;
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
-    INIT_STRING_CONST(1, LUMI_block0_cleanup, aux_String_0, "\nstring\t\"with\\formatting\n");
+    INIT_SEQUENCE_CONST(1, LUMI_block0_cleanup, aux_String_0, "\nstring\t\"with\\formatting\n");
     str_Max_length = aux_String_0_Max_length;
     str_Length = aux_String_0_Length;
     str = aux_String_0;
@@ -347,7 +347,7 @@ char* aux_String_0 = NULL;
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
-    INIT_STRING_CONST(4, LUMI_block0_cleanup, aux_String_0, "linesplitstring");
+    INIT_SEQUENCE_CONST(4, LUMI_block0_cleanup, aux_String_0, "linesplitstring");
     str_Max_length = aux_String_0_Max_length;
     str_Length = aux_String_0_Length;
     str = aux_String_0;
@@ -355,7 +355,7 @@ char* aux_String_0 = NULL;
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
-    INIT_STRING_CONST(4, LUMI_block0_cleanup, aux_String_0, "multi\nline\nstring\n");
+    INIT_SEQUENCE_CONST(4, LUMI_block0_cleanup, aux_String_0, "multi\nline\nstring\n");
     str_Max_length = aux_String_0_Max_length;
     str_Length = aux_String_0_Length;
     str = aux_String_0;
@@ -363,7 +363,7 @@ char* aux_String_0 = NULL;
 char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
-    INIT_STRING_CONST(2, LUMI_block0_cleanup, aux_String_0, "line split");
+    INIT_SEQUENCE_CONST(2, LUMI_block0_cleanup, aux_String_0, "line split");
     str_Max_length = aux_String_0_Max_length;
     str_Length = aux_String_0_Length;
     str = aux_String_0;
@@ -377,6 +377,41 @@ too short string constant """
 indentation too short, expected 12 got 8
 /// @ test-string-expression-e4
 indentation too short, expected 12 got 8
+/// @@ test-buffer-expression
+/// @ test-buffer-expression-0
+Byte* aux_Buffer_0 = NULL;
+    int aux_Buffer_0_Max_length = 0;
+    int aux_Buffer_0_Length[1] = {0};
+    INIT_SEQUENCE_CONST(1, LUMI_block0_cleanup, aux_Buffer_0, "\x4a\x00\xe2\xff\x59");
+    bfr_Max_length = aux_Buffer_0_Max_length;
+    bfr_Length = aux_Buffer_0_Length;
+    bfr = aux_Buffer_0;
+/// @ test-buffer-expression-1
+Byte* aux_Buffer_0 = NULL;
+    int aux_Buffer_0_Max_length = 0;
+    int aux_Buffer_0_Length[1] = {0};
+    INIT_SEQUENCE_CONST(3, LUMI_block0_cleanup, aux_Buffer_0, "\x4a\x00\xe2\xff\x59\xa8");
+    bfr_Max_length = aux_Buffer_0_Max_length;
+    bfr_Length = aux_Buffer_0_Length;
+    bfr = aux_Buffer_0;
+/// @ test-buffer-expression-2
+Byte* aux_Buffer_0 = NULL;
+    int aux_Buffer_0_Max_length = 0;
+    int aux_Buffer_0_Length[1] = {0};
+    INIT_SEQUENCE_CONST(5, LUMI_block0_cleanup, aux_Buffer_0, "\x4a\x00\xe2\xff\x59\xa8");
+    bfr_Max_length = aux_Buffer_0_Max_length;
+    bfr_Length = aux_Buffer_0_Length;
+    bfr = aux_Buffer_0;
+/// @ test-buffer-expression-e0
+no '`' around buffer constant "`0000"
+/// @ test-buffer-expression-e1
+too short buffer constant "`"
+/// @ test-buffer-expression-e2
+indentation too short, expected 12 got 8
+/// @ test-buffer-expression-e3
+illegal buffer data "g"
+/// @ test-buffer-expression-e4
+odd buffer data length
 /// @@ test-empty-expression
 /// @ test-empty-expression-0
 str_Max_length = 0;
@@ -657,8 +692,11 @@ char* sa = NULL;
     Ref_Manager* aux_String_1_Refman = NULL;
     Byte* aux_Buffer_0 = NULL;
     int aux_Buffer_0_Max_length = 0;
-    int* aux_Buffer_0_Length = &Lumi_empty_int;
-    Ref_Manager* aux_Buffer_0_Refman = NULL;
+    int aux_Buffer_0_Length[1] = {0};
+    Byte* aux_Buffer_1 = NULL;
+    int aux_Buffer_1_Max_length = 0;
+    int* aux_Buffer_1_Length = &Lumi_empty_int;
+    Ref_Manager* aux_Buffer_1_Refman = NULL;
     CHECK_REF(2, LUMI_block0_cleanup, sa)
     if (3 >= sa_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
     aux_String_1 = sa + 3 * sa_Value_length;
@@ -667,7 +705,7 @@ char* sa = NULL;
     aux_String_1_Refman = sa_Refman;
     LUMI_inc_ref(aux_String_1_Refman);
     CHECK_REFMAN(2, LUMI_block0_cleanup, aux_String_1_Refman)
-    INIT_STRING_CONST(2, LUMI_block0_cleanup, aux_String_0, "text");
+    INIT_SEQUENCE_CONST(2, LUMI_block0_cleanup, aux_String_0, "text");
     LUMI_err = String_copy(aux_String_1, aux_String_1_Max_length, aux_String_1_Length, aux_String_0, *aux_String_0_Length);
     CHECK(2, LUMI_block0_cleanup)
     free(sa_Seq_length);
@@ -679,14 +717,14 @@ char* sa = NULL;
     sa = NULL;
     CHECK_REF(5, LUMI_block0_cleanup, ba)
     if (3 >= ba_Length) RAISE(5, LUMI_block0_cleanup, slice_index)
-    aux_Buffer_0 = ba + 3 * ba_Value_length;
-    aux_Buffer_0_Max_length = ba_Value_length;
-    aux_Buffer_0_Length = ba_Seq_length + 3;
-    aux_Buffer_0_Refman = ba_Refman;
-    LUMI_inc_ref(aux_Buffer_0_Refman);
-    CHECK_REFMAN(5, LUMI_block0_cleanup, aux_Buffer_0_Refman)
-    CHECK_REF(5, LUMI_block0_cleanup, ut_M_buff)
-    LUMI_err = Buffer_copy(aux_Buffer_0, aux_Buffer_0_Max_length, aux_Buffer_0_Length, ut_M_buff, *ut_M_buff_Length);
+    aux_Buffer_1 = ba + 3 * ba_Value_length;
+    aux_Buffer_1_Max_length = ba_Value_length;
+    aux_Buffer_1_Length = ba_Seq_length + 3;
+    aux_Buffer_1_Refman = ba_Refman;
+    LUMI_inc_ref(aux_Buffer_1_Refman);
+    CHECK_REFMAN(5, LUMI_block0_cleanup, aux_Buffer_1_Refman)
+    INIT_SEQUENCE_CONST(5, LUMI_block0_cleanup, aux_Buffer_0, "\xbe\xef");
+    LUMI_err = Buffer_copy(aux_Buffer_1, aux_Buffer_1_Max_length, aux_Buffer_1_Length, aux_Buffer_0, *aux_Buffer_0_Length);
     CHECK(5, LUMI_block0_cleanup)
     free(ba_Seq_length);
     LUMI_owner_dec_ref(ba_Refman);
@@ -2437,6 +2475,8 @@ using "!" where there is no error
 using "!" where there is no error
 /// @ test-exclamation-expression-en32
 using "!" where there is no error
+/// @ test-exclamation-expression-en33
+using "!" where there is no error
 /// @@ test-dynamic
 /// @ test-dynamic-0
 ut_M_Ta a_Var = {{0}};
@@ -3204,7 +3244,7 @@ Returncode ut_M_fun(File* f, FileReadText* frt, FileReadBinary* frb, FileWriteTe
     LUMI_err = ut_M_fun(frt, frwt, frwb, frwt, frwb, frwt, frwb);
     CHECK(22, LUMI_block0_cleanup)
     df = &df_Var;
-    INIT_STRING_CONST(31, LUMI_block0_cleanup, aux_String_0, "name");
+    INIT_SEQUENCE_CONST(31, LUMI_block0_cleanup, aux_String_0, "name");
     INIT_NEW(31, LUMI_block0_cleanup, aux_FileWriteBinary_0, FileWriteBinary, 1);
     LUMI_err = FileWriteBinary_new(aux_FileWriteBinary_0, aux_String_0, aux_String_0_Max_length, aux_String_0_Length, false);
     CHECK(31, LUMI_block0_cleanup)
@@ -3308,6 +3348,9 @@ Ref_Manager* ut_M_svs_Refman = NULL;
 char* ut_M_cs = NULL;
 int ut_M_cs_Max_length = 0;
 int* ut_M_cs_Length = &Lumi_empty_int;
+Byte* ut_M_cb = NULL;
+int ut_M_cb_Max_length = 0;
+int* ut_M_cb_Length = &Lumi_empty_int;
 char* ut_M_us = NULL;
 int ut_M_us_Max_length = 0;
 int* ut_M_us_Length = &Lumi_empty_int;
@@ -3334,6 +3377,12 @@ USER_MAIN_HEADER {
     char* aux_String_1 = NULL;
     int aux_String_1_Max_length = 0;
     int aux_String_1_Length[1] = {0};
+    Byte* aux_Buffer_0 = NULL;
+    int aux_Buffer_0_Max_length = 0;
+    int* aux_Buffer_0_Length = &Lumi_empty_int;
+    Byte* aux_Buffer_1 = NULL;
+    int aux_Buffer_1_Max_length = 0;
+    int aux_Buffer_1_Length[1] = {0};
     char* aux_String_2 = NULL;
     int aux_String_2_Max_length = 0;
     int* aux_String_2_Length = &Lumi_empty_int;
@@ -3345,7 +3394,7 @@ USER_MAIN_HEADER {
     INIT_VAR_REFMAN(2, LUMI_block0_cleanup, ut_M_svs)
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "mock.5.lm"
-    INIT_STRING_CONST(3, LUMI_block0_cleanup, aux_String_1, "global text");
+    INIT_SEQUENCE_CONST(3, LUMI_block0_cleanup, aux_String_1, "global text");
     INIT_NEW_SEQUENCE(3, LUMI_block0_cleanup, aux_String_0, char, 12);
     LUMI_err = String_copy(aux_String_0, 12, aux_String_0_Length, aux_String_1, *aux_String_1_Length);
     CHECK(3, LUMI_block0_cleanup)
@@ -3356,15 +3405,26 @@ USER_MAIN_HEADER {
     aux_String_0_Length = &Lumi_empty_int;
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "mock.5.lm"
-    INIT_NEW_SEQUENCE(4, LUMI_block0_cleanup, aux_String_2, char, 12);
-    LUMI_err = String_copy(aux_String_2, 12, aux_String_2_Length, ut_M_s, *ut_M_s_Length);
+    INIT_SEQUENCE_CONST(4, LUMI_block0_cleanup, aux_Buffer_1, "\xfa\xde\x00\xbe\xaf");
+    INIT_NEW_SEQUENCE(4, LUMI_block0_cleanup, aux_Buffer_0, Byte, 12);
+    LUMI_err = Buffer_copy(aux_Buffer_0, 12, aux_Buffer_0_Length, aux_Buffer_1, *aux_Buffer_1_Length);
     CHECK(4, LUMI_block0_cleanup)
+    ut_M_cb_Max_length = 12;
+    ut_M_cb_Length = aux_Buffer_0_Length;
+    ut_M_cb = aux_Buffer_0;
+    aux_Buffer_0 = NULL;
+    aux_Buffer_0_Length = &Lumi_empty_int;
+#undef LUMI_FILE_NAME
+#define LUMI_FILE_NAME "mock.5.lm"
+    INIT_NEW_SEQUENCE(5, LUMI_block0_cleanup, aux_String_2, char, 12);
+    LUMI_err = String_copy(aux_String_2, 12, aux_String_2_Length, ut_M_s, *ut_M_s_Length);
+    CHECK(5, LUMI_block0_cleanup)
     ut_M_us_Max_length = 12;
     ut_M_us_Length = aux_String_2_Length;
     ut_M_us = aux_String_2;
     aux_String_2 = NULL;
     aux_String_2_Length = &Lumi_empty_int;
-    INIT_NEW_REFMAN(4, LUMI_block0_cleanup, ut_M_us)
+    INIT_NEW_REFMAN(5, LUMI_block0_cleanup, ut_M_us)
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "mock.5.lm"
     LUMI_inc_ref(ut_M_us_Refman);
@@ -3377,7 +3437,7 @@ USER_MAIN_HEADER {
 #undef LUMI_FUNC_NAME
     x = 6;
     x = 7;
-    INIT_NEW_SEQUENCE(9, LUMI_block0_cleanup, ls, char, 12);
+    INIT_NEW_SEQUENCE(10, LUMI_block0_cleanup, ls, char, 12);
     aux_String_0_Max_length = 12;
     aux_String_0_Length = ls_Length;
     aux_String_0 = ls;
@@ -3892,6 +3952,9 @@ Returncode ut_M_name(char* self, int self_Max_length, int* self_Length, Int px, 
     char* u = NULL;
     int u_Max_length = 0;
     int* u_Length = &Lumi_empty_int;
+    Byte* b = NULL;
+    int b_Max_length = 0;
+    int* b_Length = &Lumi_empty_int;
     char* o = NULL;
     int o_Max_length = 0;
     int* o_Length = &Lumi_empty_int;
@@ -3906,11 +3969,14 @@ Returncode ut_M_name(char* self, int self_Max_length, int* self_Length, Int px, 
     char* aux_String_1 = NULL;
     int aux_String_1_Max_length = 0;
     int aux_String_1_Length[1] = {0};
+    Byte* aux_Buffer_0 = NULL;
+    int aux_Buffer_0_Max_length = 0;
+    int aux_Buffer_0_Length[1] = {0};
     Char* aux_Array_0 = NULL;
     int aux_Array_0_Length = 0;
     /* initializing v */
-    INIT_NEW_SEQUENCE(7, LUMI_block0_cleanup, n, char, 12);
-    INIT_NEW_SEQUENCE(8, LUMI_block0_cleanup, aux_String_0, char, 12);
+    INIT_NEW_SEQUENCE(8, LUMI_block0_cleanup, n, char, 12);
+    INIT_NEW_SEQUENCE(9, LUMI_block0_cleanup, aux_String_0, char, 12);
     String_Del(o);
     free(o);
     o_Max_length = 12;
@@ -3918,11 +3984,15 @@ Returncode ut_M_name(char* self, int self_Max_length, int* self_Length, Int px, 
     o = aux_String_0;
     aux_String_0 = NULL;
     aux_String_0_Length = &Lumi_empty_int;
-    INIT_STRING_CONST(9, LUMI_block0_cleanup, aux_String_1, "constant string");
+    INIT_SEQUENCE_CONST(10, LUMI_block0_cleanup, aux_String_1, "constant string");
     u_Max_length = aux_String_1_Max_length;
     u_Length = aux_String_1_Length;
     u = aux_String_1;
-    if (2 + 6 > *(po_Length)) RAISE(10, LUMI_block0_cleanup, slice_index)
+    INIT_SEQUENCE_CONST(11, LUMI_block0_cleanup, aux_Buffer_0, "\xbe\xef");
+    b_Max_length = aux_Buffer_0_Max_length;
+    b_Length = aux_Buffer_0_Length;
+    b = aux_Buffer_0;
+    if (2 + 6 > *(po_Length)) RAISE(12, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = po + 2;
     aux_Array_0_Length = 6;
     pu_Length = aux_Array_0_Length;
@@ -4460,7 +4530,7 @@ Returncode ut_M_name(void) {
     char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
-    INIT_STRING_CONST(2, LUMI_block0_cleanup, aux_String_0, "some error");
+    INIT_SEQUENCE_CONST(2, LUMI_block0_cleanup, aux_String_0, "some error");
     USER_RAISE(2, LUMI_block0_cleanup, aux_String_0, *(aux_String_0_Length))
 LUMI_block0_cleanup:
     (void)0;
@@ -4737,13 +4807,16 @@ char s[12] = {0};
     char* aux_String_0 = NULL;
     int aux_String_0_Max_length = 0;
     int aux_String_0_Length[1] = {0};
-    INIT_STRING_CONST(1, LUMI_block0_cleanup, aux_String_0, "some string");
+    Byte* aux_Buffer_0 = NULL;
+    int aux_Buffer_0_Max_length = 0;
+    int aux_Buffer_0_Length[1] = {0};
+    INIT_SEQUENCE_CONST(1, LUMI_block0_cleanup, aux_String_0, "some string");
     /* initializing s */
     LUMI_err = String_copy(s, 12, s_Length, aux_String_0, *aux_String_0_Length);
     CHECK(1, LUMI_block0_cleanup)
-    CHECK_REF(2, LUMI_block0_cleanup, ut_M_buff)
+    INIT_SEQUENCE_CONST(2, LUMI_block0_cleanup, aux_Buffer_0, "\xfa\xde\x00\xbe\xaf");
     /* initializing bf */
-    LUMI_err = Buffer_copy(bf, 12, bf_Length, ut_M_buff, *ut_M_buff_Length);
+    LUMI_err = Buffer_copy(bf, 12, bf_Length, aux_Buffer_0, *aux_Buffer_0_Length);
     CHECK(2, LUMI_block0_cleanup)
 /// @ test-initialize-8
 char* s = NULL;
@@ -5718,9 +5791,12 @@ char* s = NULL;
     Int aux_Int_0 = 0;
     Byte* aux_Buffer_0 = NULL;
     int aux_Buffer_0_Max_length = 0;
-    int* aux_Buffer_0_Length = &Lumi_empty_int;
+    int aux_Buffer_0_Length[1] = {0};
+    Byte* aux_Buffer_1 = NULL;
+    int aux_Buffer_1_Max_length = 0;
+    int* aux_Buffer_1_Length = &Lumi_empty_int;
     Int aux_Int_2 = 0;
-    INIT_STRING_CONST(1, LUMI_block0_cleanup, aux_String_0, "text");
+    INIT_SEQUENCE_CONST(1, LUMI_block0_cleanup, aux_String_0, "text");
     s_Max_length = aux_String_0_Max_length;
     s_Length = aux_String_0_Length;
     s = aux_String_0;
@@ -5740,20 +5816,20 @@ char* s = NULL;
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-    CHECK_REF(4, LUMI_block0_cleanup, ut_M_buff)
-    bf_Max_length = ut_M_buff_Max_length;
-    bf_Length = ut_M_buff_Length;
-    bf = ut_M_buff;
-    aux_Buffer_0_Max_length = bf_Max_length;
-    aux_Buffer_0_Length = bf_Length;
-    aux_Buffer_0 = bf;
+    INIT_SEQUENCE_CONST(4, LUMI_block0_cleanup, aux_Buffer_0, "\xbe\xaf");
+    bf_Max_length = aux_Buffer_0_Max_length;
+    bf_Length = aux_Buffer_0_Length;
+    bf = aux_Buffer_0;
+    aux_Buffer_1_Max_length = bf_Max_length;
+    aux_Buffer_1_Length = bf_Length;
+    aux_Buffer_1 = bf;
     do {
         Byte y = 0;
         Int aux_Int_3 = 0;
         LUMI_loop_depth = 3;
-        Buffer_length(aux_Buffer_0, aux_Buffer_0_Max_length, aux_Buffer_0_Length, &(aux_Int_3));
+        Buffer_length(aux_Buffer_1, aux_Buffer_1_Max_length, aux_Buffer_1_Length, &(aux_Int_3));
         if (!(aux_Int_2 < aux_Int_3)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
-        y = aux_Buffer_0[aux_Int_2];
+        y = aux_Buffer_1[aux_Int_2];
         aux_Int_2 += 1;
         ut_M_bt = y;
     LUMI_block2_cleanup:
@@ -6243,10 +6319,10 @@ Returncode ut_M_fun(void) {
     char* aux_String_1 = NULL;
     int aux_String_1_Max_length = 0;
     int aux_String_1_Length[1] = {0};
-    INIT_STRING_CONST(2, LUMI_block0_cleanup, aux_String_0, "mock print");
+    INIT_SEQUENCE_CONST(2, LUMI_block0_cleanup, aux_String_0, "mock print");
     LUMI_err = sys_M_print_Mock(aux_String_0, *aux_String_0_Length);
     CHECK(2, LUMI_block0_cleanup)
-    INIT_STRING_CONST(3, LUMI_block0_cleanup, aux_String_1, "really print");
+    INIT_SEQUENCE_CONST(3, LUMI_block0_cleanup, aux_String_1, "really print");
     LUMI_err = sys_M_print(aux_String_1, *aux_String_1_Length);
     CHECK(3, LUMI_block0_cleanup)
     sys_M_print_Mock_active = false;
@@ -6362,7 +6438,7 @@ void ut_M_fun0(void) {
         ++LUMI_file_coverage[0].line_count[13];
         x = 0;
         ++LUMI_file_coverage[0].line_count[14];
-        INIT_STRING_CONST(14, LUMI_block7_cleanup, aux_String_0, "text");
+        INIT_SEQUENCE_CONST(14, LUMI_block7_cleanup, aux_String_0, "text");
         LUMI_err = sys_M_print(aux_String_0, *aux_String_0_Length);
         CHECK(14, LUMI_block7_cleanup)
         ++LUMI_file_coverage[0].line_count[15];

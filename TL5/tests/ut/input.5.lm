@@ -47,7 +47,7 @@ weak Data?{Test} d
 weak Array?{String} sarr
 weak Array?{Buffer} barr
 
-func ! mock(user String? str)->(strong String? so, var Int io, strong Test? to, weak Tc? tco)
+func ! mock(user String? str, user Buffer? bfr)->(strong String? so, var Int io, strong Test? to, weak Tc? tco)
 ; @@ test-int-expression
 ; @ c test-int-expression-0
 i := 0
@@ -159,6 +159,31 @@ str := "indention
 ; @ ec test-string-expression-e4
 str := "indention\
     too short"
+; @@ test-buffer-expression
+; @ c test-buffer-expression-0
+bfr := `4a00e2ff59`
+; @ c test-buffer-expression-1
+bfr := `4a00
+        e2ff
+        59a8`
+; @ c test-buffer-expression-2
+bfr := `
+        4a00
+        e2ff
+        59a8
+        `
+; @ fec test-buffer-expression-e0
+bfr := `0000
+; @ fec test-buffer-expression-e1
+bfr := `
+; @ ec test-buffer-expression-e2
+bfr := `4a00
+    e2ff
+    59a8`
+; @ ec test-buffer-expression-e3
+bfr := `4a00e2fg59a8`
+; @ ec test-buffer-expression-e4
+bfr := `4a00e2ff59a`
 ; @@ test-empty-expression
 ; @ c test-empty-expression-0
 str := _
@@ -240,7 +265,7 @@ strong Array?{String} sa
 sa![3]!.copy(user "text")!
 sa := _
 strong Array?{Buffer} ba
-ba![3]!.copy(user buff!)!
+ba![3]!.copy(user `beef`)!
 ba := _
 ; @ c test-slice-expression-10
 strong Array?{Array{Int}} aai
@@ -911,6 +936,8 @@ raise! "error"!
 raise! str!
 ; @ ec test-exclamation-expression-en32
 var String{23!} s
+; @ ec test-exclamation-expression-en33
+`beaf`!.clear()
 ; @@ test-dynamic
 ; @ c test-dynamic-0
 var Ta a
@@ -1300,6 +1327,7 @@ var Int x
 var String{12} s
 s-var String{12} svs!
 owner String cs(owner String{12}(user "global text")!)
+owner Buffer cb(owner Buffer{12}(user `fade00beaf`)!)
 strong String us(strong String{12}(user s)!)
 weak String gs(weak us)
 main!
@@ -1531,11 +1559,13 @@ func ! name(user String self, copy Int px, user Array{Char} pu, owner String po)
         strong String? oself, var Int ox, weak String? ou, owner String? oo)
     var Int x
     user String? u
+    user Buffer? b
     owner String? o
     var String{12} v
     new String{12} n!
     o := String{12}()!
     u := "constant string"
+    b := `beef`
     pu := po[2:6]!
 ; @ g test-function-8
 struct Struct
@@ -1908,7 +1938,7 @@ user String? s(user ostr)
 user Buffer? bf(user buff)
 ; @ c test-initialize-7
 var String{12} s(user "some string")!
-var Buffer{12} bf(user buff!)!
+var Buffer{12} bf(user `fade00beaf`)!
 ; @ c test-initialize-8
 new String{i} s(user ostr!)!
 new Buffer{i} bf(user buff!)!
@@ -2315,7 +2345,7 @@ for n in 6
 user String s(user "text")
 for ch in s
     c := ch
-user Buffer bf(user buff!)
+user Buffer bf(user `beaf`)
 for y in bf
     bt := y
 ; @ c test-for-loop-10

@@ -260,15 +260,16 @@ while (self->field != NULL) { \
     free(name); name = NULL; \
     RAISE(line, cleanup, object_memory) }
 
-#define INIT_STRING_CONST(line, cleanup, name, text) \
-  name = text; \
-  name##_Max_length = sizeof(text); \
-  *name##_Length = sizeof(text) - 1;
+#define INIT_SEQUENCE_CONST(line, cleanup, name, data) \
+  name = (void*)data; \
+  name##_Max_length = sizeof(data); \
+  *name##_Length = sizeof(data) - 1;
 
 
-#define String_Del(name) do { if (name##_Length != &Lumi_empty_int) { \
+#define Buffer_Del(name) do { if (name##_Length != &Lumi_empty_int) { \
   free(name##_Length); \
   name##_Length = &Lumi_empty_int; } } while (false)
+#define String_Del(name) Buffer_Del(name)
 
 
 /* traceback */

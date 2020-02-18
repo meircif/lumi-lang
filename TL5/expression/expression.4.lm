@@ -192,6 +192,9 @@ class Expression(SyntaxTreeNode)
         else-if first = '"'
             StringExpression.parse-new(user _, owner text, user code-node)->(
                     owner expression)
+        else-if first = '`'
+            BufferExpression.parse-new(user _, owner text, user code-node)->(
+                    owner expression)
         else-if (first >= '0' and first <= '9') or
                 (first = '-' and second >= '0' and second <= '9')
             IntExpression.parse-new(user _, owner text, user code-node)->(

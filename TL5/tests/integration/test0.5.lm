@@ -18,6 +18,7 @@ comment
 ; Test global variables
 var Int global-int(copy 23)
 owner String global-string(owner String{32}(user "a constant string")!)
+owner Buffer global-buffer(owner Buffer{32}(user `feed1000beef`)!)
 
 var Array{TestEnum.length + LENGTH:Int} int-arr
 const Int LENGTH SIZE * 5
@@ -65,6 +66,13 @@ func ! test-const-expression()->(
     s := "some
             str\
             ing"
+    user Buffer? b
+    b := `2400fade`
+    b := `
+            2400
+            fade
+            3456
+            beef`
     t := _
     d := _
     f := _
@@ -123,33 +131,42 @@ func test-container-expression(copy Int x, copy Int y, user String? s)->(
             not s?)
 
 
-func ! test-variable(copy Int i, weak String text, user Array{Int} arr)
+func ! test-variable(
+        copy Int i, weak String text, weak Buffer data, user Array{Int} arr)
     var Int x
     user String? s
+    user Buffer? b
     owner Array?{Int} a
     user TestStruct? t
     user TestClass? d
     var TestStruct tv(copy 0, user _)!
     var TestClass dv
     var String{12} sv
+    var Buffer{12} bv
     var Func?{(copy Int xi, user String si)->(var Int xo, user String? so)} f
     var Array{12:Int} ia
     var Array{12:SimpleStruct} ta
     var Array{12:SimpleClass} da
     var Array{12:String{7}} sa
+    var Array{12:Buffer{7}} ba
     var Array{12:Func{()}} fa
     new TestStruct tn(copy 0, user _)!
     new TestClass dn!
     new String{arr[0]} sn!
+    new Buffer{arr[0]} bn!
     new Array{arr[0]:Int} ian!
     new Array{arr[0]:SimpleStruct} tan!
     new Array{arr[0]:SimpleClass} dan!
     new Array{arr[0]:String{arr[1]!}} san!
-    new Array{arr[0]:Func{()}} sfn!
+    new Array{arr[0]:Buffer{arr[1]!}} ban!
+    new Array{arr[0]:Func{()}} fan!
     var Int ix(copy arr[0])
     user String si(user text!)
-    var String{12} isv(user "some string")!
+    user Buffer bi(user data!)
+    var String{12} ibv(user "some string")!
+    var Buffer{12} isv(user `fadebeef`)!
     new String{i} isn(user text!)!
+    new Buffer{i} ibn(user data!)!
     var Func{:(copy Int n)->(owner String? st)} fi(copy test-int2str)
     var TestStruct itv(copy i, user text!)!
     new TestStruct itn(copy i, user text!)!
@@ -158,13 +175,16 @@ func ! test-variable(copy Int i, weak String text, user Array{Int} arr)
     TestStruct(copy i, user text!)!.print()!
     TestClass()!.print()!
     assert! String{arr[0]}()!.length() > 0
+    assert! Buffer{arr[0]}()!.length() > 0
     assert! Array{arr[0]:Int}()!.length() > 0
     assert! Array{arr[0]:SimpleStruct}()!.length() > 0
     assert! Array{arr[0]:SimpleClass}()!.length() > 0
     assert! Array{arr[0]:String{arr[1]!}}()!.length() > 0
+    assert! Array{arr[0]:Buffer{arr[1]!}}()!.length() > 0
     assert! Array{arr[0]:Func{()}}()!.length() > 0
     assert! x = 0
     assert! s?
+    assert! b?
     assert! a?
     t!.print()!
     d!.print()!
@@ -172,24 +192,31 @@ func ! test-variable(copy Int i, weak String text, user Array{Int} arr)
     tv.print()!
     dv.print()!
     assert! sv.length() > 0
+    assert! bv.length() > 0
     assert! ia.length() > 0
     assert! ta.length() > 0
     assert! da.length() > 0
     assert! sa.length() > 0
+    assert! ba.length() > 0
     assert! fa.length() > 0
     tn.print()!
     dn.print()!
     assert! sn.length() > 0
+    assert! bn.length() > 0
     assert! ian.length() > 0
     assert! tan.length() > 0
     assert! dan.length() > 0
     assert! san.length() > 0
-    assert! sfn.length() > 0
+    assert! ban.length() > 0
+    assert! fan.length() > 0
     assert! ix = 0
     assert! si.length() > 0
+    assert! bi.length() > 0
     fi(copy 7)!
     assert! isv.length() > 0
+    assert! ibv.length() > 0
     assert! isn.length() > 0
+    assert! ibn.length() > 0
 
 
 func test-complex-function(
