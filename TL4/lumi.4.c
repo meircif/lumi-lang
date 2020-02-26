@@ -951,7 +951,7 @@ void Long_realloc(Long* self) {
 #define LUMI_FUNC_NAME "Long.set"
 Returncode Long_set(Long* self, Ref_Manager* self_Refman, int value) {
   int length = 1;
-  unsigned tmp;
+  unsigned tmp = value;
   int n;
   Byte *number;
   CHECK_NOT_NULL(self)
