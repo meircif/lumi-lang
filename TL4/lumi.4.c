@@ -1256,7 +1256,6 @@ Returncode long_larger(
     Long* a, Ref_Manager* a_Refman,
     Long* b, Ref_Manager* b_Refman,
     Bool* res) {
-  int n;
   CHECK_NOT_NULL(a)
   CHECK_NOT_NULL(b)
   if (a->sign > b->sign) {
