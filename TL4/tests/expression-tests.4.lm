@@ -64,6 +64,19 @@ c := 'aa'
 c := 'aaa'
 ## @ ec te10
 c := 'aaaaa'
+## @@ test-long-expression
+## @ c t0
+var Long l
+    l.set(copy 100)
+    l.parse(user str)
+    l.hex(user str)
+    var Long x
+    owner Long res
+    long-add(user l, user x)->(owner res)
+    long-sub(user l, user x)->(owner res)
+    long-mul(user l, user x)->(owner res)
+    long-equal(user l, user x)->(var b)
+    long-larger(user l, user x)->(var b)
 ## @@ test-string-expression
 ## @ c t0
 str := "some string"

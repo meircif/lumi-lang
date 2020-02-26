@@ -38,6 +38,12 @@ typedef struct {
   FILE* fobj;
 } File;
 
+typedef struct {
+  Byte* number;
+  int length;
+  int sign;
+} Long;
+
 typedef void* Ref;
 
 typedef struct {
@@ -267,6 +273,22 @@ Returncode Sys_getenv(
   String* name, Ref_Manager*,
   String* value, Ref_Manager*,
   Bool* exists);
+
+void Long_Del(Long*);
+Returncode Long_new(Long*, Ref_Manager*);
+Returncode Long_set(Long*, Ref_Manager*, int);
+Returncode Long_parse(Long*, Ref_Manager*, String*, Ref_Manager*);
+Returncode Long_hex(Long*, Ref_Manager*, String*, Ref_Manager*);
+Returncode long_combine(
+  Long*, Ref_Manager*, Long*, Ref_Manager*, Long**, Ref_Manager**, Bool add);
+#define long_add(a, a_Refman, b, b_Refman, res, res_Refman) \
+  long_combine(a, a_Refman, b, b_Refman, res, res_Refman, true)
+#define long_sub(a, a_Refman, b, b_Refman, res, res_Refman) \
+  long_combine(a, a_Refman, b, b_Refman, res, res_Refman, false)
+Returncode long_mul(
+  Long*, Ref_Manager*, Long*, Ref_Manager*, Long**, Ref_Manager**);
+Returncode long_equal(Long*, Ref_Manager*, Long*, Ref_Manager*, Bool*);
+Returncode long_larger(Long*, Ref_Manager*, Long*, Ref_Manager*, Bool*);
 
 extern int lumi_debug_value;
 

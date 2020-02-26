@@ -104,6 +104,17 @@ tl4-compiler.c:
 	cd TL4 && lumi -c tl4-compiler.3.lm global/*.3.lm expression/*.3.lm \
 		syntax-tree/*.3.lm statement/*.3.lm
 
+tl4-install: tl4-compiler.c tl4-compiler
+	sudo install $(BUILDDIR)/tl4-compiler $(INSTALLDIR)
+	rm -f $(BUILDDIR)/tl4-compiler
+
+tl4-tests: build-dir
+	cd TL4 && tl3-compiler global/*.3.lm expression/*.3.lm  \
+		syntax-tree/*.3.lm statement/*.3.lm tests/*.3.lm tl4-compiler.3.lm
+	cd TL4 && $(CC) -g tl4-compiler.c ../TL3/lumi.3.c -I. -I../TL3 \
+		-o ../$(BUILDDIR)/tl4-compiler-tests
+	TEST_DIR=TL4/tests/ $(BUILDDIR)/tl4-compiler-tests
+
 tl5-compiler.c: build-dir
 	lumi TL5/string-generator.4.lm -o $(BUILDDIR)/string-generator
 	$(BUILDDIR)/string-generator TL5/lumi.5.c TL5/global/header-string.4.lm

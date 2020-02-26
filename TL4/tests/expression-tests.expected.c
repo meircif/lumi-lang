@@ -64,6 +64,38 @@ illegal character constant "'aa'"
 illegal character constant "'aaa'"
 /// @ te10
 illegal character constant "'aaaaa'"
+/// @@ test-long-expression
+/// @ t0
+Long l_Var = {0};
+    Long* l = NULL;
+    Ref_Manager* l_Refman = NULL;
+    Long x_Var = {0};
+    Long* x = NULL;
+    Ref_Manager* x_Refman = NULL;
+    Long* res = NULL;
+    Ref_Manager* res_Refman = NULL;
+    INIT_VAR(1, l)
+    LUMI_err = Long_new(l, l_Refman);
+    CHECK(1)
+    LUMI_err = Long_set(l, l_Refman, 100);
+    CHECK(2)
+    LUMI_err = Long_parse(l, l_Refman, ut_M_str, ut_M_str_Refman);
+    CHECK(3)
+    LUMI_err = Long_hex(l, l_Refman, ut_M_str, ut_M_str_Refman);
+    CHECK(4)
+    INIT_VAR(5, x)
+    LUMI_err = Long_new(x, x_Refman);
+    CHECK(5)
+    LUMI_err = long_add(l, l_Refman, x, x_Refman, &(res), &(res_Refman));
+    CHECK(7)
+    LUMI_err = long_sub(l, l_Refman, x, x_Refman, &(res), &(res_Refman));
+    CHECK(8)
+    LUMI_err = long_mul(l, l_Refman, x, x_Refman, &(res), &(res_Refman));
+    CHECK(9)
+    LUMI_err = long_equal(l, l_Refman, x, x_Refman, &(ut_M_b));
+    CHECK(10)
+    LUMI_err = long_larger(l, l_Refman, x, x_Refman, &(ut_M_b));
+    CHECK(11)
 /// @@ test-string-expression
 /// @ t0
 String aux_String_0_Var = {0};

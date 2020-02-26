@@ -83,9 +83,9 @@ Returncode CallExpression_analyze(CallExpression* self) {
     CHECK(47, TypeInstance_f_new_replace_params(result_type, instance_type, bases, &(self->_base.result_type)) )
     result_type = self->_base.result_type;
   }
-  Bool _Bool32;
-  CHECK(50, FunctionArguments_check_same_as(self->arguments, declaration, instance_type, bases, &(_Bool32)) )
-  if (_Bool32) {
+  Bool _Bool33;
+  CHECK(50, FunctionArguments_check_same_as(self->arguments, declaration, instance_type, bases, &(_Bool33)) )
+  if (_Bool33) {
     /* add omitted output */
     CallArgument* output = malloc(sizeof(CallArgument));
     if (output == NULL) RAISE(53)
@@ -96,13 +96,13 @@ Returncode CallExpression_analyze(CallExpression* self) {
     output->_base.is_native = ((Argument*)(declaration->outputs->last->item))->is_native;
     output->is_primitive = result_type->type_data->is_primitive;
     output->is_dynamic = result_type->type_data->is_dynamic;
-    TypeInstance* _TypeInstance33;
-    CHECK(59, (((Argument*)(declaration->outputs->last->item)))->_base._dtl[7](((Argument*)(declaration->outputs->last->item)), &(_TypeInstance33)) )
-    output->is_generic = _TypeInstance33->type_data == glob->type_generic;
+    TypeInstance* _TypeInstance34;
+    CHECK(59, (((Argument*)(declaration->outputs->last->item)))->_base._dtl[7](((Argument*)(declaration->outputs->last->item)), &(_TypeInstance34)) )
+    output->is_generic = _TypeInstance34->type_data == glob->type_generic;
     output->_base.access = ((Argument*)(declaration->outputs->last->item))->access;
-    SymbolExpression* _SymbolExpression34;
-    CHECK(63, Expression_add_aux_variable(&(self->_base), ((Argument*)(declaration->outputs->last->item))->access, false, result_type, &(_SymbolExpression34)) )
-    output->value = &(_SymbolExpression34->_base);
+    SymbolExpression* _SymbolExpression35;
+    CHECK(63, Expression_add_aux_variable(&(self->_base), ((Argument*)(declaration->outputs->last->item))->access, false, result_type, &(_SymbolExpression35)) )
+    output->value = &(_SymbolExpression35->_base);
     self->output = output->value;
     CHECK(68, List_add(self->arguments->outputs, &(output->_base)) )
   }
@@ -273,9 +273,9 @@ Returncode CallArgument_check_same_type_as(CallArgument* self, TypeInstance* typ
   TypeInstance* real_type = NULL;
   CHECK(152, TypeInstance_f_new_replace_params(type_instance, instance_type, bases, &(real_type)) )
   if (self->_base.is_output) {
-    Int _Int35;
-    CHECK(155, TypeInstance_check_assign_to(real_type, self->_base.access, self->value->result_type, self->value->access, &(self->_base._base), &(_Int35)) )
-    self->is_down_cast = _Int35 > 0;
+    Int _Int36;
+    CHECK(155, TypeInstance_check_assign_to(real_type, self->_base.access, self->value->result_type, self->value->access, &(self->_base._base), &(_Int36)) )
+    self->is_down_cast = _Int36 > 0;
   }
   else {
     CHECK(161, TypeInstance_check_assign_from(real_type, self->_base.access, &(self->_base._base), &(self->value), &(self->assignee)) )
@@ -421,11 +421,11 @@ Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argumen
 static char* _func_name_CallArgumentFactory_m_new_argument = "CallArgumentFactory.m-new-argument";
 #define LUMI_FUNC_NAME _func_name_CallArgumentFactory_m_new_argument
 Returncode CallArgumentFactory_m_new_argument(CallArgumentFactory* self, Argument** new_argument) {
-  CallArgument* _CallArgument36 = malloc(sizeof(CallArgument));
-  if (_CallArgument36 == NULL) RAISE(231)
-  *_CallArgument36 = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false, false};
-  _CallArgument36->_base._base._dtl = CallArgument__dtl;
-  (*new_argument) = &(_CallArgument36->_base);
+  CallArgument* _CallArgument37 = malloc(sizeof(CallArgument));
+  if (_CallArgument37 == NULL) RAISE(231)
+  *_CallArgument37 = (CallArgument){CallArgument__dtl, NULL, 0, 0, false, false, NULL, NULL, NULL, false, false, false, false};
+  _CallArgument37->_base._base._dtl = CallArgument__dtl;
+  (*new_argument) = &(_CallArgument37->_base);
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -458,8 +458,8 @@ Func CallArgumentFactory__dtl[] = {(void*)CallArgumentFactory_m_new_argument};
 #include "expression/symbol.c"
 #include "syntax-tree/block.c"
 #include "syntax-tree/branch.c"
-#include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
+#include "syntax-tree/code.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "statement/enum.c"

@@ -906,3 +906,371 @@ Returncode Sys_getenv(
   return OK;
 }
 #undef LUMI_FUNC_NAME
+
+/*Long*/
+void Long_Del(Long* self) {
+  free(self->number);
+}
+
+#define ALLOC_LONG(number, length) \
+  number = calloc(length, sizeof(Byte)); \
+  if (number == NULL) \
+    CRAISE("insufficient memory for object dynamic allocation")
+
+#define LUMI_FUNC_NAME "Long.new"
+Returncode Long_new(Long* self, Ref_Manager* self_Refman) {
+  Byte *number;
+  CHECK_NOT_NULL(self)
+  ALLOC_LONG(number, 1)
+  free(self->number);
+  self->number = number;
+  self->sign = 1;
+  self->length = 1;
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+void Long_realloc(Long* self) {
+  int length;
+  Byte *number;
+  length = self->length;
+  while (length > 1 && self->number[length - 1] == 0) {
+    --length;
+  }
+  if (length >= self->length) {
+    return;
+  }
+  number = realloc(self->number, length * sizeof(Byte));
+  if (number == NULL) {
+    return;
+  }
+  self->number = number;
+  self->length = length;
+}
+
+#define LUMI_FUNC_NAME "Long.set"
+Returncode Long_set(Long* self, Ref_Manager* self_Refman, int value) {
+  int length = 1;
+  unsigned tmp;
+  int n;
+  Byte *number;
+  CHECK_NOT_NULL(self)
+  while (tmp >= 256) {
+    ++length;
+    tmp /= 256;
+  }
+  if (length > self->length) {
+    ALLOC_LONG(number, length)
+    free(self->number);
+    self->number = number;
+    self->length = length;
+  }
+  if (value >= 0) {
+    self->sign = 1;
+    tmp = value;
+  }
+  else {
+    self->sign = -1;
+    tmp = -value;
+  }
+  for (n = 0; n < self->length; ++n) {
+    self->number[n] = tmp % 256;
+    tmp /= 256;
+  }
+  Long_realloc(self);
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+void set_hex(String* text, int index, int value) {
+  if (value >= 10) {
+    text->values[index] = 'A' + value - 10;
+  }
+  else {
+    text->values[index] = '0' + value;
+  }
+}
+
+#define LUMI_FUNC_NAME "Long.hex"
+Returncode Long_hex(
+    Long* self, Ref_Manager* self_Refman,
+    String* text, Ref_Manager* text_Refman) {
+  int n, sign=0;
+  CHECK_NOT_NULL(self)
+  CHECK_NOT_NULL(text)
+  if (self->sign == -1) {
+    sign = 1;
+    text->values[0] = '-';
+  }
+  if (text->max_length <= 2 * self->length + sign) {
+    CRAISE("string too long")
+  }
+  for (n = 0; n < self->length; ++n) {
+    Byte value;
+    value = self->number[self->length - n - 1];
+    set_hex(text, 2 * n + sign, value / 16);
+    set_hex(text, 2 * n + sign + 1, value % 16);
+  }
+  text->length = 2 * self->length + sign;
+  text->values[text->length] = '\0';
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+#define INC_REALLOC_LONG(number, length) { \
+  Byte *new_number; \
+  new_number = realloc(number, (length + 1) * sizeof(Byte)); \
+  if (new_number == NULL) \
+    CRAISE("insufficient memory for object dynamic allocation") \
+  number = new_number; \
+  number[length] = 0; \
+  ++length; }
+
+#define LUMI_FUNC_NAME "Long.parse"
+Returncode Long_parse(
+    Long* self, Ref_Manager* self_Refman,
+    String* text, Ref_Manager* text_Refman) {
+  int read_index = text->length - 1;
+  int base_length = 1;
+  Byte *base;
+  CHECK_NOT_NULL(self)
+  CHECK_NOT_NULL(text)
+  CCHECK(Long_new(self, self_Refman));
+  if (text->length < 1) {
+    CRAISE("text not integer")
+  }
+  self->sign = 1;
+  ALLOC_LONG(base, base_length)
+  base[0] = 1;
+  do {
+    unsigned carry = 0;
+    char digit;
+    int n;
+    digit = text->values[read_index];
+    if (digit < '0' && digit > '9') {
+      CRAISE("text not integer")
+    }
+    digit -= '0';
+    for (n = 0; n < base_length || carry > 0; ++n) {
+      unsigned value;
+      if (n >= self->length) INC_REALLOC_LONG(self->number, self->length)
+      value = self->number[n] + carry;
+      if (n < base_length) {
+        value += digit * base[n];
+      }
+      self->number[n] = value % 256;
+      carry = value / 256;
+    }
+    if (read_index == 0) break;
+    --read_index;
+    carry = 0;
+    for (n = 0; n < base_length || carry > 0; ++n) {
+      unsigned value;
+      if (n >= base_length) INC_REALLOC_LONG(base, base_length)
+      value = 10 * base[n] + carry;
+      base[n] = value % 256;
+      carry = value / 256;
+    }
+    if (read_index == 0 && text->values[0] == '-') {
+      self->sign = -1;
+      break;
+    }
+  } while (true);
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FUNC_NAME "long-alloc"
+Returncode long_alloc(Long** res, Ref_Manager** res_Refman) {
+  ALLOC_LONG(*res, 1)
+  *res_Refman = LUMI_new_ref((void**)res, true);
+  if (*res_Refman == NULL) {
+    CRAISE("insufficient memory for managed object");
+  }
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FUNC_NAME "Long.sum"
+Returncode Long_sum(Long* self, Long* a, Long* b) {
+  unsigned carry = 0;
+  int n;
+  self->length = (a->length >= b->length? a->length: b->length) + 1;
+  ALLOC_LONG(self->number, self->length)
+  self->sign = a->sign;
+  for (n = 0; n < self->length; ++n) {
+    unsigned va, vb, sum;
+    va = n < a->length? a->number[n]: 0;
+    vb = n < b->length? b->number[n]: 0;
+    sum = va + vb + carry;
+    self->number[n] = sum % 256;
+    carry = sum / 256;
+  }
+  if (carry > 0) {
+    self->number[n] = carry;
+  }
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FUNC_NAME "Long.diff"
+Returncode Long_diff(Long* self, Long* a, Long* b) {
+  unsigned carry = 0;
+  int n;
+  Long* big = NULL;
+  Long* small = NULL;
+  self->length = a->length >= b->length? a->length: b->length;
+  ALLOC_LONG(self->number, self->length)
+  self->number = calloc(self->length, sizeof(Byte));
+  for (n = self->length - 1; big == NULL && n >= 0; --n) {
+    unsigned va, vb;
+    va = n < a->length? a->number[n]: 0;
+    vb = n < b->length? b->number[n]: 0;
+    if (va > vb) {
+      big = a;
+      small = b;
+      self->sign = a->sign;
+    }
+    else if (vb > va) {
+      big = b;
+      small = a;
+      self->sign = -(a->sign);
+    }
+  }
+  for (n = 0; n < self->length; ++n) {
+    int vbig, vsmall, diff;
+    vbig = big->number[n];
+    vsmall = n < small->length? small->number[n]: 0;
+    diff = vbig - vsmall - carry;
+    if (diff >= 0) {
+      self->number[n] = diff;
+      carry = 0;
+    }
+    else {
+      self->number[n] = 256 + diff;
+      carry = 1;
+    }
+  }
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FUNC_NAME "long-combine"
+Returncode long_combine(
+    Long* a, Ref_Manager* a_Refman,
+    Long* b, Ref_Manager* b_Refman,
+    Long** res, Ref_Manager** res_Refman,
+    Bool add) {
+  CHECK_NOT_NULL(a)
+  CHECK_NOT_NULL(b)
+  CCHECK(long_alloc(res, res_Refman))
+  if (a->sign == (add? b->sign: -(b->sign))) {
+    CCHECK(Long_sum(*res, a, b))
+  }
+  else {
+    CCHECK(Long_diff(*res, a, b))
+  }
+  Long_realloc(*res);
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FUNC_NAME "Long.mul"
+Returncode Long_mul(Long* self, Long* a, Long* b) {
+  int na, nb;
+  self->length = a->length + b->length;
+  ALLOC_LONG(self->number, self->length)
+  self->sign = a->sign * b->sign;
+  for (na = 0; na < a->length; ++na) for (nb = 0; nb < b->length; ++nb) {
+    unsigned mul;
+    int n;
+    mul = a->number[na] * b->number[nb];
+    n = na + nb;
+    while (mul > 0) {
+      mul += self->number[n];
+      self->number[n] = mul % 256;
+      mul /= 256;
+      ++n;
+    }
+  }
+  Long_realloc(self);
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FUNC_NAME "long-mul"
+Returncode long_mul(
+    Long* a, Ref_Manager* a_Refman,
+    Long* b, Ref_Manager* b_Refman,
+    Long** res, Ref_Manager** res_Refman) {
+  CHECK_NOT_NULL(a)
+  CHECK_NOT_NULL(b)
+  CCHECK(long_alloc(res, res_Refman))
+  CCHECK(Long_mul(*res, a, b))
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FUNC_NAME "long-equal"
+Returncode long_equal(
+    Long* a, Ref_Manager* a_Refman,
+    Long* b, Ref_Manager* b_Refman,
+    Bool* res) {
+  int n;
+  CHECK_NOT_NULL(a)
+  CHECK_NOT_NULL(b)
+  if (a->sign != b->sign) {
+    *res = false;
+    return OK;
+  }
+  for (n = 0; n < a->length || n < b->length; ++n) {
+    if ((n >= a->length && b->number[n] != 0) ||
+        (n >= b->length && a->number[n] != 0) ||
+        (n < a->length && n < b->length && a->number[n] != b->number[n])) {
+      *res = false;
+      return OK;
+    }
+  }
+  *res = true;
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+Bool long_abs_larger(Long* a, Long* b) {
+  int n;
+  for (n = a->length >= b->length? a->length: b->length; n >= 0; --n) {
+    if ((n >= a->length && b->number[n] != 0) ||
+        (n < a->length && n < b->length && a->number[n] < b->number[n])) {
+      return false;
+    }
+    if ((n >= b->length && a->number[n] != 0) ||
+        (n < a->length && n < b->length && a->number[n] > b->number[n])) {
+      return true;
+    }
+  }
+  return false;
+}
+
+#define LUMI_FUNC_NAME "long-larger"
+Returncode long_larger(
+    Long* a, Ref_Manager* a_Refman,
+    Long* b, Ref_Manager* b_Refman,
+    Bool* res) {
+  int n;
+  CHECK_NOT_NULL(a)
+  CHECK_NOT_NULL(b)
+  if (a->sign > b->sign) {
+    *res = true;
+  }
+  else if (a->sign < b->sign) {
+    *res = false;
+  }
+  else if (a->sign == 1) {
+    *res = long_abs_larger(a, b);
+  }
+  else {
+    *res = long_abs_larger(b, a);
+  }
+  return OK;
+}
+#undef LUMI_FUNC_NAME
