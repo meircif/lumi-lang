@@ -6,28 +6,28 @@ Convert text to number based on given `int-base`.
 Return whether conversion succeeded
 ~~~
 func get-number-value(user String text, copy Int int-base)->(
-        var Int value, var Bool is-number)
+        owner Long value, var Bool is-number)
     is-number := true
-    value := 0
+    value := Long()
     var Bool is-hex(copy int-base = 16)
     for n in text.length
-        value := value * int-base
+        value.mul(copy int-base)
         var Char ch(copy text[n])
         if is-hex
             if ch >= 'a' and ch <= 'f'
-                value += ch - 'a' + 10
+                value.add(copy ch - 'a' + 10)
             else-if ch >= 'A' and ch <= 'F'
-                value += ch - 'A' + 10
+                value.add(copy ch - 'A' + 10)
             else
                 if ch < '0' or ch > '9'
                     is-number := false
                     return
-                value += ch - '0'
+                value.add(copy ch - '0')
         else
             if ch < '0' or ch > '0' + int-base - 1
                 is-number := false
                 return
-            value += ch - '0'
+            value.add(copy ch - '0')
 
 
 ~~~ A basic expression that has a single textual value ~~~
@@ -40,11 +40,12 @@ class TextExpression(Expression)
 
 ~~~ Constant integer expression ~~~
 class IntExpression(Expression)
-    var Int value
+    owner Long value
     
     new(user SyntaxTreeCode code-node, copy Int value)
         base(user code-node)
-        self.value := value
+        self.value := Long()
+        self.value.set(copy value)
         self.set-simple-type(user glob.type-int)
         self.access := Access.VAR
     
@@ -63,34 +64,35 @@ class IntExpression(Expression)
         if number[0] = '0' and number.length > 1
             var Char second(copy number[1])
             if second >= '0' and second <= '7'
-                if not get-number-value(user number, copy 8)->(var self.value)
+                if not get-number-value(user number, copy 8)->(
+                        owner self.value)
                     self.syntax-error(user "illegal octal number", user text)
             else
                 number := number[2:number.length - 2]
                 if second = 'b' or second = 'B'
                     if not get-number-value(user number, copy 2)->(
-                            var self.value)
+                            owner self.value)
                         self.syntax-error(
                                 user "illegal binary number", user text)
                 else-if second = 'x' or second = 'X'
                     if not get-number-value(user number, copy 16)->(
-                            var self.value)
+                            owner self.value)
                         self.syntax-error(
                                 user "illegal hexadecimal number", user text)
                 else
                     self.syntax-error(user "illegal number", user text)
-        else-if not get-number-value(user number, copy 10)->(var self.value)
+        else-if not get-number-value(user number, copy 10)->(owner self.value)
             self.syntax-error(user "illegal number", user text)
         if is-negative
-            self.value := - self.value
+            self.value.mul(copy -1)
         text := _
     
-    func dynamic get-constant-value()->(var Int value, var Bool has-value)
-        value := self.value
+    func dynamic get-constant-value()->(owner Long value, var Bool has-value)
+        self.value.copy()->(owner value)
         has-value := true
         
     func dynamic write()
-        write-int(copy self.value)
+        write-long(user self.value)
 
 
 ~~~ Constant character expression ~~~
@@ -119,16 +121,16 @@ class CharExpression(TextExpression)
             if text[1] != '\\'
                 self.syntax-error(user "illegal character constant", user text)
             ch := text[2]
-            var Int value
+            owner Long value
             if ch = 'x'
-                if not get-number-value(user text[3:2], copy 16)->(var value)
+                if not get-number-value(user text[3:2], copy 16)->(owner value)
                     self.syntax-error(
                             user "illegal character constant", user text)
             else
-                if not get-number-value(user text[2:3], copy 8)->(var value)
+                if not get-number-value(user text[2:3], copy 8)->(owner value)
                     self.syntax-error(
                             user "illegal character constant", user text)
-            self.value := value
+            self.value := value.int()
         else
             self.syntax-error(user "illegal character constant", user text)
         if text[text.length - 1] != '\''
@@ -148,8 +150,9 @@ class CharExpression(TextExpression)
                 return
         is-legal := false
     
-    func dynamic get-constant-value()->(var Int value, var Bool has-value)
-        value := self.value
+    func dynamic get-constant-value()->(owner Long value, var Bool has-value)
+        value := Long()
+        value.set(copy self.value)
         has-value := true
 
 

@@ -974,6 +974,54 @@ raise! str!
 var String{23!} s
 ; @ ec test-exclamation-expression-en33
 `beaf`!.clear()
+; @@ test-int-range
+; @ g test-int-range-0
+struct Test
+    var Int int
+    var Uint8b u8b
+    var Uint16b u16b
+    var Uint32b u32b
+    var Uint64b u64b
+    ; var UintSize usize
+    var Sint8b s8b
+    var Sint16b s16b
+    var Sint32b s32b
+    var Sint64b s64b
+    ; var SintSize ssize
+    var Int{32} ru8
+    var Int{5:1000} ru16
+    var Int{1000000} ru32
+    var Int{100000000000:200000000000} ru64
+    var Int{-100:100} rs8
+    var Int{-1:1000} rs16
+    var Int{-2000000:-1000000} rs32
+    var Int{-100000000000:100000000000} rs64
+; @ c test-int-range-1
+var Int{0:255} u8
+var Int{0:65535} u16
+var Int{0:4294967295} u32
+var Int{0:18446744073709551615} u64
+var Int{-128:127} s8
+var Int{-32768:32767} s16
+var Int{-2147483648:2147483647} s32
+var Int{-9223372036854775808:9223372036854775807} s64
+; @ g test-int-range-2
+const Int MAX 10000
+enum Nums
+    MIN
+var Int{Nums.MIN - 12:MAX * 2} s16
+; @ ec test-int-range-e0
+var Int{12:11} error
+; @ ec test-int-range-e1
+var Int{0:18446744073709551616} error
+; @ ec test-int-range-e2
+var Int{-1:9223372036854775808} error
+; @ ec test-int-range-e3
+var Int{-9223372036854775809:1} error
+; @ ec test-int-range-e4
+var Int{0:str} error
+; @ ec test-int-range-e5
+var Int{0:i} error
 ; @@ test-dynamic
 ; @ c test-dynamic-0
 var Ta a

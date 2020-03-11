@@ -147,15 +147,15 @@ class AssignExpression(Expression)
                 else
                     sequence-type := _
             var Bool is-constant-length
-            var Int length-value
+            owner Long length-value
             if sequence-type?
                 if sequence-type.length?
                     sequence-type.length.get-constant-value()->(
-                            var length-value, var is-constant-length)
+                            owner length-value, var is-constant-length)
             if self.value.result-type.type-data is glob.type-empty
                 write(user "0")
             else-if is-constant-length
-                write-int(copy length-value)
+                write-long(user length-value)
             else
                 self.value.write()
                 write-array-value-length(copy n)

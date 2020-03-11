@@ -91,7 +91,7 @@ class EnumExpression(ModuleTypeExpression)
     owner String name
     owner String value
     user EnumData enum-data
-    var Int int-value
+    owner Long int-value
     
     func inst parse-new(
             owner String name,
@@ -127,15 +127,16 @@ class EnumExpression(ModuleTypeExpression)
         else-if not glob.current-module.enum-map.find(user self.name)->(
                 user self.enum-data)?
             self.syntax-error(user "unknown Enum", user self.name)
-        if not self.enum-data.has-value(user self.value)->(var self.int-value)
+        if not self.enum-data.has-value(user self.value)->(
+                owner self.int-value)
             self.syntax-error2(
                     user "Enum",
                     user self.name,
                     user "has no value",
                     user self.value)
                 
-    func dynamic get-constant-value()->(var Int value, var Bool has-value)
-        value := self.int-value
+    func dynamic get-constant-value()->(owner Long value, var Bool has-value)
+        self.int-value.copy()->(owner value)
         has-value := true
     
     func dynamic write()

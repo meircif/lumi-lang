@@ -155,6 +155,9 @@ test test-illegal-call()
     assert-error call.write-function()
     var tl5-compiler.SyntaxTreeSpecialMethod special-meth
     assert-error special-meth.parse-special()
+    var tl5-compiler.CompileTimeComputedArithmeticOperatorExpression operator(
+            user _, user _)
+    assert-error operator.compute-constant-value(owner _, owner _)
 
 test test-mocked-functions()
     setup-test()

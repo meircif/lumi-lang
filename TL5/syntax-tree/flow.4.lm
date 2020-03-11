@@ -150,7 +150,7 @@ class SyntaxTreeLoop(SyntaxTreeFlowElement)
     var ExpressionValue limit
     owner VariableExpression aux-counter
     owner VariableExpression aux-limit
-    var Int limit-value
+    owner Long limit-value
     var Bool check-infinite
     var Bool is-finite
 
@@ -188,7 +188,7 @@ class SyntaxTreeLoop(SyntaxTreeFlowElement)
             self.add-aux-variable(
                     copy Access.VAR, copy false, user self.limit.result-type)->(
                     owner self.aux-counter)
-            if not self.limit.get-constant-value()->(var self.limit-value)
+            if not self.limit.get-constant-value()->(owner self.limit-value)
                 self.add-aux-variable(
                         copy Access.VAR,
                         copy false,
@@ -242,7 +242,7 @@ class SyntaxTreeLoop(SyntaxTreeFlowElement)
         if self.aux-limit?
             self.aux-limit.write()
         else
-            write-int(copy self.limit-value)
+            write-long(user self.limit-value)
         write(user ") ")
         var SyntaxTreeCode dummy-node(user self.block)
         dummy-node.write-raise(user "loop_limit")

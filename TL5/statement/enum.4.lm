@@ -38,17 +38,17 @@ class EnumData(SyntaxTreeNode)
         glob.save-input := true
         self.my-module.enum-map.add(user self.name, user self)
     
-    func inst has-value(user String name)->(var Int value, var Bool has-value)
+    func inst has-value(user String name)->(
+            owner Long value, var Bool has-value)
         has-value := true
-        var Int index
+        value := Long()
         for text in self.values.iter()
             if name.equal(user text)
-                value := index
                 return
-            index += 1
+            value.add(copy 1)
         if name.equal(user "length")
-            value := index
             return
+        value := _
         has-value := false
     
     func inst write-cname()

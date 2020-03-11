@@ -57,6 +57,10 @@ struct Global
     ~~~ maps access number to its name ~~~
     owner Array{String} access-names
 
+    ~~~ maps integer alias to its range ~~~
+    var List{IntRange} int-ranges
+    var NameMap{IntRange} int-map
+
     ~~~ the currently parsed input file object ~~~
     owner File input-file
 
@@ -121,6 +125,7 @@ struct Global
         self.global-module.new(user _)
         self.init-operator-map()
         self.init-access-names()
+        self.init-int-map()
         self.init-builtin-types()
 
     func init-access-names()
@@ -298,6 +303,32 @@ struct Global
                 copy order,
                 copy group-index,
                 copy factory)
+
+    func init-int-map()
+        self.add-int-alias(user "Uint8b", user _, user "255")
+        self.add-int-alias(user "Uint16b", user _, user "65535")
+        self.add-int-alias(user "Uint32b", user _, user "4294967295")
+        self.add-int-alias(user "Uint64b", user _, user "18446744073709551615")
+        self.add-int-alias(user "Sint8b", user "-128", user "127")
+        self.add-int-alias(user "Sint16b", user "-32768", user "32767")
+        self.add-int-alias(
+                user "Sint32b", user "-2147483648", user "2147483647")
+        self.add-int-alias(
+                user "Sint64b",
+                user "-9223372036854775808",
+                user "9223372036854775807")
+
+    func add-int-alias(
+            user String name, user String min-value, user String max-value)
+        new IntRange int-range
+        int-range.min-value := Long()
+        if min-value?
+            int-range.min-value.parse(user min-value)
+        int-range.max-value := Long()
+        int-range.max-value.parse(user max-value)
+        string-new-copy(user name)->(owner int-range.name)
+        self.int-map.add(user int-range.name, user int-range)
+        self.int-ranges.add(owner int-range)
 
     func init-builtin-types()
         self.init-primitive-types()

@@ -161,12 +161,12 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
             owner Expression iterator-expression,
             user VariableExpression iterator-aux-variable-expression)
         var Int iterator-access(copy Access.USER)
-        var Int iterator-value
+        owner Long iterator-value
         var Bool is-constant-iterator
         if is-int-iteration
             iterator-access := Access.VAR
             self.iterator.get-constant-value()->(
-                    var iterator-value, var is-constant-iterator)
+                    owner iterator-value, var is-constant-iterator)
         if is-constant-iterator
             iterator-expression := self.iterator.expression
             iterator-expression.code-node := code-node

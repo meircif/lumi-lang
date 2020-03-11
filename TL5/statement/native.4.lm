@@ -119,7 +119,7 @@ class NativeConstant(SyntaxTreeConstant)
     func dynamic analyze()
         ; do nothing
     
-    func dynamic get-constant-value()->(var Int value, var Bool has-value)
+    func dynamic get-constant-value()->(owner Long value, var Bool has-value)
         has-value := false
 
     func dynamic write()

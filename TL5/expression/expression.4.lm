@@ -52,8 +52,8 @@ class ExpressionValue(SyntaxTreeNode)
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
         self.expression.order-constants(user ordered-list)
     
-    func dynamic get-constant-value()->(var Int value, var Bool has-value)
-        self.expression.get-constant-value()->(var value, var has-value)
+    func dynamic get-constant-value()->(owner Long value, var Bool has-value)
+        self.expression.get-constant-value()->(owner value, var has-value)
     
     func dynamic check-memory(user ReferenceMemoryList refs)
         if self.expression?
@@ -301,7 +301,7 @@ class Expression(SyntaxTreeNode)
             self.syntax-error-msg(
                     user "using \"!\" where error is not propagated")
         
-    func dynamic get-constant-value()->(var Int value, var Bool has-value)
+    func dynamic get-constant-value()->(owner Long value, var Bool has-value)
         has-value := false
 
     func dynamic restructure()->(
@@ -356,14 +356,14 @@ class Expression(SyntaxTreeNode)
     func inst write-length(
             user String prefix, user String empty, copy Bool is-static)
         var Bool is-constant-length
-        var Int length-value
+        owner Long length-value
         if is-static and self.result-type.length?
             self.result-type.length.get-constant-value()->(
-                    var length-value, var is-constant-length)
+                    owner length-value, var is-constant-length)
         if self.result-type.type-data is glob.type-empty
             write(user empty)
         else-if is-constant-length
-            write-int(copy length-value)
+            write-long(user length-value)
         else
             self.write()
             write(user prefix)

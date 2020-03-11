@@ -43,25 +43,26 @@ func generic-binary-operator-factory(
         
         
 class CompileTimeComputedArithmeticOperatorExpression(ArithmeticOperatorExpression)
-    func dynamic get-constant-value()->(var Int value, var Bool has-value)
-        var Int left-value
-        var Int right-value
-        has-value :=
-                self.left-expression.get-constant-value()->(var left-value) and
-                self.right-expression.get-constant-value()->(var right-value)
+    func dynamic get-constant-value()->(owner Long value, var Bool has-value)
+        owner Long left-value
+        owner Long right-value
+        has-value := self.left-expression.get-constant-value()->(
+                owner left-value) and
+                self.right-expression.get-constant-value()->(owner right-value)
         if has-value
-            self.compute-constant-value(copy left-value, copy right-value)->(
-                    var value)
+            self.compute-constant-value(owner left-value, owner right-value)->(
+                    owner value)
 
     func dynamic compute-constant-value(
-            copy Int left-value, copy Int right-value)->(var Int value)
+            owner Long left-value, owner Long right-value)->(owner Long value)
+        raise
 
 
 ~~~ + ~~~
 class AdditionOperatorExpression(CompileTimeComputedArithmeticOperatorExpression)
     func dynamic compute-constant-value(
-            copy Int left-value, copy Int right-value)->(var Int value)
-        value := left-value + right-value
+            owner Long left-value, owner Long right-value)->(owner Long value)
+        long-add(user left-value, user right-value)->(owner value)
 
 func addition-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
@@ -71,8 +72,8 @@ func addition-operator-factory(
 ~~~ - ~~~
 class SubtractionOperatorExpression(CompileTimeComputedArithmeticOperatorExpression)
     func dynamic compute-constant-value(
-            copy Int left-value, copy Int right-value)->(var Int value)
-        value := left-value - right-value
+            owner Long left-value, owner Long right-value)->(owner Long value)
+        long-sub(user left-value, user right-value)->(owner value)
 
 func subtraction-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
@@ -82,8 +83,8 @@ func subtraction-operator-factory(
 ~~~ * ~~~
 class MultiplicationOperatorExpression(CompileTimeComputedArithmeticOperatorExpression)
     func dynamic compute-constant-value(
-            copy Int left-value, copy Int right-value)->(var Int value)
-        value := left-value * right-value
+            owner Long left-value, owner Long right-value)->(owner Long value)
+        long-mul(user left-value, user right-value)->(owner value)
 
 func multiplication-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
@@ -96,9 +97,10 @@ class DivisionOperatorExpression(CompileTimeComputedArithmeticOperatorExpression
     func dynamic analyze()
         self.allow-right-error := true
         base()
-        var Int value
-        if self.right-expression.get-constant-value()->(var value)
-            if value = 0
+        owner Long value
+        if self.right-expression.get-constant-value()->(owner value)
+            var Long zero
+            if long-equal(user value, user zero)
                 self.syntax-error-msg(user "dividing by zero")
             else
                 self.right-expression.check-no-error()
@@ -116,8 +118,8 @@ class DivisionOperatorExpression(CompileTimeComputedArithmeticOperatorExpression
         self.code-node.write-spaces()
 
     func dynamic compute-constant-value(
-            copy Int left-value, copy Int right-value)->(var Int value)
-        value := left-value div right-value
+            owner Long left-value, owner Long right-value)->(owner Long value)
+        long-div(user left-value, user right-value)->(owner value)
 
 func division-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
@@ -127,8 +129,8 @@ func division-operator-factory(
 ~~~ mod ~~~
 class ModuloOperatorExpression(DivisionOperatorExpression)
     func dynamic compute-constant-value(
-            copy Int left-value, copy Int right-value)->(var Int value)
-        value := left-value mod right-value
+            owner Long left-value, owner Long right-value)->(owner Long value)
+        long-mod(user left-value, user right-value)->(owner value)
 
 func modulo-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(

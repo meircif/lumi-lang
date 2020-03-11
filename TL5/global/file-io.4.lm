@@ -122,6 +122,13 @@ func write-int(copy Int num)
     write(user num-str)
 
 
+~~~ write `num` to the output file as text ~~~
+func write-long(user Long num)
+    var String{64} num-str
+    num.hex(user num-str)
+    write(user num-str)
+
+
 ~~~ write `num` spaces - usefull for writing indentation ~~~
 func write-spaces(copy Int num)
     for n in num

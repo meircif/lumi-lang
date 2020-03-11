@@ -1,12 +1,107 @@
 ~~~ TL5 compiler - Type instance ~~~
 module tl5-compiler
 
-~~~ Specific usage of a type including the assigned subtypes and values ~~~
+
+struct IntRange
+    var ExpressionValue min-owner
+    var ExpressionValue max-owner
+    user ExpressionValue min-expression
+    user ExpressionValue max-expression
+    owner Long min-value
+    owner Long max-value
+    owner String name
+    
+    func copy-values(user IntRange other)
+        other.min-value.copy()->(owner self.min-value)
+        other.max-value.copy()->(owner self.max-value)
+    
+    func set-values(user SyntaxTreeNode node)
+        self.set-value(
+                user node, user self.max-owner, user self.max-expression)->(
+                owner self.max-value)
+        if self.min-expression?
+            self.set-value(
+                    user node,
+                    user self.min-owner,
+                    user self.min-expression)->(
+                    owner self.min-value)
+        else
+            self.min-value := Long()
+        if long-larger(user self.min-value, user self.max-value)
+            node.syntax-error-msg(
+                    user "integer range minimum larger than maximum")
+        var Long num
+        num.set(copy -1)
+        if long-larger(user self.min-value, user num)
+            num.parse(user "18446744073709551615")
+            if long-larger(user self.max-value, user num)
+                node.syntax-error-msg(user "unsigned integer maximum too high")
+        else
+            num.parse(user "9223372036854775807")
+            if long-larger(user self.max-value, user num)
+                node.syntax-error-msg(user "signed integer maximum too high")
+            num.parse(user "-9223372036854775808")
+            if long-larger(user num, user self.min-value)
+                node.syntax-error-msg(user "signed integer minimum too low")
+    
+    func set-value(
+            user SyntaxTreeNode node,
+            user ExpressionValue value-owner,
+            user ExpressionValue value-expression)->(
+            owner Long value)
+        if value-owner.parsed()
+            node.analyze-expression(user value-owner, user glob.type-int)
+        if not value-expression.get-constant-value()->(owner value)
+            node.syntax-error-msg(user "int range is not constant")
+    
+    func write-cname()
+        var Long min8
+        var Long min16
+        var Long min32
+        var Long max8
+        var Long max16
+        var Long max32
+        min8.set(copy -1)
+        if long-larger(user self.min-value, user min8)
+            write(user "uint")
+            max8.set(copy 256)
+            max16.parse(user "65536")
+            max32.parse(user "4294967296")
+            if long-larger(user max8, user self.max-value)
+                write(user "8_t")
+            else-if long-larger(user max16, user self.max-value)
+                write(user "16_t")
+            else-if long-larger(user max32, user self.max-value)
+                write(user "32_t")
+            else
+                write(user "64_t")
+        else
+            write(user "int")
+            min8.set(copy -129)
+            min16.parse(user "-32769")
+            min32.parse(user "-2147483649")
+            max8.set(copy 128)
+            max16.parse(user "32768")
+            max32.parse(user "2147483648")
+            if long-larger(user self.min-value, user min8) and
+                    long-larger(user max8, user self.max-value)
+                write(user "8_t")
+            else-if long-larger(user self.min-value, user min16) and
+                    long-larger(user max16, user self.max-value)
+                write(user "16_t")
+            else-if long-larger(user self.min-value, user min32) and
+                    long-larger(user max32, user self.max-value)
+                write(user "32_t")
+            else
+                write(user "64_t")
+
+~~~ Specific usage of a type including the assigned parameters and values ~~~
 struct TypeInstance
     var ExpressionValue length-owner
     owner String name
     owner String module-name
     owner List{TypeInstance} parameters
+    owner IntRange int-range
     owner FunctionArguments arguments
     owner ReferencePath reference-path
     user TypeData type-data
@@ -79,6 +174,16 @@ struct TypeInstance
                         user node,
                         user code-node,
                         copy indentation-spaces)
+            else-if self.name.equal(user "Int")
+                self.int-range := IntRange()
+                self.int-range.min-owner.new(user ":}", user code-node)
+                if glob.last-char = ':'
+                    self.int-range.min-expression := self.int-range.min-owner
+                    self.int-range.max-owner.new(user "}", user code-node)
+                else
+                    self.int-range.max-owner.expression :=
+                            self.int-range.min-owner.expression
+                self.int-range.max-expression := self.int-range.max-owner
             else-if code-node? and (self.name.equal(user "String") or
                     self.name.equal(user "Buffer"))
                 self.length-owner.new(user "}", user code-node)
@@ -141,14 +246,24 @@ struct TypeInstance
             if self.arguments?
                 self.arguments.link-types()
         if check-length
+            if self.int-range?
+                self.int-range.set-values(user node)
+            else-if self.type-data is glob.type-int
+                user IntRange int-range
+                if glob.int-map.find(user self.name)->(user int-range)?
+                    self.int-range := IntRange()
+                    self.int-range.copy-values(user int-range)
             if self.length-owner.parsed()
                 node.analyze-expression(user self.length, user glob.type-int)
                 if constant-length
-                    var Int length-value
-                    if not self.length.get-constant-value()->(var length-value)
+                    owner Long length-value
+                    var Long one
+                    one.set(copy 1)
+                    if not self.length.get-constant-value()->(
+                            owner length-value)
                         node.syntax-error-msg(
                                 user "sequence length is not constant")
-                    if length-value <= 0
+                    if long-larger(user one, user length-value)
                         node.syntax-error-msg(
                                 user "sequence length is not positive")
                 self.length.check-no-error()
@@ -491,7 +606,9 @@ struct TypeInstance
                         user actual-params, copy replace-bases)
                 
     func write-cname()
-        if self.type-data is glob.type-pointer
+        if self.int-range?
+            self.int-range.write-cname()
+        else-if self.type-data is glob.type-pointer
             if self.parameters?
                 self.parameters.first.item.write-cname()
                 write(user "*")

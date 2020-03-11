@@ -29,8 +29,8 @@ class BlockExpression(Expression)
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
         self.expression.order-constants(user ordered-list)
 
-    func dynamic get-constant-value()->(var Int value, var Bool has-value)
-        self.expression.get-constant-value()->(var value, var has-value)
+    func dynamic get-constant-value()->(owner Long value, var Bool has-value)
+        self.expression.get-constant-value()->(owner value, var has-value)
 
     func dynamic check-memory(user ReferenceMemoryList refs)
         self.expression.check-memory(user refs)
@@ -114,11 +114,11 @@ class UnaryExpression(Expression)
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
         self.right-expression.order-constants(user ordered-list)
 
-    func dynamic get-constant-value()->(var Int value, var Bool has-value)
+    func dynamic get-constant-value()->(owner Long value, var Bool has-value)
         if self.operator.name.equal(user "-")->(var has-value)
             if self.right-expression.get-constant-value()->(
-                    var value, var has-value)
-                value := - value
+                    owner value, var has-value)
+                value.mul(copy -1)
 
     func dynamic check-memory(user ReferenceMemoryList refs)
         self.right-expression.check-memory(user refs)

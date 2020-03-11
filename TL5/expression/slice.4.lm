@@ -102,45 +102,58 @@ class SliceExpression(Expression)
                     owner self.slice-variable)
         
     func inst analyze-values()
-        var Int index-value
-        var Int second-index-value(copy 1)
-        var Int length-value
+        owner Long index-value
+        new Long second-index-value
+        second-index-value.set(copy 1)
+        owner Long length-value
+        var Long zero
+        var Long one
+        one.set(copy 1)
         var Bool has-length-value
         
         self.need-index-check :=
-                not self.index.get-constant-value()->(var index-value)
-        if not self.need-index-check and index-value < 0
-            self.syntax-error-value(
-                    user "negative slice index", copy index-value)
+                not self.index.get-constant-value()->(owner index-value)
+        if not self.need-index-check
+            if long-larger(user zero, user index-value)
+                self.syntax-error-value(
+                        user "negative slice index", user index-value)
         
         if self.second-index?
             self.need-second-index-check :=
                     not self.second-index.get-constant-value()->(
-                    var second-index-value)
-            if not self.need-second-index-check and second-index-value < 1
-                self.syntax-error-value(
-                        user "non positive slice length",
-                        copy second-index-value)
+                    owner second-index-value)
+            if not self.need-second-index-check
+                if long-larger(user one, user second-index-value)
+                    self.syntax-error-value(
+                            user "non positive slice length",
+                            user second-index-value)
         
         if not self.sequence.result-type.type-data.is-sequence() and
                 self.sequence.result-type.length?
             self.sequence.result-type.length.get-constant-value()->(
-                    var length-value, var has-length-value)
+                    owner length-value, var has-length-value)
         self.need-bounds-check := self.need-index-check or
-                self.need-second-index-check or not (has-length-value or
-                (index-value = 0 and second-index-value = 1))
+                self.need-second-index-check
+        if not self.need-bounds-check
+            self.need-bounds-check := not (has-length-value or
+                    (long-equal(user index-value, user zero) and
+                    long-equal(user second-index-value, user one)))
         
         if self.need-bounds-check
             self.check-error-propagated(user "ignoring slice bounds check")
-        else-if has-length-value and
-                index-value + second-index-value > length-value
-            self.print-syntax-error-header()
-            self.print-msg-and-value(
-                    user "slice last index",
-                    copy index-value + second-index-value - 1)
-            self.print-msg-and-value(
-                    user " is larger than sequence size", copy length-value)
-            self.syntax-error-raise()
+        else-if has-length-value
+            owner Long index-sum
+            long-add(user index-value, user second-index-value)->(
+                    owner index-sum)
+            if long-larger(user index-sum, user length-value)
+                self.print-syntax-error-header()
+                self.print-msg-and-value(
+                        user "slice last index",
+                        user long-sub(user index-sum, user one))
+                self.print-msg-and-value(
+                        user " is larger than sequence size",
+                        user length-value)
+                self.syntax-error-raise()
     
     func inst check-index(user Expression index)
         index.check-no-error()
@@ -154,15 +167,17 @@ class SliceExpression(Expression)
                     user "expected integer index for slice, got void \
                     expression")
     
-    func inst syntax-error-value(user String header, copy Int value)
+    func inst syntax-error-value(user String header, user Long value)
         self.print-syntax-error-header()
-        self.print-msg-and-value(user header, copy value)
+        self.print-msg-and-value(user header, user value)
         self.syntax-error-raise()
 
-    func inst print-msg-and-value(user String text, copy Int value)
+    func inst print-msg-and-value(user String text, user Long value)
         sys.print(user text)
         sys.print(user " [")
-        print-int(copy value)
+        var String{64} value-str
+        value.hex(user value-str)
+        sys.print(user value-str)
         sys.print(user "]")
 
     func dynamic check-memory(user ReferenceMemoryList refs)

@@ -68,6 +68,9 @@ class SyntaxTreeNode
                     if parameter.equal(user name)
                         type-data := glob.type-generic
                         return
+        if glob.int-map.find(user name)?
+            type-data := glob.type-int
+            return
         self.syntax-error(user "unknown type", user name)
     
     func dynamic find-variable(user String name, user String module-name)->(
