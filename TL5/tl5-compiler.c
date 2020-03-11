@@ -3821,7 +3821,7 @@ void tl5_compiler_M_SyntaxTreeConstructor_Del(tl5_compiler_M_SyntaxTreeConstruct
 
 Returncode tl5_compiler_M_SyntaxTreeCleanup_parse_new(tl5_compiler_M_SyntaxTreeCleanup* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeCleanup_Dynamic* self_Dynamic, tl5_compiler_M_TypeData* parent_type, Ref_Manager* parent_type_Refman, tl5_compiler_M_TypeData_Dynamic* parent_type_Dynamic, tl5_compiler_M_SyntaxTreeCleanup** new_node, Ref_Manager** new_node_Refman, tl5_compiler_M_SyntaxTreeCleanup_Dynamic** new_node_Dynamic);
 
-Returncode tl5_compiler_M_SyntaxTreeCleanup_parse_special(tl5_compiler_M_SyntaxTreeCleanup* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeCleanup_Dynamic* self_Dynamic, tl5_compiler_M_TypeData* parent_type, Ref_Manager* parent_type_Refman, tl5_compiler_M_TypeData_Dynamic* parent_type_Dynamic);
+Returncode tl5_compiler_M_SyntaxTreeCleanup_parse_special(tl5_compiler_M_SyntaxTreeCleanup* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeCleanup_Dynamic* self_Dynamic);
 
 Returncode tl5_compiler_M_SyntaxTreeCleanup_analyze(tl5_compiler_M_SyntaxTreeCleanup* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeCleanup_Dynamic* self_Dynamic);
 
@@ -44540,7 +44540,7 @@ LUMI_cleanup:
 
 #define LUMI_FILE_NAME "TL5/statement/function.4.lm"
 #define LUMI_FUNC_NAME "SyntaxTreeCleanup.parse-special"
-Returncode tl5_compiler_M_SyntaxTreeCleanup_parse_special(tl5_compiler_M_SyntaxTreeCleanup* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeCleanup_Dynamic* self_Dynamic, tl5_compiler_M_TypeData* parent_type, Ref_Manager* parent_type_Refman, tl5_compiler_M_TypeData_Dynamic* parent_type_Dynamic) {
+Returncode tl5_compiler_M_SyntaxTreeCleanup_parse_special(tl5_compiler_M_SyntaxTreeCleanup* self, Ref_Manager* self_Refman, tl5_compiler_M_SyntaxTreeCleanup_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
     String aux_String_0_Var = {0};
     String* aux_String_0 = NULL;
@@ -44550,7 +44550,6 @@ Returncode tl5_compiler_M_SyntaxTreeCleanup_parse_special(tl5_compiler_M_SyntaxT
     Ref_Manager* aux_String_1_Refman = NULL;
     Ref_Manager* aux_Ref_Manager = NULL;
     LUMI_inc_ref(self_Refman);
-    LUMI_inc_ref(parent_type_Refman);
     CHECK_REF(476, self, self_Refman)
     CHECK_REF(476, self->_base._base.parent_type, self->_base._base.parent_type_Refman)
     aux_Ref_Manager = self->_base._base.parent_type->cleanup_Refman;
@@ -44573,7 +44572,6 @@ Returncode tl5_compiler_M_SyntaxTreeCleanup_parse_special(tl5_compiler_M_SyntaxT
 LUMI_cleanup:
     LUMI_var_dec_ref(aux_String_1_Refman);
     LUMI_var_dec_ref(aux_String_0_Refman);
-    LUMI_dec_ref(parent_type_Refman);
     LUMI_dec_ref(self_Refman);
     return LUMI_err;
 }

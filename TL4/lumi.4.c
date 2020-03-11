@@ -1304,7 +1304,7 @@ Returncode long_mul(
 
 Bool long_abs_larger(Long* a, Long* b, Bool equal) {
   int n;
-  for (n = a->length >= b->length? a->length: b->length; n >= 0; --n) {
+  for (n = (a->length >= b->length? a->length: b->length) - 1; n >= 0; --n) {
     if ((n >= a->length && b->number[n] != 0) ||
         (n < a->length && n < b->length && a->number[n] < b->number[n])) {
       return false;

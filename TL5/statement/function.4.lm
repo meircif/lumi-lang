@@ -472,7 +472,7 @@ class SyntaxTreeCleanup(SyntaxTreeSpecialMethod)
         new-node := SyntaxTreeCleanup()
         new-node.parse(user parent-type)
     
-    func dynamic parse-special(user TypeData parent-type)
+    func dynamic parse-special()
         self.parent-type.cleanup := self
         if glob.last-char != '('
             self.syntax-error-c(user "expected \"(\" after \"cleanup\", got")
