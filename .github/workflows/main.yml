@@ -36,6 +36,9 @@ jobs:
         sudo apt-get update
         sudo apt-get install valgrind
         sudo apt-get install python3-enchant
+    - name: Install macos dependencies
+      if: matrix.os == 'macos-latest'
+      run: brew install enchant
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
