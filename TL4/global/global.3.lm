@@ -233,7 +233,23 @@ static Global
     
     self.add-builtin-method(user glob.type-long, user "new")
     
+    self.add-builtin-method(user glob.type-long, user "copy"):(user arguments)
+    self.add-builtin-output(
+        user arguments, copy ACCESS-OWNER, user glob.type-long, user "res")
+    
     self.add-builtin-method(user glob.type-long, user "set"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-COPY, user glob.type-int, user "value")
+        
+    self.add-builtin-method(user glob.type-long, user "int"):(user arguments)
+    self.add-builtin-output(
+        user arguments, copy ACCESS-VAR, user glob.type-int, user "value")
+        
+    self.add-builtin-method(user glob.type-long, user "add"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-COPY, user glob.type-int, user "value")
+        
+    self.add-builtin-method(user glob.type-long, user "mul"):(user arguments)
     self.add-builtin-parameter(
         user arguments, copy ACCESS-COPY, user glob.type-int, user "value")
         
@@ -268,6 +284,22 @@ static Global
         user arguments, copy ACCESS-USER, user glob.type-long, user "b")
     self.add-builtin-output(
         user arguments, copy ACCESS-OWNER, user glob.type-long, user "res")
+        
+    self.add-builtin-global-function(user "long-div"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "n")
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "d")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-OWNER, user glob.type-long, user "q")
+        
+    self.add-builtin-global-function(user "long-mod"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "n")
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "d")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-OWNER, user glob.type-long, user "r")
         
     self.add-builtin-global-function(user "long-equal"):(user arguments)
     self.add-builtin-parameter(

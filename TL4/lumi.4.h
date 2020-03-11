@@ -276,7 +276,11 @@ Returncode Sys_getenv(
 
 void Long_Del(Long*);
 Returncode Long_new(Long*, Ref_Manager*);
+Returncode Long_copy(Long*, Ref_Manager*, Long**, Ref_Manager**);
 Returncode Long_set(Long*, Ref_Manager*, int);
+Returncode Long_int(Long*, Ref_Manager*, int*);
+Returncode Long_add(Long*, Ref_Manager*, int);
+Returncode Long_mul(Long*, Ref_Manager*, int);
 Returncode Long_parse(Long*, Ref_Manager*, String*, Ref_Manager*);
 Returncode Long_hex(Long*, Ref_Manager*, String*, Ref_Manager*);
 Returncode long_combine(
@@ -286,6 +290,10 @@ Returncode long_combine(
 #define long_sub(a, a_Refman, b, b_Refman, res, res_Refman) \
   long_combine(a, a_Refman, b, b_Refman, res, res_Refman, false)
 Returncode long_mul(
+  Long*, Ref_Manager*, Long*, Ref_Manager*, Long**, Ref_Manager**);
+Returncode long_div(
+  Long*, Ref_Manager*, Long*, Ref_Manager*, Long**, Ref_Manager**);
+Returncode long_mod(
   Long*, Ref_Manager*, Long*, Ref_Manager*, Long**, Ref_Manager**);
 Returncode long_equal(Long*, Ref_Manager*, Long*, Ref_Manager*, Bool*);
 Returncode long_larger(Long*, Ref_Manager*, Long*, Ref_Manager*, Bool*);
