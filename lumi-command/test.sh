@@ -16,12 +16,7 @@ if [ -z $CC ]; then
   CC=gcc
 fi
 CCW="$CC --std=c89 -Werror -Wall"
-CCA="$CCW --pedantic -Wno-unused-label -Wno-overlength-strings"
-if [ $CC == "gcc" ]; then
-  CCA="$CCA -Wno-unused-but-set-variable"
-else
-  CCA="$CCA -Wno-self-assign"
-fi
+CCA="$CCW --pedantic -Wno-unused -Wno-overlength-strings -Wno-self-assign"
 
 rm -rf $DIR/.test/lumi
 mkdir -p $DIR/.test/lumi

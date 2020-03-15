@@ -15,10 +15,7 @@ DIR="$( cd -P "$( dirname "$MYDIR" )" >/dev/null && pwd )"
 if [ -z $CC ]; then
   CC=gcc
 fi
-CCA="$CC --std=c89 -Werror -Wall -Wno-unused -Wno-missing-braces --pedantic"
-if [ $CC == "clang" ]; then
-  CCA="$CCA -Wno-self-assign"
-fi
+CCA="$CC --std=c89 -Werror -Wall -Wno-unused -Wno-self-assign --pedantic"
 
 rm -rf $DIR/.test/stdlib
 mkdir -p $DIR/.test/stdlib
