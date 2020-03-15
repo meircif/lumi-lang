@@ -6,24 +6,14 @@ jobs:
       matrix:
         c-compiler: [gcc, clang]
         os: [ubuntu-latest, macos-latest, windows-latest]
-        exclude:
-          - os: macos-latest
-            c-compiler: gcc
-          - os: windows-latest
-            c-compiler: clang
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v1
     - name: Setup Python
       uses: actions/setup-python@v1
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os != 'windows-latest'
       with:
         python-version: '3.x'
-    - name: Setup macos Python
-      uses: actions/setup-python@v1
-      if: matrix.os == 'macos-latest'
-      with:
-        python-version: '3.6'
     - name: Setup windows Python
       uses: actions/setup-python@v1
       if: matrix.os == 'windows-latest'
