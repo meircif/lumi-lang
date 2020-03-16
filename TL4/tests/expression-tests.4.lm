@@ -73,6 +73,7 @@ var Long l
     l.int()->(var i)
     l.add(copy 100)
     l.mul(copy 100)
+    l.negate()
     l.parse(user str)
     l.hex(user str)
     var Long x

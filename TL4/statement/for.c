@@ -102,8 +102,8 @@ Returncode SyntaxTreeForLoop_analyze(SyntaxTreeForLoop* self) {
   
   CHECK(53, (self->_base._base.parent)->_base._base._dtl[7](self->_base._base.parent, self->item_name, NULL, &(self->item)) )
   if (NULL != self->item) {
-    Int _Int149;
-    CHECK(54, TypeInstance_check_assign_to(type_instance, self->item->access, self->item->type_instance, self->item->access, &(self->_base._base._base), &(_Int149)) )
+    Int _Int150;
+    CHECK(54, TypeInstance_check_assign_to(type_instance, self->item->access, self->item->type_instance, self->item->access, &(self->_base._base._base), &(_Int150)) )
     free(type_instance);
     free(self->item_name);
   }
@@ -136,13 +136,13 @@ Returncode SyntaxTreeForLoop_analyze(SyntaxTreeForLoop* self) {
     self->aux_symbol->_base.code_node = &(self->_base._base);
     CHECK(79, SyntaxTreeNode_set_location(&(self->aux_symbol->_base._base)) )
     CHECK(80, TypeInstance_copy_new(self->iterator->result_type, &(self->aux_symbol->_base.result_type)) )
-    SyntaxTreeFunction* _SyntaxTreeFunction150;
-    CHECK(81, SyntaxTreeCode_get_function(&(self->_base._base), &(_SyntaxTreeFunction150)) )
-    CHECK(81, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction150, ACCESS_USER, false, self->iterator->result_type, &(self->aux_symbol->variable)) )
-    CHECK(84, string_new_copy(self->aux_symbol->variable->name, &(self->aux_symbol->name)) )
     SyntaxTreeFunction* _SyntaxTreeFunction151;
-    CHECK(86, SyntaxTreeCode_get_function(&(self->_base._base), &(_SyntaxTreeFunction151)) )
-    _SyntaxTreeFunction151->has_user_assign = true;
+    CHECK(81, SyntaxTreeCode_get_function(&(self->_base._base), &(_SyntaxTreeFunction151)) )
+    CHECK(81, SyntaxTreeFunction_add_aux_variable(_SyntaxTreeFunction151, ACCESS_USER, false, self->iterator->result_type, &(self->aux_symbol->variable)) )
+    CHECK(84, string_new_copy(self->aux_symbol->variable->name, &(self->aux_symbol->name)) )
+    SyntaxTreeFunction* _SyntaxTreeFunction152;
+    CHECK(86, SyntaxTreeCode_get_function(&(self->_base._base), &(_SyntaxTreeFunction152)) )
+    _SyntaxTreeFunction152->has_user_assign = true;
   }
   
   CHECK(88, SyntaxTreeFlowElement_analyze(&(self->_base)) )
@@ -156,8 +156,8 @@ Returncode SyntaxTreeForLoop_get_iterator_type(SyntaxTreeForLoop* self, TypeInst
 static char* _func_name_SyntaxTreeForLoop_get_iterator_type = "SyntaxTreeForLoop.get-iterator-type";
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeForLoop_get_iterator_type
 Returncode SyntaxTreeForLoop_get_iterator_type(SyntaxTreeForLoop* self, TypeInstance** type_instance) {
-  Int _Int152;
-  CHECK(91, TypeData_find_meth(self->iterator->result_type->type_data, &(String){4, 3, "has"}, &(self->has_func), &(_Int152)) )
+  Int _Int153;
+  CHECK(91, TypeData_find_meth(self->iterator->result_type->type_data, &(String){4, 3, "has"}, &(self->has_func), &(_Int153)) )
   if (!(NULL != self->has_func)) {
     CHECK(94, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){49, 48, "cannot iterate type with no \"has\" named method -"}, self->iterator->result_type->type_data->name) )
   }
@@ -170,14 +170,14 @@ Returncode SyntaxTreeForLoop_get_iterator_type(SyntaxTreeForLoop* self, TypeInst
   if (NULL != self->has_func->arguments->outputs->first->next) {
     CHECK(106, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){55, 54, "iterator \"has\" method has more than one output in type"}, self->iterator->result_type->type_data->name) )
   }
-  TypeInstance* _TypeInstance153;
-  CHECK(109, (((Argument*)(self->has_func->arguments->outputs->first->item)))->_base._dtl[7](((Argument*)(self->has_func->arguments->outputs->first->item)), &(_TypeInstance153)) )
-  if (_TypeInstance153->type_data != glob->type_bool) {
+  TypeInstance* _TypeInstance154;
+  CHECK(109, (((Argument*)(self->has_func->arguments->outputs->first->item)))->_base._dtl[7](((Argument*)(self->has_func->arguments->outputs->first->item)), &(_TypeInstance154)) )
+  if (_TypeInstance154->type_data != glob->type_bool) {
     CHECK(111, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){51, 50, "iterator \"has\" method output is not \"Bool\" in type"}, self->iterator->result_type->type_data->name) )
   }
   
-  Int _Int154;
-  CHECK(115, TypeData_find_meth(self->iterator->result_type->type_data, &(String){4, 3, "get"}, &(self->get_func), &(_Int154)) )
+  Int _Int155;
+  CHECK(115, TypeData_find_meth(self->iterator->result_type->type_data, &(String){4, 3, "get"}, &(self->get_func), &(_Int155)) )
   if (!(NULL != self->get_func)) {
     CHECK(118, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){49, 48, "cannot iterate type with no \"get\" named method -"}, self->iterator->result_type->type_data->name) )
   }
@@ -194,12 +194,12 @@ Returncode SyntaxTreeForLoop_get_iterator_type(SyntaxTreeForLoop* self, TypeInst
     CHECK(134, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){56, 55, "iterator \"get\" method output has \"owner\" access in type"}, self->iterator->result_type->type_data->name) )
   }
   
-  TypeInstance* _TypeInstance155;
-  CHECK(138, (((Argument*)(self->get_func->arguments->outputs->first->item)))->_base._dtl[7](((Argument*)(self->get_func->arguments->outputs->first->item)), &(_TypeInstance155)) )
-  CHECK(138, TypeInstance_f_new_replace_params(_TypeInstance155, self->iterator->result_type, 0, &((*type_instance))) )
+  TypeInstance* _TypeInstance156;
+  CHECK(138, (((Argument*)(self->get_func->arguments->outputs->first->item)))->_base._dtl[7](((Argument*)(self->get_func->arguments->outputs->first->item)), &(_TypeInstance156)) )
+  CHECK(138, TypeInstance_f_new_replace_params(_TypeInstance156, self->iterator->result_type, 0, &((*type_instance))) )
   
-  Int _Int156;
-  CHECK(141, TypeData_find_meth(self->iterator->result_type->type_data, &(String){5, 4, "next"}, &(self->next_func), &(_Int156)) )
+  Int _Int157;
+  CHECK(141, TypeData_find_meth(self->iterator->result_type->type_data, &(String){5, 4, "next"}, &(self->next_func), &(_Int157)) )
   if (!(NULL != self->next_func)) {
     CHECK(144, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){50, 49, "cannot iterate type with no \"next\" named method -"}, self->iterator->result_type->type_data->name) )
   }
@@ -421,9 +421,9 @@ Returncode SyntaxTreeForLoop_write_iter(SyntaxTreeForLoop* self) {
   item_arg->value = &(item_symbol->_base);
   item_arg->is_primitive = item_symbol->_base.result_type->type_data->is_primitive;
   item_arg->is_dynamic = item_symbol->_base.result_type->type_data->is_dynamic;
-  TypeInstance* _TypeInstance157;
-  CHECK(294, (((Argument*)(self->get_func->arguments->outputs->first->item)))->_base._dtl[7](((Argument*)(self->get_func->arguments->outputs->first->item)), &(_TypeInstance157)) )
-  item_arg->is_generic = _TypeInstance157->type_data == glob->type_generic;
+  TypeInstance* _TypeInstance158;
+  CHECK(294, (((Argument*)(self->get_func->arguments->outputs->first->item)))->_base._dtl[7](((Argument*)(self->get_func->arguments->outputs->first->item)), &(_TypeInstance158)) )
+  item_arg->is_generic = _TypeInstance158->type_data == glob->type_generic;
   CHECK(297, SyntaxTreeForLoop_write_iter_meth(self, self->get_func, item_arg) )
   
   CHECK(299, SyntaxTreeFlowElement_write_block_body(&(self->_base)) )

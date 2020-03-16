@@ -50,9 +50,9 @@ Returncode NameMap_find(NameMap* self, String* name, void** value) {
   NameMapNode* node = self->first;
   while (true) {
     if (!(NULL != node)) break;
-    Bool _Bool13;
-    CHECK(23, String_equal(node->name, name, &(_Bool13)) )
-    if (_Bool13) {
+    Bool _Bool14;
+    CHECK(23, String_equal(node->name, name, &(_Bool14)) )
+    if (_Bool14) {
       (*value) = ((void*)(node->value));
       return OK;
     }
@@ -72,9 +72,9 @@ Returncode NameMap_update_or_add(NameMap* self, String* name, void* value) {
   NameMapNode* node = self->first;
   while (true) {
     if (!(NULL != node)) break;
-    Bool _Bool14;
-    CHECK(33, String_equal(node->name, name, &(_Bool14)) )
-    if (_Bool14) {
+    Bool _Bool15;
+    CHECK(33, String_equal(node->name, name, &(_Bool15)) )
+    if (_Bool15) {
       node->value = value;
       return OK;
     }

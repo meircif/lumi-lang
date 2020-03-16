@@ -1095,6 +1095,14 @@ Returncode Long_mul(Long* self, Ref_Manager* self_Refman, int value) {
 }
 #undef LUMI_FUNC_NAME
 
+#define LUMI_FUNC_NAME "Long.negate"
+Returncode Long_negate(Long* self, Ref_Manager* self_Refman) {
+  CHECK_NOT_NULL(self)
+  self->sign = -(self->sign);
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
 void set_hex(String* text, int index, int value) {
   if (value >= 10) {
     text->values[index] = 'a' + value - 10;

@@ -253,6 +253,8 @@ static Global
     self.add-builtin-parameter(
         user arguments, copy ACCESS-COPY, user glob.type-int, user "value")
         
+    self.add-builtin-method(user glob.type-long, user "negate")
+        
     self.add-builtin-method(user glob.type-long, user "parse"):(user arguments)
     self.add-builtin-parameter(
         user arguments, copy ACCESS-USER, user glob.type-string, user "text")
