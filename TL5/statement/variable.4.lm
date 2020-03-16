@@ -166,8 +166,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         if self.my-module?
             glob.current-module := _
         
-    func dynamic get-constant-value()->(owner Long value, var Bool has-value)
-        has-value := false
+    func dynamic get-constant-value()->(owner Long value)
+        value := _
 
     func dynamic check-memory(user ReferenceMemoryList refs)
         refs.add(user self)
@@ -516,7 +516,7 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
         self.analyze-expression(user self.value, user glob.type-int)
         self.value.check-no-error()
         self.int-value := Long()
-        if not self.value.get-constant-value()->(owner self.int-value)
+        if not self.value.get-constant-value()->(owner self.int-value)?
             self.syntax-error-msg(user "value is not constant")
         glob.current-module := _
     
@@ -531,10 +531,9 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
         ordered-list.add(user self.name, user self)
         self.is-ordered := true
     
-    func dynamic get-constant-value()->(owner Long value, var Bool has-value)
+    func dynamic get-constant-value()->(owner Long value)
         self.analyze()
         self.int-value.copy()->(owner value)
-        has-value := true
     
     func dynamic write()
         if not self.is-ordered

@@ -109,19 +109,17 @@ class SliceExpression(Expression)
         var Long zero
         var Long one
         one.set(copy 1)
-        var Bool has-length-value
         
-        self.need-index-check :=
-                not self.index.get-constant-value()->(owner index-value)
+        self.index.get-constant-value()->(owner index-value)
+        self.need-index-check := not index-value?
         if not self.need-index-check
             if long-larger(user zero, user index-value)
                 self.syntax-error-value(
                         user "negative slice index", user index-value)
         
         if self.second-index?
-            self.need-second-index-check :=
-                    not self.second-index.get-constant-value()->(
-                    owner second-index-value)
+            self.second-index.get-constant-value()->(owner second-index-value)
+            self.need-second-index-check := not second-index-value?
             if not self.need-second-index-check
                 if long-larger(user one, user second-index-value)
                     self.syntax-error-value(
@@ -131,17 +129,17 @@ class SliceExpression(Expression)
         if not self.sequence.result-type.type-data.is-sequence() and
                 self.sequence.result-type.length?
             self.sequence.result-type.length.get-constant-value()->(
-                    owner length-value, var has-length-value)
+                    owner length-value)
         self.need-bounds-check := self.need-index-check or
                 self.need-second-index-check
         if not self.need-bounds-check
-            self.need-bounds-check := not (has-length-value or
+            self.need-bounds-check := not (length-value? or
                     (long-equal(user index-value, user zero) and
                     long-equal(user second-index-value, user one)))
         
         if self.need-bounds-check
             self.check-error-propagated(user "ignoring slice bounds check")
-        else-if has-length-value
+        else-if length-value?
             owner Long index-sum
             long-add(user index-value, user second-index-value)->(
                     owner index-sum)

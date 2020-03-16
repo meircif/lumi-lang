@@ -188,7 +188,7 @@ class SyntaxTreeLoop(SyntaxTreeFlowElement)
             self.add-aux-variable(
                     copy Access.VAR, copy false, user self.limit.result-type)->(
                     owner self.aux-counter)
-            if not self.limit.get-constant-value()->(owner self.limit-value)
+            if not self.limit.get-constant-value()->(owner self.limit-value)?
                 self.add-aux-variable(
                         copy Access.VAR,
                         copy false,

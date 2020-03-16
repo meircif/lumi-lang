@@ -978,16 +978,14 @@ var String{23!} s
 ; @ g test-int-range-0
 struct Test
     var Int int
-    var Uint8b u8b
-    var Uint16b u16b
-    var Uint32b u32b
-    var Uint64b u64b
-    ; var UintSize usize
-    var Sint8b s8b
-    var Sint16b s16b
-    var Sint32b s32b
-    var Sint64b s64b
-    ; var SintSize ssize
+    var Uint8 u8b
+    var Uint16 u16b
+    var Uint32 u32b
+    var Uint64 u64b
+    var Sint8 s8b
+    var Sint16 s16b
+    var Sint32 s32b
+    var Sint64 s64b
     var Int{32} ru8
     var Int{5:1000} ru16
     var Int{1000000} ru32
@@ -1010,6 +1008,15 @@ const Int MAX 10000
 enum Nums
     MIN
 var Int{Nums.MIN - 12:MAX * 2} s16
+; @ c test-int-range-3
+var Int u8
+var Int s16(copy -1000)
+var Int u32(copy 100000)
+var Int u16
+u16 := 1000
+var Int s32
+s32 := 100000
+s32 := -100000
 ; @ ec test-int-range-e0
 var Int{12:11} error
 ; @ ec test-int-range-e1
@@ -1022,6 +1029,8 @@ var Int{-9223372036854775809:1} error
 var Int{0:str} error
 ; @ ec test-int-range-e5
 var Int{0:i} error
+; @ ec test-int-range-e6
+var Int{-100} error
 ; @@ test-dynamic
 ; @ c test-dynamic-0
 var Ta a

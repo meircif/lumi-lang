@@ -135,9 +135,8 @@ class EnumExpression(ModuleTypeExpression)
                     user "has no value",
                     user self.value)
                 
-    func dynamic get-constant-value()->(owner Long value, var Bool has-value)
+    func dynamic get-constant-value()->(owner Long value)
         self.int-value.copy()->(owner value)
-        has-value := true
     
     func dynamic write()
         self.enum-data.write-cname()

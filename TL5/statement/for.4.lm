@@ -162,12 +162,10 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
             user VariableExpression iterator-aux-variable-expression)
         var Int iterator-access(copy Access.USER)
         owner Long iterator-value
-        var Bool is-constant-iterator
         if is-int-iteration
             iterator-access := Access.VAR
-            self.iterator.get-constant-value()->(
-                    owner iterator-value, var is-constant-iterator)
-        if is-constant-iterator
+            self.iterator.get-constant-value()->(owner iterator-value)
+        if iterator-value?
             iterator-expression := self.iterator.expression
             iterator-expression.code-node := code-node
             return
@@ -365,7 +363,7 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
             owner Expression target,
             owner Expression value)
         owner BinaryExpression binary-expression
-        glob.operator-map.find(user operator-name).create-expression(
+        glob.operator-map.find(user operator-name).create-binary-expression(
                 user code-node)->(owner binary-expression)
         target.code-node := code-node
         value.code-node := code-node

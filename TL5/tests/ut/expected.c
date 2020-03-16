@@ -1897,7 +1897,7 @@ expected expression, got "{"
 /// @ test-unary-expression-6
 expected space after "-", got "["
 /// @ test-unary-expression-7
-not unary operator "+"
+used non-unary operator "+"
 /// @ test-unary-expression-8
 void expression given as operand to operator "-"
 /// @ test-unary-expression-9
@@ -2603,6 +2603,17 @@ enum {
 };
 enum { ut_M_MAX = 0x2710 };
 int16_t ut_M_s16 = 0;
+/// @ test-int-range-3
+Int u8 = 0;
+    Int s16 = 0;
+    Int u32 = 0;
+    Int u16 = 0;
+    Int s32 = 0;
+    s16 = -0x03e8;
+    u32 = 0x0186a0;
+    u16 = 0x03e8;
+    s32 = 0x0186a0;
+    s32 = -0x0186a0;
 /// @ test-int-range-e0
 integer range minimum larger than maximum
 /// @ test-int-range-e1
@@ -2615,6 +2626,8 @@ signed integer minimum too low
 got "String" expression, expected "Int"
 /// @ test-int-range-e5
 int range is not constant
+/// @ test-int-range-e6
+integer range minimum larger than maximum
 /// @@ test-dynamic
 /// @ test-dynamic-0
 ut_M_Ta a_Var = {{0}};

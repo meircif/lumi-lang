@@ -51,7 +51,7 @@ struct IntRange
             owner Long value)
         if value-owner.parsed()
             node.analyze-expression(user value-owner, user glob.type-int)
-        if not value-expression.get-constant-value()->(owner value)
+        if not value-expression.get-constant-value()->(owner value)?
             node.syntax-error-msg(user "int range is not constant")
     
     func write-cname()
@@ -259,8 +259,8 @@ struct TypeInstance
                     owner Long length-value
                     var Long one
                     one.set(copy 1)
-                    if not self.length.get-constant-value()->(
-                            owner length-value)
+                    self.length.get-constant-value()->(owner length-value)
+                    if not length-value?
                         node.syntax-error-msg(
                                 user "sequence length is not constant")
                     if long-larger(user one, user length-value)

@@ -66,8 +66,8 @@ class VariableExpression(Expression)
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
         self.variable.order-constants(user ordered-list)
     
-    func dynamic get-constant-value()->(owner Long value, var Bool has-value)
-        self.variable.get-constant-value()->(owner value, var has-value)
+    func dynamic get-constant-value()->(owner Long value)
+        self.variable.get-constant-value()->(owner value)
             
 
     func dynamic check-memory(user ReferenceMemoryList refs)

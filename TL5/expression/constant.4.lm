@@ -47,7 +47,14 @@ class IntExpression(Expression)
         self.value := Long()
         self.value.set(copy value)
         self.set-simple-type(user glob.type-int)
+        self.set-range()
         self.access := Access.VAR
+    
+    func inst set-range()
+        if not self.result-type.int-range?
+            self.result-type.int-range := IntRange()
+        self.value.copy()->(owner self.result-type.int-range.min-value)
+        self.value.copy()->(owner self.result-type.int-range.max-value)
     
     func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
             owner Expression expression)
@@ -84,12 +91,12 @@ class IntExpression(Expression)
         else-if not get-number-value(user number, copy 10)->(owner self.value)
             self.syntax-error(user "illegal number", user text)
         if is-negative
-            self.value.mul(copy -1)
+            self.value.negate()
+        self.set-range()
         text := _
     
-    func dynamic get-constant-value()->(owner Long value, var Bool has-value)
+    func dynamic get-constant-value()->(owner Long value)
         self.value.copy()->(owner value)
-        has-value := true
         
     func dynamic write()
         write-long(user self.value)
@@ -150,10 +157,9 @@ class CharExpression(TextExpression)
                 return
         is-legal := false
     
-    func dynamic get-constant-value()->(owner Long value, var Bool has-value)
+    func dynamic get-constant-value()->(owner Long value)
         value := Long()
         value.set(copy self.value)
-        has-value := true
 
 
 class ConstantBufferVariable(SyntaxTreeVariable)

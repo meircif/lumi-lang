@@ -817,6 +817,26 @@ func ! test-cleanup()
     bs := _
 
 
+struct IntRangeTest
+    var Int int-def
+    var Uint8 u8b
+    var Uint16 u16b
+    var Uint32 u32b
+    var Uint64 u64b
+    var Sint8 s8b
+    var Sint16 s16b
+    var Sint32 s32b
+    var Sint64 s64b
+    var Int{32} ru8
+    var Int{5:1000} ru16
+    var Int{1000000} ru32
+    var Int{100000000000:200000000000} ru64
+    var Int{-100:100} rs8
+    var Int{-1:1000} rs16
+    var Int{-2000000:-1000000} rs32
+    var Int{-100000000000:100000000000} rs64
+
+
 main!
     test-simple-function()!
     test-ref-count()!
