@@ -47,7 +47,6 @@ class NativeFunction(SyntaxTreeFunction)
         new-node.parse()
     
     func inst parse()
-        self.my-module := glob.current-module
         self.parse-header(copy true)
         if glob.last-char = ' '
             NativeText.parse-new(user _, user self)->(owner self.cname)
@@ -117,10 +116,14 @@ class NativeConstant(SyntaxTreeConstant)
         self.is-ordered := true
 
     func dynamic analyze()
-        ; do nothing
-    
-    func dynamic get-constant-value()->(owner Long value)
-        value := _
+        if self.is-analyzed
+            return
+        self.is-analyzed := true
+        self.type-instance.analyze-after-link(user self, copy true)
+        if not self.type-instance.type-data.is-int-like
+            self.syntax-error(
+                    user "Only numeric typed native constant supported, got",
+                    user self.type-instance.name)
 
     func dynamic write()
         ; do nothing

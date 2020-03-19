@@ -124,7 +124,7 @@ class EnumExpression(ModuleTypeExpression)
                         user self.name,
                         user "in module",
                         user module-name)
-        else-if not glob.current-module.enum-map.find(user self.name)->(
+        else-if not self.module.enum-map.find(user self.name)->(
                 user self.enum-data)?
             self.syntax-error(user "unknown Enum", user self.name)
         if not self.enum-data.has-value(user self.value)->(
@@ -134,9 +134,7 @@ class EnumExpression(ModuleTypeExpression)
                     user self.name,
                     user "has no value",
                     user self.value)
-                
-    func dynamic get-constant-value()->(owner Long value)
-        self.int-value.copy()->(owner value)
+        self.result-type.set-int-constant(user self.int-value)
     
     func dynamic write()
         self.enum-data.write-cname()

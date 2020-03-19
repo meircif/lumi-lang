@@ -51,10 +51,7 @@ class IntExpression(Expression)
         self.access := Access.VAR
     
     func inst set-range()
-        if not self.result-type.int-range?
-            self.result-type.int-range := IntRange()
-        self.value.copy()->(owner self.result-type.int-range.min-value)
-        self.value.copy()->(owner self.result-type.int-range.max-value)
+        self.result-type.set-int-constant(user self.value)
     
     func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
             owner Expression expression)
@@ -94,9 +91,6 @@ class IntExpression(Expression)
             self.value.negate()
         self.set-range()
         text := _
-    
-    func dynamic get-constant-value()->(owner Long value)
-        self.value.copy()->(owner value)
         
     func dynamic write()
         write-long(user self.value)
@@ -115,6 +109,7 @@ class CharExpression(TextExpression)
     ~~~ parsing `'a'` or `'\n'` or `'\xf5'` or `'\270'` ~~~
     func inst parse(owner String text)
         var Char ch
+        owner Long value
         if text.length = 3
             self.value := text[1]
             if self.value = '\'' or self.value = '\\'
@@ -128,7 +123,6 @@ class CharExpression(TextExpression)
             if text[1] != '\\'
                 self.syntax-error(user "illegal character constant", user text)
             ch := text[2]
-            owner Long value
             if ch = 'x'
                 if not get-number-value(user text[3:2], copy 16)->(owner value)
                     self.syntax-error(
@@ -143,6 +137,9 @@ class CharExpression(TextExpression)
         if text[text.length - 1] != '\''
             self.syntax-error(user "illegal character constant", user text)
         self.set-simple-type(user glob.type-char)
+        value := Long()
+        value.set(copy self.value)
+        self.result-type.set-int-constant(user value)
         self.access := Access.VAR
         self.text := text
         
@@ -156,10 +153,6 @@ class CharExpression(TextExpression)
                 is-legal := true
                 return
         is-legal := false
-    
-    func dynamic get-constant-value()->(owner Long value)
-        value := Long()
-        value.set(copy self.value)
 
 
 class ConstantBufferVariable(SyntaxTreeVariable)
@@ -182,13 +175,13 @@ class ConstantBufferVariable(SyntaxTreeVariable)
         self.write-data()
         write(user "};\n")
         self.write-spaces()
-        write(user "int ")
+        write(user "Seq_Length ")
         self.write-cname()
         write(user "_Max_length = sizeof(")
         self.write-cname()
         write(user ");\n")
         self.write-spaces()
-        write(user "int ")
+        write(user "Seq_Length ")
         self.write-cname()
         write(user "_Length[1] = {sizeof(")
         self.write-cname()

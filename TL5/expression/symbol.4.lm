@@ -28,8 +28,9 @@ class VariableExpression(Expression)
             expression := ModuleExpression(owner self.name)
             return
         
-        if self.code-node.find-variable(
+        if self.code-node.find-declared-variable(
                 user self.name, user self.module-name)->(user self.variable)?
+            self.variable.analyze()
             self.variable.type-instance.copy-new()->(owner self.result-type)
             self.result-type.reference-path := ReferencePath(user self.variable)
             self.access := self.variable.access
@@ -65,10 +66,6 @@ class VariableExpression(Expression)
 
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
         self.variable.order-constants(user ordered-list)
-    
-    func dynamic get-constant-value()->(owner Long value)
-        self.variable.get-constant-value()->(owner value)
-            
 
     func dynamic check-memory(user ReferenceMemoryList refs)
         refs.check-reference(user self)
@@ -157,8 +154,8 @@ class FunctionExpression(Expression)
                 new VariableExpression self-var(
                         user self.instance.code-node,
                         owner string-new-copy(user "self"))
-                self.code-node.find-variable(user self-var.name, user _)->(
-                        user self-var.variable)
+                self.code-node.find-declared-variable(
+                        user self-var.name, user _)->(user self-var.variable)
                 self-var.variable.type-instance.new-replace-params(
                         user actual-params)->(owner self-var.result-type)
                 self-var.result-type.reference-path :=

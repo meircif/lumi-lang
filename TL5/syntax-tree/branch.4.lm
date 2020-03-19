@@ -186,7 +186,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
             user TypeData parent-type,
             user TypeInstance data-type)
         if variable.type-instance.type-data is glob.type-array and
-                data-type.type-data.is-sequence()
+                data-type.type-data.is-buffered()
             write-spaces(copy INDENTATION-SPACES)
             write(user "free(")
             if parent-type?
@@ -263,7 +263,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
             user TypeData parent-type,
             user TypeInstance data-type)
         if data-type.type-data.is-primitive or
-                data-type.type-data.is-sequence()
+                data-type.type-data.is-buffered()
             return
         write-spaces(copy INDENTATION-SPACES)
         if variable.type-instance.type-data is glob.type-array

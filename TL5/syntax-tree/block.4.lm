@@ -16,10 +16,6 @@ class SyntaxTreeCode(SyntaxTreeNode)
             self.parent.find-variable(user name, user _)->(user variable)
         else
             base(user name, user module-name)->(user variable)
-        if variable?
-            if variable.not-declared-yet
-                self.syntax-error(
-                        user "using before declaration variable", user name)
     
     func inst get-function()->(user SyntaxTreeFunction function)
         self.parent.get-function()->(user function)

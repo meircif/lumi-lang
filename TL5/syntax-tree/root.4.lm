@@ -6,6 +6,7 @@ class GlobalNodes(SyntaxTreeNamespace)
     
     new()
         self.types := List{TypeData}()
+        self.module := glob.global-module
 
 
 ~~~ The syntax tree root ~~~
@@ -305,7 +306,7 @@ class SyntaxTreeRoot(GlobalNodes)
             if not glob.is-new-mocked
                 write(user "\n\nvoid new_Mock(Bool* allocate_success) { }")
             if not glob.is-delete-mocked
-                write(user "\n\nReturncode delete_Mock(Ref self) \
+                write(user "\n\nReturn_Code delete_Mock(Ref self) \
                         { return OK; }")
                 
         if glob.tested-module?
@@ -326,7 +327,7 @@ class SyntaxTreeRoot(GlobalNodes)
         for n in self.line-counts.length
             line-count := self.line-counts[n]
             if line-count.needs-cover
-                write(user "\nint LUMI_file")
+                write(user "\nLine_Count LUMI_file")
                 write-int(copy line-count.covered-index)
                 write(user "_line_count[")
                 write-int(copy line-count.line-needs-cover.length)
@@ -369,7 +370,7 @@ class SyntaxTreeRoot(GlobalNodes)
     func inst write-test-main()
         write(user "\nUSER_MAIN_HEADER {\n")
         write-spaces(copy INDENTATION-SPACES)
-        write(user "Returncode LUMI_err = OK;\n")
+        write(user "Return_Code LUMI_err = OK;\n")
         write-spaces(copy INDENTATION-SPACES)
         write(user "unsigned LUMI_loop_depth = 1;\n")
         write-spaces(copy INDENTATION-SPACES)
@@ -411,8 +412,9 @@ struct ModuleMembers
         glob.module-map.add(user self.name, user self)
     
     func write-prefix()
-        write-cname(user self.name)
-        write(user "_M_")
+        if self.name?
+            write-cname(user self.name)
+            write(user "_M_")
 
 
 ~~~ Main function node in the syntax tree ~~~
@@ -422,7 +424,6 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
         new-node.parse()
     
     func inst parse()
-        self.my-module := glob.current-module
         string-new-copy(user "main")->(owner self.name)
         if glob.last-char = '!'
             self.arguments.has-error := true

@@ -11,7 +11,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     owner DeleteGroup delete-group-owner
     owner DeleteGroupBuilder delete-group-builder-owner
     user TypeData parent-type
-    user ModuleMembers my-module
     user SyntaxTreeFunction implemented-function
     user SyntaxTreeMockFunction mocker-function
     user SyntaxTreeFunction dynamic-base-method
@@ -59,8 +58,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
             if glob.last-char != ' '
                 self.syntax-error-msg(user "missing access before method name")
             self.get-access(user access-str)->(var self.self-access)
-        else
-            self.my-module := glob.current-module
         self.parse-header(copy false)
         self.parse-body()
     
@@ -101,7 +98,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         self.arguments.add-self-parameter(
                 user self.parent-type,
                 copy self.self-access,
-                copy self.self-conditional)
+                copy self.self-conditional,
+                user self)
     
     func inst parse-arguments(copy Bool is-native)
         var DeclarationArgumentFactory argument-factory
@@ -143,15 +141,14 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
             if glob.module-map.find(user self.name)?
                 self.syntax-error(
                         user "function name overrides module", user self.name)
-            if glob.find-function(user self.name)?
+            if self.find-function(user self.name, user _)?
                 self.syntax-error(
                         user "redefinition of function", user self.name)
-            if glob.find-variable(user self.name)?
+            if self.find-variable(user self.name, user _)?
                 self.syntax-error(
                         user "function name overrides global variable",
                         user self.name)
-            if self.my-module?
-                self.my-module.function-map.add(user self.name, user self)
+            self.module.function-map.add(user self.name, user self)
     
     func dynamic get-function()->(user SyntaxTreeFunction function)
         function := self
@@ -186,10 +183,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
             index := 0
     
     func dynamic link-types()
-        if self.my-module?
-            glob.current-module := self.my-module
         if self.type-name?
-            self.find-type(user self.type-name, user self.module-name)->(
+            self.check-type(user self.type-name, user self.module-name)->(
                     user self.parent-type)
             self.parent-type.find-meth(user self.name)->(
                     user self.implemented-function)
@@ -207,8 +202,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
             self.add-self-parameter()
         self.arguments.link-types()
         base()
-        if self.my-module?
-            glob.current-module := _
     
     func dynamic check-already-implemented()
         if not self.implemented-function.header-only or
@@ -226,12 +219,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
             is-constructor := self is self.parent-type.constructor
     
     func dynamic analyze()
-        if self.my-module?
-            glob.current-module := self.my-module
         if self.implemented-function?
             self.arguments.check-same-as(
                     user self.implemented-function.arguments, copy true)
-            self.my-module := self.implemented-function.my-module
         self.arguments.analyze()
         if self.header-only
             return
@@ -250,8 +240,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
                     not variable.type-instance.type-data.is-primitive
                 self.delete-group-builder.add-deleting(
                         user variable.type-instance)
-        if self.my-module?
-            glob.current-module := _
     
     func inst compare(user SyntaxTreeFunction other)
         if self.is-dynamic != other.is-dynamic
@@ -331,7 +319,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     func dynamic write()
         ; #define LUMI_FILE_NAME "`file-name`"
         ; #define LUMI_FUNC_NAME "`parent-type`.`function-name`"
-        ; [void|Returncode] `Type`_`name`(`args`) {
+        ; [void|Return_Code] `Type`_`name`(`args`) {
         ;     `block...`
         ; }
         ; #undef LUMI_FILE_NAME
@@ -345,7 +333,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     
     func inst write-header()
         if self.arguments.has-error
-            write(user "\nReturncode ")
+            write(user "\nReturn_Code ")
         else
             write(user "\nvoid ")
         self.write-cname()
@@ -353,7 +341,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     
     func inst write-block()
         ; `previous-text` {
-        ;     [Returncode LUMI_err = OK;]
+        ;     [Return_Code LUMI_err = OK;]
         ;     unsigned LUMI_loop_depth = 1;
         ;     `block...`
         ;     [return LUMI_err;]
@@ -362,7 +350,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         self.write-block-start()
         if self.err-aux-var or self.arguments.has-error
             write-spaces(copy INDENTATION-SPACES)
-            write(user "Returncode LUMI_err = OK;\n")
+            write(user "Return_Code LUMI_err = OK;\n")
         write-spaces(copy INDENTATION-SPACES)
         write(user "unsigned LUMI_loop_depth = 1;\n")
         self.write-block-setup()
@@ -394,15 +382,17 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         if self.parent-type?
             self.parent-type.write-cname()
             write(user "_")
-        else-if self.my-module?
-            self.my-module.write-prefix()
+        else-if self.implemented-function?
+            self.implemented-function.module.write-prefix()
+        else
+            self.module.write-prefix()
         write-cname(user self.name)
     
     func inst write-pointer()
         self.arguments.write-pointer(user self.name)
     
     func dynamic write-declaration()
-        ; Returncode `Type`_`name`(`args`);
+        ; Return_Code `Type`_`name`(`args`);
         if self.external-body and not self.header-only
             return
         self.write-header()
@@ -559,7 +549,8 @@ class DeclarationArgument(Argument)
                     user "access should not be \"temp\" for non-primitive \
                     type",
                     user type-data.name)
-        self.variable.type-instance.analyze-lengths(user self, copy false)
+        self.variable.type-instance.analyze-after-link(user self, copy false)
+        self.variable.is-analyzed := true
         if self.is-native
             if access-is-owner(copy self.access)
                 self.syntax-error-msg(user "owner argument to native function")
@@ -567,9 +558,8 @@ class DeclarationArgument(Argument)
                 self.syntax-error-msg(
                         user "managed argument to native function")
             if self.is-output
-                if self.access = Access.USER and (type-data.is-dynamic or
-                        type-data.is-sequence() or
-                        type-data is glob.type-array)
+                if self.access = Access.USER and
+                        (type-data.is-dynamic or type-data.is-sequence())
                     self.syntax-error(
                             user "user output to native function with non \
                             struct type",
@@ -589,7 +579,7 @@ class DeclarationArgument(Argument)
     
     func dynamic write()
         if self.variable.type-instance.type-data is glob.type-func
-            ; [void|Returncode] (*[*]`name`)(`arguments`)
+            ; [void|Return_Code] (*[*]`name`)(`arguments`)
             self.variable.type-instance.arguments.write-pointer-start()
             if self.is-output
                 write(user "*")
@@ -599,8 +589,8 @@ class DeclarationArgument(Argument)
             return
         
         if self.variable.type-instance.type-data is glob.type-array
-            ; `data-type`*[*] `name`, int[*] `name`_Length
-            ; [void|Returncode] (**[*] `name`)(`arguments`), int[*]
+            ; `data-type`*[*] `name`, Seq_Length[*] `name`_Length
+            ; [void|Return_Code] (**[*] `name`)(`arguments`), Seq_Length[*]
             ;    `name`_Length
             user TypeInstance data-type
             var Int depth
@@ -613,28 +603,29 @@ class DeclarationArgument(Argument)
             else-if data-type.type-data is glob.type-func
                 data-type.arguments.write-pointer-start()
             else
-                data-type.type-data.write-cname()
+                data-type.write-cname()
             self.write-name-param(user "*", user _)
             if data-type.type-data is glob.type-func
                 write(user ")")
                 data-type.arguments.write()
-            self.write-name-param(user ", int", user "_Length")
+            self.write-name-param(user ", Seq_Length", user "_Length")
             for n in depth
-                ; , int[*] `name`_Value_length
-                self.write-name-param(user ", int", user _)
+                ; , Seq_Length[*] `name`_Value_length
+                self.write-name-param(user ", Seq_Length", user _)
                 write-array-value-length(copy n)
-            if data-type.type-data.is-sequence()
-                ; , int*[*] `name`_Seq_length
-                self.write-name-param(user ", int*", user "_Seq_length")
+            if data-type.type-data.is-buffered()
+                ; , Seq_Length*[*] `name`_Seq_length
+                self.write-name-param(user ", Seq_Length*", user "_Seq_length")
         
-        else-if self.variable.type-instance.type-data.is-sequence()
-            ; char*[*] `name`, int[*] `name`_Max_length, int*[*] `name`_Length
+        else-if self.variable.type-instance.type-data.is-buffered()
+            ; char*[*] `name`, Seq_Length[*] `name`_Max_length,
+            ;   Seq_Length*[*] `name`_Length
             if self.variable.type-instance.type-data is glob.type-string
                 self.write-name-param(user "char*", user _)
             else
                 self.write-name-param(user "Byte*", user _)
-            self.write-name-param(user ", int", user "_Max_length")
-            self.write-name-param(user ", int*", user "_Length")
+            self.write-name-param(user ", Seq_Length", user "_Max_length")
+            self.write-name-param(user ", Seq_Length*", user "_Length")
         
         else
             ; `type`[*][*] `name`

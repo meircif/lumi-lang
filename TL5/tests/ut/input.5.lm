@@ -353,6 +353,20 @@ struct Test
 func fun()
     var Test t
     var Array{6:Test} a
+; @ c test-slice-expression-19
+new Array{i:Int} a!
+var Sint8 x
+var Int{-6:0} y
+i := a[x:x]![y:y + 1]![x]! + a[i:i + 1]![0:y + 1]![y]! + a[0:1][i]!
+var Int{100:200} length
+new Array{length:Int} aa!
+var Int{10:20} xx
+var Int{0:8} yy
+i := aa[xx:xx][yy]
+var Array{12:Int} ab
+i := ab[3:4][3]
+; @ c test-slice-expression-20
+i := str![2]! + buff![2]! + str![1:3]![2] + buff![1:3]![2]
 ; @ ec test-slice-expression-e0
 arr[2
 ; @ ec test-slice-expression-e1
@@ -390,10 +404,21 @@ var Array{0:Int} error
 ; @ ec test-slice-expression-e15
 arr![-1]
 ; @ ec test-slice-expression-e16
-arr![1:0]
+var Int{-10:-2} x
+arr![x]
 ; @ ec test-slice-expression-e17
+arr![1:0]
+; @ ec test-slice-expression-e18
+var Int{-10:0} x
+arr![1:x]
+; @ ec test-slice-expression-e19
 s-var Array{3:Int} a!
 arr := a[1:3]
+; @ ec test-slice-expression-e20
+var Int{-10:10} length
+new Array{length:Int} a!
+var Int{8:80} x
+arr := a[x:x]
 ; @@ test-call-expression
 ; @ c test-call-expression-0
 fun0()
@@ -485,6 +510,19 @@ fun1(copy 0, user sw!, owner s)
 fun8(strong ostr)
 ; @ c test-call-expression-26
 fune()!
+; @ c test-call-expression-27
+var Uint8 u8
+var Sint8 s8
+var Uint32 u32
+var Sint32 s32
+var Uint64 u64
+var Sint64 s64
+fun5(copy 0)->(var u8)
+fun5(copy 1)->(var s8)
+fun5(copy 50)->(var u32)
+fun5(copy 2)->(var s32)
+fun5(copy 3)->(var u64)
+fun5(copy 4)->(var s64)
 ; @ ec test-call-expression-e0
 function( copy 1)
 ; @ ec test-call-expression-e1
@@ -648,7 +686,7 @@ b := 3 <= 5 and 23 >= 37
 ; @ c test-binary-expression-5
 b := i = 5 or i <> 37
 ; @ c test-binary-expression-6
-b := 2 < i < 12 = 2 * i
+b := 2 < i < 12 = -2 * i
 ; @ c test-binary-expression-7
 t := tc
 ; @ c test-binary-expression-8
@@ -675,15 +713,22 @@ io := (60 div i!) + (60 mod i!)
 ; @ c test-binary-expression-17
 i := i bor 8
 ; @ c test-binary-expression-18
-i := i band 10
+i := 10 band i
 ; @ c test-binary-expression-19
-i := bnot i
+var Int{4:20} i8
+var Int{100000000000:200000000000} i64
+i := bnot i + bnot i8 + bnot i64
 ; @ c test-binary-expression-20
 i := i xor 16
 ; @ c test-binary-expression-21
-i := i shr 2
+i := 2 shr i
 ; @ c test-binary-expression-22
 i := i shl 1
+; @ c test-binary-expression-23
+i := bnot i + (10 band i)
+; @ c test-binary-expression-24
+var Int{1:100} x
+io := (60 div x) + (60 mod x)
 ; @ ec test-binary-expression-e0
 345 @ 2
 ; @ ec test-binary-expression-e1
@@ -741,6 +786,30 @@ io := 60 mod i
 io := 60 div 0
 ; @ ec test-binary-expression-e25
 io := 60 mod 0
+; @ ec test-binary-expression-e26
+var Int{-10:10} x
+i := bnot x
+; @ ec test-binary-expression-e27
+var Int{-10:10} x
+i := x xor 1
+; @ ec test-binary-expression-e28
+var Int{-10:10} x
+i := 2 bor x
+; @ ec test-binary-expression-e29
+var Int{-10:10} x
+i := x band 3
+; @ ec test-binary-expression-e30
+var Int{-10:10} x
+i := x shr 4
+; @ ec test-binary-expression-e31
+var Int{-10:10} x
+i := 5 shl x
+; @ ec test-binary-expression-e32
+var Int{-10:10} x
+i := x div 6
+; @ ec test-binary-expression-e33
+var Int{-10:10} x
+i := 7 mod x
 ; @@ test-swap-expression
 ; @ c test-swap-expression-0
 new Test t1!
@@ -977,7 +1046,7 @@ var String{23!} s
 ; @@ test-int-range
 ; @ g test-int-range-0
 struct Test
-    var Int int
+    var Int int-def
     var Uint8 u8b
     var Uint16 u16b
     var Uint32 u32b
@@ -1008,6 +1077,10 @@ const Int MAX 10000
 enum Nums
     MIN
 var Int{Nums.MIN - 12:MAX * 2} s16
+struct Test
+    var Int x
+func fun(user Test t)->(var Int x)
+    x := fun(user t) + t.x
 ; @ c test-int-range-3
 var Int u8
 var Int s16(copy -1000)
@@ -2011,6 +2084,8 @@ var Array{i:Int} error
 var Int error--name
 ; @ ec test-code-variables-e11
 var Int x #
+; @ ec test-code-variables-e12
+new Array{-2:Int} a!
 ; @@ test-initialize
 ; @ c test-initialize-0
 tb := Tb(copy i)!
@@ -2167,6 +2242,8 @@ user String s!
 ; @ eg test-initialize-e38
 struct Test
     weak String s!
+; @ ec test-initialize-e39
+arr := Buffer{-2}()!
 ; @@ test-comment
 ; @ c test-comment-0
 ; comment
@@ -2457,7 +2534,7 @@ for _ in ostr!
 for _ in buff!
     i += 1
 ; @ c test-for-loop-13
-repeat i + 4
+repeat i - 4
     i += 1
 ; @ ec test-for-loop-e0
 for(
@@ -2785,8 +2862,9 @@ func use()
     x := 2
 ; @ g test-native-c0
 native const Int VALUE
+native const Byte BYTE
 func get()->(var Int x)
-    x := VALUE
+    x := VALUE + BYTE
 ; @ g test-native-c1
 native const Int VALUE "SOME_External_const"
 func get()->(var Int x)
@@ -2868,6 +2946,8 @@ native var Int x error
 ; @ eg test-native-ec0
 native const Int VALUE error
 ; @ eg test-native-ec1
+native const Bool VALUE
+; @ eg test-native-ec2
 native const Int VALUE
 var String{VALUE} error
 ; @ eg test-native-et0
@@ -3650,10 +3730,15 @@ const Int NUMBER MyEnum.VALUE
 ; @ g test-constant-4
 const Int NUMBER (128 div 3) mod 10
 const Int D-CHAR 'a' + 3
+; @ g test-constant-5
+var Array{Enum.VAL + Enum.length + LENGTH:Int} arr
+const Int LENGTH 6
+enum Enum
+    VAL
 ; @ eg test-constant-e0
 const
 ; @ eg test-constant-e1
-const Bool
+const Bool ERROR 0
 ; @ eg test-constant-e2
 const Int
 ; @ eg test-constant-e3
@@ -4649,15 +4734,15 @@ p-void := p-char
 p-uint := p-void
 p-char := p-uint
 ; @ c test-c-objects-2
-var cdef.Int int
+var cdef.Int cint
 var cdef.Pointer{cdef.Int} p-int
 var cdef.Pointer{cdef.Pointer{cdef.Int}} pp-int
 user Array?{cdef.Int} arr-int
 p-int.set-from-array(user arr-int!)
-p-int.set-point-to(var int)
+p-int.set-point-to(var cint)
 pp-int.set-point-to(var p-int)
 p-int := pp-int.get-pointed-at(copy 0)
-int := p-int.get-pointed-at(copy 3)
+cint := p-int.get-pointed-at(copy 3)
 var Test test
 user Test u-test(user test)
 var cdef.Pointer{Test} p-test

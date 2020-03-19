@@ -30,7 +30,6 @@ test power-test()
     assert! math.power(copy 0, copy 0)! = 1
     assert! math.power(copy 0, copy 1)! = 0
     assert! math.power(copy 0, copy 3)! = 0
-    assert-error! math.power(copy 3, copy - 2), "negative power exponent"
 
 
 test factorial-test()
@@ -40,7 +39,6 @@ test factorial-test()
     assert! math.factorial(copy 3)! = 6
     assert! math.factorial(copy 4)! = 24
     assert! math.factorial(copy 6)! = 720
-    assert-error! math.factorial(copy -4), "negative factorial"
 
 
 test sum-test()

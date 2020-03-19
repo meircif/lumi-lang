@@ -10,29 +10,53 @@ struct IntRange
     owner Long min-value
     owner Long max-value
     owner String name
+    var Int bits
+    var Bool is-signed
     
-    func copy-values(user IntRange other)
-        other.min-value.copy()->(owner self.min-value)
-        other.max-value.copy()->(owner self.max-value)
+    func copy-new()->(owner IntRange other)
+        other := IntRange()
+        other.min-expression := self.min-expression
+        other.max-expression := self.max-expression
+        other.bits := self.bits
+        other.is-signed := self.is-signed
+        if self.min-value?
+            self.min-value.copy()->(owner other.min-value)
+        if self.max-value?
+            self.max-value.copy()->(owner other.max-value)
     
     func set-values(user SyntaxTreeNode node)
+        if self.max-value?
+            return
         self.set-value(
                 user node, user self.max-owner, user self.max-expression)->(
                 owner self.max-value)
         if self.min-expression?
             self.set-value(
-                    user node,
-                    user self.min-owner,
-                    user self.min-expression)->(
+                    user node, user self.min-owner, user self.min-expression)->(
                     owner self.min-value)
         else
             self.min-value := Long()
+        self.check-range(user node)
+        self.set-sign-and-bits()
+
+    func set-value(
+            user SyntaxTreeNode node,
+            user ExpressionValue value-owner,
+            user ExpressionValue value-expression)->(
+            owner Long value)
+        if value-owner.parsed()
+            node.analyze-expression(user value-owner, user glob.type-int)
+        user Long constant-value
+        if not value-expression.get-constant-value()->(user constant-value)?
+            node.syntax-error-msg(user "integer range is not constant")
+        constant-value.copy()->(owner value)
+    
+    func check-range(user SyntaxTreeNode node)
         if long-larger(user self.min-value, user self.max-value)
             node.syntax-error-msg(
                     user "integer range minimum larger than maximum")
         var Long num
-        num.set(copy -1)
-        if long-larger(user self.min-value, user num)
+        if self.min-value.sign() >= 0
             num.parse(user "18446744073709551615")
             if long-larger(user self.max-value, user num)
                 node.syntax-error-msg(user "unsigned integer maximum too high")
@@ -43,40 +67,16 @@ struct IntRange
             num.parse(user "-9223372036854775808")
             if long-larger(user num, user self.min-value)
                 node.syntax-error-msg(user "signed integer minimum too low")
-    
-    func set-value(
-            user SyntaxTreeNode node,
-            user ExpressionValue value-owner,
-            user ExpressionValue value-expression)->(
-            owner Long value)
-        if value-owner.parsed()
-            node.analyze-expression(user value-owner, user glob.type-int)
-        if not value-expression.get-constant-value()->(owner value)?
-            node.syntax-error-msg(user "int range is not constant")
-    
-    func write-cname()
-        var Long min8
-        var Long min16
-        var Long min32
+
+    func set-sign-and-bits()
         var Long max8
         var Long max16
         var Long max32
-        min8.set(copy -1)
-        if long-larger(user self.min-value, user min8)
-            write(user "uint")
-            max8.set(copy 256)
-            max16.parse(user "65536")
-            max32.parse(user "4294967296")
-            if long-larger(user max8, user self.max-value)
-                write(user "8_t")
-            else-if long-larger(user max16, user self.max-value)
-                write(user "16_t")
-            else-if long-larger(user max32, user self.max-value)
-                write(user "32_t")
-            else
-                write(user "64_t")
-        else
-            write(user "int")
+        self.is-signed := self.min-value.sign() < 0
+        if self.is-signed
+            var Long min8
+            var Long min16
+            var Long min32
             min8.set(copy -129)
             min16.parse(user "-32769")
             min32.parse(user "-2147483649")
@@ -85,15 +85,37 @@ struct IntRange
             max32.parse(user "2147483648")
             if long-larger(user self.min-value, user min8) and
                     long-larger(user max8, user self.max-value)
-                write(user "8_t")
+                self.bits := 8
             else-if long-larger(user self.min-value, user min16) and
                     long-larger(user max16, user self.max-value)
-                write(user "16_t")
+                self.bits := 16
             else-if long-larger(user self.min-value, user min32) and
                     long-larger(user max32, user self.max-value)
-                write(user "32_t")
+                self.bits := 32
             else
-                write(user "64_t")
+                self.bits := 64
+        else
+            max8.set(copy 256)
+            max16.parse(user "65536")
+            max32.parse(user "4294967296")
+            if long-larger(user max8, user self.max-value)
+                self.bits := 8
+            else-if long-larger(user max16, user self.max-value)
+                self.bits := 16
+            else-if long-larger(user max32, user self.max-value)
+                self.bits := 32
+            else
+                self.bits := 64
+    
+    ; func is-same(user Long other)->(var Bool same)
+    ;     same := self.is-signed = other.is-signed and self.bits = other.bits
+    
+    func write-cname()
+        if not self.is-signed
+            write(user "u")
+        write(user "int")
+        write-int(copy self.bits)
+        write(user "_t")
 
 ~~~ Specific usage of a type including the assigned parameters and values ~~~
 struct TypeInstance
@@ -127,6 +149,8 @@ struct TypeInstance
             other.parameters := List{TypeInstance}()
             for parameter in self.parameters.iter()
                 other.parameters.add(owner parameter.copy-new())
+        if self.int-range?
+            self.int-range.copy-new()->(owner other.int-range)
         if self.arguments?
             self.arguments.copy-new()->(owner other.arguments)
         if self.reference-path?
@@ -224,48 +248,62 @@ struct TypeInstance
             self.parameters := List{TypeInstance}()
         self.parameters.add(owner type-data.new-type-instance())
     
+    func set-int-constant(user Long value)
+        if not self.int-range?
+            self.int-range := IntRange()
+        value.copy()->(owner self.int-range.min-value)
+        value.copy()->(owner self.int-range.max-value)
+        self.int-range.set-sign-and-bits()
+    
+    func set-int-range()
+        user IntRange int-range
+        if glob.int-map.find(user self.name)->(user int-range)?
+            int-range.copy-new()->(owner self.int-range)
+    
     func analyze(user SyntaxTreeNode node)
         self.analyze-part(user node, copy true, copy true, copy false)
     
     func link-types(user SyntaxTreeNode node)
         self.analyze-part(user node, copy true, copy false, copy true)
     
-    func analyze-lengths(user SyntaxTreeNode node, copy Bool constant-length)
+    func analyze-after-link(user SyntaxTreeNode node, copy Bool constant-length)
         self.analyze-part(
                 user node, copy false, copy true, copy constant-length)
     
     func analyze-part(
             user SyntaxTreeNode node,
-            copy Bool check-types,
-            copy Bool check-length,
+            copy Bool link-types,
+            copy Bool analyze,
             copy Bool constant-length)
-        if check-types
+        if link-types
             if not self.type-data?
-                node.find-type(user self.name, user self.module-name)->(
+                node.check-type(user self.name, user self.module-name)->(
                         user self.type-data)
             if self.arguments?
                 self.arguments.link-types()
-        if check-length
+            if self.type-data.is-int-like and not self.int-range?
+                self.set-int-range()
+        if analyze
             if self.int-range?
                 self.int-range.set-values(user node)
-            else-if self.type-data is glob.type-int
-                user IntRange int-range
-                if glob.int-map.find(user self.name)->(user int-range)?
-                    self.int-range := IntRange()
-                    self.int-range.copy-values(user int-range)
             if self.length-owner.parsed()
                 node.analyze-expression(user self.length, user glob.type-int)
                 if constant-length
-                    owner Long length-value
-                    var Long one
-                    one.set(copy 1)
-                    self.length.get-constant-value()->(owner length-value)
+                    user Long length-value
+                    self.length.get-constant-value()->(user length-value)
                     if not length-value?
                         node.syntax-error-msg(
                                 user "sequence length is not constant")
-                    if long-larger(user one, user length-value)
+                    if length-value.sign() <= 0
                         node.syntax-error-msg(
                                 user "sequence length is not positive")
+                else
+                    user IntRange range(user self.length.result-type.int-range)
+                    if range.max-value.sign() <= 0
+                        node.syntax-error-long(
+                                user "sequence length never positive with \
+                                maximum value of",
+                                user range.max-value)
                 self.length.check-no-error()
             if self.arguments?
                 self.arguments.analyze()
@@ -273,13 +311,13 @@ struct TypeInstance
             for sub-type in self.parameters.iter()
                 sub-type.analyze-part(
                         user node,
-                        copy check-types,
-                        copy check-length,
+                        copy link-types,
+                        copy analyze,
                         copy constant-length)
-        if check-types
-            self.check-parameters(user node)
+        if link-types
+            self.link-parameters(user node)
     
-    func check-parameters(user SyntaxTreeNode node)
+    func link-parameters(user SyntaxTreeNode node)
         if self.type-data is glob.type-array
             if not self.parameters?
                 node.syntax-error-msg(user "missing subtype for array")
@@ -542,12 +580,11 @@ struct TypeInstance
             target-iter.next()
         
     func check-sequence(user SyntaxTreeNode node)
-        if (self.type-data is glob.type-array or
-                self.type-data.is-sequence()) and not self.length?
+        if self.type-data.is-sequence() and not self.length?
             assert node?
             node.syntax-error-msg(user "missing length for sequence")
         if self.type-data is glob.type-array
-            if self.parameters.first.item.type-data.is-sequence() and
+            if self.parameters.first.item.type-data.is-buffered() and
                     not self.parameters.first.item.length?
                 assert node?
                 node.syntax-error-msg(user "missing length for sequence")
@@ -560,8 +597,7 @@ struct TypeInstance
             while data-type.type-data is glob.type-array
             while data-type.parameters?
             data-type := data-type.parameters.first.item
-            while data-type.type-data is glob.type-array or
-                    data-type.type-data.is-sequence()
+            while data-type.type-data.is-sequence()
             depth += 1
     
     ~~~ Create a copy of self type-instance with generic parameters replaced by
@@ -606,13 +642,13 @@ struct TypeInstance
                         user actual-params, copy replace-bases)
                 
     func write-cname()
-        if self.int-range?
+        if self.type-data is glob.type-int and self.int-range?
             self.int-range.write-cname()
         else-if self.type-data is glob.type-pointer
             if self.parameters?
                 self.parameters.first.item.write-cname()
-                write(user "*")
             else
-                write(user "void*")
+                write(user "void")
+            write(user "*")
         else
             self.type-data.write-cname()

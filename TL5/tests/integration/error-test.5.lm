@@ -36,8 +36,9 @@ test fail-slice-index()
     var Int i(copy 6)
     assert! arr[i]! = 0
 
-test fail-negative-slice()
-    new Array{-2:Int} arr!
+test fail-negative-sequence()
+    var Sint8 length(copy -2)
+    new Array{length:Int} arr!
 
 test fail-member-empty()
     user BaseType? obj

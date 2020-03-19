@@ -29,9 +29,6 @@ class BlockExpression(Expression)
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
         self.expression.order-constants(user ordered-list)
 
-    func dynamic get-constant-value()->(owner Long value)
-        self.expression.get-constant-value()->(owner value)
-
     func dynamic check-memory(user ReferenceMemoryList refs)
         self.expression.check-memory(user refs)
 

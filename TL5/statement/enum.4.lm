@@ -4,7 +4,6 @@ module tl5-compiler
  ~~~ Enum node in the syntax tree ~~~
 class EnumData(SyntaxTreeNode)
     owner String name
-    user ModuleMembers my-module
     var List{String} values
     
     func inst parse-new()->(owner EnumData new-node)
@@ -13,13 +12,12 @@ class EnumData(SyntaxTreeNode)
     
     func inst parse()
         self.set-location()
-        self.my-module := glob.current-module
         read-new(user "")->(owner self.name)
         if not is-legal-name(user self.name, copy NameGroup.TYPE)
             self.syntax-error(user "illegal Enum name", user self.name)
-        if glob.find-type(user self.name)?
+        if self.find-type(user self.name)?
             self.syntax-error(user "Enum name overrides type", user self.name)
-        if self.my-module.enum-map.find(user self.name)?
+        if self.module.enum-map.find(user self.name)?
             self.syntax-error(user "redefinition of Enum", user self.name)
         do
             user String value
@@ -36,7 +34,7 @@ class EnumData(SyntaxTreeNode)
         if not self.values.first?
             self.syntax-error-msg(user "Enum with no values")
         glob.save-input := true
-        self.my-module.enum-map.add(user self.name, user self)
+        self.module.enum-map.add(user self.name, user self)
     
     func inst has-value(user String name)->(
             owner Long value, var Bool has-value)
@@ -52,7 +50,7 @@ class EnumData(SyntaxTreeNode)
         has-value := false
     
     func inst write-cname()
-        self.my-module.write-prefix()
+        self.module.write-prefix()
         write-cname(user self.name)
     
     func dynamic write()

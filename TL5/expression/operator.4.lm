@@ -59,18 +59,45 @@ func not-operator-factory(
     expression := NotOperatorExpression(user code-node, user operator)
 
 
+func set-int-type(user UnaryExpression self, copy Int bits)
+    var String{8} uint-name(user "Uint")
+    if bits >= 10
+        uint-name.append(copy '0' + (bits div 10))
+    uint-name.append(copy '0' + (bits mod 10))
+    self.set-simple-type(user glob.type-int)
+    string-new-copy(user uint-name)->(owner self.result-type.name)
+    self.result-type.set-int-range()
+
+func check-not-signed(user UnaryExpression self, user Expression expression)
+    if expression.result-type.int-range.is-signed
+        self.syntax-error-long(
+                user "bitwize operation on signed integer with minimum \
+                value of",
+                user expression.result-type.int-range.min-value)
+
+
 ~~~ bnot ~~~
-class BinaryNotOperatorExpression(UnaryExpression)
+class BitwizeNotOperatorExpression(UnaryExpression)
     func dynamic analyze()
         base()
         self.test-operand-type(
                 user self.right-expression, user glob.type-int)
-        self.set-simple-type(user glob.type-int)
+        check-not-signed(user self, user self.right-expression)
+        set-int-type(
+                user self,
+                copy self.right-expression.result-type.int-range.bits)
 
-func binary-not-operator-factory(
+    func dynamic write()
+        write(user "(")
+        self.result-type.write-cname()
+        write(user ")(")
+        base()
+        write(user ")")
+
+func bitwize-not-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
         owner UnaryExpression expression)
-    expression := BinaryNotOperatorExpression(user code-node, user operator)
+    expression := BitwizeNotOperatorExpression(user code-node, user operator)
 
 
 ~~~ - ~~~
@@ -80,10 +107,14 @@ class NegationOperatorExpression(UnaryExpression)
         self.test-operand-type(
                 user self.right-expression, user glob.type-int)
         self.set-simple-type(user glob.type-int)
-
-    func dynamic get-constant-value()->(owner Long value)
-        if self.right-expression.get-constant-value()->(owner value)?
-            value.negate()
+        self.result-type.int-range := IntRange()
+        self.right-expression.result-type.int-range.max-value.copy()->(
+                owner self.result-type.int-range.min-value)
+        self.right-expression.result-type.int-range.min-value.copy()->(
+                owner self.result-type.int-range.max-value)
+        self.result-type.int-range.min-value.negate()
+        self.result-type.int-range.max-value.negate()
+        self.result-type.int-range.set-sign-and-bits()
 
 func negation-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
@@ -91,39 +122,70 @@ func negation-operator-factory(
     expression := NegationOperatorExpression(user code-node, user operator)
 
 
+class BitwizeOperatorExpression(BinaryExpression)
+    func dynamic analyze()
+        base()
+        self.test-operands-type(user glob.type-int)
+        check-not-signed(user self, user self.left-expression)
+        check-not-signed(user self, user self.right-expression)
+        set-int-type(user self, copy self.get-result-bits())
+    
+    func dynamic get-result-bits()->(var Int bits)
+        if self.right-expression.result-type.int-range.bits >
+                self.left-expression.result-type.int-range.bits
+            bits := self.right-expression.result-type.int-range.bits
+        else
+            bits := self.left-expression.result-type.int-range.bits
+        
+func bitwize-operator-factory(
+        user SyntaxTreeCode code-node, user Operator operator)->(
+        owner BinaryExpression expression)
+    expression := BitwizeOperatorExpression(user code-node, user operator)
+
+
+class ShiftOperatorExpression(BitwizeOperatorExpression)
+    func dynamic get-result-bits()->(var Int bits)
+        bits := self.left-expression.result-type.int-range.bits
+        
+func shift-operator-factory(
+        user SyntaxTreeCode code-node, user Operator operator)->(
+        owner BinaryExpression expression)
+    expression := ShiftOperatorExpression(user code-node, user operator)
+        
+        
 class ArithmeticOperatorExpression(BinaryExpression)
     func dynamic analyze()
         base()
         self.test-operands-type(user glob.type-int)
         self.set-simple-type(user glob.type-int)
-
-
-func generic-binary-operator-factory(
-        user SyntaxTreeCode code-node, user Operator operator)->(
-        owner BinaryExpression expression)
-    expression := ArithmeticOperatorExpression(user code-node, user operator)
-        
-        
-class CompileTimeComputedArithmeticOperatorExpression(ArithmeticOperatorExpression)
-    func dynamic get-constant-value()->(owner Long value)
-        owner Long left-value
-        owner Long right-value
-        self.left-expression.get-constant-value()->(owner left-value)
-        self.right-expression.get-constant-value()->(owner right-value)
-        if left-value? and right-value?
-            self.compute-constant-value(owner left-value, owner right-value)->(
-                    owner value)
-
-    func dynamic compute-constant-value(
-            owner Long left-value, owner Long right-value)->(owner Long value)
+        self.result-type.int-range := IntRange()
+        self.set-range(
+                user self.result-type.int-range,
+                user self.left-expression.result-type.int-range.min-value,
+                user self.left-expression.result-type.int-range.max-value,
+                user self.right-expression.result-type.int-range.min-value,
+                user self.right-expression.result-type.int-range.max-value)
+        self.result-type.int-range.set-sign-and-bits()
+    
+    func dynamic set-range(
+            user IntRange int-range,
+            user Long left-min,
+            user Long left-max,
+            user Long right-min,
+            user Long right-max)
         raise
 
 
 ~~~ + ~~~
-class AdditionOperatorExpression(CompileTimeComputedArithmeticOperatorExpression)
-    func dynamic compute-constant-value(
-            owner Long left-value, owner Long right-value)->(owner Long value)
-        long-add(user left-value, user right-value)->(owner value)
+class AdditionOperatorExpression(ArithmeticOperatorExpression)
+    func dynamic set-range(
+            user IntRange int-range,
+            user Long left-min,
+            user Long left-max,
+            user Long right-min,
+            user Long right-max)
+        long-add(user left-min, user right-min)->(owner int-range.min-value)
+        long-add(user left-max, user right-max)->(owner int-range.max-value)
 
 func addition-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
@@ -131,10 +193,15 @@ func addition-operator-factory(
     expression := AdditionOperatorExpression(user code-node, user operator)
 
 ~~~ - ~~~
-class SubtractionOperatorExpression(CompileTimeComputedArithmeticOperatorExpression)
-    func dynamic compute-constant-value(
-            owner Long left-value, owner Long right-value)->(owner Long value)
-        long-sub(user left-value, user right-value)->(owner value)
+class SubtractionOperatorExpression(ArithmeticOperatorExpression)
+    func dynamic set-range(
+            user IntRange int-range,
+            user Long left-min,
+            user Long left-max,
+            user Long right-min,
+            user Long right-max)
+        long-sub(user left-min, user right-max)->(owner int-range.min-value)
+        long-sub(user left-max, user right-min)->(owner int-range.max-value)
 
 func subtraction-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
@@ -142,10 +209,27 @@ func subtraction-operator-factory(
     expression := SubtractionOperatorExpression(user code-node, user operator)
 
 ~~~ * ~~~
-class MultiplicationOperatorExpression(CompileTimeComputedArithmeticOperatorExpression)
-    func dynamic compute-constant-value(
-            owner Long left-value, owner Long right-value)->(owner Long value)
-        long-mul(user left-value, user right-value)->(owner value)
+class MultiplicationOperatorExpression(ArithmeticOperatorExpression)
+    func dynamic set-range(
+            user IntRange int-range,
+            user Long left-min,
+            user Long left-max,
+            user Long right-min,
+            user Long right-max)
+        long-mul(user left-min, user right-min)->(owner int-range.min-value)
+        int-range.min-value.copy()->(owner int-range.max-value)
+        self.limit-candidate(user int-range, user left-min, user right-max)
+        self.limit-candidate(user int-range, user left-max, user right-min)
+        self.limit-candidate(user int-range, user left-max, user right-max)
+    
+    func inst limit-candidate(
+            user IntRange int-range, user Long a, user Long b)
+        owner Long mul
+        long-mul(user a, user b)->(owner mul)
+        if long-larger(user int-range.min-value, user mul)
+            int-range.min-value := mul
+        else-if long-larger(user mul, user int-range.max-value)
+            int-range.max-value := mul
 
 func multiplication-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
@@ -154,34 +238,54 @@ func multiplication-operator-factory(
             MultiplicationOperatorExpression(user code-node, user operator)
 
 ~~~ div ~~~
-class DivisionOperatorExpression(CompileTimeComputedArithmeticOperatorExpression)
+class DivisionOperatorExpression(ArithmeticOperatorExpression)
+    var Bool zero-check
+    
+    func dynamic set-range(
+            user IntRange int-range,
+            user Long left-min,
+            user Long left-max,
+            user Long right-min,
+            user Long right-max)
+        if right-min.sign() = 0
+            left-max.copy()->(owner int-range.max-value)
+        else
+            long-div(user left-max, user right-min)->(owner int-range.max-value)
+        long-div(user left-min, user right-max)->(owner int-range.min-value)
+    
     func dynamic analyze()
         self.allow-right-error := true
         base()
-        owner Long value
-        self.right-expression.get-constant-value()->(owner value)
-        if value?
-            var Long zero
-            if long-equal(user value, user zero)
-                self.syntax-error-msg(user "dividing by zero")
-            else
-                self.right-expression.check-no-error()
-        else
+        self.check-not-signed(user self.left-expression)
+        self.check-not-signed(user self.right-expression)
+        user IntRange right-int-range(
+                user self.right-expression.result-type.int-range)
+        if right-int-range.max-value.sign() = 0
+            self.syntax-error-msg(user "dividing by zero")
+        self.zero-check := right-int-range.min-value.sign() = 0
+        if self.zero-check
             self.right-expression.check-error-propagated(
                     user "ignoring zero division check")
+        else
+            self.right-expression.check-no-error()
+                
+    func inst check-not-signed(user Expression expression)
+        if expression.result-type.int-range.is-signed
+            self.syntax-error-long(
+                    user "division operation on signed integer with minimum \
+                    value of",
+                    user expression.result-type.int-range.min-value)
 
     func dynamic write-preactions()
         base()
+        if not self.zero-check
+            return
         ; if (`right` == 0) RAISE(`line`, `cleanup`, zero_division)
         write(user "if (")
         self.right-expression.write()
         write(user " == 0) ")
         self.code-node.write-raise(user "zero_division")
         self.code-node.write-spaces()
-
-    func dynamic compute-constant-value(
-            owner Long left-value, owner Long right-value)->(owner Long value)
-        long-div(user left-value, user right-value)->(owner value)
 
 func division-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
@@ -190,9 +294,21 @@ func division-operator-factory(
 
 ~~~ mod ~~~
 class ModuloOperatorExpression(DivisionOperatorExpression)
-    func dynamic compute-constant-value(
-            owner Long left-value, owner Long right-value)->(owner Long value)
-        long-mod(user left-value, user right-value)->(owner value)
+    func dynamic set-range(
+            user IntRange int-range,
+            user Long left-min,
+            user Long left-max,
+            user Long right-min,
+            user Long right-max)
+        if long-equal(user left-min, user left-max) and
+                long-equal(user right-min, user right-max)
+            long-mod(user left-min, user right-min)->(owner int-range.min-value)
+            int-range.min-value.copy()->(owner int-range.max-value)
+        else
+            var Long one
+            one.set(copy 1)
+            int-range.min-value := Long()
+            long-sub(user right-max, user one)->(owner int-range.max-value)
 
 func modulo-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(

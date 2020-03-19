@@ -157,7 +157,7 @@ struct Global
                 user "~",
                 copy Precedence.BNOT,
                 copy 0,
-                copy binary-not-operator-factory,
+                copy bitwize-not-operator-factory,
                 copy _)
         self.add-operator-copy(
                 user "+",
@@ -197,35 +197,35 @@ struct Global
                 copy Precedence.ARITHMETIC,
                 copy 2,
                 copy _,
-                copy generic-binary-operator-factory)
+                copy bitwize-operator-factory)
         self.add-operator(
                 user "band",
                 user "&",
                 copy Precedence.ARITHMETIC,
                 copy 2,
                 copy _,
-                copy generic-binary-operator-factory)
+                copy bitwize-operator-factory)
         self.add-operator(
                 user "xor",
                 user "^",
                 copy Precedence.ARITHMETIC,
                 copy 2,
                 copy _,
-                copy generic-binary-operator-factory)
+                copy bitwize-operator-factory)
         self.add-operator(
                 user "shr",
                 user ">>",
                 copy Precedence.ARITHMETIC,
                 copy 2,
                 copy _,
-                copy generic-binary-operator-factory)
+                copy shift-operator-factory)
         self.add-operator(
                 user "shl",
                 user "<<",
                 copy Precedence.ARITHMETIC,
                 copy 2,
                 copy _,
-                copy generic-binary-operator-factory)
+                copy shift-operator-factory)
         self.add-operator(
                 user "=",
                 user "==",
@@ -368,24 +368,34 @@ struct Global
                 copy binary-factory)
 
     func init-int-map()
-        self.add-int-alias(user "Uint8", user _, user "255")
-        self.add-int-alias(user "Uint16", user _, user "65535")
-        self.add-int-alias(user "Uint32", user _, user "4294967295")
-        self.add-int-alias(user "Uint64", user _, user "18446744073709551615")
-        self.add-int-alias(user "Sint8", user "-128", user "127")
-        self.add-int-alias(user "Sint16", user "-32768", user "32767")
+        self.add-int-alias(user "Char", copy 8, user _, user "127")
+        self.add-int-alias(user "Byte", copy 8, user _, user "255")
+        self.add-int-alias(user "Int", copy 32, user _, user "4294967295")
+        self.add-int-alias(user "Uint8", copy 8, user _, user "255")
+        self.add-int-alias(user "Uint16", copy 16, user _, user "65535")
+        self.add-int-alias(user "Uint32", copy 32, user _, user "4294967295")
         self.add-int-alias(
-                user "Sint32", user "-2147483648", user "2147483647")
+                user "Uint64", copy 64, user _, user "18446744073709551615")
+        self.add-int-alias(user "Sint8", copy 8, user "-128", user "127")
+        self.add-int-alias(user "Sint16", copy 16, user "-32768", user "32767")
+        self.add-int-alias(
+                user "Sint32", copy 32, user "-2147483648", user "2147483647")
         self.add-int-alias(
                 user "Sint64",
+                copy 64,
                 user "-9223372036854775808",
                 user "9223372036854775807")
 
     func add-int-alias(
-            user String name, user String min-value, user String max-value)
+            user String name,
+            copy Int bits,
+            user String min-value,
+            user String max-value)
         new IntRange int-range
+        int-range.bits := bits
         int-range.min-value := Long()
         if min-value?
+            int-range.is-signed := true
             int-range.min-value.parse(user min-value)
         int-range.max-value := Long()
         int-range.max-value.parse(user max-value)
@@ -460,10 +470,10 @@ struct Global
                 copy false,
                 copy Access.USER)->(
                 user function)
-        self.add-builtin-output(
+        self.add-builtin-int-argument(
                 user function,
-                copy Access.VAR,
-                user self.type-int,
+                user "Uint32",
+                copy true,
                 user "length")
 
         ; String
@@ -477,10 +487,10 @@ struct Global
                 copy true,
                 copy Access.USER)->(
                 user function)
-        self.add-builtin-parameter(
+        self.add-builtin-int-argument(
                 user function,
-                copy Access.COPY,
-                user self.type-int,
+                user "Sint64",
+                copy false,
                 user "number")
 
         ; Buffer
@@ -507,10 +517,10 @@ struct Global
         self.add-builtin-method(
                 user seq-type, user "length", copy false, copy Access.USER)->(
                 user function)
-        self.add-builtin-output(
+        self.add-builtin-int-argument(
                 user function,
-                copy Access.VAR,
-                user self.type-int,
+                user "Uint32",
+                copy true,
                 user "length")
 
         self.add-builtin-method(
@@ -519,10 +529,10 @@ struct Global
                 copy false,
                 copy Access.USER)->(
                 user function)
-        self.add-builtin-output(
+        self.add-builtin-int-argument(
                 user function,
-                copy Access.VAR,
-                user self.type-int,
+                user "Uint32",
+                copy true,
                 user "max-length")
 
         self.add-builtin-method(
@@ -561,10 +571,10 @@ struct Global
         self.add-builtin-method(
                 user seq-type, user "get", copy true, copy Access.USER)->(
                 user function)
-        self.add-builtin-parameter(
+        self.add-builtin-int-argument(
                 user function,
-                copy Access.COPY,
-                user self.type-int,
+                user "Uint32",
+                copy false,
                 user "index")
         self.add-builtin-output(
                 user function, copy Access.VAR, user value-type, user "value")
@@ -572,10 +582,10 @@ struct Global
         self.add-builtin-method(
                 user seq-type, user "set", copy true, copy Access.USER)->(
                 user function)
-        self.add-builtin-parameter(
+        self.add-builtin-int-argument(
                 user function,
-                copy Access.COPY,
-                user self.type-int,
+                user "Uint32",
+                copy false,
                 user "index")
         self.add-builtin-parameter(
                 user function, copy Access.COPY, user value-type, user "value")
@@ -605,10 +615,10 @@ struct Global
                 copy false,
                 copy Access.USER,
                 user "pattern")
-        self.add-builtin-output(
+        self.add-builtin-int-argument(
                 user function,
-                copy Access.VAR,
-                user self.type-int,
+                user "Uint32",
+                copy true,
                 user "index")
 
         self.add-builtin-method(
@@ -713,10 +723,10 @@ struct Global
         self.add-builtin-method(
                 user file-type, user "tell", copy true, copy Access.USER)->(
                 user function)
-        self.add-builtin-output(
+        self.add-builtin-int-argument(
                 user function,
-                copy Access.VAR,
-                user self.type-int,
+                user "Uint64",
+                copy true,
                 user "offset")
 
         self.add-builtin-method(
@@ -725,10 +735,10 @@ struct Global
                 copy true,
                 copy Access.USER)->(
                 user function)
-        self.add-builtin-parameter(
+        self.add-builtin-int-argument(
                 user function,
-                copy Access.COPY,
-                user self.type-int,
+                user "Uint64",
+                copy false,
                 user "offset")
 
         self.add-builtin-method(
@@ -737,10 +747,10 @@ struct Global
                 copy true,
                 copy Access.USER)->(
                 user function)
-        self.add-builtin-parameter(
+        self.add-builtin-int-argument(
                 user function,
-                copy Access.COPY,
-                user self.type-int,
+                user "Uint64",
+                copy false,
                 user "offset")
 
         self.add-builtin-method(
@@ -749,10 +759,10 @@ struct Global
                 copy true,
                 copy Access.USER)->(
                 user function)
-        self.add-builtin-parameter(
+        self.add-builtin-int-argument(
                 user function,
-                copy Access.COPY,
-                user self.type-int,
+                user "Uint64",
+                copy false,
                 user "offset")
 
         self.add-builtin-method(
@@ -803,10 +813,10 @@ struct Global
                         copy false,
                         copy Access.USER,
                         user "data")
-                self.add-builtin-output(
+                self.add-builtin-int-argument(
                         user function,
-                        copy Access.VAR,
-                        user glob.type-int,
+                        user "Uint32",
+                        copy true,
                         user "bytes-read")
         
         if is-write
@@ -831,10 +841,10 @@ struct Global
                     copy false,
                     copy Access.USER,
                     user "data")
-            self.add-builtin-output(
+            self.add-builtin-int-argument(
                     user function,
-                    copy Access.VAR,
-                    user glob.type-int,
+                    user "Uint32",
+                    copy true,
                     user "written")
 
     func init-sys-module()
@@ -907,10 +917,10 @@ struct Global
 
         self.add-builtin-global-function(
                 user sys-module, user "exit", copy true)->(user function)
-        self.add-builtin-parameter(
+        self.add-builtin-int-argument(
                 user function,
-                copy Access.COPY,
-                user self.type-int,
+                user "Sint32",
+                copy false,
                 user "status")
 
         self.add-builtin-global-function(
@@ -920,10 +930,10 @@ struct Global
                 copy Access.USER,
                 user self.type-string,
                 user "command")
-        self.add-builtin-output(
+        self.add-builtin-int-argument(
                 user function,
-                copy Access.VAR,
-                user self.type-int,
+                user "Sint32",
+                copy true,
                 user "status")
 
         self.add-builtin-global-function(
@@ -1010,11 +1020,11 @@ struct Global
                 user function)
         self.add-builtin-argument(
                 user function,
-                user function.arguments.parameters,
                 copy false,
                 copy Access.USER,
                 user self.type-array,
                 user self.type-generic,
+                user _,
                 user "array")
         function.arguments.parameters.last.item.get-type-instance()->(
                 user argument-type-instance)
@@ -1028,10 +1038,10 @@ struct Global
                 user "cdef_M_Pointer_get_pointed_at",
                 copy Access.COPY)->(
                 user function)
-        self.add-builtin-parameter(
+        self.add-builtin-int-argument(
                 user function,
-                copy Access.COPY,
-                user self.type-int,
+                user "Uint32",
+                copy false,
                 user "index")
         self.add-builtin-output(
                 user function,
@@ -1051,10 +1061,10 @@ struct Global
                 user "cdef_M_Pointer_get_ref_at",
                 copy Access.COPY)->(
                 user function)
-        self.add-builtin-parameter(
+        self.add-builtin-int-argument(
                 user function,
-                copy Access.COPY,
-                user self.type-int,
+                user "Uint32",
+                copy false,
                 user "index")
         self.add-builtin-output(
                 user function,
@@ -1072,11 +1082,11 @@ struct Global
                 user function)
         self.add-builtin-argument(
                 user function,
-                user function.arguments.parameters,
                 copy false,
                 copy Access.COPY,
                 user self.type-pointer,
                 user self.type-char,
+                user _,
                 user "pointer")
         self.add-builtin-parameter(
                 user function,
@@ -1098,16 +1108,16 @@ struct Global
                 user function)
         self.add-builtin-argument(
                 user function,
-                user function.arguments.parameters,
                 copy false,
                 copy Access.COPY,
                 user self.type-pointer,
                 user self.type-byte,
+                user _,
                 user "pointer")
-        self.add-builtin-parameter(
+        self.add-builtin-int-argument(
                 user function,
-                copy Access.COPY,
-                user self.type-int,
+                user "Uint32",
+                copy false,
                 user "length")
         self.add-builtin-parameter(
                 user function,
@@ -1132,7 +1142,6 @@ struct Global
             user TypeData type-data)
         self.add-builtin-type(user cdef-module, user name, copy true)->(
                 user type-data)
-        type-data.my-module := cdef-module
 
     func add-builtin-type(
             user ModuleMembers module,
@@ -1144,6 +1153,7 @@ struct Global
         string-new-copy(user name)->(owner new-type.name)
         new-type.is-primitive := is-primitive
         new-type.is-ordered := true
+        type-data.module := module
         module.type-map.add(user new-type.name, user new-type)
         self.builtins.types.add(owner new-type)
 
@@ -1157,10 +1167,9 @@ struct Global
                 user variable-type,
                 user variable-subtype,
                 user _,
+                user module,
                 user self.builtins)
         user SyntaxTreeVariable variable(user self.builtins.variables.last.item)
-        if module is-not self.global-module
-            variable.my-module := module
         module.variable-map.add(user variable.name, user variable)
 
     func add-builtin-field(
@@ -1173,6 +1182,7 @@ struct Global
                 user field-type,
                 user field-subtype,
                 user builtin-type,
+                user builtin-type.module,
                 user builtin-type)
 
     func add-builtin-variable(
@@ -1180,6 +1190,7 @@ struct Global
             user TypeData variable-type,
             user TypeData variable-subtype,
             user TypeData parent-type,
+            user ModuleMembers module,
             user SyntaxTreeBranch branch)
         new SyntaxTreeVariable variable(user _)
         string-new-copy(user name)->(owner variable.name)
@@ -1190,7 +1201,14 @@ struct Global
         variable-type.new-type-instance()->(owner variable.type-instance)
         if variable-subtype?
             variable.type-instance.add-subtype-copy(user variable-subtype)
+        assert not variable-type.is-int-like
+        ; if variable-type.is-int-like
+        ;     string-new-copy(user variable-type.name)->(
+        ;             owner variable.type-instance.name)
+        ;     variable.type-instance.set-int-range()
         variable.parent-type := parent-type
+        variable.is-analyzed := true
+        variable.module := module
         branch.variables.add(owner variable)
 
     func add-builtin-global-function(
@@ -1205,8 +1223,7 @@ struct Global
                 user _,
                 user self.builtins)->(
                 user function)
-        if module is-not self.global-module
-            function.my-module := module
+        function.module := module
         module.function-map.add(user function.name, user function)
 
     func add-builtin-method(
@@ -1243,6 +1260,7 @@ struct Global
         self-param.is-native := native-name?
         function.self-access := self-param.access
         function.self-conditional := self-param.get-type-instance().conditional
+        function.module := builtin-type.module
 
     func add-builtin-function(
             user String name,
@@ -1272,10 +1290,24 @@ struct Global
             user String name)
         self.add-builtin-argument(
                 user function,
-                user function.arguments.parameters,
                 copy false,
                 copy access,
                 user parameter-type,
+                user _,
+                user _,
+                user name)
+
+    func add-builtin-output(
+            user SyntaxTreeFunction function,
+            copy Int access,
+            user TypeData output-type,
+            user String name)
+        self.add-builtin-argument(
+                user function,
+                copy true,
+                copy access,
+                user output-type,
+                user _,
                 user _,
                 user name)
 
@@ -1287,34 +1319,37 @@ struct Global
             user String name)
         self.add-builtin-argument(
                 user function,
-                user function.arguments.parameters,
                 copy is-output,
                 copy access,
                 user self.type-array,
                 user subtype,
+                user _,
                 user name)
 
-    func add-builtin-output(
+    func add-builtin-int-argument(
             user SyntaxTreeFunction function,
-            copy Int access,
-            user TypeData output-type,
+            user String int-name,
+            copy Bool is-output,
             user String name)
+        var Int access(copy Access.COPY)
+        if is-output
+            access := Access.VAR
         self.add-builtin-argument(
                 user function,
-                user function.arguments.outputs,
-                copy true,
+                copy is-output,
                 copy access,
-                user output-type,
+                user self.type-int,
                 user _,
+                user int-name,
                 user name)
 
     func add-builtin-argument(
             user SyntaxTreeFunction function,
-            user List{Argument} argument-list,
             copy Bool is-output,
             copy Int access,
             user TypeData argument-type,
             user TypeData argument-subtype,
+            user String int-name,
             user String name)
         new DeclarationArgument argument
         argument.access := access
@@ -1331,29 +1366,20 @@ struct Global
             argument.variable.type-instance.parameters := List{TypeInstance}()
             argument.variable.type-instance.parameters.add(
                     owner argument-subtype.new-type-instance())
+        if not int-name? and argument-type.is-int-like
+            int-name := argument-type.name
+        if int-name?
+            string-new-copy(user int-name)->(
+                    owner argument.variable.type-instance.name)
+            argument.variable.type-instance.set-int-range()
         if is-output and not argument-type.is-primitive
             argument.variable.type-instance.conditional := true
         ; if access = Access.OWNER or access = Access.STRONG
         ;     function.delete-group.add-deleting(
         ;             user argument.variable.type-instance)
-        argument-list.add(owner argument)
-
-    func find-type(user String name)->(user TypeData type-data)
-        if self.current-module?
-            if self.current-module.type-map.find(user name)->(user type-data)?
-                return
-        self.global-module.type-map.find(user name)->(user type-data)
-
-    func find-variable(user String name)->(user SyntaxTreeVariable variable)
-        if self.current-module?
-            if self.current-module.variable-map.find(user name)->(
-                    user variable)?
-                return
-        self.global-module.variable-map.find(user name)->(user variable)
-
-    func find-function(user String name)->(user SyntaxTreeFunction function)
-        if self.current-module.function-map.find(user name)->(user function)?
-            return
-        self.global-module.function-map.find(user name)->(user function)
+        if is-output
+            function.arguments.outputs.add(owner argument)
+        else
+            function.arguments.parameters.add(owner argument)
 
 user Global glob
