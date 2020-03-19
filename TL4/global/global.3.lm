@@ -236,6 +236,10 @@ static Global
     self.add-builtin-method(user glob.type-long, user "copy"):(user arguments)
     self.add-builtin-output(
         user arguments, copy ACCESS-OWNER, user glob.type-long, user "res")
+        
+    self.add-builtin-method(user glob.type-long, user "sign"):(user arguments)
+    self.add-builtin-output(
+        user arguments, copy ACCESS-VAR, user glob.type-int, user "value")
     
     self.add-builtin-method(user glob.type-long, user "set"):(user arguments)
     self.add-builtin-parameter(

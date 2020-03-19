@@ -79,37 +79,39 @@ Long l_Var = {0};
     CHECK(1)
     LUMI_err = Long_copy(l, l_Refman, &(res), &(res_Refman));
     CHECK(3)
-    LUMI_err = Long_set(l, l_Refman, 100);
+    LUMI_err = Long_sign(l, l_Refman, &(ut_M_i));
     CHECK(4)
-    LUMI_err = Long_int(l, l_Refman, &(ut_M_i));
+    LUMI_err = Long_set(l, l_Refman, 100);
     CHECK(5)
-    LUMI_err = Long_add(l, l_Refman, 100);
+    LUMI_err = Long_int(l, l_Refman, &(ut_M_i));
     CHECK(6)
-    LUMI_err = Long_mul(l, l_Refman, 100);
+    LUMI_err = Long_add(l, l_Refman, 100);
     CHECK(7)
-    LUMI_err = Long_negate(l, l_Refman);
+    LUMI_err = Long_mul(l, l_Refman, 100);
     CHECK(8)
-    LUMI_err = Long_parse(l, l_Refman, ut_M_str, ut_M_str_Refman);
+    LUMI_err = Long_negate(l, l_Refman);
     CHECK(9)
-    LUMI_err = Long_hex(l, l_Refman, ut_M_str, ut_M_str_Refman);
+    LUMI_err = Long_parse(l, l_Refman, ut_M_str, ut_M_str_Refman);
     CHECK(10)
-    INIT_VAR(11, x)
-    LUMI_err = Long_new(x, x_Refman);
+    LUMI_err = Long_hex(l, l_Refman, ut_M_str, ut_M_str_Refman);
     CHECK(11)
-    LUMI_err = long_add(l, l_Refman, x, x_Refman, &(res), &(res_Refman));
+    INIT_VAR(12, x)
+    LUMI_err = Long_new(x, x_Refman);
     CHECK(12)
-    LUMI_err = long_sub(l, l_Refman, x, x_Refman, &(res), &(res_Refman));
+    LUMI_err = long_add(l, l_Refman, x, x_Refman, &(res), &(res_Refman));
     CHECK(13)
-    LUMI_err = long_mul(l, l_Refman, x, x_Refman, &(res), &(res_Refman));
+    LUMI_err = long_sub(l, l_Refman, x, x_Refman, &(res), &(res_Refman));
     CHECK(14)
-    LUMI_err = long_div(l, l_Refman, x, x_Refman, &(res), &(res_Refman));
+    LUMI_err = long_mul(l, l_Refman, x, x_Refman, &(res), &(res_Refman));
     CHECK(15)
-    LUMI_err = long_mod(l, l_Refman, x, x_Refman, &(res), &(res_Refman));
+    LUMI_err = long_div(l, l_Refman, x, x_Refman, &(res), &(res_Refman));
     CHECK(16)
-    LUMI_err = long_equal(l, l_Refman, x, x_Refman, &(ut_M_b));
+    LUMI_err = long_mod(l, l_Refman, x, x_Refman, &(res), &(res_Refman));
     CHECK(17)
-    LUMI_err = long_larger(l, l_Refman, x, x_Refman, &(ut_M_b));
+    LUMI_err = long_equal(l, l_Refman, x, x_Refman, &(ut_M_b));
     CHECK(18)
+    LUMI_err = long_larger(l, l_Refman, x, x_Refman, &(ut_M_b));
+    CHECK(19)
 /// @@ test-string-expression
 /// @ t0
 String aux_String_0_Var = {0};

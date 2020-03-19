@@ -277,6 +277,7 @@ Returncode Sys_getenv(
 void Long_Del(Long*);
 Returncode Long_new(Long*, Ref_Manager*);
 Returncode Long_copy(Long*, Ref_Manager*, Long**, Ref_Manager**);
+Returncode Long_sign(Long*, Ref_Manager*, int*);
 Returncode Long_set(Long*, Ref_Manager*, int);
 Returncode Long_int(Long*, Ref_Manager*, int*);
 Returncode Long_add(Long*, Ref_Manager*, int);

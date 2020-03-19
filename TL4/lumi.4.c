@@ -980,6 +980,14 @@ void Long_realloc(Long* self) {
   self->length = length;
 }
 
+#define LUMI_FUNC_NAME "Long.sign"
+Returncode Long_sign(Long* self, Ref_Manager* self_Refman, int* sign) {
+  CHECK_NOT_NULL(self)
+  *sign = (self->length == 1 && self->number[0] == 0)? 0: self->sign;
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
 #define LUMI_FUNC_NAME "Long.set"
 Returncode Long_set(Long* self, Ref_Manager* self_Refman, int value) {
   int length = 1;

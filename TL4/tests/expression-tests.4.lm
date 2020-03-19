@@ -69,6 +69,7 @@ c := 'aaaaa'
 var Long l
     owner Long res
     l.copy()->(owner res)
+    l.sign()->(var i)
     l.set(copy 100)
     l.int()->(var i)
     l.add(copy 100)
