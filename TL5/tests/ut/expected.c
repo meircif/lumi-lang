@@ -574,13 +574,13 @@ Char* x = NULL;
     Byte* aux_Array_1 = NULL;
     Seq_Length aux_Array_1_Length = 0;
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_ostr)
-    if (0x02 + 0x06 > *(ut_M_ostr_Length)) RAISE(2, LUMI_block0_cleanup, slice_index)
+    if (SAFE_SUM_LARGER(0x02, 0x06, *(ut_M_ostr_Length))) RAISE(2, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = ut_M_ostr + 0x02;
     aux_Array_0_Length = 0x06;
     x_Length = 0x06;
     x = aux_Array_0;
     CHECK_REF(4, LUMI_block0_cleanup, ut_M_buff)
-    if (0x02 + 0x06 > *(ut_M_buff_Length)) RAISE(4, LUMI_block0_cleanup, slice_index)
+    if (SAFE_SUM_LARGER(0x02, 0x06, *(ut_M_buff_Length))) RAISE(4, LUMI_block0_cleanup, slice_index)
     aux_Array_1 = ut_M_buff + 0x02;
     aux_Array_1_Length = 0x06;
     y_Length = 0x06;
@@ -595,7 +595,7 @@ uint32_t* x = NULL;
     uint32_t* aux_Array_0 = NULL;
     Seq_Length aux_Array_0_Length = 0;
     CHECK_REF_REFMAN(2, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (ut_M_i <= 0 || 0x02 + ut_M_i > ut_M_arr_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
+    if (ut_M_i <= 0 || SAFE_SUM_LARGER(0x02, ut_M_i, ut_M_arr_Length)) RAISE(2, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = ut_M_arr + 0x02;
     aux_Array_0_Length = ut_M_i;
     x_Length = aux_Array_0_Length;
@@ -715,7 +715,7 @@ Return_Code ut_M_fun(char* s, Seq_Length s_Max_length, Seq_Length* s_Length, cha
     Ref_Manager* aux_Buffer_0_Refman = NULL;
     if (0x05 >= *(s_Length)) RAISE(6, LUMI_block0_cleanup, slice_index)
     c = s[0x05];
-    if (0x04 + 0x02 > *(s_Length)) RAISE(7, LUMI_block0_cleanup, slice_index)
+    if (SAFE_SUM_LARGER(0x04, 0x02, *(s_Length))) RAISE(7, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = s + 0x04;
     aux_Array_0_Length = 0x02;
     spart_Length = 0x02;
@@ -732,7 +732,7 @@ Return_Code ut_M_fun(char* s, Seq_Length s_Max_length, Seq_Length* s_Length, cha
     si = aux_String_0;
     if (0x05 >= *(b_Length)) RAISE(9, LUMI_block0_cleanup, slice_index)
     y = b[0x05];
-    if (0x04 + 0x02 > *(b_Length)) RAISE(10, LUMI_block0_cleanup, slice_index)
+    if (SAFE_SUM_LARGER(0x04, 0x02, *(b_Length))) RAISE(10, LUMI_block0_cleanup, slice_index)
     aux_Array_1 = b + 0x04;
     aux_Array_1_Length = 0x02;
     bpart_Length = 0x02;
@@ -844,7 +844,7 @@ uint32_t* aai = NULL;
     ut_M_arr_Length = aux_Array_0_Length;
     ut_M_arr = aux_Array_0;
     CHECK_REF(3, LUMI_block0_cleanup, aai)
-    if (0x02 + 0x04 > aai_Length) RAISE(3, LUMI_block0_cleanup, slice_index)
+    if (SAFE_SUM_LARGER(0x02, 0x04, aai_Length)) RAISE(3, LUMI_block0_cleanup, slice_index)
     aux_Array_1 = aai + 0x02 * aai_Value_length;
     aux_Array_1_Length = 0x04;
     aux_Array_1_Value_length = aai_Value_length;
@@ -901,7 +901,7 @@ uint32_t* aai = NULL;
     ua_Value_value_length = aux_Array_0_Value_value_length;
     ua = aux_Array_0;
     CHECK_REF(3, LUMI_block0_cleanup, aai)
-    if (0x02 + 0x04 > aai_Length) RAISE(3, LUMI_block0_cleanup, slice_index)
+    if (SAFE_SUM_LARGER(0x02, 0x04, aai_Length)) RAISE(3, LUMI_block0_cleanup, slice_index)
     aux_Array_1 = aai + 0x02 * aai_Value_length * aai_Value_value_length * aai_Value_value_value_length;
     aux_Array_1_Length = 0x04;
     aux_Array_1_Value_length = aai_Value_length;
@@ -1002,7 +1002,7 @@ char* aas = NULL;
     wsa_Seq_length = aux_Array_0_Seq_length;
     wsa = aux_Array_0;
     CHECK_REF(3, LUMI_block0_cleanup, aas)
-    if (0x02 + 0x04 > aas_Length) RAISE(3, LUMI_block0_cleanup, slice_index)
+    if (SAFE_SUM_LARGER(0x02, 0x04, aas_Length)) RAISE(3, LUMI_block0_cleanup, slice_index)
     aux_Array_1 = aas + 0x02 * aas_Value_length * aas_Value_value_length * aas_Value_value_value_length;
     aux_Array_1_Length = 0x04;
     aux_Array_1_Value_length = aas_Value_length;
@@ -1047,7 +1047,7 @@ char* aas = NULL;
     wba_Seq_length = aux_Array_2_Seq_length;
     wba = aux_Array_2;
     CHECK_REF(7, LUMI_block0_cleanup, aab)
-    if (0x02 + 0x04 > aab_Length) RAISE(7, LUMI_block0_cleanup, slice_index)
+    if (SAFE_SUM_LARGER(0x02, 0x04, aab_Length)) RAISE(7, LUMI_block0_cleanup, slice_index)
     aux_Array_3 = aab + 0x02 * aab_Value_length * aab_Value_value_length * aab_Value_value_value_length;
     aux_Array_3_Length = 0x04;
     aux_Array_3_Value_length = aab_Value_length;
@@ -1365,14 +1365,14 @@ uint32_t* a = NULL;
     aux_Array_0 = a + 0x00;
     aux_Array_0_Length = 0x01;
     if (ut_M_i >= 0x01) RAISE(4, LUMI_block0_cleanup, slice_index)
-    if (ut_M_i + (ut_M_i + 0x01) > ut_M_i) RAISE(4, LUMI_block0_cleanup, slice_index)
+    if (SAFE_SUM_LARGER(ut_M_i, (ut_M_i + 0x01), ut_M_i)) RAISE(4, LUMI_block0_cleanup, slice_index)
     aux_Array_1 = a + ut_M_i;
     aux_Array_1_Length = ut_M_i + 0x01;
     if ((y + 0x01) <= 0) RAISE(4, LUMI_block0_cleanup, slice_index)
     aux_Array_2 = (aux_Array_1) + 0x00;
     aux_Array_2_Length = y + 0x01;
     if (y < 0) RAISE(4, LUMI_block0_cleanup, slice_index)
-    if (x < 0 || x <= 0 || x + x > ut_M_i) RAISE(4, LUMI_block0_cleanup, slice_index)
+    if (x < 0 || x <= 0 || SAFE_SUM_LARGER(x, x, ut_M_i)) RAISE(4, LUMI_block0_cleanup, slice_index)
     aux_Array_3 = a + x;
     aux_Array_3_Length = x;
     if (y < 0 || (y + 0x01) <= 0) RAISE(4, LUMI_block0_cleanup, slice_index)
@@ -1394,11 +1394,11 @@ Byte* aux_Array_0 = NULL;
     Char* aux_Array_1 = NULL;
     Seq_Length aux_Array_1_Length = 0;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    if (0x01 + 0x03 > *(ut_M_buff_Length)) RAISE(1, LUMI_block0_cleanup, slice_index)
+    if (SAFE_SUM_LARGER(0x01, 0x03, *(ut_M_buff_Length))) RAISE(1, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = ut_M_buff + 0x01;
     aux_Array_0_Length = 0x03;
     CHECK_REF(1, LUMI_block0_cleanup, str)
-    if (0x01 + 0x03 > *(str_Length)) RAISE(1, LUMI_block0_cleanup, slice_index)
+    if (SAFE_SUM_LARGER(0x01, 0x03, *(str_Length))) RAISE(1, LUMI_block0_cleanup, slice_index)
     aux_Array_1 = str + 0x01;
     aux_Array_1_Length = 0x03;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
@@ -4296,7 +4296,7 @@ Return_Code ut_M_name(char* self, Seq_Length self_Max_length, Seq_Length* self_L
     b_Max_length = aux_Buffer_0_Max_length;
     b_Length = aux_Buffer_0_Length;
     b = aux_Buffer_0;
-    if (0x02 + 0x06 > *(po_Length)) RAISE(12, LUMI_block0_cleanup, slice_index)
+    if (SAFE_SUM_LARGER(0x02, 0x06, *(po_Length))) RAISE(12, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = po + 0x02;
     aux_Array_0_Length = 0x06;
     pu_Length = 0x06;
@@ -4954,7 +4954,7 @@ Return_Code ut_M_fun(void) {
         Seq_Length su_Length = 0;
         Char* aux_Array_0 = NULL;
         Seq_Length aux_Array_0_Length = 0;
-        if (0x01 + 0x02 > *(sv_Length)) RAISE(4, LUMI_block1_cleanup, slice_index)
+        if (SAFE_SUM_LARGER(0x01, 0x02, *(sv_Length))) RAISE(4, LUMI_block1_cleanup, slice_index)
         aux_Array_0 = sv + 0x01;
         aux_Array_0_Length = 0x02;
         su_Length = 0x02;
@@ -6408,7 +6408,7 @@ if (ut_M_b) {
         /* initializing s */
         TEST_ASSERT(3, LUMI_block1_cleanup, ut_M_b)
         ++LUMI_trace_ignore_count;
-        if (ut_M_i + 0x02 > *(s_Length)) RAISE(4, LUMI_block2_cleanup, slice_index)
+        if (SAFE_SUM_LARGER(ut_M_i, 0x02, *(s_Length))) RAISE(4, LUMI_block2_cleanup, slice_index)
         aux_Array_0 = s + ut_M_i;
         aux_Array_0_Length = 0x02;
         --LUMI_trace_ignore_count;
@@ -6425,7 +6425,7 @@ if (ut_M_b) {
             if (!(aux_Int_0 < 0x03)) { LUMI_loop_depth = 1; goto LUMI_block3_cleanup; }
             aux_Int_0 += 0x01;
             ++LUMI_trace_ignore_count;
-            if (ut_M_i + 0x02 > *(s_Length)) RAISE(6, LUMI_block4_cleanup, slice_index)
+            if (SAFE_SUM_LARGER(ut_M_i, 0x02, *(s_Length))) RAISE(6, LUMI_block4_cleanup, slice_index)
             aux_Array_1 = s + ut_M_i;
             aux_Array_1_Length = 0x02;
             --LUMI_trace_ignore_count;

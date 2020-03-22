@@ -265,6 +265,8 @@ while (self->field != NULL) { \
     free(name); name = NULL; \
     RAISE(line, cleanup, object_memory) }
 
+#define SAFE_SUM_LARGER(a, b, c) a > c || b > c - a
+
 
 #define Buffer_Del(name) do { if (name##_Length != &Lumi_empty_length) { \
   free(name##_Length); \

@@ -206,7 +206,8 @@ class SliceExpression(Expression)
                 not self.need-bounds-check
             return
         ; if (index < 0 || index >= [*]`seq`_Length)
-        ; if (index < 0 || second <= 0 || index + second > [*]`seq`_Length)
+        ; if (index < 0 || second <= 0 ||
+        ;         SAFE_SUM_LARGER(index, second, [*]`seq`_Length))
         ;         RAISE(`slice_index`)
         write(user "if (")
         if self.need-index-check
@@ -222,11 +223,13 @@ class SliceExpression(Expression)
         if self.need-bounds-check
             if self.need-index-check or self.need-second-index-check
                 write(user " || ")
+            if self.second-index?
+                write(user "SAFE_SUM_LARGER(")
             self.index.write-safe()
             if self.second-index?
-                write(user " + ")
+                write(user ", ")
                 self.second-index.write-safe()
-                write(user " > ")
+                write(user ", ")
             else
                 write(user " >= ")
             if self.sequence.result-type.type-data is glob.type-array and
@@ -239,6 +242,8 @@ class SliceExpression(Expression)
                 write(user "_Length")
                 if self.sequence.result-type.type-data.is-buffered()
                     write(user ")")
+            if self.second-index?
+                write(user ")")
         write(user ") ")
         self.code-node.write-raise(user "slice_index")
         self.code-node.write-spaces()

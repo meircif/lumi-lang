@@ -107,8 +107,8 @@ struct IntRange
             else
                 self.bits := 64
     
-    ; func is-same(user Long other)->(var Bool same)
-    ;     same := self.is-signed = other.is-signed and self.bits = other.bits
+    func size-as(user IntRange other)->(var Bool same)
+        same := self.is-signed = other.is-signed and self.bits = other.bits
     
     func write-cname()
         if not self.is-signed
