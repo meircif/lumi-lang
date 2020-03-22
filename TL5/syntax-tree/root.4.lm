@@ -404,6 +404,7 @@ struct ModuleMembers
     owner String name
     var NameMap{TypeData} type-map
     var NameMap{EnumData} enum-map
+    var NameMap{IntRange} int-map
     var NameMap{SyntaxTreeVariable} variable-map
     var NameMap{SyntaxTreeFunction} function-map
     

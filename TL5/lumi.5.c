@@ -60,8 +60,8 @@ Ref_Manager* sys_M_stderr_Refman = NULL;
 typedef void* Ref;
 
 typedef char cdef_M_Char;
+typedef signed char cdef_M_Schar;
 typedef unsigned char cdef_M_Uchar;
-typedef wchar_t cdef_M_Wchar;
 typedef short cdef_M_Short;
 typedef unsigned short cdef_M_Ushort;
 typedef int cdef_M_Int;
@@ -531,9 +531,9 @@ Bool LUMI_test_coverage(File_Coverage* files_coverage, size_t files_number) {
           }
         }
         else if (prev_uncovered) {
-          printf(" %lu", first_uncovered);
+          printf(" %ld", first_uncovered);
           if (first_uncovered < line - 1) {
-            printf("-%lu", line - 1);
+            printf("-%ld", line - 1);
           }
           prev_uncovered = false;
         }

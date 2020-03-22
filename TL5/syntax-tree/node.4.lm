@@ -77,7 +77,7 @@ class SyntaxTreeNode
                     if parameter.equal(user name)
                         type-data := glob.type-generic
                         return
-        if glob.int-map.find(user name)?
+        if glob.global-module.int-map.find(user name)?
             type-data := glob.type-int
             return
     

@@ -256,66 +256,53 @@ struct TypeInstance
         self.int-range.set-sign-and-bits()
     
     func set-int-range()
-        user IntRange int-range
-        if glob.int-map.find(user self.name)->(user int-range)?
-            int-range.copy-new()->(owner self.int-range)
-    
-    func analyze(user SyntaxTreeNode node)
-        self.analyze-part(user node, copy true, copy true, copy false)
-    
+        self.type-data.module.int-map.find(user self.name).copy-new()->(
+                owner self.int-range)
+
     func link-types(user SyntaxTreeNode node)
-        self.analyze-part(user node, copy true, copy false, copy true)
-    
-    func analyze-after-link(user SyntaxTreeNode node, copy Bool constant-length)
-        self.analyze-part(
-                user node, copy false, copy true, copy constant-length)
-    
-    func analyze-part(
-            user SyntaxTreeNode node,
-            copy Bool link-types,
-            copy Bool analyze,
-            copy Bool constant-length)
-        if link-types
-            if not self.type-data?
-                node.check-type(user self.name, user self.module-name)->(
-                        user self.type-data)
-            if self.arguments?
-                self.arguments.link-types()
-            if self.type-data.is-int-like and not self.int-range?
-                self.set-int-range()
-        if analyze
-            if self.int-range?
-                self.int-range.set-values(user node)
-            if self.length-owner.parsed()
-                node.analyze-expression(user self.length, user glob.type-int)
-                if constant-length
-                    user Long length-value
-                    self.length.get-constant-value()->(user length-value)
-                    if not length-value?
-                        node.syntax-error-msg(
-                                user "sequence length is not constant")
-                    if length-value.sign() <= 0
-                        node.syntax-error-msg(
-                                user "sequence length is not positive")
-                else
-                    user IntRange range(user self.length.result-type.int-range)
-                    if range.max-value.sign() <= 0
-                        node.syntax-error-long(
-                                user "sequence length never positive with \
-                                maximum value of",
-                                user range.max-value)
-                self.length.check-no-error()
-            if self.arguments?
-                self.arguments.analyze()
+        if not self.type-data?
+            node.check-type(user self.name, user self.module-name)->(
+                    user self.type-data)
+        if self.type-data.is-int-like and not self.int-range?
+            self.set-int-range()
+        if self.arguments?
+            self.arguments.link-types()
         if self.parameters?
             for sub-type in self.parameters.iter()
-                sub-type.analyze-part(
-                        user node,
-                        copy link-types,
-                        copy analyze,
-                        copy constant-length)
-        if link-types
-            self.link-parameters(user node)
+                sub-type.link-types(user node)
+        self.link-parameters(user node)
+    
+    func analyze(user SyntaxTreeNode node)
+        self.link-types(user node)
+        self.analyze-after-link(user node, copy false)
+    
+    func analyze-after-link(user SyntaxTreeNode node, copy Bool constant-length)
+        if self.int-range?
+            self.int-range.set-values(user node)
+        if self.length-owner.parsed()
+            node.analyze-expression(user self.length, user glob.type-int)
+            if constant-length
+                user Long length-value
+                self.length.get-constant-value()->(user length-value)
+                if not length-value?
+                    node.syntax-error-msg(
+                            user "sequence length is not constant")
+                if length-value.sign() <= 0
+                    node.syntax-error-msg(
+                            user "sequence length is not positive")
+            else
+                user IntRange range(user self.length.result-type.int-range)
+                if range.max-value.sign() <= 0
+                    node.syntax-error-long(
+                            user "sequence length never positive with \
+                            maximum value of",
+                            user range.max-value)
+            self.length.check-no-error()
+        if self.arguments?
+            self.arguments.analyze()
+        if self.parameters?
+            for sub-type in self.parameters.iter()
+                sub-type.analyze-after-link(user node, copy constant-length)
     
     func link-parameters(user SyntaxTreeNode node)
         if self.type-data is glob.type-array

@@ -11151,6 +11151,7 @@ argument "s" access should not be "var" for non-primitive type "String"
 /// @@ test-c-objects
 /// @ test-c-objects-0
 cdef_M_Char c_char = 0;
+    cdef_M_Schar c_schar = 0;
     cdef_M_Uchar c_uchar = 0;
     cdef_M_Short c_short = 0;
     cdef_M_Ushort c_ushort = 0;
@@ -11164,6 +11165,8 @@ cdef_M_Char c_char = 0;
     cdef_M_LongDouble c_long_double = 0;
     c_char = ut_M_i;
     ut_M_i = c_char;
+    c_schar = ut_M_i;
+    ut_M_i = c_schar;
     c_uchar = ut_M_i;
     ut_M_i = c_uchar;
     c_short = ut_M_i;
@@ -11186,6 +11189,7 @@ cdef_M_Char c_char = 0;
     ut_M_i = c_double;
     c_long_double = ut_M_i;
     ut_M_i = c_long_double;
+    ut_M_i = (((((((((((c_char + c_schar) + c_uchar) + c_short) + c_ushort) + c_int) + c_uint) + c_long) + c_ulong) + c_size) + c_float) + c_double) + c_long_double;
 /// @ test-c-objects-1
 void* p_void = 0;
     cdef_M_Char* p_char = 0;

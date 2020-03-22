@@ -67,9 +67,8 @@ struct Global
     ~~~ maps access number to its name ~~~
     owner Array{String} access-names
 
-    ~~~ maps integer alias to its range ~~~
+    ~~~ stores all integer range aliases ~~~
     var List{IntRange} int-ranges
-    var NameMap{IntRange} int-map
 
     ~~~ the currently parsed input file object ~~~
     owner File input-file
@@ -368,39 +367,45 @@ struct Global
                 copy binary-factory)
 
     func init-int-map()
-        self.add-int-alias(user "Char", copy 8, user _, user "127")
-        self.add-int-alias(user "Byte", copy 8, user _, user "255")
-        self.add-int-alias(user "Int", copy 32, user _, user "4294967295")
-        self.add-int-alias(user "Uint8", copy 8, user _, user "255")
-        self.add-int-alias(user "Uint16", copy 16, user _, user "65535")
-        self.add-int-alias(user "Uint32", copy 32, user _, user "4294967295")
+        self.add-global-int-alias(user "Char", copy 8, user "127")
+        self.add-global-int-alias(user "Byte", copy 8, user "255")
+        self.add-global-int-alias(user "Int", copy 32, user "4294967295")
+        self.add-global-int-alias(user "Uint8", copy 8, user "255")
+        self.add-global-int-alias(user "Uint16", copy 16, user "65535")
+        self.add-global-int-alias(user "Uint32", copy 32, user "4294967295")
+        self.add-global-int-alias(
+                user "Uint64", copy 64, user "18446744073709551615")
+        self.add-global-int-alias(user "Sint8", copy 8, user "-128")
+        self.add-global-int-alias(user "Sint16", copy 16, user "-32768")
+        self.add-global-int-alias(user "Sint32", copy 32, user "-2147483648")
+        self.add-global-int-alias(
+                user "Sint64", copy 64, user "-9223372036854775808")
+
+    func add-global-int-alias(
+            user String name, copy Int bits, user String limit)
         self.add-int-alias(
-                user "Uint64", copy 64, user _, user "18446744073709551615")
-        self.add-int-alias(user "Sint8", copy 8, user "-128", user "127")
-        self.add-int-alias(user "Sint16", copy 16, user "-32768", user "32767")
-        self.add-int-alias(
-                user "Sint32", copy 32, user "-2147483648", user "2147483647")
-        self.add-int-alias(
-                user "Sint64",
-                copy 64,
-                user "-9223372036854775808",
-                user "9223372036854775807")
+                user self.global-module, user name, copy bits, user limit)
 
     func add-int-alias(
+            user ModuleMembers module,
             user String name,
             copy Int bits,
-            user String min-value,
-            user String max-value)
+            user String limit)
         new IntRange int-range
         int-range.bits := bits
         int-range.min-value := Long()
-        if min-value?
-            int-range.is-signed := true
-            int-range.min-value.parse(user min-value)
         int-range.max-value := Long()
-        int-range.max-value.parse(user max-value)
+        if limit[0] = '-'
+            var Int last(copy limit.length - 1)
+            int-range.is-signed := true
+            int-range.min-value.parse(user limit)
+            var String{32} max-limit(user limit)
+            max-limit[last] -= 1
+            int-range.max-value.parse(user max-limit[1:last])
+        else
+            int-range.max-value.parse(user limit)
         string-new-copy(user name)->(owner int-range.name)
-        self.int-map.add(user int-range.name, user int-range)
+        module.int-map.add(user int-range.name, user int-range)
         self.int-ranges.add(owner int-range)
 
     func init-builtin-types()
@@ -959,19 +964,57 @@ struct Global
     func init-cdef-module()
         ; cdef types
         new ModuleMembers cdef-module(user "cdef")
-        self.add-cint-type(user cdef-module, user "Char")->(
+        self.add-cint-type(
+                user cdef-module, user "Char", copy 32, user "-65536")->(
                 user self.type-c-char)
-        self.add-cint-type(user cdef-module, user "Uchar")
-        self.add-cint-type(user cdef-module, user "Short")
-        self.add-cint-type(user cdef-module, user "Ushort")
-        self.add-cint-type(user cdef-module, user "Int")
-        self.add-cint-type(user cdef-module, user "Uint")
-        self.add-cint-type(user cdef-module, user "Long")
-        self.add-cint-type(user cdef-module, user "Ulong")
-        self.add-cint-type(user cdef-module, user "Size")
-        self.add-cint-type(user cdef-module, user "Float")
-        self.add-cint-type(user cdef-module, user "Double")
-        self.add-cint-type(user cdef-module, user "LongDouble")
+        self.add-cint-type(
+                user cdef-module, user "Uchar", copy 16, user "65535")
+        self.add-cint-type(
+                user cdef-module, user "Schar", copy 16, user "-32768")
+        self.add-cint-type(
+                user cdef-module, user "Short", copy 32, user "-2147483648")
+        self.add-cint-type(
+                user cdef-module, user "Ushort", copy 32, user "4294967295")
+        self.add-cint-type(
+                user cdef-module,
+                user "Int",
+                copy 64,
+                user "-9223372036854775808")
+        self.add-cint-type(
+                user cdef-module,
+                user "Uint",
+                copy 64,
+                user "18446744073709551615")
+        self.add-cint-type(
+                user cdef-module,
+                user "Long",
+                copy 64,
+                user "-9223372036854775808")
+        self.add-cint-type(
+                user cdef-module,
+                user "Ulong",
+                copy 64,
+                user "18446744073709551615")
+        self.add-cint-type(
+                user cdef-module,
+                user "Size",
+                copy 64,
+                user "18446744073709551615")
+        self.add-cint-type(
+                user cdef-module,
+                user "Float",
+                copy 64,
+                user "-9223372036854775808")
+        self.add-cint-type(
+                user cdef-module,
+                user "Double",
+                copy 64,
+                user "-9223372036854775808")
+        self.add-cint-type(
+                user cdef-module,
+                user "LongDouble",
+                copy 64,
+                user "-9223372036854775808")
         self.add-cdef-type(user cdef-module, user "Pointer")->(
                 user self.type-pointer)
         self.type-pointer.parameters := List{String}()
@@ -1133,10 +1176,15 @@ struct Global
                 user self.global-module, user name, copy is-primitive)->(
                 user type-data)
 
-    func add-cint-type(user ModuleMembers cdef-module, user String name)->(
+    func add-cint-type(
+            user ModuleMembers cdef-module,
+            user String name,
+            copy Int bits,
+            user String limit)->(
             user TypeData type-data)
         self.add-cdef-type(user cdef-module, user name)->(user type-data)
         type-data.is-int-like := true
+        self.add-int-alias(user cdef-module, user name, copy bits, user limit)
 
     func add-cdef-type(user ModuleMembers cdef-module, user String name)->(
             user TypeData type-data)

@@ -4688,6 +4688,7 @@ func error()->(var String s)
 ; @@ test-c-objects
 ; @ c test-c-objects-0
 var cdef.Char c-char
+var cdef.Schar c-schar
 var cdef.Uchar c-uchar
 var cdef.Short c-short
 var cdef.Ushort c-ushort
@@ -4701,6 +4702,8 @@ var cdef.Double c-double
 var cdef.LongDouble c-long-double
 c-char := i
 i := c-char
+c-schar := i
+i := c-schar
 c-uchar := i
 i := c-uchar
 c-short := i
@@ -4723,6 +4726,8 @@ c-double := i
 i := c-double
 c-long-double := i
 i := c-long-double
+i := c-char + c-schar + c-uchar + c-short + c-ushort + c-int + c-uint + c-long +
+        c-ulong + c-size + c-float + c-double + c-long-double
 ; @ c test-c-objects-1
 var cdef.Pointer p-void
 var cdef.Pointer{cdef.Char} p-char

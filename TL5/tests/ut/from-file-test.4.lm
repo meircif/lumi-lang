@@ -7,7 +7,7 @@ owner tl5-compiler.Global tested-compiler
 ; IO mocks
 
 var String{1024} mock-print-text
-var String{2048} mock-input-file-text
+var String{4096} mock-input-file-text
 var String{16384} mock-output-file-text
 var String{16} mock-input-file-name
 var String{2048} common-header

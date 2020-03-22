@@ -817,6 +817,22 @@ func ! test-cleanup()
     bs := _
 
 
+struct CdefTest
+    var cdef.Char c-char
+    var cdef.Schar c-schar
+    var cdef.Uchar c-uchar
+    var cdef.Short c-short
+    var cdef.Ushort c-ushort
+    var cdef.Int c-int
+    var cdef.Uint c-uint
+    var cdef.Long c-long
+    var cdef.Ulong c-ulong
+    var cdef.Size c-size
+    var cdef.Float c-float
+    var cdef.Double c-double
+    var cdef.LongDouble c-long-double
+
+
 struct IntRangeTest
     var Int int-def
     var Uint8 u8b
