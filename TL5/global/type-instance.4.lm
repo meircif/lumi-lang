@@ -248,6 +248,13 @@ struct TypeInstance
             self.parameters := List{TypeInstance}()
         self.parameters.add(owner type-data.new-type-instance())
     
+    func set-expected-type()->(owner TypeInstance expected)
+        if expected?
+            return
+        if self.int-range?
+            expected := TypeInstance()
+            self.int-range.copy-new()->(owner expected.int-range)
+    
     func set-int-constant(user Long value)
         if not self.int-range?
             self.int-range := IntRange()

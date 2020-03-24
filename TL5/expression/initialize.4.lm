@@ -119,6 +119,7 @@ class InitExpression(ModuleTypeExpression)
         self-param.is-output := false
         self-param.access := access
         self-param.code-node := self.code-node
+        self-param.is-analyzed := true
         self.aux-variable.copy-new()->(owner self-param.value)
         self-param.value.result-type.reference-path := _
         self.arguments.parameters.prepend(owner self-param)

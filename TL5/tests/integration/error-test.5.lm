@@ -109,3 +109,7 @@ test fail-zero-division()
 test fail-loop-limit()
     loop! 3
         while true
+
+test fail-integer-overflow()
+    var Uint8 x(copy 12)
+    x := clamp! - x

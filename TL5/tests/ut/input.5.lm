@@ -658,18 +658,60 @@ i := - - i
 b := not b
 ; @ c test-unary-expression-4
 b := not i > 3
-; @ ec test-unary-expression-5
+; @ c test-unary-expression-5
+i := clamp i + 1
+; @ c test-unary-expression-6
+i := clamp i - 1
+; @ c test-unary-expression-7
+var Int{10:20} x
+x := clamp i
+; @ c test-unary-expression-8
+i := clamp! i + 1
+; @ c test-unary-expression-9
+i := clamp! i - 1
+; @ c test-unary-expression-10
+var Int{10:20} x
+x := clamp! i
+; @ c test-unary-expression-11
+if-error i := clamp? i + 1
+    i := 12
+; @ c test-unary-expression-12
+fun4(copy clamp i + 1)
+; @ c test-unary-expression-13
+fun4(copy clamp! i + 1)
+; @ c test-unary-expression-14
+if-error fun4(copy clamp? i + 1)
+    i := 12
+; @ ec test-unary-expression-e0
 {45}
-; @ ec test-unary-expression-6
+; @ ec test-unary-expression-e1
 -[
-; @ ec test-unary-expression-7
+; @ ec test-unary-expression-e2
 + 2
-; @ ec test-unary-expression-8
+; @ ec test-unary-expression-e3
 - (i := 2)
-; @ ec test-unary-expression-9
+; @ ec test-unary-expression-e4
 - (i > 4)
-; @ ec test-unary-expression-10
+; @ ec test-unary-expression-e5
 not i
+; @ ec test-unary-expression-e6
+i := i + clamp i
+; @ ec test-unary-expression-e7
+fun4(copy - clamp i)
+; @ ec test-unary-expression-e8
+i := clamp i
+; @ ec test-unary-expression-e9
+fun4(copy clamp i)
+; @ ec test-unary-expression-e10
+i := clamp? i + 1
+; @ eg test-unary-expression-e11
+func error()->(var Int i)
+    i := clamp! i + 1
+; @ eg test-unary-expression-e12
+func error()->(var Int i)
+    i := clamp? i + 1
+; @ ec test-unary-expression-e13
+i += clamp -1
 ; @@ test-binary-expression
 ; @ c test-binary-expression-0
 i := 23 + 54

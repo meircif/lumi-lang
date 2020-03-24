@@ -96,6 +96,7 @@ typedef struct Error_Messages {
   Error_Message outdated_weak_reference;
   Error_Message object_memory;
   Error_Message managed_object_memory;
+  Error_Message integer_overflow;
   Error_Message slice_index;
   Error_Message sequence_too_short;
   Error_Message file_not_opened;
@@ -301,6 +302,7 @@ Error_Messages LUMI_error_messages = {
   ERROR_MESAGE("outdated weak reference used"),
   ERROR_MESAGE("insufficient memory for object dynamic allocation"),
   ERROR_MESAGE("insufficient memory for managed object"),
+  ERROR_MESAGE("integer overflow"),
   ERROR_MESAGE("slice index out of bounds"),
   ERROR_MESAGE("sequence too short"),
   ERROR_MESAGE("file not opened"),

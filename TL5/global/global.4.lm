@@ -42,6 +42,7 @@ enum Precedence
     RELATIONAL
     NOT
     LOGICAL
+    CLAMP
     ASSIGN
 
 
@@ -298,6 +299,12 @@ struct Global
                 copy 1,
                 copy _,
                 copy logical-operator-factory)
+        self.add-operator-copy(
+                user "clamp",
+                copy Precedence.CLAMP,
+                copy 0,
+                copy clamp-operator-factory,
+                copy _)
         self.add-operator(
                 user ":=",
                 user "=",

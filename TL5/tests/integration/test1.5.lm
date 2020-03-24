@@ -528,6 +528,8 @@ test test-assert-error-message()
     assert-error! wrong-message-assert-error()
     var Func?{()} fun
     assert-error! fun(), "empty object used"
+    var Uint8 x(copy 100)
+    assert-error! x := clamp? x * 3, "integer overflow"
     strong Array?{Int} arr(strong Array{2:Int}()!)
     assert-error! arr[6], "slice index out of bounds"
     var Sint8 l(copy -2)
@@ -670,7 +672,12 @@ test test-constants()
     assert! int-arr.length() = 63
 
 
-test test-bitwise()
+test test-operations()
+    var Int{-20:30} x(copy 10)
+    x := clamp x * 4
+    assert! x = 30
+    x := clamp - x
+    assert! x = -20
     var Uint8 c(copy 0xF0)
     assert! c band 0x31 = 0x30
     assert! c bor 0x0F = 0xFF

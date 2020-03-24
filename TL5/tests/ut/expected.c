@@ -768,29 +768,29 @@ char* sa = NULL;
     Seq_Length ba_Value_length = 0;
     Seq_Length* ba_Seq_length = NULL;
     Ref_Manager* ba_Refman = NULL;
-    static char aux_String_0[] = {'t','e','x','t','\0',};
-    Seq_Length aux_String_0_Max_length = sizeof(aux_String_0);
-    Seq_Length aux_String_0_Length[1] = {sizeof(aux_String_0) - 1};
-    char* aux_String_1 = NULL;
-    Seq_Length aux_String_1_Max_length = 0;
-    Seq_Length* aux_String_1_Length = &Lumi_empty_length;
-    Ref_Manager* aux_String_1_Refman = NULL;
-    static Byte aux_Buffer_0[] = {0xbe,0xef,};
-    Seq_Length aux_Buffer_0_Max_length = sizeof(aux_Buffer_0);
-    Seq_Length aux_Buffer_0_Length[1] = {sizeof(aux_Buffer_0)};
-    Byte* aux_Buffer_1 = NULL;
-    Seq_Length aux_Buffer_1_Max_length = 0;
-    Seq_Length* aux_Buffer_1_Length = &Lumi_empty_length;
-    Ref_Manager* aux_Buffer_1_Refman = NULL;
+    char* aux_String_0 = NULL;
+    Seq_Length aux_String_0_Max_length = 0;
+    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
+    Ref_Manager* aux_String_0_Refman = NULL;
+    static char aux_String_1[] = {'t','e','x','t','\0',};
+    Seq_Length aux_String_1_Max_length = sizeof(aux_String_1);
+    Seq_Length aux_String_1_Length[1] = {sizeof(aux_String_1) - 1};
+    Byte* aux_Buffer_0 = NULL;
+    Seq_Length aux_Buffer_0_Max_length = 0;
+    Seq_Length* aux_Buffer_0_Length = &Lumi_empty_length;
+    Ref_Manager* aux_Buffer_0_Refman = NULL;
+    static Byte aux_Buffer_1[] = {0xbe,0xef,};
+    Seq_Length aux_Buffer_1_Max_length = sizeof(aux_Buffer_1);
+    Seq_Length aux_Buffer_1_Length[1] = {sizeof(aux_Buffer_1)};
     CHECK_REF(2, LUMI_block0_cleanup, sa)
     if (0x03 >= sa_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
-    aux_String_1 = sa + 0x03 * sa_Value_length;
-    aux_String_1_Max_length = sa_Value_length;
-    aux_String_1_Length = sa_Seq_length + 0x03;
-    aux_String_1_Refman = sa_Refman;
-    LUMI_inc_ref(aux_String_1_Refman);
-    CHECK_REFMAN(2, LUMI_block0_cleanup, aux_String_1_Refman)
-    LUMI_err = String_copy(aux_String_1, aux_String_1_Max_length, aux_String_1_Length, aux_String_0, *aux_String_0_Length);
+    aux_String_0 = sa + 0x03 * sa_Value_length;
+    aux_String_0_Max_length = sa_Value_length;
+    aux_String_0_Length = sa_Seq_length + 0x03;
+    aux_String_0_Refman = sa_Refman;
+    LUMI_inc_ref(aux_String_0_Refman);
+    CHECK_REFMAN(2, LUMI_block0_cleanup, aux_String_0_Refman)
+    LUMI_err = String_copy(aux_String_0, aux_String_0_Max_length, aux_String_0_Length, aux_String_1, *aux_String_1_Length);
     CHECK(2, LUMI_block0_cleanup)
     free(sa_Seq_length);
     LUMI_owner_dec_ref(sa_Refman);
@@ -801,13 +801,13 @@ char* sa = NULL;
     sa = NULL;
     CHECK_REF(5, LUMI_block0_cleanup, ba)
     if (0x03 >= ba_Length) RAISE(5, LUMI_block0_cleanup, slice_index)
-    aux_Buffer_1 = ba + 0x03 * ba_Value_length;
-    aux_Buffer_1_Max_length = ba_Value_length;
-    aux_Buffer_1_Length = ba_Seq_length + 0x03;
-    aux_Buffer_1_Refman = ba_Refman;
-    LUMI_inc_ref(aux_Buffer_1_Refman);
-    CHECK_REFMAN(5, LUMI_block0_cleanup, aux_Buffer_1_Refman)
-    LUMI_err = Buffer_copy(aux_Buffer_1, aux_Buffer_1_Max_length, aux_Buffer_1_Length, aux_Buffer_0, *aux_Buffer_0_Length);
+    aux_Buffer_0 = ba + 0x03 * ba_Value_length;
+    aux_Buffer_0_Max_length = ba_Value_length;
+    aux_Buffer_0_Length = ba_Seq_length + 0x03;
+    aux_Buffer_0_Refman = ba_Refman;
+    LUMI_inc_ref(aux_Buffer_0_Refman);
+    CHECK_REFMAN(5, LUMI_block0_cleanup, aux_Buffer_0_Refman)
+    LUMI_err = Buffer_copy(aux_Buffer_0, aux_Buffer_0_Max_length, aux_Buffer_0_Length, aux_Buffer_1, *aux_Buffer_1_Length);
     CHECK(5, LUMI_block0_cleanup)
     free(ba_Seq_length);
     LUMI_owner_dec_ref(ba_Refman);
@@ -1362,24 +1362,24 @@ uint32_t* a = NULL;
     Seq_Length aux_Array_6_Length = 0;
     if (ut_M_i <= 0) RAISE(1, LUMI_block0_cleanup, sequence_too_short)
     INIT_NEW_ARRAY(1, LUMI_block0_cleanup, a, uint32_t, ut_M_i, 1);
-    aux_Array_0 = a + 0x00;
-    aux_Array_0_Length = 0x01;
-    if (ut_M_i >= 0x01) RAISE(4, LUMI_block0_cleanup, slice_index)
-    if (SAFE_SUM_LARGER(ut_M_i, (ut_M_i + 0x01), ut_M_i)) RAISE(4, LUMI_block0_cleanup, slice_index)
-    aux_Array_1 = a + ut_M_i;
-    aux_Array_1_Length = ut_M_i + 0x01;
-    if ((y + 0x01) <= 0) RAISE(4, LUMI_block0_cleanup, slice_index)
-    aux_Array_2 = (aux_Array_1) + 0x00;
-    aux_Array_2_Length = y + 0x01;
-    if (y < 0) RAISE(4, LUMI_block0_cleanup, slice_index)
     if (x < 0 || x <= 0 || SAFE_SUM_LARGER(x, x, ut_M_i)) RAISE(4, LUMI_block0_cleanup, slice_index)
-    aux_Array_3 = a + x;
-    aux_Array_3_Length = x;
+    aux_Array_0 = a + x;
+    aux_Array_0_Length = x;
     if (y < 0 || (y + 0x01) <= 0) RAISE(4, LUMI_block0_cleanup, slice_index)
-    aux_Array_4 = (aux_Array_3) + y;
-    aux_Array_4_Length = y + 0x01;
+    aux_Array_1 = (aux_Array_0) + y;
+    aux_Array_1_Length = y + 0x01;
     if (x < 0 || x >= y + 0x01) RAISE(4, LUMI_block0_cleanup, slice_index)
-    ut_M_i = (((aux_Array_4)[x]) + ((aux_Array_2)[y])) + ((aux_Array_0)[ut_M_i]);
+    if (SAFE_SUM_LARGER(ut_M_i, (ut_M_i + 0x01), ut_M_i)) RAISE(4, LUMI_block0_cleanup, slice_index)
+    aux_Array_2 = a + ut_M_i;
+    aux_Array_2_Length = ut_M_i + 0x01;
+    if ((y + 0x01) <= 0) RAISE(4, LUMI_block0_cleanup, slice_index)
+    aux_Array_3 = (aux_Array_2) + 0x00;
+    aux_Array_3_Length = y + 0x01;
+    if (y < 0) RAISE(4, LUMI_block0_cleanup, slice_index)
+    aux_Array_4 = a + 0x00;
+    aux_Array_4_Length = 0x01;
+    if (ut_M_i >= 0x01) RAISE(4, LUMI_block0_cleanup, slice_index)
+    ut_M_i = (((aux_Array_1)[x]) + ((aux_Array_3)[y])) + ((aux_Array_4)[ut_M_i]);
     INIT_NEW_ARRAY(6, LUMI_block0_cleanup, aa, uint32_t, length, 1);
     aux_Array_5 = aa + xx;
     aux_Array_5_Length = xx;
@@ -1389,23 +1389,23 @@ uint32_t* a = NULL;
     aux_Array_6_Length = 0x04;
     ut_M_i = (aux_Array_6)[0x03];
 /// @ test-slice-expression-20
-Byte* aux_Array_0 = NULL;
+Char* aux_Array_0 = NULL;
     Seq_Length aux_Array_0_Length = 0;
-    Char* aux_Array_1 = NULL;
+    Byte* aux_Array_1 = NULL;
     Seq_Length aux_Array_1_Length = 0;
-    CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    if (SAFE_SUM_LARGER(0x01, 0x03, *(ut_M_buff_Length))) RAISE(1, LUMI_block0_cleanup, slice_index)
-    aux_Array_0 = ut_M_buff + 0x01;
-    aux_Array_0_Length = 0x03;
     CHECK_REF(1, LUMI_block0_cleanup, str)
-    if (SAFE_SUM_LARGER(0x01, 0x03, *(str_Length))) RAISE(1, LUMI_block0_cleanup, slice_index)
-    aux_Array_1 = str + 0x01;
-    aux_Array_1_Length = 0x03;
+    if (0x02 >= *(str_Length)) RAISE(1, LUMI_block0_cleanup, slice_index)
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
     if (0x02 >= *(ut_M_buff_Length)) RAISE(1, LUMI_block0_cleanup, slice_index)
     CHECK_REF(1, LUMI_block0_cleanup, str)
-    if (0x02 >= *(str_Length)) RAISE(1, LUMI_block0_cleanup, slice_index)
-    ut_M_i = (((str[0x02]) + (ut_M_buff[0x02])) + ((aux_Array_1)[0x02])) + ((aux_Array_0)[0x02]);
+    if (SAFE_SUM_LARGER(0x01, 0x03, *(str_Length))) RAISE(1, LUMI_block0_cleanup, slice_index)
+    aux_Array_0 = str + 0x01;
+    aux_Array_0_Length = 0x03;
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
+    if (SAFE_SUM_LARGER(0x01, 0x03, *(ut_M_buff_Length))) RAISE(1, LUMI_block0_cleanup, slice_index)
+    aux_Array_1 = ut_M_buff + 0x01;
+    aux_Array_1_Length = 0x03;
+    ut_M_i = (((str[0x02]) + (ut_M_buff[0x02])) + ((aux_Array_0)[0x02])) + ((aux_Array_1)[0x02]);
 /// @ test-slice-expression-e0
 expected "]", got "new-line"
 /// @ test-slice-expression-e1
@@ -1993,17 +1993,83 @@ ut_M_b = ! ut_M_b;
 /// @ test-unary-expression-4
 ut_M_b = ! (ut_M_i > 0x03);
 /// @ test-unary-expression-5
-expected expression, got "{"
+ut_M_i = ((ut_M_i + 0x01) > 0xffffffff)? 0xffffffff: (ut_M_i + 0x01);
 /// @ test-unary-expression-6
-expected space after "-", got "["
+ut_M_i = ((ut_M_i - 0x01) < 0x00)? 0x00: (ut_M_i - 0x01);
 /// @ test-unary-expression-7
-used non-unary operator "+"
+uint8_t x = 0;
+    x = (ut_M_i < 0x0a)? 0x0a: ((ut_M_i > 0x14)? 0x14: ut_M_i);
 /// @ test-unary-expression-8
-void expression given as operand to operator "-"
+if ((ut_M_i + 0x01) > 0xffffffff) RAISE(1, LUMI_block0_cleanup, integer_overflow)
+    ut_M_i = ut_M_i + 0x01;
 /// @ test-unary-expression-9
-operator "-" expected "Int" operand, got "Bool"
+if ((ut_M_i - 0x01) < 0x00) RAISE(1, LUMI_block0_cleanup, integer_overflow)
+    ut_M_i = ut_M_i - 0x01;
 /// @ test-unary-expression-10
+uint8_t x = 0;
+    if (ut_M_i < 0x0a || ut_M_i > 0x14) RAISE(2, LUMI_block0_cleanup, integer_overflow)
+    x = ut_M_i;
+/// @ test-unary-expression-11
+++LUMI_trace_ignore_count;
+    if ((ut_M_i + 0x01) > 0xffffffff) RAISE(1, LUMI_block2_cleanup, integer_overflow)
+    ut_M_i = ut_M_i + 0x01;
+LUMI_block2_cleanup:
+    --LUMI_trace_ignore_count;
+    if (LUMI_err != OK) {
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+        ut_M_i = 0x0c;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ test-unary-expression-12
+ut_M_fun4(((ut_M_i + 0x01) > 0xffffffff)? 0xffffffff: (ut_M_i + 0x01));
+/// @ test-unary-expression-13
+if ((ut_M_i + 0x01) > 0xffffffff) RAISE(1, LUMI_block0_cleanup, integer_overflow)
+    ut_M_fun4(ut_M_i + 0x01);
+/// @ test-unary-expression-14
+++LUMI_trace_ignore_count;
+    if ((ut_M_i + 0x01) > 0xffffffff) RAISE(1, LUMI_block2_cleanup, integer_overflow)
+    ut_M_fun4(ut_M_i + 0x01);
+LUMI_block2_cleanup:
+    --LUMI_trace_ignore_count;
+    if (LUMI_err != OK) {
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+        ut_M_i = 0x0c;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ test-unary-expression-e0
+expected expression, got "{"
+/// @ test-unary-expression-e1
+expected space after "-", got "["
+/// @ test-unary-expression-e2
+used non-unary operator "+"
+/// @ test-unary-expression-e3
+void expression given as operand to operator "-"
+/// @ test-unary-expression-e4
+operator "-" expected "Int" operand, got "Bool"
+/// @ test-unary-expression-e5
 operator "not" expected "Bool" operand, got "Int"
+/// @ test-unary-expression-e6
+misplaced use of "clamp"
+/// @ test-unary-expression-e7
+misplaced use of "clamp"
+/// @ test-unary-expression-e8
+unnecessary use of "clamp"
+/// @ test-unary-expression-e9
+unnecessary use of "clamp"
+/// @ test-unary-expression-e10
+using "?" where error is propagated
+/// @ test-unary-expression-e11
+error raised inside function not declared as error raising "error"
+/// @ test-unary-expression-e12
+using "?" where error is propagated
+/// @ test-unary-expression-e13
+misplaced use of "clamp"
 /// @@ test-binary-expression
 /// @ test-binary-expression-0
 ut_M_i = 0x17 + 0x36;

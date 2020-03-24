@@ -159,7 +159,7 @@ func ! test-slice-expression(
 
 func test-container-expression(copy Int x, copy Int y, user String? s)->(
         var Int i, var Bool b)
-    i := - x + - - - y
+    i := clamp - x + - - - y
     b := not ((not (x * 3) - 5 > 6 * y = 234 and not 5 - x < y) or not
             (x = -2 - (-4 * y) and -6 > y >= 12 = x)) and (- (2 + x) > y or s? or
             not s?)
