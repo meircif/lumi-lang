@@ -202,9 +202,9 @@ Returncode UnaryExpression_analyze(UnaryExpression* self) {
     CHECK(94, Expression_set_simple_type(&(self->_base), glob->type_bool) )
   }
   else {
-    Bool _Bool44;
-    CHECK(95, String_equal(self->operator->name, &(String){2, 1, "-"}, &(_Bool44)) )
-    if (_Bool44) {
+    Bool _Bool46;
+    CHECK(95, String_equal(self->operator->name, &(String){2, 1, "-"}, &(_Bool46)) )
+    if (_Bool46) {
       CHECK(96, UnaryExpression_test_operand_type(self, self->right_expression, glob->type_int) )
       CHECK(97, Expression_set_simple_type(&(self->_base), glob->type_int) )
     }
@@ -236,9 +236,9 @@ Returncode UnaryExpression_test_operand_type(UnaryExpression* self, Expression* 
 static char* _func_name_UnaryExpression_test_operand_type = "UnaryExpression.test-operand-type";
 #define LUMI_FUNC_NAME _func_name_UnaryExpression_test_operand_type
 Returncode UnaryExpression_test_operand_type(UnaryExpression* self, Expression* operand, TypeData* expected_type) {
-  Bool _Bool45;
-  CHECK(111, TypeData_m_is_same(expected_type, operand->result_type->type_data, &(_Bool45)) )
-  if (!_Bool45) {
+  Bool _Bool47;
+  CHECK(111, TypeData_m_is_same(expected_type, operand->result_type->type_data, &(_Bool47)) )
+  if (!_Bool47) {
     CHECK(112, SyntaxTreeNode_m_syntax_error3(&(self->_base._base), &(String){9, 8, "operator"}, self->operator->name, &(String){9, 8, "expected"}, expected_type->name, &(String){13, 12, "operand, got"}, operand->result_type->type_data->name) )
   }
   return OK;
@@ -402,9 +402,9 @@ Returncode BinaryExpression_analyze(BinaryExpression* self) {
       /* := operator */
       CHECK(199, TypeInstance_check_assign_from(self->left_expression->result_type, self->left_expression->access, &(self->_base._base._base), &(self->_base.right_expression), &(self->assignee)) )
       if (self->left_expression->access == ACCESS_USER) {
-        SyntaxTreeFunction* _SyntaxTreeFunction46;
-        CHECK(203, SyntaxTreeCode_get_function(self->_base._base.code_node, &(_SyntaxTreeFunction46)) )
-        _SyntaxTreeFunction46->has_user_assign = true;
+        SyntaxTreeFunction* _SyntaxTreeFunction48;
+        CHECK(203, SyntaxTreeCode_get_function(self->_base._base.code_node, &(_SyntaxTreeFunction48)) )
+        _SyntaxTreeFunction48->has_user_assign = true;
       }
       else {
         if (self->left_expression->access == ACCESS_OWNER) {
@@ -420,11 +420,11 @@ Returncode BinaryExpression_analyze(BinaryExpression* self) {
         CHECK(213, BinaryExpression_analyze_equalizer(self, true) )
       }
       else {
-        Bool _Bool47;
-        CHECK(214, String_equal(self->_base.operator->name, &(String){2, 1, "="}, &(_Bool47)) )
-        Bool _Bool48;
-        CHECK(214, String_equal(self->_base.operator->name, &(String){3, 2, "!="}, &(_Bool48)) )
-        if (_Bool47 || _Bool48) {
+        Bool _Bool49;
+        CHECK(214, String_equal(self->_base.operator->name, &(String){2, 1, "="}, &(_Bool49)) )
+        Bool _Bool50;
+        CHECK(214, String_equal(self->_base.operator->name, &(String){3, 2, "!="}, &(_Bool50)) )
+        if (_Bool49 || _Bool50) {
           CHECK(216, BinaryExpression_analyze_equalizer(self, false) )
         }
         else {
@@ -879,8 +879,8 @@ Func QuestionExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)Synt
 #include "expression/symbol.c"
 #include "syntax-tree/block.c"
 #include "syntax-tree/branch.c"
-#include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
+#include "syntax-tree/code.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "statement/enum.c"

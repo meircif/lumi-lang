@@ -2,7 +2,7 @@
 module math
 
 ~~~ Return the absolute value of `x` ~~~
-func abs(copy Int x)->(var Int res)
+func abs(copy Sint64 x)->(var Sint64 res)
     if x >= 0
         res := x
     else
@@ -11,7 +11,7 @@ func abs(copy Int x)->(var Int res)
 
 ~~~ Return `x` with the sign of `sign`,
 if sign is `0` no sign change is made to `x` ~~~
-func copysign(copy Int x, copy Int sign)->(var Int res)
+func copysign(copy Sint64 x, copy Sint64 sign)->(var Sint64 res)
     if (x >= 0 and sign >= 0) or (x < 0 and sign <= 0)
         res := x
     else
@@ -20,33 +20,29 @@ func copysign(copy Int x, copy Int sign)->(var Int res)
 
 ~~~ Return `x` raised to power `exp`, fail if `exp` is negative,
 if `x` and `exp` are zero the result is `1` ~~~
-func ! power(copy Int x, copy Int exp)->(var Int res)
-    if exp < 0
-        raise! "negative power exponent"
+func ! power(copy Sint64 x, copy Uint64 exp)->(var Sint64 res)
     res := 1
     for n in exp
         res := res * x
 
 
 ~~~ Return `x`!, fail if `x` is negative ~~~
-func ! factorial(copy Int x)->(var Int res)
-    if x < 0
-        raise! "negative factorial"
+func ! factorial(copy Uint64 x)->(var Uint64 res)
     res := 1
     for n in 2:x + 1
         res := res * n
 
 
 struct IntBox
-    var Int value
+    var Sint64 value
 
-    func user set(copy Int value)
+    func user set(copy Sint64 value)
         self.value := value
 
 
 class IntIterator
     ~~~ in TL5 a class must contain at least one field. ~~~
-    var Int dummy
+    var Uint8 dummy
 
     ~~~ Is called once before any iteration step.
     Iteration continues only if "has" returns true, in such case
@@ -57,7 +53,7 @@ class IntIterator
 
 
 ~~~ Return the sum of all integers in `iter` ~~~
-func ! sum(user IntIterator iter)->(var Int res)
+func ! sum(user IntIterator iter)->(var Sint64 res)
     res := 0
     for box in iter!
         res += box!.value

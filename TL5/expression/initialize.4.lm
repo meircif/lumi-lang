@@ -135,11 +135,10 @@ class InitExpression(ModuleTypeExpression)
     
     func inst write-allocation()
         self.arguments.write-preactions()
-        if self.result-type.type-data is glob.type-array or
-                self.result-type.type-data.is-sequence()
+        if self.result-type.type-data.is-sequence()
             self.result-type.length.write-preactions()
         if self.result-type.type-data is glob.type-array
-            if self.result-type.parameters.first.item.type-data.is-sequence()
+            if self.result-type.parameters.first.item.type-data.is-buffered()
                 self.result-type.parameters.first.item.length.write-preactions()
         
         if access-is-only-var(copy self.aux-variable.variable.access)
@@ -156,8 +155,7 @@ class InitExpression(ModuleTypeExpression)
             self.code-node.write-call(user self.arguments)
     
     func inst write-var-init()
-        if self.result-type.type-data is-not glob.type-array and
-                not self.result-type.type-data.is-sequence()
+        if not self.result-type.type-data.is-sequence()
             self.write-init-var-ref(user self.aux-variable)
             return
         
@@ -172,10 +170,20 @@ class InitExpression(ModuleTypeExpression)
             write(user " */\n")
     
     func inst write-new-init()
+        if self.result-type.type-data.is-sequence()
+            if self.result-type.length.result-type.int-range.min-value.sign() <=
+                    0
+                ; if (`length` <= 0) RAISE(`sequence_too_short`)
+                write(user "if (")
+                self.result-type.length.write()
+                write(user " <= 0) ")
+                self.code-node.write-raise(user "sequence_too_short")
+                self.code-node.write-spaces()
+        
         if self.result-type.type-data is glob.type-array
             self.write-new-array-init()
                 
-        else-if self.result-type.type-data.is-sequence()
+        else-if self.result-type.type-data.is-buffered()
             ; INIT_NEW_SEQUENCE(..., `type`, `length`);
             self.write-macro-init(
                     user "INIT_NEW_SEQUENCE", user self.aux-variable)
@@ -238,11 +246,12 @@ class InitExpression(ModuleTypeExpression)
             write(user "1")
         write(user ");\n")
         
-        if data-type.type-data.is-sequence()
-            ; `aux-variable`_Seq_length = LUMI_alloc(sizeof(int) * `length`);
+        if data-type.type-data.is-buffered()
+            ; `aux-variable`_Seq_length =
+            ;   LUMI_alloc(sizeof(Seq_Length) * `length`);
             self.code-node.write-spaces()
             self.aux-variable.write()
-            write(user "_Seq_length = LUMI_alloc(sizeof(int) * ")
+            write(user "_Seq_length = LUMI_alloc(sizeof(Seq_Length) * ")
             self.aux-variable.write()
             write(user "_Length")
             for n in depth - 1

@@ -84,7 +84,7 @@ class CallExpression(Expression)
                 self.result-type?
             if not self.result-type.type-data.is-primitive
                 write(user "((")
-                self.result-type.type-data.write-cname()
+                self.result-type.write-cname()
                 write(user "*)")
         self.write-function()
         if self.native-output and not self.is-statement
@@ -288,6 +288,7 @@ class FunctionObjectCallExpression(CallExpression)
 class CallArgument(Argument)
     owner Expression value
     owner TypeInstance real-type
+    owner Expression original-value
     user Expression assignee
     user SyntaxTreeCode code-node
     var Bool is-down-cast
@@ -307,11 +308,12 @@ class CallArgument(Argument)
         analyze-expression()->(owner self.value)
         if self.is-output and not self.value.assignable
             self.syntax-error-msg(user "non assignable call output")
-        if self.value.result-type?
-            if self.access = Access.STRONG and
-                    self.value.access = Access.OWNER and
-                    self.value.result-type.type-data is-not glob.type-empty
-                self.value := OwnerToStrongCallExpression(owner self.value)
+        if not self.value.result-type?
+            return
+        if self.access = Access.STRONG and
+                self.value.access = Access.OWNER and
+                self.value.result-type.type-data is-not glob.type-empty
+            self.value := OwnerToStrongCallExpression(owner self.value)
     
     func dynamic check-same-type-as(
             user Argument other,
@@ -349,6 +351,13 @@ class CallArgument(Argument)
         if self.is-native and self.is-output
             self.syntax-error-msg(
                     user "output argument in native function call")
+        if self.is-output and self.real-type.type-data.is-int-like
+            if not self.real-type.int-range.size-as(
+                    user self.value.result-type.int-range)
+                self.original-value := self.value
+                self.code-node.add-aux-variable(
+                        copy self.access, copy false, user self.real-type)->(
+                        owner self.value)
     
     func dynamic get-output()->(user Expression output)
         output := self.value
@@ -376,6 +385,8 @@ class CallArgument(Argument)
     
     func dynamic write-preactions()
         self.value.write-preactions()
+        if self.original-value?
+            self.original-value.write-preactions()
         if self.is-down-cast
             ; `value` = NULL;
             self.value.write-assign-null()
@@ -395,7 +406,6 @@ class CallArgument(Argument)
                 write(user "(void*)")
             write(user "&(")
         else-if self.is-native and not self.real-type.type-data.is-primitive and
-                not self.real-type.type-data is glob.type-array and
                 not self.real-type.type-data.is-sequence()
             write(user "(void*)")
         self.value.write-cast()
@@ -405,14 +415,14 @@ class CallArgument(Argument)
         if self.real-type.type-data is glob.type-array and not self.is-native
             ; , [*][&(]`value`_Length[)]
             write(user ", ")
-            if self.value.result-type.type-data.is-sequence()
+            if self.value.result-type.type-data.is-buffered()
                 write(user "*")
             if self.is-output
                 write(user "&(")
             self.value.write-length(
                     user "_Length",
                     user "0",
-                    copy not self.value.result-type.type-data.is-sequence())
+                    copy not self.value.result-type.type-data.is-buffered())
             if self.is-output
                 write(user ")")
             user TypeInstance data-type
@@ -428,7 +438,7 @@ class CallArgument(Argument)
                 write-array-value-length(copy n)
                 if self.is-output
                     write(user ")")
-            if data-type.type-data.is-sequence()
+            if data-type.type-data.is-buffered()
                 ; , [&(]`value`_Seq_length[)]
                 write(user ", ")
                 if self.is-output
@@ -438,7 +448,7 @@ class CallArgument(Argument)
                 if self.is-output
                     write(user ")")
         
-        else-if self.real-type.type-data.is-sequence() and not self.is-native
+        else-if self.real-type.type-data.is-buffered() and not self.is-native
             ; , [&(]`value`_Max_length[)], [&(]`value`_Length[)]
             write(user ", ")
             if self.is-output
@@ -450,7 +460,7 @@ class CallArgument(Argument)
             if self.is-output
                 write(user "&(")
             self.value.write-length(
-                    user "_Length", user "&Lumi_empty_int", copy false)
+                    user "_Length", user "&Lumi_empty_length", copy false)
             if self.is-output
                 write(user ")")
         
@@ -490,7 +500,12 @@ class CallArgument(Argument)
                 self.value.result-type.type-data is-not glob.type-empty
             self.code-node.write-spaces()
             self.assignee.write-assign-null()
-
+        if self.original-value?
+            self.code-node.write-spaces()
+            self.original-value.write()
+            write(user " = ")
+            self.value.write()
+            write(user ";\n")
 
 class CallArgumentFactory(ArgumentFactory)
     func dynamic new-argument()->(owner Argument new-argument)

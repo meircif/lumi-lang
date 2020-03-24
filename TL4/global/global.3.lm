@@ -65,6 +65,7 @@ static Global
   owner TypeData type-ref
   owner TypeData type-string
   owner TypeData type-array
+  owner TypeData type-long
   owner TypeData type-type
   owner TypeData type-base
   owner TypeData type-generic
@@ -145,6 +146,7 @@ static Global
     self.add-builtin-type(user "Ref", copy true):(owner self.type-ref)
     self.add-builtin-type(user "String", copy false):(owner self.type-string)
     self.add-builtin-type(user "Array", copy false):(owner self.type-array)
+    self.add-builtin-type(user "Long", copy false):(owner self.type-long)
     self.add-builtin-type(user "Type Name", copy false):(owner self.type-type)
     self.add-builtin-type(user "Base Symbol", copy false):(owner self.type-base)
     self.add-builtin-type(user "Generic Type", copy false):(
@@ -224,6 +226,102 @@ static Global
     # Array
     self.add-builtin-field(
         user glob.type-array, user "length", user glob.type-int, user _)
+    
+    # Long
+    self.add-builtin-field(
+        user glob.type-long, user "", user glob.type-int, user _)
+    
+    self.add-builtin-method(user glob.type-long, user "new")
+    
+    self.add-builtin-method(user glob.type-long, user "copy"):(user arguments)
+    self.add-builtin-output(
+        user arguments, copy ACCESS-OWNER, user glob.type-long, user "res")
+        
+    self.add-builtin-method(user glob.type-long, user "sign"):(user arguments)
+    self.add-builtin-output(
+        user arguments, copy ACCESS-VAR, user glob.type-int, user "value")
+    
+    self.add-builtin-method(user glob.type-long, user "set"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-COPY, user glob.type-int, user "value")
+        
+    self.add-builtin-method(user glob.type-long, user "int"):(user arguments)
+    self.add-builtin-output(
+        user arguments, copy ACCESS-VAR, user glob.type-int, user "value")
+        
+    self.add-builtin-method(user glob.type-long, user "add"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-COPY, user glob.type-int, user "value")
+        
+    self.add-builtin-method(user glob.type-long, user "mul"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-COPY, user glob.type-int, user "value")
+        
+    self.add-builtin-method(user glob.type-long, user "negate")
+        
+    self.add-builtin-method(user glob.type-long, user "parse"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "text")
+        
+    self.add-builtin-method(user glob.type-long, user "hex"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "text")
+        
+    self.add-builtin-global-function(user "long-add"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "a")
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "b")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-OWNER, user glob.type-long, user "res")
+        
+    self.add-builtin-global-function(user "long-sub"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "a")
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "b")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-OWNER, user glob.type-long, user "res")
+        
+    self.add-builtin-global-function(user "long-mul"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "a")
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "b")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-OWNER, user glob.type-long, user "res")
+        
+    self.add-builtin-global-function(user "long-div"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "n")
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "d")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-OWNER, user glob.type-long, user "q")
+        
+    self.add-builtin-global-function(user "long-mod"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "n")
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "d")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-OWNER, user glob.type-long, user "r")
+        
+    self.add-builtin-global-function(user "long-equal"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "a")
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "b")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-VAR, user glob.type-bool, user "res")
+        
+    self.add-builtin-global-function(user "long-larger"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "a")
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-long, user "b")
+    self.add-builtin-output(
+        user arguments, copy ACCESS-VAR, user glob.type-bool, user "res")
     
     # File
     self.add-builtin-global-function(user "file-open-read"):(user arguments)

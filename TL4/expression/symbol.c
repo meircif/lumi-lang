@@ -59,9 +59,9 @@ Returncode SymbolExpression_analyze(SymbolExpression* self);
 static char* _func_name_SymbolExpression_analyze = "SymbolExpression.analyze";
 #define LUMI_FUNC_NAME _func_name_SymbolExpression_analyze
 Returncode SymbolExpression_analyze(SymbolExpression* self) {
-  ModuleMembers* _ModuleMembers55;
-  CHECK(24, NameMap_find(glob->module_map, self->name, (void**)&(_ModuleMembers55)) )
-  if (NULL != _ModuleMembers55) {
+  ModuleMembers* _ModuleMembers57;
+  CHECK(24, NameMap_find(glob->module_map, self->name, (void**)&(_ModuleMembers57)) )
+  if (NULL != _ModuleMembers57) {
     self->_base.result_type = malloc(sizeof(TypeInstance));
     if (self->_base.result_type == NULL) RAISE(25)
     *self->_base.result_type = (TypeInstance){NULL, NULL, NULL, NULL, NULL, NULL, NULL};
@@ -294,18 +294,18 @@ Returncode MemberExpression_analyze(MemberExpression* self) {
   else {
     CHECK(150, TypeData_find_meth(instance_type->type_data, self->_base.name, &(self->_base.function), &(self->bases)) )
     if (!(NULL != self->_base.function)) {
-      Bool _Bool56;
-      CHECK(153, String_equal(self->_base.name, &(String){7, 6, "mocked"}, &(_Bool56)) )
-      self->_base.is_annotate = _Bool56;
+      Bool _Bool58;
+      CHECK(153, String_equal(self->_base.name, &(String){7, 6, "mocked"}, &(_Bool58)) )
+      self->_base.is_annotate = _Bool58;
       CHECK(154, (self->instance)->_base._dtl[8](self->instance, self->_base.is_annotate, &(self->is_mock_field)) )
       if (self->is_mock_field) {
         if (self->_base.is_annotate) {
           CHECK(157, TypeInstance_copy_new(instance_type, &(self->_base._base.result_type)) )
         }
         else {
-          Bool _Bool57;
-          CHECK(158, String_equal(self->_base.name, &(String){7, 6, "active"}, &(_Bool57)) )
-          if (!_Bool57) {
+          Bool _Bool59;
+          CHECK(158, String_equal(self->_base.name, &(String){7, 6, "active"}, &(_Bool59)) )
+          if (!_Bool59) {
             CHECK(159, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){28, 27, "mock function has no member"}, self->_base.name) )
           }
           else {
@@ -569,8 +569,8 @@ Func MemberExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)Syntax
 #include "expression/slice.c"
 #include "syntax-tree/block.c"
 #include "syntax-tree/branch.c"
-#include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
+#include "syntax-tree/code.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "statement/enum.c"

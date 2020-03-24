@@ -106,6 +106,10 @@ test test-char-expression()
   test-from-file(user "test-char-expression")
 
 
+test test-long-expression()
+  test-from-file(user "test-long-expression")
+
+
 test test-string-expression()
   test-from-file(user "test-string-expression")
 

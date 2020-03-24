@@ -31,6 +31,11 @@ func print-msg-with-item(user String text, user String item)
     sys.print(user item)
     sys.print(user "\"")
 
+func print-msg-with-long(user String text, user Long number)
+    var String{64} number-str
+    number.hex(user number-str)
+    print-msg-with-item(user text, user number-str)
+
 
 enum NameGroup
     DEFAULT

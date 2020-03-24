@@ -7,7 +7,7 @@ owner tl5-compiler.Global tested-compiler
 ; IO mocks
 
 var String{1024} mock-print-text
-var String{2048} mock-input-file-text
+var String{4096} mock-input-file-text
 var String{16384} mock-output-file-text
 var String{16} mock-input-file-name
 var String{2048} common-header
@@ -83,15 +83,15 @@ mock File.getc()->(var Char ch, var Bool is-eof)
 
 mock File.putc(copy Char ch)
     assert self is tl5-compiler.glob.output-file
-    tl5-compiler-tests.mock-output-file-text.append(copy ch)
+    try
+        tl5-compiler-tests.mock-output-file-text.append(copy ch)
 
 
 mock File.write(user String text)
-    assert self is tl5-compiler.glob.output-file
     for n in text.length
         var Char ch(copy text[n])
         if ch != '\n' or ch != tl5-compiler-tests.mock-output-file-last
-            tl5-compiler-tests.mock-output-file-text.append(copy ch)
+            self.putc(copy ch)
         tl5-compiler-tests.mock-output-file-last := ch
 
 

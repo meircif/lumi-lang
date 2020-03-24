@@ -43,7 +43,7 @@ cp ../../TL4/statement/*.3.lm statement
   expression/constant.3.lm expression/container.3.lm \
   expression/expression.3.lm expression/initialize.3.lm expression/slice.3.lm \
   expression/symbol.3.lm syntax-tree/block.3.lm syntax-tree/branch.3.lm \
-  syntax-tree/code.3.lm syntax-tree/code-flow.3.lm syntax-tree/node.3.lm \
+  syntax-tree/code-flow.3.lm syntax-tree/code.3.lm syntax-tree/node.3.lm \
   syntax-tree/root.3.lm statement/enum.3.lm statement/error.3.lm \
   statement/for.3.lm statement/function.3.lm statement/native.3.lm \
   statement/test.3.lm statement/type.3.lm statement/variable.3.lm

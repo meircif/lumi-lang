@@ -46,19 +46,19 @@ Returncode EnumData_parse(EnumData* self, Char* end) {
   CHECK(14, SyntaxTreeNode_set_location(&(self->_base)) )
   self->my_module = glob->current_module;
   CHECK(16, read_new(&(String){1, 0, ""}, &(self->name), &((*end))) )
-  Bool _Bool141;
-  CHECK(17, f_is_legal_name(self->name, NAME_TYPE, &(_Bool141)) )
-  if (!_Bool141) {
+  Bool _Bool143;
+  CHECK(17, f_is_legal_name(self->name, NAME_TYPE, &(_Bool143)) )
+  if (!_Bool143) {
     CHECK(18, SyntaxTreeNode_m_syntax_error(&(self->_base), &(String){18, 17, "illegal Enum name"}, self->name) )
   }
-  TypeData* _TypeData142;
-  CHECK(19, Global_find_type(glob, self->name, &(_TypeData142)) )
-  if (NULL != _TypeData142) {
+  TypeData* _TypeData144;
+  CHECK(19, Global_find_type(glob, self->name, &(_TypeData144)) )
+  if (NULL != _TypeData144) {
     CHECK(20, SyntaxTreeNode_m_syntax_error(&(self->_base), &(String){25, 24, "Enum name overrides type"}, self->name) )
   }
-  EnumData* _EnumData143;
-  CHECK(21, NameMap_find(self->my_module->enum_map, self->name, (void**)&(_EnumData143)) )
-  if (NULL != _EnumData143) {
+  EnumData* _EnumData145;
+  CHECK(21, NameMap_find(self->my_module->enum_map, self->name, (void**)&(_EnumData145)) )
+  if (NULL != _EnumData145) {
     CHECK(22, SyntaxTreeNode_m_syntax_error(&(self->_base), &(String){21, 20, "redefinition of Enum"}, self->name) )
   }
   self->values = malloc(sizeof(List));
@@ -72,17 +72,17 @@ Returncode EnumData_parse(EnumData* self, Char* end) {
     if (spaces != 4) {
       CHECK(30, SyntaxTreeNode_m_syntax_error_indentation(&(self->_base), spaces, 4) )
     }
-    Bool _Bool144;
-    CHECK(31, f_is_legal_name(value, NAME_CONSTANT, &(_Bool144)) )
-    if (!_Bool144) {
+    Bool _Bool146;
+    CHECK(31, f_is_legal_name(value, NAME_CONSTANT, &(_Bool146)) )
+    if (!_Bool146) {
       CHECK(32, SyntaxTreeNode_m_syntax_error(&(self->_base), &(String){22, 21, "illegal constant name"}, value) )
     }
     if ((*end) != '\n') {
       CHECK(34, SyntaxTreeNode_m_syntax_error_c(&(self->_base), &(String){40, 39, "expected new-line after Enum value, got"}, (*end)) )
     }
-    String* _String145;
-    CHECK(36, string_new_copy(value, &(_String145)) )
-    CHECK(36, List_add(self->values, _String145) )
+    String* _String147;
+    CHECK(36, string_new_copy(value, &(_String147)) )
+    CHECK(36, List_add(self->values, _String147) )
   }
   if (!(NULL != self->values->first)) {
     CHECK(38, SyntaxTreeNode_m_syntax_error_msg(&(self->_base), &(String){20, 19, "Enum with no values"}) )
@@ -100,17 +100,17 @@ static char* _func_name_EnumData_m_has_value = "EnumData.m-has-value";
 #define LUMI_FUNC_NAME _func_name_EnumData_m_has_value
 Returncode EnumData_m_has_value(EnumData* self, String* value, Bool* has_value) {
   (*has_value) = true;
-  Bool _Bool146;
-  CHECK(44, String_equal(value, &(String){7, 6, "length"}, &(_Bool146)) )
-  if (_Bool146) {
+  Bool _Bool148;
+  CHECK(44, String_equal(value, &(String){7, 6, "length"}, &(_Bool148)) )
+  if (_Bool148) {
     return OK;
   }
   ListNode* node = self->values->first;
   while (true) {
     if (!(NULL != node)) break;
-    Bool _Bool147;
-    CHECK(49, String_equal(value, node->item, &(_Bool147)) )
-    if (_Bool147) {
+    Bool _Bool149;
+    CHECK(49, String_equal(value, node->item, &(_Bool149)) )
+    if (_Bool149) {
       return OK;
     }
     node = node->next;
@@ -187,8 +187,8 @@ Func EnumData__dtl[] = {(void*)SyntaxTreeNode_get_parent_type, (void*)SyntaxTree
 #include "expression/symbol.c"
 #include "syntax-tree/block.c"
 #include "syntax-tree/branch.c"
-#include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
+#include "syntax-tree/code.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "statement/error.c"

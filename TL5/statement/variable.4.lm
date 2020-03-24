@@ -4,7 +4,6 @@ module tl5-compiler
 ~~~ Variable node in the syntax tree ~~~
 class SyntaxTreeVariable(SyntaxTreeCode)
     owner String name
-    user ModuleMembers my-module
     var Int access
     owner TypeInstance type-instance
     user TypeData parent-type
@@ -14,6 +13,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     var Bool is-native
     var Bool is-aux
     var Bool is-initialized
+    var Bool is-analyzed
     var Bool not-declared-yet
     
     func inst parse-new(
@@ -32,6 +32,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             copy Int access,
             copy Bool is-create,
             user TypeData parent-type)
+        self.set-location()
         self.parent-type := parent-type
         self.access := access
         self.is-create := is-create
@@ -51,8 +52,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             self.syntax-error-msg(user "type members cannot be initialized")
         if not self.parent? and not self.parent-type?
             self.parent := glob.root.global-init
-            self.my-module := glob.current-module
-            self.my-module.variable-map.add(user self.name, user self)
+            self.module.variable-map.add(user self.name, user self)
         if self.parent?
             self.is-initialized := glob.last-char = '(' or self.is-create
             if self.is-initialized
@@ -86,16 +86,12 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             if glob.module-map.find(user self.name)?
                 self.syntax-error(
                         user "variable name overrides module", user self.name)
-            if glob.find-variable(user self.name)?
+            if self.find-variable(user self.name, user _)?
                 self.syntax-error(
-                        user "redefinition of global variable", user self.name)
-            if glob.find-function(user self.name)?
+                        user "redefinition of variable", user self.name)
+            if self.find-function(user self.name, user _)?
                 self.syntax-error(
                         user "variable name overrides function", user self.name)
-            if self.parent?
-                if self.parent.find-variable(user self.name, user _)?
-                    self.syntax-error(
-                            user "redefinition of variable", user self.name)
     
     func dynamic get-parent-type()->(user TypeData parent-type)
         if self.parent-type?
@@ -112,23 +108,21 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             variable := _
     
     func dynamic link-types()
-        if self.my-module?
-            glob.current-module := self.my-module
         self.type-instance.link-types(user self)
-        if self.my-module?
-            glob.current-module := _
     
     func dynamic analyze()
-        if self.my-module?
-            glob.current-module := self.my-module
+        if self.is-analyzed
+            return
+        self.is-analyzed := true
         if self.type-instance.type-data.is-primitive and
                 self.access != Access.VAR
             self.syntax-error(
                     user "only \"var\" access is supported for primitive \
                     types, got",
                     user glob.access-names[self.access])
-        self.type-instance.analyze-lengths(
-                user self, copy access-is-only-var(copy self.access))
+        if not self.parent?
+            self.type-instance.analyze-after-link(
+                    user self, copy access-is-only-var(copy self.access))
         if self.is-create and self.type-instance.type-data is glob.type-generic
             self.syntax-error(
                     user "declared variable with generic subtype",
@@ -163,18 +157,13 @@ class SyntaxTreeVariable(SyntaxTreeCode)
                             user "non-conditional reference in type without \
                             constructor",
                             user self.parent-type.name)
-        if self.my-module?
-            glob.current-module := _
-        
-    func dynamic get-constant-value()->(var Int value, var Bool has-value)
-        has-value := false
 
     func dynamic check-memory(user ReferenceMemoryList refs)
         refs.add(user self)
     
     func dynamic write-cname()
-        if self.my-module?
-            self.my-module.write-prefix()
+        if not self.parent? and not self.parent-type?
+            self.module.write-prefix()
         write-cname(user self.name)
     
     func dynamic write()
@@ -183,8 +172,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         else-if not self.is-native
             write(user "\n")
         
-        if self.type-instance.type-data is glob.type-array or
-                self.type-instance.type-data.is-sequence()
+        if self.type-instance.type-data.is-sequence()
             self.write-sequence()
             return
         
@@ -224,8 +212,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
     func inst write-sequence()
         ; `data-type` `name`[`full length`][ = {0}];
         ; `data-type`* `name`[ = NULL];
-        ; [void|Returncode] (*`name`[`full length`])(`arguments`)[ = {0}];
-        ; [void|Returncode] (**`name`)(`arguments`)[ = NULL];
+        ; [void|Return_Code] (*`name`[`full length`])(`arguments`)[ = {0}];
+        ; [void|Return_Code] (**`name`)(`arguments`)[ = NULL];
         var Bool is-new-or-aux-var(
                 copy access-is-only-var(copy self.access) and self.is-create)
         var Bool is-new-var(copy is-new-or-aux-var and not self.is-aux)
@@ -267,14 +255,14 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         write(user ";\n")
         
         if not is-new-var
-            ; int[*] `name`_Length[ = 0|NULL];
-            ; int `name`_Max_length[ = 0];
+            ; Seq_Length[*] `name`_Length[ = 0|NULL];
+            ; Seq_Length `name`_Max_length[ = 0];
             self.write-spaces()
-            write(user "int")
+            write(user "Seq_Length")
             write(user " ")
             self.write-cname()
             write(user "_")
-            if self.type-instance.type-data.is-sequence()
+            if self.type-instance.type-data.is-buffered()
                 write(user "Max_length")
             else
                 write(user "Length")
@@ -282,23 +270,23 @@ class SyntaxTreeVariable(SyntaxTreeCode)
                 write(user " = 0")
             write(user ";\n")
         
-            ; int `name`_Value[_value*]_length[ = 0]; ...*
+            ; Seq_Length `name`_Value[_value*]_length[ = 0]; ...*
             for depth in sequence-depth
                 self.write-spaces()
-                write(user "int ")
+                write(user "Seq_Length ")
                 self.write-cname()
                 write-array-value-length(copy depth)
                 if not self.parent-type?
                     write(user " = 0")
                 write(user ";\n")
         
-        if data-type.type-data.is-sequence()
-            ; int `name`_Length[1][ = {0}];
-            ; int* `name`_Length[ = &Lumi_empty_int];
-            ; int `name`_Seq_length[`strings`][ = {0}];
-            ; int* `name`_Seq_length[ = NULL];
+        if data-type.type-data.is-buffered()
+            ; Seq_Length `name`_Length[1][ = {0}];
+            ; Seq_Length* `name`_Length[ = &Lumi_empty_length];
+            ; Seq_Length `name`_Seq_length[`strings`][ = {0}];
+            ; Seq_Length* `name`_Seq_length[ = NULL];
             self.write-spaces()
-            write(user "int")
+            write(user "Seq_Length")
             if not is-new-or-aux-var
                 write(user "*")
             write(user " ")
@@ -324,7 +312,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
                 if is-new-or-aux-var
                     write(user "{0}")
                 else-if sequence-depth = 0
-                    write(user "&Lumi_empty_int")
+                    write(user "&Lumi_empty_length")
                 else
                     write(user "NULL")
             write(user ";\n")
@@ -401,6 +389,8 @@ class VariableCreate(SyntaxTreeCode)
         base(user variable.parent)
     
     func dynamic analyze()
+        self.variable.type-instance.analyze-after-link(
+                user self, copy access-is-only-var(copy self.variable.access))
         self.variable.not-declared-yet := false
 
     func dynamic check-memory(user ReferenceMemoryList refs)
@@ -445,16 +435,19 @@ class VariableInit(VariableCreate)
             self.expression-init.error-expected := true
             read-c()
     
+    func dynamic find-variable(user String name, user String module-name)->(
+            user SyntaxTreeVariable variable)
+        if self.parent is glob.root.global-init
+            self.module.variable-map.find(user name)->(user variable)
+        else
+            base(user name, user module-name)->(user variable)
+    
     func dynamic analyze()
-        if self.parent is glob.root.global-init
-            glob.current-module := self.variable.my-module
+        base()
         self.expression-init.analyze()
-        if self.parent is glob.root.global-init
-            glob.current-module := _
         if self.variable.type-instance.type-data is glob.type-func and
                 not self.expression-init.arguments.parameters.first?
             self.variable.is-initialized := false
-        base()
 
     func dynamic check-memory(user ReferenceMemoryList refs)
         self.expression-init.check-memory(user refs)
@@ -476,10 +469,9 @@ class VariableInit(VariableCreate)
 
 class SyntaxTreeConstant(SyntaxTreeVariable)
     var ExpressionValue value
-    var Int int-value
+    user Long int-value
     var Bool is-ordered
-    var Bool ordering
-    var Bool analyzed
+    var Bool analyzing
     
     func inst parse-new()->(owner SyntaxTreeConstant constant)
         constant := SyntaxTreeConstant(user _)
@@ -488,52 +480,46 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
     func inst parse()
         self.access := Access.VAR
         self.constant := true
-        self.my-module := glob.current-module
-        user String type-name
-        read-until(user " ", copy false)->(user type-name)
-        if not type-name.equal(user "Int")
-            self.syntax-error(
-                    user "Only \"Int\" typed constant supported, got",
-                    user type-name)
-        self.expect-space(user "Int")
+        self.type-instance := TypeInstance()
+        self.type-instance.parse(
+                user " ", user self, user _, copy INDENTATION-SPACES)
+        self.expect-space(user self.type-instance.name)
         read-new(user " ")->(owner self.name)
         if not is-legal-name(user self.name, copy NameGroup.CONSTANT)
             self.syntax-error(user "illegal constant name", user self.name)
         if not self.is-native
             self.expect-space(user self.name)
             self.value.new(user "", user self)
-        glob.type-int.new-type-instance()->(owner self.type-instance)
-        self.my-module.variable-map.add(user self.name, user self)
+        self.module.variable-map.add(user self.name, user self)
     
     func dynamic link-types()
-        ; do nothing
+        self.type-instance.link-types(user self)
     
     func dynamic analyze()
-        if self.analyzed
+        if self.is-analyzed
             return
-        self.analyzed := true
-        glob.current-module := self.my-module
+        if self.analyzing
+            self.syntax-error(
+                    user "recursive dependency in constant", user self.name)
+        self.analyzing := true
+        if not self.type-instance.name.equal(user "Int")
+            self.syntax-error(
+                    user "Only \"Int\" typed constant supported, got",
+                    user self.type-instance.name)
+        self.type-instance.analyze-after-link(user self, copy true)
         self.analyze-expression(user self.value, user glob.type-int)
         self.value.check-no-error()
-        if not self.value.get-constant-value()->(var self.int-value)
+        if not self.value.get-constant-value()->(user self.int-value)?
             self.syntax-error-msg(user "value is not constant")
-        glob.current-module := _
+        self.type-instance.set-int-constant(user self.int-value)
+        self.is-analyzed := true
     
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
         if self.is-ordered
             return
-        if self.ordering
-            self.syntax-error(
-                    user "recursive dependency in constant", user self.name)
-        self.ordering := true
+        self.is-ordered := true
         self.value.order-constants(user ordered-list)
         ordered-list.add(user self.name, user self)
-        self.is-ordered := true
-    
-    func dynamic get-constant-value()->(var Int value, var Bool has-value)
-        self.analyze()
-        value := self.int-value
-        has-value := true
     
     func dynamic write()
         if not self.is-ordered
@@ -542,6 +528,6 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
         write(user "\nenum { ")
         self.write-cname()
         write(user " = ")
-        write-int(copy self.int-value)
+        write-long(user self.int-value)
         write(user " };\n")
         self.is-ordered := false

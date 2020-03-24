@@ -140,11 +140,16 @@ class FunctionArguments(SyntaxTreeNode)
                     copy indentation-spaces)
     
     func inst add-self-parameter(
-            user TypeData type-data, copy Int access, copy Bool conditional)
+            user TypeData type-data,
+            copy Int access,
+            copy Bool conditional,
+            user SyntaxTreeBlock parent)
         new DeclarationArgument self-args
         self-args.access := access
         self-args.variable := SyntaxTreeVariable(user _)
         self-args.variable.access := self-args.access
+        self-args.variable.parent := parent
+        self-args.variable.is-analyzed := true
         string-new-copy(user "self")->(owner self-args.variable.name)
         type-data.self-type-instance()->(owner self-args.variable.type-instance)
         self-args.variable.type-instance.conditional := conditional
@@ -351,7 +356,7 @@ class FunctionArguments(SyntaxTreeNode)
     
     func inst write-pointer-start()
         if self.has-error
-            write(user "Returncode (*")
+            write(user "Return_Code (*")
         else
             write(user "void (*")
     
@@ -365,3 +370,5 @@ class FunctionArguments(SyntaxTreeNode)
     func inst write-postactions()
         for parameter in self.parameters.iter()
             parameter.write-postactions()
+        for output in self.outputs.iter()
+            output.write-postactions()

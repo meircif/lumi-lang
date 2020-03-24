@@ -33,6 +33,9 @@ class ExpressionValue(SyntaxTreeNode)
         self.expression.restructure()->(owner self.expression)
         self.expression.is-statement := self.is-statement
         self.expression.analyze()
+        self.update()
+    
+    func inst update()
         self.result-type := self.expression.result-type
         self.access := self.expression.access
 
@@ -42,7 +45,7 @@ class ExpressionValue(SyntaxTreeNode)
     func inst check-all-errors()
         self.expression.code-node.check-expression-all-errors()->(
                 owner self.expression)
-        self.result-type := self.expression.result-type
+        self.update()
             
     func inst check-errors(copy Bool check-conditional, copy Bool check-weak)
         self.expression.code-node.check-expression-errors(
@@ -52,8 +55,10 @@ class ExpressionValue(SyntaxTreeNode)
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
         self.expression.order-constants(user ordered-list)
     
-    func dynamic get-constant-value()->(var Int value, var Bool has-value)
-        self.expression.get-constant-value()->(var value, var has-value)
+    func inst get-constant-value()->(user Long value)
+        user IntRange int-range(user self.result-type.int-range)
+        if long-equal(user int-range.min-value, user int-range.max-value)
+            value := int-range.max-value
     
     func dynamic check-memory(user ReferenceMemoryList refs)
         if self.expression?
@@ -127,7 +132,7 @@ class Expression(SyntaxTreeNode)
         do
             while operator?
             if curr-operator?
-                while operator.order < curr-operator.order
+                while operator.precedence < curr-operator.precedence
             owner BinaryExpression new-binary-expression
             BinaryExpression.parse-new(
                     user _,
@@ -300,9 +305,6 @@ class Expression(SyntaxTreeNode)
         else-if self.error-expected
             self.syntax-error-msg(
                     user "using \"!\" where error is not propagated")
-        
-    func dynamic get-constant-value()->(var Int value, var Bool has-value)
-        has-value := false
 
     func dynamic restructure()->(
             owner Expression expression, owner FunctionArguments arguments)
@@ -348,22 +350,21 @@ class Expression(SyntaxTreeNode)
             self.code-node.write-spaces()
             self.write-dynamic()
             write(user " = NULL;\n")
-        if self.result-type.type-data.is-sequence()
+        if self.result-type.type-data.is-buffered()
             self.code-node.write-spaces()
             self.write()
-            write(user "_Length = &Lumi_empty_int;\n")
+            write(user "_Length = &Lumi_empty_length;\n")
     
     func inst write-length(
             user String prefix, user String empty, copy Bool is-static)
         var Bool is-constant-length
-        var Int length-value
+        user Long length-value
         if is-static and self.result-type.length?
-            self.result-type.length.get-constant-value()->(
-                    var length-value, var is-constant-length)
+            self.result-type.length.get-constant-value()->(user length-value)
         if self.result-type.type-data is glob.type-empty
             write(user empty)
-        else-if is-constant-length
-            write-int(copy length-value)
+        else-if length-value?
+            write-long(user length-value)
         else
             self.write()
             write(user prefix)

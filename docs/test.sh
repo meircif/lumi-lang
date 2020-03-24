@@ -15,13 +15,7 @@ DIR="$( cd -P "$( dirname "$MYDIR" )" >/dev/null && pwd )"
 if [ -z $CC ]; then
   CC=gcc
 fi
-CCA="$CC --std=c89 -Werror -Wall -Wno-unused-variable --pedantic \
-  -Wno-unused-label"
-if [ $CC == "gcc" ]; then
-  CCA="$CCA -Wno-unused-but-set-variable"
-else
-  CCA="$CCA -Wno-self-assign"
-fi
+CCA="$CC --std=c89 -Werror -Wall -Wno-unused -Wno-self-assign --pedantic"
 
 rm -rf $DIR/.test/docs
 mkdir -p $DIR/.test/docs

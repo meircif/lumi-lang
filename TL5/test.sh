@@ -16,10 +16,7 @@ if [ -z $CC ]; then
   CC=gcc
 fi
 CCW="$CC --std=c89 -Werror -Wall -Wno-unused -Wno-missing-braces"
-CCA="$CCW --pedantic"
-if [ $CC == "clang" ]; then
-  CCA="$CCA -Wno-self-assign"
-fi
+CCA="$CCW -Wno-self-assign --pedantic"
 if ! which valgrind > /dev/null; then
   SKIP_VALGRIND="y"
 fi

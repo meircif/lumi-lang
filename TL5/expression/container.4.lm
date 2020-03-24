@@ -29,9 +29,6 @@ class BlockExpression(Expression)
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
         self.expression.order-constants(user ordered-list)
 
-    func dynamic get-constant-value()->(var Int value, var Bool has-value)
-        self.expression.get-constant-value()->(var value, var has-value)
-
     func dynamic check-memory(user ReferenceMemoryList refs)
         self.expression.check-memory(user refs)
 
@@ -62,7 +59,9 @@ class UnaryExpression(Expression)
             user Operator operator,
             user SyntaxTreeCode code-node)->(
             owner Expression expression, user Operator next-operator)
-        new UnaryExpression unary-expression(user code-node, user operator)
+        owner UnaryExpression unary-expression
+        operator.create-unary-expression(user code-node)->(
+                owner unary-expression)
         unary-expression.parse(user ends)->(user next-operator)
         expression := unary-expression
 
@@ -78,19 +77,6 @@ class UnaryExpression(Expression)
     func dynamic analyze()
         self.analyze-operand()->(owner self.right-expression)
         self.right-expression.check-no-error()
-        if self.operator.name.equal(user "not")
-            ; `not` operator
-            self.test-operand-type(
-                    user self.right-expression, user glob.type-bool)
-            self.set-simple-type(user glob.type-bool)
-        else-if self.operator.name.equal(user "-") or
-                self.operator.name.equal(user "bnot")
-            self.test-operand-type(
-                    user self.right-expression, user glob.type-int)
-            self.set-simple-type(user glob.type-int)
-        else
-            self.syntax-error(
-                    user "not unary operator", user self.operator.name)
 
     func inst analyze-operand()->(owner Expression operand)
         analyze-expression()->(owner operand)
@@ -113,12 +99,6 @@ class UnaryExpression(Expression)
 
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
         self.right-expression.order-constants(user ordered-list)
-
-    func dynamic get-constant-value()->(var Int value, var Bool has-value)
-        if self.operator.name.equal(user "-")->(var has-value)
-            if self.right-expression.get-constant-value()->(
-                    var value, var has-value)
-                value := - value
 
     func dynamic check-memory(user ReferenceMemoryList refs)
         self.right-expression.check-memory(user refs)
@@ -160,7 +140,7 @@ class BinaryExpression(UnaryExpression)
             user BinaryExpression binary-left-expression)->(
             owner BinaryExpression expression,
             user Operator next-operator)
-        operator.create-expression(user code-node)->(owner expression)
+        operator.create-binary-expression(user code-node)->(owner expression)
         expression.left-expression := left-expression
         expression.binary-left-expression := binary-left-expression
         expression.parse(user ends)->(user next-operator)
@@ -172,8 +152,8 @@ class BinaryExpression(UnaryExpression)
         if not self.allow-right-error
             self.right-expression.check-no-error()
         if self.binary-left-expression?
-            if self.operator.order =
-                    self.binary-left-expression.operator.order and
+            if self.operator.precedence =
+                    self.binary-left-expression.operator.precedence and
                     self.operator.group-index !=
                     self.binary-left-expression.operator.group-index
                 self.syntax-error2(

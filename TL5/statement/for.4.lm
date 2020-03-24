@@ -52,6 +52,7 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
         if is-index-iteration
             self.add-index-nodes(
                     copy is-int-iteration,
+                    user item-type-instance,
                     owner iterator-expression,
                     user iterator-aux-variable-expression,
                     user while-node)
@@ -79,12 +80,18 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
             self.start.check-no-error()
             self.analyze-expression(user self.iterator, user glob.type-int)
             glob.type-int.new-type-instance()->(owner item-type-instance)
+            item-type-instance.int-range := IntRange()
+            self.start.result-type.int-range.min-value.copy()->(
+                    owner item-type-instance.int-range.min-value)
+            self.iterator.result-type.int-range.max-value.copy()->(
+                    owner item-type-instance.int-range.max-value)
+            item-type-instance.int-range.set-sign-and-bits()
         else
             self.iterator.analyze()
             if not self.iterator.result-type?
                 self.syntax-error-msg(user "cannot iterate void expression")
             if self.iterator.result-type.type-data is glob.type-int
-                glob.type-int.new-type-instance()->(owner item-type-instance)
+                self.set-simple-int-item()->(owner item-type-instance)
             else-if self.iterator.result-type.type-data is glob.type-string
                 glob.type-char.new-type-instance()->(owner item-type-instance)
             else-if self.iterator.result-type.type-data is glob.type-buffer
@@ -105,8 +112,14 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
         
         user TypeData iterator-type(user self.iterator.result-type.type-data)
         is-int-iteration := iterator-type is glob.type-int
-        is-index-iteration := is-int-iteration or
-                iterator-type.is-sequence() or iterator-type is glob.type-array
+        is-index-iteration := is-int-iteration or iterator-type.is-sequence()
+        
+    func inst set-simple-int-item()->(owner TypeInstance item-type-instance)
+        glob.type-int.new-type-instance()->(owner item-type-instance)
+        self.iterator.result-type.int-range.copy-new()->(
+                owner item-type-instance.int-range)
+        item-type-instance.int-range.min-value := Long()
+        item-type-instance.int-range.set-sign-and-bits()
         
     func inst get-step-item-data()->(
             owner TypeInstance item-type-instance, var Int item-access)
@@ -161,16 +174,12 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
             owner Expression iterator-expression,
             user VariableExpression iterator-aux-variable-expression)
         var Int iterator-access(copy Access.USER)
-        var Int iterator-value
-        var Bool is-constant-iterator
         if is-int-iteration
             iterator-access := Access.VAR
-            self.iterator.get-constant-value()->(
-                    var iterator-value, var is-constant-iterator)
-        if is-constant-iterator
-            iterator-expression := self.iterator.expression
-            iterator-expression.code-node := code-node
-            return
+            if self.iterator.get-constant-value()?
+                iterator-expression := self.iterator.expression
+                iterator-expression.code-node := code-node
+                return
         
         ; aux-iterator := iterator
         owner VariableExpression aux-variable-expression-owner
@@ -199,7 +208,7 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
             return
         
         user SyntaxTreeVariable item-variable
-        if self.parent.find-variable(user self.item-name, user _)->(
+        if self.parent.find-declared-variable(user self.item-name, user _)->(
                 user item-variable)?
             item-type-instance.check-assign-to(
                     copy item-variable.access,
@@ -218,14 +227,21 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
     
     func inst add-index-nodes(
             copy Bool is-int-iteration,
+            user TypeInstance item-type-instance,
             owner Expression iterator-expression,
             user VariableExpression iterator-aux-variable-expression,
             user SyntaxTreeWhile while-node)
+        owner TypeInstance index-type-instance
+        glob.type-int.new-type-instance()->(owner index-type-instance)
+        if is-int-iteration
+            item-type-instance.int-range.copy-new()->(
+                    owner index-type-instance.int-range)
+        else
+            string-new-copy(user "Uint32")->(owner index-type-instance.name)
+            index-type-instance.set-int-range()
         owner VariableExpression index-aux-expression
         self.add-aux-variable(
-                copy Access.VAR,
-                copy false,
-                user glob.type-int.new-type-instance())->(
+                copy Access.VAR, copy false, user index-type-instance)->(
                 owner index-aux-expression)
         
         if self.start.expression?
@@ -365,7 +381,7 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
             owner Expression target,
             owner Expression value)
         owner BinaryExpression binary-expression
-        glob.operator-map.find(user operator-name).create-expression(
+        glob.operator-map.find(user operator-name).create-binary-expression(
                 user code-node)->(owner binary-expression)
         target.code-node := code-node
         value.code-node := code-node
@@ -402,7 +418,7 @@ class SyntaxTreeRepeatLoop(SyntaxTreeForLoop)
             var Bool is-index-iteration)
         self.analyze-expression(user self.iterator, user glob.type-int)
         self.iterator.check-no-error()
-        glob.type-int.new-type-instance()->(owner item-type-instance)
+        self.set-simple-int-item()->(owner item-type-instance)
         item-access := Access.VAR
         is-int-iteration := true
         is-index-iteration := true

@@ -117,13 +117,13 @@ class AssignExpression(Expression)
             self.write-assign-dynamic()
         if self.target.result-type.type-data is glob.type-array
             self.write-array-preactions()
-        else-if self.target.result-type.type-data.is-sequence()
+        else-if self.target.result-type.type-data.is-buffered()
             self.write-sequence-preactions()
     
     func inst write-array-preactions()
         self.target.write()
         write(user "_Length = ")
-        if self.value.result-type.type-data.is-sequence()
+        if self.value.result-type.type-data.is-buffered()
             write(user "*(")
             self.value.write()
             write(user "_Length)")
@@ -146,23 +146,22 @@ class AssignExpression(Expression)
                     sequence-type := sequence-type.parameters.first.item
                 else
                     sequence-type := _
-            var Bool is-constant-length
-            var Int length-value
+            user Long length-value
             if sequence-type?
                 if sequence-type.length?
                     sequence-type.length.get-constant-value()->(
-                            var length-value, var is-constant-length)
+                            user length-value)
             if self.value.result-type.type-data is glob.type-empty
                 write(user "0")
-            else-if is-constant-length
-                write-int(copy length-value)
+            else-if length-value?
+                write-long(user length-value)
             else
                 self.value.write()
                 write-array-value-length(copy n)
             write(user ";\n")
             self.code-node.write-spaces()
         
-        if data-type.type-data.is-sequence()
+        if data-type.type-data.is-buffered()
             self.target.write()
             write(user "_Seq_length = ")
             self.value.write-length(
@@ -180,7 +179,7 @@ class AssignExpression(Expression)
         self.target.write()
         write(user "_Length = ")
         self.value.write-length(
-                user "_Length", user "&Lumi_empty_int", copy false)
+                user "_Length", user "&Lumi_empty_length", copy false)
         write(user ";\n")
         self.code-node.write-spaces()
     
@@ -284,7 +283,7 @@ class AssignExpression(Expression)
             user TypeInstance data-type
             self.target.result-type.get-array-data-type-depth()->(
                     user data-type)
-            if data-type.type-data.is-sequence()
+            if data-type.type-data.is-buffered()
                 write(user "free(")
                 self.target.write()
                 write(user "_Seq_length);\n")

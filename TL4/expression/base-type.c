@@ -100,11 +100,11 @@ Returncode BaseMethExpression_analyze_call(BaseMethExpression* self, FunctionArg
   self_param->_base._base._dtl = CallArgument__dtl;
   CHECK(53, SyntaxTreeNode_set_location(&(self_param->_base._base)) )
   self_param->_base.access = ((Argument*)(self->function->arguments->parameters->first->item))->access;
-  BaseMethExpression* _BaseMethExpression28 = malloc(sizeof(BaseMethExpression));
-  if (_BaseMethExpression28 == NULL) RAISE(55)
-  *_BaseMethExpression28 = (BaseMethExpression){BaseMethExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, false, NULL, NULL, 0};
-  _BaseMethExpression28->_base._base._dtl = BaseMethExpression__dtl;
-  self_param->value = &(_BaseMethExpression28->_base);
+  BaseMethExpression* _BaseMethExpression30 = malloc(sizeof(BaseMethExpression));
+  if (_BaseMethExpression30 == NULL) RAISE(55)
+  *_BaseMethExpression30 = (BaseMethExpression){BaseMethExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, false, NULL, NULL, 0};
+  _BaseMethExpression30->_base._base._dtl = BaseMethExpression__dtl;
+  self_param->value = &(_BaseMethExpression30->_base);
   CHECK(56, TypeData_m_self_type_instance(self->parent_type, &(self_param->value->result_type)) )
   CHECK(57, List_prepend(arguments->parameters, &(self_param->_base)) )
   return OK;
@@ -334,11 +334,11 @@ Returncode TypeExpression_parse_new(TypeExpression* self, String* text, String* 
   if ((*end) == '.') {
     CHECK(145, Expression_read_new_value(&(self->_base._base), ends, &(value), &(next_end)) )
     if (value->length > 0) {
-      Bool _Bool29;
-      CHECK(147, String_equal(value, &(String){7, 6, "length"}, &(_Bool29)) )
+      Bool _Bool31;
+      CHECK(147, String_equal(value, &(String){7, 6, "length"}, &(_Bool31)) )
       if ((0) < 0 || (0) >= (value)->length) RAISE(147)
       if ((0) < 0 || (0) >= (value)->length) RAISE(147)
-      if (_Bool29 || (((value)->values[0]) >= 'A' && ((value)->values[0]) <= 'Z')) {
+      if (_Bool31 || (((value)->values[0]) >= 'A' && ((value)->values[0]) <= 'Z')) {
         EnumExpression* enum_expression = malloc(sizeof(EnumExpression));
         if (enum_expression == NULL) RAISE(148)
         *enum_expression = (EnumExpression){EnumExpression__dtl, NULL, 0, NULL, NULL, 0, false, false, false, false, false, false, NULL, NULL, NULL, NULL};
@@ -451,9 +451,9 @@ Returncode EnumExpression_analyze(EnumExpression* self) {
   if (NULL != self->_base.module_expression) {
     CHECK(211, ModuleTypeExpression_analyze_module(&(self->_base)) )
     String* module_name = self->_base.module_expression->result_type->name;
-    ModuleMembers* _ModuleMembers30;
-    CHECK(213, SyntaxTreeNode_find_module(&(self->_base._base.code_node->_base), module_name, &(_ModuleMembers30)) )
-    CHECK(213, NameMap_find(_ModuleMembers30->enum_map, self->name, (void**)&(self->enum_data)) )
+    ModuleMembers* _ModuleMembers32;
+    CHECK(213, SyntaxTreeNode_find_module(&(self->_base._base.code_node->_base), module_name, &(_ModuleMembers32)) )
+    CHECK(213, NameMap_find(_ModuleMembers32->enum_map, self->name, (void**)&(self->enum_data)) )
     if (!(NULL != self->enum_data)) {
       CHECK(215, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){13, 12, "unknown Enum"}, self->name, &(String){10, 9, "in module"}, module_name) )
     }
@@ -464,9 +464,9 @@ Returncode EnumExpression_analyze(EnumExpression* self) {
       CHECK(222, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){13, 12, "unknown Enum"}, self->name) )
     }
   }
-  Bool _Bool31;
-  CHECK(223, EnumData_m_has_value(self->enum_data, self->value, &(_Bool31)) )
-  if (!_Bool31) {
+  Bool _Bool33;
+  CHECK(223, EnumData_m_has_value(self->enum_data, self->value, &(_Bool33)) )
+  if (!_Bool33) {
     CHECK(224, SyntaxTreeNode_m_syntax_error2(&(self->_base._base._base), &(String){5, 4, "Enum"}, self->name, &(String){13, 12, "has no value"}, self->value) )
   }
   return OK;
@@ -514,8 +514,8 @@ Func EnumExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTr
 #include "expression/symbol.c"
 #include "syntax-tree/block.c"
 #include "syntax-tree/branch.c"
-#include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
+#include "syntax-tree/code.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "statement/enum.c"

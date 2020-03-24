@@ -4,7 +4,6 @@ module tl5-compiler
  ~~~ Type node in the syntax tree ~~~
 class TypeData(SyntaxTreeNamespace)
     owner String name
-    user ModuleMembers my-module
     owner TypeInstance base-type
     owner List{String} parameters
     owner NameMap{SyntaxTreeFunction} dynamic-base-methods
@@ -25,9 +24,8 @@ class TypeData(SyntaxTreeNamespace)
     func inst parse(copy Bool is-dynamic)
         self.set-location()
         self.is-dynamic := is-dynamic
-        self.my-module := glob.current-module
         read-new(user "({")->(owner self.name)
-        self.add-type(user self.my-module)
+        self.add-type(user self.module)
         if glob.last-char = '{'
             self.parameters := List{String}()
             do
@@ -61,17 +59,20 @@ class TypeData(SyntaxTreeNamespace)
         is-reference := not self.is-primitive or self is glob.type-func or
                 self is glob.type-ref
         
+    func inst is-buffered()->(var Bool is-buffered)
+        is-buffered := self is glob.type-string or self is glob.type-buffer
+
     func inst is-sequence()->(var Bool is-sequence)
-        is-sequence := self is glob.type-string or self is glob.type-buffer
+        is-sequence := self is glob.type-array or self.is-buffered()
     
-    func inst add-type(user ModuleMembers my-module)
+    func inst add-type(user ModuleMembers module)
         if not is-legal-name(user self.name, copy NameGroup.TYPE)
             self.syntax-error(user "illegal type name", user self.name)
-        if glob.find-type(user self.name)?
+        if self.find-type(user self.name)?
             self.syntax-error(user "redefinition of type", user self.name)
         if glob.current-module.enum-map.find(user self.name)?
             self.syntax-error(user "type name overrides Enum", user self.name)
-        my-module.type-map.add(user self.name, user self)
+        module.type-map.add(user self.name, user self)
     
     func dynamic parse-child(user String keyword)
         if self.parse-if-function(user keyword, user self)
@@ -161,9 +162,7 @@ class TypeData(SyntaxTreeNamespace)
         
         ; order base type
         if self.base-type?
-            glob.current-module := self.my-module
             self.base-type.link-types(user self)
-            glob.current-module := _
             if self.base-type.type-data.order-bases(user ordered-list)->(
                     var recursion-error)
                 print-msg-with-item(user ", extended by type", user self.name)
@@ -172,9 +171,7 @@ class TypeData(SyntaxTreeNamespace)
         ; order complex fields
         for variable in self.variables.iter()
             if access-is-only-var(copy variable.access)
-                glob.current-module := self.my-module
                 variable.type-instance.link-types(user self)
-                glob.current-module := _
                 if not variable.type-instance.type-data.is-primitive and
                         variable.type-instance.type-data is-not
                         glob.type-generic
@@ -209,7 +206,6 @@ class TypeData(SyntaxTreeNamespace)
                 self.dynamic-base-methods.add(user function.name, user function)
     
     func dynamic link-types()
-        glob.current-module := self.my-module
         if self.base-type?
             self.base-type.link-types(user self)
             if self.base-type.type-data.parameters? and
@@ -220,12 +216,10 @@ class TypeData(SyntaxTreeNamespace)
             if not self.constructor?
                 self.constructor := self.base-type.type-data.constructor
         base()
-        glob.current-module := _
     
     func dynamic analyze()
-        glob.current-module := self.my-module
         if self.base-type?
-            self.base-type.analyze-lengths(user self, copy true)
+            self.base-type.analyze-after-link(user self, copy true)
         if not self.base-type? and self.variables.is-empty()
             self.syntax-error(user "type with no fields", user self.name)
         if self.is-dynamic and not self.is-base-dynamic()
@@ -238,7 +232,6 @@ class TypeData(SyntaxTreeNamespace)
                 while not iter.get().is-dynamic
                 iter.next()
         base()
-        glob.current-module := _
     
     func inst collect-delete-group()
         if self.delete-group?
@@ -257,8 +250,7 @@ class TypeData(SyntaxTreeNamespace)
             type-data.delete-group.extend(user self.delete-group)
     
     func dynamic write-cname()
-        if self.my-module?
-            self.my-module.write-prefix()
+        self.module.write-prefix()
         write-cname(user self.name)
     
     func dynamic write-declaration()

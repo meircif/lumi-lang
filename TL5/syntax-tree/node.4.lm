@@ -4,10 +4,12 @@ module tl5-compiler
 
 ~~~ Basic node type for all syntax tree nodes ~~~
 class SyntaxTreeNode
+    user ModuleMembers module
     user String input-file-name
     var Int line-number
     
     func inst set-location()
+        self.module := glob.current-module
         self.input-file-name := glob.input-file-name
         self.line-number := glob.line-number
     
@@ -48,7 +50,7 @@ class SyntaxTreeNode
         if not glob.module-map.find(user name)->(user module-members)?
             self.syntax-error(user "unknown module", user name)
     
-    func inst find-type(user String name, user String module-name)->(
+    func inst check-type(user String name, user String module-name)->(
             user TypeData type-data)
         if module-name?
             if self.find-module(user module-name).type-map.find(user name)->(
@@ -59,7 +61,14 @@ class SyntaxTreeNode
                     user name,
                     user "in module",
                     user module-name)
-        if glob.find-type(user name)->(user type-data)?
+        if not self.find-type(user name)->(user type-data)?
+            self.syntax-error(user "unknown type", user name)
+    
+    func inst find-type(user String name)->(
+            user TypeData type-data)
+        if self.module.type-map.find(user name)->(user type-data)?
+            return
+        if glob.global-module.type-map.find(user name)->(user type-data)?
             return
         user TypeData parent-type
         if self.get-parent-type()->(user parent-type)?
@@ -68,23 +77,38 @@ class SyntaxTreeNode
                     if parameter.equal(user name)
                         type-data := glob.type-generic
                         return
-        self.syntax-error(user "unknown type", user name)
+        if glob.global-module.int-map.find(user name)?
+            type-data := glob.type-int
+            return
     
     func dynamic find-variable(user String name, user String module-name)->(
             user SyntaxTreeVariable variable)
         if module-name?
             self.find-module(user module-name).variable-map.find(user name)->(
                     user variable)
-        else
-            glob.find-variable(user name)->(user variable)
+            return
+        if self.module?
+            if self.module.variable-map.find(user name)->(user variable)?
+                return
+        glob.global-module.variable-map.find(user name)->(user variable)
+                
+    func inst find-declared-variable(user String name, user String module-name)->(
+            user SyntaxTreeVariable variable)
+        self.find-variable(user name, user module-name)->(user variable)
+        if variable?
+            if variable.not-declared-yet
+                self.syntax-error(
+                        user "using before declaration variable", user name)
     
     func inst find-function(user String name, user String module-name)->(
             user SyntaxTreeFunction function)
         if module-name?
             self.find-module(user module-name).function-map.find(user name)->(
                     user function)
-        else
-            glob.find-function(user name)->(user function)
+            return
+        if self.module.function-map.find(user name)->(user function)?
+            return
+        glob.global-module.function-map.find(user name)->(user function)
     
     ~~~ Expect `expected-text` to be read exactly from the input file ~~~
     func inst read-expect(user String expected-text)
@@ -227,6 +251,22 @@ class SyntaxTreeNode
         sys.print(user " ")
         path.print-error(user text2)
         sys.exit(copy 1)
+    
+    func inst syntax-error-long(user String text, user Long number)
+        self.print-syntax-error-header()
+        print-msg-with-long(user text, user number)
+        self.syntax-error-raise()
+    
+    func inst syntax-error-long2(
+            user String text1,
+            user Long number1,
+            user String text2,
+            user Long number2)
+        self.print-syntax-error-header()
+        print-msg-with-long(user text1, user number1)
+        sys.print(user " ")
+        print-msg-with-long(user text2, user number2)
+        self.syntax-error-raise()
     
     ~~~ Check `text` is a string constant ~~~
     func inst check-string(user String text)

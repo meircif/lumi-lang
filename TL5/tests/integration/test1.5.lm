@@ -125,13 +125,13 @@ test test-another()
 
 
 native include "external.h"
-native var Int external-int
-native const Int EXTERNAL-CONST
+native var cdef.Int external-int
+native const Uint8 EXTERNAL-CONST
 native type Native
 native func external0() "MY_Some_external"
-native func external1(copy Int i, user String s, user Array{Int} a)->(
+native func external1(copy cdef.Int i, user String s, user Array{cdef.Int} a)->(
         copy Native n)
-native func external2(copy Native n)->(copy Int i)
+native func external2(copy Native n)->(copy cdef.Int i)
 native code "#define MY_DEF_VALUE 12"
 
 test test-native()
@@ -139,11 +139,11 @@ test test-native()
     assert! EXTERNAL-CONST = 12
     var Native n
     var String{4} s(user "bb")!
-    var Array{6:Int} a
+    var Array{6:cdef.Int} a
     external0()
     assert! external-int = 7
     n := external1(copy 3, user s, user a)
-    assert! s[0] = 'a'
+    assert! s[0]! = 'a'
     assert! a[0] = 3
     assert! external2(copy n) = 7
     var Int x
@@ -530,7 +530,8 @@ test test-assert-error-message()
     assert-error! fun(), "empty object used"
     strong Array?{Int} arr(strong Array{2:Int}()!)
     assert-error! arr[6], "slice index out of bounds"
-    assert-error! Array{-2:Int}(), "slice index out of bounds"
+    var Sint8 l(copy -2)
+    assert-error! Array{l:Int}(), "sequence too short"
     weak Array?{Int} arr2(weak arr)
     arr := _
     assert-error! arr.length(), "empty object used"
@@ -609,33 +610,33 @@ test test-builtin-errors()
     assert-error! file-read-text.seek-end(copy 0), "setting file offset failed"
     assert-error! file-read-text.flush(), "flush file failed"
     lumi-debug-value := LumiDebug.SUCCESS
-    assert-error! sys.getline(user short-str), "sequence too long"
+    assert-error! sys.getline(user short-str), "sequence too short"
     lumi-debug-value := LumiDebug.NOTHING
     
     var String{4} full-string(user "abc")!
     assert-error! "aa".get(copy 2), "slice index out of bounds"
     assert-error! strg.set(copy 3, copy 'a'), "slice index out of bounds"
-    assert-error! full-string.append(copy 'a'), "sequence too long"
-    assert-error! full-string.concat(user "a"), "sequence too long"
-    assert-error! 123.str(user short-str), "sequence too long"
-    assert-error! short-str.copy(user "aaaaa"), "sequence too long"
+    assert-error! full-string.append(copy 'a'), "sequence too short"
+    assert-error! full-string.concat(user "a"), "sequence too short"
+    assert-error! 123.str(user short-str), "sequence too short"
+    assert-error! short-str.copy(user "aaaaa"), "sequence too short"
     var cdef.Pointer{Char} charp
     charp.set-from-array(user "aaaaa")
     assert-error! cdef.copy-to-string(copy charp, user short-str),
-            "sequence too long"
+            "sequence too short"
     
     var Buffer{1} full-buffer
     full-buffer.append(copy 52)!
     assert-error! buff.get(copy 4), "slice index out of bounds"
     assert-error! buff.set(copy 4, copy 55), "slice index out of bounds"
-    assert-error! full-buffer.append(copy 111), "sequence too long"
-    assert-error! full-buffer.concat(user buff), "sequence too long"
+    assert-error! full-buffer.append(copy 111), "sequence too short"
+    assert-error! full-buffer.concat(user buff), "sequence too short"
     buff.append(copy 3)!
-    assert-error! full-buffer.copy(user buff), "sequence too long"
+    assert-error! full-buffer.copy(user buff), "sequence too short"
     var cdef.Pointer{Byte} bytep
     bytep.set-from-array(user buff)
     assert-error! cdef.copy-to-buffer(copy bytep, copy 2, user full-buffer),
-            "sequence too long"
+            "sequence too short"
     
     lumi-debug-value := LumiDebug.FAIL
     assert-error! sys.print(user strg), "file write failed"
@@ -645,7 +646,7 @@ test test-builtin-errors()
     assert-error! sys.exit(copy 0), "exit failed"
     assert-error! sys.system(user "aaa"), "command execution failed"
     lumi-debug-value := LumiDebug.SUCCESS
-    assert-error! sys.getline(user short-str), "sequence too long"
+    assert-error! sys.getline(user short-str), "sequence too short"
     lumi-debug-value := LumiDebug.NOTHING
 
 mock ! sys.println(user Array{Char} text)
@@ -670,12 +671,11 @@ test test-constants()
 
 
 test test-bitwise()
-    var cdef.Uchar c(copy 0xF0)
+    var Uint8 c(copy 0xF0)
     assert! c band 0x31 = 0x30
     assert! c bor 0x0F = 0xFF
     assert! c shr 2 = 0x3C
     assert! 0x0F shl 4 = c
     assert! c xor 0xA0 = 0x50
-    ; bitwise not in C is not limited to char, so we have to trim
-    assert! bnot c band 0xFF = 0x0F
+    assert! bnot c = 0x0F
 

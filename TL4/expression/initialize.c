@@ -77,8 +77,8 @@ Returncode InitExpression_analyze(InitExpression* self) {
     if (self->_base._base.result_type->type_data->create_disallowed) {
       CHECK(56, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){32, 31, "cannot create objects with type"}, self->_base._base.result_type->type_data->name) )
     }
-    Int _Int53;
-    CHECK(59, TypeData_find_meth(self->_base._base.result_type->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int53)) )
+    Int _Int55;
+    CHECK(59, TypeData_find_meth(self->_base._base.result_type->type_data, &(String){4, 3, "new"}, &(self->constructor), &(_Int55)) )
     if (!(NULL != self->arguments->parameters->first) &&  ! (NULL != self->arguments->outputs->first) && (!(NULL != self->constructor) || self->_base._base.result_type->type_data == glob->type_string)) {
       self->constructor = NULL;
     }
@@ -93,8 +93,8 @@ Returncode InitExpression_analyze(InitExpression* self) {
         self_param->code_node = self->_base._base.code_node;
         self_param->value = &(self->symbol->_base);
         CHECK(71, List_prepend(self->arguments->parameters, &(self_param->_base)) )
-        Bool _Bool54;
-        CHECK(72, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, self->_base._base.result_type, 0, &(_Bool54)) )
+        Bool _Bool56;
+        CHECK(72, FunctionArguments_check_same_as(self->arguments, self->constructor->arguments, self->_base._base.result_type, 0, &(_Bool56)) )
       }
       else {
         CHECK(75, SyntaxTreeNode_m_syntax_error(&(self->_base._base._base), &(String){24, 23, "no constructor for type"}, self->_base._base.result_type->type_data->name) )
@@ -357,8 +357,8 @@ Func InitExpression__dtl[] = {(void*)Expression_get_parent_type, (void*)SyntaxTr
 #include "expression/symbol.c"
 #include "syntax-tree/block.c"
 #include "syntax-tree/branch.c"
-#include "syntax-tree/code.c"
 #include "syntax-tree/code-flow.c"
+#include "syntax-tree/code.c"
 #include "syntax-tree/node.c"
 #include "syntax-tree/root.c"
 #include "statement/enum.c"
