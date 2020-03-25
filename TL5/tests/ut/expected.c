@@ -1381,6 +1381,7 @@ uint32_t* a = NULL;
     if (ut_M_i >= 0x01) RAISE(4, LUMI_block0_cleanup, slice_index)
     ut_M_i = (((aux_Array_1)[x]) + ((aux_Array_3)[y])) + ((aux_Array_4)[ut_M_i]);
     INIT_NEW_ARRAY(6, LUMI_block0_cleanup, aa, uint32_t, length, 1);
+    xx = 0x0a;
     aux_Array_5 = aa + xx;
     aux_Array_5_Length = xx;
     ut_M_i = (aux_Array_5)[yy];
@@ -2144,6 +2145,8 @@ ut_M_i = 0x0a & ut_M_i;
 /// @ test-binary-expression-19
 uint8_t i8 = 0;
     uint64_t i64 = 0;
+    i8 = 0x04;
+    i64 = 0x174876e800;
     ut_M_i = (((uint32_t)(~ ut_M_i)) + ((uint8_t)(~ i8))) + ((uint64_t)(~ i64));
 /// @ test-binary-expression-20
 ut_M_i = ut_M_i ^ 0x10;
@@ -2155,6 +2158,7 @@ ut_M_i = ut_M_i << 0x01;
 ut_M_i = ((uint32_t)(~ ut_M_i)) + (0x0a & ut_M_i);
 /// @ test-binary-expression-24
 uint8_t x = 0;
+    x = 0x01;
     *io = (0x3c / x) + (0x3c % x);
 /// @ test-binary-expression-e0
 unknown operator "@"
@@ -2772,8 +2776,17 @@ struct ut_M_Test {
     int32_t rs32;
     int64_t rs64;
 };
+void ut_M_Test_new(ut_M_Test* self);
 void ut_M_Test_Del(ut_M_Test* self);
 Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_new(ut_M_Test* self) {
+    unsigned LUMI_loop_depth = 1;
+    self->ru16 = 0x05;
+    self->ru64 = 0x174876e800;
+    self->rs32 = -0x0f4240;
+LUMI_block0_cleanup:
+    (void)0;
+}
 void ut_M_Test_Del(ut_M_Test* self) {
     if (self == NULL) return;
 }
@@ -5495,6 +5508,8 @@ using "!" where there is no error
 unexpected "!" after "s"
 /// @ test-initialize-e39
 sequence length never positive with maximum value of "-0x02"
+/// @ test-initialize-e40
+using invalid reference "x"
 /// @@ test-comment
 /// @ test-comment-0
 uint32_t x = 0;
@@ -11177,6 +11192,28 @@ void ut_M_fun2(void (*f)(void)) {
 LUMI_block0_cleanup:
     (void)0;
 }
+/// @ test-memory-constructor-2
+typedef struct ut_M_Test ut_M_Test;
+struct ut_M_Test {
+    uint8_t a;
+    int8_t b;
+    uint8_t c;
+    int8_t d;
+    int8_t e;
+};
+void ut_M_Test_new(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self);
+Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_new(ut_M_Test* self) {
+    unsigned LUMI_loop_depth = 1;
+    self->a = 0x01;
+    self->b = -0x01;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Test_Del(ut_M_Test* self) {
+    if (self == NULL) return;
+}
 /// @ test-memory-constructor-e0
 non-conditional reference in type without constructor "Error"
 /// @ test-memory-constructor-e1
@@ -11203,6 +11240,12 @@ constructor did not initialize field "s"
 using invalid reference "self.t"
 /// @ test-memory-constructor-e12
 using invalid reference "self.t"
+/// @ test-memory-constructor-e13
+non-zero integer in type without constructor "Test"
+/// @ test-memory-constructor-e14
+constructor did not initialize field "a"
+/// @ test-memory-constructor-e15
+using invalid reference "self.a"
 /// @@ test-memory-error
 /// @ test-memory-error-e0
 assigning reference into itself

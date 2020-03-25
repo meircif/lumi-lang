@@ -265,6 +265,12 @@ struct TypeInstance
     func set-int-range()
         self.type-data.module.int-map.find(user self.name).copy-new()->(
                 owner self.int-range)
+    
+    func is-non-zero-integer()->(var Bool non-zero)
+        non-zero := self.int-range?
+        if non-zero
+            non-zero := self.int-range.min-value.sign() > 0 or
+                    self.int-range.max-value.sign() < 0
 
     func link-types(user SyntaxTreeNode node)
         if not self.type-data?
@@ -446,6 +452,23 @@ struct TypeInstance
             node.syntax-error(
                     user "assigning into a weak reference an illegal access",
                     user glob.access-names[self-access])
+        ; if self.int-range? and target.int-range?
+        ;     if long-larger(user self.int-range.max-value,
+        ;             user target.int-range.max-value)
+        ;         assert node?
+        ;         node.syntax-error-long2(
+        ;                 user "assigning integer with maximum of",
+        ;                 user self.int-range.max-value,
+        ;                 user "into integer with smaller maximum of",
+        ;                 user target.int-range.max-value)
+        ;     if long-larger(user target.int-range.min-value,
+        ;             user self.int-range.min-value)
+        ;         assert node?
+        ;         node.syntax-error-long2(
+        ;                 user "assigning integer with minimum of",
+        ;                 user self.int-range.min-value,
+        ;                 user "into integer with larger minimum of",
+        ;                 user target.int-range.min-value)
         if self.type-data is glob.type-file-read-write-text and
                 (target.type-data is glob.type-file or
                 target.type-data is glob.type-file-read-text or

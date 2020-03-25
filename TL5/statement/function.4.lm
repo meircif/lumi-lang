@@ -268,7 +268,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         do
             for field in type-data.variables.iter()
                 reference-path.field := ReferencePath(user field)
-                if access-is-only-var(copy field.access)
+                if field.type-instance.is-non-zero-integer()
+                    refs.mark-invalid-reference(user reference-path)
+                else-if access-is-only-var(copy field.access)
                     if field.type-instance.type-data.constructor?
                         refs.mark-invalid-reference(user reference-path)
                 else-if not field.type-instance.conditional
@@ -284,12 +286,11 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         user TypeData type-data(user self.parent-type)
         do
             for field in type-data.variables.iter()
-                if not field.type-instance.conditional
-                    reference-path.field := ReferencePath(user field)
-                    if refs.is-invalid(user reference-path)
-                        self.syntax-error(
-                                user "constructor did not initialize field",
-                                user field.name)
+                reference-path.field := ReferencePath(user field)
+                if refs.is-invalid(user reference-path)
+                    self.syntax-error(
+                            user "constructor did not initialize field",
+                            user field.name)
             while type-data.base-type?
             type-data := type-data.base-type.type-data
     

@@ -144,9 +144,13 @@ class SyntaxTreeVariable(SyntaxTreeCode)
                 self.syntax-error(
                         user "fields cannot have access",
                         user glob.access-names[self.access])
-            if self.type-instance.type-data.is-ref() and
-                    not self.parent-type.constructor?
-                if access-is-only-var(copy self.access)
+            if not self.parent-type.constructor?
+                if self.type-instance.is-non-zero-integer()
+                    self.syntax-error(
+                            user "non-zero integer in type without \
+                            constructor",
+                            user self.parent-type.name)
+                else-if access-is-only-var(copy self.access)
                     if self.type-instance.type-data.constructor?
                         self.syntax-error(
                                 user "variable with constructor in type \
@@ -445,8 +449,9 @@ class VariableInit(VariableCreate)
     func dynamic analyze()
         base()
         self.expression-init.analyze()
-        if self.variable.type-instance.type-data is glob.type-func and
-                not self.expression-init.arguments.parameters.first?
+        if not self.expression-init.arguments.parameters.first? and
+                (self.variable.type-instance.is-non-zero-integer() or
+                self.variable.type-instance.type-data is glob.type-func)
             self.variable.is-initialized := false
 
     func dynamic check-memory(user ReferenceMemoryList refs)
