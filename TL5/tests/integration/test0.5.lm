@@ -853,8 +853,10 @@ struct IntRangeTest
     var Int{-100000000000:100000000000} rs64
     new()
         self.ru16 := 5
-        self.ru64 := 100000000000
+        self.ru32 := 1000000
         self.rs32 := -1000000
+        self.ru64 := 100000000000
+        self.rs64 := -100000000000
 
 
 main!

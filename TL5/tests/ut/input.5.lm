@@ -1107,8 +1107,10 @@ struct Test
     var Int{-100000000000:100000000000} rs64
     new()
         self.ru16 := 5
-        self.ru64 := 100000000000
+        self.ru32 := 1000000
         self.rs32 := -1000000
+        self.ru64 := 100000000000
+        self.rs64 := -100000000000
 ; @ c test-int-range-1
 var Int{0:255} u8
 var Int{0:65535} u16
@@ -2887,7 +2889,7 @@ func call()
     user Array?{Int} a
     user Test? t
     i := external(copy 5, user s, user a, user t)
-    i := (2 * external(copy 5, user s, user a, user t)) + 3
+    i := clamp (2 * external(copy 5, user s, user a, user t)) + 3
     external(copy 5, user s, user a, user t)
 ; @ g test-native-f2
 native func external() "SOME_External_func"
@@ -2913,7 +2915,7 @@ func use()
 native const Int VALUE
 native const Byte BYTE
 func get()->(var Int x)
-    x := VALUE + BYTE
+    x := clamp VALUE + BYTE
 ; @ g test-native-c1
 native const Int VALUE "SOME_External_const"
 func get()->(var Int x)
@@ -4070,12 +4072,12 @@ func fun(owner String? s)->(owner String? s2)
 struct Test
     var Int x
 func ! fun(owner Test? t)->(var Int x)
-    x := fun(owner t)! + t!.x
+    x := clamp fun(owner t)! + t!.x
 ; @ eg test-memory-owner-e22
 struct Test
     var Int x
 func ! fun(owner Test? t)->(var Int x)
-    x := t!.x + fun(owner t)!
+    x := clamp t!.x + fun(owner t)!
 ; @ eg test-memory-owner-e23
 func ! fun(owner String s)->(var Int x)
     for _ in fun(owner s)!:s.length()
@@ -4759,6 +4761,12 @@ func error(var String s)
 func error()->(var String s)
 ; @@ test-c-objects
 ; @ c test-c-objects-0
+var Uint16 u16
+var Sint16 s16
+var Uint32 u32
+var Sint32 s32
+var Uint64 u64
+var Sint64 s64
 var cdef.Char c-char
 var cdef.Schar c-schar
 var cdef.Uchar c-uchar
@@ -4772,33 +4780,33 @@ var cdef.Size c-size
 var cdef.Float c-float
 var cdef.Double c-double
 var cdef.LongDouble c-long-double
-c-char := i
-i := c-char
-c-schar := i
-i := c-schar
-c-uchar := i
-i := c-uchar
-c-short := i
-i := c-short
-c-ushort := i
-i := c-ushort
-c-int := i
-i := c-int
-c-uint := i
-i := c-uint
-c-long := i
-i := c-long
-c-ulong := i
-i := c-ulong
-c-size := i
-i := c-size
-c-float := i
-i := c-float
-c-double := i
-i := c-double
-c-long-double := i
-i := c-long-double
-i := c-char + c-schar + c-uchar + c-short + c-ushort + c-int + c-uint + c-long +
+c-char := s16
+s32 := c-char
+c-schar := s16
+s16 := c-schar
+c-uchar := u16
+u16 := c-uchar
+c-short := s32
+s32 := c-short
+c-ushort := u32
+u32 := c-ushort
+c-int := s64
+s64 := c-int
+c-uint := u64
+u64 := c-uint
+c-long := s64
+s64 := c-long
+c-ulong := u64
+u64 := c-ulong
+c-size := u64
+u64 := c-size
+c-float := s64
+s64 := c-float
+c-double := s64
+s64 := c-double
+c-long-double := s64
+s64 := c-long-double
+i := clamp c-char + c-schar + c-uchar + c-short + c-ushort + c-int + c-uint + c-long +
         c-ulong + c-size + c-float + c-double + c-long-double
 ; @ c test-c-objects-1
 var cdef.Pointer p-void

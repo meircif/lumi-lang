@@ -2782,8 +2782,10 @@ Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
 void ut_M_Test_new(ut_M_Test* self) {
     unsigned LUMI_loop_depth = 1;
     self->ru16 = 0x05;
-    self->ru64 = 0x174876e800;
+    self->ru32 = 0x0f4240;
     self->rs32 = -0x0f4240;
+    self->ru64 = 0x174876e800;
+    self->rs64 = -0x174876e800;
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -7179,7 +7181,7 @@ void ut_M_call(void) {
     ut_M_Test* t = NULL;
     ut_M_Test_Dynamic* t_Dynamic = NULL;
     i = external(0x05, s, a, (void*)t);
-    i = (0x02 * external(0x05, s, a, (void*)t)) + 0x03;
+    i = (((0x02 * external(0x05, s, a, (void*)t)) + 0x03) > 0xffffffff)? 0xffffffff: ((0x02 * external(0x05, s, a, (void*)t)) + 0x03);
     external(0x05, s, a, (void*)t);
 LUMI_block0_cleanup:
     (void)0;
@@ -7231,7 +7233,7 @@ LUMI_block0_cleanup:
 void ut_M_get(uint32_t* x);
 void ut_M_get(uint32_t* x) {
     unsigned LUMI_loop_depth = 1;
-    *x = VALUE + BYTE;
+    *x = ((VALUE + BYTE) > 0xffffffff)? 0xffffffff: (VALUE + BYTE);
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -11259,7 +11261,13 @@ argument "s" access should not be "var" for non-primitive type "String"
 argument "s" access should not be "var" for non-primitive type "String"
 /// @@ test-c-objects
 /// @ test-c-objects-0
-cdef_M_Char c_char = 0;
+uint16_t u16 = 0;
+    int16_t s16 = 0;
+    uint32_t u32 = 0;
+    int32_t s32 = 0;
+    uint64_t u64 = 0;
+    int64_t s64 = 0;
+    cdef_M_Char c_char = 0;
     cdef_M_Schar c_schar = 0;
     cdef_M_Uchar c_uchar = 0;
     cdef_M_Short c_short = 0;
@@ -11272,33 +11280,33 @@ cdef_M_Char c_char = 0;
     cdef_M_Float c_float = 0;
     cdef_M_Double c_double = 0;
     cdef_M_LongDouble c_long_double = 0;
-    c_char = ut_M_i;
-    ut_M_i = c_char;
-    c_schar = ut_M_i;
-    ut_M_i = c_schar;
-    c_uchar = ut_M_i;
-    ut_M_i = c_uchar;
-    c_short = ut_M_i;
-    ut_M_i = c_short;
-    c_ushort = ut_M_i;
-    ut_M_i = c_ushort;
-    c_int = ut_M_i;
-    ut_M_i = c_int;
-    c_uint = ut_M_i;
-    ut_M_i = c_uint;
-    c_long = ut_M_i;
-    ut_M_i = c_long;
-    c_ulong = ut_M_i;
-    ut_M_i = c_ulong;
-    c_size = ut_M_i;
-    ut_M_i = c_size;
-    c_float = ut_M_i;
-    ut_M_i = c_float;
-    c_double = ut_M_i;
-    ut_M_i = c_double;
-    c_long_double = ut_M_i;
-    ut_M_i = c_long_double;
-    ut_M_i = (((((((((((c_char + c_schar) + c_uchar) + c_short) + c_ushort) + c_int) + c_uint) + c_long) + c_ulong) + c_size) + c_float) + c_double) + c_long_double;
+    c_char = s16;
+    s32 = c_char;
+    c_schar = s16;
+    s16 = c_schar;
+    c_uchar = u16;
+    u16 = c_uchar;
+    c_short = s32;
+    s32 = c_short;
+    c_ushort = u32;
+    u32 = c_ushort;
+    c_int = s64;
+    s64 = c_int;
+    c_uint = u64;
+    u64 = c_uint;
+    c_long = s64;
+    s64 = c_long;
+    c_ulong = u64;
+    u64 = c_ulong;
+    c_size = u64;
+    u64 = c_size;
+    c_float = s64;
+    s64 = c_float;
+    c_double = s64;
+    s64 = c_double;
+    c_long_double = s64;
+    s64 = c_long_double;
+    ut_M_i = (((((((((((((c_char + c_schar) + c_uchar) + c_short) + c_ushort) + c_int) + c_uint) + c_long) + c_ulong) + c_size) + c_float) + c_double) + c_long_double) < 0x00)? 0x00: ((((((((((((((c_char + c_schar) + c_uchar) + c_short) + c_ushort) + c_int) + c_uint) + c_long) + c_ulong) + c_size) + c_float) + c_double) + c_long_double) > 0xffffffff)? 0xffffffff: ((((((((((((c_char + c_schar) + c_uchar) + c_short) + c_ushort) + c_int) + c_uint) + c_long) + c_ulong) + c_size) + c_float) + c_double) + c_long_double));
 /// @ test-c-objects-1
 void* p_void = 0;
     cdef_M_Char* p_char = 0;
