@@ -5,14 +5,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        c-compiler: [gcc, clang]
+        c-compiler: ['gcc -m32', 'gcc -m64', clang]
         os: [ubuntu-latest, macos-latest, windows-latest]
         exclude:
           - os: windows-latest
             c-compiler: clang
-        include:
-          - os: ubuntu-latest
-            c-compiler: 'gcc -m32'
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v1
