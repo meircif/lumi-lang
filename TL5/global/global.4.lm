@@ -191,6 +191,24 @@ struct Global
                 copy 1,
                 copy _,
                 copy modulo-operator-factory)
+        self.add-operator-copy(
+                user "clamp+",
+                copy Precedence.ARITHMETIC,
+                copy 0,
+                copy _,
+                copy addition-operator-factory)
+        self.add-operator-copy(
+                user "clamp-",
+                copy Precedence.ARITHMETIC,
+                copy 0,
+                copy negation-operator-factory,
+                copy subtraction-operator-factory)
+        self.add-operator-copy(
+                user "clamp*",
+                copy Precedence.ARITHMETIC,
+                copy 1,
+                copy _,
+                copy multiplication-operator-factory)
         self.add-operator(
                 user "bor",
                 user "|",

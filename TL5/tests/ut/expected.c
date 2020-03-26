@@ -1998,7 +1998,7 @@ ut_M_b = ! (ut_M_i > 0x03);
 ut_M_i = ((ut_M_i + 0x01) > 0xffffffff)? 0xffffffff: (ut_M_i + 0x01);
 /// @ test-unary-expression-6
 int64_t x = 0;
-    x = ((x - 0x01) < -0x7fffffffffffffff-1)? -0x7fffffffffffffff-1: (x - 0x01);
+    x = ((x - 0x01) < INT64_MIN)? INT64_MIN: (x - 0x01);
 /// @ test-unary-expression-7
 int8_t x = 0;
     x = (ut_M_j < -0x80)? -0x80: ((ut_M_j > 0x7f)? 0x7f: ut_M_j);
@@ -2806,7 +2806,9 @@ void ut_M_Test_new(ut_M_Test* self) {
     self->rs32 = -0x0f4240;
     self->ru64 = 0x174876e800;
     self->rs64 = -0x174876e800;
-    self->s64b = -0x7fffffffffffffff-1;
+    self->u64b = UINT64_MAX;
+    self->s64b = INT64_MAX;
+    self->s64b = INT64_MIN;
 LUMI_block0_cleanup:
     (void)0;
 }

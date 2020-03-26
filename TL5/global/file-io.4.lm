@@ -124,14 +124,23 @@ func write-int(copy Int num)
 
 ~~~ write `num` to the output file as text ~~~
 func write-long(user Long num)
-    var Long min
-    min.parse(user "-9223372036854775808")
-    if long-equal(user num, user min)
-        write(user "-0x7fffffffffffffff-1")
+    if long-const(user num, user "18446744073709551615", user "UINT64_MAX")
+        return
+    if long-const(user num, user "9223372036854775807", user "INT64_MAX")
+        return
+    if long-const(user num, user "-9223372036854775808", user "INT64_MIN")
         return
     var String{64} num-str
     num.hex(user num-str)
     write(user num-str)
+
+
+func long-const(user Long num, user String value-str, user String output)->(
+        var Bool equal)
+    var Long value
+    value.parse(user value-str)
+    if long-equal(user num, user value)->(var equal)
+        write(user output)
 
 
 ~~~ write `num` spaces - usefull for writing indentation ~~~
