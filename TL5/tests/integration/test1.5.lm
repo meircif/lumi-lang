@@ -686,3 +686,12 @@ test test-operations()
     assert! c xor 0xA0 = 0x50
     assert! bnot c = 0x0F
 
+
+test test-builtins()
+    var Uint64 max(copy 0xffffffffffffffff)
+    var Sint64 min(copy -0x7fffffffffffffff)
+    var String{32} str
+    max.str(user str)!
+    assert! str.equal(user "18446744073709551615")
+    min.str(user str)!
+    assert! str.equal(user "-9223372036854775807")

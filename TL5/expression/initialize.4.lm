@@ -89,6 +89,8 @@ class InitExpression(ModuleTypeExpression)
             user Argument param(user self.arguments.parameters.first.item)
             param.take-value()->(owner self.assign-value)
             self.assign-value.restructure()->(owner self.assign-value)
+            self.aux-variable.result-type.set-expected-type()->(
+                    owner self.assign-value.result-type)
             self.assign-value.analyze()
             self.assign-expression := AssignExpression(
                     user self.code-node,
@@ -113,7 +115,6 @@ class InitExpression(ModuleTypeExpression)
         self.check-no-error()
     
     func inst add-self-and-check(copy Int access)
-        self.arguments.analyze()
         new CallArgument self-param
         self-param.set-location()
         self-param.is-output := false

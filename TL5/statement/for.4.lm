@@ -83,8 +83,14 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
             item-type-instance.int-range := IntRange()
             self.start.result-type.int-range.min-value.copy()->(
                     owner item-type-instance.int-range.min-value)
-            self.iterator.result-type.int-range.max-value.copy()->(
-                    owner item-type-instance.int-range.max-value)
+            if long-larger(
+                    user self.start.result-type.int-range.max-value,
+                    user self.iterator.result-type.int-range.max-value)
+                self.start.result-type.int-range.max-value.copy()->(
+                        owner item-type-instance.int-range.max-value)
+            else
+                self.iterator.result-type.int-range.max-value.copy()->(
+                        owner item-type-instance.int-range.max-value)
             item-type-instance.int-range.set-sign-and-bits()
         else
             self.iterator.analyze()

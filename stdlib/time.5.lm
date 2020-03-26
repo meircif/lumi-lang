@@ -5,9 +5,9 @@ native include "time.h"
 
 native type CtimeT "time_t"
 
-native const Int CLOCKS-PER-SEC
+native const Uint64 CLOCKS-PER-SEC
 
-native func c-clock()->(copy cdef.Double res) "clock"
+native func c-clock()->(copy Uint64 res) "clock"
 
 native func c-time(copy cdef.Pointer{CtimeT} timer)->(copy CtimeT res) "time"
 
@@ -60,23 +60,23 @@ struct Timer
 
 
 struct Time
-    var Int sec
-    var Int min
-    var Int hour
-    var Int mday
-    var Int mon
-    var Int year
-    var Int wday
-    var Int yday
-    var Int isdst
+    var cdef.Int sec
+    var cdef.Int min
+    var cdef.Int hour
+    var cdef.Int mday
+    var cdef.Int mon
+    var cdef.Int year
+    var cdef.Int wday
+    var cdef.Int yday
+    var cdef.Int isdst
     
     func user ! asctime(user String target)
         cdef.copy-to-string(copy c-asctime(user self), user target)!
     
     func user strftime(user String target, user String format)->(
-            var Int copied)
+            var Uint32 copied)
         var Ref timeptr(copy self)
-        copied := c-strftime(
+        copied := clamp c-strftime(
                 user target,
                 copy target.max-length(),
                 user format,
@@ -84,9 +84,9 @@ struct Time
         cdef.set-null-term-length(user target)
 
 
-func clock()->(var Int ticks)
+func clock()->(var Uint64 ticks)
     ticks := c-clock()
 
 
-func difftime(user Timer timer1, user Timer timer2)->(var Int diff)
+func difftime(user Timer timer1, user Timer timer2)->(var Sint64 diff)
     diff := c-difftime(copy timer1.c-timer, copy timer2.c-timer)

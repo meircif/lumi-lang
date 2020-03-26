@@ -31,8 +31,8 @@ $CCA docs/hello-world.c -o docs/hello-world
 docs/tl5-compiler docs/hello-world-test.c ../docs/hello-world.5.lm \
   ../docs/hello-world-test.5.lm -t hello-world
 $CCA docs/hello-world-test.c -o docs/hello-world-test
-# docs/tl5-compiler docs/examples.c ../docs/examples.5.lm
-# $CCA docs/examples.c -o docs/run-examples
+docs/tl5-compiler docs/examples.c ../docs/examples.5.lm
+$CCA docs/examples.c -o docs/run-examples
 
 # run examples
 docs/hello-world

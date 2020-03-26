@@ -129,10 +129,10 @@ tl5-tests: build-dir
 		-o $(BUILDDIR)/tl5-compiler-tests -r -ra TL5/tests/ut/
 
 tl5-single-test: build-dir
-	lumi TL5/tests/integration/test0.5.lm -o $(BUILDDIR)/simple -r
+	lumi TL5/tests/integration/test0.5.lm -o $(BUILDDIR)/single -r
 
 tl5-single-test-output: build-dir
-	lumi TL5/tests/integration/test0.5.lm -o $(BUILDDIR)/simple -r > \
+	lumi TL5/tests/integration/test0.5.lm -o $(BUILDDIR)/single -r > \
 		TL5/tests/integration/single-output.txt
 
 tl5-multiple-test: build-dir

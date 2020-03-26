@@ -124,6 +124,11 @@ func write-int(copy Int num)
 
 ~~~ write `num` to the output file as text ~~~
 func write-long(user Long num)
+    var Long min
+    min.parse(user "-9223372036854775808")
+    if long-equal(user num, user min)
+        write(user "-0x7fffffffffffffff-1")
+        return
     var String{64} num-str
     num.hex(user num-str)
     write(user num-str)

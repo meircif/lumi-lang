@@ -2,7 +2,8 @@
 module math
 
 ~~~ Return the absolute value of `x` ~~~
-func abs(copy Sint64 x)->(var Sint64 res)
+func abs(copy Int{-0x7fffffffffffffff:0x7fffffffffffffff} x)->(
+        var Int{-0x7fffffffffffffff:0x7fffffffffffffff} res)
     if x >= 0
         res := x
     else
@@ -11,26 +12,28 @@ func abs(copy Sint64 x)->(var Sint64 res)
 
 ~~~ Return `x` with the sign of `sign`,
 if sign is `0` no sign change is made to `x` ~~~
-func copysign(copy Sint64 x, copy Sint64 sign)->(var Sint64 res)
+func copysign(
+        copy Int{-0x7fffffffffffffff:0x7fffffffffffffff} x, copy Sint64 sign)->(
+        var Int{-0x7fffffffffffffff:0x7fffffffffffffff} res)
     if (x >= 0 and sign >= 0) or (x < 0 and sign <= 0)
         res := x
     else
         res := - x
 
 
-~~~ Return `x` raised to power `exp`, fail if `exp` is negative,
+~~~ Return `x` raised to power `exp`,
 if `x` and `exp` are zero the result is `1` ~~~
-func ! power(copy Sint64 x, copy Uint64 exp)->(var Sint64 res)
+func power(copy Sint64 x, copy Uint64 exp)->(var Sint64 res)
     res := 1
-    for n in exp
-        res := res * x
+    repeat exp
+        res := clamp res * x
 
 
-~~~ Return `x`!, fail if `x` is negative ~~~
-func ! factorial(copy Uint64 x)->(var Uint64 res)
+~~~ Return `x`! ~~~
+func factorial(copy Int{20} x)->(var Int{2432902008176640000} res)
     res := 1
     for n in 2:x + 1
-        res := res * n
+        res := clamp res * n
 
 
 struct IntBox

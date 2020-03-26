@@ -467,6 +467,10 @@ struct Global
         self.add-builtin-method(
                 user self.type-int, user "str", copy true, copy Access.COPY)->(
                 user function)
+        user IntRange int-range(
+                user function.arguments.parameters.first.item.get-type-instance().int-range)
+        int-range.min-value.parse(user "-9223372036854775808")
+        int-range.max-value.parse(user "18446744073709551615")
         self.add-builtin-parameter(
                 user function,
                 copy Access.USER,

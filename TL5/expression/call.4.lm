@@ -183,6 +183,12 @@ class FunctionCallExpression(CallExpression)
     
     func dynamic write-function()
         self.function.write()
+        if self.function.function.parent-type is glob.type-int
+            user Argument first(user self.arguments.parameters.first.item)
+            if first.get-output().result-type.int-range.min-value.sign() < 0
+                write-c(copy 'S')
+            else
+                write-c(copy 'U')
 
 
 class DynamicCallExpression(FunctionCallExpression)
@@ -327,7 +333,8 @@ class CallArgument(Argument)
         other.get-type-instance()->(user type-instance)
         type-instance.new-replace-params(user actual-params)->(
                 owner self.real-type)
-        self.real-type.set-expected-type()->(owner self.value.result-type)
+        if not self.is-output
+            self.real-type.set-expected-type()->(owner self.value.result-type)
         self.analyze()
         if access-is-owner(copy self.access) and
                 not access-is-owner(copy self.value.access)

@@ -452,23 +452,23 @@ struct TypeInstance
             node.syntax-error(
                     user "assigning into a weak reference an illegal access",
                     user glob.access-names[self-access])
-        ; if self.int-range? and target.int-range?
-        ;     if long-larger(user self.int-range.max-value,
-        ;             user target.int-range.max-value)
-        ;         assert node?
-        ;         node.syntax-error-long2(
-        ;                 user "assigning integer with maximum of",
-        ;                 user self.int-range.max-value,
-        ;                 user "into integer with smaller maximum of",
-        ;                 user target.int-range.max-value)
-        ;     if long-larger(user target.int-range.min-value,
-        ;             user self.int-range.min-value)
-        ;         assert node?
-        ;         node.syntax-error-long2(
-        ;                 user "assigning integer with minimum of",
-        ;                 user self.int-range.min-value,
-        ;                 user "into integer with larger minimum of",
-        ;                 user target.int-range.min-value)
+        if self.int-range? and target.int-range?
+            if long-larger(user self.int-range.max-value,
+                    user target.int-range.max-value)
+                assert node?
+                node.syntax-error-long2(
+                        user "assigning integer with maximum of",
+                        user self.int-range.max-value,
+                        user "into integer with smaller maximum of",
+                        user target.int-range.max-value)
+            if long-larger(user target.int-range.min-value,
+                    user self.int-range.min-value)
+                assert node?
+                node.syntax-error-long2(
+                        user "assigning integer with minimum of",
+                        user self.int-range.min-value,
+                        user "into integer with larger minimum of",
+                        user target.int-range.min-value)
         if self.type-data is glob.type-file-read-write-text and
                 (target.type-data is glob.type-file or
                 target.type-data is glob.type-file-read-text or

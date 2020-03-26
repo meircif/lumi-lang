@@ -71,6 +71,7 @@ ut_M_Tb_Dynamic ut_M_Tb_dynamic = {{(Dynamic_Del)ut_M_Tb_Del, (void (*)(ut_M_Ta*
 ut_M_Tc_Dynamic ut_M_Tc_dynamic = {{{(Dynamic_Del)ut_M_Tc_Del, (void (*)(ut_M_Ta* self, ut_M_Ta_Dynamic* self_Dynamic))ut_M_Tc_dyn}}};
 Generic_Type_Dynamic ut_M_Data_dynamic = {(Dynamic_Del)ut_M_Data_Del};
 uint32_t ut_M_i = 0;
+int32_t ut_M_j = 0;
 Byte ut_M_bt = 0;
 Char ut_M_c = 0;
 Bool ut_M_b = 0;
@@ -251,23 +252,23 @@ ut_M_i = 0x00;
 /// @ test-int-expression-1
 ut_M_i = 0x259e;
 /// @ test-int-expression-2
-ut_M_i = -0x259e;
+ut_M_j = -0x259e;
 /// @ test-int-expression-3
 ut_M_i = 0x0f50;
 /// @ test-int-expression-4
-ut_M_i = -0x0f50;
+ut_M_j = -0x0f50;
 /// @ test-int-expression-5
 ut_M_i = 0xfda940;
 /// @ test-int-expression-6
-ut_M_i = -0xfda940;
+ut_M_j = -0xfda940;
 /// @ test-int-expression-7
 ut_M_i = 0xfda940;
 /// @ test-int-expression-8
-ut_M_i = -0xfda940;
+ut_M_j = -0xfda940;
 /// @ test-int-expression-9
 ut_M_i = 0x25;
 /// @ test-int-expression-10
-ut_M_i = -0x25;
+ut_M_j = -0x25;
 /// @ test-int-expression-e0
 illegal number "2a"
 /// @ test-int-expression-e1
@@ -301,9 +302,9 @@ ut_M_c = '\n';
 /// @ test-char-expression-3
 ut_M_c = '\x0f';
 /// @ test-char-expression-4
-ut_M_c = '\xA9';
+ut_M_c = '\x7A';
 /// @ test-char-expression-5
-ut_M_c = '\270';
+ut_M_c = '\173';
 /// @ test-char-expression-e0
 illegal character constant "'''"
 /// @ test-char-expression-e1
@@ -1379,7 +1380,7 @@ uint32_t* a = NULL;
     aux_Array_4 = a + 0x00;
     aux_Array_4_Length = 0x01;
     if (ut_M_i >= 0x01) RAISE(4, LUMI_block0_cleanup, slice_index)
-    ut_M_i = (((aux_Array_1)[x]) + ((aux_Array_3)[y])) + ((aux_Array_4)[ut_M_i]);
+    ut_M_i = (((((aux_Array_1)[x]) + ((aux_Array_3)[y])) + ((aux_Array_4)[ut_M_i])) > 0xffffffff)? 0xffffffff: ((((aux_Array_1)[x]) + ((aux_Array_3)[y])) + ((aux_Array_4)[ut_M_i]));
     INIT_NEW_ARRAY(6, LUMI_block0_cleanup, aa, uint32_t, length, 1);
     xx = 0x0a;
     aux_Array_5 = aa + xx;
@@ -1782,12 +1783,12 @@ uint8_t u8 = 0;
     uint32_t aux_Int_3 = 0;
     uint32_t aux_Int_4 = 0;
     ut_M_fun5(0x00, &(aux_Int_0));
-    u8 = aux_Int_0;
+    u8 = (aux_Int_0 > 0xff)? 0xff: aux_Int_0;
     ut_M_fun5(0x01, &(aux_Int_1));
-    s8 = aux_Int_1;
+    s8 = (aux_Int_1 > 0x7f)? 0x7f: aux_Int_1;
     ut_M_fun5(0x32, &(u32));
     ut_M_fun5(0x02, &(aux_Int_2));
-    s32 = aux_Int_2;
+    s32 = (aux_Int_2 > 0x7fffffff)? 0x7fffffff: aux_Int_2;
     ut_M_fun5(0x03, &(aux_Int_3));
     u64 = aux_Int_3;
     ut_M_fun5(0x04, &(aux_Int_4));
@@ -1979,14 +1980,14 @@ ut_M_i = 0x02 + (0x7b);
 /// @ test-block-expression-1
 ut_M_i = 0x7b;
 /// @ test-block-expression-2
-ut_M_i = (0x7b * (ut_M_i - 0x04)) + 0x02;
+ut_M_i = (((0x7b * (ut_M_i - 0x04)) + 0x02) < 0x00)? 0x00: ((((0x7b * (ut_M_i - 0x04)) + 0x02) > 0xffffffff)? 0xffffffff: ((0x7b * (ut_M_i - 0x04)) + 0x02));
 /// @ test-block-expression-3
 expected ")", got "new-line"
 /// @@ test-unary-expression
 /// @ test-unary-expression-0
-ut_M_i = - ut_M_i;
+ut_M_j = ((- ut_M_j) > 0x7fffffff)? 0x7fffffff: (- ut_M_j);
 /// @ test-unary-expression-1
-ut_M_i = - ut_M_i;
+ut_M_j = ((- ut_M_j) > 0x7fffffff)? 0x7fffffff: (- ut_M_j);
 /// @ test-unary-expression-2
 ut_M_i = - (- ut_M_i);
 /// @ test-unary-expression-3
@@ -1996,20 +1997,21 @@ ut_M_b = ! (ut_M_i > 0x03);
 /// @ test-unary-expression-5
 ut_M_i = ((ut_M_i + 0x01) > 0xffffffff)? 0xffffffff: (ut_M_i + 0x01);
 /// @ test-unary-expression-6
-ut_M_i = ((ut_M_i - 0x01) < 0x00)? 0x00: (ut_M_i - 0x01);
+int64_t x = 0;
+    x = ((x - 0x01) < -0x7fffffffffffffff-1)? -0x7fffffffffffffff-1: (x - 0x01);
 /// @ test-unary-expression-7
-uint8_t x = 0;
-    x = (ut_M_i < 0x0a)? 0x0a: ((ut_M_i > 0x14)? 0x14: ut_M_i);
+int8_t x = 0;
+    x = (ut_M_j < -0x80)? -0x80: ((ut_M_j > 0x7f)? 0x7f: ut_M_j);
+    x = (ut_M_j < -0x80)? -0x80: ((ut_M_j > 0x7f)? 0x7f: ut_M_j);
 /// @ test-unary-expression-8
 if ((ut_M_i + 0x01) > 0xffffffff) RAISE(1, LUMI_block0_cleanup, integer_overflow)
     ut_M_i = ut_M_i + 0x01;
 /// @ test-unary-expression-9
-if ((ut_M_i - 0x01) < 0x00) RAISE(1, LUMI_block0_cleanup, integer_overflow)
-    ut_M_i = ut_M_i - 0x01;
+if ((ut_M_j - 0x01) < -0x80000000) RAISE(1, LUMI_block0_cleanup, integer_overflow)
+    ut_M_j = ut_M_j - 0x01;
 /// @ test-unary-expression-10
-uint8_t x = 0;
-    if (ut_M_i < 0x0a || ut_M_i > 0x14) RAISE(2, LUMI_block0_cleanup, integer_overflow)
-    x = ut_M_i;
+if ((ut_M_j * 0x02) < -0x80000000 || (ut_M_j * 0x02) > 0x7fffffff) RAISE(1, LUMI_block0_cleanup, integer_overflow)
+    ut_M_j = ut_M_j * 0x02;
 /// @ test-unary-expression-11
 ++LUMI_trace_ignore_count;
     if ((ut_M_i + 0x01) > 0xffffffff) RAISE(1, LUMI_block2_cleanup, integer_overflow)
@@ -2025,7 +2027,23 @@ LUMI_block2_cleanup:
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ test-unary-expression-12
-ut_M_fun4(((ut_M_i + 0x01) > 0xffffffff)? 0xffffffff: (ut_M_i + 0x01));
+ut_M_Tb* ttb = NULL;
+    ut_M_Tb_Dynamic* ttb_Dynamic = &ut_M_Tb_dynamic;
+    ut_M_Tb* aux_Tb_0 = NULL;
+    ut_M_Tb_Dynamic* aux_Tb_0_Dynamic = &ut_M_Tb_dynamic;
+    ut_M_fun4(((ut_M_i + 0x01) > 0xffffffff)? 0xffffffff: (ut_M_i + 0x01));
+    INIT_NEW(2, LUMI_block0_cleanup, ttb, ut_M_Tb, 1);
+    LUMI_err = ut_M_Tb_new(ttb, ttb_Dynamic, ((ut_M_i + 0x01) > 0xffffffff)? 0xffffffff: (ut_M_i + 0x01));
+    CHECK(2, LUMI_block0_cleanup)
+    INIT_NEW(3, LUMI_block0_cleanup, aux_Tb_0, ut_M_Tb, 1);
+    LUMI_err = ut_M_Tb_new(aux_Tb_0, aux_Tb_0_Dynamic, ((ut_M_i + 0x01) > 0xffffffff)? 0xffffffff: (ut_M_i + 0x01));
+    CHECK(3, LUMI_block0_cleanup)
+    if (ttb_Dynamic != NULL) ttb_Dynamic->_base._del(ttb, ttb_Dynamic);
+    free(ttb);
+    ttb_Dynamic = aux_Tb_0_Dynamic;
+    ttb = aux_Tb_0;
+    aux_Tb_0 = NULL;
+    aux_Tb_0_Dynamic = NULL;
 /// @ test-unary-expression-13
 if ((ut_M_i + 0x01) > 0xffffffff) RAISE(1, LUMI_block0_cleanup, integer_overflow)
     ut_M_fun4(ut_M_i + 0x01);
@@ -2070,6 +2088,8 @@ error raised inside function not declared as error raising "error"
 /// @ test-unary-expression-e12
 using "?" where error is propagated
 /// @ test-unary-expression-e13
+misplaced use of "clamp"
+/// @ test-unary-expression-e14
 misplaced use of "clamp"
 /// @@ test-binary-expression
 /// @ test-binary-expression-0
@@ -2147,7 +2167,7 @@ uint8_t i8 = 0;
     uint64_t i64 = 0;
     i8 = 0x04;
     i64 = 0x174876e800;
-    ut_M_i = (((uint32_t)(~ ut_M_i)) + ((uint8_t)(~ i8))) + ((uint64_t)(~ i64));
+    ut_M_i = (((((uint32_t)(~ ut_M_i)) + ((uint8_t)(~ i8))) + ((uint64_t)(~ i64))) > 0xffffffff)? 0xffffffff: ((((uint32_t)(~ ut_M_i)) + ((uint8_t)(~ i8))) + ((uint64_t)(~ i64)));
 /// @ test-binary-expression-20
 ut_M_i = ut_M_i ^ 0x10;
 /// @ test-binary-expression-21
@@ -2155,11 +2175,11 @@ ut_M_i = 0x02 >> ut_M_i;
 /// @ test-binary-expression-22
 ut_M_i = ut_M_i << 0x01;
 /// @ test-binary-expression-23
-ut_M_i = ((uint32_t)(~ ut_M_i)) + (0x0a & ut_M_i);
+ut_M_i = ((((uint32_t)(~ ut_M_i)) + (0x0a & ut_M_i)) > 0xffffffff)? 0xffffffff: (((uint32_t)(~ ut_M_i)) + (0x0a & ut_M_i));
 /// @ test-binary-expression-24
 uint8_t x = 0;
     x = 0x01;
-    *io = (0x3c / x) + (0x3c % x);
+    *io = (0x3c / x) + (0x0258 % x);
 /// @ test-binary-expression-e0
 unknown operator "@"
 /// @ test-binary-expression-e1
@@ -2786,6 +2806,7 @@ void ut_M_Test_new(ut_M_Test* self) {
     self->rs32 = -0x0f4240;
     self->ru64 = 0x174876e800;
     self->rs64 = -0x174876e800;
+    self->s64b = -0x7fffffffffffffff-1;
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -2822,21 +2843,22 @@ void ut_M_fun(ut_M_Test* t, uint32_t* x) {
     unsigned LUMI_loop_depth = 1;
     uint32_t aux_Int_0 = 0;
     ut_M_fun(t, &(aux_Int_0));
-    *x = aux_Int_0 + t->x;
+    *x = ((aux_Int_0 + t->x) > 0xffffffff)? 0xffffffff: (aux_Int_0 + t->x);
 LUMI_block0_cleanup:
     (void)0;
 }
 /// @ test-int-range-3
-uint32_t u8 = 0;
-    uint32_t s16 = 0;
+uint8_t u8 = 0;
+    int16_t s16 = 0;
     uint32_t u32 = 0;
-    uint32_t u16 = 0;
-    uint32_t s32 = 0;
+    uint16_t u16 = 0;
+    int32_t s32 = 0;
     s16 = -0x03e8;
     u32 = 0x0186a0;
     u16 = 0x03e8;
     s32 = 0x0186a0;
     s32 = -0x0186a0;
+    ut_M_i = 0x14 + -0x14;
 /// @ test-int-range-e0
 integer range minimum larger than maximum
 /// @ test-int-range-e1
@@ -2851,6 +2873,10 @@ got "String" expression, expected "Int"
 integer range is not constant
 /// @ test-int-range-e6
 integer range minimum larger than maximum
+/// @ test-int-range-e7
+assigning integer with minimum of "-0x80000000" into integer with larger minimum of "0x00"
+/// @ test-int-range-e8
+assigning integer with maximum of "0xffffffff" into integer with smaller maximum of "0x7fffffff"
 /// @@ test-dynamic
 /// @ test-dynamic-0
 ut_M_Ta a_Var = {{0}};
@@ -3159,9 +3185,14 @@ non matching error result
 non matching error result
 /// @@ test-builtin
 /// @ test-builtin-int0
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = Int_str(ut_M_i, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
-    CHECK(1, LUMI_block0_cleanup)
+uint64_t u64 = 0;
+    int64_t s64 = 0;
+    CHECK_REF(3, LUMI_block0_cleanup, ut_M_ostr)
+    LUMI_err = Int_strU(u64, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
+    CHECK(3, LUMI_block0_cleanup)
+    CHECK_REF(4, LUMI_block0_cleanup, ut_M_ostr)
+    LUMI_err = Int_strS(s64, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
+    CHECK(4, LUMI_block0_cleanup)
 /// @ test-builtin-bool0
 ut_M_b = true;
 /// @ test-builtin-bool1
@@ -3276,9 +3307,9 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         FileReadText f_Var = {0};
         FileReadText* f = NULL;
         Ref_Manager* f_Refman = NULL;
+        uint64_t x = 0;
         ut_M_Data df_Var = {0};
         ut_M_Data* df = NULL;
-        uint64_t aux_Int_0 = 0;
         ++LUMI_trace_ignore_count;
         CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
         f = &f_Var;
@@ -3290,19 +3321,18 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         CHECK_REF(4, LUMI_block1_cleanup, ut_M_ostr)
         LUMI_err = FileReadText_getline(f, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_b));
         CHECK(4, LUMI_block1_cleanup)
-        LUMI_err = FileReadText_tell(f, &(aux_Int_0));
-        ut_M_i = aux_Int_0;
-        CHECK(5, LUMI_block1_cleanup)
-        LUMI_err = FileReadText_seek_set(f, ut_M_i);
+        LUMI_err = FileReadText_tell(f, &(x));
         CHECK(6, LUMI_block1_cleanup)
-        LUMI_err = FileReadText_seek_cur(f, ut_M_i);
+        LUMI_err = FileReadText_seek_set(f, x);
         CHECK(7, LUMI_block1_cleanup)
-        LUMI_err = FileReadText_seek_end(f, ut_M_i);
+        LUMI_err = FileReadText_seek_cur(f, x);
         CHECK(8, LUMI_block1_cleanup)
-        LUMI_err = FileReadText_flush(f);
+        LUMI_err = FileReadText_seek_end(f, x);
         CHECK(9, LUMI_block1_cleanup)
-        LUMI_err = FileReadText_close(f);
+        LUMI_err = FileReadText_flush(f);
         CHECK(10, LUMI_block1_cleanup)
+        LUMI_err = FileReadText_close(f);
+        CHECK(11, LUMI_block1_cleanup)
         df = &df_Var;
         LUMI_inc_ref(f_Refman);
         LUMI_dec_ref(df->item_Refman);
@@ -3326,9 +3356,9 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
 /// @ test-builtin-file1
 {
         FileReadBinary* f = NULL;
+        uint64_t x = 0;
         ut_M_Data df_Var = {0};
         ut_M_Data* df = NULL;
-        uint64_t aux_Int_0 = 0;
         ++LUMI_trace_ignore_count;
         CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
         INIT_NEW(2, LUMI_block1_cleanup, f, FileReadBinary, 1);
@@ -3339,19 +3369,18 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         CHECK_REF(4, LUMI_block1_cleanup, ut_M_buff)
         LUMI_err = FileReadBinary_read(f, ut_M_buff, *ut_M_buff_Length, &(ut_M_i));
         CHECK(4, LUMI_block1_cleanup)
-        LUMI_err = FileReadBinary_tell(f, &(aux_Int_0));
-        ut_M_i = aux_Int_0;
-        CHECK(5, LUMI_block1_cleanup)
-        LUMI_err = FileReadBinary_seek_set(f, ut_M_i);
+        LUMI_err = FileReadBinary_tell(f, &(x));
         CHECK(6, LUMI_block1_cleanup)
-        LUMI_err = FileReadBinary_seek_cur(f, ut_M_i);
+        LUMI_err = FileReadBinary_seek_set(f, x);
         CHECK(7, LUMI_block1_cleanup)
-        LUMI_err = FileReadBinary_seek_end(f, ut_M_i);
+        LUMI_err = FileReadBinary_seek_cur(f, x);
         CHECK(8, LUMI_block1_cleanup)
-        LUMI_err = FileReadBinary_flush(f);
+        LUMI_err = FileReadBinary_seek_end(f, x);
         CHECK(9, LUMI_block1_cleanup)
-        LUMI_err = FileReadBinary_close(f);
+        LUMI_err = FileReadBinary_flush(f);
         CHECK(10, LUMI_block1_cleanup)
+        LUMI_err = FileReadBinary_close(f);
+        CHECK(11, LUMI_block1_cleanup)
         df = &df_Var;
         ut_M_Data_set(df, f, &FileReadBinary_dynamic);
         f = NULL;
@@ -3372,10 +3401,10 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
 /// @ test-builtin-file2
 {
         FileWriteText* f = NULL;
+        uint64_t x = 0;
         ut_M_Data df_Var = {0};
         ut_M_Data* df = NULL;
         FileWriteText* aux_FileWriteText_0 = NULL;
-        uint64_t aux_Int_0 = 0;
         ++LUMI_trace_ignore_count;
         CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
         INIT_NEW(2, LUMI_block1_cleanup, aux_FileWriteText_0, FileWriteText, 1);
@@ -3388,19 +3417,18 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         CHECK_REF(4, LUMI_block1_cleanup, ut_M_ostr)
         LUMI_err = FileWriteText_write(f, ut_M_ostr, *ut_M_ostr_Length, &(ut_M_i));
         CHECK(4, LUMI_block1_cleanup)
-        LUMI_err = FileWriteText_tell(f, &(aux_Int_0));
-        ut_M_i = aux_Int_0;
-        CHECK(5, LUMI_block1_cleanup)
-        LUMI_err = FileWriteText_seek_set(f, ut_M_i);
+        LUMI_err = FileWriteText_tell(f, &(x));
         CHECK(6, LUMI_block1_cleanup)
-        LUMI_err = FileWriteText_seek_cur(f, ut_M_i);
+        LUMI_err = FileWriteText_seek_set(f, x);
         CHECK(7, LUMI_block1_cleanup)
-        LUMI_err = FileWriteText_seek_end(f, ut_M_i);
+        LUMI_err = FileWriteText_seek_cur(f, x);
         CHECK(8, LUMI_block1_cleanup)
-        LUMI_err = FileWriteText_flush(f);
+        LUMI_err = FileWriteText_seek_end(f, x);
         CHECK(9, LUMI_block1_cleanup)
-        LUMI_err = FileWriteText_close(f);
+        LUMI_err = FileWriteText_flush(f);
         CHECK(10, LUMI_block1_cleanup)
+        LUMI_err = FileWriteText_close(f);
+        CHECK(11, LUMI_block1_cleanup)
         df = &df_Var;
         ut_M_Data_set(df, f, &FileWriteText_dynamic);
         f = NULL;
@@ -3424,10 +3452,10 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
 {
         FileWriteBinary* f = NULL;
         Ref_Manager* f_Refman = NULL;
+        uint64_t x = 0;
         ut_M_Data df_Var = {0};
         ut_M_Data* df = NULL;
         FileWriteBinary* aux_FileWriteBinary_0 = NULL;
-        uint64_t aux_Int_0 = 0;
         ++LUMI_trace_ignore_count;
         CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
         INIT_NEW(2, LUMI_block1_cleanup, aux_FileWriteBinary_0, FileWriteBinary, 1);
@@ -3441,19 +3469,18 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         CHECK_REF(4, LUMI_block1_cleanup, ut_M_buff)
         LUMI_err = FileWriteBinary_write(f, ut_M_buff, *ut_M_buff_Length, &(ut_M_i));
         CHECK(4, LUMI_block1_cleanup)
-        LUMI_err = FileWriteBinary_tell(f, &(aux_Int_0));
-        ut_M_i = aux_Int_0;
-        CHECK(5, LUMI_block1_cleanup)
-        LUMI_err = FileWriteBinary_seek_set(f, ut_M_i);
+        LUMI_err = FileWriteBinary_tell(f, &(x));
         CHECK(6, LUMI_block1_cleanup)
-        LUMI_err = FileWriteBinary_seek_cur(f, ut_M_i);
+        LUMI_err = FileWriteBinary_seek_set(f, x);
         CHECK(7, LUMI_block1_cleanup)
-        LUMI_err = FileWriteBinary_seek_end(f, ut_M_i);
+        LUMI_err = FileWriteBinary_seek_cur(f, x);
         CHECK(8, LUMI_block1_cleanup)
-        LUMI_err = FileWriteBinary_flush(f);
+        LUMI_err = FileWriteBinary_seek_end(f, x);
         CHECK(9, LUMI_block1_cleanup)
-        LUMI_err = FileWriteBinary_close(f);
+        LUMI_err = FileWriteBinary_flush(f);
         CHECK(10, LUMI_block1_cleanup)
+        LUMI_err = FileWriteBinary_close(f);
+        CHECK(11, LUMI_block1_cleanup)
         df = &df_Var;
         LUMI_inc_ref(f_Refman);
         LUMI_dec_ref(df->item_Refman);
@@ -3481,9 +3508,9 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         FileReadWriteText f_Var = {0};
         FileReadWriteText* f = NULL;
         Ref_Manager* f_Refman = NULL;
+        uint64_t x = 0;
         ut_M_Data df_Var = {0};
         ut_M_Data* df = NULL;
-        uint64_t aux_Int_0 = 0;
         ++LUMI_trace_ignore_count;
         CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
         f = &f_Var;
@@ -3500,19 +3527,18 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         CHECK_REF(6, LUMI_block1_cleanup, ut_M_ostr)
         LUMI_err = FileReadWriteText_write(f, ut_M_ostr, *ut_M_ostr_Length, &(ut_M_i));
         CHECK(6, LUMI_block1_cleanup)
-        LUMI_err = FileReadWriteText_tell(f, &(aux_Int_0));
-        ut_M_i = aux_Int_0;
-        CHECK(7, LUMI_block1_cleanup)
-        LUMI_err = FileReadWriteText_seek_set(f, ut_M_i);
+        LUMI_err = FileReadWriteText_tell(f, &(x));
         CHECK(8, LUMI_block1_cleanup)
-        LUMI_err = FileReadWriteText_seek_cur(f, ut_M_i);
+        LUMI_err = FileReadWriteText_seek_set(f, x);
         CHECK(9, LUMI_block1_cleanup)
-        LUMI_err = FileReadWriteText_seek_end(f, ut_M_i);
+        LUMI_err = FileReadWriteText_seek_cur(f, x);
         CHECK(10, LUMI_block1_cleanup)
-        LUMI_err = FileReadWriteText_flush(f);
+        LUMI_err = FileReadWriteText_seek_end(f, x);
         CHECK(11, LUMI_block1_cleanup)
-        LUMI_err = FileReadWriteText_close(f);
+        LUMI_err = FileReadWriteText_flush(f);
         CHECK(12, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteText_close(f);
+        CHECK(13, LUMI_block1_cleanup)
         df = &df_Var;
         LUMI_inc_ref(f_Refman);
         LUMI_dec_ref(df->item_Refman);
@@ -3536,9 +3562,9 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
 /// @ test-builtin-file5
 {
         FileReadWriteBinary* f = NULL;
+        uint64_t x = 0;
         ut_M_Data df_Var = {0};
         ut_M_Data* df = NULL;
-        uint64_t aux_Int_0 = 0;
         ++LUMI_trace_ignore_count;
         CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
         INIT_NEW(2, LUMI_block1_cleanup, f, FileReadWriteBinary, 1);
@@ -3554,19 +3580,18 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         CHECK_REF(6, LUMI_block1_cleanup, ut_M_buff)
         LUMI_err = FileReadWriteBinary_write(f, ut_M_buff, *ut_M_buff_Length, &(ut_M_i));
         CHECK(6, LUMI_block1_cleanup)
-        LUMI_err = FileReadWriteBinary_tell(f, &(aux_Int_0));
-        ut_M_i = aux_Int_0;
-        CHECK(7, LUMI_block1_cleanup)
-        LUMI_err = FileReadWriteBinary_seek_set(f, ut_M_i);
+        LUMI_err = FileReadWriteBinary_tell(f, &(x));
         CHECK(8, LUMI_block1_cleanup)
-        LUMI_err = FileReadWriteBinary_seek_cur(f, ut_M_i);
+        LUMI_err = FileReadWriteBinary_seek_set(f, x);
         CHECK(9, LUMI_block1_cleanup)
-        LUMI_err = FileReadWriteBinary_seek_end(f, ut_M_i);
+        LUMI_err = FileReadWriteBinary_seek_cur(f, x);
         CHECK(10, LUMI_block1_cleanup)
-        LUMI_err = FileReadWriteBinary_flush(f);
+        LUMI_err = FileReadWriteBinary_seek_end(f, x);
         CHECK(11, LUMI_block1_cleanup)
-        LUMI_err = FileReadWriteBinary_close(f);
+        LUMI_err = FileReadWriteBinary_flush(f);
         CHECK(12, LUMI_block1_cleanup)
+        LUMI_err = FileReadWriteBinary_close(f);
+        CHECK(13, LUMI_block1_cleanup)
         df = &df_Var;
         ut_M_Data_set(df, f, &FileReadWriteBinary_dynamic);
         f = NULL;
@@ -3612,12 +3637,11 @@ Return_Code ut_M_fun(File* f, FileReadText* frt, FileReadBinary* frb, FileWriteT
     ut_M_Data df_Var = {0};
     ut_M_Data* df = NULL;
     File* fo = NULL;
-    uint32_t i = 0;
+    uint64_t i = 0;
     FileWriteBinary* aux_FileWriteBinary_0 = NULL;
     static char aux_String_0[] = {'n','a','m','e','\0',};
     Seq_Length aux_String_0_Max_length = sizeof(aux_String_0);
     Seq_Length aux_String_0_Length[1] = {sizeof(aux_String_0) - 1};
-    uint64_t aux_Int_0 = 0;
     f = frt;
     f = frb;
     f = fwt;
@@ -3636,8 +3660,7 @@ Return_Code ut_M_fun(File* f, FileReadText* frt, FileReadBinary* frb, FileWriteT
     CHECK(31, LUMI_block0_cleanup)
     fo = aux_FileWriteBinary_0;
     aux_FileWriteBinary_0 = NULL;
-    LUMI_err = File_tell(fo, &(aux_Int_0));
-    i = aux_Int_0;
+    LUMI_err = File_tell(fo, &(i));
     CHECK(33, LUMI_block0_cleanup)
     LUMI_err = File_seek_set(fo, i);
     CHECK(34, LUMI_block0_cleanup)
@@ -3685,13 +3708,11 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = sys_M_getline(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_b));
     CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-sys5
-LUMI_err = sys_M_exit(ut_M_i);
+LUMI_err = sys_M_exit(ut_M_j);
     CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-sys6
-int32_t aux_Int_0 = 0;
-    CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = sys_M_system(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(aux_Int_0));
-    ut_M_i = aux_Int_0;
+CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
+    LUMI_err = sys_M_system(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_j));
     CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-sys7
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
@@ -6355,6 +6376,21 @@ char* aux_String_0 = NULL;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ test-for-loop-13
+uint32_t aux_Int_0 = 0;
+    uint32_t aux_Int_1 = 0;
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
+    String_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(aux_Int_0));
+    aux_Int_1 = aux_Int_0;
+    do {
+        LUMI_loop_depth = 3;
+        if (!(aux_Int_1 < 0x02)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        aux_Int_1 += 0x01;
+        ut_M_i += 0x01;
+    LUMI_block1_cleanup:
+        (void)0;
+    } while (LUMI_loop_depth >= 2);
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ test-for-loop-14
 int64_t aux_Int_0 = 0;
     uint32_t aux_Int_1 = 0;
     aux_Int_0 = ut_M_i - 0x04;

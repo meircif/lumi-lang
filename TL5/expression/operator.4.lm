@@ -398,10 +398,13 @@ class ModuloOperatorExpression(DivisionOperatorExpression)
             long-mod(user left-min, user right-min)->(owner int-range.min-value)
             int-range.min-value.copy()->(owner int-range.max-value)
         else
-            var Long one
-            one.set(copy 1)
             int-range.min-value := Long()
-            long-sub(user right-max, user one)->(owner int-range.max-value)
+            if long-larger(user right-max, user left-max)
+                left-max.copy()->(owner int-range.max-value)
+            else
+                var Long one
+                one.set(copy 1)
+                long-sub(user right-max, user one)->(owner int-range.max-value)
 
 func modulo-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(

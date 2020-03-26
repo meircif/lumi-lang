@@ -1249,6 +1249,7 @@ Returncode Long_set_diff(Long* self, Long* a, Long* b) {
     }
   }
   if (big == NULL) {
+    self->sign = 1;
     return OK;
   }
   for (n = 0; n < self->length; ++n) {

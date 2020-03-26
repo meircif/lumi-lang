@@ -629,44 +629,45 @@ void LUMI_owner_dec_ref(Ref_Manager* ref) {
 
 #define LUMI_FUNC_NAME "Int.str"
 Return_Code Int_str(
-    int64_t value, char* str, Seq_Length str_max_length, Seq_Length* str_length) {
-  Bool is_neg;
-  uint64_t abs;
-  uint64_t swap;
-  char* next;
-  char* last;
-  is_neg = value < 0;
-  abs = value;
+    uint64_t abs, Bool is_neg,
+    char* str, Seq_Length str_max_length, Seq_Length* str_length) {
+  uint64_t tmp;
+  char* low;
+  char* high;
+  *str_length = is_neg? 1: 0;
+  high = str;
   if (is_neg) {
-    abs = -value;
+    *high = '-';
+    ++high;
   }
-  swap = 0;
-  *str_length = is_neg;
+  low = high;
+  tmp = abs;
   do {
-    swap *= 10;
-    swap += abs % 10;
-    abs /= 10;
+    *high = '0' + tmp % 10;
+    ++high;
+    tmp /= 10;
     if (str_max_length <= *str_length + 1) {
       *str_length = 0;
+      str[0] = '\0';
       CRAISE(LUMI_error_messages.sequence_too_short.str)
     }
-    ++*str_length;
-  } while (abs > 0);
-  next = str;
-  if (is_neg) {
-    *next = '-';
-    ++next;
+    ++(*str_length);
+  } while (tmp > 0);
+  *high = '\0';
+  for (--high; low < high; ++low, --high) {
+    char swap;
+    swap = *low;
+    *low = *high;
+    *high = swap;
   }
-  last = str + *str_length;
-  while (next < last) {
-    *next = '0' + swap % 10;
-    ++next;
-    swap /= 10;
-  }
-  *last = '\0';
   return OK;
 }
 #undef LUMI_FUNC_NAME
+
+#define Int_strU(value, str, str_max_length, str_length) \
+  Int_str(value, false, str, str_max_length, str_length)
+#define Int_strS(value, str, str_max_length, str_length) \
+  Int_str(value < 0? -value: value, value < 0, str, str_max_length, str_length)
 
 
 /* Array */
@@ -892,7 +893,7 @@ Return_Code String_concat(
 Return_Code String_concat_int(
     char* self, Seq_Length max_length, Seq_Length* length, int64_t num) {
   Seq_Length added_length = 0;
-  CCHECK(Int_str(num, self + *length, max_length - *length, &added_length))
+  CCHECK(Int_strS(num, self + *length, max_length - *length, &added_length))
   *length += added_length;
   return OK;
 }
