@@ -191,24 +191,27 @@ struct Global
                 copy 1,
                 copy _,
                 copy modulo-operator-factory)
-        self.add-operator-copy(
+        self.add-operator(
                 user "clamp+",
+                user "CLAMPED_ADD",
                 copy Precedence.ARITHMETIC,
                 copy 0,
                 copy _,
-                copy addition-operator-factory)
-        self.add-operator-copy(
+                copy clamped-operator-factory)
+        self.add-operator(
                 user "clamp-",
+                user "CLAMPED_SUB",
                 copy Precedence.ARITHMETIC,
                 copy 0,
-                copy negation-operator-factory,
-                copy subtraction-operator-factory)
-        self.add-operator-copy(
+                copy _,
+                copy clamped-operator-factory)
+        self.add-operator(
                 user "clamp*",
+                user "CLAMPED_MUL",
                 copy Precedence.ARITHMETIC,
                 copy 1,
                 copy _,
-                copy multiplication-operator-factory)
+                copy clamped-operator-factory)
         self.add-operator(
                 user "bor",
                 user "|",
@@ -330,19 +333,22 @@ struct Global
                 copy 0,
                 copy _,
                 copy assign-operator-factory)
-        self.add-operator-copy(
+        self.add-operator(
+                user "clamp+=",
                 user "+=",
                 copy Precedence.ASSIGN,
                 copy 1,
                 copy _,
                 copy arithmetic-assign-operator-factory)
-        self.add-operator-copy(
+        self.add-operator(
+                user "clamp-=",
                 user "-=",
                 copy Precedence.ASSIGN,
                 copy 2,
                 copy _,
                 copy arithmetic-assign-operator-factory)
-        self.add-operator-copy(
+        self.add-operator(
+                user "clamp*=",
                 user "*=",
                 copy Precedence.ASSIGN,
                 copy 3,

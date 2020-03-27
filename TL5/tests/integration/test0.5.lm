@@ -396,7 +396,7 @@ func ! test-code-flow(user Array{Int} arr)->(var Int res)
         if w > 4 and arr is-not arr[3:2]!
             arr[1]! := w
         repeat arr[1]! + w
-            arr[2]! += 2
+            arr[2]! := 2
 
 
 func ! use-builtins(

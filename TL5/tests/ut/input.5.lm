@@ -381,7 +381,7 @@ arr![str]!
 ; @ ec test-slice-expression-e5
 arr![3:str]!
 ; @ ec test-slice-expression-e6
-arr![i += 3]!
+arr![i clamp+= 3]!
 ; @ ec test-slice-expression-e7
 str![2:5]! := so
 ; @ ec test-slice-expression-e8
@@ -714,17 +714,17 @@ func error()->(var Uint32 i)
 func error()->(var Uint32 i)
     i := clamp? i + 1
 ; @ ec test-unary-expression-e13
-i += clamp -1
+i clamp+= clamp -1
 ; @ ec test-unary-expression-e14
 fun5(copy i)->(var clamp j)
 ; @@ test-binary-expression
 ; @ c test-binary-expression-0
 i := 23 + 54
 ; @ c test-binary-expression-1
-i += (100 * 2) - 37
-i *= 3
+i clamp+= (100 * 2) - 37
+i clamp*= 3
 ; @ c test-binary-expression-2
-i -= 12 *
+i clamp-= 12 *
         13
 ; @ c test-binary-expression-3
 b := 3 < 5 or 23 > 37
@@ -776,6 +776,21 @@ i := clamp bnot i + (10 band i)
 ; @ c test-binary-expression-24
 var Int{1:100} x(copy 1)
 io := (60 div x) + (600 mod x)
+; @ c test-binary-expression-25
+i := i clamp+ i
+i := i clamp+ j
+j := j clamp+ i
+j := j clamp+ j
+; @ c test-binary-expression-26
+i := i clamp- i
+i := i clamp- j
+j := j clamp- i
+j := j clamp- j
+; @ c test-binary-expression-27
+i := i clamp* i
+i := i clamp* j
+j := j clamp* i
+j := j clamp* j
 ; @ ec test-binary-expression-e0
 345 @ 2
 ; @ ec test-binary-expression-e1
@@ -789,9 +804,9 @@ io := (60 div x) + (600 mod x)
 ; @ ec test-binary-expression-e5
 1 := 2
 ; @ ec test-binary-expression-e6
-1 += 2
+1 clamp+= 2
 ; @ ec test-binary-expression-e7
-1 -= 2
+1 clamp-= 2
 ; @ ec test-binary-expression-e8
 so := str
 ; @ ec test-binary-expression-e9
@@ -803,9 +818,9 @@ b := 1 > 4 > t
 ; @ ec test-binary-expression-e12
 i := 3 + t
 ; @ ec test-binary-expression-e13
-t += 3
+t clamp+= 3
 ; @ ec test-binary-expression-e14
-i -= b
+i clamp-= b
 ; @ ec test-binary-expression-e15
 b := 3 is t
 ; @ ec test-binary-expression-e16
@@ -1116,6 +1131,15 @@ struct Test
         self.rs32 := -1000000
         self.ru64 := 100000000000
         self.rs64 := -100000000000
+        self.u8b := 0xff
+        self.s8b := 0x7f
+        self.s8b := -0x80
+        self.u16b := 0xffff
+        self.s16b := 0x7fff
+        self.s16b := -0x8000
+        self.u32b := 0xffffffff
+        self.s32b := 0x7fffffff
+        self.s32b := -0x80000000
         self.u64b := 0xffffffffffffffff
         self.s64b := 0x7fffffffffffffff
         self.s64b := -0x8000000000000000
@@ -1973,7 +1997,7 @@ struct Test
             self.x := 3
         loop
             for n in 4
-                self.x += n
+                self.x := n
             while self.x < 30
 ; @ g test-members-9
 struct Test
@@ -2343,7 +2367,7 @@ var Uint32 x
 ; @ c test-block-0
 block
     new Test tt!
-    i += 1
+    i := 1
 ; @ c test-block-1
 block
     return
@@ -2373,21 +2397,21 @@ tt.meth()
 ; @@ test-if-else
 ; @ c test-if-else-0
 if t!.num > 3
-    i -= 2
+    i := 2
 ; @ c test-if-else-1
 if i > 3
-    i -= 2
+    i := 2
 else
-    i += 1
+    i := 1
 ; @ c test-if-else-2
 if i > 3
-    i -= 3
+    i := 3
 else-if t!.num > 2
-    i -= 2
+    i := 2
 else-if t!.num > 1
-    i -= 1
+    i := 1
 else
-    i += 1
+    i := 1
 ; @ c test-if-else-3
 if b
     return
@@ -2395,7 +2419,7 @@ i := 3
 ; @ c test-if-else-4
 if b and
         b
-    i += 1
+    i := 1
 ; @ c test-if-else-5
 if b
     var String{4} sa
@@ -2495,7 +2519,7 @@ try
         while b
 ; @ c test-loop-8
 loop-infinite
-    i += 1
+    i := 1
 ; @ c test-loop-9
 loop
     loop
@@ -2529,7 +2553,7 @@ loop
     break error
 ; @ ec test-loop-e11
 loop
-    i += 1
+    i := 1
 ; @ ec test-loop-e12
 loop
     loop
@@ -2541,10 +2565,10 @@ try
 ; @@ test-for-loop
 ; @ c test-for-loop-0
 for n in 5
-    i += n
+    i := n
 ; @ c test-for-loop-1
 for n in t!.num:ostr!.length() + 2
-    i += n
+    i := clamp n
 ; @ c test-for-loop-2
 for ch in ostr!
     c := ch
@@ -2552,7 +2576,7 @@ for y in buff!
     bt := y
 ; @ c test-for-loop-3
 for n in arr!
-    i += n
+    i := n
 ; @ c test-for-loop-4
 for s in sarr!
     s.clear()
@@ -2561,16 +2585,16 @@ for bf in barr!
 ; @ c test-for-loop-5
 var Uint32 n
 for n in 5
-    i += n
+    i := n
 ; @ c test-for-loop-6
 for n in 5
-    i += n
+    i := n
 for n in 7
-    i += n
+    i := n
 ; @ c test-for-loop-7
 for n in 1 +
         2
-    i += n
+    i := n
 ; @ c test-for-loop-8
 for n in 6
     var String{4} sa
@@ -2600,18 +2624,18 @@ for bf in ba
     bf.clear()
 ; @ c test-for-loop-11
 for _ in 2:6
-    i += 1
+    i := 1
 ; @ c test-for-loop-12
 for _ in ostr!
-    i += 1
+    i := 1
 for _ in buff!
-    i += 1
+    i := 1
 ; @ c test-for-loop-13
 for _ in ostr!.length():2
-    i += 1
+    i := 1
 ; @ c test-for-loop-14
 repeat i - 4
-    i += 1
+    i := 1
 ; @ ec test-for-loop-e0
 for(
 ; @ ec test-for-loop-e1
@@ -2628,11 +2652,11 @@ for n in 5
 ; @ ec test-for-loop-e6
 var Uint32 n
 for n in arr!
-    i += n
+    i := n
 for n in sarr!
 ; @ ec test-for-loop-e7
 for n in 7
-    i += 1
+    i := 1
 var Uint32 n
 ; @@ test-testing
 ; @ c test-testing-a0
@@ -2721,7 +2745,7 @@ func fun()
 ; @ tg test-testing-t0
 func fun0()
     var Uint32 x(copy 4)
-    x += 1
+    x := 1
     var Uint32 y(copy 5)
     y := x
     if y > 3
@@ -2729,7 +2753,7 @@ func fun0()
     else-if y < 0
         y := 0
     else
-        y += 1
+        y := 1
     try
         x := 0
         sys.print(user "text")
@@ -2746,7 +2770,7 @@ func fun0()
         if x = 5
             continue
     for n in 3
-        x += y
+        x := y
 ; @-
 module ut
 func fun1()
@@ -3599,7 +3623,7 @@ struct TestIterator
 func fun(user TestIterator iter)
     var Uint32 x
     for _ in iter
-        x += 1
+        x := 1
 ; @ eg test-for-each-e0
 struct TestIterator
     var Uint32 num
@@ -3737,8 +3761,8 @@ enum MyEnum
     LAST-VALUE
 func dummy()
     var Uint32 x(copy MyEnum.VALUE)
-    x += MyEnum.ANOTHER-VALUE
-    x -= MyEnum.length
+    x := MyEnum.ANOTHER-VALUE
+    x := MyEnum.length
 ; @ g test-enum-1
 enum MyEnum
     VALUE

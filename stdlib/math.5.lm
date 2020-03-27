@@ -50,13 +50,14 @@ class IntIterator
     ~~~ Is called once before any iteration step.
     Iteration continues only if "has" returns true, in such case
     "value" is set to the iteration value. ~~~
-    func dynamic user? ! step()->(user IntBox? value, var Bool has)
+    func dynamic user? step()->(user IntBox? value, var Bool has)
         value := _
-        raise! "unimplemented dynamic method 'step'"
+        has := false
 
 
 ~~~ Return the sum of all integers in `iter` ~~~
-func ! sum(user IntIterator iter)->(var Sint64 res)
+func sum(user IntIterator iter)->(var Sint64 res)
     res := 0
-    for box in iter!
-        res += box!.value
+    for box in iter
+        if-error res clamp+= box.value
+            break

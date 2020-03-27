@@ -285,6 +285,7 @@ func addition-operator-factory(
         owner BinaryExpression expression)
     expression := AdditionOperatorExpression(user code-node, user operator)
 
+
 ~~~ - ~~~
 class SubtractionOperatorExpression(ArithmeticOperatorExpression)
     func dynamic set-range(
@@ -300,6 +301,7 @@ func subtraction-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
         owner BinaryExpression expression)
     expression := SubtractionOperatorExpression(user code-node, user operator)
+
 
 ~~~ * ~~~
 class MultiplicationOperatorExpression(ArithmeticOperatorExpression)
@@ -329,6 +331,7 @@ func multiplication-operator-factory(
         owner BinaryExpression expression)
     expression :=
             MultiplicationOperatorExpression(user code-node, user operator)
+
 
 ~~~ div ~~~
 class DivisionOperatorExpression(ArithmeticOperatorExpression)
@@ -385,6 +388,7 @@ func division-operator-factory(
         owner BinaryExpression expression)
     expression := DivisionOperatorExpression(user code-node, user operator)
 
+
 ~~~ mod ~~~
 class ModuloOperatorExpression(DivisionOperatorExpression)
     func dynamic set-range(
@@ -411,6 +415,45 @@ func modulo-operator-factory(
         owner BinaryExpression expression)
     expression := ModuloOperatorExpression(user code-node, user operator)
 
+
+~~~ clamp+, clamp-, clamp* ~~~
+class ClampedArithmeticOperatorExpression(ArithmeticOperatorExpression)
+    func dynamic set-range(
+            user IntRange int-range,
+            user Long left-min,
+            user Long left-max,
+            user Long right-min,
+            user Long right-max)
+        left-min.copy()->(owner int-range.min-value)
+        left-max.copy()->(owner int-range.max-value)
+    
+    func dynamic write()
+        write(user self.operator.c-name)
+        write-c(copy '_')
+        self.write-sign-char(user self.left-expression)
+        self.write-sign-char(user self.right-expression)
+        write-c(copy '(')
+        self.left-expression.write-safe()
+        write(user ", ")
+        self.right-expression.write-safe()
+        write(user ", ")
+        write-long(user self.left-expression.result-type.int-range.min-value)
+        write(user ", ")
+        write-long(user self.left-expression.result-type.int-range.max-value)
+        write-c(copy ')')
+    
+    func inst write-sign-char(user Expression expression)
+        if expression.result-type.int-range.is-signed
+            write-c(copy 'S')
+        else
+            write-c(copy 'U')
+        
+
+func clamped-operator-factory(
+        user SyntaxTreeCode code-node, user Operator operator)->(
+        owner BinaryExpression expression)
+    expression := ClampedArithmeticOperatorExpression(
+            user code-node, user operator)
 
 ~~~ > < >= <= ~~~
 class RelationalOperatorExpression(BinaryExpression)

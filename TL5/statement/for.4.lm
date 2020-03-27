@@ -279,7 +279,7 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
         ; aux-index += 1
         new SyntaxTreeExpression index-inc-node(user self.block)
         self.insert-binary-expression(
-                user "+=",
+                user "clamp+=",
                 user index-inc-node,
                 user index-inc-node.expression,
                 owner index-aux-expression.copy-new(),

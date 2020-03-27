@@ -48,13 +48,13 @@ test sum-test()
     array[1]!.set(copy 0)
     array[2]!.set(copy -1)
     array[3]!.set(copy 34)
-    assert! math.sum(user iter)! = 36
+    assert! math.sum(user iter) = 36
     user math.IntBox? item
     iter.new(weak array)
     iter.step()->(user item)!
     iter.step()->(user item)!
-    assert! math.sum(user iter)! = 33
-    assert! math.sum(user iter)! = 0
+    assert! math.sum(user iter) = 33
+    assert! math.sum(user iter) = 0
 
 class MockIntIterator(math.IntIterator)
     weak Array{math.IntBox} array
@@ -64,17 +64,25 @@ class MockIntIterator(math.IntIterator)
         self.array := array
         self.index := 0
     
-    func dynamic user ! step()->(
+    func dynamic user step()->(
             user math.IntBox? item, var Bool has-another-item)
-        has-another-item := self.index < self.array!.length()
+        if-error has-another-item := self.index < self.array.length()
+            has-another-item := false
         item := _
         if has-another-item
-            item := self.array![self.index]!
-            self.index += 1
+            if-error item := self.array[self.index]
+                has-another-item := false
+            else
+                self.index clamp+= 1
 
+
+class FailIterator(math.IntIterator)
+    func dynamic user? step()->(user math.IntBox? value, var Bool has)
+        value := _
+        has := true
 
 test abstract-methods()
     user math.IntBox? item
-    assert-error! math.IntIterator.step(user _)->(user item),
-            "unimplemented dynamic method 'step'"
-            
+    assert! not math.IntIterator.step(user _)->(user item)
+    var FailIterator fail-iter
+    assert! math.sum(user fail-iter) = 0
