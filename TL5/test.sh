@@ -16,7 +16,8 @@ if [ -z $CC ]; then
   CC=gcc
 fi
 CCW="$CC --std=c89 -Werror -Wall -Wno-unused -Wno-missing-braces"
-CCA="$CCW -Wno-self-assign -Wno-long-long --pedantic"
+CCA="$CCW -Wno-self-assign -Wno-long-long
+  -Wno-tautological-constant-out-of-range-compare --pedantic"
 if ! which valgrind > /dev/null || [[ $CC == *32* ]]; then
   SKIP_VALGRIND="y"
 fi
