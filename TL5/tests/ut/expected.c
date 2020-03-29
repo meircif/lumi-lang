@@ -1985,9 +1985,9 @@ ut_M_i = (((0x7b * (ut_M_i - 0x04)) + 0x02) < 0)? 0: ((((0x7b * (ut_M_i - 0x04))
 expected ")", got "new-line"
 /// @@ test-unary-expression
 /// @ test-unary-expression-0
-ut_M_j = ((- ut_M_j) > INT32_MAX)? INT32_MAX: (- ut_M_j);
+ut_M_j = - ut_M_j;
 /// @ test-unary-expression-1
-ut_M_j = ((- ut_M_j) > INT32_MAX)? INT32_MAX: (- ut_M_j);
+ut_M_j = - ut_M_j;
 /// @ test-unary-expression-2
 ut_M_i = - (- ut_M_i);
 /// @ test-unary-expression-3
@@ -1997,20 +1997,19 @@ ut_M_b = ! (ut_M_i > 0x03);
 /// @ test-unary-expression-5
 ut_M_i = ((ut_M_i + 0x01) > UINT32_MAX)? UINT32_MAX: (ut_M_i + 0x01);
 /// @ test-unary-expression-6
-int64_t x = 0;
-    x = ((x - 0x01) < INT64_MIN)? INT64_MIN: (x - 0x01);
+ut_M_j = ((ut_M_j - 0x01) < -INT32_MAX)? -INT32_MAX: (ut_M_j - 0x01);
 /// @ test-unary-expression-7
 int8_t x = 0;
-    x = (ut_M_j < -0x80)? -0x80: ((ut_M_j > 0x7f)? 0x7f: ut_M_j);
-    x = (ut_M_j < -0x80)? -0x80: ((ut_M_j > 0x7f)? 0x7f: ut_M_j);
+    x = (ut_M_j < -0x7f)? -0x7f: ((ut_M_j > 0x7f)? 0x7f: ut_M_j);
+    x = (ut_M_j < -0x7f)? -0x7f: ((ut_M_j > 0x7f)? 0x7f: ut_M_j);
 /// @ test-unary-expression-8
 if ((ut_M_i + 0x01) > UINT32_MAX) RAISE(1, LUMI_block0_cleanup, integer_overflow)
     ut_M_i = ut_M_i + 0x01;
 /// @ test-unary-expression-9
-if ((ut_M_j - 0x01) < INT32_MIN) RAISE(1, LUMI_block0_cleanup, integer_overflow)
+if ((ut_M_j - 0x01) < -INT32_MAX) RAISE(1, LUMI_block0_cleanup, integer_overflow)
     ut_M_j = ut_M_j - 0x01;
 /// @ test-unary-expression-10
-if ((ut_M_j * 0x02) < INT32_MIN || (ut_M_j * 0x02) > INT32_MAX) RAISE(1, LUMI_block0_cleanup, integer_overflow)
+if ((ut_M_j * 0x02) < -INT32_MAX || (ut_M_j * 0x02) > INT32_MAX) RAISE(1, LUMI_block0_cleanup, integer_overflow)
     ut_M_j = ut_M_j * 0x02;
 /// @ test-unary-expression-11
 ++LUMI_trace_ignore_count;
@@ -2167,7 +2166,7 @@ uint8_t i8 = 0;
     uint64_t i64 = 0;
     i8 = 0x04;
     i64 = 0x174876e800;
-    ut_M_i = (((((uint32_t)(~ ut_M_i)) + ((uint8_t)(~ i8))) + ((uint64_t)(~ i64))) > UINT32_MAX)? UINT32_MAX: ((((uint32_t)(~ ut_M_i)) + ((uint8_t)(~ i8))) + ((uint64_t)(~ i64)));
+    ut_M_i = CLAMPED_ADD_UU((CLAMPED_ADD_UU(((uint32_t)(~ ut_M_i)), ((uint8_t)(~ i8)), 0, UINT32_MAX)), ((uint64_t)(~ i64)), 0, UINT32_MAX);
 /// @ test-binary-expression-20
 ut_M_i = ut_M_i ^ 0x10;
 /// @ test-binary-expression-21
@@ -2183,18 +2182,18 @@ uint8_t x = 0;
 /// @ test-binary-expression-25
 ut_M_i = CLAMPED_ADD_UU(ut_M_i, ut_M_i, 0, UINT32_MAX);
     ut_M_i = CLAMPED_ADD_US(ut_M_i, ut_M_j, 0, UINT32_MAX);
-    ut_M_j = CLAMPED_ADD_SU(ut_M_j, ut_M_i, INT32_MIN, INT32_MAX);
-    ut_M_j = CLAMPED_ADD_SS(ut_M_j, ut_M_j, INT32_MIN, INT32_MAX);
+    ut_M_j = CLAMPED_ADD_SU(ut_M_j, ut_M_i, -INT32_MAX, INT32_MAX);
+    ut_M_j = CLAMPED_ADD_SS(ut_M_j, ut_M_j, -INT32_MAX, INT32_MAX);
 /// @ test-binary-expression-26
 ut_M_i = CLAMPED_SUB_UU(ut_M_i, ut_M_i, 0, UINT32_MAX);
     ut_M_i = CLAMPED_SUB_US(ut_M_i, ut_M_j, 0, UINT32_MAX);
-    ut_M_j = CLAMPED_SUB_SU(ut_M_j, ut_M_i, INT32_MIN, INT32_MAX);
-    ut_M_j = CLAMPED_SUB_SS(ut_M_j, ut_M_j, INT32_MIN, INT32_MAX);
+    ut_M_j = CLAMPED_SUB_SU(ut_M_j, ut_M_i, -INT32_MAX, INT32_MAX);
+    ut_M_j = CLAMPED_SUB_SS(ut_M_j, ut_M_j, -INT32_MAX, INT32_MAX);
 /// @ test-binary-expression-27
 ut_M_i = CLAMPED_MUL_UU(ut_M_i, ut_M_i, 0, UINT32_MAX);
     ut_M_i = CLAMPED_MUL_US(ut_M_i, ut_M_j, 0, UINT32_MAX);
-    ut_M_j = CLAMPED_MUL_SU(ut_M_j, ut_M_i, INT32_MIN, INT32_MAX);
-    ut_M_j = CLAMPED_MUL_SS(ut_M_j, ut_M_j, INT32_MIN, INT32_MAX);
+    ut_M_j = CLAMPED_MUL_SU(ut_M_j, ut_M_i, -INT32_MAX, INT32_MAX);
+    ut_M_j = CLAMPED_MUL_SS(ut_M_j, ut_M_j, -INT32_MAX, INT32_MAX);
 /// @ test-binary-expression-e0
 unknown operator "@"
 /// @ test-binary-expression-e1
@@ -2823,16 +2822,16 @@ void ut_M_Test_new(ut_M_Test* self) {
     self->rs64 = -0x174876e800;
     self->u8b = 0xff;
     self->s8b = 0x7f;
-    self->s8b = -0x80;
+    self->s8b = -0x7f;
     self->u16b = UINT16_MAX;
     self->s16b = INT16_MAX;
-    self->s16b = INT16_MIN;
+    self->s16b = -INT16_MAX;
     self->u32b = UINT32_MAX;
     self->s32b = INT32_MAX;
-    self->s32b = INT32_MIN;
+    self->s32b = -INT32_MAX;
     self->u64b = UINT64_MAX;
     self->s64b = INT64_MAX;
-    self->s64b = INT64_MIN;
+    self->s64b = -INT64_MAX;
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -2886,23 +2885,25 @@ uint8_t u8 = 0;
     s32 = -0x0186a0;
     ut_M_i = 0x14 + -0x14;
 /// @ test-int-range-e0
-integer range minimum larger than maximum
+integer range minimum "0x0c" larger than maximum "0x0b"
 /// @ test-int-range-e1
-unsigned integer maximum too high
+too high unsigned integer maximum "0x010000000000000000"
 /// @ test-int-range-e2
-signed integer maximum too high
+too high signed integer maximum "0x8000000000000000"
 /// @ test-int-range-e3
-signed integer minimum too low
+too low signed integer minimum "-0x8000000000000001"
 /// @ test-int-range-e4
 got "String" expression, expected "Int"
 /// @ test-int-range-e5
 integer range is not constant
 /// @ test-int-range-e6
-integer range minimum larger than maximum
+integer range minimum "0x00" larger than maximum "-0x64"
 /// @ test-int-range-e7
-assigning integer with minimum of "-0x80000000" into integer with larger minimum of "0x00"
+assigning integer with minimum of "-0x7fffffff" into integer with larger minimum of "0x00"
 /// @ test-int-range-e8
 assigning integer with maximum of "0xffffffff" into integer with smaller maximum of "0x7fffffff"
+/// @ test-int-range-e9
+too high unsigned integer maximum "0x010000000000000000"
 /// @@ test-dynamic
 /// @ test-dynamic-0
 ut_M_Ta a_Var = {{0}};
@@ -11345,30 +11346,30 @@ uint16_t u16 = 0;
     c_char = s16;
     s32 = c_char;
     c_schar = s16;
-    s16 = c_schar;
+    s32 = c_schar;
     c_uchar = u16;
     u16 = c_uchar;
     c_short = s32;
-    s32 = c_short;
+    s64 = c_short;
     c_ushort = u32;
     u32 = c_ushort;
     c_int = s64;
-    s64 = c_int;
+    s64 = (c_int < -INT64_MAX)? -INT64_MAX: c_int;
     c_uint = u64;
     u64 = c_uint;
     c_long = s64;
-    s64 = c_long;
+    s64 = (c_long < -INT64_MAX)? -INT64_MAX: c_long;
     c_ulong = u64;
     u64 = c_ulong;
     c_size = u64;
     u64 = c_size;
     c_float = s64;
-    s64 = c_float;
+    s64 = (c_float < -INT64_MAX)? -INT64_MAX: c_float;
     c_double = s64;
-    s64 = c_double;
+    s64 = (c_double < -INT64_MAX)? -INT64_MAX: c_double;
     c_long_double = s64;
-    s64 = c_long_double;
-    ut_M_i = (((((((((((((c_char + c_schar) + c_uchar) + c_short) + c_ushort) + c_int) + c_uint) + c_long) + c_ulong) + c_size) + c_float) + c_double) + c_long_double) < 0)? 0: ((((((((((((((c_char + c_schar) + c_uchar) + c_short) + c_ushort) + c_int) + c_uint) + c_long) + c_ulong) + c_size) + c_float) + c_double) + c_long_double) > UINT32_MAX)? UINT32_MAX: ((((((((((((c_char + c_schar) + c_uchar) + c_short) + c_ushort) + c_int) + c_uint) + c_long) + c_ulong) + c_size) + c_float) + c_double) + c_long_double));
+    s64 = (c_long_double < -INT64_MAX)? -INT64_MAX: c_long_double;
+    ut_M_j = CLAMPED_ADD_SS(c_char, (CLAMPED_ADD_SU(c_schar, (CLAMPED_ADD_US(c_uchar, (CLAMPED_ADD_SU(c_short, (CLAMPED_ADD_US(c_ushort, (CLAMPED_ADD_SU(c_int, (CLAMPED_ADD_US(c_uint, (CLAMPED_ADD_SU(c_long, (CLAMPED_ADD_UU(c_ulong, (CLAMPED_ADD_US(c_size, (CLAMPED_ADD_SS(c_float, (CLAMPED_ADD_SS(c_double, (CLAMPED_ADD_SS(c_long_double, (c_char), -0x8000000000000000, INT64_MAX)), -0x8000000000000000, INT64_MAX)), -0x8000000000000000, INT64_MAX)), 0, UINT64_MAX)), 0, UINT64_MAX)), -0x8000000000000000, INT64_MAX)), 0, UINT64_MAX)), -0x8000000000000000, INT64_MAX)), 0, UINT32_MAX)), -0x80000000, INT32_MAX)), 0, UINT16_MAX)), -0x8000, INT16_MAX)), -0x010000, UINT16_MAX);
 /// @ test-c-objects-1
 void* p_void = 0;
     cdef_M_Char* p_char = 0;

@@ -119,7 +119,7 @@ class NegationOperatorExpression(UnaryExpression)
                 owner self.result-type.int-range.max-value)
         self.result-type.int-range.min-value.negate()
         self.result-type.int-range.max-value.negate()
-        self.result-type.int-range.set-sign-and-bits()
+        self.result-type.int-range.set-sign-and-bits(user self)
 
 func negation-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
@@ -264,7 +264,7 @@ class ArithmeticOperatorExpression(BinaryExpression)
                 user self.left-expression.result-type.int-range.max-value,
                 user self.right-expression.result-type.int-range.min-value,
                 user self.right-expression.result-type.int-range.max-value)
-        self.result-type.int-range.set-sign-and-bits()
+        self.result-type.int-range.set-sign-and-bits(user self)
     
     func dynamic set-range(
             user IntRange int-range,
@@ -343,12 +343,20 @@ func multiplication-operator-factory(
 class DivisionOperatorExpression(ArithmeticOperatorExpression)
     var Bool zero-check
     
+    func inst check-division(user Long right-min, user Long right-max)
+        self.check-not-signed(user self.left-expression)
+        self.check-not-signed(user self.right-expression)
+        if right-max.sign() = 0
+            self.syntax-error-msg(user "dividing by zero")
+        self.zero-check := right-min.sign() = 0
+    
     func dynamic set-range(
             user IntRange int-range,
             user Long left-min,
             user Long left-max,
             user Long right-min,
             user Long right-max)
+        self.check-division(user right-min, user right-max)
         if right-min.sign() = 0
             left-max.copy()->(owner int-range.max-value)
         else
@@ -358,13 +366,6 @@ class DivisionOperatorExpression(ArithmeticOperatorExpression)
     func dynamic analyze()
         self.allow-right-error := true
         base()
-        self.check-not-signed(user self.left-expression)
-        self.check-not-signed(user self.right-expression)
-        user IntRange right-int-range(
-                user self.right-expression.result-type.int-range)
-        if right-int-range.max-value.sign() = 0
-            self.syntax-error-msg(user "dividing by zero")
-        self.zero-check := right-int-range.min-value.sign() = 0
         if self.zero-check
             self.right-expression.check-error-propagated(
                     user "ignoring zero division check")
@@ -403,6 +404,7 @@ class ModuloOperatorExpression(DivisionOperatorExpression)
             user Long left-max,
             user Long right-min,
             user Long right-max)
+        self.check-division(user right-min, user right-max)
         if long-equal(user left-min, user left-max) and
                 long-equal(user right-min, user right-max)
             long-mod(user left-min, user right-min)->(owner int-range.min-value)

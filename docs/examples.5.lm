@@ -5,7 +5,7 @@ func fibonacci(copy Uint64 n)->(var Uint64 res)
     var Uint64 prev(copy 1)
     res := 0
     repeat n
-        var Uint64 sum(copy clamp res + prev)
+        var Uint64 sum(copy res clamp+ prev)
         prev := res
         res := sum
 

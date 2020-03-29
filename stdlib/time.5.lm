@@ -15,7 +15,7 @@ native func c-ctime(copy cdef.Pointer{CtimeT} timer)->(
         copy cdef.Pointer{cdef.Char} res) "ctime"
 
 native func c-difftime(copy CtimeT time1, copy CtimeT time2)->(
-        copy cdef.Double res) "difftime"
+        copy Sint64 res) "difftime"
 
 native func c-asctime(user Time timeptr)->(
         copy cdef.Pointer{cdef.Char} res) "asctime"

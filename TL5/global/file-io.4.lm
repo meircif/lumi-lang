@@ -131,19 +131,19 @@ func write-long(user Long num)
         return
     if long-const(user num, user "32767", user "INT16_MAX")
         return
-    if long-const(user num, user "-32768", user "INT16_MIN")
+    if long-const(user num, user "-32767", user "-INT16_MAX")
         return
     if long-const(user num, user "4294967295", user "UINT32_MAX")
         return
     if long-const(user num, user "2147483647", user "INT32_MAX")
         return
-    if long-const(user num, user "-2147483648", user "INT32_MIN")
+    if long-const(user num, user "-2147483647", user "-INT32_MAX")
         return
     if long-const(user num, user "18446744073709551615", user "UINT64_MAX")
         return
     if long-const(user num, user "9223372036854775807", user "INT64_MAX")
         return
-    if long-const(user num, user "-9223372036854775808", user "INT64_MIN")
+    if long-const(user num, user "-9223372036854775807", user "-INT64_MAX")
         return
     var String{64} num-str
     num.hex(user num-str)

@@ -13,17 +13,11 @@
 #ifndef INT8_MAX
 #define INT8_MAX 0x7f
 #endif
-#ifndef INT8_MIN
-#define INT8_MIN -0x80
-#endif
 #ifndef UINT16_MAX
 #define UINT16_MAX 0xffff
 #endif
 #ifndef INT16_MAX
 #define INT16_MAX 0x7fff
-#endif
-#ifndef INT16_MIN
-#define INT16_MIN -INT16_MAX-1
 #endif
 #ifndef UINT32_MAX
 #define UINT32_MAX 0xffffffff
@@ -31,17 +25,11 @@
 #ifndef INT32_MAX
 #define INT32_MAX 0x7fffffff
 #endif
-#ifndef INT32_MIN
-#define INT32_MIN -INT32_MAX-1
-#endif
 #ifndef UINT64_MAX
 #define UINT64_MAX 0xffffffffffffffff
 #endif
 #ifndef INT64_MAX
 #define INT64_MAX 0x7fffffffffffffff
-#endif
-#ifndef INT64_MIN
-#define INT64_MIN -INT64_MAX-1
 #endif
 
 /* builtin type defines */

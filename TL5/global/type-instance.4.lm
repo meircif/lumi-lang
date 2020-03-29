@@ -36,8 +36,7 @@ struct IntRange
                     owner self.min-value)
         else
             self.min-value := Long()
-        self.check-range(user node)
-        self.set-sign-and-bits()
+        self.set-sign-and-bits(user node)
 
     func set-value(
             user SyntaxTreeNode node,
@@ -50,30 +49,30 @@ struct IntRange
         if not value-expression.get-constant-value()->(user constant-value)?
             node.syntax-error-msg(user "integer range is not constant")
         constant-value.copy()->(owner value)
-    
-    func check-range(user SyntaxTreeNode node)
-        if long-larger(user self.min-value, user self.max-value)
-            node.syntax-error-msg(
-                    user "integer range minimum larger than maximum")
-        var Long num
-        if self.min-value.sign() >= 0
-            num.parse(user "18446744073709551615")
-            if long-larger(user self.max-value, user num)
-                node.syntax-error-msg(user "unsigned integer maximum too high")
-        else
-            num.parse(user "9223372036854775807")
-            if long-larger(user self.max-value, user num)
-                node.syntax-error-msg(user "signed integer maximum too high")
-            num.parse(user "-9223372036854775808")
-            if long-larger(user num, user self.min-value)
-                node.syntax-error-msg(user "signed integer minimum too low")
 
-    func set-sign-and-bits()
+    func set-sign-and-bits(user SyntaxTreeNode node)
+        if long-larger(user self.min-value, user self.max-value)
+            node.syntax-error-long2(
+                    user "integer range minimum",
+                    user self.min-value,
+                    user "larger than maximum",
+                    user self.max-value)
+        var Long limit
         var Long max8
         var Long max16
         var Long max32
         self.is-signed := self.min-value.sign() < 0
         if self.is-signed
+            limit.parse(user "9223372036854775807")
+            if long-larger(user self.max-value, user limit)
+                node.syntax-error-long(
+                        user "too high signed integer maximum",
+                        user self.max-value)
+            limit.parse(user "-9223372036854775808")
+            if long-larger(user limit, user self.min-value)
+                node.syntax-error-long(
+                        user "too low signed integer minimum",
+                        user self.min-value)
             var Long min8
             var Long min16
             var Long min32
@@ -95,6 +94,11 @@ struct IntRange
             else
                 self.bits := 64
         else
+            limit.parse(user "18446744073709551615")
+            if long-larger(user self.max-value, user limit)
+                node.syntax-error-long(
+                        user "too high unsigned integer maximum",
+                        user self.max-value)
             max8.set(copy 256)
             max16.parse(user "65536")
             max32.parse(user "4294967296")
@@ -255,12 +259,12 @@ struct TypeInstance
             expected := TypeInstance()
             self.int-range.copy-new()->(owner expected.int-range)
     
-    func set-int-constant(user Long value)
+    func set-int-constant(user SyntaxTreeNode node, user Long value)
         if not self.int-range?
             self.int-range := IntRange()
         value.copy()->(owner self.int-range.min-value)
         value.copy()->(owner self.int-range.max-value)
-        self.int-range.set-sign-and-bits()
+        self.int-range.set-sign-and-bits(user node)
     
     func set-int-range()
         self.type-data.module.int-map.find(user self.name).copy-new()->(

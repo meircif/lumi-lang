@@ -696,7 +696,7 @@ test test-operations()
     assert! j clamp* j = 16
     var Uint64 max(copy 0xffffffffffffffff)
     var Sint64 sax(copy 0x7fffffffffffffff)
-    var Sint64 min(copy -0x8000000000000000)
+    var Sint64 min(copy -0x7fffffffffffffff)
     var Int{100:0xf000000000000000} u64h(copy 0xa000000000000000)
     var Int{100:0xf000000000000000} u64l(copy 1000)
     var Int{-10000000000:10000000000} s64h(copy 1000)
@@ -724,6 +724,7 @@ test test-operations()
     assert! s64h clamp* min = -10000000000
     assert! s64l clamp* sax = -10000000000
     assert! s64l clamp* min = 10000000000
+    ; assert! s64l < s64h * u64l
     s64l clamp+= max
     u64l clamp-= sax
     u64h clamp*= min

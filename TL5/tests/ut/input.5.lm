@@ -649,9 +649,9 @@ i := clamp (123 * (i - 4)) + 2
 (error
 ; @@ test-unary-expression
 ; @ c test-unary-expression-0
-j := clamp - j
+j := - j
 ; @ c test-unary-expression-1
-j := clamp -
+j := -
         j
 ; @ c test-unary-expression-2
 i := - - i
@@ -662,8 +662,7 @@ b := not i > 3
 ; @ c test-unary-expression-5
 i := clamp i + 1
 ; @ c test-unary-expression-6
-var Sint64 x
-x := clamp x - 1
+j := clamp j - 1
 ; @ c test-unary-expression-7
 var Sint8 x(copy clamp j)
 x := clamp j
@@ -764,7 +763,7 @@ i := 10 band i
 ; @ c test-binary-expression-19
 var Int{4:20} i8(copy 4)
 var Int{100000000000:200000000000} i64(copy 100000000000)
-i := clamp bnot i + bnot i8 + bnot i64
+i := bnot i clamp+ bnot i8 clamp+ bnot i64
 ; @ c test-binary-expression-20
 i := i xor 16
 ; @ c test-binary-expression-21
@@ -1133,16 +1132,16 @@ struct Test
         self.rs64 := -100000000000
         self.u8b := 0xff
         self.s8b := 0x7f
-        self.s8b := -0x80
+        self.s8b := -0x7f
         self.u16b := 0xffff
         self.s16b := 0x7fff
-        self.s16b := -0x8000
+        self.s16b := -0x7fff
         self.u32b := 0xffffffff
         self.s32b := 0x7fffffff
-        self.s32b := -0x80000000
+        self.s32b := -0x7fffffff
         self.u64b := 0xffffffffffffffff
         self.s64b := 0x7fffffffffffffff
-        self.s64b := -0x8000000000000000
+        self.s64b := -0x7fffffffffffffff
 ; @ c test-int-range-1
 var Int{0:255} u8
 var Int{0:65535} u16
@@ -1189,6 +1188,9 @@ var Int{-100} error
 i := j
 ; @ ec test-int-range-e8
 j := i
+; @ ec test-int-range-e9
+var Uint64 x
+x := clamp x + 1
 ; @@ test-dynamic
 ; @ c test-dynamic-0
 var Ta a
@@ -4829,34 +4831,39 @@ var cdef.Size c-size
 var cdef.Float c-float
 var cdef.Double c-double
 var cdef.LongDouble c-long-double
+; line 20
 c-char := s16
 s32 := c-char
 c-schar := s16
-s16 := c-schar
+s32 := c-schar
 c-uchar := u16
 u16 := c-uchar
 c-short := s32
-s32 := c-short
+s64 := c-short
 c-ushort := u32
 u32 := c-ushort
 c-int := s64
-s64 := c-int
+s64 := clamp c-int
 c-uint := u64
 u64 := c-uint
 c-long := s64
-s64 := c-long
+s64 := clamp c-long
 c-ulong := u64
 u64 := c-ulong
 c-size := u64
+; line 40
 u64 := c-size
 c-float := s64
-s64 := c-float
+s64 := clamp c-float
 c-double := s64
-s64 := c-double
+s64 := clamp c-double
 c-long-double := s64
-s64 := c-long-double
-i := clamp c-char + c-schar + c-uchar + c-short + c-ushort + c-int + c-uint + c-long +
-        c-ulong + c-size + c-float + c-double + c-long-double
+s64 := clamp c-long-double
+; line 48
+j := c-char clamp+ (c-schar clamp+ (c-uchar clamp+ (c-short clamp+
+        (c-ushort clamp+ (c-int clamp+ (c-uint clamp+ (c-long clamp+
+        (c-ulong clamp+ (c-size clamp+ (c-float clamp+ (c-double clamp+
+        (c-long-double clamp+ (c-char)))))))))))))
 ; @ c test-c-objects-1
 var cdef.Pointer p-void
 var cdef.Pointer{cdef.Char} p-char

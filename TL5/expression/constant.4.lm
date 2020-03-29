@@ -51,7 +51,7 @@ class IntExpression(Expression)
         self.access := Access.VAR
     
     func inst set-range()
-        self.result-type.set-int-constant(user self.value)
+        self.result-type.set-int-constant(user self, user self.value)
     
     func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
             owner Expression expression)
@@ -139,7 +139,7 @@ class CharExpression(TextExpression)
         self.set-simple-type(user glob.type-char)
         value := Long()
         value.set(copy self.value)
-        self.result-type.set-int-constant(user value)
+        self.result-type.set-int-constant(user self, user value)
         self.access := Access.VAR
         self.text := text
         

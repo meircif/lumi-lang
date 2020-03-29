@@ -91,7 +91,7 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
             else
                 self.iterator.result-type.int-range.max-value.copy()->(
                         owner item-type-instance.int-range.max-value)
-            item-type-instance.int-range.set-sign-and-bits()
+            item-type-instance.int-range.set-sign-and-bits(user self)
         else
             self.iterator.analyze()
             if not self.iterator.result-type?
@@ -125,7 +125,7 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
         self.iterator.result-type.int-range.copy-new()->(
                 owner item-type-instance.int-range)
         item-type-instance.int-range.min-value := Long()
-        item-type-instance.int-range.set-sign-and-bits()
+        item-type-instance.int-range.set-sign-and-bits(user self)
         
     func inst get-step-item-data()->(
             owner TypeInstance item-type-instance, var Int item-access)

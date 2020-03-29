@@ -413,33 +413,35 @@ struct Global
         self.add-global-int-alias(user "Uint32", copy 32, user "4294967295")
         self.add-global-int-alias(
                 user "Uint64", copy 64, user "18446744073709551615")
-        self.add-global-int-alias(user "Sint8", copy 8, user "-128")
-        self.add-global-int-alias(user "Sint16", copy 16, user "-32768")
-        self.add-global-int-alias(user "Sint32", copy 32, user "-2147483648")
+        self.add-global-int-alias(user "Sint8", copy 8, user "-127")
+        self.add-global-int-alias(user "Sint16", copy 16, user "-32767")
+        self.add-global-int-alias(user "Sint32", copy 32, user "-2147483647")
         self.add-global-int-alias(
-                user "Sint64", copy 64, user "-9223372036854775808")
+                user "Sint64", copy 64, user "-9223372036854775807")
 
     func add-global-int-alias(
             user String name, copy Int bits, user String limit)
         self.add-int-alias(
-                user self.global-module, user name, copy bits, user limit)
+                user self.global-module,
+                user name,
+                copy bits,
+                user limit,
+                user limit[1:limit.length - 1])
 
     func add-int-alias(
             user ModuleMembers module,
             user String name,
             copy Int bits,
-            user String limit)
+            user String limit,
+            user String another-limit)
         new IntRange int-range
         int-range.bits := bits
         int-range.min-value := Long()
         int-range.max-value := Long()
         if limit[0] = '-'
-            var Int last(copy limit.length - 1)
             int-range.is-signed := true
             int-range.min-value.parse(user limit)
-            var String{32} max-limit(user limit)
-            max-limit[last] -= 1
-            int-range.max-value.parse(user max-limit[1:last])
+            int-range.max-value.parse(user another-limit)
         else
             int-range.max-value.parse(user limit)
         string-new-copy(user name)->(owner int-range.name)
@@ -1226,7 +1228,14 @@ struct Global
             user TypeData type-data)
         self.add-cdef-type(user cdef-module, user name)->(user type-data)
         type-data.is-int-like := true
-        self.add-int-alias(user cdef-module, user name, copy bits, user limit)
+        var String{32} another-limit(user limit[1:limit.length - 1])
+        another-limit[another-limit.length - 1] -= 1
+        self.add-int-alias(
+                user cdef-module,
+                user name,
+                copy bits,
+                user limit,
+                user another-limit)
 
     func add-cdef-type(user ModuleMembers cdef-module, user String name)->(
             user TypeData type-data)

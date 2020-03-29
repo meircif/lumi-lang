@@ -516,7 +516,7 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
         self.value.check-no-error()
         if not self.value.get-constant-value()->(user self.int-value)?
             self.syntax-error-msg(user "value is not constant")
-        self.type-instance.set-int-constant(user self.int-value)
+        self.type-instance.set-int-constant(user self, user self.int-value)
         self.is-analyzed := true
     
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
