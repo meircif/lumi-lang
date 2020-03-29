@@ -334,22 +334,29 @@ struct Global
                 copy _,
                 copy assign-operator-factory)
         self.add-operator(
-                user "clamp+=",
+                user "internal +=",
                 user "+=",
+                copy Precedence.ASSIGN,
+                copy 1,
+                copy _,
+                copy internal-binary-operator-factory)
+        self.add-operator(
+                user "clamp+=",
+                user "= CLAMPED_ADD",
                 copy Precedence.ASSIGN,
                 copy 1,
                 copy _,
                 copy arithmetic-assign-operator-factory)
         self.add-operator(
                 user "clamp-=",
-                user "-=",
+                user "= CLAMPED_SUB",
                 copy Precedence.ASSIGN,
                 copy 2,
                 copy _,
                 copy arithmetic-assign-operator-factory)
         self.add-operator(
                 user "clamp*=",
-                user "*=",
+                user "= CLAMPED_MUL",
                 copy Precedence.ASSIGN,
                 copy 3,
                 copy _,

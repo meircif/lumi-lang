@@ -26,14 +26,14 @@ if `x` and `exp` are zero the result is `1` ~~~
 func power(copy Sint64 x, copy Uint64 exp)->(var Sint64 res)
     res := 1
     repeat exp
-        res := clamp res * x
+        res := res clamp* x
 
 
 ~~~ Return `x`! ~~~
 func factorial(copy Int{20} x)->(var Int{2432902008176640000} res)
     res := 1
     for n in 2:x + 1
-        res := clamp res * n
+        res := res clamp* n
 
 
 struct IntBox

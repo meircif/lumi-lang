@@ -727,21 +727,23 @@ Return_Code Int_str(
 #define CLAMPED_SUB_SS(a, b, min, max) (b > 0)? \
   (CLAMPED_SUB_SU(a, b, min, max)): CLAMPED_SUB_SN_LIMIT(a, b, max, INT64_MAX)
 
-#define CLAMPED_MUL_UP_LIMIT(a, b, max, LIMIT) \
-  (((a > LIMIT / b) || (a * b > max))? max: (a * b))
-#define CLAMPED_MUL_UP(a, b, max) CLAMPED_MUL_UP_LIMIT(a, b, max, UINT64_MAX)
-#define CLAMPED_MUL_UN(a, b, min, max) \
-  (((a >= INT64_MIN / b) || (a * b < min))? min: (a * b))
-#define CLAMPED_MUL_UU(a, b, min, max) (b == 0)? min: CLAMPED_MUL_UP(a, b, max)
-#define CLAMPED_MUL_US(a, b, min, max) (b == 0)? min: \
-  ((b > 0)? CLAMPED_MUL_UP(a, b, max): CLAMPED_MUL_UN(a, b, min, max))
-#define CLAMPED_MUL_SU(a, b, min, max) (b == 0)? \
-  ((min > 0)? min: (max < 0? max: 0)): \
-  (a > 0)? CLAMPED_MUL_UP(a, b, max): CLAMPED_MUL_UN(a, b, min, max)
-#define CLAMPED_MUL_SS(a, b, min, max) (b == 0)? \
-  ((min > 0)? min: (max < 0? max: 0)): \
-  (((b > 0) == (a > 0))? \
-    CLAMPED_MUL_UP_LIMIT(a, b, max, INT64_MAX): CLAMPED_MUL_UN(a, b, min, max))
+#define CLAMPED_MUL_UP_LIMIT(a, b, max, CMP_LIMIT) \
+  (((a CMP_LIMIT / b) || (a * b > max))? max: (a * b))
+#define CLAMPED_MUL_UP(a, b, max) CLAMPED_MUL_UP_LIMIT(a, b, max, > UINT64_MAX)
+#define CLAMPED_MUL_UN(a, b, min, cmp) \
+  (((a cmp INT64_MIN / b) || (a * b < min))? min: (a * b))
+#define CLAMPED_MUL_UU(a, b, min, max) (a == 0 || b == 0)? min: \
+  CLAMPED_MUL_UP(a, b, max)
+#define CLAMPED_MUL_US(a, b, min, max) (a == 0 || b == 0)? min: \
+  ((b > 0)? CLAMPED_MUL_UP(a, b, max): CLAMPED_MUL_UN(a, b, min, >=))
+#define CLAMPED_MUL_SU(a, b, min, max) (a == 0 || b == 0)? (max < 0? max: 0): \
+  (a > 0)? CLAMPED_MUL_UP(a, b, max): CLAMPED_MUL_UN(a, b, min, >=)
+#define CLAMPED_MUL_SS(a, b, min, max) (a == 0 || b == 0)? (max < 0? max: 0): \
+  ((a > 0)? \
+    ((b > 0)? CLAMPED_MUL_UP_LIMIT(a, b, max, > INT64_MAX): \
+      CLAMPED_MUL_UN(a, b, min, >=)): \
+    ((b > 0)? CLAMPED_MUL_UN(a, b, min, <=): \
+      CLAMPED_MUL_UP_LIMIT(a, b, max, < INT64_MAX)))
 
 
 /* Array */

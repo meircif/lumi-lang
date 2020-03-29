@@ -2095,10 +2095,10 @@ misplaced use of "clamp"
 /// @ test-binary-expression-0
 ut_M_i = 0x17 + 0x36;
 /// @ test-binary-expression-1
-ut_M_i += (0x64 * 0x02) - 0x25;
-    ut_M_i *= 0x03;
+ut_M_i = CLAMPED_ADD_UU(ut_M_i, ((0x64 * 0x02) - 0x25), 0, UINT32_MAX);
+    ut_M_i = CLAMPED_MUL_UU(ut_M_i, 0x03, 0, UINT32_MAX);
 /// @ test-binary-expression-2
-ut_M_i -= 0x0c * 0x0d;
+ut_M_i = CLAMPED_SUB_UU(ut_M_i, (0x0c * 0x0d), 0, UINT32_MAX);
 /// @ test-binary-expression-3
 ut_M_b = (0x03 < 0x05) || (0x17 > 0x25);
 /// @ test-binary-expression-4

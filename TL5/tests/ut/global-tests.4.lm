@@ -129,35 +129,28 @@ test test-name-map()
 
 ; Illegal call tests
 test test-illegal-call()
-    var tl5-compiler.Argument arg
-    assert-error arg.copy-new()
-    assert-error arg.parse-value(user _, user _, copy 0)
-    assert-error arg.get-type-instance()
-    assert-error arg.get-variable()
-    assert-error arg.get-output()
-    assert-error arg.take-value()
-    assert-error arg.write-preactions()
-    assert-error arg.write-postactions()
-    var tl5-compiler.ArgumentFactory factory
-    assert-error factory.new-argument()
-    var tl5-compiler.SyntaxTreeBranch branch
-    assert-error branch.parse-child(user _)
-    var tl5-compiler.SyntaxTreeNode node
-    assert-error node.write()
-    assert not node.get-parent-type()?
-    var tl5-compiler.NodeAction action
-    assert-error action.action(user _)
-    var tl5-compiler.SyntaxTreeRoot root
-    assert-error root.link-types()
-    var tl5-compiler.TypeWriter tw
-    assert-error tw.write(user _)
-    var tl5-compiler.CallExpression call(user _)
-    assert-error call.write-function()
-    var tl5-compiler.SyntaxTreeSpecialMethod special-meth
-    assert-error special-meth.parse-special()
-    var tl5-compiler.ArithmeticOperatorExpression operator(
-            user _, user _)
-    assert-error operator.set-range(user _, user _, user _, user _, user _)
+    assert-error tl5-compiler.Argument.copy-new(user _)
+    assert-error tl5-compiler.Argument.parse-value(
+            user _, user _, user _, copy 0)
+    assert-error tl5-compiler.Argument.get-type-instance(user _)
+    assert-error tl5-compiler.Argument.get-variable(user _)
+    assert-error tl5-compiler.Argument.get-output(user _)
+    assert-error tl5-compiler.Argument.take-value(user _)
+    assert-error tl5-compiler.Argument.write-preactions(user _)
+    assert-error tl5-compiler.Argument.write-postactions(user _)
+    assert-error tl5-compiler.ArgumentFactory.new-argument(user _)
+    assert-error tl5-compiler.SyntaxTreeBranch.parse-child(user _, user _)
+    assert-error tl5-compiler.SyntaxTreeNode.write(user _)
+    assert not tl5-compiler.SyntaxTreeNode.get-parent-type(user _)?
+    assert-error tl5-compiler.NodeAction.action(user _, user _)
+    assert-error tl5-compiler.SyntaxTreeRoot.link-types(user _)
+    assert-error tl5-compiler.TypeWriter.write(user _, user _)
+    assert-error tl5-compiler.CallExpression.write-function(user _)
+    assert-error tl5-compiler.SyntaxTreeSpecialMethod.parse-special(user _)
+    assert-error tl5-compiler.BaseAssignOperatorExpression.analyze-assignment(
+            user _)
+    assert-error tl5-compiler.ArithmeticOperatorExpression.set-range(
+            user _, user _, user _, user _, user _, user _)
 
 test test-mocked-functions()
     setup-test()

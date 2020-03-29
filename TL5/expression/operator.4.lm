@@ -45,6 +45,12 @@ struct Operator
                 owner expression)
 
 
+func internal-binary-operator-factory(
+        user SyntaxTreeCode code-node, user Operator operator)->(
+        owner BinaryExpression expression)
+    expression := BinaryExpression(user code-node, user operator)
+
+
 ~~~ not ~~~
 class NotOperatorExpression(UnaryExpression)
     func dynamic analyze()
@@ -534,8 +540,7 @@ func logical-operator-factory(
     expression := LogicalOperatorExpression(user code-node, user operator)
 
 
-~~~ += -= *= ~~~
-class ArithmeticAssignOperatorExpression(BinaryExpression)
+class BaseAssignOperatorExpression(BinaryExpression)
     func dynamic analyze-right-and-all()
         base()
         if not self.left-expression.assignable
@@ -546,7 +551,26 @@ class ArithmeticAssignOperatorExpression(BinaryExpression)
         self.result-type := _
 
     func dynamic analyze-assignment()
+        raise
+
+
+~~~ clamp+= clamp-= clamp*= ~~~
+class ArithmeticAssignOperatorExpression(BaseAssignOperatorExpression)
+    func dynamic analyze-assignment()
         self.test-operands-type(user glob.type-int)
+    
+    func dynamic write()
+        self.write-operand(user self.left-expression)
+        write(user " ")
+        var ClampedArithmeticOperatorExpression clamped-expression(
+                user self.code-node, user self.operator)
+        clamped-expression.left-expression := self.left-expression
+        clamped-expression.right-expression := self.right-expression
+        self.write-operand(user clamped-expression)
+        self.left-expression := clamped-expression.left-expression
+        self.right-expression := clamped-expression.right-expression
+        if self.is-statement
+            write(user ";\n")
 
 func arithmetic-assign-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
@@ -556,7 +580,7 @@ func arithmetic-assign-operator-factory(
 
 
 ~~~ := ~~~
-class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
+class AssignOperatorExpression(BaseAssignOperatorExpression)
     var AssignExpression assign
     
     func dynamic analyze()
