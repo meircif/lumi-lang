@@ -358,7 +358,7 @@ func fun()
 new Array{i:Uint32} a!
 var Sint8 x
 var Int{-6:0} y
-i := clamp a[x:x]![y:y + 1]![x]! + a[i:i + 1]![0:y + 1]![y]! + a[0:1][i]!
+i := wraparound a[x:x]![y:y + 1]![x]! + a[i:i + 1]![0:y + 1]![y]! + a[0:1][i]!
 var Int{100:200} length
 new Array{length:Uint32} aa!
 var Int{10:20} xx(copy 10)
@@ -381,7 +381,7 @@ arr![str]!
 ; @ ec test-slice-expression-e5
 arr![3:str]!
 ; @ ec test-slice-expression-e6
-arr![i clamp+= 3]!
+arr![i wraparound+= 3]!
 ; @ ec test-slice-expression-e7
 str![2:5]! := so
 ; @ ec test-slice-expression-e8
@@ -518,7 +518,7 @@ var Uint32 u32
 var Sint32 s32
 var Uint64 u64
 var Sint64 s64
-u8 := clamp fun5(copy 0)
+u8 := wraparound fun5(copy 0)
 s8 := clamp fun5(copy 1)
 fun5(copy 50)->(var u32)
 s32 := clamp fun5(copy 2)
@@ -644,7 +644,7 @@ i := 2 + (123)
 ; @ c test-block-expression-1
 i := (123)
 ; @ c test-block-expression-2
-i := clamp (123 * (i - 4)) + 2
+i := wraparound (123 * (i - 4)) + 2
 ; @ ec test-block-expression-3
 (error
 ; @@ test-unary-expression
@@ -684,6 +684,12 @@ fun4(copy clamp! i + 1)
 ; @ c test-unary-expression-14
 if-error fun4(copy clamp? i + 1)
     i := 12
+; @ c test-unary-expression-15
+i := wraparound i + 1
+; @ c test-unary-expression-16
+fun4(copy wraparound i + 1)
+new Tb ttb(copy wraparound i + 1)!
+ttb := Tb(copy wraparound i + 1)!
 ; @ ec test-unary-expression-e0
 {45}
 ; @ ec test-unary-expression-e1
@@ -716,6 +722,10 @@ func error()->(var Uint32 i)
 i clamp+= clamp -1
 ; @ ec test-unary-expression-e14
 fun5(copy i)->(var clamp j)
+; @ ec test-unary-expression-e15
+i := i + wraparound i
+; @ ec test-unary-expression-e16
+i := wraparound i
 ; @@ test-binary-expression
 ; @ c test-binary-expression-0
 i := 23 + 54
@@ -763,7 +773,7 @@ i := 10 band i
 ; @ c test-binary-expression-19
 var Int{4:20} i8(copy 4)
 var Int{100000000000:200000000000} i64(copy 100000000000)
-i := bnot i clamp+ bnot i8 clamp+ bnot i64
+i := bnot i wraparound+ bnot i8 wraparound+ bnot i64
 ; @ c test-binary-expression-20
 i := i xor 16
 ; @ c test-binary-expression-21
@@ -771,7 +781,7 @@ i := 2 shr i
 ; @ c test-binary-expression-22
 i := i shl 1
 ; @ c test-binary-expression-23
-i := clamp bnot i + (10 band i)
+i := wraparound bnot i + (10 band i)
 ; @ c test-binary-expression-24
 var Int{1:100} x(copy 1)
 io := (60 div x) + (600 mod x)
@@ -792,6 +802,18 @@ j := j clamp* i
 j := j clamp* j
 ; @ c test-binary-expression-28
 b := i >= i or i < j or j > j or bt <= j
+; @ c test-binary-expression-29
+var Int{10:100} x(copy 50)
+var Int{1000} y
+var Uint64 z
+i := x wraparound+ 1000
+i := y wraparound- 2000
+z := z wraparound* 2
+z := z wraparound+ j wraparound+ (x wraparound- z)
+; @ c test-binary-expression-30
+i wraparound+= i
+i wraparound-= i
+i wraparound*= i
 ; @ ec test-binary-expression-e0
 345 @ 2
 ; @ ec test-binary-expression-e1
@@ -876,6 +898,21 @@ i := 7 mod x
 ; @ ec test-binary-expression-e34
 var Uint64 u64
 b := j < u64
+; @ ec test-binary-expression-e35
+var Int{10} x
+i := x wraparound+ 100
+; @ ec test-binary-expression-e36
+var Int{200:220} x(copy 210)
+i := x wraparound- 100
+; @ ec test-binary-expression-e37
+var Uint8 x
+i := x wraparound* 1
+; @ ec test-binary-expression-e38
+var Int{1:255} x
+x wraparound+= 1
+; @ ec test-binary-expression-e39
+var Int{254} x
+x wraparound-= 1
 ; @@ test-swap-expression
 ; @ c test-swap-expression-0
 new Test t1!
@@ -1164,7 +1201,7 @@ var Int{Nums.MIN - 12:MAX * 2} s16
 struct Test
     var Uint32 x
 func fun(user Test t)->(var Uint32 x)
-    x := clamp fun(user t) + t.x
+    x := wraparound fun(user t) + t.x
 ; @ c test-int-range-3
 var Uint8 u8
 var Sint16 s16(copy -1000)
@@ -1195,7 +1232,7 @@ i := j
 j := i
 ; @ ec test-int-range-e9
 var Uint64 x
-x := clamp x + 1
+x := wraparound x + 1
 ; @@ test-dynamic
 ; @ c test-dynamic-0
 var Ta a
@@ -2575,7 +2612,7 @@ for n in 5
     i := n
 ; @ c test-for-loop-1
 for n in t!.num:ostr!.length() + 2
-    i := clamp n
+    i := wraparound n
 ; @ c test-for-loop-2
 for ch in ostr!
     c := ch
@@ -2945,7 +2982,7 @@ func call()
     user Array?{Uint32} a
     user Test? t
     i := external(copy 5, user s, user a, user t)
-    i := clamp (2 * external(copy 5, user s, user a, user t)) + 3
+    i := wraparound (2 * external(copy 5, user s, user a, user t)) + 3
     external(copy 5, user s, user a, user t)
 ; @ g test-native-f2
 native func external() "SOME_External_func"
@@ -2971,7 +3008,7 @@ func use()
 native const Int VALUE
 native const Byte BYTE
 func get()->(var Uint32 x)
-    x := clamp VALUE + BYTE
+    x := wraparound VALUE + BYTE
 ; @ g test-native-c1
 native const Int VALUE "SOME_External_const"
 func get()->(var Uint32 x)
@@ -4128,12 +4165,12 @@ func fun(owner String? s)->(owner String? s2)
 struct Test
     var Uint32 x
 func ! fun(owner Test? t)->(var Uint32 x)
-    x := clamp fun(owner t)! + t!.x
+    x := wraparound fun(owner t)! + t!.x
 ; @ eg test-memory-owner-e22
 struct Test
     var Uint32 x
 func ! fun(owner Test? t)->(var Uint32 x)
-    x := clamp t!.x + fun(owner t)!
+    x := wraparound t!.x + fun(owner t)!
 ; @ eg test-memory-owner-e23
 func ! fun(owner String s)->(var Uint32 x)
     for _ in fun(owner s)!:s.length()

@@ -42,7 +42,7 @@ enum Precedence
     RELATIONAL
     NOT
     LOGICAL
-    CLAMP
+    LIMIT
     ASSIGN
 
 
@@ -213,6 +213,27 @@ struct Global
                 copy _,
                 copy clamped-operator-factory)
         self.add-operator(
+                user "wraparound+",
+                user "+",
+                copy Precedence.ARITHMETIC,
+                copy 0,
+                copy _,
+                copy wraparound-addition-operator-factory)
+        self.add-operator(
+                user "wraparound-",
+                user "-",
+                copy Precedence.ARITHMETIC,
+                copy 0,
+                copy _,
+                copy wraparound-subtraction-operator-factory)
+        self.add-operator(
+                user "wraparound*",
+                user "*",
+                copy Precedence.ARITHMETIC,
+                copy 1,
+                copy _,
+                copy wraparound-multiplication-operator-factory)
+        self.add-operator(
                 user "bor",
                 user "|",
                 copy Precedence.ARITHMETIC,
@@ -322,9 +343,15 @@ struct Global
                 copy logical-operator-factory)
         self.add-operator-copy(
                 user "clamp",
-                copy Precedence.CLAMP,
+                copy Precedence.LIMIT,
                 copy 0,
                 copy clamp-operator-factory,
+                copy _)
+        self.add-operator-copy(
+                user "wraparound",
+                copy Precedence.LIMIT,
+                copy 1,
+                copy wraparound-operator-factory,
                 copy _)
         self.add-operator(
                 user ":=",
@@ -344,23 +371,44 @@ struct Global
                 user "clamp+=",
                 user "= CLAMPED_ADD",
                 copy Precedence.ASSIGN,
-                copy 1,
+                copy 4,
                 copy _,
-                copy arithmetic-assign-operator-factory)
+                copy clamped-assign-operator-factory)
         self.add-operator(
                 user "clamp-=",
                 user "= CLAMPED_SUB",
                 copy Precedence.ASSIGN,
-                copy 2,
+                copy 5,
                 copy _,
-                copy arithmetic-assign-operator-factory)
+                copy clamped-assign-operator-factory)
         self.add-operator(
                 user "clamp*=",
                 user "= CLAMPED_MUL",
                 copy Precedence.ASSIGN,
-                copy 3,
+                copy 6,
                 copy _,
-                copy arithmetic-assign-operator-factory)
+                copy clamped-assign-operator-factory)
+        self.add-operator(
+                user "wraparound+=",
+                user "+=",
+                copy Precedence.ASSIGN,
+                copy 7,
+                copy _,
+                copy wraparound-assign-operator-factory)
+        self.add-operator(
+                user "wraparound-=",
+                user "-=",
+                copy Precedence.ASSIGN,
+                copy 8,
+                copy _,
+                copy wraparound-assign-operator-factory)
+        self.add-operator(
+                user "wraparound*=",
+                user "*=",
+                copy Precedence.ASSIGN,
+                copy 9,
+                copy _,
+                copy wraparound-assign-operator-factory)
         self.add-operator(
                 user ":=:",
                 user "swap",

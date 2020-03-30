@@ -1380,7 +1380,7 @@ uint32_t* a = NULL;
     aux_Array_4 = a + 0;
     aux_Array_4_Length = 0x01;
     if (ut_M_i >= 0x01) RAISE(4, LUMI_block0_cleanup, slice_index)
-    ut_M_i = ((((uint64_t)((aux_Array_1)[x]) + ((aux_Array_3)[y])) + ((aux_Array_4)[ut_M_i])) > UINT32_MAX)? UINT32_MAX: (((uint64_t)((aux_Array_1)[x]) + ((aux_Array_3)[y])) + ((aux_Array_4)[ut_M_i]));
+    ut_M_i = ((uint64_t)((aux_Array_1)[x]) + ((aux_Array_3)[y])) + ((aux_Array_4)[ut_M_i]);
     INIT_NEW_ARRAY(6, LUMI_block0_cleanup, aa, uint32_t, length, 1);
     xx = 0x0a;
     aux_Array_5 = aa + xx;
@@ -1783,7 +1783,7 @@ uint8_t u8 = 0;
     uint32_t aux_Int_3 = 0;
     uint32_t aux_Int_4 = 0;
     ut_M_fun5(0, &(aux_Int_0));
-    u8 = (aux_Int_0 > 0xff)? 0xff: aux_Int_0;
+    u8 = aux_Int_0;
     ut_M_fun5(0x01, &(aux_Int_1));
     s8 = (aux_Int_1 > 0x7f)? 0x7f: aux_Int_1;
     ut_M_fun5(0x32, &(u32));
@@ -1980,7 +1980,7 @@ ut_M_i = 0x02 + (0x7b);
 /// @ test-block-expression-1
 ut_M_i = 0x7b;
 /// @ test-block-expression-2
-ut_M_i = (((0x7b * ((uint64_t)ut_M_i - 0x04)) + 0x02) < 0)? 0: ((((0x7b * ((uint64_t)ut_M_i - 0x04)) + 0x02) > UINT32_MAX)? UINT32_MAX: ((0x7b * ((uint64_t)ut_M_i - 0x04)) + 0x02));
+ut_M_i = (0x7b * ((uint64_t)ut_M_i - 0x04)) + 0x02;
 /// @ test-block-expression-3
 expected ")", got "new-line"
 /// @@ test-unary-expression
@@ -2060,6 +2060,26 @@ LUMI_block2_cleanup:
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ test-unary-expression-15
+ut_M_i = (uint64_t)ut_M_i + 0x01;
+/// @ test-unary-expression-16
+ut_M_Tb* ttb = NULL;
+    ut_M_Tb_Dynamic* ttb_Dynamic = &ut_M_Tb_dynamic;
+    ut_M_Tb* aux_Tb_0 = NULL;
+    ut_M_Tb_Dynamic* aux_Tb_0_Dynamic = &ut_M_Tb_dynamic;
+    ut_M_fun4((uint64_t)ut_M_i + 0x01);
+    INIT_NEW(2, LUMI_block0_cleanup, ttb, ut_M_Tb, 1);
+    LUMI_err = ut_M_Tb_new(ttb, ttb_Dynamic, (uint64_t)ut_M_i + 0x01);
+    CHECK(2, LUMI_block0_cleanup)
+    INIT_NEW(3, LUMI_block0_cleanup, aux_Tb_0, ut_M_Tb, 1);
+    LUMI_err = ut_M_Tb_new(aux_Tb_0, aux_Tb_0_Dynamic, (uint64_t)ut_M_i + 0x01);
+    CHECK(3, LUMI_block0_cleanup)
+    if (ttb_Dynamic != NULL) ttb_Dynamic->_base._del(ttb, ttb_Dynamic);
+    free(ttb);
+    ttb_Dynamic = aux_Tb_0_Dynamic;
+    ttb = aux_Tb_0;
+    aux_Tb_0 = NULL;
+    aux_Tb_0_Dynamic = NULL;
 /// @ test-unary-expression-e0
 expected expression, got "{"
 /// @ test-unary-expression-e1
@@ -2090,6 +2110,10 @@ using "?" where error is propagated
 misplaced use of "clamp"
 /// @ test-unary-expression-e14
 misplaced use of "clamp"
+/// @ test-unary-expression-e15
+misplaced use of "wraparound"
+/// @ test-unary-expression-e16
+unnecessary use of "wraparound"
 /// @@ test-binary-expression
 /// @ test-binary-expression-0
 ut_M_i = 0x17 + 0x36;
@@ -2166,7 +2190,7 @@ uint8_t i8 = 0;
     uint64_t i64 = 0;
     i8 = 0x04;
     i64 = 0x174876e800;
-    ut_M_i = CLAMPED_ADD_UU((CLAMPED_ADD_UU(((uint32_t)(~ ut_M_i)), ((uint8_t)(~ i8)), 0, UINT32_MAX)), ((uint64_t)(~ i64)), 0, UINT32_MAX);
+    ut_M_i = (uint32_t)((uint32_t)(((uint32_t)(~ ut_M_i)) + ((uint8_t)(~ i8))) + ((uint64_t)(~ i64)));
 /// @ test-binary-expression-20
 ut_M_i = ut_M_i ^ 0x10;
 /// @ test-binary-expression-21
@@ -2174,7 +2198,7 @@ ut_M_i = 0x02 >> ut_M_i;
 /// @ test-binary-expression-22
 ut_M_i = ut_M_i << 0x01;
 /// @ test-binary-expression-23
-ut_M_i = (((uint64_t)((uint32_t)(~ ut_M_i)) + (0x0a & ut_M_i)) > UINT32_MAX)? UINT32_MAX: ((uint64_t)((uint32_t)(~ ut_M_i)) + (0x0a & ut_M_i));
+ut_M_i = (uint64_t)((uint32_t)(~ ut_M_i)) + (0x0a & ut_M_i);
 /// @ test-binary-expression-24
 uint8_t x = 0;
     x = 0x01;
@@ -2196,6 +2220,19 @@ ut_M_i = CLAMPED_MUL_UU(ut_M_i, ut_M_i, 0, UINT32_MAX);
     ut_M_j = CLAMPED_MUL_SS(ut_M_j, ut_M_j, -INT32_MAX, INT32_MAX);
 /// @ test-binary-expression-28
 ut_M_b = (((ut_M_i >= ut_M_i) || ((int64_t)ut_M_i < (int64_t)ut_M_j)) || ((int32_t)ut_M_j > (int32_t)ut_M_j)) || ((int32_t)ut_M_bt <= (int32_t)ut_M_j);
+/// @ test-binary-expression-29
+uint8_t x = 0;
+    uint16_t y = 0;
+    uint64_t z = 0;
+    x = 0x32;
+    ut_M_i = (uint8_t)(x + 0x03e8);
+    ut_M_i = (uint16_t)(y - 0x07d0);
+    z = (uint64_t)(z * 0x02);
+    z = (uint64_t)((uint64_t)(z + ut_M_j) + ((uint8_t)(x - z)));
+/// @ test-binary-expression-30
+ut_M_i += ut_M_i;
+    ut_M_i -= ut_M_i;
+    ut_M_i *= ut_M_i;
 /// @ test-binary-expression-e0
 unknown operator "@"
 /// @ test-binary-expression-e1
@@ -2249,23 +2286,33 @@ dividing by zero
 /// @ test-binary-expression-e25
 dividing by zero
 /// @ test-binary-expression-e26
-bitwize operation on signed integer with minimum value of "-0x0a"
+unsigned operation on signed integer with minimum value of "-0x0a"
 /// @ test-binary-expression-e27
-bitwize operation on signed integer with minimum value of "-0x0a"
+unsigned operation on signed integer with minimum value of "-0x0a"
 /// @ test-binary-expression-e28
-bitwize operation on signed integer with minimum value of "-0x0a"
+unsigned operation on signed integer with minimum value of "-0x0a"
 /// @ test-binary-expression-e29
-bitwize operation on signed integer with minimum value of "-0x0a"
+unsigned operation on signed integer with minimum value of "-0x0a"
 /// @ test-binary-expression-e30
-bitwize operation on signed integer with minimum value of "-0x0a"
+unsigned operation on signed integer with minimum value of "-0x0a"
 /// @ test-binary-expression-e31
-bitwize operation on signed integer with minimum value of "-0x0a"
+unsigned operation on signed integer with minimum value of "-0x0a"
 /// @ test-binary-expression-e32
-division operation on signed integer with minimum value of "-0x0a"
+unsigned operation on signed integer with minimum value of "-0x0a"
 /// @ test-binary-expression-e33
-division operation on signed integer with minimum value of "-0x0a"
+unsigned operation on signed integer with minimum value of "-0x0a"
 /// @ test-binary-expression-e34
 too high signed integer maximum "0xffffffffffffffff"
+/// @ test-binary-expression-e35
+unnecessary wraparound with "+"
+/// @ test-binary-expression-e36
+unnecessary wraparound with "-"
+/// @ test-binary-expression-e37
+unnecessary wraparound with "*"
+/// @ test-binary-expression-e38
+assigning integer with minimum of "0x00" into integer with larger minimum of "0x01"
+/// @ test-binary-expression-e39
+assigning integer with maximum of "0xff" into integer with smaller maximum of "0xfe"
 /// @@ test-swap-expression
 /// @ test-swap-expression-0
 ut_M_Test* t1 = NULL;
@@ -2872,7 +2919,7 @@ void ut_M_fun(ut_M_Test* t, uint32_t* x) {
     unsigned LUMI_loop_depth = 1;
     uint32_t aux_Int_0 = 0;
     ut_M_fun(t, &(aux_Int_0));
-    *x = (((uint64_t)aux_Int_0 + t->x) > UINT32_MAX)? UINT32_MAX: ((uint64_t)aux_Int_0 + t->x);
+    *x = (uint64_t)aux_Int_0 + t->x;
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -5985,7 +6032,7 @@ uint32_t aux_Int_0 = 0;
         if (!(aux_Int_2 < aux_Int_1)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
         n = aux_Int_2;
         aux_Int_2 += 0x01;
-        ut_M_i = (n > UINT32_MAX)? UINT32_MAX: n;
+        ut_M_i = n;
     LUMI_block1_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
@@ -7248,7 +7295,7 @@ void ut_M_call(void) {
     ut_M_Test* t = NULL;
     ut_M_Test_Dynamic* t_Dynamic = NULL;
     i = external(0x05, s, a, (void*)t);
-    i = ((((uint64_t)0x02 * external(0x05, s, a, (void*)t)) + 0x03) > UINT32_MAX)? UINT32_MAX: (((uint64_t)0x02 * external(0x05, s, a, (void*)t)) + 0x03);
+    i = ((uint64_t)0x02 * external(0x05, s, a, (void*)t)) + 0x03;
     external(0x05, s, a, (void*)t);
 LUMI_block0_cleanup:
     (void)0;
@@ -7300,7 +7347,7 @@ LUMI_block0_cleanup:
 void ut_M_get(uint32_t* x);
 void ut_M_get(uint32_t* x) {
     unsigned LUMI_loop_depth = 1;
-    *x = (((uint64_t)VALUE + BYTE) > UINT32_MAX)? UINT32_MAX: ((uint64_t)VALUE + BYTE);
+    *x = (uint64_t)VALUE + BYTE;
 LUMI_block0_cleanup:
     (void)0;
 }

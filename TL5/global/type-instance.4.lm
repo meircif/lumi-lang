@@ -50,7 +50,8 @@ struct IntRange
             node.syntax-error-msg(user "integer range is not constant")
         constant-value.copy()->(owner value)
 
-    func set-sign-and-bits(user SyntaxTreeNode node)
+    func set-sign-and-bits(user SyntaxTreeNode node)->(var Bool legal)
+        legal := false
         if long-larger(user self.min-value, user self.max-value)
             node.syntax-error-long2(
                     user "integer range minimum",
@@ -65,11 +66,15 @@ struct IntRange
         if self.is-signed
             limit.parse(user "9223372036854775807")
             if long-larger(user self.max-value, user limit)
+                if not node?
+                    return
                 node.syntax-error-long(
                         user "too high signed integer maximum",
                         user self.max-value)
             limit.parse(user "-9223372036854775808")
             if long-larger(user limit, user self.min-value)
+                if not node?
+                    return
                 node.syntax-error-long(
                         user "too low signed integer minimum",
                         user self.min-value)
@@ -96,6 +101,8 @@ struct IntRange
         else
             limit.parse(user "18446744073709551615")
             if long-larger(user self.max-value, user limit)
+                if not node?
+                    return
                 node.syntax-error-long(
                         user "too high unsigned integer maximum",
                         user self.max-value)
@@ -110,6 +117,7 @@ struct IntRange
                 self.bits := 32
             else
                 self.bits := 64
+        legal := true
     
     func size-as(user IntRange other)->(var Bool same)
         same := self.is-signed = other.is-signed and self.bits = other.bits

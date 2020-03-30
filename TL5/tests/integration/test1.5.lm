@@ -724,15 +724,42 @@ test test-operations()
     assert! s64h clamp* min = -10000000000
     assert! s64l clamp* sax = -10000000000
     assert! s64l clamp* min = 10000000000
-    var Uint32 l(copy 3000000000)
-    assert! l + l = 6000000000
-    assert! s64l < s64h clamp* u64l
     s64l clamp+= max
     u64l clamp-= sax
     u64h clamp*= min
     assert! s64l = 10000000000
     assert! u64l = 100
     assert! u64h = 100
+    ; wraparound arithmetic
+    assert! i wraparound+ i = 10
+    assert! i wraparound+ j = 9
+    assert! i wraparound- i = 0
+    assert! i wraparound- j = 1
+    assert! i wraparound* i = 25
+    assert! i wraparound* j = 20
+    var Uint8 u8(copy 0xf0)
+    var Uint16 u16(copy 0xfff0)
+    var Uint32 u32(copy 0xfffffff0)
+    var Uint64 u64(copy 0xfffffffffffffff0)
+    assert! u8 wraparound+ 20 = 4
+    assert! u16 wraparound+ 20 = 4
+    assert! u32 wraparound+ 20 = 4
+    assert! u64 wraparound+ 20 = 4
+    u8 wraparound+= 20
+    u16 wraparound+= 20
+    u32 wraparound+= 20
+    u64 wraparound+= 20
+    assert! u8 = 4
+    assert! u16 = 4
+    assert! u32 = 4
+    assert! u64 = 4
+    ; C problems fix
+    var Uint32 l(copy 3000000000)
+    assert! l + l = 6000000000
+    s64l := -1000
+    s64h := 1000
+    u64l := 1000
+    assert! s64l < s64h clamp* u64l
     ; binary
     var Uint8 c(copy 0xF0)
     assert! c band 0x31 = 0x30

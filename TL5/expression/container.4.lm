@@ -96,6 +96,23 @@ class UnaryExpression(Expression)
                     user expected-type.name,
                     user "operand, got",
                     user operand.result-type.type-data.name)
+    
+    func inst set-uint-type(user Expression operand)
+        var String{8} uint-name(user "Uint")
+        var Int bits(copy operand.result-type.int-range.bits)
+        if bits >= 10
+            uint-name.append(copy '0' + (bits div 10))
+        uint-name.append(copy '0' + (bits mod 10))
+        self.set-simple-type(user glob.type-int)
+        string-new-copy(user uint-name)->(owner self.result-type.name)
+        self.result-type.set-int-range()
+
+    func inst check-not-signed(user Expression operand)
+        if operand.result-type.int-range.is-signed
+            self.syntax-error-long(
+                    user "unsigned operation on signed integer with minimum \
+                    value of",
+                    user operand.result-type.int-range.min-value)
 
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
         self.right-expression.order-constants(user ordered-list)
