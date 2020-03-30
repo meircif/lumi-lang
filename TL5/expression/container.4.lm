@@ -74,6 +74,9 @@ class UnaryExpression(Expression)
                 user _, user ends, user self.code-node, user self.operator)->(
                 owner self.right-expression, user next-operator)
 
+    func dynamic get-first-operand()->(user Expression operand)
+        operand := self.right-expression
+
     func dynamic analyze()
         self.analyze-operand()->(owner self.right-expression)
         self.right-expression.check-no-error()
@@ -161,6 +164,9 @@ class BinaryExpression(UnaryExpression)
         expression.left-expression := left-expression
         expression.binary-left-expression := binary-left-expression
         expression.parse(user ends)->(user next-operator)
+
+    func dynamic get-first-operand()->(user Expression operand)
+        operand := self.left-expression
 
     func dynamic analyze()
         self.analyze-operand()->(owner self.left-expression)

@@ -814,6 +814,16 @@ z := z wraparound+ j wraparound+ (x wraparound- z)
 i wraparound+= i
 i wraparound-= i
 i wraparound*= i
+; @ c test-binary-expression-31
+var Sint64 x
+var Uint64 y
+i := wraparound x +! j
+i := wraparound x -! j
+i := wraparound x *! j
+y := y +! 3
+i := wraparound x -! 3
+if-error x := x +? 3
+    x := 0
 ; @ ec test-binary-expression-e0
 345 @ 2
 ; @ ec test-binary-expression-e1
@@ -913,6 +923,21 @@ x wraparound+= 1
 ; @ ec test-binary-expression-e39
 var Int{254} x
 x wraparound-= 1
+; @ ec test-binary-expression-e40
+var Uint64 x
+x := x +? j
+; @ ec test-binary-expression-e41
+var Uint64 x
+if-error x := x +! j
+    x := 0
+; @ eg test-binary-expression-e42
+func error(copy Sint32 j)
+    var Uint64 x
+    x := x +! j
+; @ ec test-binary-expression-e43
+i := wraparound i +! 3
+; @ ec test-binary-expression-e44
+i := wraparound i +? 3
 ; @@ test-swap-expression
 ; @ c test-swap-expression-0
 new Test t1!

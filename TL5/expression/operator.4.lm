@@ -108,21 +108,66 @@ func negation-operator-factory(
     expression := NegationOperatorExpression(user code-node, user operator)
 
 
-~~~ clamp ~~~
-class ClampOperatorExpression(UnaryExpression)
+class LimitCheck
+    user UnaryExpression expression
     var Bool is-check
     var Bool check-min
     var Bool check-max
     
-    new(
-            user SyntaxTreeCode code-node,
-            user Operator operator,
-            copy Bool is-check,
-            copy Bool error-expected)
+    new(user UnaryExpression expression)
+        self.expression := expression
+        self.expression.error-expected := glob.last-char = '!'
+        self.expression.error-propagated := self.expression.error-expected
+        self.is-check := self.expression.error-expected or glob.last-char = '?'
+        if self.is-check
+            read-c()
+    
+    func inst no-checks()->(var Bool no-checks)
+        no-checks := not self.check-min and not self.check-max
+    
+    func inst analyze()
+        if self.expression.error-propagated
+            self.expression.check-error-propagated(user _)
+        else-if self.is-check
+            if self.expression.code-node.set-has-error()
+                self.expression.syntax-error-msg(
+                        user "using \"?\" where error is propagated")
+
+    func inst write-preactions()
+        if not self.is-check
+            return
+        ; if (`min check` || `max check`) RAISE(`integer_overflow`)
+        write(user "if (")
+        if self.check-min
+            self.write-min-check()
+        if self.check-max
+            if self.check-min
+                write(user " || ")
+            self.write-max-check()
+        write(user ") ")
+        self.expression.code-node.write-raise(user "integer_overflow")
+        self.expression.code-node.write-spaces()
+    
+    func dynamic write-min-check()
+        ; `exp` < `min`
+        self.expression.get-first-operand().write-safe()
+        write(user " < ")
+        write-long(user self.expression.result-type.int-range.min-value)
+    
+    func dynamic write-max-check()
+        ; `exp` > `max`
+        self.expression.get-first-operand().write-safe()
+        write(user " > ")
+        write-long(user self.expression.result-type.int-range.max-value)
+
+
+~~~ clamp ~~~
+class ClampOperatorExpression(UnaryExpression)
+    var LimitCheck check
+    
+    new(user SyntaxTreeCode code-node, user Operator operator)
+        self.check.new(user self)
         base(user code-node, user operator)
-        self.is-check := is-check
-        self.error-expected := error-expected
-        self.error-propagated := error-expected
     
     func dynamic analyze()
         if not self.result-type?
@@ -132,54 +177,33 @@ class ClampOperatorExpression(UnaryExpression)
         user IntRange source(user self.right-expression.result-type.int-range)
         user IntRange target(user self.result-type.int-range)
         long-larger(user target.min-value, user source.min-value)->(
-                var self.check-min)
+                var self.check.check-min)
         long-larger(user source.max-value, user target.max-value)->(
-                var self.check-max)
-        if not self.check-min and not self.check-max
+                var self.check.check-max)
+        if self.check.no-checks()
             self.syntax-error(user "unnecessary use of", user "clamp")
         self.result-type.type-data := glob.type-int
-        if self.error-propagated
-            self.check-error-propagated(user _)
-        else-if self.is-check
-            if self.code-node.set-has-error()
-                self.syntax-error-msg(
-                        user "using \"?\" where error is propagated")
+        self.check.analyze()
 
     func dynamic write-preactions()
         base()
-        if not self.is-check
-            return
-        ; if (`exp` < `min` || `exp` > `max`) RAISE(`integer_overflow`)
-        write(user "if (")
-        if self.check-min
-            self.right-expression.write-safe()
-            write(user " < ")
-            write-long(user self.result-type.int-range.min-value)
-        if self.check-max
-            if self.check-min
-                write(user " || ")
-            self.right-expression.write-safe()
-            write(user " > ")
-            write-long(user self.result-type.int-range.max-value)
-        write(user ") ")
-        self.code-node.write-raise(user "integer_overflow")
-        self.code-node.write-spaces()
+        self.check.write-preactions()
 
     func dynamic write()
-        if self.is-check
+        if self.check.is-check
             self.right-expression.write()
             return
         ; (`exp` < `min`)? `min`: ((`exp` > `max`)? `max`: `exp`)
-        if self.check-min
+        if self.check.check-min
             self.write-clamp(
                     user " < ", user self.result-type.int-range.min-value)
-        if self.check-max
-            if self.check-min
+        if self.check.check-max
+            if self.check.check-min
                 write(user "(")
             self.write-clamp(
                     user " > ", user self.result-type.int-range.max-value)
         self.right-expression.write-safe()
-        if self.check-min and self.check-max
+        if self.check.check-min and self.check.check-max
             write(user ")")
     
     func inst write-clamp(user String compare, user Long value)
@@ -194,12 +218,7 @@ class ClampOperatorExpression(UnaryExpression)
 func clamp-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
         owner UnaryExpression expression)
-    var Bool error-expected(copy glob.last-char = '!')
-    var Bool is-check(copy glob.last-char = '?' or error-expected)
-    if is-check
-        read-c()
-    expression := ClampOperatorExpression(
-            user code-node, user operator, copy is-check, copy error-expected)
+    expression := ClampOperatorExpression(user code-node, user operator)
 
 ~~~ wraparound ~~~
 class WraparoundOperatorExpression(UnaryExpression)
@@ -254,19 +273,73 @@ func shift-operator-factory(
     expression := ShiftOperatorExpression(user code-node, user operator)
         
         
+class ArithmeticLimitCheck(LimitCheck)
+    func dynamic write-min-check()
+        self.write-check(user "MIN_", user ")")
+
+    func dynamic write-max-check()
+        if self.expression.result-type.int-range.is-signed
+            self.write-check(user "MAX_", user ", INT64_MAX)")
+        else
+            self.write-check(user "MAX_", user ", UINT64_MAX)")
+        
+    func inst write-check(user String kind, user String end)
+        write(user "CHECK_")
+        write(user kind)
+        var Char operator(copy self.expression.operator.name[0])
+        if operator = '+'
+            write(user "ADD(")
+        else-if operator = '-'
+            write(user "SUB(")
+        else-if operator = '*'
+            write(user "MUL(")
+        self.expression.get-first-operand().write-safe()
+        write(user ", ")
+        self.expression.right-expression.write-safe()
+        write(user end)
+
+
 class ArithmeticOperatorExpression(BinaryExpression)
+    var ArithmeticLimitCheck check
+    
+    new(user SyntaxTreeCode code-node, user Operator operator)
+        self.check.new(user self)
+        base(user code-node, user operator)
+    
     func dynamic analyze()
         base()
         self.test-operands-type(user glob.type-int)
         self.set-simple-type(user glob.type-int)
-        self.result-type.int-range := IntRange()
+        new IntRange int-range
         self.set-range(
-                user self.result-type.int-range,
+                user int-range,
                 user self.left-expression.result-type.int-range.min-value,
                 user self.left-expression.result-type.int-range.max-value,
                 user self.right-expression.result-type.int-range.min-value,
                 user self.right-expression.result-type.int-range.max-value)
-        self.result-type.int-range.set-sign-and-bits(user self)
+        if self.check.is-check
+            var Long limit
+            if int-range.min-value.sign() < 0
+                limit.parse(user "-9223372036854775808")
+                if long-larger(user limit, user int-range.min-value)->(
+                        var self.check.check-min)
+                    limit.copy()->(owner int-range.min-value)
+                limit.parse(user "9223372036854775807")
+                if long-larger(user int-range.max-value, user limit)->(
+                        var self.check.check-max)
+                    limit.copy()->(owner int-range.max-value)
+            else
+                limit.parse(user "18446744073709551615")
+                if long-larger(user int-range.max-value, user limit)->(
+                        var self.check.check-max)
+                    limit.copy()->(owner int-range.max-value)
+            if self.check.no-checks()
+                self.check-no-error()
+                self.syntax-error-msg(
+                        user "using \"?\" where there is no error")
+        int-range.set-sign-and-bits(user self)
+        self.result-type.int-range := int-range
+        self.check.analyze()
     
     func dynamic set-range(
             user IntRange int-range,
@@ -275,7 +348,11 @@ class ArithmeticOperatorExpression(BinaryExpression)
             user Long right-min,
             user Long right-max)
         raise
-
+    
+    func dynamic write-preactions()
+        base()
+        self.check.write-preactions()
+    
     func dynamic write()
         if (self.result-type.int-range.bits >
                 self.left-expression.result-type.int-range.bits and

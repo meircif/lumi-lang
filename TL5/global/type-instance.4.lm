@@ -52,12 +52,13 @@ struct IntRange
 
     func set-sign-and-bits(user SyntaxTreeNode node)->(var Bool legal)
         legal := false
-        if long-larger(user self.min-value, user self.max-value)
-            node.syntax-error-long2(
-                    user "integer range minimum",
-                    user self.min-value,
-                    user "larger than maximum",
-                    user self.max-value)
+        if node?
+            if long-larger(user self.min-value, user self.max-value)
+                node.syntax-error-long2(
+                        user "integer range minimum",
+                        user self.min-value,
+                        user "larger than maximum",
+                        user self.max-value)
         var Long limit
         var Long max8
         var Long max16

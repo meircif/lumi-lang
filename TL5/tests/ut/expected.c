@@ -2233,6 +2233,32 @@ uint8_t x = 0;
 ut_M_i += ut_M_i;
     ut_M_i -= ut_M_i;
     ut_M_i *= ut_M_i;
+/// @ test-binary-expression-31
+int64_t x = 0;
+    uint64_t y = 0;
+    if (CHECK_MIN_ADD(x, ut_M_j) || CHECK_MAX_ADD(x, ut_M_j, INT64_MAX)) RAISE(3, LUMI_block0_cleanup, integer_overflow)
+    ut_M_i = x + ut_M_j;
+    if (CHECK_MIN_SUB(x, ut_M_j) || CHECK_MAX_SUB(x, ut_M_j, INT64_MAX)) RAISE(4, LUMI_block0_cleanup, integer_overflow)
+    ut_M_i = x - ut_M_j;
+    if (CHECK_MIN_MUL(x, ut_M_j) || CHECK_MAX_MUL(x, ut_M_j, INT64_MAX)) RAISE(5, LUMI_block0_cleanup, integer_overflow)
+    ut_M_i = x * ut_M_j;
+    if (CHECK_MAX_ADD(y, 0x03, UINT64_MAX)) RAISE(6, LUMI_block0_cleanup, integer_overflow)
+    y = y + 0x03;
+    if (CHECK_MIN_SUB(x, 0x03)) RAISE(7, LUMI_block0_cleanup, integer_overflow)
+    ut_M_i = x - 0x03;
+    ++LUMI_trace_ignore_count;
+    if (CHECK_MAX_ADD(x, 0x03, INT64_MAX)) RAISE(8, LUMI_block2_cleanup, integer_overflow)
+    x = x + 0x03;
+LUMI_block2_cleanup:
+    --LUMI_trace_ignore_count;
+    if (LUMI_err != OK) {
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+        x = 0;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ test-binary-expression-e0
 unknown operator "@"
 /// @ test-binary-expression-e1
@@ -2313,6 +2339,16 @@ unnecessary wraparound with "*"
 assigning integer with minimum of "0x00" into integer with larger minimum of "0x01"
 /// @ test-binary-expression-e39
 assigning integer with maximum of "0xff" into integer with smaller maximum of "0xfe"
+/// @ test-binary-expression-e40
+using "?" where error is propagated
+/// @ test-binary-expression-e41
+using "!" where error is not propagated
+/// @ test-binary-expression-e42
+error raised inside function not declared as error raising "error"
+/// @ test-binary-expression-e43
+using "!" where there is no error
+/// @ test-binary-expression-e44
+using "?" where there is no error
 /// @@ test-swap-expression
 /// @ test-swap-expression-0
 ut_M_Test* t1 = NULL;

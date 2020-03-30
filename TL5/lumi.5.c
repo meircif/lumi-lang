@@ -692,6 +692,18 @@ Return_Code Int_str(
   Int_str(value, false, str, str_max_length, str_length)
 #define Int_strS(value, str, str_max_length, str_length) \
   Int_str(value < 0? -value: value, value < 0, str, str_max_length, str_length)
+
+#define CHECK_MIN_ADD(a, b) ((a < 0) && (b < 0) && (-a > INT64_MAX + b))
+#define CHECK_MAX_ADD(a, b, limit) ((a > 0) && (b > 0) && (a > limit - b))
+
+#define CHECK_MIN_SUB(a, b) \
+  ((b > 0) && ((int64_t)a < (int64_t)(-INT64_MAX + b)))
+#define CHECK_MAX_SUB(a, b, limit) ((a > 0) && (b < 0) && (a > limit + b))
+
+#define CHECK_MIN_MUL(a, b) \
+  ((a < 0) && (b > INT64_MAX / (-a))) || ((b < 0) && (a > INT64_MAX / (-b)))
+#define CHECK_MAX_MUL(a, b, limit) \
+  ((a > 0) && (b > limit / a)) || ((b < 0) && (-a > limit / (-b)))
   
 #define CLAMPED_ADD_UU_LIMIT(a, b, max, LIMIT) \
   ((a > LIMIT - b) || (a + b > max))? max: (a + b)
