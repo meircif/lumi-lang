@@ -1370,9 +1370,9 @@ uint32_t* a = NULL;
     aux_Array_1 = (aux_Array_0) + y;
     aux_Array_1_Length = y + 0x01;
     if (x < 0 || x >= y + 0x01) RAISE(4, LUMI_block0_cleanup, slice_index)
-    if (SAFE_SUM_LARGER(ut_M_i, (ut_M_i + 0x01), ut_M_i)) RAISE(4, LUMI_block0_cleanup, slice_index)
+    if (SAFE_SUM_LARGER(ut_M_i, ((uint64_t)ut_M_i + 0x01), ut_M_i)) RAISE(4, LUMI_block0_cleanup, slice_index)
     aux_Array_2 = a + ut_M_i;
-    aux_Array_2_Length = ut_M_i + 0x01;
+    aux_Array_2_Length = (uint64_t)ut_M_i + 0x01;
     if ((y + 0x01) <= 0) RAISE(4, LUMI_block0_cleanup, slice_index)
     aux_Array_3 = (aux_Array_2) + 0;
     aux_Array_3_Length = y + 0x01;
@@ -1380,7 +1380,7 @@ uint32_t* a = NULL;
     aux_Array_4 = a + 0;
     aux_Array_4_Length = 0x01;
     if (ut_M_i >= 0x01) RAISE(4, LUMI_block0_cleanup, slice_index)
-    ut_M_i = (((((aux_Array_1)[x]) + ((aux_Array_3)[y])) + ((aux_Array_4)[ut_M_i])) > UINT32_MAX)? UINT32_MAX: ((((aux_Array_1)[x]) + ((aux_Array_3)[y])) + ((aux_Array_4)[ut_M_i]));
+    ut_M_i = ((((uint64_t)((aux_Array_1)[x]) + ((aux_Array_3)[y])) + ((aux_Array_4)[ut_M_i])) > UINT32_MAX)? UINT32_MAX: (((uint64_t)((aux_Array_1)[x]) + ((aux_Array_3)[y])) + ((aux_Array_4)[ut_M_i]));
     INIT_NEW_ARRAY(6, LUMI_block0_cleanup, aa, uint32_t, length, 1);
     xx = 0x0a;
     aux_Array_5 = aa + xx;
@@ -1407,7 +1407,7 @@ Char* aux_Array_0 = NULL;
     if (SAFE_SUM_LARGER(0x01, 0x03, *(ut_M_buff_Length))) RAISE(1, LUMI_block0_cleanup, slice_index)
     aux_Array_1 = ut_M_buff + 0x01;
     aux_Array_1_Length = 0x03;
-    ut_M_i = (((str[0x02]) + (ut_M_buff[0x02])) + ((aux_Array_0)[0x02])) + ((aux_Array_1)[0x02]);
+    ut_M_i = (((uint16_t)(str[0x02]) + (ut_M_buff[0x02])) + ((aux_Array_0)[0x02])) + ((aux_Array_1)[0x02]);
 /// @ test-slice-expression-e0
 expected "]", got "new-line"
 /// @ test-slice-expression-e1
@@ -1980,7 +1980,7 @@ ut_M_i = 0x02 + (0x7b);
 /// @ test-block-expression-1
 ut_M_i = 0x7b;
 /// @ test-block-expression-2
-ut_M_i = (((0x7b * (ut_M_i - 0x04)) + 0x02) < 0)? 0: ((((0x7b * (ut_M_i - 0x04)) + 0x02) > UINT32_MAX)? UINT32_MAX: ((0x7b * (ut_M_i - 0x04)) + 0x02));
+ut_M_i = (((0x7b * ((uint64_t)ut_M_i - 0x04)) + 0x02) < 0)? 0: ((((0x7b * ((uint64_t)ut_M_i - 0x04)) + 0x02) > UINT32_MAX)? UINT32_MAX: ((0x7b * ((uint64_t)ut_M_i - 0x04)) + 0x02));
 /// @ test-block-expression-3
 expected ")", got "new-line"
 /// @@ test-unary-expression
@@ -1995,7 +1995,7 @@ ut_M_b = ! ut_M_b;
 /// @ test-unary-expression-4
 ut_M_b = ! (ut_M_i > 0x03);
 /// @ test-unary-expression-5
-ut_M_i = ((ut_M_i + 0x01) > UINT32_MAX)? UINT32_MAX: (ut_M_i + 0x01);
+ut_M_i = (((uint64_t)ut_M_i + 0x01) > UINT32_MAX)? UINT32_MAX: ((uint64_t)ut_M_i + 0x01);
 /// @ test-unary-expression-6
 ut_M_j = ((ut_M_j - 0x01) < -INT32_MAX)? -INT32_MAX: (ut_M_j - 0x01);
 /// @ test-unary-expression-7
@@ -2003,18 +2003,18 @@ int8_t x = 0;
     x = (ut_M_j < -0x7f)? -0x7f: ((ut_M_j > 0x7f)? 0x7f: ut_M_j);
     x = (ut_M_j < -0x7f)? -0x7f: ((ut_M_j > 0x7f)? 0x7f: ut_M_j);
 /// @ test-unary-expression-8
-if ((ut_M_i + 0x01) > UINT32_MAX) RAISE(1, LUMI_block0_cleanup, integer_overflow)
-    ut_M_i = ut_M_i + 0x01;
+if (((uint64_t)ut_M_i + 0x01) > UINT32_MAX) RAISE(1, LUMI_block0_cleanup, integer_overflow)
+    ut_M_i = (uint64_t)ut_M_i + 0x01;
 /// @ test-unary-expression-9
 if ((ut_M_j - 0x01) < -INT32_MAX) RAISE(1, LUMI_block0_cleanup, integer_overflow)
     ut_M_j = ut_M_j - 0x01;
 /// @ test-unary-expression-10
-if ((ut_M_j * 0x02) < -INT32_MAX || (ut_M_j * 0x02) > INT32_MAX) RAISE(1, LUMI_block0_cleanup, integer_overflow)
-    ut_M_j = ut_M_j * 0x02;
+if (((int64_t)ut_M_j * 0x02) < -INT32_MAX || ((int64_t)ut_M_j * 0x02) > INT32_MAX) RAISE(1, LUMI_block0_cleanup, integer_overflow)
+    ut_M_j = (int64_t)ut_M_j * 0x02;
 /// @ test-unary-expression-11
 ++LUMI_trace_ignore_count;
-    if ((ut_M_i + 0x01) > UINT32_MAX) RAISE(1, LUMI_block2_cleanup, integer_overflow)
-    ut_M_i = ut_M_i + 0x01;
+    if (((uint64_t)ut_M_i + 0x01) > UINT32_MAX) RAISE(1, LUMI_block2_cleanup, integer_overflow)
+    ut_M_i = (uint64_t)ut_M_i + 0x01;
 LUMI_block2_cleanup:
     --LUMI_trace_ignore_count;
     if (LUMI_err != OK) {
@@ -2030,12 +2030,12 @@ ut_M_Tb* ttb = NULL;
     ut_M_Tb_Dynamic* ttb_Dynamic = &ut_M_Tb_dynamic;
     ut_M_Tb* aux_Tb_0 = NULL;
     ut_M_Tb_Dynamic* aux_Tb_0_Dynamic = &ut_M_Tb_dynamic;
-    ut_M_fun4(((ut_M_i + 0x01) > UINT32_MAX)? UINT32_MAX: (ut_M_i + 0x01));
+    ut_M_fun4((((uint64_t)ut_M_i + 0x01) > UINT32_MAX)? UINT32_MAX: ((uint64_t)ut_M_i + 0x01));
     INIT_NEW(2, LUMI_block0_cleanup, ttb, ut_M_Tb, 1);
-    LUMI_err = ut_M_Tb_new(ttb, ttb_Dynamic, ((ut_M_i + 0x01) > UINT32_MAX)? UINT32_MAX: (ut_M_i + 0x01));
+    LUMI_err = ut_M_Tb_new(ttb, ttb_Dynamic, (((uint64_t)ut_M_i + 0x01) > UINT32_MAX)? UINT32_MAX: ((uint64_t)ut_M_i + 0x01));
     CHECK(2, LUMI_block0_cleanup)
     INIT_NEW(3, LUMI_block0_cleanup, aux_Tb_0, ut_M_Tb, 1);
-    LUMI_err = ut_M_Tb_new(aux_Tb_0, aux_Tb_0_Dynamic, ((ut_M_i + 0x01) > UINT32_MAX)? UINT32_MAX: (ut_M_i + 0x01));
+    LUMI_err = ut_M_Tb_new(aux_Tb_0, aux_Tb_0_Dynamic, (((uint64_t)ut_M_i + 0x01) > UINT32_MAX)? UINT32_MAX: ((uint64_t)ut_M_i + 0x01));
     CHECK(3, LUMI_block0_cleanup)
     if (ttb_Dynamic != NULL) ttb_Dynamic->_base._del(ttb, ttb_Dynamic);
     free(ttb);
@@ -2044,12 +2044,12 @@ ut_M_Tb* ttb = NULL;
     aux_Tb_0 = NULL;
     aux_Tb_0_Dynamic = NULL;
 /// @ test-unary-expression-13
-if ((ut_M_i + 0x01) > UINT32_MAX) RAISE(1, LUMI_block0_cleanup, integer_overflow)
-    ut_M_fun4(ut_M_i + 0x01);
+if (((uint64_t)ut_M_i + 0x01) > UINT32_MAX) RAISE(1, LUMI_block0_cleanup, integer_overflow)
+    ut_M_fun4((uint64_t)ut_M_i + 0x01);
 /// @ test-unary-expression-14
 ++LUMI_trace_ignore_count;
-    if ((ut_M_i + 0x01) > UINT32_MAX) RAISE(1, LUMI_block2_cleanup, integer_overflow)
-    ut_M_fun4(ut_M_i + 0x01);
+    if (((uint64_t)ut_M_i + 0x01) > UINT32_MAX) RAISE(1, LUMI_block2_cleanup, integer_overflow)
+    ut_M_fun4((uint64_t)ut_M_i + 0x01);
 LUMI_block2_cleanup:
     --LUMI_trace_ignore_count;
     if (LUMI_err != OK) {
@@ -2105,7 +2105,7 @@ ut_M_b = (0x03 <= 0x05) && (0x17 >= 0x25);
 /// @ test-binary-expression-5
 ut_M_b = (ut_M_i == 0x05) || (ut_M_i != 0x25);
 /// @ test-binary-expression-6
-ut_M_b = ((0x02 < ut_M_i) && (ut_M_i < 0x0c)) && (0x0c == (-0x02 * ut_M_i));
+ut_M_b = ((0x02 < ut_M_i) && (ut_M_i < 0x0c)) && (0x0c == ((int64_t)-0x02 * ut_M_i));
 /// @ test-binary-expression-7
 LUMI_inc_ref(ut_M_tc_Refman);
     LUMI_dec_ref(ut_M_t_Refman);
@@ -2174,7 +2174,7 @@ ut_M_i = 0x02 >> ut_M_i;
 /// @ test-binary-expression-22
 ut_M_i = ut_M_i << 0x01;
 /// @ test-binary-expression-23
-ut_M_i = ((((uint32_t)(~ ut_M_i)) + (0x0a & ut_M_i)) > UINT32_MAX)? UINT32_MAX: (((uint32_t)(~ ut_M_i)) + (0x0a & ut_M_i));
+ut_M_i = (((uint64_t)((uint32_t)(~ ut_M_i)) + (0x0a & ut_M_i)) > UINT32_MAX)? UINT32_MAX: ((uint64_t)((uint32_t)(~ ut_M_i)) + (0x0a & ut_M_i));
 /// @ test-binary-expression-24
 uint8_t x = 0;
     x = 0x01;
@@ -2194,6 +2194,8 @@ ut_M_i = CLAMPED_MUL_UU(ut_M_i, ut_M_i, 0, UINT32_MAX);
     ut_M_i = CLAMPED_MUL_US(ut_M_i, ut_M_j, 0, UINT32_MAX);
     ut_M_j = CLAMPED_MUL_SU(ut_M_j, ut_M_i, -INT32_MAX, INT32_MAX);
     ut_M_j = CLAMPED_MUL_SS(ut_M_j, ut_M_j, -INT32_MAX, INT32_MAX);
+/// @ test-binary-expression-28
+ut_M_b = (((ut_M_i >= ut_M_i) || ((int64_t)ut_M_i < (int64_t)ut_M_j)) || ((int32_t)ut_M_j > (int32_t)ut_M_j)) || ((int32_t)ut_M_bt <= (int32_t)ut_M_j);
 /// @ test-binary-expression-e0
 unknown operator "@"
 /// @ test-binary-expression-e1
@@ -2262,6 +2264,8 @@ bitwize operation on signed integer with minimum value of "-0x0a"
 division operation on signed integer with minimum value of "-0x0a"
 /// @ test-binary-expression-e33
 division operation on signed integer with minimum value of "-0x0a"
+/// @ test-binary-expression-e34
+too high signed integer maximum "0xffffffffffffffff"
 /// @@ test-swap-expression
 /// @ test-swap-expression-0
 ut_M_Test* t1 = NULL;
@@ -2868,7 +2872,7 @@ void ut_M_fun(ut_M_Test* t, uint32_t* x) {
     unsigned LUMI_loop_depth = 1;
     uint32_t aux_Int_0 = 0;
     ut_M_fun(t, &(aux_Int_0));
-    *x = ((aux_Int_0 + t->x) > UINT32_MAX)? UINT32_MAX: (aux_Int_0 + t->x);
+    *x = (((uint64_t)aux_Int_0 + t->x) > UINT32_MAX)? UINT32_MAX: ((uint64_t)aux_Int_0 + t->x);
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -5877,7 +5881,7 @@ uint16_t aux_Int_0 = 0;
         ++LUMI_trace_ignore_count;
         CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
         String_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(aux_Int_0));
-        aux_Int_2 = aux_Int_0 + 0x02;
+        aux_Int_2 = (uint64_t)aux_Int_0 + 0x02;
         do {
             LUMI_loop_depth = 3;
             if (aux_Int_1 >= aux_Int_2) RAISE(2, LUMI_block2_cleanup, loop_limit)
@@ -5974,7 +5978,7 @@ uint32_t aux_Int_0 = 0;
     aux_Int_2 = ut_M_t->num;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     String_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(aux_Int_0));
-    aux_Int_1 = aux_Int_0 + 0x02;
+    aux_Int_1 = (uint64_t)aux_Int_0 + 0x02;
     do {
         uint64_t n = 0;
         LUMI_loop_depth = 3;
@@ -6420,10 +6424,10 @@ uint32_t aux_Int_0 = 0;
 /// @ test-for-loop-14
 int64_t aux_Int_0 = 0;
     uint32_t aux_Int_1 = 0;
-    aux_Int_0 = ut_M_i - 0x04;
+    aux_Int_0 = (uint64_t)ut_M_i - 0x04;
     do {
         LUMI_loop_depth = 3;
-        if (!(aux_Int_1 < aux_Int_0)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        if (!((int64_t)aux_Int_1 < (int64_t)aux_Int_0)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
         aux_Int_1 += 0x01;
         ut_M_i = 0x01;
     LUMI_block1_cleanup:
@@ -7244,7 +7248,7 @@ void ut_M_call(void) {
     ut_M_Test* t = NULL;
     ut_M_Test_Dynamic* t_Dynamic = NULL;
     i = external(0x05, s, a, (void*)t);
-    i = (((0x02 * external(0x05, s, a, (void*)t)) + 0x03) > UINT32_MAX)? UINT32_MAX: ((0x02 * external(0x05, s, a, (void*)t)) + 0x03);
+    i = ((((uint64_t)0x02 * external(0x05, s, a, (void*)t)) + 0x03) > UINT32_MAX)? UINT32_MAX: (((uint64_t)0x02 * external(0x05, s, a, (void*)t)) + 0x03);
     external(0x05, s, a, (void*)t);
 LUMI_block0_cleanup:
     (void)0;
@@ -7296,7 +7300,7 @@ LUMI_block0_cleanup:
 void ut_M_get(uint32_t* x);
 void ut_M_get(uint32_t* x) {
     unsigned LUMI_loop_depth = 1;
-    *x = ((VALUE + BYTE) > UINT32_MAX)? UINT32_MAX: (VALUE + BYTE);
+    *x = (((uint64_t)VALUE + BYTE) > UINT32_MAX)? UINT32_MAX: ((uint64_t)VALUE + BYTE);
 LUMI_block0_cleanup:
     (void)0;
 }

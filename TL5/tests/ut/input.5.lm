@@ -790,6 +790,8 @@ i := i clamp* i
 i := i clamp* j
 j := j clamp* i
 j := j clamp* j
+; @ c test-binary-expression-28
+b := i >= i or i < j or j > j or bt <= j
 ; @ ec test-binary-expression-e0
 345 @ 2
 ; @ ec test-binary-expression-e1
@@ -871,6 +873,9 @@ i := x div 6
 ; @ ec test-binary-expression-e33
 var Int{-10:10} x
 i := 7 mod x
+; @ ec test-binary-expression-e34
+var Uint64 u64
+b := j < u64
 ; @@ test-swap-expression
 ; @ c test-swap-expression-0
 new Test t1!

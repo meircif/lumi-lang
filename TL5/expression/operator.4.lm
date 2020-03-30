@@ -274,6 +274,20 @@ class ArithmeticOperatorExpression(BinaryExpression)
             user Long right-max)
         raise
 
+    func dynamic write()
+        if (self.result-type.int-range.bits >
+                self.left-expression.result-type.int-range.bits and
+                self.result-type.int-range.bits >
+                self.right-expression.result-type.int-range.bits)
+            self.write-int-cast-operand(
+                    user self.left-expression,
+                    copy self.left-expression.result-type.int-range.is-signed,
+                    copy self.result-type.int-range.bits)
+        else
+            self.write-operand(user self.left-expression)
+        write(user " ")
+        self.write-end()
+
 
 ~~~ + ~~~
 class AdditionOperatorExpression(ArithmeticOperatorExpression)
@@ -455,7 +469,6 @@ class ClampedArithmeticOperatorExpression(ArithmeticOperatorExpression)
             write-c(copy 'S')
         else
             write-c(copy 'U')
-        
 
 func clamped-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
@@ -463,11 +476,12 @@ func clamped-operator-factory(
     expression := ClampedArithmeticOperatorExpression(
             user code-node, user operator)
 
-~~~ > < >= <= ~~~
-class RelationalOperatorExpression(BinaryExpression)
+
+~~~ = != ~~~
+class EqualizerOperatorExpression(BinaryExpression)
     ~~~ expand-and: (a > b) > c --> (a > b) && (b > c) ~~~
     var Bool expand-and
-
+    
     func dynamic analyze()
         base()
         if self.binary-left-expression?
@@ -479,34 +493,61 @@ class RelationalOperatorExpression(BinaryExpression)
 
     func dynamic is-relational()->(var Bool is-relational)
         is-relational := true
-
+        
     func dynamic test-operand(user Expression operand)
-        self.test-operand-type(user operand, user glob.type-int)
+        self.test-is-reference(copy false, user operand)
 
     func dynamic write-end()
         if self.expand-and
             write(user "&& (")
-            self.binary-left-expression.right-expression.write()
+            self.write-operand(
+                    user self.binary-left-expression.right-expression)
             write(user " ")
         base()
         if self.expand-and
             write(user ")")
 
-func relational-operator-factory(
-        user SyntaxTreeCode code-node, user Operator operator)->(
-        owner BinaryExpression expression)
-    expression := RelationalOperatorExpression(user code-node, user operator)
-
-
-~~~ = != ~~~
-class EqualizerOperatorExpression(RelationalOperatorExpression)
-    func dynamic test-operand(user Expression operand)
-        self.test-is-reference(copy false, user operand)
-
 func equalizer-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
         owner BinaryExpression expression)
     expression := EqualizerOperatorExpression(user code-node, user operator)
+
+
+~~~ > < >= <= ~~~
+class RelationalOperatorExpression(EqualizerOperatorExpression)
+    var IntRange common-range
+    
+    func dynamic test-operand(user Expression operand)
+        self.test-operand-type(user operand, user glob.type-int)
+
+    func dynamic analyze()
+        base()
+        user Expression left-expression(user self.left-expression)
+        if self.expand-and
+            left-expression := self.binary-left-expression.right-expression
+        user IntRange left(user left-expression.result-type.int-range)
+        user IntRange right(user self.right-expression.result-type.int-range)
+        if long-larger(user left.max-value, user right.max-value)
+            left.max-value.copy()->(owner self.common-range.max-value)
+        else
+            right.max-value.copy()->(owner self.common-range.max-value)
+        if long-larger(user left.min-value, user right.min-value)
+            right.min-value.copy()->(owner self.common-range.min-value)
+        else
+            left.min-value.copy()->(owner self.common-range.min-value)
+        self.common-range.set-sign-and-bits(user self)
+
+    func dynamic write-operand(user Expression operand)
+        if self.common-range.is-signed
+            self.write-int-cast-operand(
+                    user operand, copy true, copy self.common-range.bits)
+        else
+            base(user operand)
+
+func relational-operator-factory(
+        user SyntaxTreeCode code-node, user Operator operator)->(
+        owner BinaryExpression expression)
+    expression := RelationalOperatorExpression(user code-node, user operator)
 
 
 ~~~ is is-not ~~~

@@ -724,7 +724,9 @@ test test-operations()
     assert! s64h clamp* min = -10000000000
     assert! s64l clamp* sax = -10000000000
     assert! s64l clamp* min = 10000000000
-    ; assert! s64l < s64h * u64l
+    var Uint32 l(copy 3000000000)
+    assert! l + l = 6000000000
+    assert! s64l < s64h clamp* u64l
     s64l clamp+= max
     u64l clamp-= sax
     u64h clamp*= min

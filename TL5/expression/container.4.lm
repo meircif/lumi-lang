@@ -119,7 +119,7 @@ class UnaryExpression(Expression)
         if self.is-statement
             write(user ";\n")
 
-    func inst write-operand(user Expression expression)
+    func dynamic write-operand(user Expression expression)
         if self.safe-operand-write
             expression.write-safe()
         else
@@ -199,6 +199,16 @@ class BinaryExpression(UnaryExpression)
 
     func dynamic write-end()
         self.write-end-expression(user self.right-expression)
+    
+    func inst write-int-cast-operand(
+            user Expression operand, copy Bool is-signed, copy Int bits)
+        var IntRange int-cast
+        int-cast.is-signed := is-signed
+        int-cast.bits := bits
+        write-c(copy '(')
+        int-cast.write-cname()
+        write-c(copy ')')
+        operand.write-safe()
 
 
 ~~~ An expression with the "?" operator ~~~
