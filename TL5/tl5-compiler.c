@@ -57074,15 +57074,15 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "print-msg-with-long"
 Returncode tl5_compiler_M_print_msg_with_long(String* text, Ref_Manager* text_Refman, Long* number, Ref_Manager* number_Refman) {
     Returncode LUMI_err = OK;
-    char number_str_Values[64] = {0};
-    String number_str_Var = {64, 0, NULL};
+    char number_str_Values[128] = {0};
+    String number_str_Var = {128, 0, NULL};
     String* number_str = NULL;
     Ref_Manager* number_str_Refman = NULL;
     LUMI_inc_ref(text_Refman);
     LUMI_inc_ref(number_Refman);
     INIT_VAR(35, number_str)
     number_str_Var.values = number_str_Values;
-    LUMI_err = Long_hex(number, number_Refman, number_str, number_str_Refman);
+    LUMI_err = Long_str(number, number_Refman, number_str, number_str_Refman);
     CHECK(36)
     LUMI_err = tl5_compiler_M_print_msg_with_item(text, text_Refman, number_str, number_str_Refman);
     CHECK(37)
@@ -62124,6 +62124,9 @@ Returncode tl5_compiler_M_write_output_header_code(void) {
     String aux_String_1429_Var = {0};
     String* aux_String_1429 = NULL;
     Ref_Manager* aux_String_1429_Refman = NULL;
+    String aux_String_1430_Var = {0};
+    String* aux_String_1430 = NULL;
+    Ref_Manager* aux_String_1430_Refman = NULL;
     INIT_STRING_CONST(4, aux_String_0, "#ifdef _MSC_VER\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_0, aux_String_0_Refman);
     CHECK(4)
@@ -64104,7 +64107,7 @@ Returncode tl5_compiler_M_write_output_header_code(void) {
     INIT_STRING_CONST(663, aux_String_659, "  char* high;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_659, aux_String_659_Refman);
     CHECK(663)
-    INIT_STRING_CONST(664, aux_String_660, "  *str_length = is_neg? 1: 0;\n");
+    INIT_STRING_CONST(664, aux_String_660, "  *str_length = 0;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_660, aux_String_660_Refman);
     CHECK(664)
     INIT_STRING_CONST(665, aux_String_661, "  high = str;\n");
@@ -64119,2302 +64122,2306 @@ Returncode tl5_compiler_M_write_output_header_code(void) {
     INIT_STRING_CONST(668, aux_String_664, "    ++high;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_664, aux_String_664_Refman);
     CHECK(668)
-    INIT_STRING_CONST(669, aux_String_665, "  }\n");
+    INIT_STRING_CONST(669, aux_String_665, "    ++(*str_length);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_665, aux_String_665_Refman);
     CHECK(669)
-    INIT_STRING_CONST(670, aux_String_666, "  low = high;\n");
+    INIT_STRING_CONST(670, aux_String_666, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_666, aux_String_666_Refman);
     CHECK(670)
-    INIT_STRING_CONST(671, aux_String_667, "  tmp = abs;\n");
+    INIT_STRING_CONST(671, aux_String_667, "  low = high;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_667, aux_String_667_Refman);
     CHECK(671)
-    INIT_STRING_CONST(672, aux_String_668, "  do {\n");
+    INIT_STRING_CONST(672, aux_String_668, "  tmp = abs;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_668, aux_String_668_Refman);
     CHECK(672)
-    INIT_STRING_CONST(673, aux_String_669, "    *high = '0' + tmp % 10;\n");
+    INIT_STRING_CONST(673, aux_String_669, "  do {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_669, aux_String_669_Refman);
     CHECK(673)
-    INIT_STRING_CONST(674, aux_String_670, "    ++high;\n");
+    INIT_STRING_CONST(674, aux_String_670, "    *high = '0' + tmp % 10;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_670, aux_String_670_Refman);
     CHECK(674)
-    INIT_STRING_CONST(675, aux_String_671, "    tmp /= 10;\n");
+    INIT_STRING_CONST(675, aux_String_671, "    ++high;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_671, aux_String_671_Refman);
     CHECK(675)
-    INIT_STRING_CONST(676, aux_String_672, "    if (str_max_length <= *str_length + 1) {\n");
+    INIT_STRING_CONST(676, aux_String_672, "    tmp /= 10;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_672, aux_String_672_Refman);
     CHECK(676)
-    INIT_STRING_CONST(677, aux_String_673, "      *str_length = 0;\n");
+    INIT_STRING_CONST(677, aux_String_673, "    if (str_max_length <= *str_length + 1) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_673, aux_String_673_Refman);
     CHECK(677)
-    INIT_STRING_CONST(678, aux_String_674, "      str[0] = '\\0';\n");
+    INIT_STRING_CONST(678, aux_String_674, "      *str_length = 0;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_674, aux_String_674_Refman);
     CHECK(678)
-    INIT_STRING_CONST(679, aux_String_675, "      CRAISE(LUMI_error_messages.sequence_too_short.str)\n");
+    INIT_STRING_CONST(679, aux_String_675, "      str[0] = '\\0';\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_675, aux_String_675_Refman);
     CHECK(679)
-    INIT_STRING_CONST(680, aux_String_676, "    }\n");
+    INIT_STRING_CONST(680, aux_String_676, "      CRAISE(LUMI_error_messages.sequence_too_short.str)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_676, aux_String_676_Refman);
     CHECK(680)
-    INIT_STRING_CONST(681, aux_String_677, "    ++(*str_length);\n");
+    INIT_STRING_CONST(681, aux_String_677, "    }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_677, aux_String_677_Refman);
     CHECK(681)
-    INIT_STRING_CONST(682, aux_String_678, "  } while (tmp > 0);\n");
+    INIT_STRING_CONST(682, aux_String_678, "    ++(*str_length);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_678, aux_String_678_Refman);
     CHECK(682)
-    INIT_STRING_CONST(683, aux_String_679, "  *high = '\\0';\n");
+    INIT_STRING_CONST(683, aux_String_679, "  } while (tmp > 0);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_679, aux_String_679_Refman);
     CHECK(683)
-    INIT_STRING_CONST(684, aux_String_680, "  for (--high; low < high; ++low, --high) {\n");
+    INIT_STRING_CONST(684, aux_String_680, "  *high = '\\0';\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_680, aux_String_680_Refman);
     CHECK(684)
-    INIT_STRING_CONST(685, aux_String_681, "    char swap;\n");
+    INIT_STRING_CONST(685, aux_String_681, "  for (--high; low < high; ++low, --high) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_681, aux_String_681_Refman);
     CHECK(685)
-    INIT_STRING_CONST(686, aux_String_682, "    swap = *low;\n");
+    INIT_STRING_CONST(686, aux_String_682, "    char swap;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_682, aux_String_682_Refman);
     CHECK(686)
-    INIT_STRING_CONST(687, aux_String_683, "    *low = *high;\n");
+    INIT_STRING_CONST(687, aux_String_683, "    swap = *low;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_683, aux_String_683_Refman);
     CHECK(687)
-    INIT_STRING_CONST(688, aux_String_684, "    *high = swap;\n");
+    INIT_STRING_CONST(688, aux_String_684, "    *low = *high;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_684, aux_String_684_Refman);
     CHECK(688)
-    INIT_STRING_CONST(689, aux_String_685, "  }\n");
+    INIT_STRING_CONST(689, aux_String_685, "    *high = swap;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_685, aux_String_685_Refman);
     CHECK(689)
-    INIT_STRING_CONST(690, aux_String_686, "  return OK;\n");
+    INIT_STRING_CONST(690, aux_String_686, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_686, aux_String_686_Refman);
     CHECK(690)
-    INIT_STRING_CONST(691, aux_String_687, "}\n");
+    INIT_STRING_CONST(691, aux_String_687, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_687, aux_String_687_Refman);
     CHECK(691)
-    INIT_STRING_CONST(692, aux_String_688, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(692, aux_String_688, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_688, aux_String_688_Refman);
     CHECK(692)
-    INIT_STRING_CONST(693, aux_String_689, "\n");
+    INIT_STRING_CONST(693, aux_String_689, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_689, aux_String_689_Refman);
     CHECK(693)
-    INIT_STRING_CONST(694, aux_String_690, "#define Int_strU(value, str, str_max_length, str_length) \\\n");
+    INIT_STRING_CONST(694, aux_String_690, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_690, aux_String_690_Refman);
     CHECK(694)
-    INIT_STRING_CONST(695, aux_String_691, "  Int_str(value, false, str, str_max_length, str_length)\n");
+    INIT_STRING_CONST(695, aux_String_691, "#define Int_strU(value, str, str_max_length, str_length) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_691, aux_String_691_Refman);
     CHECK(695)
-    INIT_STRING_CONST(696, aux_String_692, "#define Int_strS(value, str, str_max_length, str_length) \\\n");
+    INIT_STRING_CONST(696, aux_String_692, "  Int_str(value, false, str, str_max_length, str_length)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_692, aux_String_692_Refman);
     CHECK(696)
-    INIT_STRING_CONST(697, aux_String_693, "  Int_str(value < 0? -value: value, value < 0, str, str_max_length, str_length)\n");
+    INIT_STRING_CONST(697, aux_String_693, "#define Int_strS(value, str, str_max_length, str_length) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_693, aux_String_693_Refman);
     CHECK(697)
-    INIT_STRING_CONST(698, aux_String_694, "\n");
+    INIT_STRING_CONST(698, aux_String_694, "  Int_str(value < 0? -value: value, value < 0, str, str_max_length, str_length)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_694, aux_String_694_Refman);
     CHECK(698)
-    INIT_STRING_CONST(699, aux_String_695, "#define CHECK_MIN_ADD(a, b) ((a < 0) && (b < 0) && (-a > INT64_MAX + b))\n");
+    INIT_STRING_CONST(699, aux_String_695, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_695, aux_String_695_Refman);
     CHECK(699)
-    INIT_STRING_CONST(700, aux_String_696, "#define CHECK_MAX_ADD(a, b, limit) ((a > 0) && (b > 0) && (a > limit - b))\n");
+    INIT_STRING_CONST(700, aux_String_696, "#define CHECK_MIN_ADD(a, b) ((a < 0) && (b < 0) && (-a > INT64_MAX + b))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_696, aux_String_696_Refman);
     CHECK(700)
-    INIT_STRING_CONST(701, aux_String_697, "\n");
+    INIT_STRING_CONST(701, aux_String_697, "#define CHECK_MAX_ADD(a, b, limit) ((a > 0) && (b > 0) && (a > limit - b))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_697, aux_String_697_Refman);
     CHECK(701)
-    INIT_STRING_CONST(702, aux_String_698, "#define CHECK_MIN_SUB(a, b) \\\n");
+    INIT_STRING_CONST(702, aux_String_698, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_698, aux_String_698_Refman);
     CHECK(702)
-    INIT_STRING_CONST(703, aux_String_699, "  ((b > 0) && ((int64_t)a < (int64_t)(-INT64_MAX + b)))\n");
+    INIT_STRING_CONST(703, aux_String_699, "#define CHECK_MIN_SUB(a, b) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_699, aux_String_699_Refman);
     CHECK(703)
-    INIT_STRING_CONST(704, aux_String_700, "#define CHECK_MAX_SUB(a, b, limit) ((a > 0) && (b < 0) && (a > limit + b))\n");
+    INIT_STRING_CONST(704, aux_String_700, "  ((b > 0) && ((int64_t)a < (int64_t)(-INT64_MAX + b)))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_700, aux_String_700_Refman);
     CHECK(704)
-    INIT_STRING_CONST(705, aux_String_701, "\n");
+    INIT_STRING_CONST(705, aux_String_701, "#define CHECK_MAX_SUB(a, b, limit) ((a > 0) && (b < 0) && (a > limit + b))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_701, aux_String_701_Refman);
     CHECK(705)
-    INIT_STRING_CONST(706, aux_String_702, "#define CHECK_MIN_MUL(a, b) \\\n");
+    INIT_STRING_CONST(706, aux_String_702, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_702, aux_String_702_Refman);
     CHECK(706)
-    INIT_STRING_CONST(707, aux_String_703, "  ((a < 0) && (b > INT64_MAX / (-a))) || ((b < 0) && (a > INT64_MAX / (-b)))\n");
+    INIT_STRING_CONST(707, aux_String_703, "#define CHECK_MIN_MUL(a, b) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_703, aux_String_703_Refman);
     CHECK(707)
-    INIT_STRING_CONST(708, aux_String_704, "#define CHECK_MAX_MUL(a, b, limit) \\\n");
+    INIT_STRING_CONST(708, aux_String_704, "  ((a < 0) && (b > INT64_MAX / (-a))) || ((b < 0) && (a > INT64_MAX / (-b)))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_704, aux_String_704_Refman);
     CHECK(708)
-    INIT_STRING_CONST(709, aux_String_705, "  ((a > 0) && (b > limit / a)) || ((b < 0) && (-a > limit / (-b)))\n");
+    INIT_STRING_CONST(709, aux_String_705, "#define CHECK_MAX_MUL(a, b, limit) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_705, aux_String_705_Refman);
     CHECK(709)
-    INIT_STRING_CONST(710, aux_String_706, "  \n");
+    INIT_STRING_CONST(710, aux_String_706, "  ((a > 0) && (b > limit / a)) || ((b < 0) && (-a > limit / (-b)))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_706, aux_String_706_Refman);
     CHECK(710)
-    INIT_STRING_CONST(711, aux_String_707, "#define CLAMPED_ADD_UU_LIMIT(a, b, max, LIMIT) \\\n");
+    INIT_STRING_CONST(711, aux_String_707, "  \n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_707, aux_String_707_Refman);
     CHECK(711)
-    INIT_STRING_CONST(712, aux_String_708, "  ((a > LIMIT - b) || (a + b > max))? max: (a + b)\n");
+    INIT_STRING_CONST(712, aux_String_708, "#define CLAMPED_ADD_UU_LIMIT(a, b, max, LIMIT) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_708, aux_String_708_Refman);
     CHECK(712)
-    INIT_STRING_CONST(713, aux_String_709, "#define CLAMPED_ADD_UU(a, b, min, max) \\\n");
+    INIT_STRING_CONST(713, aux_String_709, "  ((a > LIMIT - b) || (a + b > max))? max: (a + b)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_709, aux_String_709_Refman);
     CHECK(713)
-    INIT_STRING_CONST(714, aux_String_710, "  CLAMPED_ADD_UU_LIMIT(a, b, max, UINT64_MAX)\n");
+    INIT_STRING_CONST(714, aux_String_710, "#define CLAMPED_ADD_UU(a, b, min, max) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_710, aux_String_710_Refman);
     CHECK(714)
-    INIT_STRING_CONST(715, aux_String_711, "#define CLAMPED_ADD_US(a, b, min, max) (b > 0)? \\\n");
+    INIT_STRING_CONST(715, aux_String_711, "  CLAMPED_ADD_UU_LIMIT(a, b, max, UINT64_MAX)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_711, aux_String_711_Refman);
     CHECK(715)
-    INIT_STRING_CONST(716, aux_String_712, "  (CLAMPED_ADD_UU(a, b, min, max)): (((-b > a) || (a + b < min))? min: (a + b))\n");
+    INIT_STRING_CONST(716, aux_String_712, "#define CLAMPED_ADD_US(a, b, min, max) (b > 0)? \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_712, aux_String_712_Refman);
     CHECK(716)
-    INIT_STRING_CONST(717, aux_String_713, "#define CLAMPED_ADD_SU(a, b, min, max) \\\n");
+    INIT_STRING_CONST(717, aux_String_713, "  (CLAMPED_ADD_UU(a, b, min, max)): (((-b > a) || (a + b < min))? min: (a + b))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_713, aux_String_713_Refman);
     CHECK(717)
-    INIT_STRING_CONST(718, aux_String_714, "  (a > 0)? (CLAMPED_ADD_UU(a, b, min, max)): ((a + b > max)? max: (a + b))\n");
+    INIT_STRING_CONST(718, aux_String_714, "#define CLAMPED_ADD_SU(a, b, min, max) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_714, aux_String_714_Refman);
     CHECK(718)
-    INIT_STRING_CONST(719, aux_String_715, "#define CLAMPED_ADD_SS(a, b, min, max) (b > 0)? \\\n");
+    INIT_STRING_CONST(719, aux_String_715, "  (a > 0)? (CLAMPED_ADD_UU(a, b, min, max)): ((a + b > max)? max: (a + b))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_715, aux_String_715_Refman);
     CHECK(719)
-    INIT_STRING_CONST(720, aux_String_716, "  (CLAMPED_ADD_UU_LIMIT(a, b, max, INT64_MAX)): \\\n");
+    INIT_STRING_CONST(720, aux_String_716, "#define CLAMPED_ADD_SS(a, b, min, max) (b > 0)? \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_716, aux_String_716_Refman);
     CHECK(720)
-    INIT_STRING_CONST(721, aux_String_717, "  (((a < INT64_MIN - b) || (a + b < min))? min: (a + b))\n");
+    INIT_STRING_CONST(721, aux_String_717, "  (CLAMPED_ADD_UU_LIMIT(a, b, max, INT64_MAX)): \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_717, aux_String_717_Refman);
     CHECK(721)
-    INIT_STRING_CONST(722, aux_String_718, "\n");
+    INIT_STRING_CONST(722, aux_String_718, "  (((a < INT64_MIN - b) || (a + b < min))? min: (a + b))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_718, aux_String_718_Refman);
     CHECK(722)
-    INIT_STRING_CONST(723, aux_String_719, "#define CLAMPED_SUB_SN_LIMIT(a, b, max, LIMIT) \\\n");
+    INIT_STRING_CONST(723, aux_String_719, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_719, aux_String_719_Refman);
     CHECK(723)
-    INIT_STRING_CONST(724, aux_String_720, "  (((a > LIMIT + b) || (a - b > max))? max: (a - b))\n");
+    INIT_STRING_CONST(724, aux_String_720, "#define CLAMPED_SUB_SN_LIMIT(a, b, max, LIMIT) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_720, aux_String_720_Refman);
     CHECK(724)
-    INIT_STRING_CONST(725, aux_String_721, "#define CLAMPED_SUB_UU(a, b, min, max) ((a < b) || (a - b < min))? min: (a - b)\n");
+    INIT_STRING_CONST(725, aux_String_721, "  (((a > LIMIT + b) || (a - b > max))? max: (a - b))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_721, aux_String_721_Refman);
     CHECK(725)
-    INIT_STRING_CONST(726, aux_String_722, "#define CLAMPED_SUB_US(a, b, min, max) (b > 0)? \\\n");
+    INIT_STRING_CONST(726, aux_String_722, "#define CLAMPED_SUB_UU(a, b, min, max) ((a < b) || (a - b < min))? min: (a - b)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_722, aux_String_722_Refman);
     CHECK(726)
-    INIT_STRING_CONST(727, aux_String_723, "  (CLAMPED_SUB_UU(a, b, min, max)): CLAMPED_SUB_SN_LIMIT(a, b, max, UINT64_MAX)\n");
+    INIT_STRING_CONST(727, aux_String_723, "#define CLAMPED_SUB_US(a, b, min, max) (b > 0)? \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_723, aux_String_723_Refman);
     CHECK(727)
-    INIT_STRING_CONST(728, aux_String_724, "#define CLAMPED_SUB_SU(a, b, min, max) \\\n");
+    INIT_STRING_CONST(728, aux_String_724, "  (CLAMPED_SUB_UU(a, b, min, max)): CLAMPED_SUB_SN_LIMIT(a, b, max, UINT64_MAX)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_724, aux_String_724_Refman);
     CHECK(728)
-    INIT_STRING_CONST(729, aux_String_725, "  ((a < (int64_t)(INT64_MIN + b)) || (a - b < min))? min: (a - b)\n");
+    INIT_STRING_CONST(729, aux_String_725, "#define CLAMPED_SUB_SU(a, b, min, max) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_725, aux_String_725_Refman);
     CHECK(729)
-    INIT_STRING_CONST(730, aux_String_726, "#define CLAMPED_SUB_SS(a, b, min, max) (b > 0)? \\\n");
+    INIT_STRING_CONST(730, aux_String_726, "  ((a < (int64_t)(INT64_MIN + b)) || (a - b < min))? min: (a - b)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_726, aux_String_726_Refman);
     CHECK(730)
-    INIT_STRING_CONST(731, aux_String_727, "  (CLAMPED_SUB_SU(a, b, min, max)): CLAMPED_SUB_SN_LIMIT(a, b, max, INT64_MAX)\n");
+    INIT_STRING_CONST(731, aux_String_727, "#define CLAMPED_SUB_SS(a, b, min, max) (b > 0)? \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_727, aux_String_727_Refman);
     CHECK(731)
-    INIT_STRING_CONST(732, aux_String_728, "\n");
+    INIT_STRING_CONST(732, aux_String_728, "  (CLAMPED_SUB_SU(a, b, min, max)): CLAMPED_SUB_SN_LIMIT(a, b, max, INT64_MAX)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_728, aux_String_728_Refman);
     CHECK(732)
-    INIT_STRING_CONST(733, aux_String_729, "#define CLAMPED_MUL_UP_LIMIT(a, b, max, CMP_LIMIT) \\\n");
+    INIT_STRING_CONST(733, aux_String_729, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_729, aux_String_729_Refman);
     CHECK(733)
-    INIT_STRING_CONST(734, aux_String_730, "  (((a CMP_LIMIT / b) || (a * b > max))? max: (a * b))\n");
+    INIT_STRING_CONST(734, aux_String_730, "#define CLAMPED_MUL_UP_LIMIT(a, b, max, CMP_LIMIT) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_730, aux_String_730_Refman);
     CHECK(734)
-    INIT_STRING_CONST(735, aux_String_731, "#define CLAMPED_MUL_UP(a, b, max) CLAMPED_MUL_UP_LIMIT(a, b, max, > UINT64_MAX)\n");
+    INIT_STRING_CONST(735, aux_String_731, "  (((a CMP_LIMIT / b) || (a * b > max))? max: (a * b))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_731, aux_String_731_Refman);
     CHECK(735)
-    INIT_STRING_CONST(736, aux_String_732, "#define CLAMPED_MUL_UN(a, b, min, cmp) \\\n");
+    INIT_STRING_CONST(736, aux_String_732, "#define CLAMPED_MUL_UP(a, b, max) CLAMPED_MUL_UP_LIMIT(a, b, max, > UINT64_MAX)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_732, aux_String_732_Refman);
     CHECK(736)
-    INIT_STRING_CONST(737, aux_String_733, "  (((a cmp INT64_MIN / b) || (a * b < min))? min: (a * b))\n");
+    INIT_STRING_CONST(737, aux_String_733, "#define CLAMPED_MUL_UN(a, b, min, cmp) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_733, aux_String_733_Refman);
     CHECK(737)
-    INIT_STRING_CONST(738, aux_String_734, "#define CLAMPED_MUL_UU(a, b, min, max) (a == 0 || b == 0)? min: \\\n");
+    INIT_STRING_CONST(738, aux_String_734, "  (((a cmp INT64_MIN / b) || (a * b < min))? min: (a * b))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_734, aux_String_734_Refman);
     CHECK(738)
-    INIT_STRING_CONST(739, aux_String_735, "  CLAMPED_MUL_UP(a, b, max)\n");
+    INIT_STRING_CONST(739, aux_String_735, "#define CLAMPED_MUL_UU(a, b, min, max) (a == 0 || b == 0)? min: \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_735, aux_String_735_Refman);
     CHECK(739)
-    INIT_STRING_CONST(740, aux_String_736, "#define CLAMPED_MUL_US(a, b, min, max) (a == 0 || b == 0)? min: \\\n");
+    INIT_STRING_CONST(740, aux_String_736, "  CLAMPED_MUL_UP(a, b, max)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_736, aux_String_736_Refman);
     CHECK(740)
-    INIT_STRING_CONST(741, aux_String_737, "  ((b > 0)? CLAMPED_MUL_UP(a, b, max): CLAMPED_MUL_UN(a, b, min, >=))\n");
+    INIT_STRING_CONST(741, aux_String_737, "#define CLAMPED_MUL_US(a, b, min, max) (a == 0 || b == 0)? min: \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_737, aux_String_737_Refman);
     CHECK(741)
-    INIT_STRING_CONST(742, aux_String_738, "#define CLAMPED_MUL_SU(a, b, min, max) (a == 0 || b == 0)? (max < 0? max: 0): \\\n");
+    INIT_STRING_CONST(742, aux_String_738, "  ((b > 0)? CLAMPED_MUL_UP(a, b, max): CLAMPED_MUL_UN(a, b, min, >=))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_738, aux_String_738_Refman);
     CHECK(742)
-    INIT_STRING_CONST(743, aux_String_739, "  (a > 0)? CLAMPED_MUL_UP(a, b, max): CLAMPED_MUL_UN(a, b, min, >=)\n");
+    INIT_STRING_CONST(743, aux_String_739, "#define CLAMPED_MUL_SU(a, b, min, max) (a == 0 || b == 0)? (max < 0? max: 0): \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_739, aux_String_739_Refman);
     CHECK(743)
-    INIT_STRING_CONST(744, aux_String_740, "#define CLAMPED_MUL_SS(a, b, min, max) (a == 0 || b == 0)? (max < 0? max: 0): \\\n");
+    INIT_STRING_CONST(744, aux_String_740, "  (a > 0)? CLAMPED_MUL_UP(a, b, max): CLAMPED_MUL_UN(a, b, min, >=)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_740, aux_String_740_Refman);
     CHECK(744)
-    INIT_STRING_CONST(745, aux_String_741, "  ((a > 0)? \\\n");
+    INIT_STRING_CONST(745, aux_String_741, "#define CLAMPED_MUL_SS(a, b, min, max) (a == 0 || b == 0)? (max < 0? max: 0): \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_741, aux_String_741_Refman);
     CHECK(745)
-    INIT_STRING_CONST(746, aux_String_742, "    ((b > 0)? CLAMPED_MUL_UP_LIMIT(a, b, max, > INT64_MAX): \\\n");
+    INIT_STRING_CONST(746, aux_String_742, "  ((a > 0)? \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_742, aux_String_742_Refman);
     CHECK(746)
-    INIT_STRING_CONST(747, aux_String_743, "      CLAMPED_MUL_UN(a, b, min, >=)): \\\n");
+    INIT_STRING_CONST(747, aux_String_743, "    ((b > 0)? CLAMPED_MUL_UP_LIMIT(a, b, max, > INT64_MAX): \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_743, aux_String_743_Refman);
     CHECK(747)
-    INIT_STRING_CONST(748, aux_String_744, "    ((b > 0)? CLAMPED_MUL_UN(a, b, min, <=): \\\n");
+    INIT_STRING_CONST(748, aux_String_744, "      CLAMPED_MUL_UN(a, b, min, >=)): \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_744, aux_String_744_Refman);
     CHECK(748)
-    INIT_STRING_CONST(749, aux_String_745, "      CLAMPED_MUL_UP_LIMIT(a, b, max, < INT64_MAX)))\n");
+    INIT_STRING_CONST(749, aux_String_745, "    ((b > 0)? CLAMPED_MUL_UN(a, b, min, <=): \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_745, aux_String_745_Refman);
     CHECK(749)
-    INIT_STRING_CONST(750, aux_String_746, "\n");
+    INIT_STRING_CONST(750, aux_String_746, "      CLAMPED_MUL_UP_LIMIT(a, b, max, < INT64_MAX)))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_746, aux_String_746_Refman);
     CHECK(750)
     INIT_STRING_CONST(751, aux_String_747, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_747, aux_String_747_Refman);
     CHECK(751)
-    INIT_STRING_CONST(752, aux_String_748, "/* Array */\n");
+    INIT_STRING_CONST(752, aux_String_748, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_748, aux_String_748_Refman);
     CHECK(752)
-    INIT_STRING_CONST(753, aux_String_749, "\n");
+    INIT_STRING_CONST(753, aux_String_749, "/* Array */\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_749, aux_String_749_Refman);
     CHECK(753)
-    INIT_STRING_CONST(754, aux_String_750, "#define Array_length(self, length, length_out) *(length_out) = length\n");
+    INIT_STRING_CONST(754, aux_String_750, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_750, aux_String_750_Refman);
     CHECK(754)
-    INIT_STRING_CONST(755, aux_String_751, "\n");
+    INIT_STRING_CONST(755, aux_String_751, "#define Array_length(self, length, length_out) *(length_out) = length\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_751, aux_String_751_Refman);
     CHECK(755)
     INIT_STRING_CONST(756, aux_String_752, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_752, aux_String_752_Refman);
     CHECK(756)
-    INIT_STRING_CONST(757, aux_String_753, "/* Buffer */\n");
+    INIT_STRING_CONST(757, aux_String_753, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_753, aux_String_753_Refman);
     CHECK(757)
-    INIT_STRING_CONST(758, aux_String_754, "\n");
+    INIT_STRING_CONST(758, aux_String_754, "/* Buffer */\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_754, aux_String_754_Refman);
     CHECK(758)
-    INIT_STRING_CONST(759, aux_String_755, "#define Buffer_length(self, max_length, length, length_out) \\\n");
+    INIT_STRING_CONST(759, aux_String_755, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_755, aux_String_755_Refman);
     CHECK(759)
-    INIT_STRING_CONST(760, aux_String_756, "  *(length_out) = *(length)\n");
+    INIT_STRING_CONST(760, aux_String_756, "#define Buffer_length(self, max_length, length, length_out) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_756, aux_String_756_Refman);
     CHECK(760)
-    INIT_STRING_CONST(761, aux_String_757, "  \n");
+    INIT_STRING_CONST(761, aux_String_757, "  *(length_out) = *(length)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_757, aux_String_757_Refman);
     CHECK(761)
-    INIT_STRING_CONST(762, aux_String_758, "#define Buffer_max_length(self, max_length, length, max_length_out) \\\n");
+    INIT_STRING_CONST(762, aux_String_758, "  \n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_758, aux_String_758_Refman);
     CHECK(762)
-    INIT_STRING_CONST(763, aux_String_759, "  *(max_length_out) = max_length\n");
+    INIT_STRING_CONST(763, aux_String_759, "#define Buffer_max_length(self, max_length, length, max_length_out) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_759, aux_String_759_Refman);
     CHECK(763)
-    INIT_STRING_CONST(764, aux_String_760, "\n");
+    INIT_STRING_CONST(764, aux_String_760, "  *(max_length_out) = max_length\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_760, aux_String_760_Refman);
     CHECK(764)
-    INIT_STRING_CONST(765, aux_String_761, "#define LUMI_FUNC_NAME \"Buffer.copy\"\n");
+    INIT_STRING_CONST(765, aux_String_761, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_761, aux_String_761_Refman);
     CHECK(765)
-    INIT_STRING_CONST(766, aux_String_762, "Return_Code Buffer_copy(\n");
+    INIT_STRING_CONST(766, aux_String_762, "#define LUMI_FUNC_NAME \"Buffer.copy\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_762, aux_String_762_Refman);
     CHECK(766)
-    INIT_STRING_CONST(767, aux_String_763, "    void* self, Seq_Length max_length, Seq_Length* length, void* source, Seq_Length source_length) {\n");
+    INIT_STRING_CONST(767, aux_String_763, "Return_Code Buffer_copy(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_763, aux_String_763_Refman);
     CHECK(767)
-    INIT_STRING_CONST(768, aux_String_764, "  if (self == source) {\n");
+    INIT_STRING_CONST(768, aux_String_764, "    void* self, Seq_Length max_length, Seq_Length* length, void* source, Seq_Length source_length) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_764, aux_String_764_Refman);
     CHECK(768)
-    INIT_STRING_CONST(769, aux_String_765, "    return OK;\n");
+    INIT_STRING_CONST(769, aux_String_765, "  if (self == source) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_765, aux_String_765_Refman);
     CHECK(769)
-    INIT_STRING_CONST(770, aux_String_766, "  }\n");
+    INIT_STRING_CONST(770, aux_String_766, "    return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_766, aux_String_766_Refman);
     CHECK(770)
-    INIT_STRING_CONST(771, aux_String_767, "  if (source_length > max_length)\n");
+    INIT_STRING_CONST(771, aux_String_767, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_767, aux_String_767_Refman);
     CHECK(771)
-    INIT_STRING_CONST(772, aux_String_768, "    CRAISE(LUMI_error_messages.sequence_too_short.str)\n");
+    INIT_STRING_CONST(772, aux_String_768, "  if (source_length > max_length)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_768, aux_String_768_Refman);
     CHECK(772)
-    INIT_STRING_CONST(773, aux_String_769, "  *length = source_length;\n");
+    INIT_STRING_CONST(773, aux_String_769, "    CRAISE(LUMI_error_messages.sequence_too_short.str)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_769, aux_String_769_Refman);
     CHECK(773)
-    INIT_STRING_CONST(774, aux_String_770, "  memcpy(self, source, source_length);\n");
+    INIT_STRING_CONST(774, aux_String_770, "  *length = source_length;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_770, aux_String_770_Refman);
     CHECK(774)
-    INIT_STRING_CONST(775, aux_String_771, "  return OK;\n");
+    INIT_STRING_CONST(775, aux_String_771, "  memcpy(self, source, source_length);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_771, aux_String_771_Refman);
     CHECK(775)
-    INIT_STRING_CONST(776, aux_String_772, "}\n");
+    INIT_STRING_CONST(776, aux_String_772, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_772, aux_String_772_Refman);
     CHECK(776)
-    INIT_STRING_CONST(777, aux_String_773, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(777, aux_String_773, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_773, aux_String_773_Refman);
     CHECK(777)
-    INIT_STRING_CONST(778, aux_String_774, "\n");
+    INIT_STRING_CONST(778, aux_String_774, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_774, aux_String_774_Refman);
     CHECK(778)
-    INIT_STRING_CONST(779, aux_String_775, "#define LUMI_FUNC_NAME \"cdef.copy-to-buffer\"\n");
+    INIT_STRING_CONST(779, aux_String_775, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_775, aux_String_775_Refman);
     CHECK(779)
-    INIT_STRING_CONST(780, aux_String_776, "Return_Code cdef_M_copy_to_buffer(\n");
+    INIT_STRING_CONST(780, aux_String_776, "#define LUMI_FUNC_NAME \"cdef.copy-to-buffer\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_776, aux_String_776_Refman);
     CHECK(780)
-    INIT_STRING_CONST(781, aux_String_777, "    void* source, Seq_Length source_length, void* self, Seq_Length max_length, Seq_Length* length) {\n");
+    INIT_STRING_CONST(781, aux_String_777, "Return_Code cdef_M_copy_to_buffer(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_777, aux_String_777_Refman);
     CHECK(781)
-    INIT_STRING_CONST(782, aux_String_778, "  if (source == NULL) {\n");
+    INIT_STRING_CONST(782, aux_String_778, "    void* source, Seq_Length source_length, void* self, Seq_Length max_length, Seq_Length* length) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_778, aux_String_778_Refman);
     CHECK(782)
-    INIT_STRING_CONST(783, aux_String_779, "    *length = 0;\n");
+    INIT_STRING_CONST(783, aux_String_779, "  if (source == NULL) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_779, aux_String_779_Refman);
     CHECK(783)
-    INIT_STRING_CONST(784, aux_String_780, "    return OK;\n");
+    INIT_STRING_CONST(784, aux_String_780, "    *length = 0;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_780, aux_String_780_Refman);
     CHECK(784)
-    INIT_STRING_CONST(785, aux_String_781, "  }\n");
+    INIT_STRING_CONST(785, aux_String_781, "    return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_781, aux_String_781_Refman);
     CHECK(785)
-    INIT_STRING_CONST(786, aux_String_782, "  CCHECK(Buffer_copy(self, max_length, length, source, source_length))\n");
+    INIT_STRING_CONST(786, aux_String_782, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_782, aux_String_782_Refman);
     CHECK(786)
-    INIT_STRING_CONST(787, aux_String_783, "  return OK;\n");
+    INIT_STRING_CONST(787, aux_String_783, "  CCHECK(Buffer_copy(self, max_length, length, source, source_length))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_783, aux_String_783_Refman);
     CHECK(787)
-    INIT_STRING_CONST(788, aux_String_784, "}\n");
+    INIT_STRING_CONST(788, aux_String_784, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_784, aux_String_784_Refman);
     CHECK(788)
-    INIT_STRING_CONST(789, aux_String_785, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(789, aux_String_785, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_785, aux_String_785_Refman);
     CHECK(789)
-    INIT_STRING_CONST(790, aux_String_786, "\n");
+    INIT_STRING_CONST(790, aux_String_786, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_786, aux_String_786_Refman);
     CHECK(790)
-    INIT_STRING_CONST(791, aux_String_787, "void Buffer_clear(void* self, Seq_Length max_length, Seq_Length* length) {\n");
+    INIT_STRING_CONST(791, aux_String_787, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_787, aux_String_787_Refman);
     CHECK(791)
-    INIT_STRING_CONST(792, aux_String_788, "  *length = 0;\n");
+    INIT_STRING_CONST(792, aux_String_788, "void Buffer_clear(void* self, Seq_Length max_length, Seq_Length* length) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_788, aux_String_788_Refman);
     CHECK(792)
-    INIT_STRING_CONST(793, aux_String_789, "}\n");
+    INIT_STRING_CONST(793, aux_String_789, "  *length = 0;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_789, aux_String_789_Refman);
     CHECK(793)
-    INIT_STRING_CONST(794, aux_String_790, "\n");
+    INIT_STRING_CONST(794, aux_String_790, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_790, aux_String_790_Refman);
     CHECK(794)
-    INIT_STRING_CONST(795, aux_String_791, "void Buffer_equal(\n");
+    INIT_STRING_CONST(795, aux_String_791, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_791, aux_String_791_Refman);
     CHECK(795)
-    INIT_STRING_CONST(796, aux_String_792, "    void* self, Seq_Length max_length, Seq_Length *length,\n");
+    INIT_STRING_CONST(796, aux_String_792, "void Buffer_equal(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_792, aux_String_792_Refman);
     CHECK(796)
-    INIT_STRING_CONST(797, aux_String_793, "    void* other, Seq_Length other_length,\n");
+    INIT_STRING_CONST(797, aux_String_793, "    void* self, Seq_Length max_length, Seq_Length *length,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_793, aux_String_793_Refman);
     CHECK(797)
-    INIT_STRING_CONST(798, aux_String_794, "    Bool* out_equal) {\n");
+    INIT_STRING_CONST(798, aux_String_794, "    void* other, Seq_Length other_length,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_794, aux_String_794_Refman);
     CHECK(798)
-    INIT_STRING_CONST(799, aux_String_795, "  if (*length != other_length) {\n");
+    INIT_STRING_CONST(799, aux_String_795, "    Bool* out_equal) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_795, aux_String_795_Refman);
     CHECK(799)
-    INIT_STRING_CONST(800, aux_String_796, "    *out_equal = false;\n");
+    INIT_STRING_CONST(800, aux_String_796, "  if (*length != other_length) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_796, aux_String_796_Refman);
     CHECK(800)
-    INIT_STRING_CONST(801, aux_String_797, "    return;\n");
+    INIT_STRING_CONST(801, aux_String_797, "    *out_equal = false;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_797, aux_String_797_Refman);
     CHECK(801)
-    INIT_STRING_CONST(802, aux_String_798, "  }\n");
+    INIT_STRING_CONST(802, aux_String_798, "    return;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_798, aux_String_798_Refman);
     CHECK(802)
-    INIT_STRING_CONST(803, aux_String_799, "  if (self == other) {\n");
+    INIT_STRING_CONST(803, aux_String_799, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_799, aux_String_799_Refman);
     CHECK(803)
-    INIT_STRING_CONST(804, aux_String_800, "    *out_equal = true;\n");
+    INIT_STRING_CONST(804, aux_String_800, "  if (self == other) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_800, aux_String_800_Refman);
     CHECK(804)
-    INIT_STRING_CONST(805, aux_String_801, "    return;\n");
+    INIT_STRING_CONST(805, aux_String_801, "    *out_equal = true;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_801, aux_String_801_Refman);
     CHECK(805)
-    INIT_STRING_CONST(806, aux_String_802, "  }\n");
+    INIT_STRING_CONST(806, aux_String_802, "    return;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_802, aux_String_802_Refman);
     CHECK(806)
-    INIT_STRING_CONST(807, aux_String_803, "  *out_equal = memcmp(self, other, *length) == 0;\n");
+    INIT_STRING_CONST(807, aux_String_803, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_803, aux_String_803_Refman);
     CHECK(807)
-    INIT_STRING_CONST(808, aux_String_804, "}\n");
+    INIT_STRING_CONST(808, aux_String_804, "  *out_equal = memcmp(self, other, *length) == 0;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_804, aux_String_804_Refman);
     CHECK(808)
-    INIT_STRING_CONST(809, aux_String_805, "\n");
+    INIT_STRING_CONST(809, aux_String_805, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_805, aux_String_805_Refman);
     CHECK(809)
-    INIT_STRING_CONST(810, aux_String_806, "#define CHECK_INDEX(index, length) if (index < 0 || index >= *length) \\\n");
+    INIT_STRING_CONST(810, aux_String_806, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_806, aux_String_806_Refman);
     CHECK(810)
-    INIT_STRING_CONST(811, aux_String_807, "    CRAISE(LUMI_error_messages.slice_index.str)\n");
+    INIT_STRING_CONST(811, aux_String_807, "#define CHECK_INDEX(index, length) if (index < 0 || index >= *length) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_807, aux_String_807_Refman);
     CHECK(811)
-    INIT_STRING_CONST(812, aux_String_808, "\n");
+    INIT_STRING_CONST(812, aux_String_808, "    CRAISE(LUMI_error_messages.slice_index.str)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_808, aux_String_808_Refman);
     CHECK(812)
-    INIT_STRING_CONST(813, aux_String_809, "#define LUMI_FUNC_NAME \"Buffer.get\"\n");
+    INIT_STRING_CONST(813, aux_String_809, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_809, aux_String_809_Refman);
     CHECK(813)
-    INIT_STRING_CONST(814, aux_String_810, "Return_Code Buffer_get(\n");
+    INIT_STRING_CONST(814, aux_String_810, "#define LUMI_FUNC_NAME \"Buffer.get\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_810, aux_String_810_Refman);
     CHECK(814)
-    INIT_STRING_CONST(815, aux_String_811, "    Byte* self, Seq_Length max_length, Seq_Length *length, Seq_Length index, Byte* out_value) {\n");
+    INIT_STRING_CONST(815, aux_String_811, "Return_Code Buffer_get(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_811, aux_String_811_Refman);
     CHECK(815)
-    INIT_STRING_CONST(816, aux_String_812, "  CHECK_INDEX(index, length)\n");
+    INIT_STRING_CONST(816, aux_String_812, "    Byte* self, Seq_Length max_length, Seq_Length *length, Seq_Length index, Byte* out_value) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_812, aux_String_812_Refman);
     CHECK(816)
-    INIT_STRING_CONST(817, aux_String_813, "  *out_value = self[index];\n");
+    INIT_STRING_CONST(817, aux_String_813, "  CHECK_INDEX(index, length)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_813, aux_String_813_Refman);
     CHECK(817)
-    INIT_STRING_CONST(818, aux_String_814, "  return OK;\n");
+    INIT_STRING_CONST(818, aux_String_814, "  *out_value = self[index];\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_814, aux_String_814_Refman);
     CHECK(818)
-    INIT_STRING_CONST(819, aux_String_815, "}\n");
+    INIT_STRING_CONST(819, aux_String_815, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_815, aux_String_815_Refman);
     CHECK(819)
-    INIT_STRING_CONST(820, aux_String_816, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(820, aux_String_816, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_816, aux_String_816_Refman);
     CHECK(820)
-    INIT_STRING_CONST(821, aux_String_817, "\n");
+    INIT_STRING_CONST(821, aux_String_817, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_817, aux_String_817_Refman);
     CHECK(821)
-    INIT_STRING_CONST(822, aux_String_818, "#define LUMI_FUNC_NAME \"Buffer.set\"\n");
+    INIT_STRING_CONST(822, aux_String_818, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_818, aux_String_818_Refman);
     CHECK(822)
-    INIT_STRING_CONST(823, aux_String_819, "Return_Code Buffer_set(\n");
+    INIT_STRING_CONST(823, aux_String_819, "#define LUMI_FUNC_NAME \"Buffer.set\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_819, aux_String_819_Refman);
     CHECK(823)
-    INIT_STRING_CONST(824, aux_String_820, "    Byte* self, Seq_Length max_length, Seq_Length *length, Seq_Length index, Byte value) {\n");
+    INIT_STRING_CONST(824, aux_String_820, "Return_Code Buffer_set(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_820, aux_String_820_Refman);
     CHECK(824)
-    INIT_STRING_CONST(825, aux_String_821, "  CHECK_INDEX(index, length)\n");
+    INIT_STRING_CONST(825, aux_String_821, "    Byte* self, Seq_Length max_length, Seq_Length *length, Seq_Length index, Byte value) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_821, aux_String_821_Refman);
     CHECK(825)
-    INIT_STRING_CONST(826, aux_String_822, "  self[index] = value;\n");
+    INIT_STRING_CONST(826, aux_String_822, "  CHECK_INDEX(index, length)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_822, aux_String_822_Refman);
     CHECK(826)
-    INIT_STRING_CONST(827, aux_String_823, "  return OK;\n");
+    INIT_STRING_CONST(827, aux_String_823, "  self[index] = value;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_823, aux_String_823_Refman);
     CHECK(827)
-    INIT_STRING_CONST(828, aux_String_824, "}\n");
+    INIT_STRING_CONST(828, aux_String_824, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_824, aux_String_824_Refman);
     CHECK(828)
-    INIT_STRING_CONST(829, aux_String_825, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(829, aux_String_825, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_825, aux_String_825_Refman);
     CHECK(829)
-    INIT_STRING_CONST(830, aux_String_826, "\n");
+    INIT_STRING_CONST(830, aux_String_826, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_826, aux_String_826_Refman);
     CHECK(830)
-    INIT_STRING_CONST(831, aux_String_827, "#define LUMI_FUNC_NAME \"Buffer.append\"\n");
+    INIT_STRING_CONST(831, aux_String_827, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_827, aux_String_827_Refman);
     CHECK(831)
-    INIT_STRING_CONST(832, aux_String_828, "Return_Code Buffer_append(Byte* self, Seq_Length max_length, Seq_Length* length, Byte value) {\n");
+    INIT_STRING_CONST(832, aux_String_828, "#define LUMI_FUNC_NAME \"Buffer.append\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_828, aux_String_828_Refman);
     CHECK(832)
-    INIT_STRING_CONST(833, aux_String_829, "  if (*length >= max_length)\n");
+    INIT_STRING_CONST(833, aux_String_829, "Return_Code Buffer_append(Byte* self, Seq_Length max_length, Seq_Length* length, Byte value) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_829, aux_String_829_Refman);
     CHECK(833)
-    INIT_STRING_CONST(834, aux_String_830, "    CRAISE(LUMI_error_messages.sequence_too_short.str)\n");
+    INIT_STRING_CONST(834, aux_String_830, "  if (*length >= max_length)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_830, aux_String_830_Refman);
     CHECK(834)
-    INIT_STRING_CONST(835, aux_String_831, "  self[*length] = value;\n");
+    INIT_STRING_CONST(835, aux_String_831, "    CRAISE(LUMI_error_messages.sequence_too_short.str)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_831, aux_String_831_Refman);
     CHECK(835)
-    INIT_STRING_CONST(836, aux_String_832, "  ++(*length);\n");
+    INIT_STRING_CONST(836, aux_String_832, "  self[*length] = value;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_832, aux_String_832_Refman);
     CHECK(836)
-    INIT_STRING_CONST(837, aux_String_833, "  return OK;\n");
+    INIT_STRING_CONST(837, aux_String_833, "  ++(*length);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_833, aux_String_833_Refman);
     CHECK(837)
-    INIT_STRING_CONST(838, aux_String_834, "}\n");
+    INIT_STRING_CONST(838, aux_String_834, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_834, aux_String_834_Refman);
     CHECK(838)
-    INIT_STRING_CONST(839, aux_String_835, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(839, aux_String_835, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_835, aux_String_835_Refman);
     CHECK(839)
-    INIT_STRING_CONST(840, aux_String_836, "\n");
+    INIT_STRING_CONST(840, aux_String_836, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_836, aux_String_836_Refman);
     CHECK(840)
-    INIT_STRING_CONST(841, aux_String_837, "#define LUMI_FUNC_NAME \"Buffer.concat\"\n");
+    INIT_STRING_CONST(841, aux_String_837, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_837, aux_String_837_Refman);
     CHECK(841)
-    INIT_STRING_CONST(842, aux_String_838, "Return_Code Buffer_concat_internal(\n");
+    INIT_STRING_CONST(842, aux_String_838, "#define LUMI_FUNC_NAME \"Buffer.concat\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_838, aux_String_838_Refman);
     CHECK(842)
-    INIT_STRING_CONST(843, aux_String_839, "    void* self, Seq_Length max_length, Seq_Length* length, void* ext, Seq_Length ext_length) {\n");
+    INIT_STRING_CONST(843, aux_String_839, "Return_Code Buffer_concat_internal(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_839, aux_String_839_Refman);
     CHECK(843)
-    INIT_STRING_CONST(844, aux_String_840, "  if (*length + ext_length > max_length)\n");
+    INIT_STRING_CONST(844, aux_String_840, "    void* self, Seq_Length max_length, Seq_Length* length, void* ext, Seq_Length ext_length) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_840, aux_String_840_Refman);
     CHECK(844)
-    INIT_STRING_CONST(845, aux_String_841, "    CRAISE(LUMI_error_messages.sequence_too_short.str)\n");
+    INIT_STRING_CONST(845, aux_String_841, "  if (*length + ext_length > max_length)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_841, aux_String_841_Refman);
     CHECK(845)
-    INIT_STRING_CONST(846, aux_String_842, "  memcpy(self, ext, ext_length);\n");
+    INIT_STRING_CONST(846, aux_String_842, "    CRAISE(LUMI_error_messages.sequence_too_short.str)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_842, aux_String_842_Refman);
     CHECK(846)
-    INIT_STRING_CONST(847, aux_String_843, "  *length += ext_length;\n");
+    INIT_STRING_CONST(847, aux_String_843, "  memcpy(self, ext, ext_length);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_843, aux_String_843_Refman);
     CHECK(847)
-    INIT_STRING_CONST(848, aux_String_844, "  return OK;\n");
+    INIT_STRING_CONST(848, aux_String_844, "  *length += ext_length;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_844, aux_String_844_Refman);
     CHECK(848)
-    INIT_STRING_CONST(849, aux_String_845, "}\n");
+    INIT_STRING_CONST(849, aux_String_845, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_845, aux_String_845_Refman);
     CHECK(849)
-    INIT_STRING_CONST(850, aux_String_846, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(850, aux_String_846, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_846, aux_String_846_Refman);
     CHECK(850)
-    INIT_STRING_CONST(851, aux_String_847, "\n");
+    INIT_STRING_CONST(851, aux_String_847, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_847, aux_String_847_Refman);
     CHECK(851)
-    INIT_STRING_CONST(852, aux_String_848, "Return_Code Buffer_concat(\n");
+    INIT_STRING_CONST(852, aux_String_848, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_848, aux_String_848_Refman);
     CHECK(852)
-    INIT_STRING_CONST(853, aux_String_849, "    Byte* self, Seq_Length max_length, Seq_Length* length, Byte* ext, Seq_Length ext_length) {\n");
+    INIT_STRING_CONST(853, aux_String_849, "Return_Code Buffer_concat(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_849, aux_String_849_Refman);
     CHECK(853)
-    INIT_STRING_CONST(854, aux_String_850, "  return Buffer_concat_internal(\n");
+    INIT_STRING_CONST(854, aux_String_850, "    Byte* self, Seq_Length max_length, Seq_Length* length, Byte* ext, Seq_Length ext_length) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_850, aux_String_850_Refman);
     CHECK(854)
-    INIT_STRING_CONST(855, aux_String_851, "      self + (*length), max_length, length, ext, ext_length);\n");
+    INIT_STRING_CONST(855, aux_String_851, "  return Buffer_concat_internal(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_851, aux_String_851_Refman);
     CHECK(855)
-    INIT_STRING_CONST(856, aux_String_852, "}\n");
+    INIT_STRING_CONST(856, aux_String_852, "      self + (*length), max_length, length, ext, ext_length);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_852, aux_String_852_Refman);
     CHECK(856)
-    INIT_STRING_CONST(857, aux_String_853, "\n");
+    INIT_STRING_CONST(857, aux_String_853, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_853, aux_String_853_Refman);
     CHECK(857)
-    INIT_STRING_CONST(858, aux_String_854, "void Buffer_find(\n");
+    INIT_STRING_CONST(858, aux_String_854, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_854, aux_String_854_Refman);
     CHECK(858)
-    INIT_STRING_CONST(859, aux_String_855, "    Byte* self, Seq_Length max_length, Seq_Length *length,\n");
+    INIT_STRING_CONST(859, aux_String_855, "void Buffer_find(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_855, aux_String_855_Refman);
     CHECK(859)
-    INIT_STRING_CONST(860, aux_String_856, "    Byte* pattern, Seq_Length pattern_length,\n");
+    INIT_STRING_CONST(860, aux_String_856, "    Byte* self, Seq_Length max_length, Seq_Length *length,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_856, aux_String_856_Refman);
     CHECK(860)
-    INIT_STRING_CONST(861, aux_String_857, "    Seq_Length* out_index) {\n");
+    INIT_STRING_CONST(861, aux_String_857, "    Byte* pattern, Seq_Length pattern_length,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_857, aux_String_857_Refman);
     CHECK(861)
-    INIT_STRING_CONST(862, aux_String_858, "  Seq_Length n;\n");
+    INIT_STRING_CONST(862, aux_String_858, "    Seq_Length* out_index) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_858, aux_String_858_Refman);
     CHECK(862)
-    INIT_STRING_CONST(863, aux_String_859, "  for (n = 0; n <= *length - pattern_length; ++n) {\n");
+    INIT_STRING_CONST(863, aux_String_859, "  Seq_Length n;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_859, aux_String_859_Refman);
     CHECK(863)
-    INIT_STRING_CONST(864, aux_String_860, "    if (memcmp(self + n, pattern, pattern_length) == 0) {\n");
+    INIT_STRING_CONST(864, aux_String_860, "  for (n = 0; n <= *length - pattern_length; ++n) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_860, aux_String_860_Refman);
     CHECK(864)
-    INIT_STRING_CONST(865, aux_String_861, "      *out_index = n;\n");
+    INIT_STRING_CONST(865, aux_String_861, "    if (memcmp(self + n, pattern, pattern_length) == 0) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_861, aux_String_861_Refman);
     CHECK(865)
-    INIT_STRING_CONST(866, aux_String_862, "      return;\n");
+    INIT_STRING_CONST(866, aux_String_862, "      *out_index = n;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_862, aux_String_862_Refman);
     CHECK(866)
-    INIT_STRING_CONST(867, aux_String_863, "    }\n");
+    INIT_STRING_CONST(867, aux_String_863, "      return;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_863, aux_String_863_Refman);
     CHECK(867)
-    INIT_STRING_CONST(868, aux_String_864, "  }\n");
+    INIT_STRING_CONST(868, aux_String_864, "    }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_864, aux_String_864_Refman);
     CHECK(868)
-    INIT_STRING_CONST(869, aux_String_865, "  *out_index = *length;\n");
+    INIT_STRING_CONST(869, aux_String_865, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_865, aux_String_865_Refman);
     CHECK(869)
-    INIT_STRING_CONST(870, aux_String_866, "}\n");
+    INIT_STRING_CONST(870, aux_String_866, "  *out_index = *length;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_866, aux_String_866_Refman);
     CHECK(870)
-    INIT_STRING_CONST(871, aux_String_867, "\n");
+    INIT_STRING_CONST(871, aux_String_867, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_867, aux_String_867_Refman);
     CHECK(871)
-    INIT_STRING_CONST(872, aux_String_868, "void Buffer_has(\n");
+    INIT_STRING_CONST(872, aux_String_868, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_868, aux_String_868_Refman);
     CHECK(872)
-    INIT_STRING_CONST(873, aux_String_869, "    Byte* self, Seq_Length max_length, Seq_Length *length, Byte value, Bool* found) {\n");
+    INIT_STRING_CONST(873, aux_String_869, "void Buffer_has(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_869, aux_String_869_Refman);
     CHECK(873)
-    INIT_STRING_CONST(874, aux_String_870, "  Seq_Length n;\n");
+    INIT_STRING_CONST(874, aux_String_870, "    Byte* self, Seq_Length max_length, Seq_Length *length, Byte value, Bool* found) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_870, aux_String_870_Refman);
     CHECK(874)
-    INIT_STRING_CONST(875, aux_String_871, "  for (n = 0; n < *length; ++n) {\n");
+    INIT_STRING_CONST(875, aux_String_871, "  Seq_Length n;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_871, aux_String_871_Refman);
     CHECK(875)
-    INIT_STRING_CONST(876, aux_String_872, "    if (self[n] == value) {\n");
+    INIT_STRING_CONST(876, aux_String_872, "  for (n = 0; n < *length; ++n) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_872, aux_String_872_Refman);
     CHECK(876)
-    INIT_STRING_CONST(877, aux_String_873, "      *found = true;\n");
+    INIT_STRING_CONST(877, aux_String_873, "    if (self[n] == value) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_873, aux_String_873_Refman);
     CHECK(877)
-    INIT_STRING_CONST(878, aux_String_874, "      return;\n");
+    INIT_STRING_CONST(878, aux_String_874, "      *found = true;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_874, aux_String_874_Refman);
     CHECK(878)
-    INIT_STRING_CONST(879, aux_String_875, "    }\n");
+    INIT_STRING_CONST(879, aux_String_875, "      return;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_875, aux_String_875_Refman);
     CHECK(879)
-    INIT_STRING_CONST(880, aux_String_876, "  }\n");
+    INIT_STRING_CONST(880, aux_String_876, "    }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_876, aux_String_876_Refman);
     CHECK(880)
-    INIT_STRING_CONST(881, aux_String_877, "  *found = false;\n");
+    INIT_STRING_CONST(881, aux_String_877, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_877, aux_String_877_Refman);
     CHECK(881)
-    INIT_STRING_CONST(882, aux_String_878, "}\n");
+    INIT_STRING_CONST(882, aux_String_878, "  *found = false;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_878, aux_String_878_Refman);
     CHECK(882)
-    INIT_STRING_CONST(883, aux_String_879, "\n");
+    INIT_STRING_CONST(883, aux_String_879, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_879, aux_String_879_Refman);
     CHECK(883)
     INIT_STRING_CONST(884, aux_String_880, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_880, aux_String_880_Refman);
     CHECK(884)
-    INIT_STRING_CONST(885, aux_String_881, "/* String */\n");
+    INIT_STRING_CONST(885, aux_String_881, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_881, aux_String_881_Refman);
     CHECK(885)
-    INIT_STRING_CONST(886, aux_String_882, "\n");
+    INIT_STRING_CONST(886, aux_String_882, "/* String */\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_882, aux_String_882_Refman);
     CHECK(886)
-    INIT_STRING_CONST(887, aux_String_883, "#define String_length(self, max_length, length, length_out) \\\n");
+    INIT_STRING_CONST(887, aux_String_883, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_883, aux_String_883_Refman);
     CHECK(887)
-    INIT_STRING_CONST(888, aux_String_884, "  Buffer_length(self, max_length, length, length_out)\n");
+    INIT_STRING_CONST(888, aux_String_884, "#define String_length(self, max_length, length, length_out) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_884, aux_String_884_Refman);
     CHECK(888)
-    INIT_STRING_CONST(889, aux_String_885, "#define String_max_length(self, max_length, length, length_out) \\\n");
+    INIT_STRING_CONST(889, aux_String_885, "  Buffer_length(self, max_length, length, length_out)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_885, aux_String_885_Refman);
     CHECK(889)
-    INIT_STRING_CONST(890, aux_String_886, "  Buffer_max_length(self, max_length, length, length_out)\n");
+    INIT_STRING_CONST(890, aux_String_886, "#define String_max_length(self, max_length, length, length_out) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_886, aux_String_886_Refman);
     CHECK(890)
-    INIT_STRING_CONST(891, aux_String_887, "#define String_clear(self, max_length, length) \\\n");
+    INIT_STRING_CONST(891, aux_String_887, "  Buffer_max_length(self, max_length, length, length_out)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_887, aux_String_887_Refman);
     CHECK(891)
-    INIT_STRING_CONST(892, aux_String_888, "  Buffer_clear(self, max_length, length)\n");
+    INIT_STRING_CONST(892, aux_String_888, "#define String_clear(self, max_length, length) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_888, aux_String_888_Refman);
     CHECK(892)
-    INIT_STRING_CONST(893, aux_String_889, "\n");
+    INIT_STRING_CONST(893, aux_String_889, "  Buffer_clear(self, max_length, length)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_889, aux_String_889_Refman);
     CHECK(893)
-    INIT_STRING_CONST(894, aux_String_890, "#define LUMI_FUNC_NAME \"String.copy\"\n");
+    INIT_STRING_CONST(894, aux_String_890, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_890, aux_String_890_Refman);
     CHECK(894)
-    INIT_STRING_CONST(895, aux_String_891, "Return_Code String_copy(\n");
+    INIT_STRING_CONST(895, aux_String_891, "#define LUMI_FUNC_NAME \"String.copy\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_891, aux_String_891_Refman);
     CHECK(895)
-    INIT_STRING_CONST(896, aux_String_892, "    char* self, Seq_Length max_length, Seq_Length* length, char* source, Seq_Length source_length) {\n");
+    INIT_STRING_CONST(896, aux_String_892, "Return_Code String_copy(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_892, aux_String_892_Refman);
     CHECK(896)
-    INIT_STRING_CONST(897, aux_String_893, "  CCHECK(Buffer_copy(self, max_length - 1, length, source, source_length))\n");
+    INIT_STRING_CONST(897, aux_String_893, "    char* self, Seq_Length max_length, Seq_Length* length, char* source, Seq_Length source_length) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_893, aux_String_893_Refman);
     CHECK(897)
-    INIT_STRING_CONST(898, aux_String_894, "  self[source_length] = '\\0';\n");
+    INIT_STRING_CONST(898, aux_String_894, "  CCHECK(Buffer_copy(self, max_length - 1, length, source, source_length))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_894, aux_String_894_Refman);
     CHECK(898)
-    INIT_STRING_CONST(899, aux_String_895, "  return OK;\n");
+    INIT_STRING_CONST(899, aux_String_895, "  self[source_length] = '\\0';\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_895, aux_String_895_Refman);
     CHECK(899)
-    INIT_STRING_CONST(900, aux_String_896, "}\n");
+    INIT_STRING_CONST(900, aux_String_896, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_896, aux_String_896_Refman);
     CHECK(900)
-    INIT_STRING_CONST(901, aux_String_897, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(901, aux_String_897, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_897, aux_String_897_Refman);
     CHECK(901)
-    INIT_STRING_CONST(902, aux_String_898, "\n");
+    INIT_STRING_CONST(902, aux_String_898, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_898, aux_String_898_Refman);
     CHECK(902)
-    INIT_STRING_CONST(903, aux_String_899, "#define LUMI_FUNC_NAME \"cdef.copy-to-string\"\n");
+    INIT_STRING_CONST(903, aux_String_899, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_899, aux_String_899_Refman);
     CHECK(903)
-    INIT_STRING_CONST(904, aux_String_900, "Return_Code cdef_M_copy_to_string(\n");
+    INIT_STRING_CONST(904, aux_String_900, "#define LUMI_FUNC_NAME \"cdef.copy-to-string\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_900, aux_String_900_Refman);
     CHECK(904)
-    INIT_STRING_CONST(905, aux_String_901, "    char* source, char* self, Seq_Length max_length, Seq_Length* length) {\n");
+    INIT_STRING_CONST(905, aux_String_901, "Return_Code cdef_M_copy_to_string(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_901, aux_String_901_Refman);
     CHECK(905)
-    INIT_STRING_CONST(906, aux_String_902, "  CCHECK(cdef_M_copy_to_buffer(\n");
+    INIT_STRING_CONST(906, aux_String_902, "    char* source, char* self, Seq_Length max_length, Seq_Length* length) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_902, aux_String_902_Refman);
     CHECK(906)
-    INIT_STRING_CONST(907, aux_String_903, "      source, cstring_length(source, max_length), self, max_length - 1, length))\n");
+    INIT_STRING_CONST(907, aux_String_903, "  CCHECK(cdef_M_copy_to_buffer(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_903, aux_String_903_Refman);
     CHECK(907)
-    INIT_STRING_CONST(908, aux_String_904, "  self[*length] = '\\0';\n");
+    INIT_STRING_CONST(908, aux_String_904, "      source, cstring_length(source, max_length), self, max_length - 1, length))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_904, aux_String_904_Refman);
     CHECK(908)
-    INIT_STRING_CONST(909, aux_String_905, "  return OK;\n");
+    INIT_STRING_CONST(909, aux_String_905, "  self[*length] = '\\0';\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_905, aux_String_905_Refman);
     CHECK(909)
-    INIT_STRING_CONST(910, aux_String_906, "}\n");
+    INIT_STRING_CONST(910, aux_String_906, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_906, aux_String_906_Refman);
     CHECK(910)
-    INIT_STRING_CONST(911, aux_String_907, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(911, aux_String_907, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_907, aux_String_907_Refman);
     CHECK(911)
-    INIT_STRING_CONST(912, aux_String_908, "\n");
+    INIT_STRING_CONST(912, aux_String_908, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_908, aux_String_908_Refman);
     CHECK(912)
-    INIT_STRING_CONST(913, aux_String_909, "void cdef_M_set_null_term_length(char* self, Seq_Length max_length, Seq_Length* length) {\n");
+    INIT_STRING_CONST(913, aux_String_909, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_909, aux_String_909_Refman);
     CHECK(913)
-    INIT_STRING_CONST(914, aux_String_910, "  *length = cstring_length(self, max_length);\n");
+    INIT_STRING_CONST(914, aux_String_910, "void cdef_M_set_null_term_length(char* self, Seq_Length max_length, Seq_Length* length) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_910, aux_String_910_Refman);
     CHECK(914)
-    INIT_STRING_CONST(915, aux_String_911, "}\n");
+    INIT_STRING_CONST(915, aux_String_911, "  *length = cstring_length(self, max_length);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_911, aux_String_911_Refman);
     CHECK(915)
-    INIT_STRING_CONST(916, aux_String_912, "\n");
+    INIT_STRING_CONST(916, aux_String_912, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_912, aux_String_912_Refman);
     CHECK(916)
-    INIT_STRING_CONST(917, aux_String_913, "void String_equal(\n");
+    INIT_STRING_CONST(917, aux_String_913, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_913, aux_String_913_Refman);
     CHECK(917)
-    INIT_STRING_CONST(918, aux_String_914, "    char* self, Seq_Length max_length, Seq_Length *length,\n");
+    INIT_STRING_CONST(918, aux_String_914, "void String_equal(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_914, aux_String_914_Refman);
     CHECK(918)
-    INIT_STRING_CONST(919, aux_String_915, "    char* other, Seq_Length other_length,\n");
+    INIT_STRING_CONST(919, aux_String_915, "    char* self, Seq_Length max_length, Seq_Length *length,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_915, aux_String_915_Refman);
     CHECK(919)
-    INIT_STRING_CONST(920, aux_String_916, "    Bool* out_equal) {\n");
+    INIT_STRING_CONST(920, aux_String_916, "    char* other, Seq_Length other_length,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_916, aux_String_916_Refman);
     CHECK(920)
-    INIT_STRING_CONST(921, aux_String_917, "  if (self == other) {\n");
+    INIT_STRING_CONST(921, aux_String_917, "    Bool* out_equal) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_917, aux_String_917_Refman);
     CHECK(921)
-    INIT_STRING_CONST(922, aux_String_918, "    *out_equal = *length == other_length;\n");
+    INIT_STRING_CONST(922, aux_String_918, "  if (self == other) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_918, aux_String_918_Refman);
     CHECK(922)
-    INIT_STRING_CONST(923, aux_String_919, "    return;\n");
+    INIT_STRING_CONST(923, aux_String_919, "    *out_equal = *length == other_length;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_919, aux_String_919_Refman);
     CHECK(923)
-    INIT_STRING_CONST(924, aux_String_920, "  }\n");
+    INIT_STRING_CONST(924, aux_String_920, "    return;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_920, aux_String_920_Refman);
     CHECK(924)
-    INIT_STRING_CONST(925, aux_String_921, "  if (*length != other_length) {\n");
+    INIT_STRING_CONST(925, aux_String_921, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_921, aux_String_921_Refman);
     CHECK(925)
-    INIT_STRING_CONST(926, aux_String_922, "    *out_equal = false;\n");
+    INIT_STRING_CONST(926, aux_String_922, "  if (*length != other_length) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_922, aux_String_922_Refman);
     CHECK(926)
-    INIT_STRING_CONST(927, aux_String_923, "    return;\n");
+    INIT_STRING_CONST(927, aux_String_923, "    *out_equal = false;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_923, aux_String_923_Refman);
     CHECK(927)
-    INIT_STRING_CONST(928, aux_String_924, "  }\n");
+    INIT_STRING_CONST(928, aux_String_924, "    return;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_924, aux_String_924_Refman);
     CHECK(928)
-    INIT_STRING_CONST(929, aux_String_925, "  *out_equal = strncmp(self, other, *length) == 0;\n");
+    INIT_STRING_CONST(929, aux_String_925, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_925, aux_String_925_Refman);
     CHECK(929)
-    INIT_STRING_CONST(930, aux_String_926, "}\n");
+    INIT_STRING_CONST(930, aux_String_926, "  *out_equal = strncmp(self, other, *length) == 0;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_926, aux_String_926_Refman);
     CHECK(930)
-    INIT_STRING_CONST(931, aux_String_927, "\n");
+    INIT_STRING_CONST(931, aux_String_927, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_927, aux_String_927_Refman);
     CHECK(931)
-    INIT_STRING_CONST(932, aux_String_928, "#define LUMI_FUNC_NAME \"String.get\"\n");
+    INIT_STRING_CONST(932, aux_String_928, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_928, aux_String_928_Refman);
     CHECK(932)
-    INIT_STRING_CONST(933, aux_String_929, "Return_Code String_get(\n");
+    INIT_STRING_CONST(933, aux_String_929, "#define LUMI_FUNC_NAME \"String.get\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_929, aux_String_929_Refman);
     CHECK(933)
-    INIT_STRING_CONST(934, aux_String_930, "    char* self, Seq_Length max_length, Seq_Length *length, Seq_Length index, Char* out_char) {\n");
+    INIT_STRING_CONST(934, aux_String_930, "Return_Code String_get(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_930, aux_String_930_Refman);
     CHECK(934)
-    INIT_STRING_CONST(935, aux_String_931, "  CHECK_INDEX(index, length)\n");
+    INIT_STRING_CONST(935, aux_String_931, "    char* self, Seq_Length max_length, Seq_Length *length, Seq_Length index, Char* out_char) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_931, aux_String_931_Refman);
     CHECK(935)
-    INIT_STRING_CONST(936, aux_String_932, "  *out_char = self[index];\n");
+    INIT_STRING_CONST(936, aux_String_932, "  CHECK_INDEX(index, length)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_932, aux_String_932_Refman);
     CHECK(936)
-    INIT_STRING_CONST(937, aux_String_933, "  return OK;\n");
+    INIT_STRING_CONST(937, aux_String_933, "  *out_char = self[index];\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_933, aux_String_933_Refman);
     CHECK(937)
-    INIT_STRING_CONST(938, aux_String_934, "}\n");
+    INIT_STRING_CONST(938, aux_String_934, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_934, aux_String_934_Refman);
     CHECK(938)
-    INIT_STRING_CONST(939, aux_String_935, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(939, aux_String_935, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_935, aux_String_935_Refman);
     CHECK(939)
-    INIT_STRING_CONST(940, aux_String_936, "\n");
+    INIT_STRING_CONST(940, aux_String_936, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_936, aux_String_936_Refman);
     CHECK(940)
-    INIT_STRING_CONST(941, aux_String_937, "#define LUMI_FUNC_NAME \"String.set\"\n");
+    INIT_STRING_CONST(941, aux_String_937, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_937, aux_String_937_Refman);
     CHECK(941)
-    INIT_STRING_CONST(942, aux_String_938, "Return_Code String_set(\n");
+    INIT_STRING_CONST(942, aux_String_938, "#define LUMI_FUNC_NAME \"String.set\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_938, aux_String_938_Refman);
     CHECK(942)
-    INIT_STRING_CONST(943, aux_String_939, "    char* self, Seq_Length max_length, Seq_Length *length, Seq_Length index, Char ch) {\n");
+    INIT_STRING_CONST(943, aux_String_939, "Return_Code String_set(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_939, aux_String_939_Refman);
     CHECK(943)
-    INIT_STRING_CONST(944, aux_String_940, "  CHECK_INDEX(index, length)\n");
+    INIT_STRING_CONST(944, aux_String_940, "    char* self, Seq_Length max_length, Seq_Length *length, Seq_Length index, Char ch) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_940, aux_String_940_Refman);
     CHECK(944)
-    INIT_STRING_CONST(945, aux_String_941, "  self[index] = ch;\n");
+    INIT_STRING_CONST(945, aux_String_941, "  CHECK_INDEX(index, length)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_941, aux_String_941_Refman);
     CHECK(945)
-    INIT_STRING_CONST(946, aux_String_942, "  return OK;\n");
+    INIT_STRING_CONST(946, aux_String_942, "  self[index] = ch;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_942, aux_String_942_Refman);
     CHECK(946)
-    INIT_STRING_CONST(947, aux_String_943, "}\n");
+    INIT_STRING_CONST(947, aux_String_943, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_943, aux_String_943_Refman);
     CHECK(947)
-    INIT_STRING_CONST(948, aux_String_944, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(948, aux_String_944, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_944, aux_String_944_Refman);
     CHECK(948)
-    INIT_STRING_CONST(949, aux_String_945, "\n");
+    INIT_STRING_CONST(949, aux_String_945, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_945, aux_String_945_Refman);
     CHECK(949)
-    INIT_STRING_CONST(950, aux_String_946, "#define LUMI_FUNC_NAME \"String.append\"\n");
+    INIT_STRING_CONST(950, aux_String_946, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_946, aux_String_946_Refman);
     CHECK(950)
-    INIT_STRING_CONST(951, aux_String_947, "Return_Code String_append(char* self, Seq_Length max_length, Seq_Length* length, Char ch) {\n");
+    INIT_STRING_CONST(951, aux_String_947, "#define LUMI_FUNC_NAME \"String.append\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_947, aux_String_947_Refman);
     CHECK(951)
-    INIT_STRING_CONST(952, aux_String_948, "  if (*length + 1 >= max_length)\n");
+    INIT_STRING_CONST(952, aux_String_948, "Return_Code String_append(char* self, Seq_Length max_length, Seq_Length* length, Char ch) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_948, aux_String_948_Refman);
     CHECK(952)
-    INIT_STRING_CONST(953, aux_String_949, "    CRAISE(LUMI_error_messages.sequence_too_short.str)\n");
+    INIT_STRING_CONST(953, aux_String_949, "  if (*length + 1 >= max_length)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_949, aux_String_949_Refman);
     CHECK(953)
-    INIT_STRING_CONST(954, aux_String_950, "  self[*length] = ch;\n");
+    INIT_STRING_CONST(954, aux_String_950, "    CRAISE(LUMI_error_messages.sequence_too_short.str)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_950, aux_String_950_Refman);
     CHECK(954)
-    INIT_STRING_CONST(955, aux_String_951, "  ++(*length);\n");
+    INIT_STRING_CONST(955, aux_String_951, "  self[*length] = ch;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_951, aux_String_951_Refman);
     CHECK(955)
-    INIT_STRING_CONST(956, aux_String_952, "  self[*length] = '\\0';\n");
+    INIT_STRING_CONST(956, aux_String_952, "  ++(*length);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_952, aux_String_952_Refman);
     CHECK(956)
-    INIT_STRING_CONST(957, aux_String_953, "  return OK;\n");
+    INIT_STRING_CONST(957, aux_String_953, "  self[*length] = '\\0';\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_953, aux_String_953_Refman);
     CHECK(957)
-    INIT_STRING_CONST(958, aux_String_954, "}\n");
+    INIT_STRING_CONST(958, aux_String_954, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_954, aux_String_954_Refman);
     CHECK(958)
-    INIT_STRING_CONST(959, aux_String_955, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(959, aux_String_955, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_955, aux_String_955_Refman);
     CHECK(959)
-    INIT_STRING_CONST(960, aux_String_956, "\n");
+    INIT_STRING_CONST(960, aux_String_956, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_956, aux_String_956_Refman);
     CHECK(960)
-    INIT_STRING_CONST(961, aux_String_957, "#define LUMI_FUNC_NAME \"String.concat\"\n");
+    INIT_STRING_CONST(961, aux_String_957, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_957, aux_String_957_Refman);
     CHECK(961)
-    INIT_STRING_CONST(962, aux_String_958, "Return_Code String_concat(\n");
+    INIT_STRING_CONST(962, aux_String_958, "#define LUMI_FUNC_NAME \"String.concat\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_958, aux_String_958_Refman);
     CHECK(962)
-    INIT_STRING_CONST(963, aux_String_959, "    char* self, Seq_Length max_length, Seq_Length* length, char* ext, Seq_Length ext_length) {\n");
+    INIT_STRING_CONST(963, aux_String_959, "Return_Code String_concat(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_959, aux_String_959_Refman);
     CHECK(963)
-    INIT_STRING_CONST(964, aux_String_960, "  CCHECK(Buffer_concat_internal(\n");
+    INIT_STRING_CONST(964, aux_String_960, "    char* self, Seq_Length max_length, Seq_Length* length, char* ext, Seq_Length ext_length) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_960, aux_String_960_Refman);
     CHECK(964)
-    INIT_STRING_CONST(965, aux_String_961, "      self + (*length), max_length - 1, length, ext, ext_length))\n");
+    INIT_STRING_CONST(965, aux_String_961, "  CCHECK(Buffer_concat_internal(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_961, aux_String_961_Refman);
     CHECK(965)
-    INIT_STRING_CONST(966, aux_String_962, "  self[*length] = '\\0';\n");
+    INIT_STRING_CONST(966, aux_String_962, "      self + (*length), max_length - 1, length, ext, ext_length))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_962, aux_String_962_Refman);
     CHECK(966)
-    INIT_STRING_CONST(967, aux_String_963, "  return OK;\n");
+    INIT_STRING_CONST(967, aux_String_963, "  self[*length] = '\\0';\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_963, aux_String_963_Refman);
     CHECK(967)
-    INIT_STRING_CONST(968, aux_String_964, "}\n");
+    INIT_STRING_CONST(968, aux_String_964, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_964, aux_String_964_Refman);
     CHECK(968)
-    INIT_STRING_CONST(969, aux_String_965, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(969, aux_String_965, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_965, aux_String_965_Refman);
     CHECK(969)
-    INIT_STRING_CONST(970, aux_String_966, "\n");
+    INIT_STRING_CONST(970, aux_String_966, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_966, aux_String_966_Refman);
     CHECK(970)
-    INIT_STRING_CONST(971, aux_String_967, "#define LUMI_FUNC_NAME \"String.concat-int\"\n");
+    INIT_STRING_CONST(971, aux_String_967, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_967, aux_String_967_Refman);
     CHECK(971)
-    INIT_STRING_CONST(972, aux_String_968, "Return_Code String_concat_int(\n");
+    INIT_STRING_CONST(972, aux_String_968, "#define LUMI_FUNC_NAME \"String.concat-int\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_968, aux_String_968_Refman);
     CHECK(972)
-    INIT_STRING_CONST(973, aux_String_969, "    char* self, Seq_Length max_length, Seq_Length* length, int64_t num) {\n");
+    INIT_STRING_CONST(973, aux_String_969, "Return_Code String_concat_int(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_969, aux_String_969_Refman);
     CHECK(973)
-    INIT_STRING_CONST(974, aux_String_970, "  Seq_Length added_length = 0;\n");
+    INIT_STRING_CONST(974, aux_String_970, "    char* self, Seq_Length max_length, Seq_Length* length, int64_t num) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_970, aux_String_970_Refman);
     CHECK(974)
-    INIT_STRING_CONST(975, aux_String_971, "  CCHECK(Int_strS(num, self + *length, max_length - *length, &added_length))\n");
+    INIT_STRING_CONST(975, aux_String_971, "  Seq_Length added_length = 0;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_971, aux_String_971_Refman);
     CHECK(975)
-    INIT_STRING_CONST(976, aux_String_972, "  *length += added_length;\n");
+    INIT_STRING_CONST(976, aux_String_972, "  CCHECK(Int_strS(num, self + *length, max_length - *length, &added_length))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_972, aux_String_972_Refman);
     CHECK(976)
-    INIT_STRING_CONST(977, aux_String_973, "  return OK;\n");
+    INIT_STRING_CONST(977, aux_String_973, "  *length += added_length;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_973, aux_String_973_Refman);
     CHECK(977)
-    INIT_STRING_CONST(978, aux_String_974, "}\n");
+    INIT_STRING_CONST(978, aux_String_974, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_974, aux_String_974_Refman);
     CHECK(978)
-    INIT_STRING_CONST(979, aux_String_975, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(979, aux_String_975, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_975, aux_String_975_Refman);
     CHECK(979)
-    INIT_STRING_CONST(980, aux_String_976, "\n");
+    INIT_STRING_CONST(980, aux_String_976, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_976, aux_String_976_Refman);
     CHECK(980)
-    INIT_STRING_CONST(981, aux_String_977, "void String_find(\n");
+    INIT_STRING_CONST(981, aux_String_977, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_977, aux_String_977_Refman);
     CHECK(981)
-    INIT_STRING_CONST(982, aux_String_978, "    char* self, Seq_Length max_length, Seq_Length *length,\n");
+    INIT_STRING_CONST(982, aux_String_978, "void String_find(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_978, aux_String_978_Refman);
     CHECK(982)
-    INIT_STRING_CONST(983, aux_String_979, "    char* pattern, Seq_Length pattern_length,\n");
+    INIT_STRING_CONST(983, aux_String_979, "    char* self, Seq_Length max_length, Seq_Length *length,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_979, aux_String_979_Refman);
     CHECK(983)
-    INIT_STRING_CONST(984, aux_String_980, "    Seq_Length* out_index) {\n");
+    INIT_STRING_CONST(984, aux_String_980, "    char* pattern, Seq_Length pattern_length,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_980, aux_String_980_Refman);
     CHECK(984)
-    INIT_STRING_CONST(985, aux_String_981, "  Seq_Length n;\n");
+    INIT_STRING_CONST(985, aux_String_981, "    Seq_Length* out_index) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_981, aux_String_981_Refman);
     CHECK(985)
-    INIT_STRING_CONST(986, aux_String_982, "  for (n = 0; n <= *length - pattern_length; ++n) {\n");
+    INIT_STRING_CONST(986, aux_String_982, "  Seq_Length n;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_982, aux_String_982_Refman);
     CHECK(986)
-    INIT_STRING_CONST(987, aux_String_983, "    if (strncmp(self + n, pattern, pattern_length) == 0) {\n");
+    INIT_STRING_CONST(987, aux_String_983, "  for (n = 0; n <= *length - pattern_length; ++n) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_983, aux_String_983_Refman);
     CHECK(987)
-    INIT_STRING_CONST(988, aux_String_984, "      *out_index = n;\n");
+    INIT_STRING_CONST(988, aux_String_984, "    if (strncmp(self + n, pattern, pattern_length) == 0) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_984, aux_String_984_Refman);
     CHECK(988)
-    INIT_STRING_CONST(989, aux_String_985, "      return;\n");
+    INIT_STRING_CONST(989, aux_String_985, "      *out_index = n;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_985, aux_String_985_Refman);
     CHECK(989)
-    INIT_STRING_CONST(990, aux_String_986, "    }\n");
+    INIT_STRING_CONST(990, aux_String_986, "      return;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_986, aux_String_986_Refman);
     CHECK(990)
-    INIT_STRING_CONST(991, aux_String_987, "  }\n");
+    INIT_STRING_CONST(991, aux_String_987, "    }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_987, aux_String_987_Refman);
     CHECK(991)
-    INIT_STRING_CONST(992, aux_String_988, "  *out_index = *length;\n");
+    INIT_STRING_CONST(992, aux_String_988, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_988, aux_String_988_Refman);
     CHECK(992)
-    INIT_STRING_CONST(993, aux_String_989, "}\n");
+    INIT_STRING_CONST(993, aux_String_989, "  *out_index = *length;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_989, aux_String_989_Refman);
     CHECK(993)
-    INIT_STRING_CONST(994, aux_String_990, "\n");
+    INIT_STRING_CONST(994, aux_String_990, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_990, aux_String_990_Refman);
     CHECK(994)
-    INIT_STRING_CONST(995, aux_String_991, "void String_has(\n");
+    INIT_STRING_CONST(995, aux_String_991, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_991, aux_String_991_Refman);
     CHECK(995)
-    INIT_STRING_CONST(996, aux_String_992, "    char* self, Seq_Length max_length, Seq_Length *length, Char ch, Bool* found) {\n");
+    INIT_STRING_CONST(996, aux_String_992, "void String_has(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_992, aux_String_992_Refman);
     CHECK(996)
-    INIT_STRING_CONST(997, aux_String_993, "  Seq_Length n;\n");
+    INIT_STRING_CONST(997, aux_String_993, "    char* self, Seq_Length max_length, Seq_Length *length, Char ch, Bool* found) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_993, aux_String_993_Refman);
     CHECK(997)
-    INIT_STRING_CONST(998, aux_String_994, "  for (n = 0; n < *length; ++n) {\n");
+    INIT_STRING_CONST(998, aux_String_994, "  Seq_Length n;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_994, aux_String_994_Refman);
     CHECK(998)
-    INIT_STRING_CONST(999, aux_String_995, "    if (self[n] == ch) {\n");
+    INIT_STRING_CONST(999, aux_String_995, "  for (n = 0; n < *length; ++n) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_995, aux_String_995_Refman);
     CHECK(999)
-    INIT_STRING_CONST(1000, aux_String_996, "      *found = true;\n");
+    INIT_STRING_CONST(1000, aux_String_996, "    if (self[n] == ch) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_996, aux_String_996_Refman);
     CHECK(1000)
-    INIT_STRING_CONST(1001, aux_String_997, "      return;\n");
+    INIT_STRING_CONST(1001, aux_String_997, "      *found = true;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_997, aux_String_997_Refman);
     CHECK(1001)
-    INIT_STRING_CONST(1002, aux_String_998, "    }\n");
+    INIT_STRING_CONST(1002, aux_String_998, "      return;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_998, aux_String_998_Refman);
     CHECK(1002)
-    INIT_STRING_CONST(1003, aux_String_999, "  }\n");
+    INIT_STRING_CONST(1003, aux_String_999, "    }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_999, aux_String_999_Refman);
     CHECK(1003)
-    INIT_STRING_CONST(1004, aux_String_1000, "  *found = false;\n");
+    INIT_STRING_CONST(1004, aux_String_1000, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1000, aux_String_1000_Refman);
     CHECK(1004)
-    INIT_STRING_CONST(1005, aux_String_1001, "}\n");
+    INIT_STRING_CONST(1005, aux_String_1001, "  *found = false;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1001, aux_String_1001_Refman);
     CHECK(1005)
-    INIT_STRING_CONST(1006, aux_String_1002, "\n");
+    INIT_STRING_CONST(1006, aux_String_1002, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1002, aux_String_1002_Refman);
     CHECK(1006)
     INIT_STRING_CONST(1007, aux_String_1003, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1003, aux_String_1003_Refman);
     CHECK(1007)
-    INIT_STRING_CONST(1008, aux_String_1004, "/* File */\n");
+    INIT_STRING_CONST(1008, aux_String_1004, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1004, aux_String_1004_Refman);
     CHECK(1008)
-    INIT_STRING_CONST(1009, aux_String_1005, "\n");
+    INIT_STRING_CONST(1009, aux_String_1005, "/* File */\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1005, aux_String_1005_Refman);
     CHECK(1009)
-    INIT_STRING_CONST(1010, aux_String_1006, "void File_Del(File* self) {\n");
+    INIT_STRING_CONST(1010, aux_String_1006, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1006, aux_String_1006_Refman);
     CHECK(1010)
-    INIT_STRING_CONST(1011, aux_String_1007, "  if (self != NULL && self->fobj != NULL) {\n");
+    INIT_STRING_CONST(1011, aux_String_1007, "void File_Del(File* self) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1007, aux_String_1007_Refman);
     CHECK(1011)
-    INIT_STRING_CONST(1012, aux_String_1008, "    fclose(self->fobj);\n");
+    INIT_STRING_CONST(1012, aux_String_1008, "  if (self != NULL && self->fobj != NULL) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1008, aux_String_1008_Refman);
     CHECK(1012)
-    INIT_STRING_CONST(1013, aux_String_1009, "    self->fobj = NULL;\n");
+    INIT_STRING_CONST(1013, aux_String_1009, "    fclose(self->fobj);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1009, aux_String_1009_Refman);
     CHECK(1013)
-    INIT_STRING_CONST(1014, aux_String_1010, "  }\n");
+    INIT_STRING_CONST(1014, aux_String_1010, "    self->fobj = NULL;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1010, aux_String_1010_Refman);
     CHECK(1014)
-    INIT_STRING_CONST(1015, aux_String_1011, "}\n");
+    INIT_STRING_CONST(1015, aux_String_1011, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1011, aux_String_1011_Refman);
     CHECK(1015)
-    INIT_STRING_CONST(1016, aux_String_1012, "#define FileReadText_Del(self) File_Del(self)\n");
+    INIT_STRING_CONST(1016, aux_String_1012, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1012, aux_String_1012_Refman);
     CHECK(1016)
-    INIT_STRING_CONST(1017, aux_String_1013, "#define FileReadBinary_Del(self) File_Del(self)\n");
+    INIT_STRING_CONST(1017, aux_String_1013, "#define FileReadText_Del(self) File_Del(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1013, aux_String_1013_Refman);
     CHECK(1017)
-    INIT_STRING_CONST(1018, aux_String_1014, "#define FileWriteText_Del(self) File_Del(self)\n");
+    INIT_STRING_CONST(1018, aux_String_1014, "#define FileReadBinary_Del(self) File_Del(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1014, aux_String_1014_Refman);
     CHECK(1018)
-    INIT_STRING_CONST(1019, aux_String_1015, "#define FileWriteBinary_Del(self) File_Del(self)\n");
+    INIT_STRING_CONST(1019, aux_String_1015, "#define FileWriteText_Del(self) File_Del(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1015, aux_String_1015_Refman);
     CHECK(1019)
-    INIT_STRING_CONST(1020, aux_String_1016, "#define FileReadWriteText_Del(self) File_Del(self)\n");
+    INIT_STRING_CONST(1020, aux_String_1016, "#define FileWriteBinary_Del(self) File_Del(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1016, aux_String_1016_Refman);
     CHECK(1020)
-    INIT_STRING_CONST(1021, aux_String_1017, "#define FileReadWriteBinary_Del(self) File_Del(self)\n");
+    INIT_STRING_CONST(1021, aux_String_1017, "#define FileReadWriteText_Del(self) File_Del(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1017, aux_String_1017_Refman);
     CHECK(1021)
-    INIT_STRING_CONST(1022, aux_String_1018, "\n");
+    INIT_STRING_CONST(1022, aux_String_1018, "#define FileReadWriteBinary_Del(self) File_Del(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1018, aux_String_1018_Refman);
     CHECK(1022)
-    INIT_STRING_CONST(1023, aux_String_1019, "Generic_Type_Dynamic File_dynamic = { (Dynamic_Del)File_Del };\n");
+    INIT_STRING_CONST(1023, aux_String_1019, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1019, aux_String_1019_Refman);
     CHECK(1023)
-    INIT_STRING_CONST(1024, aux_String_1020, "#define FileReadText_dynamic File_dynamic\n");
+    INIT_STRING_CONST(1024, aux_String_1020, "Generic_Type_Dynamic File_dynamic = { (Dynamic_Del)File_Del };\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1020, aux_String_1020_Refman);
     CHECK(1024)
-    INIT_STRING_CONST(1025, aux_String_1021, "#define FileReadBinary_dynamic File_dynamic\n");
+    INIT_STRING_CONST(1025, aux_String_1021, "#define FileReadText_dynamic File_dynamic\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1021, aux_String_1021_Refman);
     CHECK(1025)
-    INIT_STRING_CONST(1026, aux_String_1022, "#define FileWriteText_dynamic File_dynamic\n");
+    INIT_STRING_CONST(1026, aux_String_1022, "#define FileReadBinary_dynamic File_dynamic\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1022, aux_String_1022_Refman);
     CHECK(1026)
-    INIT_STRING_CONST(1027, aux_String_1023, "#define FileWriteBinary_dynamic File_dynamic\n");
+    INIT_STRING_CONST(1027, aux_String_1023, "#define FileWriteText_dynamic File_dynamic\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1023, aux_String_1023_Refman);
     CHECK(1027)
-    INIT_STRING_CONST(1028, aux_String_1024, "#define FileReadWriteText_dynamic File_dynamic\n");
+    INIT_STRING_CONST(1028, aux_String_1024, "#define FileWriteBinary_dynamic File_dynamic\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1024, aux_String_1024_Refman);
     CHECK(1028)
-    INIT_STRING_CONST(1029, aux_String_1025, "#define FileReadWriteBinary_dynamic File_dynamic\n");
+    INIT_STRING_CONST(1029, aux_String_1025, "#define FileReadWriteText_dynamic File_dynamic\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1025, aux_String_1025_Refman);
     CHECK(1029)
-    INIT_STRING_CONST(1030, aux_String_1026, "\n");
+    INIT_STRING_CONST(1030, aux_String_1026, "#define FileReadWriteBinary_dynamic File_dynamic\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1026, aux_String_1026_Refman);
     CHECK(1030)
-    INIT_STRING_CONST(1031, aux_String_1027, "#define LUMI_FUNC_NAME \"File.close\"\n");
+    INIT_STRING_CONST(1031, aux_String_1027, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1027, aux_String_1027_Refman);
     CHECK(1031)
-    INIT_STRING_CONST(1032, aux_String_1028, "Return_Code File_close(File* self) {\n");
+    INIT_STRING_CONST(1032, aux_String_1028, "#define LUMI_FUNC_NAME \"File.close\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1028, aux_String_1028_Refman);
     CHECK(1032)
-    INIT_STRING_CONST(1033, aux_String_1029, "  if (lumi_debug_value == LUMI_DEBUG_FAIL || self->fobj != NULL) {\n");
+    INIT_STRING_CONST(1033, aux_String_1029, "Return_Code File_close(File* self) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1029, aux_String_1029_Refman);
     CHECK(1033)
-    INIT_STRING_CONST(1034, aux_String_1030, "    if (lumi_debug_value == LUMI_DEBUG_FAIL || fclose(self->fobj) != 0)\n");
+    INIT_STRING_CONST(1034, aux_String_1030, "  if (lumi_debug_value == LUMI_DEBUG_FAIL || self->fobj != NULL) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1030, aux_String_1030_Refman);
     CHECK(1034)
-    INIT_STRING_CONST(1035, aux_String_1031, "      CRAISE(\"close file failed\")\n");
+    INIT_STRING_CONST(1035, aux_String_1031, "    if (lumi_debug_value == LUMI_DEBUG_FAIL || fclose(self->fobj) != 0)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1031, aux_String_1031_Refman);
     CHECK(1035)
-    INIT_STRING_CONST(1036, aux_String_1032, "    self->fobj = NULL;\n");
+    INIT_STRING_CONST(1036, aux_String_1032, "      CRAISE(\"close file failed\")\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1032, aux_String_1032_Refman);
     CHECK(1036)
-    INIT_STRING_CONST(1037, aux_String_1033, "  }\n");
+    INIT_STRING_CONST(1037, aux_String_1033, "    self->fobj = NULL;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1033, aux_String_1033_Refman);
     CHECK(1037)
-    INIT_STRING_CONST(1038, aux_String_1034, "  return OK;\n");
+    INIT_STRING_CONST(1038, aux_String_1034, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1034, aux_String_1034_Refman);
     CHECK(1038)
-    INIT_STRING_CONST(1039, aux_String_1035, "}\n");
+    INIT_STRING_CONST(1039, aux_String_1035, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1035, aux_String_1035_Refman);
     CHECK(1039)
-    INIT_STRING_CONST(1040, aux_String_1036, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1040, aux_String_1036, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1036, aux_String_1036_Refman);
     CHECK(1040)
-    INIT_STRING_CONST(1041, aux_String_1037, "#define FileReadText_close(self) File_close(self)\n");
+    INIT_STRING_CONST(1041, aux_String_1037, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1037, aux_String_1037_Refman);
     CHECK(1041)
-    INIT_STRING_CONST(1042, aux_String_1038, "#define FileReadBinary_close(self) File_close(self)\n");
+    INIT_STRING_CONST(1042, aux_String_1038, "#define FileReadText_close(self) File_close(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1038, aux_String_1038_Refman);
     CHECK(1042)
-    INIT_STRING_CONST(1043, aux_String_1039, "#define FileWriteText_close(self) File_close(self)\n");
+    INIT_STRING_CONST(1043, aux_String_1039, "#define FileReadBinary_close(self) File_close(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1039, aux_String_1039_Refman);
     CHECK(1043)
-    INIT_STRING_CONST(1044, aux_String_1040, "#define FileWriteBinary_close(self) File_close(self)\n");
+    INIT_STRING_CONST(1044, aux_String_1040, "#define FileWriteText_close(self) File_close(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1040, aux_String_1040_Refman);
     CHECK(1044)
-    INIT_STRING_CONST(1045, aux_String_1041, "#define FileReadWriteText_close(self) File_close(self)\n");
+    INIT_STRING_CONST(1045, aux_String_1041, "#define FileWriteBinary_close(self) File_close(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1041, aux_String_1041_Refman);
     CHECK(1045)
-    INIT_STRING_CONST(1046, aux_String_1042, "#define FileReadWriteBinary_close(self) File_close(self)\n");
+    INIT_STRING_CONST(1046, aux_String_1042, "#define FileReadWriteText_close(self) File_close(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1042, aux_String_1042_Refman);
     CHECK(1046)
-    INIT_STRING_CONST(1047, aux_String_1043, "\n");
+    INIT_STRING_CONST(1047, aux_String_1043, "#define FileReadWriteBinary_close(self) File_close(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1043, aux_String_1043_Refman);
     CHECK(1047)
-    INIT_STRING_CONST(1048, aux_String_1044, "#define LUMI_FUNC_NAME \"File.new\"\n");
+    INIT_STRING_CONST(1048, aux_String_1044, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1044, aux_String_1044_Refman);
     CHECK(1048)
-    INIT_STRING_CONST(1049, aux_String_1045, "Return_Code File_new(File* self, char* name, char* mode) {\n");
+    INIT_STRING_CONST(1049, aux_String_1045, "#define LUMI_FUNC_NAME \"File.new\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1045, aux_String_1045_Refman);
     CHECK(1049)
-    INIT_STRING_CONST(1050, aux_String_1046, "  if (lumi_debug_value == LUMI_DEBUG_NOTHING) {\n");
+    INIT_STRING_CONST(1050, aux_String_1046, "Return_Code File_new(File* self, char* name, char* mode) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1046, aux_String_1046_Refman);
     CHECK(1050)
-    INIT_STRING_CONST(1051, aux_String_1047, "    CCHECK(File_close(self))\n");
+    INIT_STRING_CONST(1051, aux_String_1047, "  if (lumi_debug_value == LUMI_DEBUG_NOTHING) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1047, aux_String_1047_Refman);
     CHECK(1051)
-    INIT_STRING_CONST(1052, aux_String_1048, "  }\n");
+    INIT_STRING_CONST(1052, aux_String_1048, "    CCHECK(File_close(self))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1048, aux_String_1048_Refman);
     CHECK(1052)
-    INIT_STRING_CONST(1053, aux_String_1049, "  if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n");
+    INIT_STRING_CONST(1053, aux_String_1049, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1049, aux_String_1049_Refman);
     CHECK(1053)
-    INIT_STRING_CONST(1054, aux_String_1050, "    if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
+    INIT_STRING_CONST(1054, aux_String_1050, "  if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1050, aux_String_1050_Refman);
     CHECK(1054)
-    INIT_STRING_CONST(1055, aux_String_1051, "      self->fobj = fopen(name, mode);\n");
+    INIT_STRING_CONST(1055, aux_String_1051, "    if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1051, aux_String_1051_Refman);
     CHECK(1055)
-    INIT_STRING_CONST(1056, aux_String_1052, "    }\n");
+    INIT_STRING_CONST(1056, aux_String_1052, "      self->fobj = fopen(name, mode);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1052, aux_String_1052_Refman);
     CHECK(1056)
-    INIT_STRING_CONST(1057, aux_String_1053, "    if (self->fobj == NULL) CRAISE(\"open file failed\")\n");
+    INIT_STRING_CONST(1057, aux_String_1053, "    }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1053, aux_String_1053_Refman);
     CHECK(1057)
-    INIT_STRING_CONST(1058, aux_String_1054, "  }\n");
+    INIT_STRING_CONST(1058, aux_String_1054, "    if (self->fobj == NULL) CRAISE(\"open file failed\")\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1054, aux_String_1054_Refman);
     CHECK(1058)
-    INIT_STRING_CONST(1059, aux_String_1055, "  return OK;\n");
+    INIT_STRING_CONST(1059, aux_String_1055, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1055, aux_String_1055_Refman);
     CHECK(1059)
-    INIT_STRING_CONST(1060, aux_String_1056, "}\n");
+    INIT_STRING_CONST(1060, aux_String_1056, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1056, aux_String_1056_Refman);
     CHECK(1060)
-    INIT_STRING_CONST(1061, aux_String_1057, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1061, aux_String_1057, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1057, aux_String_1057_Refman);
     CHECK(1061)
-    INIT_STRING_CONST(1062, aux_String_1058, "#define FileReadText_new(self, name, name_max_length, name_length) \\\n");
+    INIT_STRING_CONST(1062, aux_String_1058, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1058, aux_String_1058_Refman);
     CHECK(1062)
-    INIT_STRING_CONST(1063, aux_String_1059, "  File_new(self, name, \"r\")\n");
+    INIT_STRING_CONST(1063, aux_String_1059, "#define FileReadText_new(self, name, name_max_length, name_length) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1059, aux_String_1059_Refman);
     CHECK(1063)
-    INIT_STRING_CONST(1064, aux_String_1060, "#define FileReadBinary_new(self, name, name_max_length, name_length) \\\n");
+    INIT_STRING_CONST(1064, aux_String_1060, "  File_new(self, name, \"r\")\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1060, aux_String_1060_Refman);
     CHECK(1064)
-    INIT_STRING_CONST(1065, aux_String_1061, "  File_new(self, name, \"rb\")\n");
+    INIT_STRING_CONST(1065, aux_String_1061, "#define FileReadBinary_new(self, name, name_max_length, name_length) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1061, aux_String_1061_Refman);
     CHECK(1065)
-    INIT_STRING_CONST(1066, aux_String_1062, "#define FileWriteText_new(self, name, name_max_length, name_length, append) \\\n");
+    INIT_STRING_CONST(1066, aux_String_1062, "  File_new(self, name, \"rb\")\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1062, aux_String_1062_Refman);
     CHECK(1066)
-    INIT_STRING_CONST(1067, aux_String_1063, "  File_new(self, name, append? \"a\": \"w\")\n");
+    INIT_STRING_CONST(1067, aux_String_1063, "#define FileWriteText_new(self, name, name_max_length, name_length, append) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1063, aux_String_1063_Refman);
     CHECK(1067)
-    INIT_STRING_CONST(1068, aux_String_1064, "#define FileWriteBinary_new(self, name, name_max_length, name_length, append) \\\n");
+    INIT_STRING_CONST(1068, aux_String_1064, "  File_new(self, name, append? \"a\": \"w\")\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1064, aux_String_1064_Refman);
     CHECK(1068)
-    INIT_STRING_CONST(1069, aux_String_1065, "  File_new(self, name, append? \"ab\": \"wb\")\n");
+    INIT_STRING_CONST(1069, aux_String_1065, "#define FileWriteBinary_new(self, name, name_max_length, name_length, append) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1065, aux_String_1065_Refman);
     CHECK(1069)
-    INIT_STRING_CONST(1070, aux_String_1066, "#define FileReadWriteText_new(self, name, name_max_length, name_length, append, exist) \\\n");
+    INIT_STRING_CONST(1070, aux_String_1066, "  File_new(self, name, append? \"ab\": \"wb\")\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1066, aux_String_1066_Refman);
     CHECK(1070)
-    INIT_STRING_CONST(1071, aux_String_1067, "  File_new(self, name, append? \"a+\": exist? \"r+\": \"w+\")\n");
+    INIT_STRING_CONST(1071, aux_String_1067, "#define FileReadWriteText_new(self, name, name_max_length, name_length, append, exist) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1067, aux_String_1067_Refman);
     CHECK(1071)
-    INIT_STRING_CONST(1072, aux_String_1068, "#define FileReadWriteBinary_new(self, name, name_max_length, name_length, append, exist) \\\n");
+    INIT_STRING_CONST(1072, aux_String_1068, "  File_new(self, name, append? \"a+\": exist? \"r+\": \"w+\")\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1068, aux_String_1068_Refman);
     CHECK(1072)
-    INIT_STRING_CONST(1073, aux_String_1069, "  File_new(self, name, append? \"ab+\": exist? \"rb+\": \"wb+\")\n");
+    INIT_STRING_CONST(1073, aux_String_1069, "#define FileReadWriteBinary_new(self, name, name_max_length, name_length, append, exist) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1069, aux_String_1069_Refman);
     CHECK(1073)
-    INIT_STRING_CONST(1074, aux_String_1070, "\n");
+    INIT_STRING_CONST(1074, aux_String_1070, "  File_new(self, name, append? \"ab+\": exist? \"rb+\": \"wb+\")\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1070, aux_String_1070_Refman);
     CHECK(1074)
-    INIT_STRING_CONST(1075, aux_String_1071, "#define CHECK_OPEN(self) \\\n");
+    INIT_STRING_CONST(1075, aux_String_1071, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1071, aux_String_1071_Refman);
     CHECK(1075)
-    INIT_STRING_CONST(1076, aux_String_1072, "  if (lumi_debug_value != LUMI_DEBUG_FAIL && self->fobj == NULL) \\\n");
+    INIT_STRING_CONST(1076, aux_String_1072, "#define CHECK_OPEN(self) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1072, aux_String_1072_Refman);
     CHECK(1076)
-    INIT_STRING_CONST(1077, aux_String_1073, "    CRAISE(LUMI_error_messages.file_not_opened.str)\n");
+    INIT_STRING_CONST(1077, aux_String_1073, "  if (lumi_debug_value != LUMI_DEBUG_FAIL && self->fobj == NULL) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1073, aux_String_1073_Refman);
     CHECK(1077)
-    INIT_STRING_CONST(1078, aux_String_1074, "\n");
+    INIT_STRING_CONST(1078, aux_String_1074, "    CRAISE(LUMI_error_messages.file_not_opened.str)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1074, aux_String_1074_Refman);
     CHECK(1078)
-    INIT_STRING_CONST(1079, aux_String_1075, "#define LUMI_FUNC_NAME \"File.tell\"\n");
+    INIT_STRING_CONST(1079, aux_String_1075, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1075, aux_String_1075_Refman);
     CHECK(1079)
-    INIT_STRING_CONST(1080, aux_String_1076, "Return_Code File_tell(File* self, uint64_t* offset) {\n");
+    INIT_STRING_CONST(1080, aux_String_1076, "#define LUMI_FUNC_NAME \"File.tell\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1076, aux_String_1076_Refman);
     CHECK(1080)
-    INIT_STRING_CONST(1081, aux_String_1077, "  long ret = -1;\n");
+    INIT_STRING_CONST(1081, aux_String_1077, "Return_Code File_tell(File* self, uint64_t* offset) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1077, aux_String_1077_Refman);
     CHECK(1081)
-    INIT_STRING_CONST(1082, aux_String_1078, "  CHECK_OPEN(self)\n");
+    INIT_STRING_CONST(1082, aux_String_1078, "  long ret = -1;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1078, aux_String_1078_Refman);
     CHECK(1082)
-    INIT_STRING_CONST(1083, aux_String_1079, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
+    INIT_STRING_CONST(1083, aux_String_1079, "  CHECK_OPEN(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1079, aux_String_1079_Refman);
     CHECK(1083)
-    INIT_STRING_CONST(1084, aux_String_1080, "    ret = ftell(self->fobj);\n");
+    INIT_STRING_CONST(1084, aux_String_1080, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1080, aux_String_1080_Refman);
     CHECK(1084)
-    INIT_STRING_CONST(1085, aux_String_1081, "  }\n");
+    INIT_STRING_CONST(1085, aux_String_1081, "    ret = ftell(self->fobj);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1081, aux_String_1081_Refman);
     CHECK(1085)
-    INIT_STRING_CONST(1086, aux_String_1082, "  if (ret < 0) CRAISE(\"getting file offset failed\")\n");
+    INIT_STRING_CONST(1086, aux_String_1082, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1082, aux_String_1082_Refman);
     CHECK(1086)
-    INIT_STRING_CONST(1087, aux_String_1083, "  *offset = ret;\n");
+    INIT_STRING_CONST(1087, aux_String_1083, "  if (ret < 0) CRAISE(\"getting file offset failed\")\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1083, aux_String_1083_Refman);
     CHECK(1087)
-    INIT_STRING_CONST(1088, aux_String_1084, "  return OK;\n");
+    INIT_STRING_CONST(1088, aux_String_1084, "  *offset = ret;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1084, aux_String_1084_Refman);
     CHECK(1088)
-    INIT_STRING_CONST(1089, aux_String_1085, "}\n");
+    INIT_STRING_CONST(1089, aux_String_1085, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1085, aux_String_1085_Refman);
     CHECK(1089)
-    INIT_STRING_CONST(1090, aux_String_1086, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1090, aux_String_1086, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1086, aux_String_1086_Refman);
     CHECK(1090)
-    INIT_STRING_CONST(1091, aux_String_1087, "#define FileReadText_tell(self, offset) File_tell(self, offset)\n");
+    INIT_STRING_CONST(1091, aux_String_1087, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1087, aux_String_1087_Refman);
     CHECK(1091)
-    INIT_STRING_CONST(1092, aux_String_1088, "#define FileReadBinary_tell(self, offset) File_tell(self, offset)\n");
+    INIT_STRING_CONST(1092, aux_String_1088, "#define FileReadText_tell(self, offset) File_tell(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1088, aux_String_1088_Refman);
     CHECK(1092)
-    INIT_STRING_CONST(1093, aux_String_1089, "#define FileWriteText_tell(self, offset) File_tell(self, offset)\n");
+    INIT_STRING_CONST(1093, aux_String_1089, "#define FileReadBinary_tell(self, offset) File_tell(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1089, aux_String_1089_Refman);
     CHECK(1093)
-    INIT_STRING_CONST(1094, aux_String_1090, "#define FileWriteBinary_tell(self, offset) File_tell(self, offset)\n");
+    INIT_STRING_CONST(1094, aux_String_1090, "#define FileWriteText_tell(self, offset) File_tell(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1090, aux_String_1090_Refman);
     CHECK(1094)
-    INIT_STRING_CONST(1095, aux_String_1091, "#define FileReadWriteText_tell(self, offset) File_tell(self, offset)\n");
+    INIT_STRING_CONST(1095, aux_String_1091, "#define FileWriteBinary_tell(self, offset) File_tell(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1091, aux_String_1091_Refman);
     CHECK(1095)
-    INIT_STRING_CONST(1096, aux_String_1092, "#define FileReadWriteBinary_tell(self, offset) File_tell(self, offset)\n");
+    INIT_STRING_CONST(1096, aux_String_1092, "#define FileReadWriteText_tell(self, offset) File_tell(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1092, aux_String_1092_Refman);
     CHECK(1096)
-    INIT_STRING_CONST(1097, aux_String_1093, "\n");
+    INIT_STRING_CONST(1097, aux_String_1093, "#define FileReadWriteBinary_tell(self, offset) File_tell(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1093, aux_String_1093_Refman);
     CHECK(1097)
-    INIT_STRING_CONST(1098, aux_String_1094, "#define LUMI_FUNC_NAME \"File.seek\"\n");
+    INIT_STRING_CONST(1098, aux_String_1094, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1094, aux_String_1094_Refman);
     CHECK(1098)
-    INIT_STRING_CONST(1099, aux_String_1095, "Return_Code File_seek(File* self, uint64_t offset, int whence) {\n");
+    INIT_STRING_CONST(1099, aux_String_1095, "#define LUMI_FUNC_NAME \"File.seek\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1095, aux_String_1095_Refman);
     CHECK(1099)
-    INIT_STRING_CONST(1100, aux_String_1096, "  int ret = -1;\n");
+    INIT_STRING_CONST(1100, aux_String_1096, "Return_Code File_seek(File* self, uint64_t offset, int whence) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1096, aux_String_1096_Refman);
     CHECK(1100)
-    INIT_STRING_CONST(1101, aux_String_1097, "  CHECK_OPEN(self)\n");
+    INIT_STRING_CONST(1101, aux_String_1097, "  int ret = -1;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1097, aux_String_1097_Refman);
     CHECK(1101)
-    INIT_STRING_CONST(1102, aux_String_1098, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
+    INIT_STRING_CONST(1102, aux_String_1098, "  CHECK_OPEN(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1098, aux_String_1098_Refman);
     CHECK(1102)
-    INIT_STRING_CONST(1103, aux_String_1099, "    ret = fseek(self->fobj, offset, whence);\n");
+    INIT_STRING_CONST(1103, aux_String_1099, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1099, aux_String_1099_Refman);
     CHECK(1103)
-    INIT_STRING_CONST(1104, aux_String_1100, "  }\n");
+    INIT_STRING_CONST(1104, aux_String_1100, "    ret = fseek(self->fobj, offset, whence);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1100, aux_String_1100_Refman);
     CHECK(1104)
-    INIT_STRING_CONST(1105, aux_String_1101, "  if (ret != 0) CRAISE(\"setting file offset failed\")\n");
+    INIT_STRING_CONST(1105, aux_String_1101, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1101, aux_String_1101_Refman);
     CHECK(1105)
-    INIT_STRING_CONST(1106, aux_String_1102, "  return OK;\n");
+    INIT_STRING_CONST(1106, aux_String_1102, "  if (ret != 0) CRAISE(\"setting file offset failed\")\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1102, aux_String_1102_Refman);
     CHECK(1106)
-    INIT_STRING_CONST(1107, aux_String_1103, "}\n");
+    INIT_STRING_CONST(1107, aux_String_1103, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1103, aux_String_1103_Refman);
     CHECK(1107)
-    INIT_STRING_CONST(1108, aux_String_1104, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1108, aux_String_1104, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1104, aux_String_1104_Refman);
     CHECK(1108)
-    INIT_STRING_CONST(1109, aux_String_1105, "#define File_seek_set(self, offset) File_seek(self, offset, SEEK_SET)\n");
+    INIT_STRING_CONST(1109, aux_String_1105, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1105, aux_String_1105_Refman);
     CHECK(1109)
-    INIT_STRING_CONST(1110, aux_String_1106, "#define File_seek_cur(self, offset) File_seek(self, offset, SEEK_CUR)\n");
+    INIT_STRING_CONST(1110, aux_String_1106, "#define File_seek_set(self, offset) File_seek(self, offset, SEEK_SET)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1106, aux_String_1106_Refman);
     CHECK(1110)
-    INIT_STRING_CONST(1111, aux_String_1107, "#define File_seek_end(self, offset) File_seek(self, offset, SEEK_END)\n");
+    INIT_STRING_CONST(1111, aux_String_1107, "#define File_seek_cur(self, offset) File_seek(self, offset, SEEK_CUR)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1107, aux_String_1107_Refman);
     CHECK(1111)
-    INIT_STRING_CONST(1112, aux_String_1108, "#define FileReadText_seek_set(self, offset) File_seek_set(self, offset)\n");
+    INIT_STRING_CONST(1112, aux_String_1108, "#define File_seek_end(self, offset) File_seek(self, offset, SEEK_END)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1108, aux_String_1108_Refman);
     CHECK(1112)
-    INIT_STRING_CONST(1113, aux_String_1109, "#define FileReadBinary_seek_set(self, offset) File_seek_set(self, offset)\n");
+    INIT_STRING_CONST(1113, aux_String_1109, "#define FileReadText_seek_set(self, offset) File_seek_set(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1109, aux_String_1109_Refman);
     CHECK(1113)
-    INIT_STRING_CONST(1114, aux_String_1110, "#define FileWriteText_seek_set(self, offset) File_seek_set(self, offset)\n");
+    INIT_STRING_CONST(1114, aux_String_1110, "#define FileReadBinary_seek_set(self, offset) File_seek_set(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1110, aux_String_1110_Refman);
     CHECK(1114)
-    INIT_STRING_CONST(1115, aux_String_1111, "#define FileWriteBinary_seek_set(self, offset) File_seek_set(self, offset)\n");
+    INIT_STRING_CONST(1115, aux_String_1111, "#define FileWriteText_seek_set(self, offset) File_seek_set(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1111, aux_String_1111_Refman);
     CHECK(1115)
-    INIT_STRING_CONST(1116, aux_String_1112, "#define FileReadWriteText_seek_set(self, offset) File_seek_set(self, offset)\n");
+    INIT_STRING_CONST(1116, aux_String_1112, "#define FileWriteBinary_seek_set(self, offset) File_seek_set(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1112, aux_String_1112_Refman);
     CHECK(1116)
-    INIT_STRING_CONST(1117, aux_String_1113, "#define FileReadWriteBinary_seek_set(self, offset) File_seek_set(self, offset)\n");
+    INIT_STRING_CONST(1117, aux_String_1113, "#define FileReadWriteText_seek_set(self, offset) File_seek_set(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1113, aux_String_1113_Refman);
     CHECK(1117)
-    INIT_STRING_CONST(1118, aux_String_1114, "#define FileReadText_seek_cur(self, offset) File_seek_cur(self, offset)\n");
+    INIT_STRING_CONST(1118, aux_String_1114, "#define FileReadWriteBinary_seek_set(self, offset) File_seek_set(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1114, aux_String_1114_Refman);
     CHECK(1118)
-    INIT_STRING_CONST(1119, aux_String_1115, "#define FileReadBinary_seek_cur(self, offset) File_seek_cur(self, offset)\n");
+    INIT_STRING_CONST(1119, aux_String_1115, "#define FileReadText_seek_cur(self, offset) File_seek_cur(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1115, aux_String_1115_Refman);
     CHECK(1119)
-    INIT_STRING_CONST(1120, aux_String_1116, "#define FileWriteText_seek_cur(self, offset) File_seek_cur(self, offset)\n");
+    INIT_STRING_CONST(1120, aux_String_1116, "#define FileReadBinary_seek_cur(self, offset) File_seek_cur(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1116, aux_String_1116_Refman);
     CHECK(1120)
-    INIT_STRING_CONST(1121, aux_String_1117, "#define FileWriteBinary_seek_cur(self, offset) File_seek_cur(self, offset)\n");
+    INIT_STRING_CONST(1121, aux_String_1117, "#define FileWriteText_seek_cur(self, offset) File_seek_cur(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1117, aux_String_1117_Refman);
     CHECK(1121)
-    INIT_STRING_CONST(1122, aux_String_1118, "#define FileReadWriteText_seek_cur(self, offset) File_seek_cur(self, offset)\n");
+    INIT_STRING_CONST(1122, aux_String_1118, "#define FileWriteBinary_seek_cur(self, offset) File_seek_cur(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1118, aux_String_1118_Refman);
     CHECK(1122)
-    INIT_STRING_CONST(1123, aux_String_1119, "#define FileReadWriteBinary_seek_cur(self, offset) File_seek_cur(self, offset)\n");
+    INIT_STRING_CONST(1123, aux_String_1119, "#define FileReadWriteText_seek_cur(self, offset) File_seek_cur(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1119, aux_String_1119_Refman);
     CHECK(1123)
-    INIT_STRING_CONST(1124, aux_String_1120, "#define FileReadText_seek_end(self, offset) File_seek_end(self, offset)\n");
+    INIT_STRING_CONST(1124, aux_String_1120, "#define FileReadWriteBinary_seek_cur(self, offset) File_seek_cur(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1120, aux_String_1120_Refman);
     CHECK(1124)
-    INIT_STRING_CONST(1125, aux_String_1121, "#define FileReadBinary_seek_end(self, offset) File_seek_end(self, offset)\n");
+    INIT_STRING_CONST(1125, aux_String_1121, "#define FileReadText_seek_end(self, offset) File_seek_end(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1121, aux_String_1121_Refman);
     CHECK(1125)
-    INIT_STRING_CONST(1126, aux_String_1122, "#define FileWriteText_seek_end(self, offset) File_seek_end(self, offset)\n");
+    INIT_STRING_CONST(1126, aux_String_1122, "#define FileReadBinary_seek_end(self, offset) File_seek_end(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1122, aux_String_1122_Refman);
     CHECK(1126)
-    INIT_STRING_CONST(1127, aux_String_1123, "#define FileWriteBinary_seek_end(self, offset) File_seek_end(self, offset)\n");
+    INIT_STRING_CONST(1127, aux_String_1123, "#define FileWriteText_seek_end(self, offset) File_seek_end(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1123, aux_String_1123_Refman);
     CHECK(1127)
-    INIT_STRING_CONST(1128, aux_String_1124, "#define FileReadWriteText_seek_end(self, offset) File_seek_end(self, offset)\n");
+    INIT_STRING_CONST(1128, aux_String_1124, "#define FileWriteBinary_seek_end(self, offset) File_seek_end(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1124, aux_String_1124_Refman);
     CHECK(1128)
-    INIT_STRING_CONST(1129, aux_String_1125, "#define FileReadWriteBinary_seek_end(self, offset) File_seek_end(self, offset)\n");
+    INIT_STRING_CONST(1129, aux_String_1125, "#define FileReadWriteText_seek_end(self, offset) File_seek_end(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1125, aux_String_1125_Refman);
     CHECK(1129)
-    INIT_STRING_CONST(1130, aux_String_1126, "\n");
+    INIT_STRING_CONST(1130, aux_String_1126, "#define FileReadWriteBinary_seek_end(self, offset) File_seek_end(self, offset)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1126, aux_String_1126_Refman);
     CHECK(1130)
-    INIT_STRING_CONST(1131, aux_String_1127, "#define LUMI_FUNC_NAME \"File.flush\"\n");
+    INIT_STRING_CONST(1131, aux_String_1127, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1127, aux_String_1127_Refman);
     CHECK(1131)
-    INIT_STRING_CONST(1132, aux_String_1128, "Return_Code File_flush(File* self) {\n");
+    INIT_STRING_CONST(1132, aux_String_1128, "#define LUMI_FUNC_NAME \"File.flush\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1128, aux_String_1128_Refman);
     CHECK(1132)
-    INIT_STRING_CONST(1133, aux_String_1129, "  int ret = EOF;\n");
+    INIT_STRING_CONST(1133, aux_String_1129, "Return_Code File_flush(File* self) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1129, aux_String_1129_Refman);
     CHECK(1133)
-    INIT_STRING_CONST(1134, aux_String_1130, "  CHECK_OPEN(self)\n");
+    INIT_STRING_CONST(1134, aux_String_1130, "  int ret = EOF;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1130, aux_String_1130_Refman);
     CHECK(1134)
-    INIT_STRING_CONST(1135, aux_String_1131, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
+    INIT_STRING_CONST(1135, aux_String_1131, "  CHECK_OPEN(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1131, aux_String_1131_Refman);
     CHECK(1135)
-    INIT_STRING_CONST(1136, aux_String_1132, "    ret = fflush(self->fobj);\n");
+    INIT_STRING_CONST(1136, aux_String_1132, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1132, aux_String_1132_Refman);
     CHECK(1136)
-    INIT_STRING_CONST(1137, aux_String_1133, "  }\n");
+    INIT_STRING_CONST(1137, aux_String_1133, "    ret = fflush(self->fobj);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1133, aux_String_1133_Refman);
     CHECK(1137)
-    INIT_STRING_CONST(1138, aux_String_1134, "  if (ret != 0) CRAISE(\"flush file failed\")\n");
+    INIT_STRING_CONST(1138, aux_String_1134, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1134, aux_String_1134_Refman);
     CHECK(1138)
-    INIT_STRING_CONST(1139, aux_String_1135, "  return OK;\n");
+    INIT_STRING_CONST(1139, aux_String_1135, "  if (ret != 0) CRAISE(\"flush file failed\")\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1135, aux_String_1135_Refman);
     CHECK(1139)
-    INIT_STRING_CONST(1140, aux_String_1136, "}\n");
+    INIT_STRING_CONST(1140, aux_String_1136, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1136, aux_String_1136_Refman);
     CHECK(1140)
-    INIT_STRING_CONST(1141, aux_String_1137, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1141, aux_String_1137, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1137, aux_String_1137_Refman);
     CHECK(1141)
-    INIT_STRING_CONST(1142, aux_String_1138, "#define FileReadText_flush(self) File_flush(self)\n");
+    INIT_STRING_CONST(1142, aux_String_1138, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1138, aux_String_1138_Refman);
     CHECK(1142)
-    INIT_STRING_CONST(1143, aux_String_1139, "#define FileReadBinary_flush(self) File_flush(self)\n");
+    INIT_STRING_CONST(1143, aux_String_1139, "#define FileReadText_flush(self) File_flush(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1139, aux_String_1139_Refman);
     CHECK(1143)
-    INIT_STRING_CONST(1144, aux_String_1140, "#define FileWriteText_flush(self) File_flush(self)\n");
+    INIT_STRING_CONST(1144, aux_String_1140, "#define FileReadBinary_flush(self) File_flush(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1140, aux_String_1140_Refman);
     CHECK(1144)
-    INIT_STRING_CONST(1145, aux_String_1141, "#define FileWriteBinary_flush(self) File_flush(self)\n");
+    INIT_STRING_CONST(1145, aux_String_1141, "#define FileWriteText_flush(self) File_flush(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1141, aux_String_1141_Refman);
     CHECK(1145)
-    INIT_STRING_CONST(1146, aux_String_1142, "#define FileReadWriteText_flush(self) File_flush(self)\n");
+    INIT_STRING_CONST(1146, aux_String_1142, "#define FileWriteBinary_flush(self) File_flush(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1142, aux_String_1142_Refman);
     CHECK(1146)
-    INIT_STRING_CONST(1147, aux_String_1143, "#define FileReadWriteBinary_flush(self) File_flush(self)\n");
+    INIT_STRING_CONST(1147, aux_String_1143, "#define FileReadWriteText_flush(self) File_flush(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1143, aux_String_1143_Refman);
     CHECK(1147)
-    INIT_STRING_CONST(1148, aux_String_1144, "\n");
+    INIT_STRING_CONST(1148, aux_String_1144, "#define FileReadWriteBinary_flush(self) File_flush(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1144, aux_String_1144_Refman);
     CHECK(1148)
-    INIT_STRING_CONST(1149, aux_String_1145, "Bool getc_is_not_ok(int get, char* ch) {\n");
+    INIT_STRING_CONST(1149, aux_String_1145, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1145, aux_String_1145_Refman);
     CHECK(1149)
-    INIT_STRING_CONST(1150, aux_String_1146, "  if (get == EOF) {\n");
+    INIT_STRING_CONST(1150, aux_String_1146, "Bool getc_is_not_ok(int get, char* ch) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1146, aux_String_1146_Refman);
     CHECK(1150)
-    INIT_STRING_CONST(1151, aux_String_1147, "    return true;\n");
+    INIT_STRING_CONST(1151, aux_String_1147, "  if (get == EOF) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1147, aux_String_1147_Refman);
     CHECK(1151)
-    INIT_STRING_CONST(1152, aux_String_1148, "  }\n");
+    INIT_STRING_CONST(1152, aux_String_1148, "    return true;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1148, aux_String_1148_Refman);
     CHECK(1152)
-    INIT_STRING_CONST(1153, aux_String_1149, "  else {\n");
+    INIT_STRING_CONST(1153, aux_String_1149, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1149, aux_String_1149_Refman);
     CHECK(1153)
-    INIT_STRING_CONST(1154, aux_String_1150, "    *ch = get;\n");
+    INIT_STRING_CONST(1154, aux_String_1150, "  else {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1150, aux_String_1150_Refman);
     CHECK(1154)
-    INIT_STRING_CONST(1155, aux_String_1151, "    return false;\n");
+    INIT_STRING_CONST(1155, aux_String_1151, "    *ch = get;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1151, aux_String_1151_Refman);
     CHECK(1155)
-    INIT_STRING_CONST(1156, aux_String_1152, "  }\n");
+    INIT_STRING_CONST(1156, aux_String_1152, "    return false;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1152, aux_String_1152_Refman);
     CHECK(1156)
-    INIT_STRING_CONST(1157, aux_String_1153, "}\n");
+    INIT_STRING_CONST(1157, aux_String_1153, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1153, aux_String_1153_Refman);
     CHECK(1157)
-    INIT_STRING_CONST(1158, aux_String_1154, "\n");
+    INIT_STRING_CONST(1158, aux_String_1154, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1154, aux_String_1154_Refman);
     CHECK(1158)
-    INIT_STRING_CONST(1159, aux_String_1155, "#define CHECK_READ(self, is_eof, read_fail) \\\n");
+    INIT_STRING_CONST(1159, aux_String_1155, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1155, aux_String_1155_Refman);
     CHECK(1159)
-    INIT_STRING_CONST(1160, aux_String_1156, "  if (lumi_debug_value == LUMI_DEBUG_FAIL || read_fail) { \\\n");
+    INIT_STRING_CONST(1160, aux_String_1156, "#define CHECK_READ(self, is_eof, read_fail) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1156, aux_String_1156_Refman);
     CHECK(1160)
-    INIT_STRING_CONST(1161, aux_String_1157, "    if (lumi_debug_value == LUMI_DEBUG_FAIL || feof(self->fobj) != 0) \\\n");
+    INIT_STRING_CONST(1161, aux_String_1157, "  if (lumi_debug_value == LUMI_DEBUG_FAIL || read_fail) { \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1157, aux_String_1157_Refman);
     CHECK(1161)
-    INIT_STRING_CONST(1162, aux_String_1158, "      CRAISE(LUMI_error_messages.file_read_failed.str); \\\n");
+    INIT_STRING_CONST(1162, aux_String_1158, "    if (lumi_debug_value == LUMI_DEBUG_FAIL || feof(self->fobj) != 0) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1158, aux_String_1158_Refman);
     CHECK(1162)
-    INIT_STRING_CONST(1163, aux_String_1159, "    is_eof = true; }\n");
+    INIT_STRING_CONST(1163, aux_String_1159, "      CRAISE(LUMI_error_messages.file_read_failed.str); \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1159, aux_String_1159_Refman);
     CHECK(1163)
-    INIT_STRING_CONST(1164, aux_String_1160, "\n");
+    INIT_STRING_CONST(1164, aux_String_1160, "    is_eof = true; }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1160, aux_String_1160_Refman);
     CHECK(1164)
-    INIT_STRING_CONST(1165, aux_String_1161, "#define LUMI_FUNC_NAME \"FileReadText.get\"\n");
+    INIT_STRING_CONST(1165, aux_String_1161, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1161, aux_String_1161_Refman);
     CHECK(1165)
-    INIT_STRING_CONST(1166, aux_String_1162, "Return_Code FileReadText_get(FileReadText* self, Char* out_char, Bool* is_eof) {\n");
+    INIT_STRING_CONST(1166, aux_String_1162, "#define LUMI_FUNC_NAME \"FileReadText.get\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1162, aux_String_1162_Refman);
     CHECK(1166)
-    INIT_STRING_CONST(1167, aux_String_1163, "  CHECK_OPEN(self)\n");
+    INIT_STRING_CONST(1167, aux_String_1163, "Return_Code FileReadText_get(FileReadText* self, Char* out_char, Bool* is_eof) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1163, aux_String_1163_Refman);
     CHECK(1167)
-    INIT_STRING_CONST(1168, aux_String_1164, "  CHECK_READ(self, *is_eof, getc_is_not_ok(getc(self->fobj), out_char))\n");
+    INIT_STRING_CONST(1168, aux_String_1164, "  CHECK_OPEN(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1164, aux_String_1164_Refman);
     CHECK(1168)
-    INIT_STRING_CONST(1169, aux_String_1165, "  return OK;\n");
+    INIT_STRING_CONST(1169, aux_String_1165, "  CHECK_READ(self, *is_eof, getc_is_not_ok(getc(self->fobj), out_char))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1165, aux_String_1165_Refman);
     CHECK(1169)
-    INIT_STRING_CONST(1170, aux_String_1166, "}\n");
+    INIT_STRING_CONST(1170, aux_String_1166, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1166, aux_String_1166_Refman);
     CHECK(1170)
-    INIT_STRING_CONST(1171, aux_String_1167, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1171, aux_String_1167, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1167, aux_String_1167_Refman);
     CHECK(1171)
-    INIT_STRING_CONST(1172, aux_String_1168, "#define FileReadWriteText_get(self, out_char, is_eof) \\\n");
+    INIT_STRING_CONST(1172, aux_String_1168, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1168, aux_String_1168_Refman);
     CHECK(1172)
-    INIT_STRING_CONST(1173, aux_String_1169, "  FileReadText_get(self, out_char, is_eof)\n");
+    INIT_STRING_CONST(1173, aux_String_1169, "#define FileReadWriteText_get(self, out_char, is_eof) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1169, aux_String_1169_Refman);
     CHECK(1173)
-    INIT_STRING_CONST(1174, aux_String_1170, "\n");
+    INIT_STRING_CONST(1174, aux_String_1170, "  FileReadText_get(self, out_char, is_eof)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1170, aux_String_1170_Refman);
     CHECK(1174)
-    INIT_STRING_CONST(1175, aux_String_1171, "#define LUMI_FUNC_NAME \"FileReadBinary.get\"\n");
+    INIT_STRING_CONST(1175, aux_String_1171, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1171, aux_String_1171_Refman);
     CHECK(1175)
-    INIT_STRING_CONST(1176, aux_String_1172, "Return_Code FileReadBinary_get(\n");
+    INIT_STRING_CONST(1176, aux_String_1172, "#define LUMI_FUNC_NAME \"FileReadBinary.get\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1172, aux_String_1172_Refman);
     CHECK(1176)
-    INIT_STRING_CONST(1177, aux_String_1173, "    FileReadBinary* self, Byte* out_byte, Bool* is_eof) {\n");
+    INIT_STRING_CONST(1177, aux_String_1173, "Return_Code FileReadBinary_get(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1173, aux_String_1173_Refman);
     CHECK(1177)
-    INIT_STRING_CONST(1178, aux_String_1174, "  CHECK_OPEN(self)\n");
+    INIT_STRING_CONST(1178, aux_String_1174, "    FileReadBinary* self, Byte* out_byte, Bool* is_eof) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1174, aux_String_1174_Refman);
     CHECK(1178)
-    INIT_STRING_CONST(1179, aux_String_1175, "  CHECK_READ(self, *is_eof, fread(out_byte, sizeof(Byte), 1, self->fobj) < 1)\n");
+    INIT_STRING_CONST(1179, aux_String_1175, "  CHECK_OPEN(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1175, aux_String_1175_Refman);
     CHECK(1179)
-    INIT_STRING_CONST(1180, aux_String_1176, "  return OK;\n");
+    INIT_STRING_CONST(1180, aux_String_1176, "  CHECK_READ(self, *is_eof, fread(out_byte, sizeof(Byte), 1, self->fobj) < 1)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1176, aux_String_1176_Refman);
     CHECK(1180)
-    INIT_STRING_CONST(1181, aux_String_1177, "}\n");
+    INIT_STRING_CONST(1181, aux_String_1177, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1177, aux_String_1177_Refman);
     CHECK(1181)
-    INIT_STRING_CONST(1182, aux_String_1178, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1182, aux_String_1178, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1178, aux_String_1178_Refman);
     CHECK(1182)
-    INIT_STRING_CONST(1183, aux_String_1179, "#define FileReadWriteBinary_get(self, out_byte, is_eof) \\\n");
+    INIT_STRING_CONST(1183, aux_String_1179, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1179, aux_String_1179_Refman);
     CHECK(1183)
-    INIT_STRING_CONST(1184, aux_String_1180, "  FileReadBinary_get(self, out_byte, is_eof)\n");
+    INIT_STRING_CONST(1184, aux_String_1180, "#define FileReadWriteBinary_get(self, out_byte, is_eof) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1180, aux_String_1180_Refman);
     CHECK(1184)
-    INIT_STRING_CONST(1185, aux_String_1181, "\n");
+    INIT_STRING_CONST(1185, aux_String_1181, "  FileReadBinary_get(self, out_byte, is_eof)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1181, aux_String_1181_Refman);
     CHECK(1185)
-    INIT_STRING_CONST(1186, aux_String_1182, "#define LUMI_FUNC_NAME \"FileReadText.getline-internal\"\n");
+    INIT_STRING_CONST(1186, aux_String_1182, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1182, aux_String_1182_Refman);
     CHECK(1186)
-    INIT_STRING_CONST(1187, aux_String_1183, "Return_Code FileReadText_getline_internal(\n");
+    INIT_STRING_CONST(1187, aux_String_1183, "#define LUMI_FUNC_NAME \"FileReadText.getline-internal\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1183, aux_String_1183_Refman);
     CHECK(1187)
-    INIT_STRING_CONST(1188, aux_String_1184, "    FileReadText* self,\n");
+    INIT_STRING_CONST(1188, aux_String_1184, "Return_Code FileReadText_getline_internal(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1184, aux_String_1184_Refman);
     CHECK(1188)
-    INIT_STRING_CONST(1189, aux_String_1185, "    char* line, Seq_Length line_max_length, Seq_Length* line_length,\n");
+    INIT_STRING_CONST(1189, aux_String_1185, "    FileReadText* self,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1185, aux_String_1185_Refman);
     CHECK(1189)
-    INIT_STRING_CONST(1190, aux_String_1186, "    Bool* is_eof,\n");
+    INIT_STRING_CONST(1190, aux_String_1186, "    char* line, Seq_Length line_max_length, Seq_Length* line_length,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1186, aux_String_1186_Refman);
     CHECK(1190)
-    INIT_STRING_CONST(1191, aux_String_1187, "    int (*char_getter)(FileReadText*)) {\n");
+    INIT_STRING_CONST(1191, aux_String_1187, "    Bool* is_eof,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1187, aux_String_1187_Refman);
     CHECK(1191)
-    INIT_STRING_CONST(1192, aux_String_1188, "  int ch = EOF;\n");
+    INIT_STRING_CONST(1192, aux_String_1188, "    int (*char_getter)(FileReadText*)) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1188, aux_String_1188_Refman);
     CHECK(1192)
-    INIT_STRING_CONST(1193, aux_String_1189, "  *line_length = 0;\n");
+    INIT_STRING_CONST(1193, aux_String_1189, "  int ch = EOF;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1189, aux_String_1189_Refman);
     CHECK(1193)
-    INIT_STRING_CONST(1194, aux_String_1190, "  line[0] = '\\0';\n");
+    INIT_STRING_CONST(1194, aux_String_1190, "  *line_length = 0;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1190, aux_String_1190_Refman);
     CHECK(1194)
-    INIT_STRING_CONST(1195, aux_String_1191, "  if (lumi_debug_value == LUMI_DEBUG_NOTHING) {\n");
+    INIT_STRING_CONST(1195, aux_String_1191, "  line[0] = '\\0';\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1191, aux_String_1191_Refman);
     CHECK(1195)
-    INIT_STRING_CONST(1196, aux_String_1192, "    ch = char_getter(self);\n");
+    INIT_STRING_CONST(1196, aux_String_1192, "  if (lumi_debug_value == LUMI_DEBUG_NOTHING) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1192, aux_String_1192_Refman);
     CHECK(1196)
-    INIT_STRING_CONST(1197, aux_String_1193, "  } else if (lumi_debug_value == LUMI_DEBUG_SUCCESS) {\n");
+    INIT_STRING_CONST(1197, aux_String_1193, "    ch = char_getter(self);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1193, aux_String_1193_Refman);
     CHECK(1197)
-    INIT_STRING_CONST(1198, aux_String_1194, "    ch = 'a';\n");
+    INIT_STRING_CONST(1198, aux_String_1194, "  } else if (lumi_debug_value == LUMI_DEBUG_SUCCESS) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1194, aux_String_1194_Refman);
     CHECK(1198)
-    INIT_STRING_CONST(1199, aux_String_1195, "  }\n");
+    INIT_STRING_CONST(1199, aux_String_1195, "    ch = 'a';\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1195, aux_String_1195_Refman);
     CHECK(1199)
-    INIT_STRING_CONST(1200, aux_String_1196, "  while (ch != EOF && ch != '\\n') {\n");
+    INIT_STRING_CONST(1200, aux_String_1196, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1196, aux_String_1196_Refman);
     CHECK(1200)
-    INIT_STRING_CONST(1201, aux_String_1197, "    if (*line_length + 1 >= line_max_length)\n");
+    INIT_STRING_CONST(1201, aux_String_1197, "  while (ch != EOF && ch != '\\n') {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1197, aux_String_1197_Refman);
     CHECK(1201)
-    INIT_STRING_CONST(1202, aux_String_1198, "      CRAISE(LUMI_error_messages.sequence_too_short.str)\n");
+    INIT_STRING_CONST(1202, aux_String_1198, "    if (*line_length + 1 >= line_max_length)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1198, aux_String_1198_Refman);
     CHECK(1202)
-    INIT_STRING_CONST(1203, aux_String_1199, "    line[*line_length] = ch;\n");
+    INIT_STRING_CONST(1203, aux_String_1199, "      CRAISE(LUMI_error_messages.sequence_too_short.str)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1199, aux_String_1199_Refman);
     CHECK(1203)
-    INIT_STRING_CONST(1204, aux_String_1200, "    ++(*line_length);\n");
+    INIT_STRING_CONST(1204, aux_String_1200, "    line[*line_length] = ch;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1200, aux_String_1200_Refman);
     CHECK(1204)
-    INIT_STRING_CONST(1205, aux_String_1201, "    if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n");
+    INIT_STRING_CONST(1205, aux_String_1201, "    ++(*line_length);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1201, aux_String_1201_Refman);
     CHECK(1205)
-    INIT_STRING_CONST(1206, aux_String_1202, "      ch = getc(self->fobj);\n");
+    INIT_STRING_CONST(1206, aux_String_1202, "    if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1202, aux_String_1202_Refman);
     CHECK(1206)
-    INIT_STRING_CONST(1207, aux_String_1203, "    }\n");
+    INIT_STRING_CONST(1207, aux_String_1203, "      ch = getc(self->fobj);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1203, aux_String_1203_Refman);
     CHECK(1207)
-    INIT_STRING_CONST(1208, aux_String_1204, "  }\n");
+    INIT_STRING_CONST(1208, aux_String_1204, "    }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1204, aux_String_1204_Refman);
     CHECK(1208)
-    INIT_STRING_CONST(1209, aux_String_1205, "  line[*line_length] = '\\0';\n");
+    INIT_STRING_CONST(1209, aux_String_1205, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1205, aux_String_1205_Refman);
     CHECK(1209)
-    INIT_STRING_CONST(1210, aux_String_1206, "  CHECK_READ(self, *is_eof, ch == EOF)\n");
+    INIT_STRING_CONST(1210, aux_String_1206, "  line[*line_length] = '\\0';\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1206, aux_String_1206_Refman);
     CHECK(1210)
-    INIT_STRING_CONST(1211, aux_String_1207, "  return OK;\n");
+    INIT_STRING_CONST(1211, aux_String_1207, "  CHECK_READ(self, *is_eof, ch == EOF)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1207, aux_String_1207_Refman);
     CHECK(1211)
-    INIT_STRING_CONST(1212, aux_String_1208, "}\n");
+    INIT_STRING_CONST(1212, aux_String_1208, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1208, aux_String_1208_Refman);
     CHECK(1212)
-    INIT_STRING_CONST(1213, aux_String_1209, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1213, aux_String_1209, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1209, aux_String_1209_Refman);
     CHECK(1213)
-    INIT_STRING_CONST(1214, aux_String_1210, "\n");
+    INIT_STRING_CONST(1214, aux_String_1210, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1210, aux_String_1210_Refman);
     CHECK(1214)
-    INIT_STRING_CONST(1215, aux_String_1211, "int getc_char_getter(FileReadText* self) {\n");
+    INIT_STRING_CONST(1215, aux_String_1211, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1211, aux_String_1211_Refman);
     CHECK(1215)
-    INIT_STRING_CONST(1216, aux_String_1212, "  return getc(self->fobj);\n");
+    INIT_STRING_CONST(1216, aux_String_1212, "int getc_char_getter(FileReadText* self) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1212, aux_String_1212_Refman);
     CHECK(1216)
-    INIT_STRING_CONST(1217, aux_String_1213, "}\n");
+    INIT_STRING_CONST(1217, aux_String_1213, "  return getc(self->fobj);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1213, aux_String_1213_Refman);
     CHECK(1217)
-    INIT_STRING_CONST(1218, aux_String_1214, "\n");
+    INIT_STRING_CONST(1218, aux_String_1214, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1214, aux_String_1214_Refman);
     CHECK(1218)
-    INIT_STRING_CONST(1219, aux_String_1215, "#define LUMI_FUNC_NAME \"FileReadText.getline\"\n");
+    INIT_STRING_CONST(1219, aux_String_1215, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1215, aux_String_1215_Refman);
     CHECK(1219)
-    INIT_STRING_CONST(1220, aux_String_1216, "Return_Code FileReadText_getline(\n");
+    INIT_STRING_CONST(1220, aux_String_1216, "#define LUMI_FUNC_NAME \"FileReadText.getline\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1216, aux_String_1216_Refman);
     CHECK(1220)
-    INIT_STRING_CONST(1221, aux_String_1217, "    FileReadText* self,\n");
+    INIT_STRING_CONST(1221, aux_String_1217, "Return_Code FileReadText_getline(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1217, aux_String_1217_Refman);
     CHECK(1221)
-    INIT_STRING_CONST(1222, aux_String_1218, "    char* line, Seq_Length line_max_length, Seq_Length* line_length,\n");
+    INIT_STRING_CONST(1222, aux_String_1218, "    FileReadText* self,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1218, aux_String_1218_Refman);
     CHECK(1222)
-    INIT_STRING_CONST(1223, aux_String_1219, "    Bool* is_eof) {\n");
+    INIT_STRING_CONST(1223, aux_String_1219, "    char* line, Seq_Length line_max_length, Seq_Length* line_length,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1219, aux_String_1219_Refman);
     CHECK(1223)
-    INIT_STRING_CONST(1224, aux_String_1220, "  CHECK_OPEN(self)\n");
+    INIT_STRING_CONST(1224, aux_String_1220, "    Bool* is_eof) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1220, aux_String_1220_Refman);
     CHECK(1224)
-    INIT_STRING_CONST(1225, aux_String_1221, "  CCHECK(FileReadText_getline_internal(\n");
+    INIT_STRING_CONST(1225, aux_String_1221, "  CHECK_OPEN(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1221, aux_String_1221_Refman);
     CHECK(1225)
-    INIT_STRING_CONST(1226, aux_String_1222, "      self, line, line_max_length, line_length, is_eof, getc_char_getter))\n");
+    INIT_STRING_CONST(1226, aux_String_1222, "  CCHECK(FileReadText_getline_internal(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1222, aux_String_1222_Refman);
     CHECK(1226)
-    INIT_STRING_CONST(1227, aux_String_1223, "  return OK;\n");
+    INIT_STRING_CONST(1227, aux_String_1223, "      self, line, line_max_length, line_length, is_eof, getc_char_getter))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1223, aux_String_1223_Refman);
     CHECK(1227)
-    INIT_STRING_CONST(1228, aux_String_1224, "}\n");
+    INIT_STRING_CONST(1228, aux_String_1224, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1224, aux_String_1224_Refman);
     CHECK(1228)
-    INIT_STRING_CONST(1229, aux_String_1225, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1229, aux_String_1225, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1225, aux_String_1225_Refman);
     CHECK(1229)
-    INIT_STRING_CONST(1230, aux_String_1226, "#define FileReadWriteText_getline(self, line, line_max_length, line_length, is_eof) \\\n");
+    INIT_STRING_CONST(1230, aux_String_1226, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1226, aux_String_1226_Refman);
     CHECK(1230)
-    INIT_STRING_CONST(1231, aux_String_1227, "  FileReadText_getline(self, line, line_max_length, line_length, is_eof)\n");
+    INIT_STRING_CONST(1231, aux_String_1227, "#define FileReadWriteText_getline(self, line, line_max_length, line_length, is_eof) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1227, aux_String_1227_Refman);
     CHECK(1231)
-    INIT_STRING_CONST(1232, aux_String_1228, "\n");
+    INIT_STRING_CONST(1232, aux_String_1228, "  FileReadText_getline(self, line, line_max_length, line_length, is_eof)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1228, aux_String_1228_Refman);
     CHECK(1232)
-    INIT_STRING_CONST(1233, aux_String_1229, "#define LUMI_FUNC_NAME \"FileReadBinary.read\"\n");
+    INIT_STRING_CONST(1233, aux_String_1229, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1229, aux_String_1229_Refman);
     CHECK(1233)
-    INIT_STRING_CONST(1234, aux_String_1230, "Return_Code FileReadBinary_read(\n");
+    INIT_STRING_CONST(1234, aux_String_1230, "#define LUMI_FUNC_NAME \"FileReadBinary.read\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1230, aux_String_1230_Refman);
     CHECK(1234)
-    INIT_STRING_CONST(1235, aux_String_1231, "    FileReadBinary* self, Byte* data, Seq_Length data_length, Seq_Length* bytes_read) {\n");
+    INIT_STRING_CONST(1235, aux_String_1231, "Return_Code FileReadBinary_read(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1231, aux_String_1231_Refman);
     CHECK(1235)
-    INIT_STRING_CONST(1236, aux_String_1232, "  Bool is_eof;\n");
+    INIT_STRING_CONST(1236, aux_String_1232, "    FileReadBinary* self, Byte* data, Seq_Length data_length, Seq_Length* bytes_read) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1232, aux_String_1232_Refman);
     CHECK(1236)
-    INIT_STRING_CONST(1237, aux_String_1233, "  *bytes_read = 0;\n");
+    INIT_STRING_CONST(1237, aux_String_1233, "  Bool is_eof;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1233, aux_String_1233_Refman);
     CHECK(1237)
-    INIT_STRING_CONST(1238, aux_String_1234, "  CHECK_OPEN(self)\n");
+    INIT_STRING_CONST(1238, aux_String_1234, "  *bytes_read = 0;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1234, aux_String_1234_Refman);
     CHECK(1238)
-    INIT_STRING_CONST(1239, aux_String_1235, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
+    INIT_STRING_CONST(1239, aux_String_1235, "  CHECK_OPEN(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1235, aux_String_1235_Refman);
     CHECK(1239)
-    INIT_STRING_CONST(1240, aux_String_1236, "    *bytes_read = fread(data, sizeof(Byte), data_length, self->fobj);\n");
+    INIT_STRING_CONST(1240, aux_String_1236, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1236, aux_String_1236_Refman);
     CHECK(1240)
-    INIT_STRING_CONST(1241, aux_String_1237, "  }\n");
+    INIT_STRING_CONST(1241, aux_String_1237, "    *bytes_read = fread(data, sizeof(Byte), data_length, self->fobj);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1237, aux_String_1237_Refman);
     CHECK(1241)
-    INIT_STRING_CONST(1242, aux_String_1238, "  CHECK_READ(self, is_eof, *bytes_read < data_length)\n");
+    INIT_STRING_CONST(1242, aux_String_1238, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1238, aux_String_1238_Refman);
     CHECK(1242)
-    INIT_STRING_CONST(1243, aux_String_1239, "  return OK;\n");
+    INIT_STRING_CONST(1243, aux_String_1239, "  CHECK_READ(self, is_eof, *bytes_read < data_length)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1239, aux_String_1239_Refman);
     CHECK(1243)
-    INIT_STRING_CONST(1244, aux_String_1240, "}\n");
+    INIT_STRING_CONST(1244, aux_String_1240, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1240, aux_String_1240_Refman);
     CHECK(1244)
-    INIT_STRING_CONST(1245, aux_String_1241, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1245, aux_String_1241, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1241, aux_String_1241_Refman);
     CHECK(1245)
-    INIT_STRING_CONST(1246, aux_String_1242, "#define FileReadWriteBinary_read(self, data, data_length, bytes_read) \\\n");
+    INIT_STRING_CONST(1246, aux_String_1242, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1242, aux_String_1242_Refman);
     CHECK(1246)
-    INIT_STRING_CONST(1247, aux_String_1243, "  FileReadBinary_read(self, data, data_length, bytes_read)\n");
+    INIT_STRING_CONST(1247, aux_String_1243, "#define FileReadWriteBinary_read(self, data, data_length, bytes_read) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1243, aux_String_1243_Refman);
     CHECK(1247)
-    INIT_STRING_CONST(1248, aux_String_1244, "\n");
+    INIT_STRING_CONST(1248, aux_String_1244, "  FileReadBinary_read(self, data, data_length, bytes_read)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1244, aux_String_1244_Refman);
     CHECK(1248)
-    INIT_STRING_CONST(1249, aux_String_1245, "#define LUMI_FUNC_NAME \"FileWriteText.put\"\n");
+    INIT_STRING_CONST(1249, aux_String_1245, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1245, aux_String_1245_Refman);
     CHECK(1249)
-    INIT_STRING_CONST(1250, aux_String_1246, "Return_Code FileWriteText_put(FileWriteText* self, Char ch) {\n");
+    INIT_STRING_CONST(1250, aux_String_1246, "#define LUMI_FUNC_NAME \"FileWriteText.put\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1246, aux_String_1246_Refman);
     CHECK(1250)
-    INIT_STRING_CONST(1251, aux_String_1247, "  CHECK_OPEN(self)\n");
+    INIT_STRING_CONST(1251, aux_String_1247, "Return_Code FileWriteText_put(FileWriteText* self, Char ch) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1247, aux_String_1247_Refman);
     CHECK(1251)
-    INIT_STRING_CONST(1252, aux_String_1248, "  if (lumi_debug_value == LUMI_DEBUG_FAIL || putc(ch, self->fobj) != ch)\n");
+    INIT_STRING_CONST(1252, aux_String_1248, "  CHECK_OPEN(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1248, aux_String_1248_Refman);
     CHECK(1252)
-    INIT_STRING_CONST(1253, aux_String_1249, "    CRAISE(LUMI_error_messages.file_write_failed.str)\n");
+    INIT_STRING_CONST(1253, aux_String_1249, "  if (lumi_debug_value == LUMI_DEBUG_FAIL || putc(ch, self->fobj) != ch)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1249, aux_String_1249_Refman);
     CHECK(1253)
-    INIT_STRING_CONST(1254, aux_String_1250, "  return OK;\n");
+    INIT_STRING_CONST(1254, aux_String_1250, "    CRAISE(LUMI_error_messages.file_write_failed.str)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1250, aux_String_1250_Refman);
     CHECK(1254)
-    INIT_STRING_CONST(1255, aux_String_1251, "}\n");
+    INIT_STRING_CONST(1255, aux_String_1251, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1251, aux_String_1251_Refman);
     CHECK(1255)
-    INIT_STRING_CONST(1256, aux_String_1252, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1256, aux_String_1252, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1252, aux_String_1252_Refman);
     CHECK(1256)
-    INIT_STRING_CONST(1257, aux_String_1253, "#define FileReadWriteText_put(self, ch) FileWriteText_put(self, ch)\n");
+    INIT_STRING_CONST(1257, aux_String_1253, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1253, aux_String_1253_Refman);
     CHECK(1257)
-    INIT_STRING_CONST(1258, aux_String_1254, "\n");
+    INIT_STRING_CONST(1258, aux_String_1254, "#define FileReadWriteText_put(self, ch) FileWriteText_put(self, ch)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1254, aux_String_1254_Refman);
     CHECK(1258)
-    INIT_STRING_CONST(1259, aux_String_1255, "#define LUMI_FUNC_NAME \"FileWriteBinary.put\"\n");
+    INIT_STRING_CONST(1259, aux_String_1255, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1255, aux_String_1255_Refman);
     CHECK(1259)
-    INIT_STRING_CONST(1260, aux_String_1256, "Return_Code FileWriteBinary_put(FileWriteBinary* self, Byte value) {\n");
+    INIT_STRING_CONST(1260, aux_String_1256, "#define LUMI_FUNC_NAME \"FileWriteBinary.put\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1256, aux_String_1256_Refman);
     CHECK(1260)
-    INIT_STRING_CONST(1261, aux_String_1257, "  CHECK_OPEN(self)\n");
+    INIT_STRING_CONST(1261, aux_String_1257, "Return_Code FileWriteBinary_put(FileWriteBinary* self, Byte value) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1257, aux_String_1257_Refman);
     CHECK(1261)
-    INIT_STRING_CONST(1262, aux_String_1258, "  if (lumi_debug_value == LUMI_DEBUG_FAIL ||\n");
+    INIT_STRING_CONST(1262, aux_String_1258, "  CHECK_OPEN(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1258, aux_String_1258_Refman);
     CHECK(1262)
-    INIT_STRING_CONST(1263, aux_String_1259, "      fwrite(&value, sizeof(value), 1, self->fobj) < 1)\n");
+    INIT_STRING_CONST(1263, aux_String_1259, "  if (lumi_debug_value == LUMI_DEBUG_FAIL ||\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1259, aux_String_1259_Refman);
     CHECK(1263)
-    INIT_STRING_CONST(1264, aux_String_1260, "    CRAISE(LUMI_error_messages.file_write_failed.str)\n");
+    INIT_STRING_CONST(1264, aux_String_1260, "      fwrite(&value, sizeof(value), 1, self->fobj) < 1)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1260, aux_String_1260_Refman);
     CHECK(1264)
-    INIT_STRING_CONST(1265, aux_String_1261, "  return OK;\n");
+    INIT_STRING_CONST(1265, aux_String_1261, "    CRAISE(LUMI_error_messages.file_write_failed.str)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1261, aux_String_1261_Refman);
     CHECK(1265)
-    INIT_STRING_CONST(1266, aux_String_1262, "}\n");
+    INIT_STRING_CONST(1266, aux_String_1262, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1262, aux_String_1262_Refman);
     CHECK(1266)
-    INIT_STRING_CONST(1267, aux_String_1263, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1267, aux_String_1263, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1263, aux_String_1263_Refman);
     CHECK(1267)
-    INIT_STRING_CONST(1268, aux_String_1264, "#define FileReadWriteBinary_put(self, value) FileWriteBinary_put(self, value)\n");
+    INIT_STRING_CONST(1268, aux_String_1264, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1264, aux_String_1264_Refman);
     CHECK(1268)
-    INIT_STRING_CONST(1269, aux_String_1265, "\n");
+    INIT_STRING_CONST(1269, aux_String_1265, "#define FileReadWriteBinary_put(self, value) FileWriteBinary_put(self, value)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1265, aux_String_1265_Refman);
     CHECK(1269)
-    INIT_STRING_CONST(1270, aux_String_1266, "#define LUMI_FUNC_NAME \"FileWriteText.write\"\n");
+    INIT_STRING_CONST(1270, aux_String_1266, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1266, aux_String_1266_Refman);
     CHECK(1270)
-    INIT_STRING_CONST(1271, aux_String_1267, "Return_Code FileWriteText_write(\n");
+    INIT_STRING_CONST(1271, aux_String_1267, "#define LUMI_FUNC_NAME \"FileWriteText.write\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1267, aux_String_1267_Refman);
     CHECK(1271)
-    INIT_STRING_CONST(1272, aux_String_1268, "    FileWriteText* self, char* text, Seq_Length text_length, Seq_Length* written) {\n");
+    INIT_STRING_CONST(1272, aux_String_1268, "Return_Code FileWriteText_write(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1268, aux_String_1268_Refman);
     CHECK(1272)
-    INIT_STRING_CONST(1273, aux_String_1269, "  *written = 0;\n");
+    INIT_STRING_CONST(1273, aux_String_1269, "    FileWriteText* self, char* text, Seq_Length text_length, Seq_Length* written) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1269, aux_String_1269_Refman);
     CHECK(1273)
-    INIT_STRING_CONST(1274, aux_String_1270, "  CHECK_OPEN(self)\n");
+    INIT_STRING_CONST(1274, aux_String_1270, "  *written = 0;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1270, aux_String_1270_Refman);
     CHECK(1274)
-    INIT_STRING_CONST(1275, aux_String_1271, "  while (*written < text_length) {\n");
+    INIT_STRING_CONST(1275, aux_String_1271, "  CHECK_OPEN(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1271, aux_String_1271_Refman);
     CHECK(1275)
-    INIT_STRING_CONST(1276, aux_String_1272, "    int ch;\n");
+    INIT_STRING_CONST(1276, aux_String_1272, "  while (*written < text_length) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1272, aux_String_1272_Refman);
     CHECK(1276)
-    INIT_STRING_CONST(1277, aux_String_1273, "    ch = text[*written];\n");
+    INIT_STRING_CONST(1277, aux_String_1273, "    int ch;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1273, aux_String_1273_Refman);
     CHECK(1277)
-    INIT_STRING_CONST(1278, aux_String_1274, "    if (lumi_debug_value == LUMI_DEBUG_FAIL || putc(ch, self->fobj) != ch)\n");
+    INIT_STRING_CONST(1278, aux_String_1274, "    ch = text[*written];\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1274, aux_String_1274_Refman);
     CHECK(1278)
-    INIT_STRING_CONST(1279, aux_String_1275, "      CRAISE(LUMI_error_messages.file_write_failed.str)\n");
+    INIT_STRING_CONST(1279, aux_String_1275, "    if (lumi_debug_value == LUMI_DEBUG_FAIL || putc(ch, self->fobj) != ch)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1275, aux_String_1275_Refman);
     CHECK(1279)
-    INIT_STRING_CONST(1280, aux_String_1276, "    ++(*written);\n");
+    INIT_STRING_CONST(1280, aux_String_1276, "      CRAISE(LUMI_error_messages.file_write_failed.str)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1276, aux_String_1276_Refman);
     CHECK(1280)
-    INIT_STRING_CONST(1281, aux_String_1277, "  }\n");
+    INIT_STRING_CONST(1281, aux_String_1277, "    ++(*written);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1277, aux_String_1277_Refman);
     CHECK(1281)
-    INIT_STRING_CONST(1282, aux_String_1278, "  return OK;\n");
+    INIT_STRING_CONST(1282, aux_String_1278, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1278, aux_String_1278_Refman);
     CHECK(1282)
-    INIT_STRING_CONST(1283, aux_String_1279, "}\n");
+    INIT_STRING_CONST(1283, aux_String_1279, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1279, aux_String_1279_Refman);
     CHECK(1283)
-    INIT_STRING_CONST(1284, aux_String_1280, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1284, aux_String_1280, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1280, aux_String_1280_Refman);
     CHECK(1284)
-    INIT_STRING_CONST(1285, aux_String_1281, "#define FileReadWriteText_write(self, text, text_length, written) \\\n");
+    INIT_STRING_CONST(1285, aux_String_1281, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1281, aux_String_1281_Refman);
     CHECK(1285)
-    INIT_STRING_CONST(1286, aux_String_1282, "  FileWriteText_write(self, text, text_length, written)\n");
+    INIT_STRING_CONST(1286, aux_String_1282, "#define FileReadWriteText_write(self, text, text_length, written) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1282, aux_String_1282_Refman);
     CHECK(1286)
-    INIT_STRING_CONST(1287, aux_String_1283, "\n");
+    INIT_STRING_CONST(1287, aux_String_1283, "  FileWriteText_write(self, text, text_length, written)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1283, aux_String_1283_Refman);
     CHECK(1287)
-    INIT_STRING_CONST(1288, aux_String_1284, "#define LUMI_FUNC_NAME \"FileWriteBinary.write\"\n");
+    INIT_STRING_CONST(1288, aux_String_1284, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1284, aux_String_1284_Refman);
     CHECK(1288)
-    INIT_STRING_CONST(1289, aux_String_1285, "Return_Code FileWriteBinary_write(\n");
+    INIT_STRING_CONST(1289, aux_String_1285, "#define LUMI_FUNC_NAME \"FileWriteBinary.write\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1285, aux_String_1285_Refman);
     CHECK(1289)
-    INIT_STRING_CONST(1290, aux_String_1286, "    FileWriteBinary* self, Byte* data, Seq_Length data_length, Seq_Length* written) {\n");
+    INIT_STRING_CONST(1290, aux_String_1286, "Return_Code FileWriteBinary_write(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1286, aux_String_1286_Refman);
     CHECK(1290)
-    INIT_STRING_CONST(1291, aux_String_1287, "  *written = 0;\n");
+    INIT_STRING_CONST(1291, aux_String_1287, "    FileWriteBinary* self, Byte* data, Seq_Length data_length, Seq_Length* written) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1287, aux_String_1287_Refman);
     CHECK(1291)
-    INIT_STRING_CONST(1292, aux_String_1288, "  CHECK_OPEN(self)\n");
+    INIT_STRING_CONST(1292, aux_String_1288, "  *written = 0;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1288, aux_String_1288_Refman);
     CHECK(1292)
-    INIT_STRING_CONST(1293, aux_String_1289, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
+    INIT_STRING_CONST(1293, aux_String_1289, "  CHECK_OPEN(self)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1289, aux_String_1289_Refman);
     CHECK(1293)
-    INIT_STRING_CONST(1294, aux_String_1290, "    *written = fwrite(data, sizeof(Byte), data_length, self->fobj);\n");
+    INIT_STRING_CONST(1294, aux_String_1290, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1290, aux_String_1290_Refman);
     CHECK(1294)
-    INIT_STRING_CONST(1295, aux_String_1291, "  }\n");
+    INIT_STRING_CONST(1295, aux_String_1291, "    *written = fwrite(data, sizeof(Byte), data_length, self->fobj);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1291, aux_String_1291_Refman);
     CHECK(1295)
-    INIT_STRING_CONST(1296, aux_String_1292, "  if (*written < data_length) CRAISE(LUMI_error_messages.file_write_failed.str)\n");
+    INIT_STRING_CONST(1296, aux_String_1292, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1292, aux_String_1292_Refman);
     CHECK(1296)
-    INIT_STRING_CONST(1297, aux_String_1293, "  return OK;\n");
+    INIT_STRING_CONST(1297, aux_String_1293, "  if (*written < data_length) CRAISE(LUMI_error_messages.file_write_failed.str)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1293, aux_String_1293_Refman);
     CHECK(1297)
-    INIT_STRING_CONST(1298, aux_String_1294, "}\n");
+    INIT_STRING_CONST(1298, aux_String_1294, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1294, aux_String_1294_Refman);
     CHECK(1298)
-    INIT_STRING_CONST(1299, aux_String_1295, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1299, aux_String_1295, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1295, aux_String_1295_Refman);
     CHECK(1299)
-    INIT_STRING_CONST(1300, aux_String_1296, "#define FileReadWriteBinary_write(self, data, data_length, written) \\\n");
+    INIT_STRING_CONST(1300, aux_String_1296, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1296, aux_String_1296_Refman);
     CHECK(1300)
-    INIT_STRING_CONST(1301, aux_String_1297, "  FileWriteBinary_write(self, data, data_length, written)\n");
+    INIT_STRING_CONST(1301, aux_String_1297, "#define FileReadWriteBinary_write(self, data, data_length, written) \\\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1297, aux_String_1297_Refman);
     CHECK(1301)
-    INIT_STRING_CONST(1302, aux_String_1298, "\n");
+    INIT_STRING_CONST(1302, aux_String_1298, "  FileWriteBinary_write(self, data, data_length, written)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1298, aux_String_1298_Refman);
     CHECK(1302)
     INIT_STRING_CONST(1303, aux_String_1299, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1299, aux_String_1299_Refman);
     CHECK(1303)
-    INIT_STRING_CONST(1304, aux_String_1300, "/* system */\n");
+    INIT_STRING_CONST(1304, aux_String_1300, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1300, aux_String_1300_Refman);
     CHECK(1304)
-    INIT_STRING_CONST(1305, aux_String_1301, "\n");
+    INIT_STRING_CONST(1305, aux_String_1301, "/* system */\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1301, aux_String_1301_Refman);
     CHECK(1305)
-    INIT_STRING_CONST(1306, aux_String_1302, "Return_Code set_sys(int argc, char* argv[]) {\n");
+    INIT_STRING_CONST(1306, aux_String_1302, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1302, aux_String_1302_Refman);
     CHECK(1306)
-    INIT_STRING_CONST(1307, aux_String_1303, "  int arg;\n");
+    INIT_STRING_CONST(1307, aux_String_1303, "Return_Code set_sys(int argc, char* argv[]) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1303, aux_String_1303_Refman);
     CHECK(1307)
-    INIT_STRING_CONST(1308, aux_String_1304, "  sys_M_stdin = LUMI_alloc(sizeof(File));\n");
+    INIT_STRING_CONST(1308, aux_String_1304, "  int arg;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1304, aux_String_1304_Refman);
     CHECK(1308)
-    INIT_STRING_CONST(1309, aux_String_1305, "  sys_M_stdin_Refman = LUMI_new_ref(sys_M_stdin);\n");
+    INIT_STRING_CONST(1309, aux_String_1305, "  sys_M_stdin = LUMI_alloc(sizeof(File));\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1305, aux_String_1305_Refman);
     CHECK(1309)
-    INIT_STRING_CONST(1310, aux_String_1306, "  sys_M_stdout = LUMI_alloc(sizeof(File));\n");
+    INIT_STRING_CONST(1310, aux_String_1306, "  sys_M_stdin_Refman = LUMI_new_ref(sys_M_stdin);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1306, aux_String_1306_Refman);
     CHECK(1310)
-    INIT_STRING_CONST(1311, aux_String_1307, "  sys_M_stdout_Refman = LUMI_new_ref(sys_M_stdout);\n");
+    INIT_STRING_CONST(1311, aux_String_1307, "  sys_M_stdout = LUMI_alloc(sizeof(File));\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1307, aux_String_1307_Refman);
     CHECK(1311)
-    INIT_STRING_CONST(1312, aux_String_1308, "  sys_M_stderr = LUMI_alloc(sizeof(File));\n");
+    INIT_STRING_CONST(1312, aux_String_1308, "  sys_M_stdout_Refman = LUMI_new_ref(sys_M_stdout);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1308, aux_String_1308_Refman);
     CHECK(1312)
-    INIT_STRING_CONST(1313, aux_String_1309, "  sys_M_stderr_Refman = LUMI_new_ref(sys_M_stderr);\n");
+    INIT_STRING_CONST(1313, aux_String_1309, "  sys_M_stderr = LUMI_alloc(sizeof(File));\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1309, aux_String_1309_Refman);
     CHECK(1313)
-    INIT_STRING_CONST(1314, aux_String_1310, "  sys_M_argv_Length = argc;\n");
+    INIT_STRING_CONST(1314, aux_String_1310, "  sys_M_stderr_Refman = LUMI_new_ref(sys_M_stderr);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1310, aux_String_1310_Refman);
     CHECK(1314)
-    INIT_STRING_CONST(1315, aux_String_1311, "  sys_M_argv_Value_length = 0;\n");
+    INIT_STRING_CONST(1315, aux_String_1311, "  sys_M_argv_Length = argc;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1311, aux_String_1311_Refman);
     CHECK(1315)
-    INIT_STRING_CONST(1316, aux_String_1312, "  sys_M_argv_Seq_length = LUMI_alloc(sizeof(Seq_Length) * argc);\n");
+    INIT_STRING_CONST(1316, aux_String_1312, "  sys_M_argv_Value_length = 0;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1312, aux_String_1312_Refman);
     CHECK(1316)
-    INIT_STRING_CONST(1317, aux_String_1313, "  for (arg = 0; arg < argc; ++arg) {\n");
+    INIT_STRING_CONST(1317, aux_String_1313, "  sys_M_argv_Seq_length = LUMI_alloc(sizeof(Seq_Length) * argc);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1313, aux_String_1313_Refman);
     CHECK(1317)
-    INIT_STRING_CONST(1318, aux_String_1314, "    Seq_Length length = cstring_length(argv[arg], 1024);\n");
+    INIT_STRING_CONST(1318, aux_String_1314, "  for (arg = 0; arg < argc; ++arg) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1314, aux_String_1314_Refman);
     CHECK(1318)
-    INIT_STRING_CONST(1319, aux_String_1315, "    if (sys_M_argv_Seq_length != NULL) {\n");
+    INIT_STRING_CONST(1319, aux_String_1315, "    Seq_Length length = cstring_length(argv[arg], 1024);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1315, aux_String_1315_Refman);
     CHECK(1319)
-    INIT_STRING_CONST(1320, aux_String_1316, "      sys_M_argv_Seq_length[arg] = length;\n");
+    INIT_STRING_CONST(1320, aux_String_1316, "    if (sys_M_argv_Seq_length != NULL) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1316, aux_String_1316_Refman);
     CHECK(1320)
-    INIT_STRING_CONST(1321, aux_String_1317, "    }\n");
+    INIT_STRING_CONST(1321, aux_String_1317, "      sys_M_argv_Seq_length[arg] = length;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1317, aux_String_1317_Refman);
     CHECK(1321)
-    INIT_STRING_CONST(1322, aux_String_1318, "    if (length > sys_M_argv_Value_length) {\n");
+    INIT_STRING_CONST(1322, aux_String_1318, "    }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1318, aux_String_1318_Refman);
     CHECK(1322)
-    INIT_STRING_CONST(1323, aux_String_1319, "      sys_M_argv_Value_length = length;\n");
+    INIT_STRING_CONST(1323, aux_String_1319, "    if (length > sys_M_argv_Value_length) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1319, aux_String_1319_Refman);
     CHECK(1323)
-    INIT_STRING_CONST(1324, aux_String_1320, "    }\n");
+    INIT_STRING_CONST(1324, aux_String_1320, "      sys_M_argv_Value_length = length;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1320, aux_String_1320_Refman);
     CHECK(1324)
-    INIT_STRING_CONST(1325, aux_String_1321, "  }\n");
+    INIT_STRING_CONST(1325, aux_String_1321, "    }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1321, aux_String_1321_Refman);
     CHECK(1325)
-    INIT_STRING_CONST(1326, aux_String_1322, "  ++sys_M_argv_Value_length;\n");
+    INIT_STRING_CONST(1326, aux_String_1322, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1322, aux_String_1322_Refman);
     CHECK(1326)
-    INIT_STRING_CONST(1327, aux_String_1323, "  sys_M_argv = LUMI_alloc(sys_M_argv_Value_length * sys_M_argv_Length);\n");
+    INIT_STRING_CONST(1327, aux_String_1323, "  ++sys_M_argv_Value_length;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1323, aux_String_1323_Refman);
     CHECK(1327)
-    INIT_STRING_CONST(1328, aux_String_1324, "  sys_M_argv_Refman = LUMI_new_ref(sys_M_argv);\n");
+    INIT_STRING_CONST(1328, aux_String_1324, "  sys_M_argv = LUMI_alloc(sys_M_argv_Value_length * sys_M_argv_Length);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1324, aux_String_1324_Refman);
     CHECK(1328)
-    INIT_STRING_CONST(1329, aux_String_1325, "  if (sys_M_argv == NULL || sys_M_argv_Refman == NULL ||\n");
+    INIT_STRING_CONST(1329, aux_String_1325, "  sys_M_argv_Refman = LUMI_new_ref(sys_M_argv);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1325, aux_String_1325_Refman);
     CHECK(1329)
-    INIT_STRING_CONST(1330, aux_String_1326, "    sys_M_argv_Seq_length == NULL ||\n");
+    INIT_STRING_CONST(1330, aux_String_1326, "  if (sys_M_argv == NULL || sys_M_argv_Refman == NULL ||\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1326, aux_String_1326_Refman);
     CHECK(1330)
-    INIT_STRING_CONST(1331, aux_String_1327, "    sys_M_stdin == NULL || sys_M_stdin_Refman == NULL ||\n");
+    INIT_STRING_CONST(1331, aux_String_1327, "    sys_M_argv_Seq_length == NULL ||\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1327, aux_String_1327_Refman);
     CHECK(1331)
-    INIT_STRING_CONST(1332, aux_String_1328, "    sys_M_stdout == NULL || sys_M_stdout_Refman == NULL ||\n");
+    INIT_STRING_CONST(1332, aux_String_1328, "    sys_M_stdin == NULL || sys_M_stdin_Refman == NULL ||\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1328, aux_String_1328_Refman);
     CHECK(1332)
-    INIT_STRING_CONST(1333, aux_String_1329, "    sys_M_stderr == NULL || sys_M_stderr_Refman == NULL) {\n");
+    INIT_STRING_CONST(1333, aux_String_1329, "    sys_M_stdout == NULL || sys_M_stdout_Refman == NULL ||\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1329, aux_String_1329_Refman);
     CHECK(1333)
-    INIT_STRING_CONST(1334, aux_String_1330, "    fprintf(stderr, \"insufficient memory\\n\");\n");
+    INIT_STRING_CONST(1334, aux_String_1330, "    sys_M_stderr == NULL || sys_M_stderr_Refman == NULL) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1330, aux_String_1330_Refman);
     CHECK(1334)
-    INIT_STRING_CONST(1335, aux_String_1331, "    return ERR;\n");
+    INIT_STRING_CONST(1335, aux_String_1331, "    fprintf(stderr, \"insufficient memory\\n\");\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1331, aux_String_1331_Refman);
     CHECK(1335)
-    INIT_STRING_CONST(1336, aux_String_1332, "  }\n");
+    INIT_STRING_CONST(1336, aux_String_1332, "    return ERR;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1332, aux_String_1332_Refman);
     CHECK(1336)
-    INIT_STRING_CONST(1337, aux_String_1333, "  ++sys_M_argv_Refman->count;\n");
+    INIT_STRING_CONST(1337, aux_String_1333, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1333, aux_String_1333_Refman);
     CHECK(1337)
-    INIT_STRING_CONST(1338, aux_String_1334, "  ++sys_M_stdin_Refman->count;\n");
+    INIT_STRING_CONST(1338, aux_String_1334, "  ++sys_M_argv_Refman->count;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1334, aux_String_1334_Refman);
     CHECK(1338)
-    INIT_STRING_CONST(1339, aux_String_1335, "  ++sys_M_stdout_Refman->count;\n");
+    INIT_STRING_CONST(1339, aux_String_1335, "  ++sys_M_stdin_Refman->count;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1335, aux_String_1335_Refman);
     CHECK(1339)
-    INIT_STRING_CONST(1340, aux_String_1336, "  ++sys_M_stderr_Refman->count;\n");
+    INIT_STRING_CONST(1340, aux_String_1336, "  ++sys_M_stdout_Refman->count;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1336, aux_String_1336_Refman);
     CHECK(1340)
-    INIT_STRING_CONST(1341, aux_String_1337, "  sys_M_stdin->fobj = stdin;\n");
+    INIT_STRING_CONST(1341, aux_String_1337, "  ++sys_M_stderr_Refman->count;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1337, aux_String_1337_Refman);
     CHECK(1341)
-    INIT_STRING_CONST(1342, aux_String_1338, "  sys_M_stdout->fobj = stdout;\n");
+    INIT_STRING_CONST(1342, aux_String_1338, "  sys_M_stdin->fobj = stdin;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1338, aux_String_1338_Refman);
     CHECK(1342)
-    INIT_STRING_CONST(1343, aux_String_1339, "  sys_M_stderr->fobj = stderr;\n");
+    INIT_STRING_CONST(1343, aux_String_1339, "  sys_M_stdout->fobj = stdout;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1339, aux_String_1339_Refman);
     CHECK(1343)
-    INIT_STRING_CONST(1344, aux_String_1340, "  for (arg = 0; arg < argc; ++arg) {\n");
+    INIT_STRING_CONST(1344, aux_String_1340, "  sys_M_stderr->fobj = stderr;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1340, aux_String_1340_Refman);
     CHECK(1344)
-    INIT_STRING_CONST(1345, aux_String_1341, "    strncpy(sys_M_argv + sys_M_argv_Value_length * arg, argv[arg], sys_M_argv_Length);\n");
+    INIT_STRING_CONST(1345, aux_String_1341, "  for (arg = 0; arg < argc; ++arg) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1341, aux_String_1341_Refman);
     CHECK(1345)
-    INIT_STRING_CONST(1346, aux_String_1342, "  }\n");
+    INIT_STRING_CONST(1346, aux_String_1342, "    strncpy(sys_M_argv + sys_M_argv_Value_length * arg, argv[arg], sys_M_argv_Length);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1342, aux_String_1342_Refman);
     CHECK(1346)
-    INIT_STRING_CONST(1347, aux_String_1343, "  return OK;\n");
+    INIT_STRING_CONST(1347, aux_String_1343, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1343, aux_String_1343_Refman);
     CHECK(1347)
-    INIT_STRING_CONST(1348, aux_String_1344, "}\n");
+    INIT_STRING_CONST(1348, aux_String_1344, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1344, aux_String_1344_Refman);
     CHECK(1348)
-    INIT_STRING_CONST(1349, aux_String_1345, "\n");
+    INIT_STRING_CONST(1349, aux_String_1345, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1345, aux_String_1345_Refman);
     CHECK(1349)
-    INIT_STRING_CONST(1350, aux_String_1346, "#define LUMI_FUNC_NAME \"sys.print\"\n");
+    INIT_STRING_CONST(1350, aux_String_1346, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1346, aux_String_1346_Refman);
     CHECK(1350)
-    INIT_STRING_CONST(1351, aux_String_1347, "Return_Code sys_M_print(char* text, Seq_Length text_length) {\n");
+    INIT_STRING_CONST(1351, aux_String_1347, "#define LUMI_FUNC_NAME \"sys.print\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1347, aux_String_1347_Refman);
     CHECK(1351)
-    INIT_STRING_CONST(1352, aux_String_1348, "  Seq_Length n;\n");
+    INIT_STRING_CONST(1352, aux_String_1348, "Return_Code sys_M_print(char* text, Seq_Length text_length) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1348, aux_String_1348_Refman);
     CHECK(1352)
-    INIT_STRING_CONST(1353, aux_String_1349, "  int ch;\n");
+    INIT_STRING_CONST(1353, aux_String_1349, "  Seq_Length n;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1349, aux_String_1349_Refman);
     CHECK(1353)
-    INIT_STRING_CONST(1354, aux_String_1350, "  for (n = 0; n < text_length; ++n) {\n");
+    INIT_STRING_CONST(1354, aux_String_1350, "  int ch;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1350, aux_String_1350_Refman);
     CHECK(1354)
-    INIT_STRING_CONST(1355, aux_String_1351, "    ch = text[n];\n");
+    INIT_STRING_CONST(1355, aux_String_1351, "  for (n = 0; n < text_length; ++n) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1351, aux_String_1351_Refman);
     CHECK(1355)
-    INIT_STRING_CONST(1356, aux_String_1352, "    if (lumi_debug_value == LUMI_DEBUG_FAIL || ch != putchar(ch))\n");
+    INIT_STRING_CONST(1356, aux_String_1352, "    ch = text[n];\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1352, aux_String_1352_Refman);
     CHECK(1356)
-    INIT_STRING_CONST(1357, aux_String_1353, "      CRAISE(LUMI_error_messages.file_write_failed.str)\n");
+    INIT_STRING_CONST(1357, aux_String_1353, "    if (lumi_debug_value == LUMI_DEBUG_FAIL || ch != putchar(ch))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1353, aux_String_1353_Refman);
     CHECK(1357)
-    INIT_STRING_CONST(1358, aux_String_1354, "  }\n");
+    INIT_STRING_CONST(1358, aux_String_1354, "      CRAISE(LUMI_error_messages.file_write_failed.str)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1354, aux_String_1354_Refman);
     CHECK(1358)
-    INIT_STRING_CONST(1359, aux_String_1355, "  return OK;\n");
+    INIT_STRING_CONST(1359, aux_String_1355, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1355, aux_String_1355_Refman);
     CHECK(1359)
-    INIT_STRING_CONST(1360, aux_String_1356, "}\n");
+    INIT_STRING_CONST(1360, aux_String_1356, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1356, aux_String_1356_Refman);
     CHECK(1360)
-    INIT_STRING_CONST(1361, aux_String_1357, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1361, aux_String_1357, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1357, aux_String_1357_Refman);
     CHECK(1361)
-    INIT_STRING_CONST(1362, aux_String_1358, "\n");
+    INIT_STRING_CONST(1362, aux_String_1358, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1358, aux_String_1358_Refman);
     CHECK(1362)
-    INIT_STRING_CONST(1363, aux_String_1359, "#define LUMI_FUNC_NAME \"sys.println\"\n");
+    INIT_STRING_CONST(1363, aux_String_1359, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1359, aux_String_1359_Refman);
     CHECK(1363)
-    INIT_STRING_CONST(1364, aux_String_1360, "Return_Code sys_M_println(char* text, Seq_Length text_length) {\n");
+    INIT_STRING_CONST(1364, aux_String_1360, "#define LUMI_FUNC_NAME \"sys.println\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1360, aux_String_1360_Refman);
     CHECK(1364)
-    INIT_STRING_CONST(1365, aux_String_1361, "  sys_M_print(text, text_length);\n");
+    INIT_STRING_CONST(1365, aux_String_1361, "Return_Code sys_M_println(char* text, Seq_Length text_length) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1361, aux_String_1361_Refman);
     CHECK(1365)
-    INIT_STRING_CONST(1366, aux_String_1362, "  if (lumi_debug_value == LUMI_DEBUG_FAIL || putchar('\\n') != '\\n')\n");
+    INIT_STRING_CONST(1366, aux_String_1362, "  sys_M_print(text, text_length);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1362, aux_String_1362_Refman);
     CHECK(1366)
-    INIT_STRING_CONST(1367, aux_String_1363, "    CRAISE(LUMI_error_messages.file_write_failed.str)\n");
+    INIT_STRING_CONST(1367, aux_String_1363, "  if (lumi_debug_value == LUMI_DEBUG_FAIL || putchar('\\n') != '\\n')\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1363, aux_String_1363_Refman);
     CHECK(1367)
-    INIT_STRING_CONST(1368, aux_String_1364, "  return OK;\n");
+    INIT_STRING_CONST(1368, aux_String_1364, "    CRAISE(LUMI_error_messages.file_write_failed.str)\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1364, aux_String_1364_Refman);
     CHECK(1368)
-    INIT_STRING_CONST(1369, aux_String_1365, "}\n");
+    INIT_STRING_CONST(1369, aux_String_1365, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1365, aux_String_1365_Refman);
     CHECK(1369)
-    INIT_STRING_CONST(1370, aux_String_1366, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1370, aux_String_1366, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1366, aux_String_1366_Refman);
     CHECK(1370)
-    INIT_STRING_CONST(1371, aux_String_1367, "\n");
+    INIT_STRING_CONST(1371, aux_String_1367, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1367, aux_String_1367_Refman);
     CHECK(1371)
-    INIT_STRING_CONST(1372, aux_String_1368, "#define LUMI_FUNC_NAME \"sys.getchar\"\n");
+    INIT_STRING_CONST(1372, aux_String_1368, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1368, aux_String_1368_Refman);
     CHECK(1372)
-    INIT_STRING_CONST(1373, aux_String_1369, "Return_Code sys_M_getchar(char* out_char, Bool* is_eof) {\n");
+    INIT_STRING_CONST(1373, aux_String_1369, "#define LUMI_FUNC_NAME \"sys.getchar\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1369, aux_String_1369_Refman);
     CHECK(1373)
-    INIT_STRING_CONST(1374, aux_String_1370, "  CHECK_READ(sys_M_stdin, *is_eof, getc_is_not_ok(getchar(), out_char))\n");
+    INIT_STRING_CONST(1374, aux_String_1370, "Return_Code sys_M_getchar(char* out_char, Bool* is_eof) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1370, aux_String_1370_Refman);
     CHECK(1374)
-    INIT_STRING_CONST(1375, aux_String_1371, "  return OK;\n");
+    INIT_STRING_CONST(1375, aux_String_1371, "  CHECK_READ(sys_M_stdin, *is_eof, getc_is_not_ok(getchar(), out_char))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1371, aux_String_1371_Refman);
     CHECK(1375)
-    INIT_STRING_CONST(1376, aux_String_1372, "}\n");
+    INIT_STRING_CONST(1376, aux_String_1372, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1372, aux_String_1372_Refman);
     CHECK(1376)
-    INIT_STRING_CONST(1377, aux_String_1373, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1377, aux_String_1373, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1373, aux_String_1373_Refman);
     CHECK(1377)
-    INIT_STRING_CONST(1378, aux_String_1374, "\n");
+    INIT_STRING_CONST(1378, aux_String_1374, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1374, aux_String_1374_Refman);
     CHECK(1378)
-    INIT_STRING_CONST(1379, aux_String_1375, "int getchar_char_getter(FileReadText* self) {\n");
+    INIT_STRING_CONST(1379, aux_String_1375, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1375, aux_String_1375_Refman);
     CHECK(1379)
-    INIT_STRING_CONST(1380, aux_String_1376, "  return getchar();\n");
+    INIT_STRING_CONST(1380, aux_String_1376, "int getchar_char_getter(FileReadText* self) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1376, aux_String_1376_Refman);
     CHECK(1380)
-    INIT_STRING_CONST(1381, aux_String_1377, "}\n");
+    INIT_STRING_CONST(1381, aux_String_1377, "  return getchar();\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1377, aux_String_1377_Refman);
     CHECK(1381)
-    INIT_STRING_CONST(1382, aux_String_1378, "\n");
+    INIT_STRING_CONST(1382, aux_String_1378, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1378, aux_String_1378_Refman);
     CHECK(1382)
-    INIT_STRING_CONST(1383, aux_String_1379, "#define LUMI_FUNC_NAME \"sys.getline\"\n");
+    INIT_STRING_CONST(1383, aux_String_1379, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1379, aux_String_1379_Refman);
     CHECK(1383)
-    INIT_STRING_CONST(1384, aux_String_1380, "Return_Code sys_M_getline(\n");
+    INIT_STRING_CONST(1384, aux_String_1380, "#define LUMI_FUNC_NAME \"sys.getline\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1380, aux_String_1380_Refman);
     CHECK(1384)
-    INIT_STRING_CONST(1385, aux_String_1381, "    char* line, Seq_Length line_max_length, Seq_Length* line_length, Bool* is_eof) {\n");
+    INIT_STRING_CONST(1385, aux_String_1381, "Return_Code sys_M_getline(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1381, aux_String_1381_Refman);
     CHECK(1385)
-    INIT_STRING_CONST(1386, aux_String_1382, "  CCHECK(FileReadText_getline_internal(\n");
+    INIT_STRING_CONST(1386, aux_String_1382, "    char* line, Seq_Length line_max_length, Seq_Length* line_length, Bool* is_eof) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1382, aux_String_1382_Refman);
     CHECK(1386)
-    INIT_STRING_CONST(1387, aux_String_1383, "      sys_M_stdin,\n");
+    INIT_STRING_CONST(1387, aux_String_1383, "  CCHECK(FileReadText_getline_internal(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1383, aux_String_1383_Refman);
     CHECK(1387)
-    INIT_STRING_CONST(1388, aux_String_1384, "      line, line_max_length, line_length,\n");
+    INIT_STRING_CONST(1388, aux_String_1384, "      sys_M_stdin,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1384, aux_String_1384_Refman);
     CHECK(1388)
-    INIT_STRING_CONST(1389, aux_String_1385, "      is_eof,\n");
+    INIT_STRING_CONST(1389, aux_String_1385, "      line, line_max_length, line_length,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1385, aux_String_1385_Refman);
     CHECK(1389)
-    INIT_STRING_CONST(1390, aux_String_1386, "      getchar_char_getter))\n");
+    INIT_STRING_CONST(1390, aux_String_1386, "      is_eof,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1386, aux_String_1386_Refman);
     CHECK(1390)
-    INIT_STRING_CONST(1391, aux_String_1387, "  return OK;\n");
+    INIT_STRING_CONST(1391, aux_String_1387, "      getchar_char_getter))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1387, aux_String_1387_Refman);
     CHECK(1391)
-    INIT_STRING_CONST(1392, aux_String_1388, "}\n");
+    INIT_STRING_CONST(1392, aux_String_1388, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1388, aux_String_1388_Refman);
     CHECK(1392)
-    INIT_STRING_CONST(1393, aux_String_1389, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1393, aux_String_1389, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1389, aux_String_1389_Refman);
     CHECK(1393)
-    INIT_STRING_CONST(1394, aux_String_1390, "\n");
+    INIT_STRING_CONST(1394, aux_String_1390, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1390, aux_String_1390_Refman);
     CHECK(1394)
-    INIT_STRING_CONST(1395, aux_String_1391, "#define LUMI_FUNC_NAME \"sys.exit\"\n");
+    INIT_STRING_CONST(1395, aux_String_1391, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1391, aux_String_1391_Refman);
     CHECK(1395)
-    INIT_STRING_CONST(1396, aux_String_1392, "Return_Code sys_M_exit(int32_t status) {\n");
+    INIT_STRING_CONST(1396, aux_String_1392, "#define LUMI_FUNC_NAME \"sys.exit\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1392, aux_String_1392_Refman);
     CHECK(1396)
-    INIT_STRING_CONST(1397, aux_String_1393, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
+    INIT_STRING_CONST(1397, aux_String_1393, "Return_Code sys_M_exit(int32_t status) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1393, aux_String_1393_Refman);
     CHECK(1397)
-    INIT_STRING_CONST(1398, aux_String_1394, "    exit(status);\n");
+    INIT_STRING_CONST(1398, aux_String_1394, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1394, aux_String_1394_Refman);
     CHECK(1398)
-    INIT_STRING_CONST(1399, aux_String_1395, "  }\n");
+    INIT_STRING_CONST(1399, aux_String_1395, "    exit(status);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1395, aux_String_1395_Refman);
     CHECK(1399)
-    INIT_STRING_CONST(1400, aux_String_1396, "  CRAISE(\"exit failed\")\n");
+    INIT_STRING_CONST(1400, aux_String_1396, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1396, aux_String_1396_Refman);
     CHECK(1400)
-    INIT_STRING_CONST(1401, aux_String_1397, "}\n");
+    INIT_STRING_CONST(1401, aux_String_1397, "  CRAISE(\"exit failed\")\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1397, aux_String_1397_Refman);
     CHECK(1401)
-    INIT_STRING_CONST(1402, aux_String_1398, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1402, aux_String_1398, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1398, aux_String_1398_Refman);
     CHECK(1402)
-    INIT_STRING_CONST(1403, aux_String_1399, "\n");
+    INIT_STRING_CONST(1403, aux_String_1399, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1399, aux_String_1399_Refman);
     CHECK(1403)
-    INIT_STRING_CONST(1404, aux_String_1400, "#define LUMI_FUNC_NAME \"sys.system\"\n");
+    INIT_STRING_CONST(1404, aux_String_1400, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1400, aux_String_1400_Refman);
     CHECK(1404)
-    INIT_STRING_CONST(1405, aux_String_1401, "Return_Code sys_M_system(\n");
+    INIT_STRING_CONST(1405, aux_String_1401, "#define LUMI_FUNC_NAME \"sys.system\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1401, aux_String_1401_Refman);
     CHECK(1405)
-    INIT_STRING_CONST(1406, aux_String_1402, "    char* command, Seq_Length command_max_length, Seq_Length *command_length,\n");
+    INIT_STRING_CONST(1406, aux_String_1402, "Return_Code sys_M_system(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1402, aux_String_1402_Refman);
     CHECK(1406)
-    INIT_STRING_CONST(1407, aux_String_1403, "    int32_t* status) {\n");
+    INIT_STRING_CONST(1407, aux_String_1403, "    char* command, Seq_Length command_max_length, Seq_Length *command_length,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1403, aux_String_1403_Refman);
     CHECK(1407)
-    INIT_STRING_CONST(1408, aux_String_1404, "  int res = -1;\n");
+    INIT_STRING_CONST(1408, aux_String_1404, "    int32_t* status) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1404, aux_String_1404_Refman);
     CHECK(1408)
-    INIT_STRING_CONST(1409, aux_String_1405, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
+    INIT_STRING_CONST(1409, aux_String_1405, "  int res = -1;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1405, aux_String_1405_Refman);
     CHECK(1409)
-    INIT_STRING_CONST(1410, aux_String_1406, "    res = system(command);\n");
+    INIT_STRING_CONST(1410, aux_String_1406, "  if (lumi_debug_value != LUMI_DEBUG_FAIL) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1406, aux_String_1406_Refman);
     CHECK(1410)
-    INIT_STRING_CONST(1411, aux_String_1407, "  }\n");
+    INIT_STRING_CONST(1411, aux_String_1407, "    res = system(command);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1407, aux_String_1407_Refman);
     CHECK(1411)
-    INIT_STRING_CONST(1412, aux_String_1408, "  if (res == -1) CRAISE(\"command execution failed\")\n");
+    INIT_STRING_CONST(1412, aux_String_1408, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1408, aux_String_1408_Refman);
     CHECK(1412)
-    INIT_STRING_CONST(1413, aux_String_1409, "  *status = res;\n");
+    INIT_STRING_CONST(1413, aux_String_1409, "  if (res == -1) CRAISE(\"command execution failed\")\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1409, aux_String_1409_Refman);
     CHECK(1413)
-    INIT_STRING_CONST(1414, aux_String_1410, "  return OK;\n");
+    INIT_STRING_CONST(1414, aux_String_1410, "  *status = res;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1410, aux_String_1410_Refman);
     CHECK(1414)
-    INIT_STRING_CONST(1415, aux_String_1411, "}\n");
+    INIT_STRING_CONST(1415, aux_String_1411, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1411, aux_String_1411_Refman);
     CHECK(1415)
-    INIT_STRING_CONST(1416, aux_String_1412, "#undef LUMI_FUNC_NAME\n");
+    INIT_STRING_CONST(1416, aux_String_1412, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1412, aux_String_1412_Refman);
     CHECK(1416)
-    INIT_STRING_CONST(1417, aux_String_1413, "\n");
+    INIT_STRING_CONST(1417, aux_String_1413, "#undef LUMI_FUNC_NAME\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1413, aux_String_1413_Refman);
     CHECK(1417)
-    INIT_STRING_CONST(1418, aux_String_1414, "Return_Code sys_M_getenv(\n");
+    INIT_STRING_CONST(1418, aux_String_1414, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1414, aux_String_1414_Refman);
     CHECK(1418)
-    INIT_STRING_CONST(1419, aux_String_1415, "    char* name, Seq_Length name_max_length, Seq_Length *name_length,\n");
+    INIT_STRING_CONST(1419, aux_String_1415, "Return_Code sys_M_getenv(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1415, aux_String_1415_Refman);
     CHECK(1419)
-    INIT_STRING_CONST(1420, aux_String_1416, "    char* value, Seq_Length value_max_length, Seq_Length* value_length,\n");
+    INIT_STRING_CONST(1420, aux_String_1416, "    char* name, Seq_Length name_max_length, Seq_Length *name_length,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1416, aux_String_1416_Refman);
     CHECK(1420)
-    INIT_STRING_CONST(1421, aux_String_1417, "    Bool* exists) {\n");
+    INIT_STRING_CONST(1421, aux_String_1417, "    char* value, Seq_Length value_max_length, Seq_Length* value_length,\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1417, aux_String_1417_Refman);
     CHECK(1421)
-    INIT_STRING_CONST(1422, aux_String_1418, "  char* ret;\n");
+    INIT_STRING_CONST(1422, aux_String_1418, "    Bool* exists) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1418, aux_String_1418_Refman);
     CHECK(1422)
-    INIT_STRING_CONST(1423, aux_String_1419, "  ret = getenv(name);\n");
+    INIT_STRING_CONST(1423, aux_String_1419, "  char* ret;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1419, aux_String_1419_Refman);
     CHECK(1423)
-    INIT_STRING_CONST(1424, aux_String_1420, "  if (ret == NULL) {\n");
+    INIT_STRING_CONST(1424, aux_String_1420, "  ret = getenv(name);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1420, aux_String_1420_Refman);
     CHECK(1424)
-    INIT_STRING_CONST(1425, aux_String_1421, "    *exists = false;\n");
+    INIT_STRING_CONST(1425, aux_String_1421, "  if (ret == NULL) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1421, aux_String_1421_Refman);
     CHECK(1425)
-    INIT_STRING_CONST(1426, aux_String_1422, "    return OK;\n");
+    INIT_STRING_CONST(1426, aux_String_1422, "    *exists = false;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1422, aux_String_1422_Refman);
     CHECK(1426)
-    INIT_STRING_CONST(1427, aux_String_1423, "  }\n");
+    INIT_STRING_CONST(1427, aux_String_1423, "    return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1423, aux_String_1423_Refman);
     CHECK(1427)
-    INIT_STRING_CONST(1428, aux_String_1424, "  *value_length = cstring_length(ret, value_max_length);\n");
+    INIT_STRING_CONST(1428, aux_String_1424, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1424, aux_String_1424_Refman);
     CHECK(1428)
-    INIT_STRING_CONST(1429, aux_String_1425, "  strncpy(value, ret, *value_length);\n");
+    INIT_STRING_CONST(1429, aux_String_1425, "  *value_length = cstring_length(ret, value_max_length);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1425, aux_String_1425_Refman);
     CHECK(1429)
-    INIT_STRING_CONST(1430, aux_String_1426, "  *exists = true;\n");
+    INIT_STRING_CONST(1430, aux_String_1426, "  strncpy(value, ret, *value_length);\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1426, aux_String_1426_Refman);
     CHECK(1430)
-    INIT_STRING_CONST(1431, aux_String_1427, "  return OK;\n");
+    INIT_STRING_CONST(1431, aux_String_1427, "  *exists = true;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1427, aux_String_1427_Refman);
     CHECK(1431)
-    INIT_STRING_CONST(1432, aux_String_1428, "}\n");
+    INIT_STRING_CONST(1432, aux_String_1428, "  return OK;\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1428, aux_String_1428_Refman);
     CHECK(1432)
-    INIT_STRING_CONST(1433, aux_String_1429, "\n");
+    INIT_STRING_CONST(1433, aux_String_1429, "}\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1429, aux_String_1429_Refman);
     CHECK(1433)
+    INIT_STRING_CONST(1434, aux_String_1430, "\n");
+    LUMI_err = tl5_compiler_M_write_global(aux_String_1430, aux_String_1430_Refman);
+    CHECK(1434)
 LUMI_cleanup:
+    LUMI_var_dec_ref(aux_String_1430_Refman);
     LUMI_var_dec_ref(aux_String_1429_Refman);
     LUMI_var_dec_ref(aux_String_1428_Refman);
     LUMI_var_dec_ref(aux_String_1427_Refman);

@@ -1439,17 +1439,17 @@ ignoring slice bounds check
 /// @ test-slice-expression-e14
 sequence length is not positive
 /// @ test-slice-expression-e15
-slice index always negative with maximum value of "-0x01"
+slice index always negative with maximum value of "-1"
 /// @ test-slice-expression-e16
-slice index always negative with maximum value of "-0x02"
+slice index always negative with maximum value of "-2"
 /// @ test-slice-expression-e17
-slice length never positive with maximum value of "0x00"
+slice length never positive with maximum value of "0"
 /// @ test-slice-expression-e18
-slice length never positive with maximum value of "0x00"
+slice length never positive with maximum value of "0"
 /// @ test-slice-expression-e19
-slice minimal length "0x04" is larger than sequence maximal size "0x03"
+slice minimal length "4" is larger than sequence maximal size "3"
 /// @ test-slice-expression-e20
-slice minimal length "0x10" is larger than sequence maximal size "0x0a"
+slice minimal length "16" is larger than sequence maximal size "10"
 /// @@ test-call-expression
 /// @ test-call-expression-0
 ut_M_fun0();
@@ -2312,23 +2312,23 @@ dividing by zero
 /// @ test-binary-expression-e25
 dividing by zero
 /// @ test-binary-expression-e26
-unsigned operation on signed integer with minimum value of "-0x0a"
+unsigned operation on signed integer with minimum value of "-10"
 /// @ test-binary-expression-e27
-unsigned operation on signed integer with minimum value of "-0x0a"
+unsigned operation on signed integer with minimum value of "-10"
 /// @ test-binary-expression-e28
-unsigned operation on signed integer with minimum value of "-0x0a"
+unsigned operation on signed integer with minimum value of "-10"
 /// @ test-binary-expression-e29
-unsigned operation on signed integer with minimum value of "-0x0a"
+unsigned operation on signed integer with minimum value of "-10"
 /// @ test-binary-expression-e30
-unsigned operation on signed integer with minimum value of "-0x0a"
+unsigned operation on signed integer with minimum value of "-10"
 /// @ test-binary-expression-e31
-unsigned operation on signed integer with minimum value of "-0x0a"
+unsigned operation on signed integer with minimum value of "-10"
 /// @ test-binary-expression-e32
-unsigned operation on signed integer with minimum value of "-0x0a"
+unsigned operation on signed integer with minimum value of "-10"
 /// @ test-binary-expression-e33
-unsigned operation on signed integer with minimum value of "-0x0a"
+unsigned operation on signed integer with minimum value of "-10"
 /// @ test-binary-expression-e34
-too high signed integer maximum "0xffffffffffffffff"
+too high signed integer maximum "18446744073709551615"
 /// @ test-binary-expression-e35
 unnecessary wraparound with "+"
 /// @ test-binary-expression-e36
@@ -2336,9 +2336,9 @@ unnecessary wraparound with "-"
 /// @ test-binary-expression-e37
 unnecessary wraparound with "*"
 /// @ test-binary-expression-e38
-assigning integer with minimum of "0x00" into integer with larger minimum of "0x01"
+assigning integer with minimum of "0" into integer with larger minimum of "1"
 /// @ test-binary-expression-e39
-assigning integer with maximum of "0xff" into integer with smaller maximum of "0xfe"
+assigning integer with maximum of "255" into integer with smaller maximum of "254"
 /// @ test-binary-expression-e40
 using "?" where error is propagated
 /// @ test-binary-expression-e41
@@ -2972,25 +2972,25 @@ uint8_t u8 = 0;
     s32 = -0x0186a0;
     ut_M_i = 0x14 + -0x14;
 /// @ test-int-range-e0
-integer range minimum "0x0c" larger than maximum "0x0b"
+integer range minimum "12" larger than maximum "11"
 /// @ test-int-range-e1
-too high unsigned integer maximum "0x010000000000000000"
+too high unsigned integer maximum "18446744073709551616"
 /// @ test-int-range-e2
-too high signed integer maximum "0x8000000000000000"
+too high signed integer maximum "9223372036854775808"
 /// @ test-int-range-e3
-too low signed integer minimum "-0x8000000000000001"
+too low signed integer minimum "-9223372036854775809"
 /// @ test-int-range-e4
 got "String" expression, expected "Int"
 /// @ test-int-range-e5
 integer range is not constant
 /// @ test-int-range-e6
-integer range minimum "0x00" larger than maximum "-0x64"
+integer range minimum "0" larger than maximum "-100"
 /// @ test-int-range-e7
-assigning integer with minimum of "-0x7fffffff" into integer with larger minimum of "0x00"
+assigning integer with minimum of "-2147483647" into integer with larger minimum of "0"
 /// @ test-int-range-e8
-assigning integer with maximum of "0xffffffff" into integer with smaller maximum of "0x7fffffff"
+assigning integer with maximum of "4294967295" into integer with smaller maximum of "2147483647"
 /// @ test-int-range-e9
-too high unsigned integer maximum "0x010000000000000000"
+too high unsigned integer maximum "18446744073709551616"
 /// @@ test-dynamic
 /// @ test-dynamic-0
 ut_M_Ta a_Var = {{0}};
@@ -5208,7 +5208,7 @@ illegal variable name "error--name"
 /// @ test-code-variables-e11
 unexpected space after variable name
 /// @ test-code-variables-e12
-sequence length never positive with maximum value of "-0x02"
+sequence length never positive with maximum value of "-2"
 /// @@ test-initialize
 /// @ test-initialize-0
 ut_M_Tb* aux_Tb_0 = NULL;
@@ -5644,7 +5644,7 @@ using "!" where there is no error
 /// @ test-initialize-e38
 unexpected "!" after "s"
 /// @ test-initialize-e39
-sequence length never positive with maximum value of "-0x02"
+sequence length never positive with maximum value of "-2"
 /// @ test-initialize-e40
 using invalid reference "x"
 /// @@ test-comment

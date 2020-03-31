@@ -658,11 +658,12 @@ Return_Code Int_str(
   uint64_t tmp;
   char* low;
   char* high;
-  *str_length = is_neg? 1: 0;
+  *str_length = 0;
   high = str;
   if (is_neg) {
     *high = '-';
     ++high;
+    ++(*str_length);
   }
   low = high;
   tmp = abs;
