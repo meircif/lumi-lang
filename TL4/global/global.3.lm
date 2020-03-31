@@ -263,6 +263,10 @@ static Global
     self.add-builtin-parameter(
         user arguments, copy ACCESS-USER, user glob.type-string, user "text")
         
+    self.add-builtin-method(user glob.type-long, user "str"):(user arguments)
+    self.add-builtin-parameter(
+        user arguments, copy ACCESS-USER, user glob.type-string, user "text")
+        
     self.add-builtin-method(user glob.type-long, user "hex"):(user arguments)
     self.add-builtin-parameter(
         user arguments, copy ACCESS-USER, user glob.type-string, user "text")

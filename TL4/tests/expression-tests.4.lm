@@ -76,6 +76,7 @@ var Long l
     l.mul(copy 100)
     l.negate()
     l.parse(user str)
+    l.str(user str)
     l.hex(user str)
     var Long x
     long-add(user l, user x)->(owner res)
