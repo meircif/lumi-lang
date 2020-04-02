@@ -453,7 +453,7 @@ struct Global
                 copy binary-factory)
 
     func init-int-map()
-        self.add-global-int-alias(user "Char", copy 8, user "127")
+        self.add-global-int-alias(user "Char", copy 8, user "255")
         self.add-global-int-alias(user "Byte", copy 8, user "255")
         self.add-global-int-alias(user "Int", copy 32, user "4294967295")
         self.add-global-int-alias(user "Uint8", copy 8, user "255")
@@ -634,7 +634,7 @@ struct Global
 
         self.add-builtin-method(
                 user seq-type,
-                user "copy",
+                user "new",
                 copy true,
                 copy Access.USER)->(
                 user function)
@@ -643,7 +643,7 @@ struct Global
                 user value-type,
                 copy false,
                 copy Access.USER,
-                user "other")
+                user "value")
         copy-function := function
 
         self.add-builtin-method(
@@ -658,7 +658,7 @@ struct Global
                 user value-type,
                 copy false,
                 copy Access.USER,
-                user "pattern")
+                user "other")
         self.add-builtin-output(
                 user function,
                 copy Access.VAR,
@@ -822,7 +822,7 @@ struct Global
                 user function)
         self.add-builtin-int-argument(
                 user function,
-                user "Uint64",
+                user "Sint64",
                 copy true,
                 user "offset")
 
@@ -834,7 +834,7 @@ struct Global
                 user function)
         self.add-builtin-int-argument(
                 user function,
-                user "Uint64",
+                user "Sint64",
                 copy false,
                 user "offset")
 
@@ -846,7 +846,7 @@ struct Global
                 user function)
         self.add-builtin-int-argument(
                 user function,
-                user "Uint64",
+                user "Sint64",
                 copy false,
                 user "offset")
 
@@ -858,7 +858,7 @@ struct Global
                 user function)
         self.add-builtin-int-argument(
                 user function,
-                user "Uint64",
+                user "Sint64",
                 copy false,
                 user "offset")
 
@@ -1034,7 +1034,7 @@ struct Global
                 user "status")
 
         self.add-builtin-global-function(
-                user sys-module, user "getenv", copy true)->(user function)
+                user sys-module, user "getenv", copy false)->(user function)
         self.add-builtin-parameter(
                 user function,
                 copy Access.USER,

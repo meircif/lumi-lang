@@ -791,7 +791,7 @@ char* sa = NULL;
     aux_String_0_Refman = sa_Refman;
     LUMI_inc_ref(aux_String_0_Refman);
     CHECK_REFMAN(2, LUMI_block0_cleanup, aux_String_0_Refman)
-    LUMI_err = String_copy(aux_String_0, aux_String_0_Max_length, aux_String_0_Length, aux_String_1, *aux_String_1_Length);
+    LUMI_err = String_new(aux_String_0, aux_String_0_Max_length, aux_String_0_Length, aux_String_1, *aux_String_1_Length);
     CHECK(2, LUMI_block0_cleanup)
     free(sa_Seq_length);
     LUMI_owner_dec_ref(sa_Refman);
@@ -808,7 +808,7 @@ char* sa = NULL;
     aux_Buffer_0_Refman = ba_Refman;
     LUMI_inc_ref(aux_Buffer_0_Refman);
     CHECK_REFMAN(5, LUMI_block0_cleanup, aux_Buffer_0_Refman)
-    LUMI_err = Buffer_copy(aux_Buffer_0, aux_Buffer_0_Max_length, aux_Buffer_0_Length, aux_Buffer_1, *aux_Buffer_1_Length);
+    LUMI_err = Buffer_new(aux_Buffer_0, aux_Buffer_0_Max_length, aux_Buffer_0_Length, aux_Buffer_1, *aux_Buffer_1_Length);
     CHECK(5, LUMI_block0_cleanup)
     free(ba_Seq_length);
     LUMI_owner_dec_ref(ba_Refman);
@@ -3343,7 +3343,7 @@ char sv[0x0c] = {0};
     Seq_Length sv_Length[1] = {0};
     /* initializing sv */
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = String_copy(sv, 0x0c, sv_Length, ut_M_ostr, *ut_M_ostr_Length);
+    LUMI_err = String_new(sv, 0x0c, sv_Length, ut_M_ostr, *ut_M_ostr_Length);
     CHECK(2, LUMI_block0_cleanup)
 /// @ test-builtin-string7
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
@@ -3395,7 +3395,7 @@ Byte bv[0x0c] = {0};
     Seq_Length bv_Length[1] = {0};
     /* initializing bv */
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_buff)
-    LUMI_err = Buffer_copy(bv, 0x0c, bv_Length, ut_M_buff, *ut_M_buff_Length);
+    LUMI_err = Buffer_new(bv, 0x0c, bv_Length, ut_M_buff, *ut_M_buff_Length);
     CHECK(2, LUMI_block0_cleanup)
 /// @ test-builtin-buffer7
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
@@ -3421,7 +3421,7 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         FileReadText f_Var = {0};
         FileReadText* f = NULL;
         Ref_Manager* f_Refman = NULL;
-        uint64_t x = 0;
+        int64_t x = 0;
         ut_M_Data df_Var = {0};
         ut_M_Data* df = NULL;
         ++LUMI_trace_ignore_count;
@@ -3470,7 +3470,7 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
 /// @ test-builtin-file1
 {
         FileReadBinary* f = NULL;
-        uint64_t x = 0;
+        int64_t x = 0;
         ut_M_Data df_Var = {0};
         ut_M_Data* df = NULL;
         ++LUMI_trace_ignore_count;
@@ -3515,7 +3515,7 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
 /// @ test-builtin-file2
 {
         FileWriteText* f = NULL;
-        uint64_t x = 0;
+        int64_t x = 0;
         ut_M_Data df_Var = {0};
         ut_M_Data* df = NULL;
         FileWriteText* aux_FileWriteText_0 = NULL;
@@ -3566,7 +3566,7 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
 {
         FileWriteBinary* f = NULL;
         Ref_Manager* f_Refman = NULL;
-        uint64_t x = 0;
+        int64_t x = 0;
         ut_M_Data df_Var = {0};
         ut_M_Data* df = NULL;
         FileWriteBinary* aux_FileWriteBinary_0 = NULL;
@@ -3622,7 +3622,7 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         FileReadWriteText f_Var = {0};
         FileReadWriteText* f = NULL;
         Ref_Manager* f_Refman = NULL;
-        uint64_t x = 0;
+        int64_t x = 0;
         ut_M_Data df_Var = {0};
         ut_M_Data* df = NULL;
         ++LUMI_trace_ignore_count;
@@ -3676,7 +3676,7 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
 /// @ test-builtin-file5
 {
         FileReadWriteBinary* f = NULL;
-        uint64_t x = 0;
+        int64_t x = 0;
         ut_M_Data df_Var = {0};
         ut_M_Data* df = NULL;
         ++LUMI_trace_ignore_count;
@@ -3751,7 +3751,7 @@ Return_Code ut_M_fun(File* f, FileReadText* frt, FileReadBinary* frb, FileWriteT
     ut_M_Data df_Var = {0};
     ut_M_Data* df = NULL;
     File* fo = NULL;
-    uint64_t i = 0;
+    int64_t i = 0;
     FileWriteBinary* aux_FileWriteBinary_0 = NULL;
     static char aux_String_0[] = {'n','a','m','e','\0',};
     Seq_Length aux_String_0_Max_length = sizeof(aux_String_0);
@@ -3831,8 +3831,7 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
 /// @ test-builtin-sys7
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = sys_M_getenv(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_b));
-    CHECK(1, LUMI_block0_cleanup)
+    sys_M_getenv(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_b));
 /// @ test-builtin-sys8
 LUMI_err = FileReadText_get(sys_M_stdin, &(ut_M_c), &(ut_M_b));
     CHECK(1, LUMI_block0_cleanup)
@@ -3919,7 +3918,7 @@ USER_MAIN_HEADER {
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "mock.5.lm"
     INIT_NEW_SEQUENCE(3, LUMI_block0_cleanup, aux_String_0, char, 0x0c);
-    LUMI_err = String_copy(aux_String_0, 0x0c, aux_String_0_Length, aux_String_1, *aux_String_1_Length);
+    LUMI_err = String_new(aux_String_0, 0x0c, aux_String_0_Length, aux_String_1, *aux_String_1_Length);
     CHECK(3, LUMI_block0_cleanup)
     ut_M_cs_Max_length = 0x0c;
     ut_M_cs_Length = aux_String_0_Length;
@@ -3929,7 +3928,7 @@ USER_MAIN_HEADER {
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "mock.5.lm"
     INIT_NEW_SEQUENCE(4, LUMI_block0_cleanup, aux_Buffer_0, Byte, 0x0c);
-    LUMI_err = Buffer_copy(aux_Buffer_0, 0x0c, aux_Buffer_0_Length, aux_Buffer_1, *aux_Buffer_1_Length);
+    LUMI_err = Buffer_new(aux_Buffer_0, 0x0c, aux_Buffer_0_Length, aux_Buffer_1, *aux_Buffer_1_Length);
     CHECK(4, LUMI_block0_cleanup)
     ut_M_cb_Max_length = 0x0c;
     ut_M_cb_Length = aux_Buffer_0_Length;
@@ -3939,7 +3938,7 @@ USER_MAIN_HEADER {
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "mock.5.lm"
     INIT_NEW_SEQUENCE(5, LUMI_block0_cleanup, aux_String_2, char, 0x0c);
-    LUMI_err = String_copy(aux_String_2, 0x0c, aux_String_2_Length, ut_M_s, *ut_M_s_Length);
+    LUMI_err = String_new(aux_String_2, 0x0c, aux_String_2_Length, ut_M_s, *ut_M_s_Length);
     CHECK(5, LUMI_block0_cleanup)
     ut_M_us_Max_length = 0x0c;
     ut_M_us_Length = aux_String_2_Length;
@@ -5338,10 +5337,10 @@ char s[0x0c] = {0};
     Seq_Length aux_Buffer_0_Max_length = sizeof(aux_Buffer_0);
     Seq_Length aux_Buffer_0_Length[1] = {sizeof(aux_Buffer_0)};
     /* initializing s */
-    LUMI_err = String_copy(s, 0x0c, s_Length, aux_String_0, *aux_String_0_Length);
+    LUMI_err = String_new(s, 0x0c, s_Length, aux_String_0, *aux_String_0_Length);
     CHECK(1, LUMI_block0_cleanup)
     /* initializing bf */
-    LUMI_err = Buffer_copy(bf, 0x0c, bf_Length, aux_Buffer_0, *aux_Buffer_0_Length);
+    LUMI_err = Buffer_new(bf, 0x0c, bf_Length, aux_Buffer_0, *aux_Buffer_0_Length);
     CHECK(2, LUMI_block0_cleanup)
 /// @ test-initialize-8
 char* s = NULL;
@@ -5353,12 +5352,12 @@ char* s = NULL;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     if (ut_M_i <= 0) RAISE(1, LUMI_block0_cleanup, sequence_too_short)
     INIT_NEW_SEQUENCE(1, LUMI_block0_cleanup, s, char, ut_M_i);
-    LUMI_err = String_copy(s, s_Max_length, s_Length, ut_M_ostr, *ut_M_ostr_Length);
+    LUMI_err = String_new(s, s_Max_length, s_Length, ut_M_ostr, *ut_M_ostr_Length);
     CHECK(1, LUMI_block0_cleanup)
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_buff)
     if (ut_M_i <= 0) RAISE(2, LUMI_block0_cleanup, sequence_too_short)
     INIT_NEW_SEQUENCE(2, LUMI_block0_cleanup, bf, Byte, ut_M_i);
-    LUMI_err = Buffer_copy(bf, bf_Max_length, bf_Length, ut_M_buff, *ut_M_buff_Length);
+    LUMI_err = Buffer_new(bf, bf_Max_length, bf_Length, ut_M_buff, *ut_M_buff_Length);
     CHECK(2, LUMI_block0_cleanup)
 /// @ test-initialize-9
 ut_M_Test* tt = NULL;
@@ -9477,7 +9476,7 @@ void ut_M_TestIterator_step(ut_M_TestIterator* self, char** text, Seq_Length* te
     ++LUMI_trace_ignore_count;
     CHECK_REF(4, LUMI_block2_cleanup, self->value)
     INIT_NEW_SEQUENCE(4, LUMI_block2_cleanup, aux_String_0, char, 0x0c);
-    LUMI_err = String_copy(aux_String_0, 0x0c, aux_String_0_Length, self->value, *self->value_Length);
+    LUMI_err = String_new(aux_String_0, 0x0c, aux_String_0_Length, self->value, *self->value_Length);
     CHECK(4, LUMI_block2_cleanup)
     String_Del(*text);
     LUMI_owner_dec_ref(*text_Refman);

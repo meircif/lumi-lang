@@ -36494,7 +36494,7 @@ Returncode tl5_compiler_M_Global_init_int_map(tl5_compiler_M_Global* self, Ref_M
     Ref_Manager* aux_String_21_Refman = NULL;
     LUMI_inc_ref(self_Refman);
     INIT_STRING_CONST(456, aux_String_0, "Char");
-    INIT_STRING_CONST(456, aux_String_1, "127");
+    INIT_STRING_CONST(456, aux_String_1, "255");
     LUMI_err = tl5_compiler_M_Global_add_global_int_alias(self, self_Refman, aux_String_0, aux_String_0_Refman, 8, aux_String_1, aux_String_1_Refman);
     CHECK(456)
     INIT_STRING_CONST(457, aux_String_2, "Byte");
@@ -37103,10 +37103,10 @@ Returncode tl5_compiler_M_Global_add_sequence_methods(tl5_compiler_M_Global* sel
     INIT_STRING_CONST(633, aux_String_5, "max-length");
     LUMI_err = tl5_compiler_M_Global_add_builtin_int_argument(self, self_Refman, function, function_Refman, function_Dynamic, aux_String_4, aux_String_4_Refman, true, aux_String_5, aux_String_5_Refman);
     CHECK(629)
-    INIT_STRING_CONST(637, aux_String_6, "copy");
+    INIT_STRING_CONST(637, aux_String_6, "new");
     LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, seq_type, seq_type_Refman, seq_type_Dynamic, aux_String_6, aux_String_6_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
     CHECK(635)
-    INIT_STRING_CONST(646, aux_String_7, "other");
+    INIT_STRING_CONST(646, aux_String_7, "value");
     LUMI_err = tl5_compiler_M_Global_add_builtin_array_argument(self, self_Refman, function, function_Refman, function_Dynamic, value_type, value_type_Refman, value_type_Dynamic, false, tl5_compiler_M_Access_USER, aux_String_7, aux_String_7_Refman);
     CHECK(641)
     aux_Ref_Manager = *copy_function_Refman;
@@ -37122,7 +37122,7 @@ Returncode tl5_compiler_M_Global_add_sequence_methods(tl5_compiler_M_Global* sel
     INIT_STRING_CONST(654, aux_String_9, "equal");
     LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, seq_type, seq_type_Refman, seq_type_Dynamic, aux_String_9, aux_String_9_Refman, false, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
     CHECK(653)
-    INIT_STRING_CONST(661, aux_String_10, "pattern");
+    INIT_STRING_CONST(661, aux_String_10, "other");
     LUMI_err = tl5_compiler_M_Global_add_builtin_array_argument(self, self_Refman, function, function_Refman, function_Dynamic, value_type, value_type_Refman, value_type_Dynamic, false, tl5_compiler_M_Access_USER, aux_String_10, aux_String_10_Refman);
     CHECK(656)
     CHECK_REF(665, self, self_Refman)
@@ -37468,28 +37468,28 @@ Returncode tl5_compiler_M_Global_add_file_methods(tl5_compiler_M_Global* self, R
     INIT_STRING_CONST(821, aux_String_5, "tell");
     LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, file_type, file_type_Refman, file_type_Dynamic, aux_String_5, aux_String_5_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
     CHECK(820)
-    INIT_STRING_CONST(825, aux_String_6, "Uint64");
+    INIT_STRING_CONST(825, aux_String_6, "Sint64");
     INIT_STRING_CONST(827, aux_String_7, "offset");
     LUMI_err = tl5_compiler_M_Global_add_builtin_int_argument(self, self_Refman, function, function_Refman, function_Dynamic, aux_String_6, aux_String_6_Refman, true, aux_String_7, aux_String_7_Refman);
     CHECK(823)
     INIT_STRING_CONST(831, aux_String_8, "seek-set");
     LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, file_type, file_type_Refman, file_type_Dynamic, aux_String_8, aux_String_8_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
     CHECK(829)
-    INIT_STRING_CONST(837, aux_String_9, "Uint64");
+    INIT_STRING_CONST(837, aux_String_9, "Sint64");
     INIT_STRING_CONST(839, aux_String_10, "offset");
     LUMI_err = tl5_compiler_M_Global_add_builtin_int_argument(self, self_Refman, function, function_Refman, function_Dynamic, aux_String_9, aux_String_9_Refman, false, aux_String_10, aux_String_10_Refman);
     CHECK(835)
     INIT_STRING_CONST(843, aux_String_11, "seek-cur");
     LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, file_type, file_type_Refman, file_type_Dynamic, aux_String_11, aux_String_11_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
     CHECK(841)
-    INIT_STRING_CONST(849, aux_String_12, "Uint64");
+    INIT_STRING_CONST(849, aux_String_12, "Sint64");
     INIT_STRING_CONST(851, aux_String_13, "offset");
     LUMI_err = tl5_compiler_M_Global_add_builtin_int_argument(self, self_Refman, function, function_Refman, function_Dynamic, aux_String_12, aux_String_12_Refman, false, aux_String_13, aux_String_13_Refman);
     CHECK(847)
     INIT_STRING_CONST(855, aux_String_14, "seek-end");
     LUMI_err = tl5_compiler_M_Global_add_builtin_method(self, self_Refman, file_type, file_type_Refman, file_type_Dynamic, aux_String_14, aux_String_14_Refman, true, tl5_compiler_M_Access_USER, &(function), &(function_Refman), &(function_Dynamic));
     CHECK(853)
-    INIT_STRING_CONST(861, aux_String_15, "Uint64");
+    INIT_STRING_CONST(861, aux_String_15, "Sint64");
     INIT_STRING_CONST(863, aux_String_16, "offset");
     LUMI_err = tl5_compiler_M_Global_add_builtin_int_argument(self, self_Refman, function, function_Refman, function_Dynamic, aux_String_15, aux_String_15_Refman, false, aux_String_16, aux_String_16_Refman);
     CHECK(859)
@@ -37760,7 +37760,7 @@ Returncode tl5_compiler_M_Global_init_sys_module(tl5_compiler_M_Global* self, Re
     LUMI_err = tl5_compiler_M_Global_add_builtin_int_argument(self, self_Refman, function, function_Refman, function_Dynamic, aux_String_20, aux_String_20_Refman, true, aux_String_21, aux_String_21_Refman);
     CHECK(1030)
     INIT_STRING_CONST(1037, aux_String_22, "getenv");
-    LUMI_err = tl5_compiler_M_Global_add_builtin_global_function(self, self_Refman, sys_module, sys_module_Refman, aux_String_22, aux_String_22_Refman, true, &(function), &(function_Refman), &(function_Dynamic));
+    LUMI_err = tl5_compiler_M_Global_add_builtin_global_function(self, self_Refman, sys_module, sys_module_Refman, aux_String_22, aux_String_22_Refman, false, &(function), &(function_Refman), &(function_Dynamic));
     CHECK(1036)
     CHECK_REF(1041, self, self_Refman)
     INIT_STRING_CONST(1042, aux_String_23, "name");
@@ -64413,10 +64413,10 @@ Returncode tl5_compiler_M_write_output_header_code(void) {
     INIT_STRING_CONST(765, aux_String_761, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_761, aux_String_761_Refman);
     CHECK(765)
-    INIT_STRING_CONST(766, aux_String_762, "#define LUMI_FUNC_NAME \"Buffer.copy\"\n");
+    INIT_STRING_CONST(766, aux_String_762, "#define LUMI_FUNC_NAME \"Buffer.new\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_762, aux_String_762_Refman);
     CHECK(766)
-    INIT_STRING_CONST(767, aux_String_763, "Return_Code Buffer_copy(\n");
+    INIT_STRING_CONST(767, aux_String_763, "Return_Code Buffer_new(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_763, aux_String_763_Refman);
     CHECK(767)
     INIT_STRING_CONST(768, aux_String_764, "    void* self, Seq_Length max_length, Seq_Length* length, void* source, Seq_Length source_length) {\n");
@@ -64476,7 +64476,7 @@ Returncode tl5_compiler_M_write_output_header_code(void) {
     INIT_STRING_CONST(786, aux_String_782, "  }\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_782, aux_String_782_Refman);
     CHECK(786)
-    INIT_STRING_CONST(787, aux_String_783, "  CCHECK(Buffer_copy(self, max_length, length, source, source_length))\n");
+    INIT_STRING_CONST(787, aux_String_783, "  CCHECK(Buffer_new(self, max_length, length, source, source_length))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_783, aux_String_783_Refman);
     CHECK(787)
     INIT_STRING_CONST(788, aux_String_784, "  return OK;\n");
@@ -64800,16 +64800,16 @@ Returncode tl5_compiler_M_write_output_header_code(void) {
     INIT_STRING_CONST(894, aux_String_890, "\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_890, aux_String_890_Refman);
     CHECK(894)
-    INIT_STRING_CONST(895, aux_String_891, "#define LUMI_FUNC_NAME \"String.copy\"\n");
+    INIT_STRING_CONST(895, aux_String_891, "#define LUMI_FUNC_NAME \"String.new\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_891, aux_String_891_Refman);
     CHECK(895)
-    INIT_STRING_CONST(896, aux_String_892, "Return_Code String_copy(\n");
+    INIT_STRING_CONST(896, aux_String_892, "Return_Code String_new(\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_892, aux_String_892_Refman);
     CHECK(896)
     INIT_STRING_CONST(897, aux_String_893, "    char* self, Seq_Length max_length, Seq_Length* length, char* source, Seq_Length source_length) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_893, aux_String_893_Refman);
     CHECK(897)
-    INIT_STRING_CONST(898, aux_String_894, "  CCHECK(Buffer_copy(self, max_length - 1, length, source, source_length))\n");
+    INIT_STRING_CONST(898, aux_String_894, "  CCHECK(Buffer_new(self, max_length - 1, length, source, source_length))\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_894, aux_String_894_Refman);
     CHECK(898)
     INIT_STRING_CONST(899, aux_String_895, "  self[source_length] = '\\0';\n");
@@ -65358,7 +65358,7 @@ Returncode tl5_compiler_M_write_output_header_code(void) {
     INIT_STRING_CONST(1080, aux_String_1076, "#define LUMI_FUNC_NAME \"File.tell\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1076, aux_String_1076_Refman);
     CHECK(1080)
-    INIT_STRING_CONST(1081, aux_String_1077, "Return_Code File_tell(File* self, uint64_t* offset) {\n");
+    INIT_STRING_CONST(1081, aux_String_1077, "Return_Code File_tell(File* self, int64_t* offset) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1077, aux_String_1077_Refman);
     CHECK(1081)
     INIT_STRING_CONST(1082, aux_String_1078, "  long ret = -1;\n");
@@ -65415,7 +65415,7 @@ Returncode tl5_compiler_M_write_output_header_code(void) {
     INIT_STRING_CONST(1099, aux_String_1095, "#define LUMI_FUNC_NAME \"File.seek\"\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1095, aux_String_1095_Refman);
     CHECK(1099)
-    INIT_STRING_CONST(1100, aux_String_1096, "Return_Code File_seek(File* self, uint64_t offset, int whence) {\n");
+    INIT_STRING_CONST(1100, aux_String_1096, "Return_Code File_seek(File* self, int64_t offset, int whence) {\n");
     LUMI_err = tl5_compiler_M_write_global(aux_String_1096, aux_String_1096_Refman);
     CHECK(1100)
     INIT_STRING_CONST(1101, aux_String_1097, "  int ret = -1;\n");

@@ -299,10 +299,10 @@ func ! fun(
     user Buffer bi(user ba[3]!)
 ; @ c test-slice-expression-9
 strong Array?{String} sa
-sa![3]!.copy(user "text")!
+sa![3]!.new(user "text")!
 sa := _
 strong Array?{Buffer} ba
-ba![3]!.copy(user `beef`)!
+ba![3]!.new(user `beef`)!
 ba := _
 ; @ c test-slice-expression-10
 strong Array?{Array{Uint32}} aai
@@ -1427,7 +1427,7 @@ ostr!.set(copy i, copy c)!
 ostr!.append(copy c)!
 ; @ c test-builtin-string6
 var String{12} sv
-sv.copy(user ostr!)!
+sv.new(user ostr!)!
 ; @ c test-builtin-string7
 ostr!.concat(user ostr!)!
 ; @ c test-builtin-string8
@@ -1454,7 +1454,7 @@ buff!.set(copy i, copy bt)!
 buff!.append(copy bt)!
 ; @ c test-builtin-buffer6
 var Buffer{12} bv
-bv.copy(user buff!)!
+bv.new(user buff!)!
 ; @ c test-builtin-buffer7
 buff!.concat(user buff!)!
 ; @ c test-builtin-buffer8
@@ -1470,7 +1470,7 @@ try
     s-var FileReadText f(user ostr)
     f.get()->(var c, var b)
     f.getline(user ostr)->(var b)
-    var Uint64 x
+    var Sint64 x
     f.tell()->(var x)
     f.seek-set(copy x)
     f.seek-cur(copy x)
@@ -1484,7 +1484,7 @@ try
     new FileReadBinary f(user ostr)
     f.get()->(var bt, var b)
     f.read(user buff)->(var i)
-    var Uint64 x
+    var Sint64 x
     f.tell()->(var x)
     f.seek-set(copy x)
     f.seek-cur(copy x)
@@ -1498,7 +1498,7 @@ try
     owner FileWriteText f(owner FileWriteText(user ostr, copy false))
     f.put(copy c)
     f.write(user ostr)->(var i)
-    var Uint64 x
+    var Sint64 x
     f.tell()->(var x)
     f.seek-set(copy x)
     f.seek-cur(copy x)
@@ -1512,7 +1512,7 @@ try
     strong FileWriteBinary f(strong FileWriteBinary(user ostr, copy true))
     f.put(copy bt)
     f.write(user buff)->(var i)
-    var Uint64 x
+    var Sint64 x
     f.tell()->(var x)
     f.seek-set(copy x)
     f.seek-cur(copy x)
@@ -1528,7 +1528,7 @@ try
     f.getline(user ostr)->(var b)
     f.put(copy c)
     f.write(user ostr)->(var i)
-    var Uint64 x
+    var Sint64 x
     f.tell()->(var x)
     f.seek-set(copy x)
     f.seek-cur(copy x)
@@ -1544,7 +1544,7 @@ try
     f.read(user buff)->(var i)
     f.put(copy bt)
     f.write(user buff)->(var i)
-    var Uint64 x
+    var Sint64 x
     f.tell()->(var x)
     f.seek-set(copy x)
     f.seek-cur(copy x)
@@ -1585,7 +1585,7 @@ func ! fun(
             user frwb)!
     var Data{File} df
     owner File fo(owner FileWriteBinary(user "name", copy false)!)
-    var Uint64 i
+    var Sint64 i
     fo.tell()->(var i)!
     fo.seek-set(copy i)!
     fo.seek-cur(copy i)!

@@ -623,7 +623,7 @@ test test-builtin-errors()
     assert-error! full-string.append(copy 'a'), "sequence too short"
     assert-error! full-string.concat(user "a"), "sequence too short"
     assert-error! 123.str(user short-str), "sequence too short"
-    assert-error! short-str.copy(user "aaaaa"), "sequence too short"
+    assert-error! short-str.new(user "aaaaa"), "sequence too short"
     var cdef.Pointer{Char} charp
     charp.set-from-array(user "aaaaa")
     assert-error! cdef.copy-to-string(copy charp, user short-str),
@@ -636,7 +636,7 @@ test test-builtin-errors()
     assert-error! full-buffer.append(copy 111), "sequence too short"
     assert-error! full-buffer.concat(user buff), "sequence too short"
     buff.append(copy 3)!
-    assert-error! full-buffer.copy(user buff), "sequence too short"
+    assert-error! full-buffer.new(user buff), "sequence too short"
     var cdef.Pointer{Byte} bytep
     bytep.set-from-array(user buff)
     assert-error! cdef.copy-to-buffer(copy bytep, copy 2, user full-buffer),

@@ -404,7 +404,7 @@ func ! use-builtins(
         temp Buffer buff,
         temp Array{Int} a)
     var Int i
-    var Uint64 x
+    var Sint64 x
     var Char c
     var Byte y
     var Bool b
@@ -419,7 +419,7 @@ func ! use-builtins(
     s.get(copy i)->(var c)!
     s.set(copy i, copy c)!
     s.append(copy c)!
-    s.copy(user s)!
+    s.new(user s)!
     s.concat(user s)!
     s.concat-int(copy i)!
     s.find(user s)->(var i)
@@ -434,7 +434,7 @@ func ! use-builtins(
     buff.get(copy i)->(var y)!
     buff.set(copy i, copy y)!
     buff.append(copy y)!
-    buff.copy(user buff)!
+    buff.new(user buff)!
     buff.concat(user buff)!
     buff.find(user buff)->(var i)
     buff.has(copy y)->(var b)
@@ -702,9 +702,9 @@ func ! test-for-each()
     sys.println(user "]")!
     
     var Array{3:String{16}} sarr
-    sarr[0].copy(user "ddd")!
-    sarr[1].copy(user "eee")!
-    sarr[2].copy(user "fff")!
+    sarr[0].new(user "ddd")!
+    sarr[1].new(user "eee")!
+    sarr[2].new(user "fff")!
     sys.print(user "strings[ ")!
     for s in sarr
         sys.print(user s)!
@@ -728,7 +728,7 @@ func ! test-for-each()
             for i in 3
                 user String s
                 s := saarr[n]![m]![i]!
-                s.copy(user "val")!
+                s.new(user "val")!
                 s.append(copy '0' + n)!
                 s.append(copy '0' + m)!
                 s.append(copy '0' + i)!
@@ -763,9 +763,9 @@ func ! HasComplexField.run()
     x2!.meth()!
     self.x.x!.meth()!
     ComplexField.meth(user self.x.x!)!
-    self.as[0].copy(user "a1")!
-    self.as[1].copy(user "a2")!
-    self.as[2].copy(user "a3")!
+    self.as[0].new(user "a1")!
+    self.as[1].new(user "a2")!
+    self.as[2].new(user "a3")!
     for s in self.as
         sys.print(user " ")!
         sys.print(user s)!

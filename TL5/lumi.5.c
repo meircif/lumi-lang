@@ -760,8 +760,8 @@ Return_Code Int_str(
 #define Buffer_max_length(self, max_length, length, max_length_out) \
   *(max_length_out) = max_length
 
-#define LUMI_FUNC_NAME "Buffer.copy"
-Return_Code Buffer_copy(
+#define LUMI_FUNC_NAME "Buffer.new"
+Return_Code Buffer_new(
     void* self, Seq_Length max_length, Seq_Length* length, void* source, Seq_Length source_length) {
   if (self == source) {
     return OK;
@@ -781,7 +781,7 @@ Return_Code cdef_M_copy_to_buffer(
     *length = 0;
     return OK;
   }
-  CCHECK(Buffer_copy(self, max_length, length, source, source_length))
+  CCHECK(Buffer_new(self, max_length, length, source, source_length))
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -889,10 +889,10 @@ void Buffer_has(
 #define String_clear(self, max_length, length) \
   Buffer_clear(self, max_length, length)
 
-#define LUMI_FUNC_NAME "String.copy"
-Return_Code String_copy(
+#define LUMI_FUNC_NAME "String.new"
+Return_Code String_new(
     char* self, Seq_Length max_length, Seq_Length* length, char* source, Seq_Length source_length) {
-  CCHECK(Buffer_copy(self, max_length - 1, length, source, source_length))
+  CCHECK(Buffer_new(self, max_length - 1, length, source, source_length))
   self[source_length] = '\0';
   return OK;
 }
@@ -1075,7 +1075,7 @@ Return_Code File_new(File* self, char* name, char* mode) {
     CRAISE(LUMI_error_messages.file_not_opened.str)
 
 #define LUMI_FUNC_NAME "File.tell"
-Return_Code File_tell(File* self, uint64_t* offset) {
+Return_Code File_tell(File* self, int64_t* offset) {
   long ret = -1;
   CHECK_OPEN(self)
   if (lumi_debug_value != LUMI_DEBUG_FAIL) {
@@ -1094,7 +1094,7 @@ Return_Code File_tell(File* self, uint64_t* offset) {
 #define FileReadWriteBinary_tell(self, offset) File_tell(self, offset)
 
 #define LUMI_FUNC_NAME "File.seek"
-Return_Code File_seek(File* self, uint64_t offset, int whence) {
+Return_Code File_seek(File* self, int64_t offset, int whence) {
   int ret = -1;
   CHECK_OPEN(self)
   if (lumi_debug_value != LUMI_DEBUG_FAIL) {

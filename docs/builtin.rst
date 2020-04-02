@@ -224,7 +224,7 @@ String
 
       returns maximum (static) string length, including the null-terminator
 
-   .. method:: set(user Array{Char} value)
+   .. method:: new(user Array{Char} value)
 
       initialize this string with a copy of ``value``
 
@@ -319,7 +319,7 @@ Buffer
 
       returns maximum (static) buffer length
 
-   .. method:: set(user Array{Byte} value)
+   .. method:: new(user Array{Byte} value)
 
       initialize this buffer with a copy of ``value``
 
