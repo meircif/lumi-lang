@@ -86,18 +86,19 @@ class LumiLexer(RegexLexer):
             (r"'.*'", token.String.Char),
             (r'`.*`', token.String.Backtick),
             (r'-?(?:0x[0-9a-fA-F]+|0b[0-1]+|[0-9]+)', token.Number),
-            (r' [+*><=][ \n]', token.Operator),
-            (r'(?:-|not)[ \n]', token.Operator),
-            (r' (?:div|mod|bnot|bor|band|xpr|shr|shl|is|is-not|or|and|'
-             r'[!><:+\-*]=)[ \n]', token.Operator),
+            (r' (?:clamp|wraparound)?[+\-*]=?[!?]?[ \n]', token.Operator),
+            (r'(?:-|not|clamp[!?]?|wraparound)[ \n]', token.Operator),
+            (r' (?:div|mod|bnot|bor|band|xor|shr|shl|is|is-not|or|and|[<>=]|'
+             r'[:><]=)[ \n]', token.Operator),
             (r'[?:.]', token.Operator),
             (r'->', token.Operator),
             (r'^ *(module|func|const|struct|class|interface|main|enum|'
-             r'native(?: func| type)?|test|mock|alias|for|new|return|raise|'
-             r'assert|assert-error|try|catch|if|else|else-if|loop|while|break|'
-             r'continue|switch|case|default|fallthrough|copy|user|owner|var|'
-             r's-var|strong|weak|shared|static|dynamic|global|implement|'
-             'if-ok|if-error|else-if-ok|else-if-error)[ \n]',
+             r'native(?: func| var| const| struct| type| code)?|test|mock|'
+             r'alias|for|new|return|raise|assert!?|assert-error!?|try|catch|'
+             r'if|else|else-if|loop!?|loop-infinite|while|break|continue|'
+             r'switch|case|default|fallthrough|copy|user|owner|var|s-var|'
+             r'strong|weak|shared|static|dynamic|global|implement|if-ok|'
+             r'if-error|else-if-ok|else-if-error|repeat)[ \n]',
              token.Keyword),
             (r'\b(copy|user|temp|owner|var|s-var|strong|weak|shared|func|'
              r'static|dynamic|for|in) ', token.Keyword),

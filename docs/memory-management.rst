@@ -117,7 +117,7 @@ As default, (non-weak) references always point to a legal object.
 To allow empty references, the reference type must be declared as "conditional"
 using the ``?`` sign. Empty value can be set using ``_`` sign.
 
-This is :ref:`currently implemented <variables>`, but not fully optimized.
+This is :ref:`currently implemented <conditionals>`, but not fully optimized.
 In the future the syntax may be slightly different and look like this::
 
    user String? cond-str  ; initialized as empty

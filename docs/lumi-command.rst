@@ -28,17 +28,17 @@ Running ``lumi -h`` will print help
    >>> lumi -h
    Usage: lumi [options] file...
    Options:
-     -h 		          print help
-     -o <file> 	      output file name
-     -t <module> 	    compile test program for <module>
-     -c 		          only create C file(s)
-     -l<version> 	    only run C compiler for TL<version>
+     -h               print help
+     -o <file>        output file name
+     -t <module>      compile test program for <module>
+     -c               only create C file(s)
+     -l<version>      only run C compiler for TL<version>
      -e <argument>    extra argument for C compilation
      -p <lumipath>    path of lumi-lang repository
-     -r 		          run the compiled program
+     -r               run the compiled program
      -ra <arguments>  run the compiled program with given arguments
-     -v 		          print executed commands
-     -d 		          only print commands without execution
+     -v               print executed commands
+     -d               only print commands without execution
 
 .. _lumi-command-usage:
 

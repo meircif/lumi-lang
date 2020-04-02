@@ -13,6 +13,7 @@ be used to simulate external interfaces.
 Lumi can then run all test cases automatically, while also checking code
 coverage for the tested module.
 
+
 .. _test-cases:
 
 Test Cases
@@ -26,6 +27,7 @@ The test case is consider a success if the code runs without any assertion
 or runtime errors.
 
 .. _assertions:
+
 
 Assertions
 ----------
@@ -50,6 +52,11 @@ assertion error and the test will fail. ::
 
    assert-error! raising-function(), "expected error message"
 
+.. note::
+   The ``!`` warning sign must be used if error is to be propagated, which is
+   recommended for the test to fail...
+
+
 .. _mocking:
 
 Mocking
@@ -59,10 +66,10 @@ Mocking can replace an external interface with simulated behavior.
 In :ref:`TL5 <syntax-tl5>`, only functions and methods can be mocked.
 
 Mocking a function or method is done using the ``mock`` keyword. The function
-name and its arguments access an type must much the mocked function exactly.
+name and its arguments access and type must much the mocked function exactly.
 Whenever the mocked function is used the mocking function is called instead. ::
 
-   mock mocked-module.mocked-function(copy Int input)->(var Int output)
+   mock mocked-module.mocked-function(copy Uint32 input)->(var Uint32 output)
        ; mocking body
 
    mock mocked-module.MockedType.mocked-method()
@@ -73,7 +80,7 @@ Built-in functions and methods can also be mocked::
    mock Sys.print(user String text)
        ; mocking body
 
-   mock file-open-read(user String filename)->(owner File file)
+   mock FileReadText.new(user String filename)
        ; mocking body
 
 The mocked function can still be called using ``mocked`` member::
