@@ -15,7 +15,8 @@ DIR="$( cd -P "$( dirname "$MYDIR" )" >/dev/null && pwd )"
 if [ -z $CC ]; then
   CC=gcc
 fi
-CCA="$CC --std=c89 -Werror -Wall -Wno-unused -Wno-self-assign --pedantic"
+CCA="$CC --std=c89 -Werror -Wall -Wno-unused -Wno-self-assign -Wno-long-long
+  --pedantic"
 
 rm -rf $DIR/.test/docs
 mkdir -p $DIR/.test/docs
@@ -31,8 +32,8 @@ $CCA docs/hello-world.c -o docs/hello-world
 docs/tl5-compiler docs/hello-world-test.c ../docs/hello-world.5.lm \
   ../docs/hello-world-test.5.lm -t hello-world
 $CCA docs/hello-world-test.c -o docs/hello-world-test
-# docs/tl5-compiler docs/examples.c ../docs/examples.5.lm
-# $CCA docs/examples.c -o docs/run-examples
+docs/tl5-compiler docs/examples.c ../docs/examples.5.lm
+$CCA docs/examples.c -o docs/run-examples
 
 # run examples
 docs/hello-world

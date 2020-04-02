@@ -45,6 +45,12 @@ struct Operator
                 owner expression)
 
 
+func internal-binary-operator-factory(
+        user SyntaxTreeCode code-node, user Operator operator)->(
+        owner BinaryExpression expression)
+    expression := BinaryExpression(user code-node, user operator)
+
+
 ~~~ not ~~~
 class NotOperatorExpression(UnaryExpression)
     func dynamic analyze()
@@ -59,33 +65,14 @@ func not-operator-factory(
     expression := NotOperatorExpression(user code-node, user operator)
 
 
-func set-int-type(user UnaryExpression self, copy Int bits)
-    var String{8} uint-name(user "Uint")
-    if bits >= 10
-        uint-name.append(copy '0' + (bits div 10))
-    uint-name.append(copy '0' + (bits mod 10))
-    self.set-simple-type(user glob.type-int)
-    string-new-copy(user uint-name)->(owner self.result-type.name)
-    self.result-type.set-int-range()
-
-func check-not-signed(user UnaryExpression self, user Expression expression)
-    if expression.result-type.int-range.is-signed
-        self.syntax-error-long(
-                user "bitwize operation on signed integer with minimum \
-                value of",
-                user expression.result-type.int-range.min-value)
-
-
 ~~~ bnot ~~~
 class BitwizeNotOperatorExpression(UnaryExpression)
     func dynamic analyze()
         base()
         self.test-operand-type(
                 user self.right-expression, user glob.type-int)
-        check-not-signed(user self, user self.right-expression)
-        set-int-type(
-                user self,
-                copy self.right-expression.result-type.int-range.bits)
+        self.check-not-signed(user self.right-expression)
+        self.set-uint-type(user self.right-expression)
 
     func dynamic write()
         write(user "(")
@@ -100,12 +87,11 @@ func bitwize-not-operator-factory(
     expression := BitwizeNotOperatorExpression(user code-node, user operator)
 
 
-~~~ - ~~~
+~~~ - (unary) ~~~
 class NegationOperatorExpression(UnaryExpression)
     func dynamic analyze()
         base()
-        self.test-operand-type(
-                user self.right-expression, user glob.type-int)
+        self.test-operand-type(user self.right-expression, user glob.type-int)
         self.set-simple-type(user glob.type-int)
         self.result-type.int-range := IntRange()
         self.right-expression.result-type.int-range.max-value.copy()->(
@@ -114,7 +100,7 @@ class NegationOperatorExpression(UnaryExpression)
                 owner self.result-type.int-range.max-value)
         self.result-type.int-range.min-value.negate()
         self.result-type.int-range.max-value.negate()
-        self.result-type.int-range.set-sign-and-bits()
+        self.result-type.int-range.set-sign-and-bits(user self)
 
 func negation-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
@@ -122,20 +108,154 @@ func negation-operator-factory(
     expression := NegationOperatorExpression(user code-node, user operator)
 
 
+class LimitCheck
+    user UnaryExpression expression
+    var Bool is-check
+    var Bool check-min
+    var Bool check-max
+    
+    new(user UnaryExpression expression)
+        self.expression := expression
+        self.expression.error-expected := glob.last-char = '!'
+        self.expression.error-propagated := self.expression.error-expected
+        self.is-check := self.expression.error-expected or glob.last-char = '?'
+        if self.is-check
+            read-c()
+    
+    func inst no-checks()->(var Bool no-checks)
+        no-checks := not self.check-min and not self.check-max
+    
+    func inst analyze()
+        if self.expression.error-propagated
+            self.expression.check-error-propagated(user _)
+        else-if self.is-check
+            if self.expression.code-node.set-has-error()
+                self.expression.syntax-error-msg(
+                        user "using \"?\" where error is propagated")
+
+    func inst write-preactions()
+        if not self.is-check
+            return
+        ; if (`min check` || `max check`) RAISE(`integer_overflow`)
+        write(user "if (")
+        if self.check-min
+            self.write-min-check()
+        if self.check-max
+            if self.check-min
+                write(user " || ")
+            self.write-max-check()
+        write(user ") ")
+        self.expression.code-node.write-raise(user "integer_overflow")
+        self.expression.code-node.write-spaces()
+    
+    func dynamic write-min-check()
+        ; `exp` < `min`
+        self.expression.get-first-operand().write-safe()
+        write(user " < ")
+        write-long(user self.expression.result-type.int-range.min-value)
+    
+    func dynamic write-max-check()
+        ; `exp` > `max`
+        self.expression.get-first-operand().write-safe()
+        write(user " > ")
+        write-long(user self.expression.result-type.int-range.max-value)
+
+
+~~~ clamp ~~~
+class ClampOperatorExpression(UnaryExpression)
+    var LimitCheck check
+    
+    new(user SyntaxTreeCode code-node, user Operator operator)
+        self.check.new(user self)
+        base(user code-node, user operator)
+    
+    func dynamic analyze()
+        if not self.result-type?
+            self.syntax-error(user "misplaced use of", user "clamp")
+        base()
+        self.test-operand-type(user self.right-expression, user glob.type-int)
+        user IntRange source(user self.right-expression.result-type.int-range)
+        user IntRange target(user self.result-type.int-range)
+        long-larger(user target.min-value, user source.min-value)->(
+                var self.check.check-min)
+        long-larger(user source.max-value, user target.max-value)->(
+                var self.check.check-max)
+        if self.check.no-checks()
+            self.syntax-error(user "unnecessary use of", user "clamp")
+        self.result-type.type-data := glob.type-int
+        self.check.analyze()
+
+    func dynamic write-preactions()
+        base()
+        self.check.write-preactions()
+
+    func dynamic write()
+        if self.check.is-check
+            self.right-expression.write()
+            return
+        ; (`exp` < `min`)? `min`: ((`exp` > `max`)? `max`: `exp`)
+        if self.check.check-min
+            self.write-clamp(
+                    user " < ", user self.result-type.int-range.min-value)
+        if self.check.check-max
+            if self.check.check-min
+                write(user "(")
+            self.write-clamp(
+                    user " > ", user self.result-type.int-range.max-value)
+        self.right-expression.write-safe()
+        if self.check.check-min and self.check.check-max
+            write(user ")")
+    
+    func inst write-clamp(user String compare, user Long value)
+        write(user "(")
+        self.right-expression.write-safe()
+        write(user compare)
+        write-long(user value)
+        write(user ")? ")
+        write-long(user value)
+        write(user ": ")
+
+func clamp-operator-factory(
+        user SyntaxTreeCode code-node, user Operator operator)->(
+        owner UnaryExpression expression)
+    expression := ClampOperatorExpression(user code-node, user operator)
+
+~~~ wraparound ~~~
+class WraparoundOperatorExpression(UnaryExpression)
+    func dynamic analyze()
+        if not self.result-type?
+            self.syntax-error(user "misplaced use of", user "wraparound")
+        base()
+        self.test-operand-type(user self.right-expression, user glob.type-int)
+        self.set-uint-type(user self)
+        user IntRange range(user self.right-expression.result-type.int-range)
+        if not range.is-signed and
+                range.bits <= self.result-type.int-range.bits
+            self.syntax-error(user "unnecessary use of", user "wraparound")
+    
+    func dynamic write()
+        self.right-expression.write()
+
+func wraparound-operator-factory(
+        user SyntaxTreeCode code-node, user Operator operator)->(
+        owner UnaryExpression expression)
+    expression := WraparoundOperatorExpression(user code-node, user operator)
+
+
 class BitwizeOperatorExpression(BinaryExpression)
     func dynamic analyze()
         base()
         self.test-operands-type(user glob.type-int)
-        check-not-signed(user self, user self.left-expression)
-        check-not-signed(user self, user self.right-expression)
-        set-int-type(user self, copy self.get-result-bits())
+        self.check-not-signed(user self.left-expression)
+        self.check-not-signed(user self.right-expression)
+        self.set-uint-type(user self.get-result-operand())
     
-    func dynamic get-result-bits()->(var Int bits)
+    func dynamic get-result-operand()->(user Expression operand)
         if self.right-expression.result-type.int-range.bits >
                 self.left-expression.result-type.int-range.bits
-            bits := self.right-expression.result-type.int-range.bits
+            operand := self.right-expression
         else
-            bits := self.left-expression.result-type.int-range.bits
+            operand := self.left-expression
         
 func bitwize-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
@@ -144,8 +264,8 @@ func bitwize-operator-factory(
 
 
 class ShiftOperatorExpression(BitwizeOperatorExpression)
-    func dynamic get-result-bits()->(var Int bits)
-        bits := self.left-expression.result-type.int-range.bits
+    func dynamic get-result-operand()->(user Expression operand)
+        operand := self.left-expression
         
 func shift-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
@@ -153,19 +273,73 @@ func shift-operator-factory(
     expression := ShiftOperatorExpression(user code-node, user operator)
         
         
+class ArithmeticLimitCheck(LimitCheck)
+    func dynamic write-min-check()
+        self.write-check(user "MIN_", user ")")
+
+    func dynamic write-max-check()
+        if self.expression.result-type.int-range.is-signed
+            self.write-check(user "MAX_", user ", INT64_MAX)")
+        else
+            self.write-check(user "MAX_", user ", UINT64_MAX)")
+        
+    func inst write-check(user String kind, user String end)
+        write(user "CHECK_")
+        write(user kind)
+        var Char operator(copy self.expression.operator.name[0])
+        if operator = '+'
+            write(user "ADD(")
+        else-if operator = '-'
+            write(user "SUB(")
+        else-if operator = '*'
+            write(user "MUL(")
+        self.expression.get-first-operand().write-safe()
+        write(user ", ")
+        self.expression.right-expression.write-safe()
+        write(user end)
+
+
 class ArithmeticOperatorExpression(BinaryExpression)
+    var ArithmeticLimitCheck check
+    
+    new(user SyntaxTreeCode code-node, user Operator operator)
+        self.check.new(user self)
+        base(user code-node, user operator)
+    
     func dynamic analyze()
         base()
         self.test-operands-type(user glob.type-int)
         self.set-simple-type(user glob.type-int)
-        self.result-type.int-range := IntRange()
+        new IntRange int-range
         self.set-range(
-                user self.result-type.int-range,
+                user int-range,
                 user self.left-expression.result-type.int-range.min-value,
                 user self.left-expression.result-type.int-range.max-value,
                 user self.right-expression.result-type.int-range.min-value,
                 user self.right-expression.result-type.int-range.max-value)
-        self.result-type.int-range.set-sign-and-bits()
+        if self.check.is-check
+            var Long limit
+            if int-range.min-value.sign() < 0
+                limit.parse(user "-9223372036854775808")
+                if long-larger(user limit, user int-range.min-value)->(
+                        var self.check.check-min)
+                    limit.copy()->(owner int-range.min-value)
+                limit.parse(user "9223372036854775807")
+                if long-larger(user int-range.max-value, user limit)->(
+                        var self.check.check-max)
+                    limit.copy()->(owner int-range.max-value)
+            else
+                limit.parse(user "18446744073709551615")
+                if long-larger(user int-range.max-value, user limit)->(
+                        var self.check.check-max)
+                    limit.copy()->(owner int-range.max-value)
+            if self.check.no-checks()
+                self.check-no-error()
+                self.syntax-error-msg(
+                        user "using \"?\" where there is no error")
+        int-range.set-sign-and-bits(user self)
+        self.result-type.int-range := int-range
+        self.check.analyze()
     
     func dynamic set-range(
             user IntRange int-range,
@@ -174,6 +348,24 @@ class ArithmeticOperatorExpression(BinaryExpression)
             user Long right-min,
             user Long right-max)
         raise
+    
+    func dynamic write-preactions()
+        base()
+        self.check.write-preactions()
+    
+    func dynamic write()
+        if (self.result-type.int-range.bits >
+                self.left-expression.result-type.int-range.bits and
+                self.result-type.int-range.bits >
+                self.right-expression.result-type.int-range.bits)
+            self.write-int-cast-operand(
+                    user self.left-expression,
+                    copy self.left-expression.result-type.int-range.is-signed,
+                    copy self.result-type.int-range.bits)
+        else
+            self.write-operand(user self.left-expression)
+        write(user " ")
+        self.write-end()
 
 
 ~~~ + ~~~
@@ -192,6 +384,7 @@ func addition-operator-factory(
         owner BinaryExpression expression)
     expression := AdditionOperatorExpression(user code-node, user operator)
 
+
 ~~~ - ~~~
 class SubtractionOperatorExpression(ArithmeticOperatorExpression)
     func dynamic set-range(
@@ -207,6 +400,7 @@ func subtraction-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
         owner BinaryExpression expression)
     expression := SubtractionOperatorExpression(user code-node, user operator)
+
 
 ~~~ * ~~~
 class MultiplicationOperatorExpression(ArithmeticOperatorExpression)
@@ -237,9 +431,17 @@ func multiplication-operator-factory(
     expression :=
             MultiplicationOperatorExpression(user code-node, user operator)
 
+
 ~~~ div ~~~
 class DivisionOperatorExpression(ArithmeticOperatorExpression)
     var Bool zero-check
+    
+    func inst check-division(user Long right-min, user Long right-max)
+        self.check-not-signed(user self.left-expression)
+        self.check-not-signed(user self.right-expression)
+        if right-max.sign() = 0
+            self.syntax-error-msg(user "dividing by zero")
+        self.zero-check := right-min.sign() = 0
     
     func dynamic set-range(
             user IntRange int-range,
@@ -247,6 +449,7 @@ class DivisionOperatorExpression(ArithmeticOperatorExpression)
             user Long left-max,
             user Long right-min,
             user Long right-max)
+        self.check-division(user right-min, user right-max)
         if right-min.sign() = 0
             left-max.copy()->(owner int-range.max-value)
         else
@@ -256,25 +459,11 @@ class DivisionOperatorExpression(ArithmeticOperatorExpression)
     func dynamic analyze()
         self.allow-right-error := true
         base()
-        self.check-not-signed(user self.left-expression)
-        self.check-not-signed(user self.right-expression)
-        user IntRange right-int-range(
-                user self.right-expression.result-type.int-range)
-        if right-int-range.max-value.sign() = 0
-            self.syntax-error-msg(user "dividing by zero")
-        self.zero-check := right-int-range.min-value.sign() = 0
         if self.zero-check
             self.right-expression.check-error-propagated(
                     user "ignoring zero division check")
         else
             self.right-expression.check-no-error()
-                
-    func inst check-not-signed(user Expression expression)
-        if expression.result-type.int-range.is-signed
-            self.syntax-error-long(
-                    user "division operation on signed integer with minimum \
-                    value of",
-                    user expression.result-type.int-range.min-value)
 
     func dynamic write-preactions()
         base()
@@ -292,6 +481,7 @@ func division-operator-factory(
         owner BinaryExpression expression)
     expression := DivisionOperatorExpression(user code-node, user operator)
 
+
 ~~~ mod ~~~
 class ModuloOperatorExpression(DivisionOperatorExpression)
     func dynamic set-range(
@@ -300,15 +490,19 @@ class ModuloOperatorExpression(DivisionOperatorExpression)
             user Long left-max,
             user Long right-min,
             user Long right-max)
+        self.check-division(user right-min, user right-max)
         if long-equal(user left-min, user left-max) and
                 long-equal(user right-min, user right-max)
             long-mod(user left-min, user right-min)->(owner int-range.min-value)
             int-range.min-value.copy()->(owner int-range.max-value)
         else
-            var Long one
-            one.set(copy 1)
             int-range.min-value := Long()
-            long-sub(user right-max, user one)->(owner int-range.max-value)
+            if long-larger(user right-max, user left-max)
+                left-max.copy()->(owner int-range.max-value)
+            else
+                var Long one
+                one.set(copy 1)
+                long-sub(user right-max, user one)->(owner int-range.max-value)
 
 func modulo-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
@@ -316,11 +510,116 @@ func modulo-operator-factory(
     expression := ModuloOperatorExpression(user code-node, user operator)
 
 
-~~~ > < >= <= ~~~
-class RelationalOperatorExpression(BinaryExpression)
+~~~ clamp+, clamp-, clamp* ~~~
+class ClampedArithmeticOperatorExpression(ArithmeticOperatorExpression)
+    func dynamic set-range(
+            user IntRange int-range,
+            user Long left-min,
+            user Long left-max,
+            user Long right-min,
+            user Long right-max)
+        left-min.copy()->(owner int-range.min-value)
+        left-max.copy()->(owner int-range.max-value)
+    
+    func dynamic write()
+        write(user self.operator.c-name)
+        write-c(copy '_')
+        self.write-sign-char(user self.left-expression)
+        self.write-sign-char(user self.right-expression)
+        write-c(copy '(')
+        self.left-expression.write-safe()
+        write(user ", ")
+        self.right-expression.write-safe()
+        write(user ", ")
+        write-long(user self.left-expression.result-type.int-range.min-value)
+        write(user ", ")
+        write-long(user self.left-expression.result-type.int-range.max-value)
+        write-c(copy ')')
+    
+    func inst write-sign-char(user Expression expression)
+        if expression.result-type.int-range.is-signed
+            write-c(copy 'S')
+        else
+            write-c(copy 'U')
+
+func clamped-operator-factory(
+        user SyntaxTreeCode code-node, user Operator operator)->(
+        owner BinaryExpression expression)
+    expression := ClampedArithmeticOperatorExpression(
+            user code-node, user operator)
+
+
+~~~ wraparound+, wraparound-, wraparound* ~~~
+class WraparoundArithmeticOperatorExpression(BinaryExpression)
+    owner ArithmeticOperatorExpression arithmetic
+    
+    new(
+            owner ArithmeticOperatorExpression arithmetic,
+            user SyntaxTreeCode code-node,
+            user Operator operator)
+        base(user code-node, user operator)
+        self.arithmetic := arithmetic
+    
+    func dynamic analyze()
+        base()
+        self.test-operands-type(user glob.type-int)
+        self.check-not-signed(user self.left-expression)
+        self.set-uint-type(user self.left-expression)
+        var IntRange arithmetic-range
+        self.arithmetic.set-range(
+                user arithmetic-range,
+                user self.left-expression.result-type.int-range.min-value,
+                user self.left-expression.result-type.int-range.max-value,
+                user self.right-expression.result-type.int-range.min-value,
+                user self.right-expression.result-type.int-range.max-value)
+        if arithmetic-range.set-sign-and-bits(user _) and
+                not arithmetic-range.is-signed and
+                arithmetic-range.bits <= self.result-type.int-range.bits
+            self.syntax-error(
+                    user "unnecessary wraparound with",
+                    user self.operator.c-name)
+    
+    func dynamic write()
+        write-c(copy '(')
+        self.result-type.write-cname()
+        write(user ")(")
+        base()
+        write-c(copy ')')
+
+    func dynamic write-safe()
+        self.write()
+        
+
+func wraparound-addition-operator-factory(
+        user SyntaxTreeCode code-node, user Operator operator)->(
+        owner BinaryExpression expression)
+    expression := WraparoundArithmeticOperatorExpression(
+            owner AdditionOperatorExpression(user _, user _),
+            user code-node,
+            user operator)
+
+func wraparound-subtraction-operator-factory(
+        user SyntaxTreeCode code-node, user Operator operator)->(
+        owner BinaryExpression expression)
+    expression := WraparoundArithmeticOperatorExpression(
+            owner SubtractionOperatorExpression(user _, user _),
+            user code-node,
+            user operator)
+
+func wraparound-multiplication-operator-factory(
+        user SyntaxTreeCode code-node, user Operator operator)->(
+        owner BinaryExpression expression)
+    expression := WraparoundArithmeticOperatorExpression(
+            owner MultiplicationOperatorExpression(user _, user _),
+            user code-node,
+            user operator)
+
+
+~~~ = != ~~~
+class EqualizerOperatorExpression(BinaryExpression)
     ~~~ expand-and: (a > b) > c --> (a > b) && (b > c) ~~~
     var Bool expand-and
-
+    
     func dynamic analyze()
         base()
         if self.binary-left-expression?
@@ -332,34 +631,61 @@ class RelationalOperatorExpression(BinaryExpression)
 
     func dynamic is-relational()->(var Bool is-relational)
         is-relational := true
-
+        
     func dynamic test-operand(user Expression operand)
-        self.test-operand-type(user operand, user glob.type-int)
+        self.test-is-reference(copy false, user operand)
 
     func dynamic write-end()
         if self.expand-and
             write(user "&& (")
-            self.binary-left-expression.right-expression.write()
+            self.write-operand(
+                    user self.binary-left-expression.right-expression)
             write(user " ")
         base()
         if self.expand-and
             write(user ")")
 
-func relational-operator-factory(
-        user SyntaxTreeCode code-node, user Operator operator)->(
-        owner BinaryExpression expression)
-    expression := RelationalOperatorExpression(user code-node, user operator)
-
-
-~~~ = != ~~~
-class EqualizerOperatorExpression(RelationalOperatorExpression)
-    func dynamic test-operand(user Expression operand)
-        self.test-is-reference(copy false, user operand)
-
 func equalizer-operator-factory(
         user SyntaxTreeCode code-node, user Operator operator)->(
         owner BinaryExpression expression)
     expression := EqualizerOperatorExpression(user code-node, user operator)
+
+
+~~~ > < >= <= ~~~
+class RelationalOperatorExpression(EqualizerOperatorExpression)
+    var IntRange common-range
+    
+    func dynamic test-operand(user Expression operand)
+        self.test-operand-type(user operand, user glob.type-int)
+
+    func dynamic analyze()
+        base()
+        user Expression left-expression(user self.left-expression)
+        if self.expand-and
+            left-expression := self.binary-left-expression.right-expression
+        user IntRange left(user left-expression.result-type.int-range)
+        user IntRange right(user self.right-expression.result-type.int-range)
+        if long-larger(user left.max-value, user right.max-value)
+            left.max-value.copy()->(owner self.common-range.max-value)
+        else
+            right.max-value.copy()->(owner self.common-range.max-value)
+        if long-larger(user left.min-value, user right.min-value)
+            right.min-value.copy()->(owner self.common-range.min-value)
+        else
+            left.min-value.copy()->(owner self.common-range.min-value)
+        self.common-range.set-sign-and-bits(user self)
+
+    func dynamic write-operand(user Expression operand)
+        if self.common-range.is-signed
+            self.write-int-cast-operand(
+                    user operand, copy true, copy self.common-range.bits)
+        else
+            base(user operand)
+
+func relational-operator-factory(
+        user SyntaxTreeCode code-node, user Operator operator)->(
+        owner BinaryExpression expression)
+    expression := RelationalOperatorExpression(user code-node, user operator)
 
 
 ~~~ is is-not ~~~
@@ -395,29 +721,30 @@ func logical-operator-factory(
     expression := LogicalOperatorExpression(user code-node, user operator)
 
 
-~~~ += -= *= ~~~
-class ArithmeticAssignOperatorExpression(BinaryExpression)
-    func dynamic analyze()
+~~~ {*}= ~~~
+class BaseAssignOperatorExpression(BinaryExpression)
+    func dynamic analyze-right-and-all()
         base()
         if not self.left-expression.assignable
             self.syntax-error-msg(
                     user "assigning into non assignable expression")
         self.analyze-assignment()
         self.safe-operand-write := false
+        self.result-type := _
 
     func dynamic analyze-assignment()
-        self.test-operands-type(user glob.type-int)
-
-func arithmetic-assign-operator-factory(
-        user SyntaxTreeCode code-node, user Operator operator)->(
-        owner BinaryExpression expression)
-    expression :=
-            ArithmeticAssignOperatorExpression(user code-node, user operator)
+        raise
 
 
 ~~~ := ~~~
-class AssignOperatorExpression(ArithmeticAssignOperatorExpression)
+class AssignOperatorExpression(BaseAssignOperatorExpression)
     var AssignExpression assign
+    
+    func dynamic analyze()
+        self.analyze-operand()->(owner self.left-expression)
+        self.left-expression.result-type.set-expected-type()->(
+                owner self.right-expression.result-type)
+        self.analyze-right-and-all()
 
     new(user SyntaxTreeCode code-node, user Operator operator)
         base(user code-node, user operator)
@@ -449,6 +776,49 @@ func assign-operator-factory(
         owner BinaryExpression expression)
     expression := AssignOperatorExpression(user code-node, user operator)
 
+
+~~~ clamp+= clamp-= clamp*= ~~~
+class ClampedAssignOperatorExpression(BaseAssignOperatorExpression)
+    func dynamic analyze-assignment()
+        self.test-operands-type(user glob.type-int)
+    
+    func dynamic write()
+        self.write-operand(user self.left-expression)
+        write(user " ")
+        var ClampedArithmeticOperatorExpression clamped-expression(
+                user self.code-node, user self.operator)
+        clamped-expression.left-expression := self.left-expression
+        clamped-expression.right-expression := self.right-expression
+        self.write-operand(user clamped-expression)
+        self.left-expression := clamped-expression.left-expression
+        self.right-expression := clamped-expression.right-expression
+        if self.is-statement
+            write(user ";\n")
+
+func clamped-assign-operator-factory(
+        user SyntaxTreeCode code-node, user Operator operator)->(
+        owner BinaryExpression expression)
+    expression :=
+            ClampedAssignOperatorExpression(user code-node, user operator)
+
+
+~~~ wraparound+= wraparound-= wraparound*= ~~~
+class WraparoundAssignOperatorExpression(BaseAssignOperatorExpression)
+    func dynamic analyze-assignment()
+        self.test-operands-type(user glob.type-int)
+        var UnaryExpression value(user _, user _)
+        value.set-uint-type(user self.left-expression)
+        value.result-type.check-assign-to(
+                copy Access.VAR,
+                user self.left-expression.result-type,
+                copy Access.VAR,
+                user self)
+
+func wraparound-assign-operator-factory(
+        user SyntaxTreeCode code-node, user Operator operator)->(
+        owner BinaryExpression expression)
+    expression :=
+            WraparoundAssignOperatorExpression(user code-node, user operator)
 
 ~~~ :=: ~~~
 class SwapOperatorExpression(BinaryExpression)

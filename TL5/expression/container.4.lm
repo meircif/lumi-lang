@@ -21,7 +21,7 @@ class BlockExpression(Expression)
 
     func dynamic analyze()
         analyze-expression()->(owner self.expression)
-        self.expression.result-type.copy-new()->(owner self.result-type)
+        self.set-type-from(user self.expression)
         self.access := self.expression.access
         self.error-expected := self.expression.error-expected
         self.error-propagated := self.expression.error-propagated
@@ -74,6 +74,9 @@ class UnaryExpression(Expression)
                 user _, user ends, user self.code-node, user self.operator)->(
                 owner self.right-expression, user next-operator)
 
+    func dynamic get-first-operand()->(user Expression operand)
+        operand := self.right-expression
+
     func dynamic analyze()
         self.analyze-operand()->(owner self.right-expression)
         self.right-expression.check-no-error()
@@ -96,6 +99,23 @@ class UnaryExpression(Expression)
                     user expected-type.name,
                     user "operand, got",
                     user operand.result-type.type-data.name)
+    
+    func inst set-uint-type(user Expression operand)
+        var String{8} uint-name(user "Uint")
+        var Int bits(copy operand.result-type.int-range.bits)
+        if bits >= 10
+            uint-name.append(copy '0' + (bits div 10))
+        uint-name.append(copy '0' + (bits mod 10))
+        self.set-simple-type(user glob.type-int)
+        string-new-copy(user uint-name)->(owner self.result-type.name)
+        self.result-type.set-int-range()
+
+    func inst check-not-signed(user Expression operand)
+        if operand.result-type.int-range.is-signed
+            self.syntax-error-long(
+                    user "unsigned operation on signed integer with minimum \
+                    value of",
+                    user operand.result-type.int-range.min-value)
 
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
         self.right-expression.order-constants(user ordered-list)
@@ -119,7 +139,7 @@ class UnaryExpression(Expression)
         if self.is-statement
             write(user ";\n")
 
-    func inst write-operand(user Expression expression)
+    func dynamic write-operand(user Expression expression)
         if self.safe-operand-write
             expression.write-safe()
         else
@@ -145,9 +165,15 @@ class BinaryExpression(UnaryExpression)
         expression.binary-left-expression := binary-left-expression
         expression.parse(user ends)->(user next-operator)
 
+    func dynamic get-first-operand()->(user Expression operand)
+        operand := self.left-expression
+
     func dynamic analyze()
-        self.analyze-operand()->(owner self.right-expression)
         self.analyze-operand()->(owner self.left-expression)
+        self.analyze-right-and-all()
+
+    func dynamic analyze-right-and-all()
+        self.analyze-operand()->(owner self.right-expression)
         self.left-expression.check-no-error()
         if not self.allow-right-error
             self.right-expression.check-no-error()
@@ -186,8 +212,8 @@ class BinaryExpression(UnaryExpression)
         base(user refs)
 
     func dynamic write-preactions()
-        base()
         self.left-expression.write-preactions()
+        base()
 
     func dynamic write()
         self.write-operand(user self.left-expression)
@@ -196,6 +222,16 @@ class BinaryExpression(UnaryExpression)
 
     func dynamic write-end()
         self.write-end-expression(user self.right-expression)
+    
+    func inst write-int-cast-operand(
+            user Expression operand, copy Bool is-signed, copy Int bits)
+        var IntRange int-cast
+        int-cast.is-signed := is-signed
+        int-cast.bits := bits
+        write-c(copy '(')
+        int-cast.write-cname()
+        write-c(copy ')')
+        operand.write-safe()
 
 
 ~~~ An expression with the "?" operator ~~~

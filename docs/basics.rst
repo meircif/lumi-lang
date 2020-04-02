@@ -14,10 +14,11 @@ supported in the final syntax. ::
    line
    comment
    multi-line comment end --> ;]
-   var Int x  ; not supported yet :(
+   var Uint32 x  ; not supported yet :(
 
 Some suggest to change this in the final syntax to be as in C with ``//``,
 ``/*`` and ``*/``.
+
 
 Documentation
 -------------
@@ -41,10 +42,11 @@ external documentation. ::
    func another-documented-function()
        ; do stuff
 
+
 Operators
 ---------
 * assignment: ``:=``
-* arithmetic: ``+``, ``-``, ``*``, ``div``, ``mod``
+* arithmetic: ``+``, ``-``, ``*``, ``div``, ``mod``, ``clamp``, ``wraparound``
 * assignment and arithmetic: ``+=``, ``-=``, ``*=``
 * bitwise: ``bnot``, ``bor``, ``band``, ``xor``, ``shr``, ``shl``
 * relational (arithmetic): ``=``, ``<>``, ``<``, ``>``, ``<=``, ``>=``
@@ -52,9 +54,7 @@ Operators
 * logical: ``not``, ``or``, ``and``
 * miscellaneous: ``.``, ``[]``, ``[:]``, ``()``, ``:=:``
 
-All bitwise operators are not supported yet in :ref:`TL5 <syntax-tl5>`.
-
-Any binary operator may be followed by a line brake with additional indentation
+Any operator may be followed by a line brake with additional indentation
 of exactly 8 spaces::
 
    x := 3 +
@@ -65,17 +65,19 @@ of exactly 8 spaces::
            3 +
            4
 
+
 Operator Precedence
 +++++++++++++++++++
 1. ``. [] () ?``, left-to-right
 2. ``bnot``
-3. ``- +``, ``* div mod``, ``bor band xor shr shl``, left-to-right 
+3. ``- +``, ``* div mod``, ``bor band xor shr shl``, left-to-right
    :ref:`[1] <operator-precedence-1>`
-4. ``= != > < >= <= is is-not``, left-to-right 
+4. ``= != > < >= <= is is-not``, left-to-right
    :ref:`[2] <operator-precedence-2>`
 5. ``not``
 6. ``or``, ``and``, left-to-right :ref:`[1] <operator-precedence-1>`
-7. ``:= += -= *= :=:``, only one allowed
+7. ``clamp wraparound``, only one allowed
+8. ``:= += -= *= :=:``, only one allowed
 
 .. _operator-precedence-1:
 
@@ -88,6 +90,7 @@ should be changed to ``a + (b * c)``
 **[2]** multiple operators from this group combined will be separated with
 ``and`` operator, for example, ``a < b < c < d`` is treated as ``a < b and
 b < c and c < d``
+
 
 Modules
 -------

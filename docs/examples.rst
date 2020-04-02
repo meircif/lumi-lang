@@ -6,14 +6,12 @@ Hello World Program
 A simple "Hello World" program written in :ref:`TL5 <syntax-tl5>`:
 
 .. literalinclude:: hello-world.5.lm
-   :caption:
 
 Testing the Hello World Program
 -------------------------------
 Testing code for the "Hello World" program:
 
 .. literalinclude:: hello-world-test.5.lm
-   :caption:
 
 Fibonacci Function
 ------------------

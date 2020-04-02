@@ -55,6 +55,7 @@ Any help, suggestion, comment or questions is welcome! See Lumi repository
    goals
    memory-management
    thread-safety
+   integer
    type-system
 
 .. toctree::

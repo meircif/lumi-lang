@@ -150,6 +150,7 @@ class FunctionExpression(Expression)
             self-param.set-location()
             self-param.access :=
                     self.function.arguments.parameters.first.item.access
+            self-param.is-analyzed := true
             if self.after-base
                 new VariableExpression self-var(
                         user self.instance.code-node,

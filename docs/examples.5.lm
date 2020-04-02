@@ -1,11 +1,11 @@
 module examples
 
 ; fibonacci start
-func fibonacci(copy Int n)->(var Int res)
-    var Int prev(copy 1)
+func fibonacci(copy Uint64 n)->(var Uint64 res)
+    var Uint64 prev(copy 1)
     res := 0
-    for _ in n
-        var Int sum(copy res + prev)
+    repeat n
+        var Uint64 sum(copy res clamp+ prev)
         prev := res
         res := sum
 
@@ -13,35 +13,37 @@ func fibonacci(copy Int n)->(var Int res)
 
 ; Complex start
 struct Complex
-    var Int real
-    var Int imaginary
+    var Sint64 real
+    var Sint64 imaginary
+    
+    new(copy Sint64 real, copy Sint64 imaginary)
+        self.real := real
+        self.imaginary := imaginary
 
-    func str(user String out-str)
-        self.real.str(user out-str)
-        out-str.append(copy ' ')
+    func user ! str(user String out-str)
+        self.real.str(user out-str)!
+        out-str.append(copy ' ')!
         if self.imaginary > 0
-            out-str.append(copy '+')
+            out-str.append(copy '+')!
         else
-            out-str.append(copy '-')
-        out-str.append(copy ' ')
+            out-str.append(copy '-')!
+        out-str.append(copy ' ')!
         var String{128} imaginary-str
         if self.imaginary > 0
-            self.imaginary.str(user imaginary-str)
+            self.imaginary.str(user imaginary-str)!
         else
-            (- self.imaginary).str(user imaginary-str)
-        out-str.concat(user imaginary-str)
-        out-str.append(copy 'i')
+            (- self.imaginary).str(user imaginary-str)!
+        out-str.concat(user imaginary-str)!
+        out-str.append(copy 'i')!
 
-func usage-example()
-    var Complex complex
-    complex.real := 5
-    complex.imaginary := 3
+func ! usage-example()
+    var Complex complex(copy 5, copy 3)
     var String{1024} complex-str
-    complex.str(user complex-str)
-    sys.println(user complex-str)
+    complex.str(user complex-str)!
+    sys.println(user complex-str)!
 
 ; Complex end
 
-main
+main!
     fibonacci(copy 3)
-    usage-example()
+    usage-example()!

@@ -83,9 +83,15 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
             item-type-instance.int-range := IntRange()
             self.start.result-type.int-range.min-value.copy()->(
                     owner item-type-instance.int-range.min-value)
-            self.iterator.result-type.int-range.max-value.copy()->(
-                    owner item-type-instance.int-range.max-value)
-            item-type-instance.int-range.set-sign-and-bits()
+            if long-larger(
+                    user self.start.result-type.int-range.max-value,
+                    user self.iterator.result-type.int-range.max-value)
+                self.start.result-type.int-range.max-value.copy()->(
+                        owner item-type-instance.int-range.max-value)
+            else
+                self.iterator.result-type.int-range.max-value.copy()->(
+                        owner item-type-instance.int-range.max-value)
+            item-type-instance.int-range.set-sign-and-bits(user self)
         else
             self.iterator.analyze()
             if not self.iterator.result-type?
@@ -119,7 +125,7 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
         self.iterator.result-type.int-range.copy-new()->(
                 owner item-type-instance.int-range)
         item-type-instance.int-range.min-value := Long()
-        item-type-instance.int-range.set-sign-and-bits()
+        item-type-instance.int-range.set-sign-and-bits(user self)
         
     func inst get-step-item-data()->(
             owner TypeInstance item-type-instance, var Int item-access)
@@ -273,7 +279,7 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
         ; aux-index += 1
         new SyntaxTreeExpression index-inc-node(user self.block)
         self.insert-binary-expression(
-                user "+=",
+                user "internal +=",
                 user index-inc-node,
                 user index-inc-node.expression,
                 owner index-aux-expression.copy-new(),

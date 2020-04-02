@@ -39,6 +39,8 @@ testing fail-zero-division... Error: zero division
   Error raised in TL5/tests/integration/error-test.5.lm:107 fail-zero-division()
 testing fail-loop-limit... Error: loop limit reached
   Error raised in TL5/tests/integration/error-test.5.lm:110 fail-loop-limit()
+testing fail-integer-overflow... Error: integer overflow
+  Error raised in TL5/tests/integration/error-test.5.lm:115 fail-integer-overflow()
 testing code coverage... 94% - failed, lines not covered:
   TL5/tests/integration/error-test.5.lm(94%): 12 46 53
 Tests failed

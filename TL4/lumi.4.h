@@ -284,6 +284,7 @@ Returncode Long_add(Long*, Ref_Manager*, int);
 Returncode Long_mul(Long*, Ref_Manager*, int);
 Returncode Long_negate(Long*, Ref_Manager*);
 Returncode Long_parse(Long*, Ref_Manager*, String*, Ref_Manager*);
+Returncode Long_str(Long*, Ref_Manager*, String*, Ref_Manager*);
 Returncode Long_hex(Long*, Ref_Manager*, String*, Ref_Manager*);
 Returncode long_combine(
   Long*, Ref_Manager*, Long*, Ref_Manager*, Long**, Ref_Manager**, Bool add);

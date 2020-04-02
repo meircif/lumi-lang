@@ -134,7 +134,7 @@ class EnumExpression(ModuleTypeExpression)
                     user self.name,
                     user "has no value",
                     user self.value)
-        self.result-type.set-int-constant(user self.int-value)
+        self.result-type.set-int-constant(user self, user self.int-value)
     
     func dynamic write()
         self.enum-data.write-cname()

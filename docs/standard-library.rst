@@ -7,10 +7,10 @@ Currently implemented modules in :ref:`TL5 <syntax-tl5>` standard library:
 * time
 * math (basic)
 * os (basic)
-* zlib
 
 Planned future modules in the standard library:
 
+* zlib
 * more data structures
 * math (full)
 * os (full)

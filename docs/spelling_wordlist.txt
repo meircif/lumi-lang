@@ -6,8 +6,11 @@ compressions
 coroutine
 coroutines
 destructor
+destructors
 lumi
 parameterized
 prepended
 runtime
+typedefs
+unary
 whitespace

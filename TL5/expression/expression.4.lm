@@ -84,8 +84,6 @@ func analyze-expression()->(owner Expression expression)
     expression.analyze()
 
 
-user String expression-ends(user " .([{?!")
-
 ~~~ Meta type for an expression in the language.
 Currently only the parsing is fully implemented, `write` is implemented only
 for testing. ~~~
@@ -100,7 +98,7 @@ class Expression(SyntaxTreeNode)
     var Bool is-var
     var Bool error-expected
     var Bool error-propagated
-
+    
     new(user SyntaxTreeCode code-node)
         self.set-location()
         self.code-node := code-node
@@ -149,7 +147,7 @@ class Expression(SyntaxTreeNode)
     ~~~ Read a single expression value as new string ~~~
     func inst read-new-value(user String ends)->(owner String text)
         owner String all-ends
-        string-new-concat(user expression-ends, user ends)->(owner all-ends)
+        string-new-concat(user " .([{?!", user ends)->(owner all-ends)
         read-new(user all-ends)->(owner text)
     
     ~~~ Parse an expression that is an operand ~~~
@@ -286,6 +284,9 @@ class Expression(SyntaxTreeNode)
     ~~~ Set type instance to be a type that has no sub-type ~~~
     func inst set-simple-type(user TypeData type-data)
         type-data.new-type-instance()->(owner self.result-type)
+    
+    func inst set-type-from(user Expression other)
+        other.result-type.copy-new()->(owner self.result-type)
     
     func dynamic get-parent-type()->(user TypeData parent-type)
         parent-type := _

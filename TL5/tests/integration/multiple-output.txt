@@ -11,6 +11,7 @@ testing test-assert-error-message... OK
 testing test-builtin-errors... OK
 testing test-cover-all... OK
 testing test-constants... OK
-testing test-bitwise... OK
+testing test-operations... OK
+testing test-builtins... OK
 testing code coverage... 100%
 Tests passed

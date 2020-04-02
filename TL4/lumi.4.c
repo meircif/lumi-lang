@@ -1120,6 +1120,163 @@ void set_hex(String* text, int index, int value) {
   }
 }
 
+Bool long_abs_larger(Long* a, Long* b, Bool equal) {
+  int n;
+  for (n = (a->length >= b->length? a->length: b->length) - 1; n >= 0; --n) {
+    if ((n >= a->length && b->number[n] != 0) ||
+        (n < a->length && n < b->length && a->number[n] < b->number[n])) {
+      return false;
+    }
+    if ((n >= b->length && a->number[n] != 0) ||
+        (n < a->length && n < b->length && (equal?
+         a->number[n] >= b->number[n] : a->number[n] > b->number[n]))) {
+      return true;
+    }
+  }
+  return false;
+}
+
+#define LUMI_FUNC_NAME "Long.set-diff"
+Returncode Long_set_diff(Long* self, Long* a, Long* b) {
+  unsigned carry = 0;
+  int n;
+  Long* big = NULL;
+  Long* small = NULL;
+  self->length = a->length >= b->length? a->length: b->length;
+  ALLOC_LONG(self->number, self->length)
+  self->number = calloc(self->length, sizeof(Byte));
+  for (n = self->length - 1; big == NULL && n >= 0; --n) {
+    unsigned va, vb;
+    va = n < a->length? a->number[n]: 0;
+    vb = n < b->length? b->number[n]: 0;
+    if (va > vb) {
+      big = a;
+      small = b;
+      self->sign = a->sign;
+    }
+    else if (vb > va) {
+      big = b;
+      small = a;
+      self->sign = -(a->sign);
+    }
+  }
+  if (big == NULL) {
+    self->sign = 1;
+    return OK;
+  }
+  for (n = 0; n < self->length; ++n) {
+    int vbig, vsmall, diff;
+    vbig = big->number[n];
+    vsmall = n < small->length? small->number[n]: 0;
+    diff = vbig - vsmall - carry;
+    if (diff >= 0) {
+      self->number[n] = diff;
+      carry = 0;
+    }
+    else {
+      self->number[n] = 256 + diff;
+      carry = 1;
+    }
+  }
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FUNC_NAME "long-div-mod"
+Returncode long_div_mod(Long* n, Long* d, Long* q, Long* r) {
+  int i;
+  int bits;
+  Byte tmp;
+  r->length = 1;
+  q->length = n->length;
+  ALLOC_LONG(q->number, q->length)
+  ALLOC_LONG(r->number, r->length)
+  bits = (n->length - 1) * 8;
+  tmp = n->number[n->length - 1];
+  while (tmp > 0) {
+    ++bits;
+    tmp /= 2;
+  }
+  for (i = bits - 1; i >= 0; --i) {
+    int j;
+    unsigned carry = 0;
+    for (j = 0; j < r->length || carry > 0; ++j) {
+      unsigned value = 0;
+      INC_REALLOC_LONG(j, r->number, r->length)
+      value = r->number[j];
+      value <<= 1;
+      value += carry;
+      r->number[j] = value % 256;
+      carry = value / 256;
+    }
+    r->number[0] |= (n->number[i / 8] >> (i % 8)) & 0x01;
+    if (long_abs_larger(r, d, true)) {
+      Long newr;
+      CCHECK(Long_set_diff(&newr, r, d))
+      free(r->number);
+      r->number = newr.number;
+      r->length = newr.length;
+      q->number[i / 8] |= 1 << (i % 8);
+    }
+  }
+  q->sign = n->sign * d->sign;
+  r->sign = q->sign;
+  Long_realloc(q);
+  Long_realloc(r);
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FUNC_NAME "Long.str"
+Returncode Long_str(
+    Long* self, Ref_Manager* self_Refman,
+    String* text, Ref_Manager* text_Refman) {
+  int n;
+  int prefix=2;
+  Long tmp;
+  char* low;
+  char* high;
+  CHECK_NOT_NULL(self)
+  CHECK_NOT_NULL(text)
+  text->length = 0;
+  high = text->values;
+  if (self->sign == -1) {
+    *high = '-';
+    ++high;
+    ++(text->length);
+  }
+  low = high;
+  ALLOC_LONG(tmp.number, self->length)
+  memcpy(tmp.number, self->number, self->length * sizeof(Byte));
+  tmp.length = self->length;
+  tmp.sign = 1;
+  do {
+    Long d = {0};
+    Long q, r;
+    CCHECK(Long_set(&d, self_Refman, 10))
+    CCHECK(long_div_mod(&tmp, &d, &q, &r))
+    *high = '0' + r.number[0];
+    ++high;
+    free(tmp.number);
+    tmp = q;
+    if (text->max_length <= text->length + 1) {
+      text->length = 0;
+      text->values[0] = '\0';
+      CRAISE("string too long")
+    }
+    ++(text->length);
+  } while (tmp.length > 1 || tmp.number[0] > 0);
+  *high = '\0';
+  for (--high; low < high; ++low, --high) {
+    char swap;
+    swap = *low;
+    *low = *high;
+    *high = swap;
+  }
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
 #define LUMI_FUNC_NAME "Long.hex"
 Returncode Long_hex(
     Long* self, Ref_Manager* self_Refman,
@@ -1224,51 +1381,6 @@ Returncode Long_set_sum(Long* self, Long* a, Long* b) {
 }
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FUNC_NAME "Long.set-diff"
-Returncode Long_set_diff(Long* self, Long* a, Long* b) {
-  unsigned carry = 0;
-  int n;
-  Long* big = NULL;
-  Long* small = NULL;
-  self->length = a->length >= b->length? a->length: b->length;
-  ALLOC_LONG(self->number, self->length)
-  self->number = calloc(self->length, sizeof(Byte));
-  for (n = self->length - 1; big == NULL && n >= 0; --n) {
-    unsigned va, vb;
-    va = n < a->length? a->number[n]: 0;
-    vb = n < b->length? b->number[n]: 0;
-    if (va > vb) {
-      big = a;
-      small = b;
-      self->sign = a->sign;
-    }
-    else if (vb > va) {
-      big = b;
-      small = a;
-      self->sign = -(a->sign);
-    }
-  }
-  if (big == NULL) {
-    return OK;
-  }
-  for (n = 0; n < self->length; ++n) {
-    int vbig, vsmall, diff;
-    vbig = big->number[n];
-    vsmall = n < small->length? small->number[n]: 0;
-    diff = vbig - vsmall - carry;
-    if (diff >= 0) {
-      self->number[n] = diff;
-      carry = 0;
-    }
-    else {
-      self->number[n] = 256 + diff;
-      carry = 1;
-    }
-  }
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-
 #define LUMI_FUNC_NAME "long-combine"
 Returncode long_combine(
     Long* a, Ref_Manager* a_Refman,
@@ -1314,67 +1426,6 @@ Returncode long_mul(
   CHECK_NOT_NULL(b)
   CCHECK(long_alloc(res, res_Refman))
   CCHECK(Long_set_mul(*res, a, b))
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-
-Bool long_abs_larger(Long* a, Long* b, Bool equal) {
-  int n;
-  for (n = (a->length >= b->length? a->length: b->length) - 1; n >= 0; --n) {
-    if ((n >= a->length && b->number[n] != 0) ||
-        (n < a->length && n < b->length && a->number[n] < b->number[n])) {
-      return false;
-    }
-    if ((n >= b->length && a->number[n] != 0) ||
-        (n < a->length && n < b->length && (equal?
-         a->number[n] >= b->number[n] : a->number[n] > b->number[n]))) {
-      return true;
-    }
-  }
-  return false;
-}
-
-#define LUMI_FUNC_NAME "long-div-mod"
-Returncode long_div_mod(Long* n, Long* d, Long* q, Long* r) {
-  int i;
-  int bits;
-  Byte tmp;
-  r->length = 1;
-  q->length = n->length;
-  ALLOC_LONG(q->number, q->length)
-  ALLOC_LONG(r->number, r->length)
-  bits = (n->length - 1) * 8;
-  tmp = n->number[n->length - 1];
-  while (tmp > 0) {
-    ++bits;
-    tmp /= 2;
-  }
-  for (i = bits - 1; i >= 0; --i) {
-    int j;
-    unsigned carry = 0;
-    for (j = 0; j < r->length || carry > 0; ++j) {
-      unsigned value = 0;
-      INC_REALLOC_LONG(j, r->number, r->length)
-      value = r->number[j];
-      value <<= 1;
-      value += carry;
-      r->number[j] = value % 256;
-      carry = value / 256;
-    }
-    r->number[0] |= (n->number[i / 8] >> (i % 8)) & 0x01;
-    if (long_abs_larger(r, d, true)) {
-      Long newr;
-      CCHECK(Long_set_diff(&newr, r, d))
-      free(r->number);
-      r->number = newr.number;
-      r->length = newr.length;
-      q->number[i / 8] |= 1 << (i % 8);
-    }
-  }
-  q->sign = n->sign * d->sign;
-  r->sign = q->sign;
-  Long_realloc(q);
-  Long_realloc(r);
   return OK;
 }
 #undef LUMI_FUNC_NAME

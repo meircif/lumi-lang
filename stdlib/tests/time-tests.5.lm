@@ -56,7 +56,7 @@ test test-strftime()
     tm.yday := 321
     tm.isdst := 1
     var String{256} result
-    var Int length
+    var Uint32 length
     tm.strftime(user result, user "AB")->(var length)
     assert! result.equal(user "OK")
     assert! length = result.length()

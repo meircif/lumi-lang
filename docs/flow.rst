@@ -13,6 +13,7 @@ The condition expression must be boolean typed. ::
    else
        ; do something
 
+
 Switch-Case Condition
 ---------------------
 This is not supported in :ref:`TL5 <syntax-tl5>`.
@@ -32,6 +33,7 @@ default is not to fall-through. ::
        ; do something
    default
        ; do something
+
 
 Simple Loop
 -----------
@@ -66,12 +68,37 @@ start over from loop beginning::
            continue
        ; do something
 
+It is possible to limit the number of loop iterations, when the limit is
+reached an error is raised::
+   
+   loop! number
+       ; do something
+       while condition
+
+.. note:: The ``!`` warning sign must be used if error is to be propagated.
+
+Loops must contain at least one ``while``, ``break`` or ``return`` statement -
+otherwise the compiler will complain about an infinite loop. If an infinite
+loop is intentional ``loop-infinite`` must be used::
+   
+   loop-infinite
+      ; do something forever
+
+
+Repeat Loop
+-----------
+A simple loop that just repeats itself a specific number of times::
+   
+   repeat number
+       ; do this "number" times
+
+
 For Loop
 --------
-For loop is declared using the ``for`` keyword, and iterates over a specific
-set of values.
+For loop iterates over a specific set of values, and is declared using the
+``for`` keyword.
 
-Iterating numbers incrementally, numbers can be any integer expression::
+Iterating numbers incrementally, limits can be any integer expression::
 
    for number in 3:7
        ; "number" will iterate 3,4,5,6
@@ -82,15 +109,27 @@ Number iteration with explicit step amount, this is not supported in :ref:`TL5
    for number in 9:1:-2
        ; "number" will iterate 9,7,5,3
 
+Array iteration::
+
+   for item in array
+       ; "item" will iterate each item of "array"
+
 String iteration::
 
    for character in "Example"
        ; "character" will iterate E,x,a,m,p,l,e
 
-Array iteration::
+Buffer iteration::
 
-   for item in array
-       ; "item" will iterate each item of "array"
+   for byte in `baffdaca`
+       ; "character" will iterate ba,ff,da,ca
+
+In all for loops it is possible to ignore the iteration item by replacing it
+with ``_``::
+   
+   for _ in 3:7
+       ; will iterate 4 times
+
 
 User Defined Iterators
 ++++++++++++++++++++++
@@ -99,15 +138,15 @@ a ``step`` named method that has the following deceleration:
 
 .. function:: step()->(user SomeType? value, var Bool has-another-item)
 
-   Is called once before any iteration. Iteration continues only
-   if ``has-another-item`` returns :data:`true`. In such case ``value`` returns
+   Is called once before any iteration. Iteration continue only
+   if ``has-another-item`` is :data:`true`. In such case ``value`` returns
    the next iteration value, and the iteration should advance one step.
    ``SomeType`` declared in this method is used as the iterator value type.
 
-This interface may change in the final syntax - the exact syntax is still under
-planning.
-
-An instance of an iterator type can be used in for loops::
+An instance of such iterator type can be used in for loops::
 
    for item in iterator-instance
        ; "item" will iterate as implemented by "iterator-instance" type
+
+This interface may change in the final syntax - the exact syntax is still under
+planning.

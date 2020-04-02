@@ -22,7 +22,7 @@ var Int new-fail-countdown
 mock new()->(var Bool alloc-success)
     alloc-success := true
     if new-fail-countdown > 0
-        new-fail-countdown -= 1
+        new-fail-countdown clamp-= 1
         if new-fail-countdown = 0
             alloc-success := false
 
@@ -109,3 +109,7 @@ test fail-zero-division()
 test fail-loop-limit()
     loop! 3
         while true
+
+test fail-integer-overflow()
+    var Uint8 x(copy 12)
+    x := clamp! - x

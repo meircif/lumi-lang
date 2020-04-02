@@ -1,19 +1,19 @@
 struct Test
-    var Int num
+    var Uint32 num
     weak Test? t
     var Func?{()} fun
     func user? meth()
 class Ta(Test)
-    var Int numa
+    var Uint32 numa
     func inst user? metha()
     func dynamic user? dyn()
 class Tb(Ta)
-    var Int numb
-    new!(copy Int num)
+    var Uint32 numb
+    new!(copy Uint32 num)
     func inst user? methb()
     func dynamic user? dyn()
 class Tc(Tb)
-    var Int numc
+    var Uint32 numc
     func inst user? methc()
     func dynamic user? dyn()
 struct Data{Generic}
@@ -22,23 +22,24 @@ struct Data{Generic}
     func user? get()->(weak Generic? item)
 
 func fun0()
-func fun1(copy Int x, user String? s, owner String? o)
-func fun2()->(strong String? s, var Int x)
-func fun3(copy Int x)->(strong String? s)
-func fun4(copy Int x)
-func fun5(copy Int x)->(var Int y)
-func fun6(copy Int x, copy Int y)->(var Int n, var Int m)
+func fun1(copy Uint32 x, user String? s, owner String? o)
+func fun2()->(strong String? s, var Uint32 x)
+func fun3(copy Uint32 x)->(strong String? s)
+func fun4(copy Uint32 x)
+func fun5(copy Uint32 x)->(var Uint32 y)
+func fun6(copy Uint32 x, copy Uint32 y)->(var Uint32 n, var Uint32 m)
 func fun7(weak Tb? tb)->(weak Tb? tbo)
 func fun8(strong String? s)
 func ! fune()
 
-var Int i
+var Uint32 i
+var Sint32 j
 var Byte bt
 var Char c
 var Bool b
 owner String? ostr
 owner Buffer? buff
-weak Array?{Int} arr
+weak Array?{Uint32} arr
 weak Test? t
 weak Ta? ta
 strong Tb? tb
@@ -47,30 +48,30 @@ weak Data?{Test} d
 weak Array?{String} sarr
 weak Array?{Buffer} barr
 
-func ! mock(user String? str, user Buffer? bfr)->(strong String? so, var Int io, strong Test? to, weak Tc? tco)
+func ! mock(user String? str, user Buffer? bfr)->(strong String? so, var Uint32 io, strong Test? to, weak Tc? tco)
 ; @@ test-int-expression
 ; @ c test-int-expression-0
 i := 0
 ; @ c test-int-expression-1
 i := 9630
 ; @ c test-int-expression-2
-i := -9630
+j := -9630
 ; @ c test-int-expression-3
 i := 07520
 ; @ c test-int-expression-4
-i := -07520
+j := -07520
 ; @ c test-int-expression-5
 i := 0xfda940
 ; @ c test-int-expression-6
-i := -0xfda940
+j := -0xfda940
 ; @ c test-int-expression-7
 i := 0xFDA940
 ; @ c test-int-expression-8
-i := -0xFDA940
+j := -0xFDA940
 ; @ c test-int-expression-9
 i := 0b100101
 ; @ c test-int-expression-10
-i := -0b100101
+j := -0b100101
 ; @ ec test-int-expression-e0
 2a
 ; @ ec test-int-expression-e1
@@ -104,9 +105,9 @@ c := '\n'
 ; @ c test-char-expression-3
 c := '\x0f'
 ; @ c test-char-expression-4
-c := '\xA9'
+c := '\x7A'
 ; @ c test-char-expression-5
-c := '\270'
+c := '\173'
 ; @ fec test-char-expression-e0
 c := '''
 ; @ fec test-char-expression-e1
@@ -267,7 +268,7 @@ y := buff![2:6]!
 ; @ c test-slice-expression-2
 i := arr![13]!
 ; @ c test-slice-expression-3
-user Array?{Int} x
+user Array?{Uint32} x
 x := arr![2:i]!
 ; @ c test-slice-expression-4
 ostr![4]! := c
@@ -298,19 +299,19 @@ func ! fun(
     user Buffer bi(user ba[3]!)
 ; @ c test-slice-expression-9
 strong Array?{String} sa
-sa![3]!.copy(user "text")!
+sa![3]!.new(user "text")!
 sa := _
 strong Array?{Buffer} ba
-ba![3]!.copy(user `beef`)!
+ba![3]!.new(user `beef`)!
 ba := _
 ; @ c test-slice-expression-10
-strong Array?{Array{Int}} aai
+strong Array?{Array{Uint32}} aai
 arr := aai![3]!
-weak Array?{Array{Int}} ua(weak aai![2:4]!)
+weak Array?{Array{Uint32}} ua(weak aai![2:4]!)
 ; @ c test-slice-expression-11
-strong Array?{Array{Array{Array{Int}}}} aai
-weak Array?{Array{Array{Int}}} ua(weak aai![3]!)
-weak Array?{Array{Array{Array{Int}}}} uaa(weak aai![2:4]!)
+strong Array?{Array{Array{Array{Uint32}}}} aai
+weak Array?{Array{Array{Uint32}}} ua(weak aai![3]!)
+weak Array?{Array{Array{Array{Uint32}}}} uaa(weak aai![2:4]!)
 ; @ c test-slice-expression-12
 strong Array?{Array{Array{String}}} aas
 weak Array?{Array{String}} wsa(weak aas![3]!)
@@ -321,9 +322,9 @@ weak Array?{Array{Buffer}} wba(weak aab![3]!)
 weak Array?{Array{Array{Buffer}}} wbaa(weak aab![2:4]!)
 aas := _
 ; @ c test-slice-expression-13
-var Array{8:Array{7:Array{6:Array{5:Int}}}} aai
-user Array?{Array{Array{Int}}} ua(user aai[3])
-user Array?{Array{Array{Array{Int}}}} uaa(user aai[2:4])
+var Array{8:Array{7:Array{6:Array{5:Uint32}}}} aai
+user Array?{Array{Array{Uint32}}} ua(user aai[3])
+user Array?{Array{Array{Array{Uint32}}}} uaa(user aai[2:4])
 ; @ c test-slice-expression-14
 var Array{8:Array{7:Array{6:String{5}}}} aas
 user Array?{Array{String}} usa(user aas[i]!)
@@ -354,16 +355,16 @@ func fun()
     var Test t
     var Array{6:Test} a
 ; @ c test-slice-expression-19
-new Array{i:Int} a!
+new Array{i:Uint32} a!
 var Sint8 x
 var Int{-6:0} y
-i := a[x:x]![y:y + 1]![x]! + a[i:i + 1]![0:y + 1]![y]! + a[0:1][i]!
+i := wraparound a[x:x]![y:y + 1]![x]! + a[i:i + 1]![0:y + 1]![y]! + a[0:1][i]!
 var Int{100:200} length
-new Array{length:Int} aa!
-var Int{10:20} xx
+new Array{length:Uint32} aa!
+var Int{10:20} xx(copy 10)
 var Int{0:8} yy
 i := aa[xx:xx][yy]
-var Array{12:Int} ab
+var Array{12:Uint32} ab
 i := ab[3:4][3]
 ; @ c test-slice-expression-20
 i := str![2]! + buff![2]! + str![1:3]![2] + buff![1:3]![2]
@@ -380,11 +381,11 @@ arr![str]!
 ; @ ec test-slice-expression-e5
 arr![3:str]!
 ; @ ec test-slice-expression-e6
-arr![i += 3]!
+arr![i wraparound+= 3]!
 ; @ ec test-slice-expression-e7
 str![2:5]! := so
 ; @ ec test-slice-expression-e8
-arr![7:2]! := Array{5:Int}()!
+arr![7:2]! := Array{5:Uint32}()!
 ; @ ec test-slice-expression-e9
 user Array?{Test} at
 at![0] := t
@@ -394,13 +395,13 @@ so := sarr![3]!
 var Array{3:Tc} error
 ; @ eg test-slice-expression-e12
 struct Test
-    var Int x
+    var Uint32 x
     new()
 func func(user Array{Test} error)
 ; @ ec test-slice-expression-e13
 i := arr![i]
 ; @ ec test-slice-expression-e14
-var Array{0:Int} error
+var Array{0:Uint32} error
 ; @ ec test-slice-expression-e15
 arr![-1]
 ; @ ec test-slice-expression-e16
@@ -412,11 +413,11 @@ arr![1:0]
 var Int{-10:0} x
 arr![1:x]
 ; @ ec test-slice-expression-e19
-s-var Array{3:Int} a!
+s-var Array{3:Uint32} a!
 arr := a[1:3]
 ; @ ec test-slice-expression-e20
 var Int{-10:10} length
-new Array{length:Int} a!
+new Array{length:Uint32} a!
 var Int{8:80} x
 arr := a[x:x]
 ; @@ test-call-expression
@@ -427,13 +428,13 @@ fun1(copy 3, user ostr, owner _)
 ; @ c test-call-expression-2
 fun2()->(strong so, var io)
 ; @ c test-call-expression-3
-var Int x
+var Uint32 x
 strong String? s
 fun2()->(strong s, var x)
 ; @ c test-call-expression-4
 fun3(copy 0)->(strong so)
 ; @ c test-call-expression-5
-var Int x
+var Uint32 x
 fun4(copy fun5(copy 3)->(var x))
 ; @ c test-call-expression-6
 fun6(
@@ -469,7 +470,7 @@ fun3(copy 1)
 fun5(copy 2)
 ; @ g test-call-expression-19
 class Base
-    var Int x
+    var Uint32 x
     func dynamic user ! meth(owner Base b)
 class Test(Base)
     func dynamic user ! meth(owner Base b)
@@ -477,13 +478,13 @@ class Test(Base)
         base(owner t)!
 ; @ g test-call-expression-20
 class Test
-    var Int x
+    var Uint32 x
     func dynamic user meth()
 func ! mock()->(weak Test? t)
     mock()->(weak t)!.meth()
 ; @ g test-call-expression-21
 class Test
-    var Int x
+    var Uint32 x
     func dynamic user ! meth()->(weak Test? t)
         self.meth()!.meth()!
 ; @ g test-call-expression-22
@@ -517,10 +518,10 @@ var Uint32 u32
 var Sint32 s32
 var Uint64 u64
 var Sint64 s64
-fun5(copy 0)->(var u8)
-fun5(copy 1)->(var s8)
+u8 := wraparound fun5(copy 0)
+s8 := clamp fun5(copy 1)
 fun5(copy 50)->(var u32)
-fun5(copy 2)->(var s32)
+s32 := clamp fun5(copy 2)
 fun5(copy 3)->(var u64)
 fun5(copy 4)->(var s64)
 ; @ ec test-call-expression-e0
@@ -561,7 +562,7 @@ fun0()->(copy i)
 fun2()
 ; @ eg test-call-expression-e18
 struct Base
-    var Int x
+    var Uint32 x
     func user meth(owner Base b)
 struct Test(Base)
     func user meth(owner Test t)
@@ -593,7 +594,7 @@ Error
 ; @@ test-base-expression
 ; @ g test-base-expression-0
 struct Base
-    var Int x
+    var Uint32 x
     func user methb()
 struct Mid(Base)
     func user methm()
@@ -603,7 +604,7 @@ struct Top(Mid)
         base.methm()
 ; @ g test-base-expression-1
 struct Base
-    var Int x
+    var Uint32 x
     func user methb()
 struct Mid(Base)
     func user methm()
@@ -615,27 +616,27 @@ struct Top(Mid)
 base
 ; @ eg test-base-expression-e1
 struct Test
-    var Int x
+    var Uint32 x
     func user mock()
         base
 ; @ eg test-base-expression-e2
 struct Base
-    var Int x
+    var Uint32 x
 struct Test(Base)
-    var Int x
+    var Uint32 x
     func user mock()
         base()
 ; @ eg test-base-expression-e3
 struct Base
-    var Int x
+    var Uint32 x
 struct Test(Base)
     func user mock()
         base := self
 ; @ eg test-base-expression-e4
 struct Base
-    var Int x
+    var Uint32 x
 struct Test(Base)
-    func user mock()->(var Int x)
+    func user mock()->(var Uint32 x)
         x := base.x
 ; @@ test-block-expression
 ; @ c test-block-expression-0
@@ -643,41 +644,96 @@ i := 2 + (123)
 ; @ c test-block-expression-1
 i := (123)
 ; @ c test-block-expression-2
-i := (123 * (i - 4)) + 2
+i := wraparound (123 * (i - 4)) + 2
 ; @ ec test-block-expression-3
 (error
 ; @@ test-unary-expression
 ; @ c test-unary-expression-0
-i := - i
+j := - j
 ; @ c test-unary-expression-1
-i := -
-        i
+j := -
+        j
 ; @ c test-unary-expression-2
 i := - - i
 ; @ c test-unary-expression-3
 b := not b
 ; @ c test-unary-expression-4
 b := not i > 3
-; @ ec test-unary-expression-5
+; @ c test-unary-expression-5
+i := clamp i + 1
+; @ c test-unary-expression-6
+j := clamp j - 1
+; @ c test-unary-expression-7
+var Sint8 x(copy clamp j)
+x := clamp j
+; @ c test-unary-expression-8
+i := clamp! i + 1
+; @ c test-unary-expression-9
+j := clamp! j - 1
+; @ c test-unary-expression-10
+j := clamp! j * 2
+; @ c test-unary-expression-11
+if-error i := clamp? i + 1
+    i := 12
+; @ c test-unary-expression-12
+fun4(copy clamp i + 1)
+new Tb ttb(copy clamp i + 1)!
+ttb := Tb(copy clamp i + 1)!
+; @ c test-unary-expression-13
+fun4(copy clamp! i + 1)
+; @ c test-unary-expression-14
+if-error fun4(copy clamp? i + 1)
+    i := 12
+; @ c test-unary-expression-15
+i := wraparound i + 1
+; @ c test-unary-expression-16
+fun4(copy wraparound i + 1)
+new Tb ttb(copy wraparound i + 1)!
+ttb := Tb(copy wraparound i + 1)!
+; @ ec test-unary-expression-e0
 {45}
-; @ ec test-unary-expression-6
+; @ ec test-unary-expression-e1
 -[
-; @ ec test-unary-expression-7
+; @ ec test-unary-expression-e2
 + 2
-; @ ec test-unary-expression-8
+; @ ec test-unary-expression-e3
 - (i := 2)
-; @ ec test-unary-expression-9
+; @ ec test-unary-expression-e4
 - (i > 4)
-; @ ec test-unary-expression-10
+; @ ec test-unary-expression-e5
 not i
+; @ ec test-unary-expression-e6
+i := i + clamp i
+; @ ec test-unary-expression-e7
+fun4(copy - clamp i)
+; @ ec test-unary-expression-e8
+i := clamp i
+; @ ec test-unary-expression-e9
+fun4(copy clamp i)
+; @ ec test-unary-expression-e10
+i := clamp? i + 1
+; @ eg test-unary-expression-e11
+func error()->(var Uint32 i)
+    i := clamp! i + 1
+; @ eg test-unary-expression-e12
+func error()->(var Uint32 i)
+    i := clamp? i + 1
+; @ ec test-unary-expression-e13
+i clamp+= clamp -1
+; @ ec test-unary-expression-e14
+fun5(copy i)->(var clamp j)
+; @ ec test-unary-expression-e15
+i := i + wraparound i
+; @ ec test-unary-expression-e16
+i := wraparound i
 ; @@ test-binary-expression
 ; @ c test-binary-expression-0
 i := 23 + 54
 ; @ c test-binary-expression-1
-i += (100 * 2) - 37
-i *= 3
+i clamp+= (100 * 2) - 37
+i clamp*= 3
 ; @ c test-binary-expression-2
-i -= 12 *
+i clamp-= 12 *
         13
 ; @ c test-binary-expression-3
 b := 3 < 5 or 23 > 37
@@ -715,9 +771,9 @@ i := i bor 8
 ; @ c test-binary-expression-18
 i := 10 band i
 ; @ c test-binary-expression-19
-var Int{4:20} i8
-var Int{100000000000:200000000000} i64
-i := bnot i + bnot i8 + bnot i64
+var Int{4:20} i8(copy 4)
+var Int{100000000000:200000000000} i64(copy 100000000000)
+i := bnot i wraparound+ bnot i8 wraparound+ bnot i64
 ; @ c test-binary-expression-20
 i := i xor 16
 ; @ c test-binary-expression-21
@@ -725,10 +781,49 @@ i := 2 shr i
 ; @ c test-binary-expression-22
 i := i shl 1
 ; @ c test-binary-expression-23
-i := bnot i + (10 band i)
+i := wraparound bnot i + (10 band i)
 ; @ c test-binary-expression-24
-var Int{1:100} x
-io := (60 div x) + (60 mod x)
+var Int{1:100} x(copy 1)
+io := (60 div x) + (600 mod x)
+; @ c test-binary-expression-25
+i := i clamp+ i
+i := i clamp+ j
+j := j clamp+ i
+j := j clamp+ j
+; @ c test-binary-expression-26
+i := i clamp- i
+i := i clamp- j
+j := j clamp- i
+j := j clamp- j
+; @ c test-binary-expression-27
+i := i clamp* i
+i := i clamp* j
+j := j clamp* i
+j := j clamp* j
+; @ c test-binary-expression-28
+b := i >= i or i < j or j > j or bt <= j
+; @ c test-binary-expression-29
+var Int{10:100} x(copy 50)
+var Int{1000} y
+var Uint64 z
+i := x wraparound+ 1000
+i := y wraparound- 2000
+z := z wraparound* 2
+z := z wraparound+ j wraparound+ (x wraparound- z)
+; @ c test-binary-expression-30
+i wraparound+= i
+i wraparound-= i
+i wraparound*= i
+; @ c test-binary-expression-31
+var Sint64 x
+var Uint64 y
+i := wraparound x +! j
+i := wraparound x -! j
+i := wraparound x *! j
+y := y +! 3
+i := wraparound x -! 3
+if-error x := x +? 3
+    x := 0
 ; @ ec test-binary-expression-e0
 345 @ 2
 ; @ ec test-binary-expression-e1
@@ -742,9 +837,9 @@ io := (60 div x) + (60 mod x)
 ; @ ec test-binary-expression-e5
 1 := 2
 ; @ ec test-binary-expression-e6
-1 += 2
+1 clamp+= 2
 ; @ ec test-binary-expression-e7
-1 -= 2
+1 clamp-= 2
 ; @ ec test-binary-expression-e8
 so := str
 ; @ ec test-binary-expression-e9
@@ -756,9 +851,9 @@ b := 1 > 4 > t
 ; @ ec test-binary-expression-e12
 i := 3 + t
 ; @ ec test-binary-expression-e13
-t += 3
+t clamp+= 3
 ; @ ec test-binary-expression-e14
-i -= b
+i clamp-= b
 ; @ ec test-binary-expression-e15
 b := 3 is t
 ; @ ec test-binary-expression-e16
@@ -810,6 +905,39 @@ i := x div 6
 ; @ ec test-binary-expression-e33
 var Int{-10:10} x
 i := 7 mod x
+; @ ec test-binary-expression-e34
+var Uint64 u64
+b := j < u64
+; @ ec test-binary-expression-e35
+var Int{10} x
+i := x wraparound+ 100
+; @ ec test-binary-expression-e36
+var Int{200:220} x(copy 210)
+i := x wraparound- 100
+; @ ec test-binary-expression-e37
+var Uint8 x
+i := x wraparound* 1
+; @ ec test-binary-expression-e38
+var Int{1:255} x
+x wraparound+= 1
+; @ ec test-binary-expression-e39
+var Int{254} x
+x wraparound-= 1
+; @ ec test-binary-expression-e40
+var Uint64 x
+x := x +? j
+; @ ec test-binary-expression-e41
+var Uint64 x
+if-error x := x +! j
+    x := 0
+; @ eg test-binary-expression-e42
+func error(copy Sint32 j)
+    var Uint64 x
+    x := x +! j
+; @ ec test-binary-expression-e43
+i := wraparound i +! 3
+; @ ec test-binary-expression-e44
+i := wraparound i +? 3
 ; @@ test-swap-expression
 ; @ c test-swap-expression-0
 new Test t1!
@@ -828,12 +956,12 @@ strong Tc t1(strong Tc(copy 1)!)
 strong Tc t2(strong Tc(copy 2)!)
 t1 :=: t2
 ; @ c test-swap-expression-4
-new Array{4:Int} a1!
-new Array{6:Int} a2!
+new Array{4:Uint32} a1!
+new Array{6:Uint32} a2!
 a1 :=: a2
 ; @ c test-swap-expression-5
-strong Array{Int} a1(strong Array{4:Int}()!)
-strong Array{Int} a2(strong Array{6:Int}()!)
+strong Array{Uint32} a1(strong Array{4:Uint32}()!)
+strong Array{Uint32} a2(strong Array{6:Uint32}()!)
 a1 :=: a2
 ; @ c test-swap-expression-6
 new String{4} s1!
@@ -845,7 +973,7 @@ strong String s2(strong String{6}()!)
 s1 :=: s2
 ; @ g test-swap-expression-8
 struct MyStruct
-    var Int x
+    var Uint32 x
 struct Test
     owner MyStruct f
     new(owner MyStruct f)
@@ -975,7 +1103,7 @@ var Test tv
 i := tv!.num
 ; @ eg test-exclamation-expression-en6
 struct Base
-    var Int x
+    var Uint32 x
     func user fun()
 struct Test(Base)
     func user fun()
@@ -1015,7 +1143,7 @@ for _ in 3:4!
 var String{4} s
 for _ in s!
 ; @ ec test-exclamation-expression-en21
-var Array{4:Int} a
+var Array{4:Uint32} a
 for _ in a!
 ; @ ec test-exclamation-expression-en22
 user String? s(user str!)
@@ -1024,13 +1152,13 @@ const Int CONST 12!
 ; @ ec test-exclamation-expression-en24
 assert! b!
 ; @ ec test-exclamation-expression-en26
-var Array{4:Int} a
+var Array{4:Uint32} a
 i := a![2]!
 ; @ ec test-exclamation-expression-en27
-var Array{4:Int} a
+var Array{4:Uint32} a
 i := a[2!]!
 ; @ ec test-exclamation-expression-en28
-var Array{4:Int} a
+var Array{4:Uint32} a
 i := a[2:3!]!
 ; @ ec test-exclamation-expression-en29
 var Ref r
@@ -1046,7 +1174,7 @@ var String{23!} s
 ; @@ test-int-range
 ; @ g test-int-range-0
 struct Test
-    var Int int-def
+    var Uint32 int-def
     var Uint8 u8b
     var Uint16 u16b
     var Uint32 u32b
@@ -1063,6 +1191,24 @@ struct Test
     var Int{-1:1000} rs16
     var Int{-2000000:-1000000} rs32
     var Int{-100000000000:100000000000} rs64
+    new()
+        self.ru16 := 5
+        self.ru32 := 1000000
+        self.rs32 := -1000000
+        self.ru64 := 100000000000
+        self.rs64 := -100000000000
+        self.u8b := 0xff
+        self.s8b := 0x7f
+        self.s8b := -0x7f
+        self.u16b := 0xffff
+        self.s16b := 0x7fff
+        self.s16b := -0x7fff
+        self.u32b := 0xffffffff
+        self.s32b := 0x7fffffff
+        self.s32b := -0x7fffffff
+        self.u64b := 0xffffffffffffffff
+        self.s64b := 0x7fffffffffffffff
+        self.s64b := -0x7fffffffffffffff
 ; @ c test-int-range-1
 var Int{0:255} u8
 var Int{0:65535} u16
@@ -1078,18 +1224,19 @@ enum Nums
     MIN
 var Int{Nums.MIN - 12:MAX * 2} s16
 struct Test
-    var Int x
-func fun(user Test t)->(var Int x)
-    x := fun(user t) + t.x
+    var Uint32 x
+func fun(user Test t)->(var Uint32 x)
+    x := wraparound fun(user t) + t.x
 ; @ c test-int-range-3
-var Int u8
-var Int s16(copy -1000)
-var Int u32(copy 100000)
-var Int u16
+var Uint8 u8
+var Sint16 s16(copy -1000)
+var Uint32 u32(copy 100000)
+var Uint16 u16
 u16 := 1000
-var Int s32
+var Sint32 s32
 s32 := 100000
 s32 := -100000
+i := 20 + -20
 ; @ ec test-int-range-e0
 var Int{12:11} error
 ; @ ec test-int-range-e1
@@ -1104,6 +1251,13 @@ var Int{0:str} error
 var Int{0:i} error
 ; @ ec test-int-range-e6
 var Int{-100} error
+; @ ec test-int-range-e7
+i := j
+; @ ec test-int-range-e8
+j := i
+; @ ec test-int-range-e9
+var Uint64 x
+x := wraparound x + 1
 ; @@ test-dynamic
 ; @ c test-dynamic-0
 var Ta a
@@ -1143,13 +1297,13 @@ tco!.dyn()
 fun7(weak tc)->(weak ta)
 ; @ g test-dynamic-16
 class Test
-    var Int x
+    var Uint32 x
     func dynamic user meth()
 func ! mock()->(weak Test? t)
     t!.meth()
 ; @ g test-dynamic-17
 class Base
-    var Int x
+    var Uint32 x
     func dynamic user meth()
 class Test(Base)
     func inst user fun()
@@ -1158,7 +1312,7 @@ class Test(Base)
 fun7(weak _)
 ; @ eg test-dynamic-e0
 class Test
-    var Int x
+    var Uint32 x
     func dynamic weak? meth()
 func fun()
     weak Test? t
@@ -1169,8 +1323,8 @@ var Func{()} fun
 fun := fun0
 fun()
 ; @ c test-function-object-1
-var Func{(copy Int x)->(var Int y)} fun(copy fun5)
-var Int x
+var Func{(copy Uint32 x)->(var Uint32 y)} fun(copy fun5)
+var Uint32 x
 fun(copy 9)->(var x)
 ; @ c test-function-object-2
 var Func{(user Test? self)} fun(copy Test.meth)
@@ -1185,35 +1339,35 @@ t!.fun := fun0
 t!.fun!()
 ; @ c test-function-object-5
 var Array{38:Func{()}} farr
-new Array{12:Func{(copy Int x)->(var Int y)}} farr1!
+new Array{12:Func{(copy Uint32 x)->(var Uint32 y)}} farr1!
 new Array{12:Func{:()}} farr2!
 user Array{Func{:()}} ufarr
 farr[3] := fun0
 farr[3]()
 ; @ c test-function-object-6
-var Func{(copy Int x,
-        copy Int y)} fun
+var Func{(copy Uint32 x,
+        copy Uint32 y)} fun
 ; @ g test-function-object-7
 func fun()
 func mock()->(var Func{()} f)
     f := fun
     f()
 ; @ g test-function-object-8
-func ! fun(copy Int x, copy Int y)
-func mock(copy Func?{(copy Int x,
-        copy Int y)} fi)->(var Func{:(copy Int x,
-        copy Int y)} fo)
+func ! fun(copy Uint32 x, copy Uint32 y)
+func mock(copy Func?{(copy Uint32 x,
+        copy Uint32 y)} fi)->(var Func{:(copy Uint32 x,
+        copy Uint32 y)} fo)
     mock(copy _)
     fo := fun
-func afun(user Array{Func{(copy Int x)->(var Int y)}} in)->(
+func afun(user Array{Func{(copy Uint32 x)->(var Uint32 y)}} in)->(
         owner Array?{Func{:()}} out)
 struct Test
-    var Func{(copy Int x,
-            copy Int y)} fun
-    var Array{4:Func{:(copy Int x)->(var Int y)}} afun
-    func user meth(copy Func{:(copy Int x,
-            copy Int y)} fi)->(var Func{:(copy Int x,
-            copy Int y)} fo)
+    var Func{(copy Uint32 x,
+            copy Uint32 y)} fun
+    var Array{4:Func{:(copy Uint32 x)->(var Uint32 y)}} afun
+    func user meth(copy Func{:(copy Uint32 x,
+            copy Uint32 y)} fi)->(var Func{:(copy Uint32 x,
+            copy Uint32 y)} fo)
         fo := fun
 ; @ c test-function-object-9
 var Func{:()} fun
@@ -1230,7 +1384,7 @@ var Func{() } error
 ; @ ec test-function-object-e4
 var Func{()} fun(copy fun1)
 ; @ ec test-function-object-e5
-var Func{()->(var Int x)} fun
+var Func{()->(var Uint32 x)} fun
 fun := fun0
 ; @ ec test-function-object-e6
 var Func{()} fun
@@ -1247,7 +1401,10 @@ var Func{()} fun(copy fune)
 var Func{:()} fun(copy fun0)
 ; @@ test-builtin
 ; @ c test-builtin-int0
-i.str(user ostr!)!
+var Uint64 u64
+var Sint64 s64
+u64.str(user ostr!)!
+s64.str(user ostr!)!
 ; @ c test-builtin-bool0
 b := true
 ; @ c test-builtin-bool1
@@ -1270,7 +1427,7 @@ ostr!.set(copy i, copy c)!
 ostr!.append(copy c)!
 ; @ c test-builtin-string6
 var String{12} sv
-sv.copy(user ostr!)!
+sv.new(user ostr!)!
 ; @ c test-builtin-string7
 ostr!.concat(user ostr!)!
 ; @ c test-builtin-string8
@@ -1297,7 +1454,7 @@ buff!.set(copy i, copy bt)!
 buff!.append(copy bt)!
 ; @ c test-builtin-buffer6
 var Buffer{12} bv
-bv.copy(user buff!)!
+bv.new(user buff!)!
 ; @ c test-builtin-buffer7
 buff!.concat(user buff!)!
 ; @ c test-builtin-buffer8
@@ -1313,10 +1470,11 @@ try
     s-var FileReadText f(user ostr)
     f.get()->(var c, var b)
     f.getline(user ostr)->(var b)
-    f.tell()->(var i)
-    f.seek-set(copy i)
-    f.seek-cur(copy i)
-    f.seek-end(copy i)
+    var Sint64 x
+    f.tell()->(var x)
+    f.seek-set(copy x)
+    f.seek-cur(copy x)
+    f.seek-end(copy x)
     f.flush()
     f.close()
     var Data{FileReadText} df
@@ -1326,10 +1484,11 @@ try
     new FileReadBinary f(user ostr)
     f.get()->(var bt, var b)
     f.read(user buff)->(var i)
-    f.tell()->(var i)
-    f.seek-set(copy i)
-    f.seek-cur(copy i)
-    f.seek-end(copy i)
+    var Sint64 x
+    f.tell()->(var x)
+    f.seek-set(copy x)
+    f.seek-cur(copy x)
+    f.seek-end(copy x)
     f.flush()
     f.close()
     var Data{FileReadBinary} df
@@ -1339,10 +1498,11 @@ try
     owner FileWriteText f(owner FileWriteText(user ostr, copy false))
     f.put(copy c)
     f.write(user ostr)->(var i)
-    f.tell()->(var i)
-    f.seek-set(copy i)
-    f.seek-cur(copy i)
-    f.seek-end(copy i)
+    var Sint64 x
+    f.tell()->(var x)
+    f.seek-set(copy x)
+    f.seek-cur(copy x)
+    f.seek-end(copy x)
     f.flush()
     f.close()
     var Data{FileWriteText} df
@@ -1352,10 +1512,11 @@ try
     strong FileWriteBinary f(strong FileWriteBinary(user ostr, copy true))
     f.put(copy bt)
     f.write(user buff)->(var i)
-    f.tell()->(var i)
-    f.seek-set(copy i)
-    f.seek-cur(copy i)
-    f.seek-end(copy i)
+    var Sint64 x
+    f.tell()->(var x)
+    f.seek-set(copy x)
+    f.seek-cur(copy x)
+    f.seek-end(copy x)
     f.flush()
     f.close()
     var Data{FileWriteBinary} df
@@ -1367,10 +1528,11 @@ try
     f.getline(user ostr)->(var b)
     f.put(copy c)
     f.write(user ostr)->(var i)
-    f.tell()->(var i)
-    f.seek-set(copy i)
-    f.seek-cur(copy i)
-    f.seek-end(copy i)
+    var Sint64 x
+    f.tell()->(var x)
+    f.seek-set(copy x)
+    f.seek-cur(copy x)
+    f.seek-end(copy x)
     f.flush()
     f.close()
     var Data{FileReadWriteText} df
@@ -1382,10 +1544,11 @@ try
     f.read(user buff)->(var i)
     f.put(copy bt)
     f.write(user buff)->(var i)
-    f.tell()->(var i)
-    f.seek-set(copy i)
-    f.seek-cur(copy i)
-    f.seek-end(copy i)
+    var Sint64 x
+    f.tell()->(var x)
+    f.seek-set(copy x)
+    f.seek-cur(copy x)
+    f.seek-end(copy x)
     f.flush()
     f.close()
     var Data{FileReadWriteBinary} df
@@ -1422,7 +1585,7 @@ func ! fun(
             user frwb)!
     var Data{File} df
     owner File fo(owner FileWriteBinary(user "name", copy false)!)
-    var Int i
+    var Sint64 i
     fo.tell()->(var i)!
     fo.seek-set(copy i)!
     fo.seek-cur(copy i)!
@@ -1441,9 +1604,9 @@ sys.getchar()->(var c, var b)!
 ; @ c test-builtin-sys4
 sys.getline(user ostr!)->(var b)!
 ; @ c test-builtin-sys5
-sys.exit(copy i)!
+sys.exit(copy j)!
 ; @ c test-builtin-sys6
-sys.system(user ostr!)->(var i)!
+sys.system(user ostr!)->(var j)!
 ; @ c test-builtin-sys7
 sys.getenv(user ostr!, user ostr!)->(var b)!
 ; @ c test-builtin-sys8
@@ -1466,21 +1629,21 @@ owner String? str
 
     #
 
-var Int x
+var Uint32 x
 ; @ g test-general-2
 ; comment
 
-var Int x
+var Uint32 x
 ; @ g test-general-3
 ~~~ documentation ~~~
 
-var Int x
+var Uint32 x
 ; @ g test-general-4
 [; multi #
  line #
  comment ;]
 
-var Int x
+var Uint32 x
 ; @ g test-general-5
 ~~~ multi #
  line    #
@@ -1488,7 +1651,7 @@ var Int x
  confused by ~ or ~~ or ; or ~~ ~ ?
 ~~~
 
-var Int x
+var Uint32 x
 ; @ g test-general-6
 var String{12} s
 s-var String{12} svs!
@@ -1497,7 +1660,7 @@ owner Buffer cb(owner Buffer{12}(user `fade00beaf`)!)
 strong String us(strong String{12}(user s)!)
 weak String gs(weak us)
 main!
-    var Int x(copy 6)
+    var Uint32 x(copy 6)
     x := 7
     new String{12} ls!
     ls :=: cs
@@ -1537,17 +1700,17 @@ func f()
     x :=
         y
 ; @ feg test-general-e8
-var Int x
+var Uint32 x
 ; @ eg test-general-e9
-var Int name
-var Int name
+var Uint32 name
+var Uint32 name
 ; @ eg test-general-e10
 func name()
-var Int name
+var Uint32 name
 ; @ eg test-general-e11
 user Error? error
 ; @ eg test-general-e12
-var Int x(copy error)
+var Uint32 x(copy error)
 ; @ eg test-general-e13
 [ ; error
 ; @ eg test-general-e14
@@ -1569,24 +1732,24 @@ main!
 ; @@ test-struct
 ; @ g test-struct-0
 struct Test
-    var Int x
+    var Uint32 x
 ; @ g test-struct-1
 struct Test
-    var Int x
+    var Uint32 x
 ; @ g test-struct-2
 struct Test1
-    var Int x
+    var Uint32 x
 struct Test2
-    var Int x
+    var Uint32 x
 
 
 struct Test3
-    var Int x
+    var Uint32 x
 ; @ g test-struct-3
 struct Test2(Test1)
-    var Int y
+    var Uint32 y
 struct Test1
-    var Int x
+    var Uint32 x
 ; @ g test-struct-4
 struct Test
     owner Test? to
@@ -1625,36 +1788,36 @@ struct Error
     new()
 ; @ eg test-struct-e13
 struct Error
-    var Int x
-    new()->(var Int x)
+    var Uint32 x
+    new()->(var Uint32 x)
 ; @ eg test-struct-e14
 struct Error
     func temp new()
 ; @ eg test-struct-e15
 struct Error(Error)
-    var Int x
+    var Uint32 x
 ; @ eg test-struct-e16
 struct Aerror(Berror)
-    var Int x
+    var Uint32 x
 struct Berror(Aerror)
-    var Int x
+    var Uint32 x
 ; @@ test-class
 ; @ g test-class-0
 class Base
-    var Int x
+    var Uint32 x
     owner Base? b
     func inst user stat()
     func dynamic user dyn0()
     func dynamic user ! dyn1()
     func dynamic user dyn2()
 class Mid(Base)
-    var Int y
+    var Uint32 y
     owner Mid? m
     func dynamic user dyn0()
     func dynamic user dyn3()
     func dynamic user ! dyn4()
 class Top(Mid)
-    var Int z
+    var Uint32 z
     owner Top? t
     func dynamic user dyn0()
         base()
@@ -1674,31 +1837,31 @@ class Test
 class(
 ; @ eg test-class-e1
 class Error
-    var Int x
+    var Uint32 x
 ; @ eg test-class-e2
 class Error
     func error f()
 ; @ eg test-class-e3
 struct Base
-    var Int x
+    var Uint32 x
     func user meth()
 class Error(Base)
     func dynamic user meth()
 ; @ eg test-class-e4
 class Base
-    var Int x
+    var Uint32 x
     func dynamic user meth()
 class Error(Base)
     func inst user meth()
 ; @ eg test-class-e5
 class Base
-    var Int x
+    var Uint32 x
     func dynamic user meth()
 class Error(Base)
-    func dynamic user meth(copy Int x)
+    func dynamic user meth(copy Uint32 x)
 ; @ eg test-class-e6
 class Base
-    var Int x
+    var Uint32 x
     func dynamic user meth()
 class Error(Base)
     func dynamic user ! meth()
@@ -1706,24 +1869,24 @@ class Error(Base)
 ; @ g test-function-0
 func name()
 ; @ g test-function-1
-func name(user String self, user String text, copy Int num)
+func name(user String self, user String text, copy Uint32 num)
 ; @ g test-function-2
-func name()->(owner String? text, var Int num)
+func name()->(owner String? text, var Uint32 num)
 ; @ g test-function-3
 func name(copy Char param)->(owner String? out)
 ; @ g test-function-4
-func name(user Array{Int} array)
+func name(user Array{Uint32} array)
 ; @ g test-function-5
 func some()
-func name(copy Func{(copy Int x)->(var Int y)} fun)->(var Func{()} joy)
+func name(copy Func{(copy Uint32 x)->(var Uint32 y)} fun)->(var Func{()} joy)
     joy := some
 ; @ g test-function-6
 func name()
-    var Int x
+    var Uint32 x
 ; @ g test-function-7
-func ! name(user String self, copy Int px, user Array{Char} pu, owner String po)->(
-        strong String? oself, var Int ox, weak String? ou, owner String? oo)
-    var Int x
+func ! name(user String self, copy Uint32 px, user Array{Char} pu, owner String po)->(
+        strong String? oself, var Uint32 ox, weak String? ou, owner String? oo)
+    var Uint32 x
     user String? u
     user Buffer? b
     owner String? o
@@ -1751,22 +1914,22 @@ func name(
     owner Class? c
     owner Array?{Struct} as
     owner Array?{Class} ac
-    owner Array?{Int} ai
+    owner Array?{Uint32} ai
     owner Array?{String} astr
 ; @ g test-function-9
 class Test
-    var Int x
+    var Uint32 x
     func dynamic user meth()
 func name()->(owner Test? t)
     t := _
 ; @ g test-function-10
-func name(user Array{Array{String}} ai)->(owner Array?{Array{Int}} ao)
+func name(user Array{Array{String}} ai)->(owner Array?{Array{Uint32}} ao)
 ; @ g test-function-11
 func ! name()->(owner String so)
     so := String{12}()!
 ; @ g test-function-m0
 main
-    var Int x
+    var Uint32 x
 ; @ g test-function-m1
 main!
     owner String? s
@@ -1787,7 +1950,7 @@ func error_name()
 func name()
 func name()
 ; @ eg test-function-e5
-var Int name
+var Uint32 name
 func name()
 ; @ eg test-function-e6
 func name( )
@@ -1796,20 +1959,20 @@ func name(user)
 ; @ eg test-function-e8
 func name(user String
 ; @ eg test-function-e9
-func name(error Int x)
+func name(error Uint32 x)
 ; @ eg test-function-e10
-func name(user String str,user Int x)
+func name(user String str,user Uint32 x)
 ; @ eg test-function-e11
 func name()-()
 ; @ feg test-function-e12
 func name()
 ; @ eg test-function-e13
 func name()
-        var Int x
+        var Uint32 x
 ; @ eg test-function-e14
-func name(user Int x)
+func name(user Uint32 x)
 ; @ eg test-function-e15
-func name()->(copy Int x)
+func name()->(copy Uint32 x)
 ; @ eg test-function-e16
 func name(copy String s)
 ; @ eg test-function-e17
@@ -1818,25 +1981,25 @@ func name(user Array error)
 func name(copy Func error)
 ; @ eg test-function-e20
 func name(
-    copy Int x)
+    copy Uint32 x)
 ; @ eg test-function-e21
 func Type.Error.name()
 ; @ eg test-function-e22
 func module.error.name()
 ; @ eg test-function-e23
-func name(copy Int error, copy Int error)
+func name(copy Uint32 error, copy Uint32 error)
 ; @ eg test-function-e24
-func name(copy Int error)->(var Int error)
+func name(copy Uint32 error)->(var Uint32 error)
 ; @ eg test-function-e25
-var Int error
-func name(copy Int error)
+var Uint32 error
+func name(copy Uint32 error)
 ; @ eg test-function-e26
 func error()
-func name(copy Int error)
+func name(copy Uint32 error)
 ; @ eg test-function-e27
-func error(copy Int error)
+func error(copy Uint32 error)
 ; @ eg test-function-e28
-func name(copy Int Error)
+func name(copy Uint32 Error)
 ; @ eg test-function-e29
 func fun(weak String s)
     s!.clear()
@@ -1852,141 +2015,141 @@ func fun()
 ; @@ test-members
 ; @ g test-members-0
 struct Test
-    var Int x
+    var Uint32 x
     weak String? str
 ; @ g test-members-1
 struct Test
-    var Int x
+    var Uint32 x
     func user name()
         self.x := 2
 ; @ g test-members-2
 struct Test
-    var Int x
+    var Uint32 x
     func user name()
-        var Int x
+        var Uint32 x
         x := self.x
 ; @ g test-members-3
 struct Test
     ; comment
-    var Int x
+    var Uint32 x
 ; @ g test-members-4
 struct Test
     ~~~ documemtation ~~~
-    var Int x
+    var Uint32 x
 ; @ g test-members-5
 struct Test
     [; multi #
     line #
     comment ;]
-    var Int x
+    var Uint32 x
 ; @ g test-members-6
 struct Test
     ~~~ multi #
     line #
     documemtation
     ~~~
-    var Int x
+    var Uint32 x
 ; @ g test-members-7
-var Int name
+var Uint32 name
 func fun()
 struct Test1
-    var Int name
+    var Uint32 name
     func user fun()
 struct Test2
-    var Int fun
+    var Uint32 fun
     func user name()
 ; @ g test-members-8
 struct Test
-    var Int x
+    var Uint32 x
     func user fun()
         if self.x > 3
             self.x := 3
         loop
             for n in 4
-                self.x += n
+                self.x := n
             while self.x < 30
 ; @ g test-members-9
 struct Test
-    var Int x
+    var Uint32 x
     func user fun() _
 func Test.fun()
     self.x := 3
 ; @ g test-members-10
-func Test.fun(user String s)->(var Int x)
+func Test.fun(user String s)->(var Uint32 x)
     s.length()->(var x)
 struct Test
-    var Int x
-    func user fun(user String s)->(var Int x) _
+    var Uint32 x
+    func user fun(user String s)->(var Uint32 x) _
 ; @ g test-members-11
 struct Test
-    var Int x
-    new(copy Int x) _
-func Test.new(copy Int x)
+    var Uint32 x
+    new(copy Uint32 x) _
+func Test.new(copy Uint32 x)
     self.x := x
 ; @ eg test-members-e0
 struct Test
-    var Int name
-    var Int name
+    var Uint32 name
+    var Uint32 name
 ; @ eg test-members-e1
 struct Test
     func user name()
-    var Int name
+    var Uint32 name
 ; @ eg test-members-e2
 struct Test
     func user name()
     func user name()
 ; @ eg test-members-e3
 struct Test
-    var Int name
+    var Uint32 name
     func user name()
 ; @ eg test-members-e4
 struct Test
-    var Int x
+    var Uint32 x
     func user meth()
         owner Test? error
         error := self
 ; @ eg test-members-e5
 struct Test
-    var Int x
+    var Uint32 x
     func user name() #
 ; @ eg test-members-e6
 struct Test
-    var Int x
+    var Uint32 x
     func user error.name()
 ; @ eg test-members-e7
 struct Test
-    var Int x
+    var Uint32 x
     func user fun()
 func Test.fun()
 ; @ eg test-members-e8
 func Test.fun()
 struct Test
-    var Int x
+    var Uint32 x
     func user fun() _
 func Test.fun()
 ; @ eg test-members-e9
 struct Test
-    var Int x
+    var Uint32 x
     func user fun()
         self..x := 3
 ; @ ec test-members-e10
 Test.num
 ; @ eg test-members-e11
 struct Test
-    var Int x
+    var Uint32 x
     func error()
 ; @ eg test-members-e12
 struct Test
-    var Int x
+    var Uint32 x
     func error?()
 ; @ eg test-members-e13
 struct Test
-    var Int x
-    func user fun()->(var Int x) _
+    var Uint32 x
+    func user fun()->(var Uint32 x) _
 func Test.fun()
 ; @ eg test-members-e14
 struct Test
-    var Int x
+    var Uint32 x
     func user ! fun() _
 func Test.fun()
 ; @@ test-return
@@ -2017,17 +2180,17 @@ raise! _
 raise
 ; @@ test-code-variables
 ; @ c test-code-variables-0
-var Int x
+var Uint32 x
 ; @ c test-code-variables-1
 user String? s
 ; @ c test-code-variables-2
-owner Array?{Int} a
+owner Array?{Uint32} a
 ; @ c test-code-variables-3
 user Test? tt
 ; @ c test-code-variables-4
 var String{12} s
 ; @ c test-code-variables-5
-var Array{12:Int} a
+var Array{12:Uint32} a
 ; @ c test-code-variables-6
 var Array{12:Test} a
 ; @ c test-code-variables-7
@@ -2038,7 +2201,7 @@ so := s!
 ; @ c test-code-variables-9
 var Array{12:Ta} a
 ; @ c test-code-variables-10
-new Array{12:Int} a!
+new Array{12:Uint32} a!
 ; @ c test-code-variables-11
 new Array{12:String{7}} sa!
 ; @ c test-code-variables-12
@@ -2053,39 +2216,39 @@ func ! fun()
 ; @ ec test-code-variables-e0
 var Int
 ; @ ec test-code-variables-e1
-var Int Error
+var Uint32 Error
 ; @ ec test-code-variables-e2
-var Int errorName
+var Uint32 errorName
 ; @ ec test-code-variables-e3
-var Int name
-var Int name
+var Uint32 name
+var Uint32 name
 ; @ ec test-code-variables-e4
-var Int name
+var Uint32 name
 loop
-    var Int x
+    var Uint32 x
     loop
-        var Int name
+        var Uint32 name
 ; @ eg test-code-variables-e5
-var Int name
+var Uint32 name
 func mock()
-    var Int name
+    var Uint32 name
 ; @ eg test-code-variables-e6
 func name()
 func mock()
-    var Int name
+    var Uint32 name
 ; @ eg test-code-variables-e7
 struct Test
-    var Int x(1)
+    var Uint32 x(1)
 ; @ ec test-code-variables-e8
 new
 ; @ ec test-code-variables-e9
-var Array{i:Int} error
+var Array{i:Uint32} error
 ; @ ec test-code-variables-e10
-var Int error--name
+var Uint32 error--name
 ; @ ec test-code-variables-e11
-var Int x #
+var Uint32 x #
 ; @ ec test-code-variables-e12
-new Array{-2:Int} a!
+new Array{-2:Uint32} a!
 ; @@ test-initialize
 ; @ c test-initialize-0
 tb := Tb(copy i)!
@@ -2093,14 +2256,14 @@ tb := Tb(copy i)!
 str := String{arr![0]}()!
 buff := Buffer{arr![0]}()!
 ; @ c test-initialize-2
-owner Array{Int} a(owner Array{arr![0]:Int}()!)
+owner Array{Uint32} a(owner Array{arr![0]:Uint32}()!)
 ; @ c test-initialize-3
 owner Array{Test} a(owner Array{arr![0]:Test}()!)
 ; @ c test-initialize-4
 owner Array{String} sa(owner Array{arr![0]:String{arr![1]!}}()!)
 owner Array{Buffer} ba(owner Array{arr![0]:Buffer{arr![1]!}}()!)
 ; @ c test-initialize-5
-var Int x(copy arr![0])
+var Uint32 x(copy arr![0])
 ; @ c test-initialize-6
 user String? s(user ostr)
 user Buffer? bf(user buff)
@@ -2127,7 +2290,7 @@ owner Array{Array{String}} sa(owner Array{arr![0]:Array{arr![1]!:String{arr![2]!
 owner Array{Array{Buffer}} ba(owner Array{arr![0]:Array{arr![1]!:Buffer{arr![2]!}}}()!)
 ; @ g test-initialize-16
 struct MyStruct
-    var Int x
+    var Uint32 x
 func get()->(owner MyStruct? a)
     owner MyStruct? b(owner get())
 ; @ c test-initialize-17
@@ -2140,22 +2303,22 @@ new Test t1!
 s-var Test t2!
 ; @ g test-initialize-20
 struct Test
-    var Int x
-    new(copy Int x)
+    var Uint32 x
+    new(copy Uint32 x)
 func fun()
     var Test t(copy 3)
 ; @ g test-initialize-21
 struct Base
-    var Int x
+    var Uint32 x
     new()
         self.x := 2
 struct Test(Base)
-    var Int y
+    var Uint32 y
     new()
         base()
         self.y := 3
 ; @ ec test-initialize-e0
-Int()
+Uint32()
 ; @ ec test-initialize-e1
 var String s
 ; @ ec test-initialize-e2
@@ -2180,32 +2343,32 @@ var Array{1
 ; @ ec test-initialize-e11
 var String{12
 ; @ ec test-initialize-e12
-var Array{error:Int} a
+var Array{error:Uint32} a
 ; @ ec test-initialize-e13
-var Array{"12":Int} a
+var Array{"12":Uint32} a
 ; @ ec test-initialize-e14
-user Int x
+user Uint32 x
 ; @ ec test-initialize-e15
-new Int x!
+new Uint32 x!
 ; @ ec test-initialize-e16
-var Array{4:Int} a(copy 1)
+var Array{4:Uint32} a(copy 1)
 ; @ ec test-initialize-e17
 var Bool x(var 1)
 ; @ ec test-initialize-e18
-var Int x(var 1, var 2)
+var Uint32 x(var 1, var 2)
 ; @ eg test-initialize-e19
 struct Test
-    var Int x
+    var Uint32 x
 func mock()
     Test(copy 1)
 ; @ ec test-initialize-e20
-var Int x(user 3)
+var Uint32 x(user 3)
 ; @ ec test-initialize-e21
 owner String? s(user so)
 ; @ ec test-initialize-e22
 owner String? s(owner str)
 ; @ ec test-initialize-e23
-var Array{1:Int:Int} a
+var Array{1:Uint32:Uint32} a
 ; @ ec test-initialize-e24
 owner Test? ot(owner tb)
 ; @ ec test-initialize-e25
@@ -2217,15 +2380,15 @@ user String s(user _)
 user String s(user str)
 ; @ ec test-initialize-e28
 i := error
-var Int error
+var Uint32 error
 ; @ ec test-initialize-e29
-var Int error(copy error)
+var Uint32 error(copy error)
 ; @ ec test-initialize-e30
 error := 3
-var Int error
+var Uint32 error
 ; @ ec test-initialize-e31
 if b
-    var Int error
+    var Uint32 error
 i := error
 ; @ ec test-initialize-e32
 new Test? a!
@@ -2244,41 +2407,44 @@ struct Test
     weak String s!
 ; @ ec test-initialize-e39
 arr := Buffer{-2}()!
+; @ ec test-initialize-e40
+var Int{10:20} x
+i := x
 ; @@ test-comment
 ; @ c test-comment-0
 ; comment
 
-var Int x
+var Uint32 x
 ; @ c test-comment-1
 ~~~ documemtation ~~~
 
-var Int x
+var Uint32 x
 ; @ c test-comment-2
 [; multi #
 line #
 comment ;]
 
-var Int x
+var Uint32 x
 ; @ c test-comment-3
 ~~~ multi #
 line #
 documemtation
 ~~~
 
-var Int x
+var Uint32 x
 ; @@ test-block
 ; @ c test-block-0
 block
     new Test tt!
-    i += 1
+    i := 1
 ; @ c test-block-1
 block
     return
 ; @ c test-block-2
 block
-    var Int n
+    var Uint32 n
 block
-    var Int n
+    var Uint32 n
 ; @ ec test-block-e0
 block i
 ; @ ec test-block-e1
@@ -2300,21 +2466,21 @@ tt.meth()
 ; @@ test-if-else
 ; @ c test-if-else-0
 if t!.num > 3
-    i -= 2
+    i := 2
 ; @ c test-if-else-1
 if i > 3
-    i -= 2
+    i := 2
 else
-    i += 1
+    i := 1
 ; @ c test-if-else-2
 if i > 3
-    i -= 3
+    i := 3
 else-if t!.num > 2
-    i -= 2
+    i := 2
 else-if t!.num > 1
-    i -= 1
+    i := 1
 else
-    i += 1
+    i := 1
 ; @ c test-if-else-3
 if b
     return
@@ -2322,7 +2488,7 @@ i := 3
 ; @ c test-if-else-4
 if b and
         b
-    i += 1
+    i := 1
 ; @ c test-if-else-5
 if b
     var String{4} sa
@@ -2375,7 +2541,7 @@ func error()
 ; @@ test-loop
 ; @ c test-loop-0
 loop
-    var Int x
+    var Uint32 x
     while b
 ; @ c test-loop-1
 loop
@@ -2422,7 +2588,7 @@ try
         while b
 ; @ c test-loop-8
 loop-infinite
-    i += 1
+    i := 1
 ; @ c test-loop-9
 loop
     loop
@@ -2456,7 +2622,7 @@ loop
     break error
 ; @ ec test-loop-e11
 loop
-    i += 1
+    i := 1
 ; @ ec test-loop-e12
 loop
     loop
@@ -2468,10 +2634,10 @@ try
 ; @@ test-for-loop
 ; @ c test-for-loop-0
 for n in 5
-    i += n
+    i := n
 ; @ c test-for-loop-1
 for n in t!.num:ostr!.length() + 2
-    i += n
+    i := wraparound n
 ; @ c test-for-loop-2
 for ch in ostr!
     c := ch
@@ -2479,25 +2645,25 @@ for y in buff!
     bt := y
 ; @ c test-for-loop-3
 for n in arr!
-    i += n
+    i := n
 ; @ c test-for-loop-4
 for s in sarr!
     s.clear()
 for bf in barr!
     bf.clear()
 ; @ c test-for-loop-5
-var Int n
+var Uint32 n
 for n in 5
-    i += n
+    i := n
 ; @ c test-for-loop-6
 for n in 5
-    i += n
+    i := n
 for n in 7
-    i += n
+    i := n
 ; @ c test-for-loop-7
 for n in 1 +
         2
-    i += n
+    i := n
 ; @ c test-for-loop-8
 for n in 6
     var String{4} sa
@@ -2527,15 +2693,18 @@ for bf in ba
     bf.clear()
 ; @ c test-for-loop-11
 for _ in 2:6
-    i += 1
+    i := 1
 ; @ c test-for-loop-12
 for _ in ostr!
-    i += 1
+    i := 1
 for _ in buff!
-    i += 1
+    i := 1
 ; @ c test-for-loop-13
+for _ in ostr!.length():2
+    i := 1
+; @ c test-for-loop-14
 repeat i - 4
-    i += 1
+    i := 1
 ; @ ec test-for-loop-e0
 for(
 ; @ ec test-for-loop-e1
@@ -2550,14 +2719,14 @@ for n in str:8
 for n in 5
     error
 ; @ ec test-for-loop-e6
-var Int n
+var Uint32 n
 for n in arr!
-    i += n
+    i := n
 for n in sarr!
 ; @ ec test-for-loop-e7
 for n in 7
-    i += 1
-var Int n
+    i := 1
+var Uint32 n
 ; @@ test-testing
 ; @ c test-testing-a0
 assert! t!.num = 2
@@ -2589,30 +2758,30 @@ mock fun()
 func fun()
     fun()
 ; @ g test-testing-m2
-mock Test.meth(copy Int x)
+mock Test.meth(copy Uint32 x)
 struct Test
-    var Int x
-    func user meth(copy Int x)
+    var Uint32 x
+    func user meth(copy Uint32 x)
         self.meth(copy x)
 ; @ g test-testing-m3
-mock Test.meth(copy Int x)
+mock Test.meth(copy Uint32 x)
 class Test
-    var Int x
-    func dynamic user meth(copy Int x)
+    var Uint32 x
+    func dynamic user meth(copy Uint32 x)
         self.meth(copy x)
 ; @ g test-testing-m4
-func fun(copy Int x)->(var Int y)
-mock fun(copy Int x)->(var Int y)
+func fun(copy Uint32 x)->(var Uint32 y)
+mock fun(copy Uint32 x)->(var Uint32 y)
     fun.mocked(copy x)->(var y)
     fun.active := false
     fun(copy x)->(var y)
     fun.active := true
 ; @ g test-testing-m5
 struct Test
-    var Int x
-    func user meth(copy Int x)->(var Int y)
+    var Uint32 x
+    func user meth(copy Uint32 x)->(var Uint32 y)
         self.meth(copy x)->(var y)
-mock Test.meth(copy Int x)->(var Int y)
+mock Test.meth(copy Uint32 x)->(var Uint32 y)
     self.meth.mocked(copy x)->(var y)
     Test.meth.mocked(user self, copy x)->(var y)
     self.meth.active := false
@@ -2620,10 +2789,10 @@ mock Test.meth(copy Int x)->(var Int y)
     Test.meth.active := true
 ; @ g test-testing-m6
 class Test
-    var Int x
-    func dynamic user meth(copy Int x)->(var Int y)
+    var Uint32 x
+    func dynamic user meth(copy Uint32 x)->(var Uint32 y)
         self.meth(copy x)->(var y)
-mock Test.meth(copy Int x)->(var Int y)
+mock Test.meth(copy Uint32 x)->(var Uint32 y)
     Test.meth.mocked(user self, copy x)->(var y)
     Test.meth.active := false
     Test.meth(user self, copy x)->(var y)
@@ -2637,23 +2806,23 @@ func ! fun()
 mock ! sys.print(user Array{Char} text)
 ; @ g test-testing-m8
 struct Test
-    var Int x
-    new(copy Int x)
-mock Test.new(copy Int x)
+    var Uint32 x
+    new(copy Uint32 x)
+mock Test.new(copy Uint32 x)
 func fun()
     var Test t(copy 2)
 ; @ tg test-testing-t0
 func fun0()
-    var Int x(copy 4)
-    x += 1
-    var Int y(copy 5)
+    var Uint32 x(copy 4)
+    x := 1
+    var Uint32 y(copy 5)
     y := x
     if y > 3
         y := 3
     else-if y < 0
         y := 0
     else
-        y += 1
+        y := 1
     try
         x := 0
         sys.print(user "text")
@@ -2670,7 +2839,7 @@ func fun0()
         if x = 5
             continue
     for n in 3
-        x += y
+        x := y
 ; @-
 module ut
 func fun1()
@@ -2679,7 +2848,7 @@ test fun2()
     fun1()
 ; @ tg test-testing-t1
 func fun()
-    var Int x
+    var Uint32 x
 main
     fun()
 ; @-
@@ -2719,26 +2888,26 @@ assert! error
 ; @ ec test-testing-e2
 assert-error! error
 ; @ eg test-testing-e3
-test fun(copy Int x)
+test fun(copy Uint32 x)
 ; @ eg test-testing-e4
-test fun()->(copy Int x)
+test fun()->(copy Uint32 x)
 ; @ eg test-testing-e5
 mock error()
 ; @ eg test-testing-e6
 mock Error.fun()
 ; @ eg test-testing-e7
 struct Test
-    var Int x
+    var Uint32 x
 mock Test.error()
 ; @ eg test-testing-e8
 mock fun(owner String s)
 func fun(user String s)
 ; @ eg test-testing-e9
-mock fun(user Int s)
+mock fun(user Uint32 s)
 func fun(user String s)
 ; @ eg test-testing-e10
 mock fun(user Array{Char} a)
-func fun(user Array{Int} a)
+func fun(user Array{Uint32} a)
 ; @ ec test-testing-e11
 assert #
 ; @ ec test-testing-e12
@@ -2751,7 +2920,7 @@ mock fun()
 mock fun()
 ; @ eg test-testing-e15
 struct Test
-    var Int x
+    var Uint32 x
     func user fun()
 mock Test.fun()
 mock Test.fun()
@@ -2760,7 +2929,7 @@ mock delete()
 mock delete()
 ; @ eg test-testing-e17
 struct Test
-    var Int x
+    var Uint32 x
 mock Test.delete()
 mock Test.delete()
 ; @ ec test-testing-e18
@@ -2775,24 +2944,24 @@ assert-error! t.num, error
 mock new()->(var Bool res)
 mock new()->(var Bool res)
 ; @ eg test-testing-e23
-mock new()->(var Int x)
+mock new()->(var Uint32 x)
 ; @ eg test-testing-e24
 mock new()
 ; @ eg test-testing-e25
-mock new(copy Int x)->(var Bool res)
+mock new(copy Uint32 x)->(var Bool res)
 ; @ eg test-testing-e26
-mock new()->(var Bool res, var Int x)
+mock new()->(var Bool res, var Uint32 x)
 ; @ eg test-testing-e27
-mock delete(copy Int x)
+mock delete(copy Uint32 x)
 ; @ eg test-testing-e28
-mock delete()->(copy Int x)
+mock delete()->(copy Uint32 x)
 ; @ eg test-testing-e29
 func fun()
 mock fun()
     fun.error
 ; @ eg test-testing-e30
 class Test
-    var Int x
+    var Uint32 x
     func dynamic user meth()
 mock Test.meth()
     self.meth.mocked()
@@ -2817,7 +2986,7 @@ assert-error! t!
 native include "native.h"
 ; @ g test-native-i1
 struct Test
-    var Int x
+    var Uint32 x
 native include "first.h"
 func fun()
 native include "second.h"
@@ -2827,18 +2996,18 @@ func call()
     external()
 ; @ g test-native-f1
 class Test
-    var Int x
+    var Uint32 x
     func dynamic user meth()
 native func external(
-        copy Int i, user String? s, user Array?{Int} a, user Test? t)->(
-        copy Int res)
+        copy Uint32 i, user String? s, user Array?{Uint32} a, user Test? t)->(
+        copy Uint32 res)
 func call()
-    var Int i
+    var Uint32 i
     user String? s
-    user Array?{Int} a
+    user Array?{Uint32} a
     user Test? t
     i := external(copy 5, user s, user a, user t)
-    i := (2 * external(copy 5, user s, user a, user t)) + 3
+    i := wraparound (2 * external(copy 5, user s, user a, user t)) + 3
     external(copy 5, user s, user a, user t)
 ; @ g test-native-f2
 native func external() "SOME_External_func"
@@ -2846,28 +3015,28 @@ func call()
     external()
 ; @ g test-native-f3
 struct Test
-    var Int x
+    var Uint32 x
 native func external()->(user Test? t)
 func call()
     user Test? t
     t := external()
     external()
 ; @ g test-native-v0
-native var Int x
+native var Uint32 x
 func use()
     x := 2
 ; @ g test-native-v1
-native var Int x "SOME_External_var"
+native var Uint32 x "SOME_External_var"
 func use()
     x := 2
 ; @ g test-native-c0
 native const Int VALUE
 native const Byte BYTE
-func get()->(var Int x)
-    x := VALUE + BYTE
+func get()->(var Uint32 x)
+    x := wraparound VALUE + BYTE
 ; @ g test-native-c1
 native const Int VALUE "SOME_External_const"
-func get()->(var Int x)
+func get()->(var Uint32 x)
     x := VALUE
 ; @ g test-native-t0
 native type Native
@@ -2882,9 +3051,9 @@ func call()
     var Native n
     n := external(copy n)
 ; @ g test-native-b0
-var Int x
+var Uint32 x
 native code "#define HAS_SOME_DEFINE"
-var Int y
+var Uint32 y
 ; @ c test-native-b1
 native "#ifdef __UNIX__"
 io := 3
@@ -2905,11 +3074,11 @@ native func error()
 ; @ eg test-native-ef1
 native func ! error()
 ; @ eg test-native-ef2
-native func error()->(copy Int a, copy Int b)
+native func error()->(copy Uint32 a, copy Uint32 b)
 ; @ eg test-native-ef3
 native func error()->(owner String? s)
 ; @ eg test-native-ef4
-native func error()->(var Int s)
+native func error()->(var Uint32 s)
 ; @ eg test-native-ef5
 native func error()->(s-var String? s)
 ; @ eg test-native-ef6
@@ -2925,24 +3094,24 @@ native func error(strong String s)
 ; @ eg test-native-ef11
 native func error(s-var String s)
 ; @ eg test-native-ef12
-native func fun()->(copy Int res)
-func error(copy Int i)
+native func fun()->(copy Uint32 res)
+func error(copy Uint32 i)
     fun()->(copy i)
 ; @ eg test-native-ef13
-native func fun()->(copy Int res) error
+native func fun()->(copy Uint32 res) error
 ; @ eg test-native-ef14
 native func error()->(user String? s)
 ; @ eg test-native-ef15
-native func error()->(user Array?{Int} a)
+native func error()->(user Array?{Uint32} a)
 ; @ eg test-native-ef16
 class Error
-    var Int x
+    var Uint32 x
     func dynamic user meth()
 native func error()->(user Error? e)
 ; @ eg test-native-ev0
 native var String s
 ; @ eg test-native-ev1
-native var Int x error
+native var Uint32 x error
 ; @ eg test-native-ec0
 native const Int VALUE error
 ; @ eg test-native-ec1
@@ -2973,11 +3142,11 @@ struct Test{Generic}
         item := self.item
 ; @ g test-parameter-type-2
 struct StructA
-    var Int x
+    var Uint32 x
 struct StructB
-    var Int x
+    var Uint32 x
 struct StructC
-    var Int x
+    var Uint32 x
 struct Test{First:Second:Third}
     weak First? first
     weak Second? second
@@ -2994,7 +3163,7 @@ func use(weak StructA first, weak StructB second, weak StructC third)
     t.set(weak first, weak second, weak third)
 ; @ g test-parameter-type-3
 struct Base
-    var Int x
+    var Uint32 x
 struct Test{Generic}(Base)
 ; @ c test-parameter-type-4
 d!.item := t
@@ -3002,7 +3171,7 @@ d!.item := t
 t := d!.item
 ; @ g test-parameter-type-6
 struct Test{Generic}
-    var Int x
+    var Uint32 x
     var Func{(user Generic item, copy Func{(user Generic item)} fun)} fun
     func user meth(copy Func{(user Generic item,
             copy Func{(user Generic item)} fun)} fun)
@@ -3045,7 +3214,7 @@ user Tb? tb2(user dt.item!)
 tb2 := dt.item!
 ; @ g test-parameter-type-19
 struct MyStruct
-    var Int x
+    var Uint32 x
     func user meth()
 struct Base{Generic}
     weak Generic? item
@@ -3062,7 +3231,7 @@ func ! fun(user Test test, weak MyStruct? f)
     test.get()!.meth()
 ; @ g test-parameter-type-20
 struct MyStruct
-    var Int x
+    var Uint32 x
     func user meth()
 class Base{Param}
     weak Param? item
@@ -3116,10 +3285,10 @@ struct Test{First:Second}
         self.first := self.second
 ; @ eg test-parameter-type-eg7
 struct Test{error}
-    var Int x
+    var Uint32 x
 ; @ eg test-parameter-type-eg11
 struct MyStruct
-    var Int x
+    var Uint32 x
 struct Test{First:Second:Third}
     weak First first
     weak Second second
@@ -3132,25 +3301,25 @@ struct Base{Param}
 struct Error(Base)
 ; @ eg test-parameter-type-eg13
 struct MyStruct
-    var Int x
+    var Uint32 x
 struct Base
-    weak Int x
+    weak Uint32 x
 struct Error(Base{MyStruct})
 ; @ eg test-parameter-type-eg14
 struct MyStruct
-    var Int x
+    var Uint32 x
 struct Base{Param}
     weak Param item
 struct Error(Base{MyStruct:MyStruct})
 ; @ eg test-parameter-type-eg15
 struct MyStruct
-    var Int x
+    var Uint32 x
 struct Base{Param0:Param1}
     weak Param0 item0
     weak Param1 item1
 struct Error(Base{MyStruct})
 ; @ ec test-parameter-type-ec0
-var Data{Int} error
+var Data{Uint32} error
 ; @ ec test-parameter-type-ec1
 var Data{Test:Test} error
 ; @ ec test-parameter-type-ec2
@@ -3166,7 +3335,7 @@ d := dg
 ; @ ec test-parameter-type-ec6
 str := d!.item!
 ; @ ec test-parameter-type-ec7
-var Data{Array{Int}} error
+var Data{Array{Uint32}} error
 ; @ ec test-parameter-type-ec8
 var Data{String} error
 ; @ ec test-parameter-type-ec8
@@ -3174,7 +3343,7 @@ var Data{Buffer} error
 ; @@ test-parameter-inheritance
 ; @ g test-parameter-inheritance-0
 struct MyStruct
-    var Int x
+    var Uint32 x
 struct Base{Generic}
     weak Generic? item
 struct Test(Base{MyStruct})
@@ -3186,7 +3355,7 @@ func use(weak MyStruct f)
     t.item := f
 ; @ g test-parameter-inheritance-1
 struct MyStruct
-    var Int x
+    var Uint32 x
 struct Base{Generic}
     weak Generic? item
 struct Test{Param}(Base{Param})
@@ -3198,7 +3367,7 @@ func use(weak MyStruct f)
     t.item := f
 ; @ g test-parameter-inheritance-2
 struct MyStruct
-    var Int x
+    var Uint32 x
 struct Base{Pbase}
     weak Pbase? item
     func user set(weak Pbase i)
@@ -3220,7 +3389,7 @@ func use(weak MyStruct f)
     t.item := f
 ; @ g test-parameter-inheritance-3
 struct MyStruct
-    var Int x
+    var Uint32 x
 struct Base{Generic}
     weak Generic? item
 struct Test{Generic}(Base{Generic})
@@ -3232,11 +3401,11 @@ func use(weak MyStruct f)
     t.item := f
 ; @ g test-parameter-inheritance-4
 struct StructA
-    var Int x
+    var Uint32 x
 struct StructB
-    var Int x
+    var Uint32 x
 struct StructC
-    var Int x
+    var Uint32 x
 struct Base{First:Second}
     weak First? first
     weak Second? second
@@ -3263,7 +3432,7 @@ func use(weak StructA first, weak StructB second, weak StructC third)
     t.third := third
 ; @ g test-parameter-inheritance-5
 struct MyStruct
-    var Int x
+    var Uint32 x
 struct First{FirstGeneric}
     weak FirstGeneric? item
 struct Second{SecondGeneric}
@@ -3281,7 +3450,7 @@ struct BaseGen{FirstGeneric}
     weak FirstGeneric? item
 struct TestGen{SecondGeneric}(BaseGen{SecondGeneric})
 struct Base
-    var Int x
+    var Uint32 x
 struct Test(Base)
 func test()
     user BaseGen?{Base} bb
@@ -3295,7 +3464,7 @@ func test()
     bb := tt
 ; @ g test-parameter-inheritance-7
 struct MyStruct
-    var Int x
+    var Uint32 x
 struct Base{Generic}
     weak Generic? first
 struct Mid{First:Second}(Base{First})
@@ -3311,7 +3480,7 @@ struct Test{Param}(Base{Param})
     weak Generic error
 ; @ eg test-parameter-inheritance-e1
 struct MyStruct
-    var Int x
+    var Uint32 x
 struct Base{Generic}
     weak Generic? item
 struct Test(Base{MyStruct})
@@ -3325,7 +3494,7 @@ struct Test{Param}(Base{Param})
         self.item := error
 ; @ eg test-parameter-inheritance-e3
 struct MyStruct
-    var Int x
+    var Uint32 x
 struct Base{Pbase}
     weak Pbase? item
 struct Mid{Pmid}(Base{Pmid})
@@ -3460,10 +3629,10 @@ try
 ; @@ test-for-each
 ; @ g test-for-each-0
 struct TestIterator
-    var Int counter
-    new(copy Int count)
-    func user step()->(var Int num, var Bool has-data)
-func ! fun()->(var Int i)
+    var Uint32 counter
+    new(copy Uint32 count)
+    func user step()->(var Uint32 num, var Bool has-data)
+func ! fun()->(var Uint32 i)
     for n in TestIterator(copy 6)!
         var String{4} s
         i := n
@@ -3479,13 +3648,13 @@ func fun(user TestIterator iter)
         s := t
 ; @ g test-for-each-2
 struct MyStruct
-    var Int x
+    var Uint32 x
 struct TestIterator{Generic}
     weak Generic? item
     func user ! step()->(user Generic? item, var Bool has-data)
         item := self.item!
 class Test
-    var Int x
+    var Uint32 x
     func dynamic user fun()
 func ! fun(user TestIterator{MyStruct} fiter, user TestIterator{Test} titer)
     user MyStruct? of
@@ -3496,7 +3665,7 @@ func ! fun(user TestIterator{MyStruct} fiter, user TestIterator{Test} titer)
         ot := t
 ; @ g test-for-each-3
 struct MyStruct
-    var Int x
+    var Uint32 x
 class TestIterator{Generic}
     weak Generic? item
     func dynamic user ! step()->(user Generic? item, var Bool has-data)
@@ -3521,54 +3690,54 @@ struct TestIterator
     func user step()->(user String? text, var Bool has-data)
         text := self.value
 func fun(user TestIterator iter)
-    var Int x
+    var Uint32 x
     for _ in iter
-        x += 1
+        x := 1
 ; @ eg test-for-each-e0
 struct TestIterator
-    var Int num
+    var Uint32 num
 func fun(user TestIterator iter)
     for n in iter
 ; @ eg test-for-each-e1
 struct TestIterator
-    var Int num
-    func user step(user Int x)->(var Int num, var Bool has-data)
+    var Uint32 num
+    func user step(user Uint32 x)->(var Uint32 num, var Bool has-data)
 func fun(user TestIterator iter)
     for n in iter
 ; @ eg test-for-each-e2
 struct TestIterator
-    var Int num
+    var Uint32 num
     func user step()
 func fun(user TestIterator iter)
     for n in iter
 ; @ eg test-for-each-e3
 struct TestIterator
-    var Int num
-    func user step()->(var Int num)
+    var Uint32 num
+    func user step()->(var Uint32 num)
 func fun(user TestIterator iter)
     for n in iter
 ; @ eg test-for-each-e4
 struct TestIterator
-    var Int num
-    func user step()->(var Int num, var Bool has-data, var Int error)
+    var Uint32 num
+    func user step()->(var Uint32 num, var Bool has-data, var Uint32 error)
 func fun(user TestIterator iter)
     for n in iter
 ; @ eg test-for-each-e5
 struct TestIterator
-    var Int num
-    func user step()->(var Int num, var Int has-data)
+    var Uint32 num
+    func user step()->(var Uint32 num, var Uint32 has-data)
 func fun(user TestIterator iter)
     for n in iter
 ; @ eg test-for-each-e6
 struct TestIterator
-    var Int num
-    func weak step()->(var Int num, var Bool has-data)
+    var Uint32 num
+    func weak step()->(var Uint32 num, var Bool has-data)
 func fun(user TestIterator iter)
     for n in iter
 ; @ eg test-for-each-e7
 struct TestIterator
-    var Int num
-    func user ! step()->(var Int num, var Bool has-data)
+    var Uint32 num
+    func user ! step()->(var Uint32 num, var Bool has-data)
 func fun(user TestIterator iter)
     for n in iter
 ; @@ test-complex-fields
@@ -3592,23 +3761,23 @@ struct Test
         if self.b is b or b2 is-not self.b
         b := t.b
 class Astruct
-    var Int x
+    var Uint32 x
     func dynamic user? meth()
 class Bstruct(Astruct)
     weak Bstruct? b
     func dynamic user? meth()
 ; @ g test-complex-fields-1
 struct Base
-    var Int x
+    var Uint32 x
 struct Test
     var String{10} s
-    var Array{11:Int} ai
+    var Array{11:Uint32} ai
     var Array{12:Base} ab
     var Array{7:String{8}} as
-    var Array{4:Array{5:Array{6:Int}}} aai
+    var Array{4:Array{5:Array{6:Uint32}}} aai
     var Array{4:Array{5:Array{6:Base}}} aab
     var Array{4:Array{5:String{6}}} aas
-    func user ! test()->(var Char c, var Int i, user Base? b)
+    func user ! test()->(var Char c, var Uint32 i, user Base? b)
         c := self.s[3]!
         i := self.ai[4]
         b := self.ab[5]
@@ -3617,13 +3786,13 @@ struct Test
         b := self.aab[1][2][3]
         c := self.aas[1][2][3]!
 ; @ eg test-complex-fields-e0
-var Int x
+var Uint32 x
 struct Test
     var String{x} error
 ; @ eg test-complex-fields-e1
-var Int x
+var Uint32 x
 struct Test
-    var Array{x:Int} error
+    var Array{x:Uint32} error
 ; @ eg test-complex-fields-e2
 struct Test
     var Test error
@@ -3641,14 +3810,14 @@ struct Bbase
 struct Berror(Bbase)
 ; @ eg test-complex-fields-e5
 struct Base
-    var Int x
+    var Uint32 x
 struct Test
     var Base b
     func user test(user Base b)
         self.b := b
 ; @ eg test-complex-fields-e6
 struct Base
-    var Int x
+    var Uint32 x
 struct Test
     var Base b
     func user ! error()
@@ -3660,27 +3829,27 @@ enum MyEnum
     ANOTHER-VALUE
     LAST-VALUE
 func dummy()
-    var Int x(copy MyEnum.VALUE)
-    x += MyEnum.ANOTHER-VALUE
-    x -= MyEnum.length
+    var Uint32 x(copy MyEnum.VALUE)
+    x := MyEnum.ANOTHER-VALUE
+    x := MyEnum.length
 ; @ g test-enum-1
 enum MyEnum
     VALUE
     ANOTHER-VALUE
     LAST-VALUE
-var Array{MyEnum.length:Int} arr
+var Array{MyEnum.length:Uint32} arr
 ; @ eg test-enum-e0
 enum MyEnum
     VALUE
 func dummy()
-    var Int x(copy MyEnum.ERROR)
+    var Uint32 x(copy MyEnum.ERROR)
 ; @ ec test-enum-e1
 i := Error.VALUE
 ; @ eg test-enum-e2
 enum MyEnum
     VALUE
 func dummy()
-    var Int x(copy MyEnum.error)
+    var Uint32 x(copy MyEnum.error)
 ; @ eg test-enum-e3
 enum My-Enum
 ; @ eg test-enum-e4
@@ -3705,20 +3874,20 @@ enum Error
 enum Error
 ; @ eg test-enum-e11
 struct Error
-    var Int x
+    var Uint32 x
 enum Error
 ; @ eg test-enum-e12
 enum Error
     VALUE
 struct Error
-    var Int x
+    var Uint32 x
 ; @@ test-constant
 ; @ g test-constant-0
 const Int NUMBER 12
 ; @ g test-constant-1
 const Int SIZE 12
-var Array{SIZE + 3:Int} arr
-func fun(user Array{Int} a)
+var Array{SIZE + 3:Uint32} arr
+func fun(user Array{Uint32} a)
     fun(user arr)
 ; @ g test-constant-2
 const Int LARGE 1 - (- (2 * SMALL))
@@ -3731,7 +3900,7 @@ const Int NUMBER MyEnum.VALUE
 const Int NUMBER (128 div 3) mod 10
 const Int D-CHAR 'a' + 3
 ; @ g test-constant-5
-var Array{Enum.VAL + Enum.length + LENGTH:Int} arr
+var Array{Enum.VAL + Enum.length + LENGTH:Uint32} arr
 const Int LENGTH 6
 enum Enum
     VAL
@@ -3748,7 +3917,7 @@ const Int ERROR
 ; @ eg test-constant-e5
 const Int NAME false
 ; @ eg test-constant-e6
-var Int x
+var Uint32 x
 const Int NAME x
 ; @ eg test-constant-e7
 const Int ERROR ERROR + 1
@@ -3761,7 +3930,7 @@ func dummy()
     NUMBER := 3
 ; @ eg test-constant-e10
 const Int NUMBER 12
-func dummy()->(var Int x)
+func dummy()->(var Uint32 x)
     dummy()->(var NUMBER)
 ; @@ test-module
 ; @ tg test-module-0
@@ -3769,7 +3938,7 @@ enum Enum
     VALUE
 const Int SIZE 12
 struct Test
-    var Int x
+    var Uint32 x
     func user meth()
 var Test t
 func ! fun()
@@ -3800,7 +3969,7 @@ test dummy()
 ; @ tg test-module-1
 func fun()
 struct Test
-    var Int x
+    var Uint32 x
     func user meth()
         fun()
         self.meth()
@@ -3811,7 +3980,7 @@ mock ut.Test.meth()
 test dummy()
 ; @ tg test-module-2
 native type Native
-native var Int x
+native var Uint32 x
 native func external()
 func fun()
     x := 0
@@ -3824,7 +3993,7 @@ test use()
 ; @ ec test-module-e0
 ut.error
 ; @ eg test-module-e1
-var Int ut
+var Uint32 ut
 ; @ eg test-module-e2
 func ut()
 ; @ eg test-module-e3
@@ -3872,7 +4041,7 @@ func ! fun(owner String? s, user Test tu, owner Test to)
     user String? su(user tu.s)
     use(user tu.s)
     take(owner to.s)
-    var Array{12:Int} arr
+    var Array{12:Uint32} arr
     arr[4] := arr[8]
     loop
         give()->(owner s)
@@ -3903,14 +4072,14 @@ func ! fun(user Test t)
     t.s := String{12}()!
 ; @ eg test-memory-owner-e1
 struct Aa
-    var Int x
+    var Uint32 x
 struct Bb
     owner Aa? a
 func fun(user Bb b)
     owner Aa? a(owner b.a)
 ; @ eg test-memory-owner-e2
 struct Aa
-    var Int x
+    var Uint32 x
 struct Bb
     owner Aa? a
 func take(owner Aa? a)
@@ -4019,16 +4188,16 @@ func fun(owner String? s)->(owner String? s2)
     fun(owner s)->(owner s)
 ; @ eg test-memory-owner-e21
 struct Test
-    var Int x
-func ! fun(owner Test? t)->(var Int x)
-    x := fun(owner t)! + t!.x
+    var Uint32 x
+func ! fun(owner Test? t)->(var Uint32 x)
+    x := wraparound fun(owner t)! + t!.x
 ; @ eg test-memory-owner-e22
 struct Test
-    var Int x
-func ! fun(owner Test? t)->(var Int x)
-    x := t!.x + fun(owner t)!
+    var Uint32 x
+func ! fun(owner Test? t)->(var Uint32 x)
+    x := wraparound t!.x + fun(owner t)!
 ; @ eg test-memory-owner-e23
-func ! fun(owner String s)->(var Int x)
+func ! fun(owner String s)->(var Uint32 x)
     for _ in fun(owner s)!:s.length()
 ; @ ec test-memory-owner-e24
 new String{12} s!
@@ -4143,7 +4312,7 @@ func fun(user String s)
     s.clear()
 ; @ eg test-memory-user-e8
 struct Test
-    var Int x
+    var Uint32 x
     func user deleting()->(owner String? s)
         s := _
     func user fun(user String s)
@@ -4179,7 +4348,7 @@ ostr := _
 c := a[2]!
 ; @ eg test-memory-user-e14
 func ! deleting()
-    var Int x(copy String{12}()!.length())
+    var Uint32 x(copy String{12}()!.length())
 func ! fun(user String s)
     deleting()!
     s.clear()
@@ -4197,10 +4366,10 @@ d!.set(owner _)
 tt.meth()
 ; @ eg test-memory-user-e17
 struct MyStruct
-    var Int x
+    var Uint32 x
     func user meth()
 struct Base{Atype}
-    var Int x
+    var Uint32 x
     func user fun(owner Atype? a)
 struct Test{Btype}(Base{Btype})
     func user fun()
@@ -4211,7 +4380,7 @@ func fun(user MyStruct f)
     f.meth()
 ; @ eg test-memory-user-e18
 struct Base
-    var Int x
+    var Uint32 x
 struct Test(Base)
 func deleting(owner Base? b)
 func fun(user Test t)
@@ -4219,7 +4388,7 @@ func fun(user Test t)
     t.x := 0
 ; @ eg test-memory-user-e19
 struct Base
-    var Int x
+    var Uint32 x
 struct Test(Base)
 struct Other(Base)
 func deleting(owner Test? t)
@@ -4229,7 +4398,7 @@ func fun(user Base b, user Other o)
     b.x := 0
 ; @ eg test-memory-user-e20
 class Base
-    var Int x
+    var Uint32 x
     func dynamic user fun()
 class Test(Base)
     func dynamic user fun()
@@ -4239,7 +4408,7 @@ func fun(user String s, user Base b)
     s.clear()
 ; @ eg test-memory-user-e21
 class Base
-    var Int x
+    var Uint32 x
     func dynamic user fun()
 class Test{Generic}(Base)
     func dynamic user fun()
@@ -4248,7 +4417,7 @@ func fun(user String s, user Base b)
     s.clear()
 ; @ eg test-memory-user-e22
 class Base
-    var Int x
+    var Uint32 x
     func dynamic user? fun(owner Base? b)
         recursive()
 class Test{Generic}(Base)
@@ -4284,7 +4453,7 @@ func fun(owner Test? t, user String s)
     s.clear()
 ; @ eg test-memory-user-e31
 struct MyStruct
-    var Int x
+    var Uint32 x
     func user meth()
 struct Base
     owner String? s
@@ -4297,7 +4466,7 @@ func fun(owner Test? t, user String s, user MyStruct f)
     s.clear()
 ; @ eg test-memory-user-e32
 struct Base
-    var Int x
+    var Uint32 x
 struct Test(Base)
     owner String? s
 func fun(owner Base? b, user String s)
@@ -4305,7 +4474,7 @@ func fun(owner Base? b, user String s)
     s.clear()
 ; @ eg test-memory-user-e33
 struct MyStruct
-    var Int x
+    var Uint32 x
     func user meth()
 struct Test{Generic}
     owner Generic? x
@@ -4314,7 +4483,7 @@ func fun(owner Test?{MyStruct} t, user MyStruct f)
     f.meth()
 ; @ eg test-memory-user-e34
 struct MyStruct
-    var Int x
+    var Uint32 x
     func user meth()
 struct Base{Generic}
     owner Generic? x
@@ -4583,6 +4752,16 @@ struct Test(Mid)
         fun2(copy fun1)
         self.b!.new()!
         base()!
+; @ g test-memory-constructor-2
+struct Test
+    var Int{1:100} a
+    var Int{-30:-1} b
+    var Int{0:100} c
+    var Int{-30:0} d
+    var Int{-10:10} e
+    new()
+        self.a := 1
+        self.b := -1
 ; @ eg test-memory-constructor-e0
 struct Error
     weak String s
@@ -4672,6 +4851,19 @@ struct Error
         if false
             self.t.new()!
         self.t.s.clear()!
+; @ eg test-memory-constructor-e13
+struct Test
+    var Int{1:100} a
+; @ eg test-memory-constructor-e14
+struct Test
+    var Int{1:100} a
+    new()
+; @ eg test-memory-constructor-e15
+struct Test
+    var Int{1:100} a
+    new!()
+        if self.a = 1
+        self.a := 1
 ; @@ test-memory-error
 ; @ ec test-memory-error-e0
 str := str
@@ -4687,6 +4879,12 @@ func error(var String s)
 func error()->(var String s)
 ; @@ test-c-objects
 ; @ c test-c-objects-0
+var Uint16 u16
+var Sint16 s16
+var Uint32 u32
+var Sint32 s32
+var Uint64 u64
+var Sint64 s64
 var cdef.Char c-char
 var cdef.Schar c-schar
 var cdef.Uchar c-uchar
@@ -4700,34 +4898,39 @@ var cdef.Size c-size
 var cdef.Float c-float
 var cdef.Double c-double
 var cdef.LongDouble c-long-double
-c-char := i
-i := c-char
-c-schar := i
-i := c-schar
-c-uchar := i
-i := c-uchar
-c-short := i
-i := c-short
-c-ushort := i
-i := c-ushort
-c-int := i
-i := c-int
-c-uint := i
-i := c-uint
-c-long := i
-i := c-long
-c-ulong := i
-i := c-ulong
-c-size := i
-i := c-size
-c-float := i
-i := c-float
-c-double := i
-i := c-double
-c-long-double := i
-i := c-long-double
-i := c-char + c-schar + c-uchar + c-short + c-ushort + c-int + c-uint + c-long +
-        c-ulong + c-size + c-float + c-double + c-long-double
+; line 20
+c-char := s16
+s32 := c-char
+c-schar := s16
+s32 := c-schar
+c-uchar := u16
+u16 := c-uchar
+c-short := s32
+s64 := c-short
+c-ushort := u32
+u32 := c-ushort
+c-int := s64
+s64 := clamp c-int
+c-uint := u64
+u64 := c-uint
+c-long := s64
+s64 := clamp c-long
+c-ulong := u64
+u64 := c-ulong
+c-size := u64
+; line 40
+u64 := c-size
+c-float := s64
+s64 := clamp c-float
+c-double := s64
+s64 := clamp c-double
+c-long-double := s64
+s64 := clamp c-long-double
+; line 48
+j := c-char clamp+ (c-schar clamp+ (c-uchar clamp+ (c-short clamp+
+        (c-ushort clamp+ (c-int clamp+ (c-uint clamp+ (c-long clamp+
+        (c-ulong clamp+ (c-size clamp+ (c-float clamp+ (c-double clamp+
+        (c-long-double clamp+ (c-char)))))))))))))
 ; @ c test-c-objects-1
 var cdef.Pointer p-void
 var cdef.Pointer{cdef.Char} p-char
@@ -4766,7 +4969,7 @@ cdef.copy-to-buffer(copy p-byte, copy 4, user buff!)!
 ; @ ec test-c-objects-e0
 var cdef.Pointer{Ta} error
 ; @ ec test-c-objects-e1
-var cdef.Pointer{Int} p-int
+var cdef.Pointer{Uint32} p-int
 i := p-int.get-ref-at(copy 5)
 ; @ ec test-c-objects-e2
 var Test tv
@@ -4781,7 +4984,7 @@ struct Test
             self.s.clear()
 ; @ g test-cleanup-function-1
 class Base
-    var Int x
+    var Uint32 x
     func dynamic user meth()
     cleanup()
         self.meth()
@@ -4790,12 +4993,12 @@ class Test(Base)
         self.meth()
 ; @ eg test-cleanup-function-e0
 struct Test
-    var Int x
+    var Uint32 x
     cleanup()
     cleanup()
 ; @ eg test-cleanup-function-e1
 struct Test
-    var Int x
+    var Uint32 x
     cleanup!()
 ; @ eg test-cleanup-function-e2
 struct Test
@@ -4804,14 +5007,14 @@ struct Test
         self.s!.clear()
 ; @ eg test-cleanup-function-e3
 struct Test
-    var Int x
-    cleanup(copy Int error)
+    var Uint32 x
+    cleanup(copy Uint32 error)
 ; @ eg test-cleanup-function-e4
 struct Test
-    var Int x
-    cleanup()->(var Int error)
+    var Uint32 x
+    cleanup()->(var Uint32 error)
 ; @ eg test-cleanup-function-e5
 struct Test
-    var Int x
+    var Uint32 x
     func temp cleanup()
 ; @

@@ -440,7 +440,7 @@ test test-block-delete()
     loop! 3
         strong Link la(strong Link()!)
         refs[n]! := la
-        n += 1
+        n clamp+= 1
         if n = 2
             continue
         if n = 3
@@ -452,7 +452,7 @@ test test-block-delete()
         loop-infinite
             strong Link la(strong Link())
             refs[n] := la
-            n += 1
+            n clamp+= 1
             if n = 3
                 raise
     has-refs(user refs, copy 3)!
@@ -466,7 +466,7 @@ test test-block-delete()
     repeat 3
         strong Link lb(strong Link()!)
         refs[n]! := lb
-        n += 1
+        n clamp+= 1
     has-refs(user refs, copy 3)!
     
     block
@@ -511,7 +511,7 @@ var Int new-fail-countdown
 mock new()->(var Bool alloc-success)
     alloc-success := true
     if new-fail-countdown > 0
-        new-fail-countdown -= 1
+        new-fail-countdown clamp-= 1
         if new-fail-countdown = 0
             alloc-success := false
 
@@ -528,6 +528,10 @@ test test-assert-error-message()
     assert-error! wrong-message-assert-error()
     var Func?{()} fun
     assert-error! fun(), "empty object used"
+    var Uint8 x(copy 100)
+    assert-error! x := clamp? x * 3, "integer overflow"
+    var Sint64 j(copy 0x7ffffffffffffff0)
+    assert-error! j := j +? 20, "integer overflow"
     strong Array?{Int} arr(strong Array{2:Int}()!)
     assert-error! arr[6], "slice index out of bounds"
     var Sint8 l(copy -2)
@@ -619,7 +623,7 @@ test test-builtin-errors()
     assert-error! full-string.append(copy 'a'), "sequence too short"
     assert-error! full-string.concat(user "a"), "sequence too short"
     assert-error! 123.str(user short-str), "sequence too short"
-    assert-error! short-str.copy(user "aaaaa"), "sequence too short"
+    assert-error! short-str.new(user "aaaaa"), "sequence too short"
     var cdef.Pointer{Char} charp
     charp.set-from-array(user "aaaaa")
     assert-error! cdef.copy-to-string(copy charp, user short-str),
@@ -632,7 +636,7 @@ test test-builtin-errors()
     assert-error! full-buffer.append(copy 111), "sequence too short"
     assert-error! full-buffer.concat(user buff), "sequence too short"
     buff.append(copy 3)!
-    assert-error! full-buffer.copy(user buff), "sequence too short"
+    assert-error! full-buffer.new(user buff), "sequence too short"
     var cdef.Pointer{Byte} bytep
     bytep.set-from-array(user buff)
     assert-error! cdef.copy-to-buffer(copy bytep, copy 2, user full-buffer),
@@ -670,7 +674,95 @@ test test-constants()
     assert! int-arr.length() = 63
 
 
-test test-bitwise()
+test test-operations()
+    ; clamp
+    var Int{-20:30} x(copy 10)
+    x := clamp x * 4
+    assert! x = 30
+    x := clamp - x
+    assert! x = -20
+    ; clamped arithmetic
+    var Uint64 i(copy 5)
+    var Sint64 j(copy 4)
+    assert! i clamp+ i = 10
+    assert! i clamp+ j = 9
+    assert! j clamp+ i = 9
+    assert! j clamp+ j = 8
+    assert! i clamp- i = 0
+    assert! i clamp- j = 1
+    assert! j clamp- i = -1
+    assert! j clamp- j = 0
+    assert! i clamp* i = 25
+    assert! i clamp* j = 20
+    assert! j clamp* i = 20
+    assert! j clamp* j = 16
+    var Uint64 max(copy 0xffffffffffffffff)
+    var Sint64 sax(copy 0x7fffffffffffffff)
+    var Sint64 min(copy -0x7fffffffffffffff)
+    var Int{100:0xf000000000000000} u64h(copy 0xa000000000000000)
+    var Int{100:0xf000000000000000} u64l(copy 1000)
+    var Int{-10000000000:10000000000} s64h(copy 1000)
+    var Int{-10000000000:10000000000} s64l(copy -1000)
+    assert! u64h clamp+ max = 0xf000000000000000
+    assert! u64h clamp+ sax = 0xf000000000000000
+    assert! u64l clamp+ min = 100
+    assert! s64h clamp+ max = 10000000000
+    assert! s64l clamp+ max = 10000000000
+    assert! s64h clamp+ sax = 10000000000
+    assert! s64l clamp+ min = -10000000000
+    assert! u64l clamp- max = 100
+    assert! u64h clamp- min = 0xf000000000000000
+    assert! u64l clamp- max = 100
+    assert! s64h clamp- max = -10000000000
+    assert! s64l clamp- max = -10000000000
+    assert! s64h clamp- min = 10000000000
+    assert! s64l clamp- sax = -10000000000
+    assert! u64h clamp* max = 0xf000000000000000
+    assert! u64h clamp* sax = 0xf000000000000000
+    assert! u64l clamp* min = 100
+    assert! s64h clamp* max = 10000000000
+    assert! s64l clamp* max = -10000000000
+    assert! s64h clamp* sax = 10000000000
+    assert! s64h clamp* min = -10000000000
+    assert! s64l clamp* sax = -10000000000
+    assert! s64l clamp* min = 10000000000
+    s64l clamp+= max
+    u64l clamp-= sax
+    u64h clamp*= min
+    assert! s64l = 10000000000
+    assert! u64l = 100
+    assert! u64h = 100
+    ; wraparound arithmetic
+    assert! i wraparound+ i = 10
+    assert! i wraparound+ j = 9
+    assert! i wraparound- i = 0
+    assert! i wraparound- j = 1
+    assert! i wraparound* i = 25
+    assert! i wraparound* j = 20
+    var Uint8 u8(copy 0xf0)
+    var Uint16 u16(copy 0xfff0)
+    var Uint32 u32(copy 0xfffffff0)
+    var Uint64 u64(copy 0xfffffffffffffff0)
+    assert! u8 wraparound+ 20 = 4
+    assert! u16 wraparound+ 20 = 4
+    assert! u32 wraparound+ 20 = 4
+    assert! u64 wraparound+ 20 = 4
+    u8 wraparound+= 20
+    u16 wraparound+= 20
+    u32 wraparound+= 20
+    u64 wraparound+= 20
+    assert! u8 = 4
+    assert! u16 = 4
+    assert! u32 = 4
+    assert! u64 = 4
+    ; C problems fix
+    var Uint32 l(copy 3000000000)
+    assert! l + l = 6000000000
+    s64l := -1000
+    s64h := 1000
+    u64l := 1000
+    assert! s64l < s64h clamp* u64l
+    ; binary
     var Uint8 c(copy 0xF0)
     assert! c band 0x31 = 0x30
     assert! c bor 0x0F = 0xFF
@@ -679,3 +771,12 @@ test test-bitwise()
     assert! c xor 0xA0 = 0x50
     assert! bnot c = 0x0F
 
+
+test test-builtins()
+    var Uint64 max(copy 0xffffffffffffffff)
+    var Sint64 min(copy -0x7fffffffffffffff)
+    var String{32} str
+    max.str(user str)!
+    assert! str.equal(user "18446744073709551615")
+    min.str(user str)!
+    assert! str.equal(user "-9223372036854775807")

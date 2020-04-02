@@ -14,7 +14,7 @@ class WrapExpression(Expression)
         self.error-expected := self.expression.error-expected
         self.is-generic-cast := self.expression.is-generic-cast
         self.error-propagated := self.expression.error-propagated
-        self.expression.result-type.copy-new()->(owner self.result-type)
+        self.set-type-from(user self.expression)
 
     func dynamic analyze()
         self.expression.analyze()

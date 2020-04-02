@@ -183,6 +183,12 @@ class FunctionCallExpression(CallExpression)
     
     func dynamic write-function()
         self.function.write()
+        if self.function.function.parent-type is glob.type-int
+            user Argument first(user self.arguments.parameters.first.item)
+            if first.get-output().result-type.int-range.min-value.sign() < 0
+                write-c(copy 'S')
+            else
+                write-c(copy 'U')
 
 
 class DynamicCallExpression(FunctionCallExpression)
@@ -250,7 +256,6 @@ class FunctionObjectCallExpression(CallExpression)
     
     func dynamic restructure()->(
             owner Expression expression, owner FunctionArguments arguments)
-        self.arguments.analyze()
         self.function-object.restructure()->(
                 owner self.function-object, owner self.arguments)
         if not self.arguments?
@@ -293,6 +298,7 @@ class CallArgument(Argument)
     user SyntaxTreeCode code-node
     var Bool is-down-cast
     var Bool is-generic
+    var Bool is-analyzed
     
     func dynamic parse-value(
             user SyntaxTreeNode node,
@@ -305,6 +311,9 @@ class CallArgument(Argument)
             self.syntax-error-c(user "expected \",\" or \")\", got")
     
     func dynamic analyze()
+        if self.is-analyzed
+            return
+        self.is-analyzed := true
         analyze-expression()->(owner self.value)
         if self.is-output and not self.value.assignable
             self.syntax-error-msg(user "non assignable call output")
@@ -320,23 +329,25 @@ class CallArgument(Argument)
             user TypeInstance actual-params,
             copy Int bases,
             copy Bool print-error)
+        user TypeInstance type-instance
+        other.get-type-instance()->(user type-instance)
+        type-instance.new-replace-params(user actual-params)->(
+                owner self.real-type)
+        if not self.is-output
+            self.real-type.set-expected-type()->(owner self.value.result-type)
+        self.analyze()
         if access-is-owner(copy self.access) and
                 not access-is-owner(copy self.value.access)
             self.syntax-error(
                     user "assigning into an owner a non-owner access",
                     user glob.access-names[self.value.access])
-        if self.is-output and self.access != self.value.access
-            self.syntax-error2(
-                    user "assigning into access",
-                    user glob.access-names[self.access],
-                    user "invalid access",
-                    user glob.access-names[self.value.access])
-        
-        user TypeInstance type-instance
-        other.get-type-instance()->(user type-instance)
-        type-instance.new-replace-params(user actual-params)->(
-                owner self.real-type)
         if self.is-output
+            if self.access != self.value.access
+                self.syntax-error2(
+                        user "assigning into access",
+                        user glob.access-names[self.access],
+                        user "invalid access",
+                        user glob.access-names[self.value.access])
             self.is-down-cast := self.real-type.check-assign-to(
                     copy self.access,
                     user self.value.result-type,

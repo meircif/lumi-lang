@@ -7,6 +7,30 @@
 #include <string.h>
 #include <stdint.h>
 
+#ifndef UINT8_MAX
+#define UINT8_MAX 0xff
+#endif
+#ifndef INT8_MAX
+#define INT8_MAX 0x7f
+#endif
+#ifndef UINT16_MAX
+#define UINT16_MAX 0xffff
+#endif
+#ifndef INT16_MAX
+#define INT16_MAX 0x7fff
+#endif
+#ifndef UINT32_MAX
+#define UINT32_MAX 0xffffffff
+#endif
+#ifndef INT32_MAX
+#define INT32_MAX 0x7fffffff
+#endif
+#ifndef UINT64_MAX
+#define UINT64_MAX 0xffffffffffffffff
+#endif
+#ifndef INT64_MAX
+#define INT64_MAX 0x7fffffffffffffff
+#endif
 
 /* builtin type defines */
 
@@ -96,6 +120,7 @@ typedef struct Error_Messages {
   Error_Message outdated_weak_reference;
   Error_Message object_memory;
   Error_Message managed_object_memory;
+  Error_Message integer_overflow;
   Error_Message slice_index;
   Error_Message sequence_too_short;
   Error_Message file_not_opened;
@@ -301,6 +326,7 @@ Error_Messages LUMI_error_messages = {
   ERROR_MESAGE("outdated weak reference used"),
   ERROR_MESAGE("insufficient memory for object dynamic allocation"),
   ERROR_MESAGE("insufficient memory for managed object"),
+  ERROR_MESAGE("integer overflow"),
   ERROR_MESAGE("slice index out of bounds"),
   ERROR_MESAGE("sequence too short"),
   ERROR_MESAGE("file not opened"),
@@ -627,44 +653,98 @@ void LUMI_owner_dec_ref(Ref_Manager* ref) {
 
 #define LUMI_FUNC_NAME "Int.str"
 Return_Code Int_str(
-    int64_t value, char* str, Seq_Length str_max_length, Seq_Length* str_length) {
-  Bool is_neg;
-  uint64_t abs;
-  uint64_t swap;
-  char* next;
-  char* last;
-  is_neg = value < 0;
-  abs = value;
+    uint64_t abs, Bool is_neg,
+    char* str, Seq_Length str_max_length, Seq_Length* str_length) {
+  uint64_t tmp;
+  char* low;
+  char* high;
+  *str_length = 0;
+  high = str;
   if (is_neg) {
-    abs = -value;
+    *high = '-';
+    ++high;
+    ++(*str_length);
   }
-  swap = 0;
-  *str_length = is_neg;
+  low = high;
+  tmp = abs;
   do {
-    swap *= 10;
-    swap += abs % 10;
-    abs /= 10;
+    *high = '0' + tmp % 10;
+    ++high;
+    tmp /= 10;
     if (str_max_length <= *str_length + 1) {
       *str_length = 0;
+      str[0] = '\0';
       CRAISE(LUMI_error_messages.sequence_too_short.str)
     }
-    ++*str_length;
-  } while (abs > 0);
-  next = str;
-  if (is_neg) {
-    *next = '-';
-    ++next;
+    ++(*str_length);
+  } while (tmp > 0);
+  *high = '\0';
+  for (--high; low < high; ++low, --high) {
+    char swap;
+    swap = *low;
+    *low = *high;
+    *high = swap;
   }
-  last = str + *str_length;
-  while (next < last) {
-    *next = '0' + swap % 10;
-    ++next;
-    swap /= 10;
-  }
-  *last = '\0';
   return OK;
 }
 #undef LUMI_FUNC_NAME
+
+#define Int_strU(value, str, str_max_length, str_length) \
+  Int_str(value, false, str, str_max_length, str_length)
+#define Int_strS(value, str, str_max_length, str_length) \
+  Int_str(value < 0? -value: value, value < 0, str, str_max_length, str_length)
+
+#define CHECK_MIN_ADD(a, b) ((a < 0) && (b < 0) && (-a > INT64_MAX + b))
+#define CHECK_MAX_ADD(a, b, limit) ((a > 0) && (b > 0) && (a > limit - b))
+
+#define CHECK_MIN_SUB(a, b) \
+  ((b > 0) && ((int64_t)a < (int64_t)(-INT64_MAX + b)))
+#define CHECK_MAX_SUB(a, b, limit) ((a > 0) && (b < 0) && (a > limit + b))
+
+#define CHECK_MIN_MUL(a, b) \
+  ((a < 0) && (b > INT64_MAX / (-a))) || ((b < 0) && (a > INT64_MAX / (-b)))
+#define CHECK_MAX_MUL(a, b, limit) \
+  ((a > 0) && (b > limit / a)) || ((b < 0) && (-a > limit / (-b)))
+  
+#define CLAMPED_ADD_UU_LIMIT(a, b, max, LIMIT) \
+  ((a > LIMIT - b) || (a + b > max))? max: (a + b)
+#define CLAMPED_ADD_UU(a, b, min, max) \
+  CLAMPED_ADD_UU_LIMIT(a, b, max, UINT64_MAX)
+#define CLAMPED_ADD_US(a, b, min, max) (b > 0)? \
+  (CLAMPED_ADD_UU(a, b, min, max)): (((-b > a) || (a + b < min))? min: (a + b))
+#define CLAMPED_ADD_SU(a, b, min, max) \
+  (a > 0)? (CLAMPED_ADD_UU(a, b, min, max)): ((a + b > max)? max: (a + b))
+#define CLAMPED_ADD_SS(a, b, min, max) (b > 0)? \
+  (CLAMPED_ADD_UU_LIMIT(a, b, max, INT64_MAX)): \
+  (((a < INT64_MIN - b) || (a + b < min))? min: (a + b))
+
+#define CLAMPED_SUB_SN_LIMIT(a, b, max, LIMIT) \
+  (((a > LIMIT + b) || (a - b > max))? max: (a - b))
+#define CLAMPED_SUB_UU(a, b, min, max) ((a < b) || (a - b < min))? min: (a - b)
+#define CLAMPED_SUB_US(a, b, min, max) (b > 0)? \
+  (CLAMPED_SUB_UU(a, b, min, max)): CLAMPED_SUB_SN_LIMIT(a, b, max, UINT64_MAX)
+#define CLAMPED_SUB_SU(a, b, min, max) \
+  ((a < (int64_t)(INT64_MIN + b)) || (a - b < min))? min: (a - b)
+#define CLAMPED_SUB_SS(a, b, min, max) (b > 0)? \
+  (CLAMPED_SUB_SU(a, b, min, max)): CLAMPED_SUB_SN_LIMIT(a, b, max, INT64_MAX)
+
+#define CLAMPED_MUL_UP_LIMIT(a, b, max, CMP_LIMIT) \
+  (((a CMP_LIMIT / b) || (a * b > max))? max: (a * b))
+#define CLAMPED_MUL_UP(a, b, max) CLAMPED_MUL_UP_LIMIT(a, b, max, > UINT64_MAX)
+#define CLAMPED_MUL_UN(a, b, min, cmp) \
+  (((a cmp INT64_MIN / b) || (a * b < min))? min: (a * b))
+#define CLAMPED_MUL_UU(a, b, min, max) (a == 0 || b == 0)? min: \
+  CLAMPED_MUL_UP(a, b, max)
+#define CLAMPED_MUL_US(a, b, min, max) (a == 0 || b == 0)? min: \
+  ((b > 0)? CLAMPED_MUL_UP(a, b, max): CLAMPED_MUL_UN(a, b, min, >=))
+#define CLAMPED_MUL_SU(a, b, min, max) (a == 0 || b == 0)? (max < 0? max: 0): \
+  (a > 0)? CLAMPED_MUL_UP(a, b, max): CLAMPED_MUL_UN(a, b, min, >=)
+#define CLAMPED_MUL_SS(a, b, min, max) (a == 0 || b == 0)? (max < 0? max: 0): \
+  ((a > 0)? \
+    ((b > 0)? CLAMPED_MUL_UP_LIMIT(a, b, max, > INT64_MAX): \
+      CLAMPED_MUL_UN(a, b, min, >=)): \
+    ((b > 0)? CLAMPED_MUL_UN(a, b, min, <=): \
+      CLAMPED_MUL_UP_LIMIT(a, b, max, < INT64_MAX)))
 
 
 /* Array */
@@ -680,8 +760,8 @@ Return_Code Int_str(
 #define Buffer_max_length(self, max_length, length, max_length_out) \
   *(max_length_out) = max_length
 
-#define LUMI_FUNC_NAME "Buffer.copy"
-Return_Code Buffer_copy(
+#define LUMI_FUNC_NAME "Buffer.new"
+Return_Code Buffer_new(
     void* self, Seq_Length max_length, Seq_Length* length, void* source, Seq_Length source_length) {
   if (self == source) {
     return OK;
@@ -701,7 +781,7 @@ Return_Code cdef_M_copy_to_buffer(
     *length = 0;
     return OK;
   }
-  CCHECK(Buffer_copy(self, max_length, length, source, source_length))
+  CCHECK(Buffer_new(self, max_length, length, source, source_length))
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -809,10 +889,10 @@ void Buffer_has(
 #define String_clear(self, max_length, length) \
   Buffer_clear(self, max_length, length)
 
-#define LUMI_FUNC_NAME "String.copy"
-Return_Code String_copy(
+#define LUMI_FUNC_NAME "String.new"
+Return_Code String_new(
     char* self, Seq_Length max_length, Seq_Length* length, char* source, Seq_Length source_length) {
-  CCHECK(Buffer_copy(self, max_length - 1, length, source, source_length))
+  CCHECK(Buffer_new(self, max_length - 1, length, source, source_length))
   self[source_length] = '\0';
   return OK;
 }
@@ -890,7 +970,7 @@ Return_Code String_concat(
 Return_Code String_concat_int(
     char* self, Seq_Length max_length, Seq_Length* length, int64_t num) {
   Seq_Length added_length = 0;
-  CCHECK(Int_str(num, self + *length, max_length - *length, &added_length))
+  CCHECK(Int_strS(num, self + *length, max_length - *length, &added_length))
   *length += added_length;
   return OK;
 }
@@ -995,7 +1075,7 @@ Return_Code File_new(File* self, char* name, char* mode) {
     CRAISE(LUMI_error_messages.file_not_opened.str)
 
 #define LUMI_FUNC_NAME "File.tell"
-Return_Code File_tell(File* self, uint64_t* offset) {
+Return_Code File_tell(File* self, int64_t* offset) {
   long ret = -1;
   CHECK_OPEN(self)
   if (lumi_debug_value != LUMI_DEBUG_FAIL) {
@@ -1014,7 +1094,7 @@ Return_Code File_tell(File* self, uint64_t* offset) {
 #define FileReadWriteBinary_tell(self, offset) File_tell(self, offset)
 
 #define LUMI_FUNC_NAME "File.seek"
-Return_Code File_seek(File* self, uint64_t offset, int whence) {
+Return_Code File_seek(File* self, int64_t offset, int whence) {
   int ret = -1;
   CHECK_OPEN(self)
   if (lumi_debug_value != LUMI_DEBUG_FAIL) {

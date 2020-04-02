@@ -17,7 +17,8 @@ General Syntax Highlights
 
 * strict naming conventions:
 
-   - everything is ``lowercase-only-with-hyphens`` (a.k.a "kebab-case")
+   - the default for everything is ``lowercase-only-with-hyphens``
+     (a.k.a "kebab-case")
    - types are ``FirstLetterUppercase`` (a.k.a "CamelCase)
    - compile time constants are ``UPPERCASE-ONLY-WITH-HYPHENS`` (a.k.a
      "FAT-KEBAB-CASE")
