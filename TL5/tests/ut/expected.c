@@ -1793,6 +1793,30 @@ uint8_t u8 = 0;
     u64 = aux_Int_3;
     ut_M_fun5(0x04, &(aux_Int_4));
     s64 = aux_Int_4;
+/// @ test-call-expression-28
+Return_Code ut_M_get(char** res, Seq_Length* res_Max_length, Seq_Length** res_Length, Ref_Manager** res_Refman);
+Return_Code ut_M_get(char** res, Seq_Length* res_Max_length, Seq_Length** res_Length, Ref_Manager** res_Refman) {
+    Return_Code LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    char* s = NULL;
+    Seq_Length s_Max_length = 0;
+    Seq_Length* s_Length = &Lumi_empty_length;
+    Ref_Manager* s_Refman = NULL;
+    LUMI_err = ut_M_get(&(s), &(s_Max_length), &(s_Length), &(s_Refman));
+    CHECK(3, LUMI_block0_cleanup)
+    CHECK_REFMAN(4, LUMI_block0_cleanup, s_Refman)
+    String_clear(s, s_Max_length, s_Length);
+    LUMI_inc_ref(s_Refman);
+    LUMI_dec_ref(*res_Refman);
+    *res_Refman = s_Refman;
+    *res_Max_length = s_Max_length;
+    *res_Length = s_Length;
+    *res = s;
+LUMI_block0_cleanup:
+    (void)0;
+    LUMI_dec_ref(s_Refman);
+    return LUMI_err;
+}
 /// @ test-call-expression-e0
 expected access, got " "
 /// @ test-call-expression-e1
@@ -1841,6 +1865,8 @@ ignoring error result check on function call
 error raised inside function not declared as error raising "fun"
 /// @ test-call-expression-e23
 assigning conditional into non-conditional type "String"
+/// @ test-call-expression-e24
+using invalid reference "s"
 /// @@ test-type-expression
 /// @ test-type-expression-0
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_t_Refman)
@@ -7395,11 +7421,20 @@ LUMI_block0_cleanup:
     (void)0;
 }
 /// @ test-native-t0
+void ut_M_get(Native* n);
 void ut_M_call(void);
+void ut_M_get(Native* n) {
+    unsigned LUMI_loop_depth = 1;
+    *n = get_native();
+LUMI_block0_cleanup:
+    (void)0;
+}
 void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
-    Native n = 0;
-    n = external(n);
+    Native n;
+    set_native(native_var);
+    ut_M_get(&(n));
+    set_native(n);
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -7407,8 +7442,9 @@ LUMI_block0_cleanup:
 void ut_M_call(void);
 void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
-    SOME_External_type n = 0;
-    n = SOME_External_func(n);
+    SOME_External_type n;
+    n = SOME_External_get_func();
+    SOME_External_set_func(n);
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -7476,6 +7512,8 @@ Only numeric typed native constant supported, got "Bool"
 sequence length is not constant
 /// @ test-native-et0
 no '"' around string constant "error"
+/// @ test-native-et1
+using invalid reference "n"
 /// @ test-native-eb0
 no '"' around string constant "#define error"
 /// @ test-native-eb1
@@ -10154,7 +10192,7 @@ LUMI_block0_cleanup:
 Return_Code second_M_use(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Native n = 0;
+    Native n;
     x = 0x02;
     external();
 LUMI_block0_cleanup:

@@ -524,6 +524,12 @@ fun5(copy 50)->(var u32)
 s32 := clamp fun5(copy 2)
 fun5(copy 3)->(var u64)
 fun5(copy 4)->(var s64)
+; @ g test-call-expression-28
+func ! get()->(weak String res)
+    weak String s
+    get()->(weak s)!
+    s!.clear()
+    res := s
 ; @ ec test-call-expression-e0
 function( copy 1)
 ; @ ec test-call-expression-e1
@@ -582,6 +588,11 @@ func fun()
 ; @ ec test-call-expression-e23
 strong String s
 fun3(copy 0)->(strong s)
+; @ eg test-call-expression-e24
+func fun(weak String in)->(weak String out)
+    weak String s
+    s := fun(weak s)
+    out := s
 ; @@ test-type-expression
 ; @ c test-type-expression-0
 Test.meth(user t!)
@@ -3040,16 +3051,24 @@ func get()->(var Uint32 x)
     x := VALUE
 ; @ g test-native-t0
 native type Native
-native func external(copy Native n)->(copy Native no)
+native var Native native-var
+native func get-native()->(copy Native n)
+native func set-native(copy Native n)
+func get()->(var Native n)
+    n := get-native()
 func call()
     var Native n
-    n := external(copy n)
+    set-native(copy native-var)
+    get()->(var n)
+    set-native(copy n)
 ; @ g test-native-t1
 native type Native "SOME_External_type"
-native func external(copy Native n)->(copy Native no) "SOME_External_func"
+native func get-native()->(copy Native no) "SOME_External_get_func"
+native func set-native(copy Native n) "SOME_External_set_func"
 func call()
     var Native n
-    n := external(copy n)
+    n := get-native()
+    set-native(copy n)
 ; @ g test-native-b0
 var Uint32 x
 native code "#define HAS_SOME_DEFINE"
@@ -3121,6 +3140,12 @@ native const Int VALUE
 var String{VALUE} error
 ; @ eg test-native-et0
 native type Native error
+; @ eg test-native-et1
+native type Native
+native func external(copy Native in)->(copy Native out)
+func error()
+    var Native n
+    n := external(copy n)
 ; @ eg test-native-eb0
 native code #define error
 ; @ ec test-native-eb1

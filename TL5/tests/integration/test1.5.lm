@@ -128,24 +128,33 @@ native include "external.h"
 native var cdef.Int external-int
 native const Uint8 EXTERNAL-CONST
 native type Native
+native type NativeRef
+native var Native external-nvar
 native func external0() "MY_Some_external"
-native func external1(copy cdef.Int i, user String s, user Array{cdef.Int} a)->(
-        copy Native n)
-native func external2(copy Native n)->(copy cdef.Int i)
+native func external-get-ref(
+        copy cdef.Int i, user String s, user Array{cdef.Int} a)->(
+        copy NativeRef n)
+native func external-set-ref(copy NativeRef n)->(copy cdef.Int i)
+native func external-get-var()->(copy Native n)
+native func external-set-var(copy Native n)->(copy cdef.Int i)
 native code "#define MY_DEF_VALUE 12"
 
 test test-native()
     assert! external-int = 6
     assert! EXTERNAL-CONST = 12
+    var NativeRef nr
     var Native n
     var String{4} s(user "bb")!
     var Array{6:cdef.Int} a
     external0()
     assert! external-int = 7
-    n := external1(copy 3, user s, user a)
+    nr := external-get-ref(copy 3, user s, user a)
     assert! s[0]! = 'a'
     assert! a[0] = 3
-    assert! external2(copy n) = 7
+    assert! external-set-ref(copy nr) = 7
+    n := external-get-var()
+    assert! external-set-var(copy n) = 7
+    assert! external-set-var(copy external-nvar) = 7
     var Int x
     native "x = MY_DEF_VALUE;"
     assert! x = 12

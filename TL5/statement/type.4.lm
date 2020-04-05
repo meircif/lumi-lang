@@ -13,6 +13,7 @@ class TypeData(SyntaxTreeNamespace)
     var Bool is-primitive
     var Bool is-dynamic
     var Bool is-int-like
+    var Bool is-native
     var Bool is-ordered
     var Bool is-delete-mocked
     var Bool ordering

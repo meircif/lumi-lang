@@ -139,6 +139,7 @@ class NativeType(TypeData)
     new()
         self.set-location()
         self.is-primitive := true
+        self.is-native := true
     
     func inst parse-new()->(owner NativeType new-node)
         new-node := NativeType()
