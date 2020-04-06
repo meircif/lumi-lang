@@ -5,85 +5,99 @@ native include "zlib.h"
 
 native type Stream "z_stream"
 
-native const Int ZLIB_VERSION
+native const cdef.Int ZLIB-VERSION
 
-native const Int Z_NO_FLUSH      
-native const Int Z_PARTIAL_FLUSH  
-native const Int Z_SYNC_FLUSH   
-native const Int Z_FULL_FLUSH   
-native const Int Z_FINISH        
+native const cdef.Int Z-NO-FLUSH
+native const cdef.Int Z-PARTIAL-FLUSH
+native const cdef.Int Z-SYNC-FLUSH
+native const cdef.Int Z-FULL-FLUSH
+native const cdef.Int Z-FINISH
 
-native const Int Z_OK            
-native const Int Z_STREAM_END   
-native const Int Z_NEED_DICT   
-native const Int Z_ERRNO      
-native const Int Z_STREAM_ERROR 
-native const Int Z_DATA_ERROR  
-native const Int Z_MEM_ERROR   
-native const Int Z_BUF_ERROR    
-native const Int Z_VERSION_ERROR 
+native const cdef.Int Z-OK
+native const cdef.Int Z-STREAM-END
+native const cdef.Int Z-NEED-DICT
+native const cdef.Int Z-ERRNO
+native const cdef.Int Z-STREAM-ERROR
+native const cdef.Int Z-DATA-ERROR
+native const cdef.Int Z-MEM-ERROR
+native const cdef.Int Z-BUF-ERROR
+native const cdef.Int Z-VERSION-ERROR
 
-native const Int Z_NO_COMPRESSION    
-native const Int Z_BEST_SPEED         
-native const Int Z_BEST_COMPRESSION    
-native const Int Z_DEFAULT_COMPRESSION  
+native const cdef.Int Z-NO-COMPRESSION
+native const cdef.Int Z-BEST-SPEED
+native const cdef.Int Z-BEST-COMPRESSION
+native const cdef.Int Z-DEFAULT-COMPRESSION
 
-native const Int Z_FILTERED            
-native const Int Z_HUFFMAN_ONLY        
-native const Int Z_DEFAULT_STRATEGY    
+native const cdef.Int Z-FILTERED
+native const cdef.Int Z-HUFFMAN-ONLY
+native const cdef.Int Z-DEFAULT-STRATEGY
 
-native const Int Z_BINARY   
-native const Int Z_ASCII    
-native const Int Z_UNKNOWN  
+native const cdef.Int Z-BINARY
+native const cdef.Int Z-ASCII
+native const cdef.Int Z-UNKNOWN
 
-native const Int Z_DEFLATED   
+native const cdef.Int Z-DEFLATED
 
-native const Int Z_NULL    
-;define zlib_version zlibVersion()
-
-
-native func zlibVersion()->(copy cdef.Pointer{cdef.char}) "zlibVersion"
-
-native func deflate(copy cdef.Pointer{z_stream} strm, copy Int flush)->(var Int res) "deflate"
-
-native func deflateEnd(copy cdef.Pointer{z_stream} strm)->(var Int res) "deflateEnd"
-
-native func inflate(copy cdef.Pointer{z_stream} strm, copy Int flush)->(var Int res) "inflate"
-
-native func inflateEnd(copy cdef.Pointer{z_stream} strm)->(var Int res) "inflateEnd"
-
-native func deflateSetDictionary(
-        copy cdef.Pointer{z_stream} strm,
-        copy cdef.Pointer{Bytef} dictionary,
-        copy cdef.uInt dictLength)->(var Int res) "deflateSetDictionary"
-
-native func deflateCopy(copy cdef.Pointer{z_stream} dest,
-        copy cdef.Pointer{z_stream} source)->(var Int res) "deflateCopy"
-
-native func deflateReset(copy cdef.Pointer{z_stream} strm)->(var Int res) "deflateReset"
-
-native func deflateParams(copy cdef.Pointer{z_stream} strm,
-        copy Int level,
-        copy Int strategy)->(var Int res) "deflateParams"
-
-native func inflateSetDictionary(copy cdef.Pointer{z_stream} strm,
-        copy cdef.Pointer{Bytef} dictionary,
-        copy cdef.uInt dictLength)->(var Int res) "inflateSetDictionary" 
-
-native func inflateSync(copy cdef.Pointer{z_stream} strm)->(var Int res) "inflateSync"
-
-native func inflateReset(copy cdef.Pointer{z_stream} strm)->(var Int res) "inflateReset"
-
-native func compress(copy cdef.Pointer{Bytef} dest, copy cdef.Pointer{uLongf} destLen,
-        copy cdef.Pointer{const Bytef} source, 
-        copy cdef.uLong sourceLen)->(var Int res) "compress"
-
-native func compress2(copy cdef.Pointer{Bytef} dest, copy cdef.Pointer{uLongf} destLen,
-        copy cdef.Pointer{const Bytef} source, copy cdef.uLong sourceLen,
-        copy Int level)->(var Int res) "compress2"
-
-native func uncompress(copy cdef.Pointer{Bytef} dest, copy cdef.Pointer{uLongf} destLen,
-        copy cdef.Pointer{const Bytef} source, 
-        copy cdef.uLong sourceLen)->(var Int res) "uncompress"
+native const cdef.Int Z-NULL
 
 
+native func cdef.Pointer{cdef.Char} zlib-version() "zlibVersion"
+
+func ! version(user String str)
+    cdef.copy-to-string(copy zlib-version(), user str)!
+
+native func cdef.Int deflate(
+        copy cdef.Pointer{Stream} strm, copy cdef.Int flush)
+
+native func cdef.Int deflate-end(copy cdef.Pointer{Stream} strm) "deflateEnd"
+
+native func cdef.Int inflate(
+        copy cdef.Pointer{Stream} strm, copy cdef.Int flush)
+
+native func cdef.Int inflate-end(copy cdef.Pointer{Stream} strm) "inflateEnd"
+
+native func cdef.Int deflate-set-dictionary(
+        copy cdef.Pointer{Stream} strm,
+        copy cdef.Pointer{cdef.Uchar} dictionary,
+        copy cdef.Uint dict-length) "deflateSetDictionary"
+
+native func cdef.Int deflate-copy(
+        copy cdef.Pointer{Stream} dest,
+        copy cdef.Pointer{Stream} source) "deflateCopy"
+
+native func cdef.Int deflate-reset(
+        copy cdef.Pointer{Stream} strm) "deflateReset"
+
+native func cdef.Int deflate-params(
+        copy cdef.Pointer{Stream} strm,
+        copy cdef.Int level,
+        copy cdef.Int strategy) "deflateParams"
+
+native func cdef.Int inflate-set-dictionary(
+        copy cdef.Pointer{Stream} strm,
+        copy cdef.Pointer{cdef.Uchar} dictionary,
+        copy cdef.Int dict-length) "inflateSetDictionary"
+
+native func cdef.Int inflate-sync(copy cdef.Pointer{Stream} strm) "inflateSync"
+
+native func cdef.Int inflate-reset(
+        copy cdef.Pointer{Stream} strm) "inflateReset"
+
+native func cdef.Int compress(
+        copy cdef.Pointer{cdef.Uchar} dest,
+        copy cdef.Pointer{cdef.Ulong} dest-len,
+        copy cdef.Pointer{cdef.Uchar} source,
+        copy cdef.Ulong source-len)
+
+native func cdef.Int compress2(
+        copy cdef.Pointer{cdef.Uchar} dest,
+        copy cdef.Pointer{cdef.Ulong} dest-len,
+        copy cdef.Pointer{cdef.Uchar} source,
+        copy cdef.Ulong source-len,
+        copy cdef.Int level)
+
+native func cdef.Int uncompress(
+        copy cdef.Pointer{cdef.Uchar} dest,
+        copy cdef.Pointer{cdef.Ulong} dest-len,
+        copy cdef.Pointer{cdef.Uchar} source,
+        copy cdef.Ulong source-len)

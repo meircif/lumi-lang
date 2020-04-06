@@ -52,11 +52,18 @@ mkdir stdlib/cover-time-tests
 mv cobertura.xml stdlib/cover-time-tests
 
 stdlib/tl5-compiler -t os stdlib/os-tests.c ../stdlib/os.5.lm \
-  ../stdlib/tests/os-test.5.lm ../stdlib/list.5.lm
+  ../stdlib/tests/os-tests.5.lm ../stdlib/list.5.lm
 $CCA stdlib/os-tests.c -I../stdlib/tests -o stdlib/os-tests
 stdlib/os-tests -xml
 mkdir stdlib/cover-os-tests
 mv cobertura.xml stdlib/cover-os-tests
+
+stdlib/tl5-compiler -t zlib stdlib/zlib-tests.c ../stdlib/zlib.5.lm \
+  ../stdlib/tests/zlib-tests.5.lm
+$CCA stdlib/zlib-tests.c -I../stdlib/tests -o stdlib/zlib-tests
+stdlib/zlib-tests -xml
+mkdir stdlib/cover-zlib-tests
+mv cobertura.xml stdlib/cover-zlib-tests
 
 
 # Standard Libraries teardown
