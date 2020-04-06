@@ -47,6 +47,9 @@ class TypeData(SyntaxTreeNamespace)
             if glob.last-char != ')'
                 self.syntax-error-c(user "expected \")\" after base type, got")
             read-c()
+        self.parse-body()
+    
+    func inst parse-body()
         self.indentation-spaces := INDENTATION-SPACES
         self.parse-block-children(user self, user _)
         self.indentation-spaces := 0

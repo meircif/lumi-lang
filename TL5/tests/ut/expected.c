@@ -3001,6 +3001,32 @@ uint8_t u8 = 0;
     s32 = 0x0186a0;
     s32 = -0x0186a0;
     ut_M_i = 0x14 + -0x14;
+/// @ test-int-range-4
+void ut_M_fun(void);
+void ut_M_get(uint8_t* x);
+void ut_M_set(uint8_t x);
+void ut_M_fun(void) {
+    unsigned LUMI_loop_depth = 1;
+    uint32_t x = 0;
+    uint8_t aux_Int_0 = 0;
+    uint8_t aux_Int_1 = 0;
+    ut_M_set(0x0c);
+    ut_M_get(&(aux_Int_0));
+    ut_M_get(&(aux_Int_1));
+    x = aux_Int_1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_get(uint8_t* x) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_set(uint8_t x) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
 /// @ test-int-range-e0
 integer range minimum "12" larger than maximum "11"
 /// @ test-int-range-e1
@@ -7454,6 +7480,46 @@ void ut_M_call(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
+/// @ test-native-s0
+void ut_M_fun(c_native_type_t in, c_native_type_t* out);
+void ut_M_fun(c_native_type_t in, c_native_type_t* out) {
+    unsigned LUMI_loop_depth = 1;
+    c_native_type_t n = {0};
+    c_native_type_t def = {0};
+    n = in;
+    *out = n;
+    *out = ext(in);
+    if ((uint64_t)(in.c_y_field + (*out).c_x_field) > 0x64) {
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+    in.c_x_field = 0;
+    in.c_y_field = 0;
+    *out = def;
+    ext(def);
+LUMI_block0_cleanup:
+    (void)0;
+}
+/// @ test-native-s1
+void ut_M_fun(Test t, TestRef r, Native in, Native* out);
+void ut_M_fun(Test t, TestRef r, Native in, Native* out) {
+    unsigned LUMI_loop_depth = 1;
+    if (((in.x == 0) && (in.t.x == 0)) && (in.n != NULL)) {
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+    in.x = 0;
+    in.t = t;
+    in.t.x = 0;
+    in.r = r;
+    cdef_M_Pointer_set_point_to(in.n, in, &Native_dynamic);
+    *out = cdef_M_Pointer_get_pointed_at(in.n, 0);
+    *out = in;
+LUMI_block0_cleanup:
+    (void)0;
+}
 /// @ test-native-b0
 #define HAS_SOME_DEFINE
 uint32_t ut_M_x = 0;
@@ -7512,6 +7578,12 @@ sequence length is not constant
 no '"' around string constant "error"
 /// @ test-native-et1
 using invalid reference "n"
+/// @ test-native-es0
+unknown keyword "user"
+/// @ test-native-es1
+unknown keyword "func"
+/// @ test-native-es2
+only primitive types supported for native variable, got "String"
 /// @ test-native-eb0
 no '"' around string constant "#define error"
 /// @ test-native-eb1

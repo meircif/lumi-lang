@@ -22,6 +22,9 @@ class CallExpression(Expression)
             result-type.new-replace-params(user actual-params)->(
                     owner self.result-type)
             result-type := self.result-type
+        if result-type?
+            if result-type.int-range?
+                result-type.int-range.set-values(user self)
         if self.arguments.check-calling(
                 user declaration, user actual-params, copy bases)
             ; add omitted output

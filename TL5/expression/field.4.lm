@@ -129,9 +129,12 @@ class FieldExpression(Expression)
     func dynamic write()
         if self.instance.is-complex-field
             self.instance.write()
-            write(user ".")
         else
             self.instance.write-safe()
+        if self.instance.is-complex-field or
+                self.instance.result-type.type-data.is-primitive
+            write(user ".")
+        else
             write(user "->")
         for n in self.bases
             write(user "_base.")

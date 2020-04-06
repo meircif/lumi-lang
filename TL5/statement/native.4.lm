@@ -101,13 +101,14 @@ class NativeFunction(SyntaxTreeFunction)
 class NativeVariable(SyntaxTreeVariable)
     owner NativeText cname
     
-    func inst parse-new()->(owner NativeVariable new-node)
+    func inst parse-new(user NativeType parent-type)->(
+            owner NativeVariable new-node)
         new-node := NativeVariable(user _)
-        new-node.parse-native()
+        new-node.parse-native(user parent-type)
     
-    func inst parse-native()
+    func inst parse-native(user NativeType parent-type)
         self.is-native := true
-        self.parse(copy Access.VAR, copy false, user _)
+        self.parse(copy Access.VAR, copy false, user parent-type)
         if glob.last-char = ' '
             NativeText.parse-new(user _, user self)->(owner self.cname)
     
@@ -158,7 +159,7 @@ class NativeConstant(SyntaxTreeConstant)
         self.cname.write(user self.name)
 
 
-~~~ Native variable declaration in the syntax tree ~~~
+~~~ Native type declaration in the syntax tree ~~~
 class NativeType(TypeData)
     owner NativeText cname
 
@@ -197,6 +198,33 @@ class NativeType(TypeData)
     
     func dynamic write-cname()
         self.cname.write(user self.name)
+
+
+~~~ Native struct declaration in the syntax tree ~~~
+class NativeStruct(NativeType)
+    func inst parse-new()->(owner NativeStruct new-node)
+        new-node := NativeStruct()
+        new-node.parse()
+    
+    func inst parse()
+        base()
+        self.parse-body()
+
+    func dynamic parse-if-common(
+            user String keyword,
+            user TypeData parent-type,
+            user SyntaxTreeBlock parent-block)->(
+            var Bool is-parsed)
+        keyword.equal(user glob.access-names[Access.VAR])->(var is-parsed)
+        if is-parsed
+            self.variables.add(
+                    owner NativeVariable.parse-new(user _, user self))
+    
+    func dynamic parse-child(user String keyword)
+        self.syntax-error(user "unknown keyword", user keyword)
+    
+    func dynamic analyze()
+        self.analyze-children(user self.variables)
 
 
 ~~~ Native code declaration in the syntax tree ~~~

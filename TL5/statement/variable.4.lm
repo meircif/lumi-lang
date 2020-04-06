@@ -198,9 +198,11 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             write(user " ")
             self.write-cname()
         
-        if not self.parent-type? and not self.is-native and
-                not self.type-instance.type-data.is-native
-            if self.type-instance.type-data.is-ref()
+        if not self.parent-type? and not self.is-native
+            if self.type-instance.type-data.is-native
+                if self.type-instance.type-data.variables.first?
+                    write(user " = {0}")
+            else-if self.type-instance.type-data.is-ref()
                 write(user " = NULL")
             else
                 write(user " = 0")
@@ -453,7 +455,8 @@ class VariableInit(VariableCreate)
         if not self.expression-init.arguments.parameters.first? and
                 (self.variable.type-instance.is-non-zero-integer() or
                 self.variable.type-instance.type-data is glob.type-func or
-                self.variable.type-instance.type-data.is-native)
+                (self.variable.type-instance.type-data.is-native and
+                not self.variable.type-instance.type-data.variables.first?))
             self.variable.is-initialized := false
 
     func dynamic check-memory(user ReferenceMemoryList refs)

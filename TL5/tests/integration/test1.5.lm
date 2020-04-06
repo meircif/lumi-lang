@@ -127,7 +127,9 @@ test test-another()
 native include "external.h"
 native var cdef.Int external-int
 native const Uint8 EXTERNAL-CONST
-native type Native
+native struct Native
+    var cdef.Int x
+    var cdef.Int y
 native type NativeRef
 native var Native external-nvar
 native func external0() "MY_Some_external"
@@ -147,6 +149,10 @@ test test-native()
     var Array{6:cdef.Int} a
     external0()
     assert! external-int = 7
+    assert! n.x = 0
+    assert! n.y = 0
+    assert! external-nvar.x = 3
+    assert! external-nvar.y = 4
     nr := external-get-ref(copy 3, user s, user a)
     assert! s[0]! = 'a'
     assert! a[0] = 3

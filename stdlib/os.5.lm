@@ -23,26 +23,18 @@ func exists(user String path)->(var Bool exist)
 
 native include "dirent.h"
 
-native type Dir "DIR"
+native struct Dir "DIR"
 
-native type Dirent "struct dirent"
+native struct Dirent "struct dirent"
+    var cdef.Pointer{cdef.Char} d-name
 
-native func Int strlen(copy cdef.Pointer{Char} str) "strlen"
+native func Int strlen(copy cdef.Pointer{Char} str)
 
-native func Int closedir(copy cdef.Pointer{Dir} dir) "closedir"
+native func Int closedir(copy cdef.Pointer{Dir} dir)
 
-native func cdef.Pointer{Dir} opendir(
-        copy cdef.Pointer{cdef.Char} path) "opendir"
+native func cdef.Pointer{Dir} opendir(copy cdef.Pointer{cdef.Char} path)
 
-native func cdef.Pointer{Dirent} readdir(copy cdef.Pointer{Dir} dir) "readdir"
-
-native code "
-char* get_dname(struct dirent* dir) {
-  return dir->d_name;
-}"
-
-native func cdef.Pointer{cdef.Char} get-dname(
-        copy cdef.Pointer{Dirent} dir) "get_dname"
+native func cdef.Pointer{Dirent} readdir(copy cdef.Pointer{Dir} dir)
 
 struct Path
     owner String path-r
@@ -63,7 +55,7 @@ func ! list-dir(user String dir-path)->(owner ds.List?{Path} files)
         var cdef.Pointer{Char} c-string
         ent := readdir(copy dir)
         while ent?
-        c-string := get-dname(copy ent)
+        c-string := ent.get-pointed-at(copy 0).d-name
         new Path path(copy strlen(copy c-string))!
         cdef.copy-to-string(copy c-string, user path.path-r)!
         files!.append(owner path)!
