@@ -1056,6 +1056,8 @@ i?
 ; @ ec test-question-expression-e2
 var Test tt
 if tt?
+; @ ec test-question-expression-e3
+var Int? error
 ; @@ test-exclamation-expression
 ; @ c test-exclamation-expression-0
 user String s(user ostr!)
@@ -4961,12 +4963,13 @@ var cdef.Pointer{cdef.Pointer{cdef.Pointer{cdef.Char}}} ppp-char
 p-void := p-char
 p-uint := p-void
 p-char := p-uint
+b := p-void? or p-char? or p-test? or pp-int? or ppp-char?
 ; @ c test-c-objects-2
 var cdef.Int cint
 var cdef.Pointer{cdef.Int} p-int
 var cdef.Pointer{cdef.Pointer{cdef.Int}} pp-int
 user Array?{cdef.Int} arr-int
-p-int.set-from-array(user arr-int!)
+p-int := arr-int
 p-int.set-point-to(var cint)
 pp-int.set-point-to(var p-int)
 p-int := pp-int.get-pointed-at(copy 0)
@@ -4975,14 +4978,21 @@ var Test test
 user Test u-test(user test)
 var cdef.Pointer{Test} p-test
 user Array?{Test} arr-test
-p-test.set-from-array(user arr-test!)
+p-test := arr-test
 p-test.set-from-ref(user test)
 u-test := p-test.get-ref-at(copy 5)
-; @ c test-c-objects-3
-var cdef.Pointer{Char} p-char
-p-char.set-from-array(user ostr!)
-cdef.copy-to-string(copy p-char, user ostr!)!
-cdef.set-null-term-length(user ostr!)
+; @ g test-c-objects-3
+native func ext(
+        copy cdef.Pointer{cdef.Char} p-char,
+        copy cdef.Pointer{cdef.Uchar} p-uchar)
+func ! fun(user String? str, user Buffer? buff)
+    var cdef.Pointer{cdef.Char} p-char
+    var cdef.Pointer{cdef.Uchar} p-uchar
+    p-char := str
+    p-uchar := buff
+    ext(copy str, copy buff)
+    cdef.copy-to-string(copy p-char, user str!)!
+    cdef.set-null-term-length(user str!)
 ; @ c test-c-objects-4
 var cdef.Pointer{Byte} p-byte
 cdef.copy-to-buffer(copy p-byte, copy 4, user buff!)!
@@ -4995,6 +5005,8 @@ i := p-int.get-ref-at(copy 5)
 var Test tv
 var cdef.Pointer{Test} p-test
 tv := p-test.get-pointed-at(copy 0)
+; @ ec test-c-objects-e3
+var cdef.Pointer?{cdef.Int} error
 ; @@ test-cleanup-function
 ; @ g test-cleanup-function-0
 struct Test

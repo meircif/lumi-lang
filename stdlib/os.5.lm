@@ -14,15 +14,8 @@ native const Int F-OK
 
 native func Int access(copy cdef.Pointer{cdef.Char} path, copy Int amode)
 
-func string-to-chars(user String str)->(var cdef.Pointer{Char} ptr)
-    user Array{Char} bla
-    bla := str
-    ptr.set-from-array(user bla)
-
 func exists(user String path)->(var Bool exist)
-    var cdef.Pointer{Char} c-path
-    c-path := string-to-chars(user path)
-    exist := access(copy c-path, copy F-OK) <> -1
+    exist := access(copy path, copy F-OK) <> -1
 
 
 ; dirent.h porting for directory operations.
@@ -57,27 +50,23 @@ struct Path
     new!(copy Int len)
         self.path-r := String{len + 1}()!
 
-func ! list-dir(user String dir-path)->(
-        owner ds.List?{Path} files)
-
-    var cdef.Pointer?{Dir} dir
-    var cdef.Pointer?{Dirent} ent
-    var cdef.Pointer{Char} string-pointer
+func ! list-dir(user String dir-path)->(owner ds.List?{Path} files)
+    var cdef.Pointer{Dir} dir
+    var cdef.Pointer{Dirent} ent
 
     files := ds.List{Path}()!
 
-    string-pointer := string-to-chars(user dir-path)
-    dir := opendir(copy string-pointer)
+    dir := opendir(copy dir-path)
     if not dir?
         raise! "path is not dir"
     loop
         var cdef.Pointer{Char} c-string
-        ent := readdir(copy dir!)
+        ent := readdir(copy dir)
         while ent?
-        c-string := get-dname(copy ent!)
+        c-string := get-dname(copy ent)
         new Path path(copy strlen(copy c-string))!
         cdef.copy-to-string(copy c-string, user path.path-r)!
         files!.append(owner path)!
 
-    if closedir(copy dir!) <> 0
+    if closedir(copy dir) <> 0
         raise! "failed to close directory"

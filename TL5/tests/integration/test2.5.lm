@@ -6,7 +6,7 @@ module covered
 
 
 class MiddleType(integration.BaseType)
-    var Int num-mid
+    var Uint32 num-mid
     weak integration.BaseType? mid-base-ref
     weak integration.TopType? mid-top-ref
     
@@ -14,7 +14,7 @@ class MiddleType(integration.BaseType)
         base()
         self.num-mid := 2
     
-    func dynamic user? ! meth1(copy Int n, weak String? s)
+    func dynamic user? ! meth1(copy Uint32 n, weak String? s)
         sys.println(user "MiddleType.meth1")!
         base(copy n, weak s)!
     
@@ -25,5 +25,5 @@ class MiddleType(integration.BaseType)
     func dynamic user ! meth4()
         sys.println(user "MiddleType.meth4")!
     
-    func dynamic user ! meth5(copy Int n, weak String? s)
+    func dynamic user ! meth5(copy Uint32 n, weak String? s)
         sys.println(user "MiddleType.meth5")!

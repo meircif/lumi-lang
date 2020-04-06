@@ -6,7 +6,7 @@ module integration
 
 
 class TopType(covered.MiddleType)
-    var Int num-top
+    var Uint32 num-top
     weak BaseType? top-base-ref
     weak covered.MiddleType? top-mid-ref
     
@@ -21,11 +21,11 @@ class TopType(covered.MiddleType)
         covered.MiddleType.meth2(user self)!
         BaseType.meth2(user self)!
     
-    func dynamic user ! meth3(copy Int n, user String s)
+    func dynamic user ! meth3(copy Uint32 n, user String s)
         sys.println(user "TopType.meth3")!
         base.meth3(copy n, user s)!
     
-    func dynamic user ! meth5(copy Int n, weak String? s)
+    func dynamic user ! meth5(copy Uint32 n, weak String? s)
         sys.println(user "TopType.meth5")!
         base(copy n, weak s)!
         covered.MiddleType.meth1(user _, copy n, weak s)!
@@ -42,7 +42,7 @@ class TopType(covered.MiddleType)
 
 
 class BaseType
-    var Int num-base
+    var Uint32 num-base
     weak covered.MiddleType? base-mid-ref
     weak TopType? base-top-ref
     
@@ -52,13 +52,13 @@ class BaseType
     func dynamic user ! meth0()
         sys.println(user "BaseType.meth0")!
     
-    func dynamic user? ! meth1(copy Int n, weak String? s)
+    func dynamic user? ! meth1(copy Uint32 n, weak String? s)
         sys.println(user "BaseType.meth1")!
     
     func dynamic user ! meth2()
         sys.println(user "BaseType.meth2")!
     
-    func dynamic user ! meth3(copy Int n, user String s)
+    func dynamic user ! meth3(copy Uint32 n, user String s)
         sys.println(user "BaseType.meth3")!
 
 
@@ -71,11 +71,11 @@ func ! test-new-mid()->(owner covered.MiddleType? mt)
     mt := new-mt
 
 
-mock TestStruct.get()->(var Int x, user String? s)
+mock TestStruct.get()->(var Uint32 x, user String? s)
     x := 12
     s := _
 
-mock ! test-int2str(copy Int x)->(owner String? s)
+mock ! test-int2str(copy Uint32 x)->(owner String? s)
     raise!
 
 mock TestClass.dynamic-meth()
@@ -91,7 +91,7 @@ test test-func()
     assert-error! test-int2str(copy 6)->(owner s)
     
     var TestStruct t(copy 0, user _)!
-    var Int x
+    var Uint32 x
     t.get()->(var x)
     assert! x = 12
     t.get.mocked()->(var x)
@@ -120,7 +120,7 @@ test test-func()
 
 
 test test-another()
-    var Int x
+    var Uint32 x
     assert! x = 0
 
 
@@ -154,30 +154,30 @@ test test-native()
     n := external-get-var()
     assert! external-set-var(copy n) = 7
     assert! external-set-var(copy external-nvar) = 7
-    var Int x
+    var cdef.Int x
     native "x = MY_DEF_VALUE;"
     assert! x = 12
 
 
 test test-pointer()
-    var Int a(copy 3)
-    var Int b(copy 4)
-    var cdef.Pointer{Int} pa
-    var cdef.Pointer{Int} pb
-    var cdef.Pointer{cdef.Pointer{Int}} pp
-    var Array{3:Int} arr
+    var cdef.Int a(copy 3)
+    var cdef.Int b(copy 4)
+    var cdef.Pointer{cdef.Int} pa
+    var cdef.Pointer{cdef.Int} pb
+    var cdef.Pointer{cdef.Pointer{cdef.Int}} pp
+    var Array{3:cdef.Int} arr
     pa.set-point-to(var a)
     b := pa.get-pointed-at(copy 0)
     assert! b = 3
     pb.set-point-to(var b)
-    assert! pb <> pa
+    assert! pb is-not pa
     pp.set-point-to(var pa)
     pb := pp.get-pointed-at(copy 0)
-    assert! pb = pa
+    assert! pb is pa
     arr[0] := 1
     arr[1] := 2
     arr[2] := 3
-    pa.set-from-array(user arr)
+    pa := arr
     assert! pa.get-pointed-at(copy 0) = 1
     assert! pa.get-pointed-at(copy 1) = 2
     assert! pa.get-pointed-at(copy 2) = 3
@@ -195,7 +195,7 @@ test test-pointer()
     arrs[0].num := 1
     arrs[1].num := 2
     arrs[2].num := 3
-    ps.set-from-array(user arrs)
+    ps := arrs
     assert! ps.get-ref-at(copy 0).num = 1
     assert! ps.get-ref-at(copy 1).num = 2
     assert! ps.get-ref-at(copy 2).num = 3
@@ -203,7 +203,7 @@ test test-pointer()
     var String{16} stra(user "aabbccdd")!
     var String{16} strb(user "---")!
     var cdef.Pointer{Char} pc
-    pc.set-from-array(user stra)
+    pc := stra
     cdef.copy-to-string(copy pc, user strb)!
     assert! strb.equal(user stra)
     stra[2]! := '\0'
@@ -213,7 +213,7 @@ test test-pointer()
     var Buffer{16} buffa(user `fade00beaf`)!
     var Buffer{16} buffb(user `000000`)!
     var cdef.Pointer{Byte} pbt
-    pbt.set-from-array(user buffa)
+    pbt := buffa
     cdef.copy-to-buffer(copy pbt, copy 5, user buffb)!
     assert! buffb.equal(user buffa)
 
@@ -404,7 +404,7 @@ test test-complex-delete()
     deleted-base-links := _
     deleted-top-links := _
 
-func ! has-refs(user Array{Ref} refs, copy Int number)
+func ! has-refs(user Array{Ref} refs, copy Uint32 number)
     record-delete := false
     for n in number
         has-ref(copy refs[n]!)->(owner deleted-links)!
@@ -444,7 +444,7 @@ test test-block-delete()
     cleanup-test(user refs)!
     has-refs(user refs, copy 6)!
     
-    var Int n
+    var Uint32 n
     loop! 3
         strong Link la(strong Link()!)
         refs[n]! := la
@@ -514,7 +514,7 @@ func ! loop-limit-reached()
     loop! 3
         while true
 
-var Int new-fail-countdown
+var Uint32 new-fail-countdown
 
 mock new()->(var Bool alloc-success)
     alloc-success := true
@@ -540,11 +540,11 @@ test test-assert-error-message()
     assert-error! x := clamp? x * 3, "integer overflow"
     var Sint64 j(copy 0x7ffffffffffffff0)
     assert-error! j := j +? 20, "integer overflow"
-    strong Array?{Int} arr(strong Array{2:Int}()!)
+    strong Array?{Uint32} arr(strong Array{2:Uint32}()!)
     assert-error! arr[6], "slice index out of bounds"
     var Sint8 l(copy -2)
-    assert-error! Array{l:Int}(), "sequence too short"
-    weak Array?{Int} arr2(weak arr)
+    assert-error! Array{l:Uint32}(), "sequence too short"
+    weak Array?{Uint32} arr2(weak arr)
     arr := _
     assert-error! arr.length(), "empty object used"
     assert-error! arr2.length(), "outdated weak reference used"
@@ -556,12 +556,12 @@ test test-assert-error-message()
     assert-error! alloc(), "insufficient memory for object dynamic allocation"
     new-fail-countdown := 2
     assert-error! alloc(), "insufficient memory for managed object"
-    var Int zero(copy 0)
+    var Uint32 zero(copy 0)
     assert-error! 24 div zero, "zero division"
     assert-error! 24 mod zero, "zero division"
     assert-error! loop-limit-reached(), "loop limit reached"
 
-native var Int lumi-debug-value
+native var cdef.Int lumi-debug-value
 
 enum LumiDebug
     NOTHING
@@ -573,7 +573,7 @@ test test-builtin-errors()
     var Buffer{4} buff
     var String{3} short-str
     user String? empty
-    var Int i
+    var Uint32 i
     var Char ch
     var Byte bt
     lumi-debug-value := LumiDebug.SUCCESS
@@ -633,7 +633,7 @@ test test-builtin-errors()
     assert-error! 123.str(user short-str), "sequence too short"
     assert-error! short-str.new(user "aaaaa"), "sequence too short"
     var cdef.Pointer{Char} charp
-    charp.set-from-array(user "aaaaa")
+    charp := "aaaaa"
     assert-error! cdef.copy-to-string(copy charp, user short-str),
             "sequence too short"
     
@@ -646,7 +646,7 @@ test test-builtin-errors()
     buff.append(copy 3)!
     assert-error! full-buffer.new(user buff), "sequence too short"
     var cdef.Pointer{Byte} bytep
-    bytep.set-from-array(user buff)
+    bytep := buff
     assert-error! cdef.copy-to-buffer(copy bytep, copy 2, user full-buffer),
             "sequence too short"
     

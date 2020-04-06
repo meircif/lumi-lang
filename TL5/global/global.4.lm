@@ -1130,6 +1130,7 @@ struct Global
                 user argument-type-instance)
         string-new-copy(user self.type-pointer.parameters.first.item)->(
                 owner argument-type-instance.name)
+        argument-type-instance.conditional := true
 
         self.add-builtin-method(
                 user self.type-pointer,
@@ -1146,25 +1147,6 @@ struct Global
                 user argument-type-instance)
         string-new-copy(user self.type-pointer.parameters.first.item)->(
                 owner argument-type-instance.name)
-
-        self.add-builtin-method(
-                user self.type-pointer,
-                user "set-from-array",
-                copy false,
-                copy Access.COPY)->(
-                user function)
-        self.add-builtin-argument(
-                user function,
-                copy false,
-                copy Access.USER,
-                user self.type-array,
-                user self.type-generic,
-                user _,
-                user "array")
-        function.arguments.parameters.last.item.get-type-instance()->(
-                user argument-type-instance)
-        string-new-copy(user self.type-pointer.parameters.first.item)->(
-                owner argument-type-instance.parameters.first.item.name)
 
         self.add-builtin-method-native(
                 user self.type-pointer,
@@ -1519,7 +1501,7 @@ struct Global
             string-new-copy(user int-name)->(
                     owner argument.variable.type-instance.name)
             argument.variable.type-instance.set-int-range()
-        if is-output and not argument-type.is-primitive
+        if argument-type is self.type-pointer
             argument.variable.type-instance.conditional := true
         ; if access = Access.OWNER or access = Access.STRONG
         ;     function.delete-group.add-deleting(

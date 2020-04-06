@@ -2770,6 +2770,8 @@ cannot use "?" on void expression
 cannot use "?" on non conditional or weak reference of type "Int"
 /// @ test-question-expression-e2
 cannot use "?" on non conditional or weak reference of type "Test"
+/// @ test-question-expression-e3
+cannot use "?" on primitive type "Int"
 /// @@ test-exclamation-expression
 /// @ test-exclamation-expression-0
 char* s = NULL;
@@ -11491,50 +11493,59 @@ uint16_t u16 = 0;
     s64 = (c_long_double < -INT64_MAX)? -INT64_MAX: c_long_double;
     ut_M_j = CLAMPED_ADD_SS(c_char, (CLAMPED_ADD_SU(c_schar, (CLAMPED_ADD_US(c_uchar, (CLAMPED_ADD_SU(c_short, (CLAMPED_ADD_US(c_ushort, (CLAMPED_ADD_SU(c_int, (CLAMPED_ADD_US(c_uint, (CLAMPED_ADD_SU(c_long, (CLAMPED_ADD_UU(c_ulong, (CLAMPED_ADD_US(c_size, (CLAMPED_ADD_SS(c_float, (CLAMPED_ADD_SS(c_double, (CLAMPED_ADD_SS(c_long_double, (c_char), -0x8000000000000000, INT64_MAX)), -0x8000000000000000, INT64_MAX)), -0x8000000000000000, INT64_MAX)), 0, UINT64_MAX)), 0, UINT64_MAX)), -0x8000000000000000, INT64_MAX)), 0, UINT64_MAX)), -0x8000000000000000, INT64_MAX)), 0, UINT32_MAX)), -0x80000000, INT32_MAX)), 0, UINT16_MAX)), -0x8000, INT16_MAX)), -0x010000, UINT16_MAX);
 /// @ test-c-objects-1
-void* p_void = 0;
-    cdef_M_Char* p_char = 0;
-    cdef_M_Uint* p_uint = 0;
-    ut_M_Test* p_test = 0;
-    cdef_M_Int** pp_int = 0;
-    cdef_M_Char*** ppp_char = 0;
+void* p_void = NULL;
+    cdef_M_Char* p_char = NULL;
+    cdef_M_Uint* p_uint = NULL;
+    ut_M_Test* p_test = NULL;
+    cdef_M_Int** pp_int = NULL;
+    cdef_M_Char*** ppp_char = NULL;
     p_void = p_char;
     p_uint = p_void;
     p_char = p_uint;
+    ut_M_b = ((((p_void != NULL) || (p_char != NULL)) || (p_test != NULL)) || (pp_int != NULL)) || (ppp_char != NULL);
 /// @ test-c-objects-2
 cdef_M_Int cint = 0;
-    cdef_M_Int* p_int = 0;
-    cdef_M_Int** pp_int = 0;
+    cdef_M_Int* p_int = NULL;
+    cdef_M_Int** pp_int = NULL;
     cdef_M_Int* arr_int = NULL;
     Seq_Length arr_int_Length = 0;
     ut_M_Test test_Var = {0};
     ut_M_Test* test = NULL;
     ut_M_Test* u_test = NULL;
-    ut_M_Test* p_test = 0;
+    ut_M_Test* p_test = NULL;
     ut_M_Test* arr_test = NULL;
     Seq_Length arr_test_Length = 0;
-    CHECK_REF(5, LUMI_block0_cleanup, arr_int)
-    cdef_M_Pointer_set_from_array(p_int, arr_int, arr_int_Length);
+    p_int = arr_int;
     cdef_M_Pointer_set_point_to(p_int, cint, &cdef_M_Int_dynamic);
     cdef_M_Pointer_set_point_to(pp_int, p_int, &cdef_M_Int*_dynamic);
     p_int = cdef_M_Pointer_get_pointed_at(pp_int, 0);
     cint = cdef_M_Pointer_get_pointed_at(p_int, 0x03);
     test = &test_Var;
     u_test = test;
-    CHECK_REF(14, LUMI_block0_cleanup, arr_test)
-    cdef_M_Pointer_set_from_array(p_test, arr_test, arr_test_Length);
+    p_test = arr_test;
     cdef_M_Pointer_set_from_ref(p_test, test, &ut_M_Test_dynamic);
     u_test = ((ut_M_Test*)cdef_M_Pointer_get_ref_at(p_test, 0x05));
 /// @ test-c-objects-3
-Char* p_char = 0;
-    CHECK_REF(2, LUMI_block0_cleanup, ut_M_ostr)
-    cdef_M_Pointer_set_from_array(p_char, ut_M_ostr, *ut_M_ostr_Length);
-    CHECK_REF(3, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = cdef_M_copy_to_string(p_char, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
-    CHECK(3, LUMI_block0_cleanup)
-    CHECK_REF(4, LUMI_block0_cleanup, ut_M_ostr)
-    cdef_M_set_null_term_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
+Return_Code ut_M_fun(char* str, Seq_Length str_Max_length, Seq_Length* str_Length, Byte* buff, Seq_Length buff_Max_length, Seq_Length* buff_Length);
+Return_Code ut_M_fun(char* str, Seq_Length str_Max_length, Seq_Length* str_Length, Byte* buff, Seq_Length buff_Max_length, Seq_Length* buff_Length) {
+    Return_Code LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    cdef_M_Char* p_char = NULL;
+    cdef_M_Uchar* p_uchar = NULL;
+    p_char = str;
+    p_uchar = buff;
+    ext(str, buff);
+    CHECK_REF(10, LUMI_block0_cleanup, str)
+    LUMI_err = cdef_M_copy_to_string(p_char, str, str_Max_length, str_Length);
+    CHECK(10, LUMI_block0_cleanup)
+    CHECK_REF(11, LUMI_block0_cleanup, str)
+    cdef_M_set_null_term_length(str, str_Max_length, str_Length);
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
 /// @ test-c-objects-4
-Byte* p_byte = 0;
+Byte* p_byte = NULL;
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_buff)
     LUMI_err = cdef_M_copy_to_buffer(p_byte, 0x04, ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length);
     CHECK(2, LUMI_block0_cleanup)
@@ -11544,6 +11555,8 @@ dynamic pointed type "Ta"
 cannot assign value with access "user" into value with access "var"
 /// @ test-c-objects-e2
 assigning into non assignable expression
+/// @ test-c-objects-e3
+cannot use "?" on primitive type "Pointer"
 /// @@ test-cleanup-function
 /// @ test-cleanup-function-0
 typedef struct ut_M_Test ut_M_Test;

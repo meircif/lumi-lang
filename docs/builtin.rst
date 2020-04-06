@@ -495,6 +495,7 @@ Files
       :raises: if read failed
 
    .. method:: get()->(var Byte value, var Bool is-eof)
+      :noindex:
 
       *only available in* ``FileReadBinary`` *and* ``FileReadWriteBinary``
       
@@ -532,6 +533,7 @@ Files
       :raises: if writing failed
 
    .. method:: put(copy Byte value)
+      :noindex:
 
       *only available in* ``FileWriteBinary`` *and* ``FileReadWriteBinary``
 
@@ -549,6 +551,7 @@ Files
       :raises: if writing failed
 
    .. method:: write(user Array{Byte} data)->(var Uint32 written)
+      :noindex:
 
       *only available in* ``FileWriteBinary`` *and* ``FileReadWriteBinary``
 
