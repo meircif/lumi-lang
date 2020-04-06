@@ -1867,6 +1867,8 @@ error raised inside function not declared as error raising "fun"
 assigning conditional into non-conditional type "String"
 /// @ test-call-expression-e24
 using invalid reference "s"
+/// @ test-call-expression-e25
+adding "->()" without outputs
 /// @@ test-type-expression
 /// @ test-type-expression-0
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_t_Refman)
@@ -4797,6 +4799,8 @@ error raised inside function not declared as error raising "fun"
 error raised inside function not declared as error raising "fun"
 /// @ test-function-e32
 error raised inside function not declared as error raising "fun"
+/// @ test-function-e33
+adding "->()" without outputs
 /// @@ test-members
 /// @ test-members-0
 typedef struct ut_M_Test ut_M_Test;
@@ -7471,34 +7475,26 @@ redefinition of function "error"
 /// @ test-native-ef1
 error raising native function
 /// @ test-native-ef2
-more than one output to native function
+output arguments to native function
 /// @ test-native-ef3
-owner argument to native function
+expected space after "return type", got "new-line"
 /// @ test-native-ef4
-var output to native function
+owner argument to native function
 /// @ test-native-ef5
-argument "s" access should not be "s-var" for non-primitive type "String"
+managed argument to native function
 /// @ test-native-ef6
-managed argument to native function
+owner argument to native function
 /// @ test-native-ef7
-owner argument to native function
-/// @ test-native-ef8
-owner argument to native function
-/// @ test-native-ef9
-managed argument to native function
-/// @ test-native-ef10
-owner argument to native function
-/// @ test-native-ef11
 argument "s" access should not be "s-var" for non-primitive type "String"
-/// @ test-native-ef12
+/// @ test-native-ef8
 output argument in native function call
-/// @ test-native-ef13
+/// @ test-native-ef9
 no '"' around string constant "error"
-/// @ test-native-ef14
+/// @ test-native-ef10
 user output to native function with non struct type "String"
-/// @ test-native-ef15
+/// @ test-native-ef11
 user output to native function with non struct type "Array"
-/// @ test-native-ef16
+/// @ test-native-ef12
 user output to native function with non struct type "Error"
 /// @ test-native-ev0
 only primitive types supported for native variable, got "String"

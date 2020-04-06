@@ -131,12 +131,11 @@ native type Native
 native type NativeRef
 native var Native external-nvar
 native func external0() "MY_Some_external"
-native func external-get-ref(
-        copy cdef.Int i, user String s, user Array{cdef.Int} a)->(
-        copy NativeRef n)
-native func external-set-ref(copy NativeRef n)->(copy cdef.Int i)
-native func external-get-var()->(copy Native n)
-native func external-set-var(copy Native n)->(copy cdef.Int i)
+native func NativeRef external-get-ref(
+        copy cdef.Int i, user String s, user Array{cdef.Int} a)
+native func cdef.Int external-set-ref(copy NativeRef n)
+native func Native external-get-var()
+native func cdef.Int external-set-var(copy Native n)
 native code "#define MY_DEF_VALUE 12"
 
 test test-native()

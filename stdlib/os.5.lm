@@ -12,8 +12,7 @@ native const Int X-OK
 native const Int F-OK
 
 
-native func access(copy cdef.Pointer{cdef.Char} path, copy Int amode)->(
-        copy Int res)
+native func Int access(copy cdef.Pointer{cdef.Char} path, copy Int amode)
 
 func string-to-chars(user String str)->(var cdef.Pointer{Char} ptr)
     user Array{Char} bla
@@ -35,25 +34,22 @@ native type Dir "DIR"
 
 native type Dirent "struct dirent"
 
-native func strlen(copy cdef.Pointer{Char} str)->(
-        copy Int len) "strlen"
+native func Int strlen(copy cdef.Pointer{Char} str) "strlen"
 
-native func closedir(copy cdef.Pointer{Dir} dir)->(
-        copy Int ret) "closedir"
+native func Int closedir(copy cdef.Pointer{Dir} dir) "closedir"
 
-native func opendir(copy cdef.Pointer{cdef.Char} path)->(
-        copy cdef.Pointer{Dir} dir) "opendir"
+native func cdef.Pointer{Dir} opendir(
+        copy cdef.Pointer{cdef.Char} path) "opendir"
 
-native func readdir(copy cdef.Pointer{Dir} dir)->(
-        copy cdef.Pointer{Dirent} ent) "readdir"
+native func cdef.Pointer{Dirent} readdir(copy cdef.Pointer{Dir} dir) "readdir"
 
 native code "
 char* get_dname(struct dirent* dir) {
   return dir->d_name;
 }"
 
-native func get-dname(copy cdef.Pointer{Dirent} dir)->(
-        copy cdef.Pointer{cdef.Char} path) "get_dname"
+native func cdef.Pointer{cdef.Char} get-dname(
+        copy cdef.Pointer{Dirent} dir) "get_dname"
 
 struct Path
     owner String path-r

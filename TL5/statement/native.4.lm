@@ -40,6 +40,7 @@ class NativeInclude(SyntaxTreeFunction)
 
 ~~~ Native function declaration in the syntax tree ~~~
 class NativeFunction(SyntaxTreeFunction)
+    owner TypeInstance return-type
     owner NativeText cname
     
     func inst parse-new()->(owner NativeFunction new-node)
@@ -47,16 +48,41 @@ class NativeFunction(SyntaxTreeFunction)
         new-node.parse()
     
     func inst parse()
+        self.return-type := TypeInstance()
+        self.return-type.parse(
+                user " (", user self, user _, copy INDENTATION-SPACES)
+        if glob.last-char = '('
+            glob.save-input := true
+            self.return-type := _
+        else
+            self.expect-space(user "return type")
         self.parse-header(copy true)
         if glob.last-char = ' '
             NativeText.parse-new(user _, user self)->(owner self.cname)
         if self.arguments.has-error
             self.syntax-error-msg(user "error raising native function")
         if self.arguments.outputs.first?
-            if self.arguments.outputs.first.next?
-                self.syntax-error-msg(
-                        user "more than one output to native function")
+            self.syntax-error-msg(user "output arguments to native function")
         glob.current-module.function-map.add(user self.name, user self)
+    
+    func dynamic analyze()
+        if self.return-type?
+            self.return-type.analyze(user self)
+            new DeclarationArgument output
+            output.parent-node := self
+            output.is-output := true
+            output.is-native := true
+            if self.return-type.type-data.is-primitive
+                output.access := Access.COPY
+            else
+                output.access := Access.USER
+            output.variable := SyntaxTreeVariable(user _)
+            output.variable.access := output.access
+            output.variable.is-output := output.is-output
+            output.variable.type-instance := self.return-type
+            string-new-copy(user "native-return")->(owner output.variable.name)
+            self.arguments.outputs.add(owner output)
+        base()
     
     func dynamic check-memory(user ReferenceMemoryList global-refs)
         ; do nothing

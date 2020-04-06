@@ -593,6 +593,8 @@ func fun(weak String in)->(weak String out)
     weak String s
     s := fun(weak s)
     out := s
+; @ ec test-call-expression-e25
+fun0()->()
 ; @@ test-type-expression
 ; @ c test-type-expression-0
 Test.meth(user t!)
@@ -2023,6 +2025,8 @@ func fun()
 ; @ eg test-function-e32
 func fun()
     assert-error! 1 = 2
+; @ eg test-function-e33
+func error()->()
 ; @@ test-members
 ; @ g test-members-0
 struct Test
@@ -3009,9 +3013,8 @@ func call()
 class Test
     var Uint32 x
     func dynamic user meth()
-native func external(
-        copy Uint32 i, user String? s, user Array?{Uint32} a, user Test? t)->(
-        copy Uint32 res)
+native func Uint32 external(
+        copy Uint32 i, user String? s, user Array?{Uint32} a, user Test? t)
 func call()
     var Uint32 i
     user String? s
@@ -3027,7 +3030,7 @@ func call()
 ; @ g test-native-f3
 struct Test
     var Uint32 x
-native func external()->(user Test? t)
+native func Test? external()
 func call()
     user Test? t
     t := external()
@@ -3052,7 +3055,7 @@ func get()->(var Uint32 x)
 ; @ g test-native-t0
 native type Native
 native var Native native-var
-native func get-native()->(copy Native n)
+native func Native get-native()
 native func set-native(copy Native n)
 func get()->(var Native n)
     n := get-native()
@@ -3063,7 +3066,7 @@ func call()
     set-native(copy n)
 ; @ g test-native-t1
 native type Native "SOME_External_type"
-native func get-native()->(copy Native no) "SOME_External_get_func"
+native func Native get-native() "SOME_External_get_func"
 native func set-native(copy Native n) "SOME_External_set_func"
 func call()
     var Native n
@@ -3091,42 +3094,34 @@ native include native.h
 native func error()
 native func error()
 ; @ eg test-native-ef1
-native func ! error()
+native func Int ! error()
 ; @ eg test-native-ef2
-native func error()->(copy Uint32 a, copy Uint32 b)
+native func error()->(copy Uint32 x)
 ; @ eg test-native-ef3
-native func error()->(owner String? s)
+native func Uint32
 ; @ eg test-native-ef4
-native func error()->(var Uint32 s)
-; @ eg test-native-ef5
-native func error()->(s-var String? s)
-; @ eg test-native-ef6
-native func error()->(weak String? s)
-; @ eg test-native-ef7
-native func error()->(strong String? s)
-; @ eg test-native-ef8
 native func error(owner String s)
-; @ eg test-native-ef9
+; @ eg test-native-ef5
 native func error(weak String s)
-; @ eg test-native-ef10
+; @ eg test-native-ef6
 native func error(strong String s)
-; @ eg test-native-ef11
+; @ eg test-native-ef7
 native func error(s-var String s)
-; @ eg test-native-ef12
-native func fun()->(copy Uint32 res)
+; @ eg test-native-ef8
+native func Uint32 fun()
 func error(copy Uint32 i)
     fun()->(copy i)
-; @ eg test-native-ef13
+; @ eg test-native-ef9
 native func fun()->(copy Uint32 res) error
-; @ eg test-native-ef14
-native func error()->(user String? s)
-; @ eg test-native-ef15
-native func error()->(user Array?{Uint32} a)
-; @ eg test-native-ef16
+; @ eg test-native-ef10
+native func String? error()
+; @ eg test-native-ef11
+native func Array?{Uint32} error()
+; @ eg test-native-ef12
 class Error
     var Uint32 x
     func dynamic user meth()
-native func error()->(user Error? e)
+native func Error? error()
 ; @ eg test-native-ev0
 native var String s
 ; @ eg test-native-ev1
@@ -3142,7 +3137,7 @@ var String{VALUE} error
 native type Native error
 ; @ eg test-native-et1
 native type Native
-native func external(copy Native in)->(copy Native out)
+native func Native external(copy Native in)
 func error()
     var Native n
     n := external(copy n)

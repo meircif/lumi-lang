@@ -558,15 +558,12 @@ class DeclarationArgument(Argument)
             if access-has-refman(copy self.access)
                 self.syntax-error-msg(
                         user "managed argument to native function")
-            if self.is-output
-                if self.access = Access.USER and
-                        (type-data.is-dynamic or type-data.is-sequence())
-                    self.syntax-error(
-                            user "user output to native function with non \
-                            struct type",
-                            user type-data.name)
-                if self.access = Access.VAR
-                    self.syntax-error-msg(user "var output to native function")
+            if self.is-output and self.access = Access.USER and
+                    (type-data.is-dynamic or type-data.is-sequence())
+                self.syntax-error(
+                        user "user output to native function with non \
+                        struct type",
+                        user type-data.name)
     
     func dynamic get-type-instance()->(user TypeInstance type-instance)
         type-instance := self.variable.type-instance
