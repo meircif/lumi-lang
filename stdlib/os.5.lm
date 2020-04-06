@@ -52,12 +52,10 @@ func ! list-dir(user String dir-path)->(owner ds.List?{Path} files)
     if not dir?
         raise! "path is not dir"
     loop
-        var cdef.Pointer{Char} c-string
         ent := readdir(copy dir)
         while ent?
-        c-string := ent.get-pointed-at(copy 0).d-name
-        new Path path(copy strlen(copy c-string))!
-        cdef.copy-to-string(copy c-string, user path.path-r)!
+        new Path path(copy strlen(copy ent!.d-name))!
+        cdef.copy-to-string(copy ent!.d-name, user path.path-r)!
         files!.append(owner path)!
 
     if closedir(copy dir) <> 0

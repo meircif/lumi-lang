@@ -3106,12 +3106,13 @@ native struct Native
     var Test t
     var TestRef r
     var cdef.Pointer{Native} n
-func fun(copy Test t, copy TestRef r, copy Native in)->(var Native out)
-    if in.x = 0 and in.t.x = 0 and in.n?
+func ! fun(copy Test t, copy TestRef r, copy Native in)->(var Native out)
+    if in.x = 0 and in.t.x = 0 and in.n!.x = 0
     in.x := 0
     in.t := t
     in.t.x := 0
     in.r := r
+    in.n!.x := 0
     in.n.set-point-to(var in)
     out := in.n.get-pointed-at(copy 0)
     out := in

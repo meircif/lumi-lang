@@ -7502,10 +7502,12 @@ LUMI_block0_cleanup:
     (void)0;
 }
 /// @ test-native-s1
-void ut_M_fun(Test t, TestRef r, Native in, Native* out);
-void ut_M_fun(Test t, TestRef r, Native in, Native* out) {
+Return_Code ut_M_fun(Test t, TestRef r, Native in, Native* out);
+Return_Code ut_M_fun(Test t, TestRef r, Native in, Native* out) {
+    Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    if (((in.x == 0) && (in.t.x == 0)) && (in.n != NULL)) {
+    CHECK_REF(10, LUMI_block0_cleanup, in.n)
+    if (((in.x == 0) && (in.t.x == 0)) && (in.n->x == 0)) {
     LUMI_block1_cleanup:
         (void)0;
     }
@@ -7514,11 +7516,14 @@ void ut_M_fun(Test t, TestRef r, Native in, Native* out) {
     in.t = t;
     in.t.x = 0;
     in.r = r;
+    CHECK_REF(15, LUMI_block0_cleanup, in.n)
+    in.n->x = 0;
     cdef_M_Pointer_set_point_to(in.n, in, &Native_dynamic);
     *out = cdef_M_Pointer_get_pointed_at(in.n, 0);
     *out = in;
 LUMI_block0_cleanup:
     (void)0;
+    return LUMI_err;
 }
 /// @ test-native-b0
 #define HAS_SOME_DEFINE
