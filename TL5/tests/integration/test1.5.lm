@@ -195,7 +195,7 @@ test test-pointer()
     var Array{3:SimpleStruct} arrs
     sa.num := 1
     sb.num := 1
-    ps.set-from-ref(user sa)
+    ps := sa
     s := ps.get-ref-at(copy 0)
     assert! s.num = 1
     arrs[0].num := 1

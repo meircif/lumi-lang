@@ -5030,7 +5030,7 @@ user Test u-test(user test)
 var cdef.Pointer{Test} p-test
 user Array?{Test} arr-test
 p-test := arr-test
-p-test.set-from-ref(user test)
+p-test := test
 u-test := p-test.get-ref-at(copy 5)
 ; @ g test-c-objects-3
 native func ext(
@@ -5045,8 +5045,8 @@ func ! fun(user String? str, user Buffer? buff)
     cdef.copy-to-string(copy p-char, user str!)!
     cdef.set-null-term-length(user str!)
 ; @ c test-c-objects-4
-var cdef.Pointer{Byte} p-byte
-cdef.copy-to-buffer(copy p-byte, copy 4, user buff!)!
+var cdef.Pointer{cdef.Uchar} p-uchar
+cdef.copy-to-buffer(copy p-uchar, copy 4, user buff!)!
 ; @ ec test-c-objects-e0
 var cdef.Pointer{Ta} error
 ; @ ec test-c-objects-e1

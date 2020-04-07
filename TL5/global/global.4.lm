@@ -1132,22 +1132,6 @@ struct Global
                 owner argument-type-instance.name)
         argument-type-instance.conditional := true
 
-        self.add-builtin-method(
-                user self.type-pointer,
-                user "set-from-ref",
-                copy false,
-                copy Access.COPY)->(
-                user function)
-        self.add-builtin-parameter(
-                user function,
-                copy Access.USER,
-                user self.type-generic,
-                user "ref")
-        function.arguments.parameters.last.item.get-type-instance()->(
-                user argument-type-instance)
-        string-new-copy(user self.type-pointer.parameters.first.item)->(
-                owner argument-type-instance.name)
-
         self.add-builtin-method-native(
                 user self.type-pointer,
                 user "get-pointed-at",

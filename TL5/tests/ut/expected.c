@@ -11600,7 +11600,7 @@ cdef_M_Int cint = 0;
     test = &test_Var;
     u_test = test;
     p_test = arr_test;
-    cdef_M_Pointer_set_from_ref(p_test, test, &ut_M_Test_dynamic);
+    p_test = test;
     u_test = ((ut_M_Test*)cdef_M_Pointer_get_ref_at(p_test, 0x05));
 /// @ test-c-objects-3
 Return_Code ut_M_fun(char* str, Seq_Length str_Max_length, Seq_Length* str_Length, Byte* buff, Seq_Length buff_Max_length, Seq_Length* buff_Length);
@@ -11622,9 +11622,9 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 /// @ test-c-objects-4
-Byte* p_byte = NULL;
+cdef_M_Uchar* p_uchar = NULL;
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_buff)
-    LUMI_err = cdef_M_copy_to_buffer(p_byte, 0x04, ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length);
+    LUMI_err = cdef_M_copy_to_buffer(p_uchar, 0x04, ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length);
     CHECK(2, LUMI_block0_cleanup)
 /// @ test-c-objects-e0
 dynamic pointed type "Ta"

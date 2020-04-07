@@ -60,8 +60,7 @@ class TypeData(SyntaxTreeNamespace)
             base-dynamic := self.base-type.type-data.is-dynamic
     
     func inst is-ref()->(var Bool is-reference)
-        is-reference := not self.is-primitive or self is glob.type-func or
-                self is glob.type-ref or self is glob.type-pointer
+        is-reference := not self.is-int-like and self is-not glob.type-bool
         
     func inst is-buffered()->(var Bool is-buffered)
         is-buffered := self is glob.type-string or self is glob.type-buffer

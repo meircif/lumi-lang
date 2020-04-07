@@ -424,9 +424,7 @@ struct TypeInstance
             return
         if target.type-data is glob.type-ref and not self.type-data.is-primitive
             return
-        if target.type-data is glob.type-pointer and
-                (self.type-data is glob.type-pointer or
-                self.type-data.is-sequence())
+        if target.type-data is glob.type-pointer and self.type-data.is-ref()
             return
         if access-is-owner(copy target-access)
             if not access-is-owner(copy self-access)
