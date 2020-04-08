@@ -156,13 +156,16 @@ class SyntaxTreeRoot(GlobalNodes)
             self.functions.add(owner NativeFunction.parse-new(user _))
             
         else-if keyword.equal(user "var")
-            self.variables.add(owner NativeVariable.parse-new(user _))
+            self.variables.add(owner NativeVariable.parse-new(user _, user _))
             
         else-if keyword.equal(user "const")
             self.variables.add(owner NativeConstant.parse-new(user _))
             
         else-if keyword.equal(user "type")
             self.types.add(owner NativeType.parse-new(user _))
+            
+        else-if keyword.equal(user "struct")
+            self.types.add(owner NativeStruct.parse-new(user _))
             
         else-if keyword.equal(user "code")
             self.global-nodes.add(owner NativeCode.parse-new(user _, user _))

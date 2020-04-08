@@ -16,11 +16,11 @@ comment
 ; Test Single line comment
 
 ; Test global variables
-var Int global-int(copy 23)
+var Uint32 global-int(copy 23)
 owner String global-string(owner String{32}(user "a constant string")!)
 owner Buffer global-buffer(owner Buffer{32}(user `feed1000beef`)!)
 
-var Array{TestEnum.length + LENGTH:Int} int-arr
+var Array{TestEnum.length + LENGTH:Uint32} int-arr
 const Int LENGTH SIZE * 5
 const Int SIZE 12
 
@@ -67,11 +67,11 @@ enum TestEnum
 
 
 struct SimpleStruct
-    var Int num
+    var Uint32 num
     owner String? text
 
 class SimpleClass
-    var Int x
+    var Uint32 x
     weak String? s
     func dynamic user fun()
         self.x := 0
@@ -87,7 +87,7 @@ func ! test-simple-function()
 
 
 func ! test-const-expression()->(
-        var Int i,
+        var Uint32 i,
         var Char c,
         weak TestStruct? t,
         weak TestClass? d,
@@ -114,7 +114,7 @@ func ! test-const-expression()->(
 
 
 func ! test-member-expression(strong TestStruct t)->(
-        weak TestStruct? to, var Int i)
+        weak TestStruct? to, var Uint32 i)
     to := t
     t.num := clamp to!.num + t.ts!.num + t.ts!.ts!.num
     to!.num := t.num
@@ -126,17 +126,17 @@ func ! test-member-expression(strong TestStruct t)->(
 
 func ! test-slice-expression(
         user String s,
-        strong Array{Int} arri,
+        strong Array{Uint32} arri,
         strong Array{String} arrs,
         strong Array{SimpleStruct} arrt,
         strong Array{SimpleClass} arrd,
         strong Array{Func{()}} arrf)->(
         var Char c,
-        var Int i,
+        var Uint32 i,
         weak SimpleStruct? t,
         weak SimpleClass? d,
         var Func{()} f,
-        weak Array?{Int} arrio,
+        weak Array?{Uint32} arrio,
         weak Array?{String} arrso,
         weak Array?{SimpleStruct} arrto,
         weak Array?{SimpleClass} arrdo,
@@ -166,19 +166,23 @@ func test-container-expression(copy Sint32 x, copy Sint32 y, user String? s)->(
 
 
 func ! test-variable(
-        copy Int i, weak String text, weak Buffer data, user Array{Int} arr)
-    var Int x
+        copy Uint32 i,
+        weak String text,
+        weak Buffer data,
+        user Array{Uint32} arr)
+    var Uint32 x
     user String? s
     user Buffer? b
-    owner Array?{Int} a
+    owner Array?{Uint32} a
     user TestStruct? t
     user TestClass? d
     var TestStruct tv(copy 0, user _)!
     var TestClass dv
     var String{12} sv
     var Buffer{12} bv
-    var Func?{(copy Int xi, user String si)->(var Int xo, user String? so)} f
-    var Array{12:Int} ia
+    var Func?{(copy Uint32 xi, user String si)->(
+            var Uint32 xo, user String? so)} f
+    var Array{12:Uint32} ia
     var Array{12:SimpleStruct} ta
     var Array{12:SimpleClass} da
     var Array{12:String{7}} sa
@@ -188,20 +192,20 @@ func ! test-variable(
     new TestClass dn!
     new String{arr[0]} sn!
     new Buffer{arr[0]} bn!
-    new Array{arr[0]:Int} ian!
+    new Array{arr[0]:Uint32} ian!
     new Array{arr[0]:SimpleStruct} tan!
     new Array{arr[0]:SimpleClass} dan!
     new Array{arr[0]:String{arr[1]!}} san!
     new Array{arr[0]:Buffer{arr[1]!}} ban!
     new Array{arr[0]:Func{()}} fan!
-    var Int ix(copy arr[0])
+    var Uint32 ix(copy arr[0])
     user String si(user text!)
     user Buffer bi(user data!)
     var String{12} ibv(user "some string")!
     var Buffer{12} isv(user `fadebeef`)!
     new String{i} isn(user text!)!
     new Buffer{i} ibn(user data!)!
-    var Func{:(copy Int n)->(owner String? st)} fi(copy test-int2str)
+    var Func{:(copy Uint32 n)->(owner String? st)} fi(copy test-int2str)
     var TestStruct itv(copy i, user text!)!
     new TestStruct itn(copy i, user text!)!
     var TestClass idv()
@@ -210,7 +214,7 @@ func ! test-variable(
     TestClass()!.print()!
     assert! String{arr[0]}()!.length() > 0
     assert! Buffer{arr[0]}()!.length() > 0
-    assert! Array{arr[0]:Int}()!.length() > 0
+    assert! Array{arr[0]:Uint32}()!.length() > 0
     assert! Array{arr[0]:SimpleStruct}()!.length() > 0
     assert! Array{arr[0]:SimpleClass}()!.length() > 0
     assert! Array{arr[0]:String{arr[1]!}}()!.length() > 0
@@ -254,7 +258,8 @@ func ! test-variable(
 
 
 func test-complex-function(
-        copy Int num, user String text)->(var Int out-num, user String? out-text)
+        copy Uint32 num, user String text)->(
+        var Uint32 out-num, user String? out-text)
     [; Test
     multiline
     comment ;]
@@ -270,7 +275,7 @@ func test-complex-function(
 ; Test types
 struct TestStruct
     ~~~ documentation test ~~~
-    var Int num
+    var Uint32 num
     
     ~~~ Test
     multiline
@@ -282,18 +287,18 @@ struct TestStruct
     owner TestStruct? ts
     var Func{:()} fun
     
-    new!(copy Int x, user String? s) _
+    new!(copy Uint32 x, user String? s) _
     
     [; Test
     multiline
     comment ;]
     
-    func user get()->(var Int x, user String? s) _
+    func user get()->(var Uint32 x, user String? s) _
     
     func user ! print()
         sys.println(user self.text!)!
         
-func ! TestStruct.new(copy Int x, user String? s)
+func ! TestStruct.new(copy Uint32 x, user String? s)
     self.num := x
     if s?
         new String{s!.length() + 1} text(user s!)!
@@ -301,13 +306,13 @@ func ! TestStruct.new(copy Int x, user String? s)
     if x < 0
         self.ts := TestStruct(copy clamp x + 1, user self.text)!
   
-func TestStruct.get()->(var Int x, user String? s)
+func TestStruct.get()->(var Uint32 x, user String? s)
     x := self.num
     s := self.text
 
 
 class TestClass
-    var Int num
+    var Uint32 num
     weak String? text
     owner TestClass? tc
     
@@ -330,22 +335,22 @@ func TestClass.dynamic-meth()
 
 func ! test-void()
     return
-func ! test-params(copy Int x, user String? s, owner String? o)
+func ! test-params(copy Uint32 x, user String? s, owner String? o)
     raise!
-func test-outs()->(owner String? s, var Int x)
-func ! test-int2str(copy Int x)->(owner String? s)
-func test-int(copy Int x)
-func test-int2int(copy Int x)->(var Int r)
+func test-outs()->(owner String? s, var Uint32 x)
+func ! test-int2str(copy Uint32 x)->(owner String? s)
+func test-int(copy Uint32 x)
+func test-int2int(copy Uint32 x)->(var Uint32 r)
 func test-many(
-        copy Int x,
-        copy Int y)->(
-        var Int n,
-        var Int m)
+        copy Uint32 x,
+        copy Uint32 y)->(
+        var Uint32 n,
+        var Uint32 m)
 
 
 func ! test-call-expression()
     owner String? s
-    var Int x
+    var Uint32 x
     test-void()!
     test-params(copy 3, user "text", owner _)!
     test-outs()->(owner s, var x)
@@ -357,15 +362,15 @@ func ! test-call-expression()
             copy 8)->(
             var x,
             var x)
-    var Int tmp
+    var Uint32 tmp
     test-int(copy test-int2int(copy 9)->(var tmp))
     x := clamp test-int2int(copy 10) + test-many(copy 11, copy 12)->(var x)
     s := test-int2str(copy 13)!
 
 
-func ! test-code-flow(user Array{Int} arr)->(var Int res)
+func ! test-code-flow(user Array{Uint32} arr)->(var Uint32 res)
     block
-        var Array{12:Int} a2
+        var Array{12:Uint32} a2
         a2[0] := res
         a2[1] := clamp a2[0] + 3
     if arr[4]! > 6
@@ -380,19 +385,19 @@ func ! test-code-flow(user Array{Int} arr)->(var Int res)
         res := 0
     loop! arr.length()
         arr[6]! := 6
-        var Int x(copy arr[2]!)
+        var Uint32 x(copy arr[2]!)
         while x > 3 and arr is _
-        var Int y(copy clamp x - 1)
+        var Uint32 y(copy clamp x - 1)
         loop! 60
             arr[4]! := arr[8]!
             if y > arr[4]!
                 continue
-            var Int z(copy 7)
+            var Uint32 z(copy 7)
             if z <= arr[4]!
                 while z > 0
     for n in arr[2]!:2 - (3 * arr[2]!)
         arr[0] := arr[2]!
-        var Int w(copy arr[0])
+        var Uint32 w(copy arr[0])
         if w > 4 and arr is-not arr[3:2]!
             arr[1]! := w
         repeat arr[1]! + w
@@ -402,8 +407,8 @@ func ! test-code-flow(user Array{Int} arr)->(var Int res)
 func ! use-builtins(
         temp String s,
         temp Buffer buff,
-        temp Array{Int} a)
-    var Int i
+        temp Array{Uint32} a)
+    var Uint32 i
     var Sint64 x
     var Char c
     var Byte y
@@ -679,7 +684,7 @@ func ! test-for-each()
         sys.print(user " ")!
     sys.println(user "]")!
     
-    var Array{3:Int} arr
+    var Array{3:Uint32} arr
     arr[0] := 14
     arr[1] := 15
     arr[2] := 16

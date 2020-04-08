@@ -16,7 +16,10 @@ The ``cdef`` Module
 The builtin ``cdef`` module contains various C declarations that help
 interacting with C code.
 
-It contains many C primitive types:
+
+C Primitives
+++++++++++++
+``cdef`` contains many C primitive types:
 
 * ``cdef.Char``
 * ``cdef.Uchar``
@@ -34,49 +37,65 @@ It contains many C primitive types:
 
 C Pointers
 ++++++++++
-It also contains ``cdef.Pointer`` generic type to declare C pointers::
+``cdef`` contains ``cdef.Pointer`` generic type to declare C pointers::
 
    var cdef.Pointer{cdef.Int} pointer-to-int
    var cdef.Pointer{cdef.Char} pointer-to-char
-   var cdef.Pointer{SomeStruct} pointer-to-user-defined-struct
+   var cdef.Pointer{cdef.Uchar} pointer-to-uchar
    var cdef.Pointer{cdef.Pointer{cdef.Int}} pointer-to-pointer-to-int
    var cdef.Pointer void-pointer
+
+Set and get pointed value::
    
-   ; pointer methods
    var cdef.Int value
    pointer-to-int.set-point-to(var value)
    pointer-to-pointer-to-int.set-point-to(var pointer-to-int)
    pointer-to-int := pointer-to-pointer-to-int.get-pointed-at(copy 0)
    value := pointer-to-int.get-pointed-at(copy 0)
+
+Get and set pointer from array, string and buffer::
    
-   ; from array
-   user Array?{cdef.Int} int-array
-   pointer-to-int.set-from-array(user int-array)
+   user Array{cdef.Int} int-array
+   user String string
+   user Buffer buffer
+   pointer-to-int := int-array
+   pointer-to-char := string
+   pointer-to-uchar := buffer
    value := pointer-to-int.get-pointed-at(copy 3)
+   cdef.copy-to-string(copy pointer-to-char, user string)!
+   cdef.copy-to-buffer(copy pointer-to-uchar, copy 4, user buffer)!
    
-   ; from reference
-   user SomeStruct? reference
-   pointer-to-user-defined-struct.set-from-ref(user reference)
-   reference := pointer-to-user-defined-struct.get-ref-at(copy 0)
+Pointer to complex types::
+   
+   user SomeStruct reference
+   var cdef.Pointer{SomeStruct} pointer-to-struct
+   pointer-to-struct := reference
+   reference := pointer-to-struct.get-ref-at(copy 0)
 
 
 Calling C Functions
 -------------------
-In order to call a C function it must be declared using the ``native func``
-statement the same way as a standard Lumi function. ::
+To call a C function from Lumi it must first be declared using the
+``native func`` statement::
 
-   ; Allow calling a C function with the following header:
-   ; "int c_function_name(int number)"
+   ; allow calling a C function with header:
+   ; "int some_c_function(int number)"
+   native func cdef.Int some-c-function(copy cdef.Int number)
+   ; "_" characters in the C function name are replaced with "-" in Lumi
+   
+   ; allow calling a C function with header:
+   ; "void CfunctionName(int number, char* text)"
    native func name-used-in-lumi(
-           copy cdef.Int number)->(copy cdef.Int result) "c_function_name"
+       copy cdef.Int number,
+       copy cdef.Pointer{cdef.Char} text) "CfunctionName"
+   ; Lumi name can be different that the C name
 
-This function can now be called as any standard Lumi function.
+These functions can now be called from Lumi code using their Lumi name.
 
 Native functions Have some limitation compared to normal Lumi functions:
 
-* ``owner``, ``strong`` or ``weak`` arguments are unsupported
-* only up to one primitive output is supported
-* primitive outputs must be ``copy``, not ``var``
+* have no output arguments, only input parameters
+* all parameters must be primitives, with ``copy`` access
 * cannot be called with output arguments:
   ``native-function()->(copy output-argument)`` is illegal, may use
   ``output-argument := native-function()`` instead
@@ -85,57 +104,104 @@ Native functions Have some limitation compared to normal Lumi functions:
 Accessing C Global Variables
 ----------------------------
 In order to access a C global variable it must be declared using the
-``native var`` statement. The variable is declared as any uninitialized Lumi
-global variable. ::
+``native var`` statement::
 
-   native var cdef.Int name-used-in-lumi "c_variable_name"
+   ; allow accessing "int some_c_variable" global variable
+   native var cdef.Int some-c-variable
+   
+   ; allow accessing "char* CvariableName" global variable
+   native var cdef.Pointer{cdef.Char} name-used-in-lumi "CvariableName"
+
+These variables can now be accessed from Lumi code using their Lumi name.
 
 Only primitive types can be declared as native variables.
-
-This variable can now be accessed as any standard Lumi variable.
 
 
 Accessing C Global Constants or Defines
 ---------------------------------------
-In order to access a C global constant or ``#define`` value it must be
-declared using the ``native const`` statement. The constant is declared as any
-uninitialized Lumi global constant. ::
+In order to access a C global constant or a ``#define`` value it must be
+declared using the ``native const`` statement::
 
-   native const cdef.Int name-used-in-lumi "C_CONSTANT_NAME"
+   ; allow accessing "SOME_C_CONSTANT" global constant
+   native const cdef.Int SOME-C-CONSTANT
 
-Only ``Int`` Types can be declared as a native constant.
+   ; allow accessing "c_constant_name" global constant
+   native const cdef.Int NAME-USED-IN-LUMI "c_constant_name"
 
-This constant can now be accessed as any standard Lumi constant.
+These constant can now be accessed from Lumi code using their Lumi name.
+
+Only primitive types can be declared as native constants. Currently in
+:ref:`TL5 <syntax-tl5>` only integer types are supported.
 
 
 Accessing C Structures
 ----------------------
-This is not supported yet in :ref:`TL5 <syntax-tl5>`.
-
 It is possible to access custom C structures and their internal fields using
 the ``native struct`` statement with ``var`` lines for each needed field::
    
-   native struct NameUsedInLumi "c_struct_name_t"
-       var cdef.Int field-name-used-in-lumi "c_field_name"
-       var cdef.Int other-field "other_field"
+   ; allow using "SomeCStruct" structure that have fields:
+   ;   int some_filed;
+   ;   char* other_field;
+   native struct SomeCStruct
+       var cdef.Int some-filed
+       var cdef.Pointer{cdef.Char} other-field
+   
+   ; allow using "struct c_struct_name" structure that have fields:
+   ;   int CfieldName;
+   ;   char* CanotherName;
+   native struct NameUsedInLumi "struct c_struct_name"
+       var cdef.Int field-name-used-in-lumi "CfieldName"
+       var cdef.Pointer{cdef.Char} another-lumi-field "CanotherName"
 
-Not all the original fields must be declared - only the ones that are needed to
-be used in Lumi. It is also legal to not declare any fields at all.
+Not all of the original fields must be declared - only the ones that are needed
+to be used in Lumi. It is also legal to not declare any fields at all::
+   
+   native struct SomeCStruct
+
+These structures can now be accessed from Lumi code using their Lumi name.
+
+Native structures are treated as values and not as references like Lumi
+structures. A pointer to the native structures can be used instead::
+
+   var cdef.Pointer{SomeCStruct} pointer-to-native-struct
+
+Native structures fields are accessed as in Lumi structures:
+``native-struct.some-filed``. This also works with pointers to native
+structures: ``pointer-to-native-struct.some-filed``.
+
+Native structures can be used in other native functions, variables, constants,
+and structures::
+
+   native func SomeCStruct c-func-name(copy SomeCStruct input)
+   native func cdef.Pointer{SomeCStruct} other-func(
+       copy cdef.Pointer{SomeCStruct} input)
+   native var SomeCStruct c-var-name
+   native var cdef.Pointer{SomeCStruct} other-var
+   native struct CstructName
+      var SomeCStruct struct-field
+      var cdef.Pointer{SomeCStruct} pointer-field
+      var cdef.Pointer{OtherStruct} self-pointer
 
 
 Accessing Custom C Types
 ------------------------
-It is possible to handle values for custom C types. These types are treated
-as "abstract" values in Lumi, meaning that their exact structure is unknown
-and cannot be accessed.
+It is possible to handle values for custom C types that may be of any kind:
+integers, structures, pointers, etc. These types are treated as "abstract"
+values in Lumi, meaning that their exact structure is unknown and cannot be
+accessed.
 
-C types can be declared using the ``native type`` statement. ::
+C types can be declared using the ``native type`` statement::
 
-   native type NameUsedInLumi "c_type_name_t"
+   ; allow using "SomeCtype" type:
+   native type SomeCtype
+   
+   ; allow using "c_type_name" type:
+   native type NameUsedInLumi "c_type_name"
 
-Native types are treated as any standard Lumi **primitive** type, so this is
-only useful to store and manage primitive C typedefs, or pointers to C
-structures. The only way to use their content is by other C functions.
+These types can now be accessed from Lumi code using their Lumi name.
+
+Native types are treated as abstract unknown values, the only way to use their
+content is by other C functions.
 
 
 Writing C code directly
@@ -152,7 +218,12 @@ or just ``native`` inside a function ::
        result := false
        native "#endif"
 
+This may be used in some special cases where the other methods above are not
+sufficient, or to write some special glue code between Lumi and C.
+
+
 C Wrapper Code
 --------------
-It's recommended to wrap C declarations with pure Lumi declarations that takes
-care for correct usage of the C declarations.
+It's recommended to wrap native C declarations with pure Lumi declarations that
+takes care for correct usage of the C declarations, and to present a simple and
+safe pure Lumi interface.

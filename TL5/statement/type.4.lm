@@ -13,6 +13,7 @@ class TypeData(SyntaxTreeNamespace)
     var Bool is-primitive
     var Bool is-dynamic
     var Bool is-int-like
+    var Bool is-native
     var Bool is-ordered
     var Bool is-delete-mocked
     var Bool ordering
@@ -46,6 +47,9 @@ class TypeData(SyntaxTreeNamespace)
             if glob.last-char != ')'
                 self.syntax-error-c(user "expected \")\" after base type, got")
             read-c()
+        self.parse-body()
+    
+    func inst parse-body()
         self.indentation-spaces := INDENTATION-SPACES
         self.parse-block-children(user self, user _)
         self.indentation-spaces := 0
@@ -56,8 +60,7 @@ class TypeData(SyntaxTreeNamespace)
             base-dynamic := self.base-type.type-data.is-dynamic
     
     func inst is-ref()->(var Bool is-reference)
-        is-reference := not self.is-primitive or self is glob.type-func or
-                self is glob.type-ref
+        is-reference := not self.is-int-like and self is-not glob.type-bool
         
     func inst is-buffered()->(var Bool is-buffered)
         is-buffered := self is glob.type-string or self is glob.type-buffer

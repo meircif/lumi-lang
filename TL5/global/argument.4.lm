@@ -138,6 +138,8 @@ class FunctionArguments(SyntaxTreeNode)
                     user node,
                     user code-node,
                     copy indentation-spaces)
+            if not self.outputs.first?
+                self.syntax-error-msg(user "adding \"->()\" without outputs")
     
     func inst add-self-parameter(
             user TypeData type-data,

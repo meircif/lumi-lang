@@ -27,6 +27,7 @@ class FieldExpression(Expression)
         if not typed-expression
             self.syntax-error(
                     user "void expression has no member", user self.name)
+        user TypeInstance pointed-type
         var Bool after-type(copy instance-type.type-data is glob.type-type)
         var Bool after-base(copy instance-type.type-data is glob.type-base)
         if after-type
@@ -34,6 +35,11 @@ class FieldExpression(Expression)
         else-if after-base
             instance-type :=
                     instance-type.parameters.first.item.type-data.base-type
+        else-if instance-type.type-data is glob.type-pointer
+            if instance-type.parameters?
+                pointed-type := instance-type.parameters.first.item
+                if not pointed-type.type-data.is-primitive
+                    pointed-type := _
         
         if instance-type.type-data is glob.type-module
             new VariableExpression variable-expression(
@@ -45,6 +51,9 @@ class FieldExpression(Expression)
         
         instance-type.type-data.find-field(user self.name)->(
                 user self.variable, var self.bases)
+        if not self.variable? and pointed-type?
+            pointed-type.type-data.find-field(user self.name)->(
+                    user self.variable, var self.bases)
         if self.variable?
             if after-base
                 self.syntax-error(
@@ -129,9 +138,12 @@ class FieldExpression(Expression)
     func dynamic write()
         if self.instance.is-complex-field
             self.instance.write()
-            write(user ".")
         else
             self.instance.write-safe()
+        if self.instance.is-complex-field or
+                self.instance.result-type.type-data.is-native
+            write(user ".")
+        else
             write(user "->")
         for n in self.bases
             write(user "_base.")

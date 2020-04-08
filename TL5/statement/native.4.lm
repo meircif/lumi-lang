@@ -40,6 +40,7 @@ class NativeInclude(SyntaxTreeFunction)
 
 ~~~ Native function declaration in the syntax tree ~~~
 class NativeFunction(SyntaxTreeFunction)
+    owner TypeInstance return-type
     owner NativeText cname
     
     func inst parse-new()->(owner NativeFunction new-node)
@@ -47,16 +48,41 @@ class NativeFunction(SyntaxTreeFunction)
         new-node.parse()
     
     func inst parse()
+        self.return-type := TypeInstance()
+        self.return-type.parse(
+                user " (", user self, user _, copy INDENTATION-SPACES)
+        if glob.last-char = '('
+            glob.save-input := true
+            self.return-type := _
+        else
+            self.expect-space(user "return type")
         self.parse-header(copy true)
         if glob.last-char = ' '
             NativeText.parse-new(user _, user self)->(owner self.cname)
         if self.arguments.has-error
             self.syntax-error-msg(user "error raising native function")
         if self.arguments.outputs.first?
-            if self.arguments.outputs.first.next?
-                self.syntax-error-msg(
-                        user "more than one output to native function")
+            self.syntax-error-msg(user "output arguments to native function")
         glob.current-module.function-map.add(user self.name, user self)
+    
+    func dynamic analyze()
+        if self.return-type?
+            self.return-type.analyze(user self)
+            new DeclarationArgument output
+            output.parent-node := self
+            output.is-output := true
+            output.is-native := true
+            if self.return-type.type-data.is-primitive
+                output.access := Access.COPY
+            else
+                output.access := Access.USER
+            output.variable := SyntaxTreeVariable(user _)
+            output.variable.access := output.access
+            output.variable.is-output := output.is-output
+            output.variable.type-instance := self.return-type
+            string-new-copy(user "native-return")->(owner output.variable.name)
+            self.arguments.outputs.add(owner output)
+        base()
     
     func dynamic check-memory(user ReferenceMemoryList global-refs)
         ; do nothing
@@ -75,13 +101,14 @@ class NativeFunction(SyntaxTreeFunction)
 class NativeVariable(SyntaxTreeVariable)
     owner NativeText cname
     
-    func inst parse-new()->(owner NativeVariable new-node)
+    func inst parse-new(user NativeType parent-type)->(
+            owner NativeVariable new-node)
         new-node := NativeVariable(user _)
-        new-node.parse-native()
+        new-node.parse-native(user parent-type)
     
-    func inst parse-native()
+    func inst parse-native(user NativeType parent-type)
         self.is-native := true
-        self.parse(copy Access.VAR, copy false, user _)
+        self.parse(copy Access.VAR, copy false, user parent-type)
         if glob.last-char = ' '
             NativeText.parse-new(user _, user self)->(owner self.cname)
     
@@ -132,13 +159,14 @@ class NativeConstant(SyntaxTreeConstant)
         self.cname.write(user self.name)
 
 
-~~~ Native variable declaration in the syntax tree ~~~
+~~~ Native type declaration in the syntax tree ~~~
 class NativeType(TypeData)
     owner NativeText cname
 
     new()
         self.set-location()
         self.is-primitive := true
+        self.is-native := true
     
     func inst parse-new()->(owner NativeType new-node)
         new-node := NativeType()
@@ -170,6 +198,33 @@ class NativeType(TypeData)
     
     func dynamic write-cname()
         self.cname.write(user self.name)
+
+
+~~~ Native struct declaration in the syntax tree ~~~
+class NativeStruct(NativeType)
+    func inst parse-new()->(owner NativeStruct new-node)
+        new-node := NativeStruct()
+        new-node.parse()
+    
+    func inst parse()
+        base()
+        self.parse-body()
+
+    func dynamic parse-if-common(
+            user String keyword,
+            user TypeData parent-type,
+            user SyntaxTreeBlock parent-block)->(
+            var Bool is-parsed)
+        keyword.equal(user glob.access-names[Access.VAR])->(var is-parsed)
+        if is-parsed
+            self.variables.add(
+                    owner NativeVariable.parse-new(user _, user self))
+    
+    func dynamic parse-child(user String keyword)
+        self.syntax-error(user "unknown keyword", user keyword)
+    
+    func dynamic analyze()
+        self.analyze-children(user self.variables)
 
 
 ~~~ Native code declaration in the syntax tree ~~~

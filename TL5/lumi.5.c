@@ -643,8 +643,6 @@ void LUMI_owner_dec_ref(Ref_Manager* ref) {
 /* Pointer */
 
 #define cdef_M_Pointer_set_point_to(pointer, value, _) pointer = &value
-#define cdef_M_Pointer_set_from_ref(pointer, ref, _) pointer = ref
-#define cdef_M_Pointer_set_from_array cdef_M_Pointer_set_from_ref
 #define cdef_M_Pointer_get_pointed_at(pointer, index) pointer[index]
 #define cdef_M_Pointer_get_ref_at(pointer, index) (pointer + index)
 

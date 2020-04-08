@@ -5,35 +5,44 @@ native include "time.h"
 
 native type CtimeT "time_t"
 
+native struct StructTm "struct tm"
+    var cdef.Uint tm-sec
+    var cdef.Uint tm-min
+    var cdef.Uint tm-hour
+    var cdef.Uint tm-mday
+    var cdef.Uint tm-mon
+    var cdef.Uint tm-year
+    var cdef.Uint tm-wday
+    var cdef.Uint tm-yday
+    var cdef.Uint tm-isdst
+
 native const Uint64 CLOCKS-PER-SEC
 
-native func c-clock()->(copy Uint64 res) "clock"
+native func Uint64 c-clock() "clock"
 
-native func c-time(copy cdef.Pointer{CtimeT} timer)->(copy CtimeT res) "time"
+native func CtimeT c-time(copy cdef.Pointer{CtimeT} timer) "time"
 
-native func c-ctime(copy cdef.Pointer{CtimeT} timer)->(
-        copy cdef.Pointer{cdef.Char} res) "ctime"
+native func cdef.Pointer{cdef.Char} c-ctime(
+        copy cdef.Pointer{CtimeT} timer) "ctime"
 
-native func c-difftime(copy CtimeT time1, copy CtimeT time2)->(
-        copy Sint64 res) "difftime"
+native func Sint64 c-difftime(copy CtimeT time1, copy CtimeT time2) "difftime"
 
-native func c-asctime(user Time timeptr)->(
-        copy cdef.Pointer{cdef.Char} res) "asctime"
+native func cdef.Pointer{cdef.Char} c-asctime(
+        copy cdef.Pointer{StructTm} timeptr) "asctime"
 
-native func c-mktime(user Time timeptr)->(copy CtimeT res) "mktime"
+native func CtimeT c-mktime(copy cdef.Pointer{StructTm} timeptr) "mktime"
 
-native func c-strftime(
-        user String target,
+native func cdef.Size c-strftime(
+        copy cdef.Pointer{cdef.Char} target,
         copy cdef.Size maxsize,
-        user String format,
-        user Time timeptr)->(
-        copy cdef.Size res) "strftime"
+        copy cdef.Pointer{cdef.Char} format,
+        copy cdef.Pointer{StructTm} timeptr) "strftime"
 
-native func c-gmtime(copy cdef.Pointer{CtimeT} timer)->(
-        user Time? res) "gmtime"
+native func cdef.Pointer{StructTm} c-gmtime(
+        copy cdef.Pointer{CtimeT} timer) "gmtime"
 
-native func c-localtime(copy cdef.Pointer{CtimeT} timer)->(
-        user Time? res) "localtime"
+native func cdef.Pointer{StructTm} c-localtime(
+        copy cdef.Pointer{CtimeT} timer) "localtime"
 
 
 struct Timer
@@ -44,7 +53,7 @@ struct Timer
         self.c-timer := c-time(copy null)
     
     func user mktime(user Time tm)
-        self.c-timer := c-mktime(user tm)
+        self.c-timer := c-mktime(copy tm.c-pointer())
       
     func user c-pointer()->(var cdef.Pointer{CtimeT} timer-pointer)
         timer-pointer.set-point-to(var self.c-timer)
@@ -52,35 +61,90 @@ struct Timer
     func user ! ctime(user String target)
         cdef.copy-to-string(copy c-ctime(copy self.c-pointer()), user target)!
     
-    func user gmtime()->(user Time? new-time)
-        new-time := c-gmtime(copy self.c-pointer())
+    func user gmtime(user Time tm)
+        tm.set(copy c-gmtime(copy self.c-pointer()))
     
-    func user localtime()->(user Time? new-time)
-        new-time := c-localtime(copy self.c-pointer())
+    func user localtime(user Time tm)
+        tm.set(copy c-localtime(copy self.c-pointer()))
 
 
 struct Time
-    var cdef.Int sec
-    var cdef.Int min
-    var cdef.Int hour
-    var cdef.Int mday
-    var cdef.Int mon
-    var cdef.Int year
-    var cdef.Int wday
-    var cdef.Int yday
-    var cdef.Int isdst
+    var StructTm tm
+    
+    func user set(copy cdef.Pointer{StructTm} tm)
+        self.tm := tm.get-pointed-at(copy 0)
+    
+    func user get-sec()->(var Int{59} sec)
+        sec := self.tm.tm-sec mod 60
+    
+    func user set-sec(copy Int{59} sec)
+        self.tm.tm-sec := sec
+    
+    func user get-min()->(var Int{59} min)
+        min := self.tm.tm-min mod 60
+    
+    func user set-min(copy Int{59} min)
+        self.tm.tm-min := min
+        
+    func user get-hour()->(var Int{23} hour)
+        hour := self.tm.tm-hour mod 24
+    
+    func user set-hour(copy Int{23} hour)
+        self.tm.tm-hour := hour
+    
+    func user get-mday()->(var Int{1:31} mday)
+        mday := clamp self.tm.tm-mday
+    
+    func user set-mday(copy Int{1:31} mday)
+        self.tm.tm-mday := mday
+    
+    func user get-mon()->(var Int{11} mon)
+        mon := self.tm.tm-mon mod 12
+    
+    func user set-mon(copy Int{11} mon)
+        self.tm.tm-mon := mon
+    
+    func user get-year()->(var Int{0x7fffffff} year)
+        year := clamp self.tm.tm-year
+    
+    func user set-year(copy Int{0x7fffffff} year)
+        self.tm.tm-year := year
+    
+    func user get-wday()->(var Int{6} wday)
+        wday := self.tm.tm-wday mod 7
+    
+    func user set-wday(copy Int{6} wday)
+        self.tm.tm-wday := wday
+    
+    func user get-yday()->(var Int{365} yday)
+        yday := self.tm.tm-yday mod 366
+    
+    func user set-yday(copy Int{365} yday)
+        self.tm.tm-yday := yday
+    
+    func user get-isdst()->(var Bool isdst)
+        isdst := self.tm.tm-isdst <> 0
+    
+    func user set-isdst(copy Bool isdst)
+        if isdst
+            self.tm.tm-isdst := 1
+        else
+            self.tm.tm-isdst := 0
+    
+    func user c-pointer()->(var cdef.Pointer{StructTm} timeptr)
+        timeptr.set-point-to(var self.tm)
     
     func user ! asctime(user String target)
-        cdef.copy-to-string(copy c-asctime(user self), user target)!
+        cdef.copy-to-string(copy c-asctime(copy self.c-pointer()), user target)!
     
     func user strftime(user String target, user String format)->(
             var Uint32 copied)
         var Ref timeptr(copy self)
         copied := clamp c-strftime(
-                user target,
+                copy target,
                 copy target.max-length(),
-                user format,
-                user self)
+                copy format,
+                copy self.c-pointer())
         cdef.set-null-term-length(user target)
 
 

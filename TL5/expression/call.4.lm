@@ -22,6 +22,9 @@ class CallExpression(Expression)
             result-type.new-replace-params(user actual-params)->(
                     owner self.result-type)
             result-type := self.result-type
+        if result-type?
+            if result-type.int-range?
+                result-type.int-range.set-values(user self)
         if self.arguments.check-calling(
                 user declaration, user actual-params, copy bases)
             ; add omitted output
@@ -379,6 +382,8 @@ class CallArgument(Argument)
     func dynamic check-memory(user ReferenceMemoryList refs)
         user ReferencePath reference-path(
                 user self.value.result-type.reference-path)
+        if self.is-output
+            refs.clear-invalid-reference(user reference-path)
         if access-is-owner(copy self.access) and reference-path?
             refs.check-writing-memory(user self.value)
             if not self.is-output

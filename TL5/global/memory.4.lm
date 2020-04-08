@@ -18,7 +18,8 @@ struct ReferencePath
             owner ReferencePath reference)
         reference := ReferencePath(user self.variable)
         if self.field?
-            self.field.copy-and-add-field(user variable)->(owner reference.field)
+            self.field.copy-and-add-field(user variable)->(
+                    owner reference.field)
         else
             reference.field := ReferencePath(user variable)
     

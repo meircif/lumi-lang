@@ -2,7 +2,7 @@
 module error
 
 class BaseType
-    var Int x
+    var Uint32 x
     func dynamic user? meth()
 
 class TopType(BaseType)
@@ -17,7 +17,7 @@ func ! f-good-function()
 func ! f-raise-message(user String msg)
     raise! msg
 
-var Int new-fail-countdown
+var Uint32 new-fail-countdown
 
 mock new()->(var Bool alloc-success)
     alloc-success := true
@@ -32,13 +32,13 @@ test fail-call-empty()
     fun!()
 
 test fail-slice-index()
-    var Array{2:Int} arr
-    var Int i(copy 6)
+    var Array{2:Uint32} arr
+    var Uint32 i(copy 6)
     assert! arr[i]! = 0
 
 test fail-negative-sequence()
     var Sint8 length(copy -2)
-    new Array{length:Int} arr!
+    new Array{length:Uint32} arr!
 
 test fail-member-empty()
     user BaseType? obj
@@ -53,18 +53,18 @@ test fail-member-outdated()
     obj!.meth()
 
 test fail-sequence-empty()
-    user Array?{Int} arr
+    user Array?{Uint32} arr
     assert! arr![0] = 0
 
 test fail-sequence-outdated()
-    strong Array?{Int} arr-owner(strong Array{2:Int}()!)
-    weak Array?{Int} arr(weak arr-owner)
+    strong Array?{Uint32} arr-owner(strong Array{2:Uint32}()!)
+    weak Array?{Uint32} arr(weak arr-owner)
     arr-owner := _
     assert! arr![0] = 0
 
 test fail-slice-outdated()
-    strong Array?{Int} arr-owner(strong Array{6:Int}()!)
-    weak Array?{Int} arr(weak arr-owner![2:3]!)
+    strong Array?{Uint32} arr-owner(strong Array{6:Uint32}()!)
+    weak Array?{Uint32} arr(weak arr-owner![2:3]!)
     arr-owner := _
     assert! arr![0] = 0
 
@@ -103,7 +103,7 @@ test fail-assert-error-message-prefix()
     assert-error! f-raise-message(user "tested message"), "tested message and more"
 
 test fail-zero-division()
-    var Int x(copy 0)
+    var Uint32 x(copy 0)
     assert! 12 div x! = 0
     
 test fail-loop-limit()

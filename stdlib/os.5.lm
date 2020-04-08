@@ -12,18 +12,10 @@ native const Int X-OK
 native const Int F-OK
 
 
-native func access(copy cdef.Pointer{cdef.Char} path, copy Int amode)->(
-        copy Int res)
-
-func string-to-chars(user String str)->(var cdef.Pointer{Char} ptr)
-    user Array{Char} bla
-    bla := str
-    ptr.set-from-array(user bla)
+native func Int access(copy cdef.Pointer{cdef.Char} path, copy Int amode)
 
 func exists(user String path)->(var Bool exist)
-    var cdef.Pointer{Char} c-path
-    c-path := string-to-chars(user path)
-    exist := access(copy c-path, copy F-OK) <> -1
+    exist := access(copy path, copy F-OK) <> -1
 
 
 ; dirent.h porting for directory operations.
@@ -31,29 +23,18 @@ func exists(user String path)->(var Bool exist)
 
 native include "dirent.h"
 
-native type Dir "DIR"
+native struct Dir "DIR"
 
-native type Dirent "struct dirent"
+native struct Dirent "struct dirent"
+    var cdef.Pointer{cdef.Char} d-name
 
-native func strlen(copy cdef.Pointer{Char} str)->(
-        copy Int len) "strlen"
+native func Int strlen(copy cdef.Pointer{Char} str)
 
-native func closedir(copy cdef.Pointer{Dir} dir)->(
-        copy Int ret) "closedir"
+native func Int closedir(copy cdef.Pointer{Dir} dir)
 
-native func opendir(copy cdef.Pointer{cdef.Char} path)->(
-        copy cdef.Pointer{Dir} dir) "opendir"
+native func cdef.Pointer{Dir} opendir(copy cdef.Pointer{cdef.Char} path)
 
-native func readdir(copy cdef.Pointer{Dir} dir)->(
-        copy cdef.Pointer{Dirent} ent) "readdir"
-
-native code "
-char* get_dname(struct dirent* dir) {
-  return dir->d_name;
-}"
-
-native func get-dname(copy cdef.Pointer{Dirent} dir)->(
-        copy cdef.Pointer{cdef.Char} path) "get_dname"
+native func cdef.Pointer{Dirent} readdir(copy cdef.Pointer{Dir} dir)
 
 struct Path
     owner String path-r
@@ -61,27 +42,21 @@ struct Path
     new!(copy Int len)
         self.path-r := String{len + 1}()!
 
-func ! list-dir(user String dir-path)->(
-        owner ds.List?{Path} files)
-
-    var cdef.Pointer?{Dir} dir
-    var cdef.Pointer?{Dirent} ent
-    var cdef.Pointer{Char} string-pointer
+func ! list-dir(user String dir-path)->(owner ds.List?{Path} files)
+    var cdef.Pointer{Dir} dir
+    var cdef.Pointer{Dirent} ent
 
     files := ds.List{Path}()!
 
-    string-pointer := string-to-chars(user dir-path)
-    dir := opendir(copy string-pointer)
+    dir := opendir(copy dir-path)
     if not dir?
         raise! "path is not dir"
     loop
-        var cdef.Pointer{Char} c-string
-        ent := readdir(copy dir!)
+        ent := readdir(copy dir)
         while ent?
-        c-string := get-dname(copy ent!)
-        new Path path(copy strlen(copy c-string))!
-        cdef.copy-to-string(copy c-string, user path.path-r)!
+        new Path path(copy strlen(copy ent!.d-name))!
+        cdef.copy-to-string(copy ent!.d-name, user path.path-r)!
         files!.append(owner path)!
 
-    if closedir(copy dir!) <> 0
+    if closedir(copy dir) <> 0
         raise! "failed to close directory"

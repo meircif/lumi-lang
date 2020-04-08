@@ -28,17 +28,22 @@ test test-difftime()
     assert! time.difftime(user timer1, user timer2) = 200
 
 
+func set-time(user time.Time tm)
+    tm.set-sec(copy 43)
+    tm.set-min(copy 54)
+    tm.set-hour(copy 21)
+    tm.set-mday(copy 28)
+    tm.set-mon(copy 11)
+    tm.set-year(copy 118)
+    tm.set-wday(copy 5)
+    tm.set-yday(copy 321)
+    tm.set-isdst(copy false)
+    tm.set-isdst(copy true)
+
+
 test test-asctime()
     var time.Time tm
-    tm.sec := 43
-    tm.min := 54
-    tm.hour := 21
-    tm.mday := 28
-    tm.mon := 11
-    tm.year := 118
-    tm.wday := 5
-    tm.yday := 321
-    tm.isdst := 1
+    set-time(user tm)
     var String{256} result
     tm.asctime(user result)!
     assert! result.equal(user "good")
@@ -46,15 +51,7 @@ test test-asctime()
 
 test test-strftime()
     var time.Time tm
-    tm.sec := 43
-    tm.min := 54
-    tm.hour := 21
-    tm.mday := 28
-    tm.mon := 11
-    tm.year := 118
-    tm.wday := 5
-    tm.yday := 321
-    tm.isdst := 1
+    set-time(user tm)
     var String{256} result
     var Uint32 length
     tm.strftime(user result, user "AB")->(var length)
@@ -64,15 +61,7 @@ test test-strftime()
 
 test test-mktime()
     var time.Time tm
-    tm.sec := 43
-    tm.min := 54
-    tm.hour := 21
-    tm.mday := 28
-    tm.mon := 11
-    tm.year := 118
-    tm.wday := 5
-    tm.yday := 321
-    tm.isdst := 1
+    set-time(user tm)
     var time.Timer timer
     time-value := 2233
     timer.mktime(user tm)
@@ -85,33 +74,31 @@ test test-gmtime()
     var time.Timer timer
     time-value := 3004
     timer.time()
-    user time.Time? ctm
-    timer.gmtime()->(user ctm)!
-    user time.Time tm(user ctm!)
-    assert! tm.sec = 43
-    assert! tm.min = 54
-    assert! tm.hour = 21
-    assert! tm.mday = 28
-    assert! tm.mon = 11
-    assert! tm.year = 118
-    assert! tm.wday = 5
-    assert! tm.yday = 321
-    assert! tm.isdst = 1
+    var time.Time tm
+    timer.gmtime(user tm)!
+    assert! tm.get-sec() = 43
+    assert! tm.get-min() = 54
+    assert! tm.get-hour() = 21
+    assert! tm.get-mday() = 28
+    assert! tm.get-mon() = 11
+    assert! tm.get-year() = 118
+    assert! tm.get-wday() = 5
+    assert! tm.get-yday() = 321
+    assert! tm.get-isdst() = 1
 
 
 test test-localtime()
     var time.Timer timer
     time-value := 3005
     timer.time()
-    user time.Time? ctm
-    timer.localtime()->(user ctm)!
-    user time.Time tm(user ctm!)
-    assert! tm.sec = 43
-    assert! tm.min = 54
-    assert! tm.hour = 18
-    assert! tm.mday = 28
-    assert! tm.mon = 11
-    assert! tm.year = 118
-    assert! tm.wday = 5
-    assert! tm.yday = 321
-    assert! tm.isdst = 1
+    var time.Time tm
+    timer.localtime(user tm)!
+    assert! tm.get-sec() = 43
+    assert! tm.get-min() = 54
+    assert! tm.get-hour() = 18
+    assert! tm.get-mday() = 28
+    assert! tm.get-mon() = 11
+    assert! tm.get-year() = 118
+    assert! tm.get-wday() = 5
+    assert! tm.get-yday() = 321
+    assert! tm.get-isdst() = 1

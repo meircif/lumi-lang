@@ -1793,6 +1793,30 @@ uint8_t u8 = 0;
     u64 = aux_Int_3;
     ut_M_fun5(0x04, &(aux_Int_4));
     s64 = aux_Int_4;
+/// @ test-call-expression-28
+Return_Code ut_M_get(char** res, Seq_Length* res_Max_length, Seq_Length** res_Length, Ref_Manager** res_Refman);
+Return_Code ut_M_get(char** res, Seq_Length* res_Max_length, Seq_Length** res_Length, Ref_Manager** res_Refman) {
+    Return_Code LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    char* s = NULL;
+    Seq_Length s_Max_length = 0;
+    Seq_Length* s_Length = &Lumi_empty_length;
+    Ref_Manager* s_Refman = NULL;
+    LUMI_err = ut_M_get(&(s), &(s_Max_length), &(s_Length), &(s_Refman));
+    CHECK(3, LUMI_block0_cleanup)
+    CHECK_REFMAN(4, LUMI_block0_cleanup, s_Refman)
+    String_clear(s, s_Max_length, s_Length);
+    LUMI_inc_ref(s_Refman);
+    LUMI_dec_ref(*res_Refman);
+    *res_Refman = s_Refman;
+    *res_Max_length = s_Max_length;
+    *res_Length = s_Length;
+    *res = s;
+LUMI_block0_cleanup:
+    (void)0;
+    LUMI_dec_ref(s_Refman);
+    return LUMI_err;
+}
 /// @ test-call-expression-e0
 expected access, got " "
 /// @ test-call-expression-e1
@@ -1841,6 +1865,10 @@ ignoring error result check on function call
 error raised inside function not declared as error raising "fun"
 /// @ test-call-expression-e23
 assigning conditional into non-conditional type "String"
+/// @ test-call-expression-e24
+using invalid reference "s"
+/// @ test-call-expression-e25
+adding "->()" without outputs
 /// @@ test-type-expression
 /// @ test-type-expression-0
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_t_Refman)
@@ -2742,6 +2770,8 @@ cannot use "?" on void expression
 cannot use "?" on non conditional or weak reference of type "Int"
 /// @ test-question-expression-e2
 cannot use "?" on non conditional or weak reference of type "Test"
+/// @ test-question-expression-e3
+cannot use "?" on primitive type "Int"
 /// @@ test-exclamation-expression
 /// @ test-exclamation-expression-0
 char* s = NULL;
@@ -2971,6 +3001,32 @@ uint8_t u8 = 0;
     s32 = 0x0186a0;
     s32 = -0x0186a0;
     ut_M_i = 0x14 + -0x14;
+/// @ test-int-range-4
+void ut_M_fun(void);
+void ut_M_get(uint8_t* x);
+void ut_M_set(uint8_t x);
+void ut_M_fun(void) {
+    unsigned LUMI_loop_depth = 1;
+    uint32_t x = 0;
+    uint8_t aux_Int_0 = 0;
+    uint8_t aux_Int_1 = 0;
+    ut_M_set(0x0c);
+    ut_M_get(&(aux_Int_0));
+    ut_M_get(&(aux_Int_1));
+    x = aux_Int_1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_get(uint8_t* x) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_set(uint8_t x) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
 /// @ test-int-range-e0
 integer range minimum "12" larger than maximum "11"
 /// @ test-int-range-e1
@@ -4771,6 +4827,8 @@ error raised inside function not declared as error raising "fun"
 error raised inside function not declared as error raising "fun"
 /// @ test-function-e32
 error raised inside function not declared as error raising "fun"
+/// @ test-function-e33
+adding "->()" without outputs
 /// @@ test-members
 /// @ test-members-0
 typedef struct ut_M_Test ut_M_Test;
@@ -7395,11 +7453,20 @@ LUMI_block0_cleanup:
     (void)0;
 }
 /// @ test-native-t0
+void ut_M_get(Native* n);
 void ut_M_call(void);
+void ut_M_get(Native* n) {
+    unsigned LUMI_loop_depth = 1;
+    *n = get_native();
+LUMI_block0_cleanup:
+    (void)0;
+}
 void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
-    Native n = 0;
-    n = external(n);
+    Native n;
+    set_native(native_var);
+    ut_M_get(&(n));
+    set_native(n);
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -7407,10 +7474,56 @@ LUMI_block0_cleanup:
 void ut_M_call(void);
 void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
-    SOME_External_type n = 0;
-    n = SOME_External_func(n);
+    SOME_External_type n;
+    n = SOME_External_get_func();
+    SOME_External_set_func(n);
 LUMI_block0_cleanup:
     (void)0;
+}
+/// @ test-native-s0
+void ut_M_fun(c_native_type_t in, c_native_type_t* out);
+void ut_M_fun(c_native_type_t in, c_native_type_t* out) {
+    unsigned LUMI_loop_depth = 1;
+    c_native_type_t n = {0};
+    c_native_type_t def = {0};
+    n = in;
+    *out = n;
+    *out = ext(in);
+    if ((uint64_t)(in.c_y_field + (*out).c_x_field) > 0x64) {
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+    in.c_x_field = 0;
+    in.c_y_field = 0;
+    *out = def;
+    ext(def);
+LUMI_block0_cleanup:
+    (void)0;
+}
+/// @ test-native-s1
+Return_Code ut_M_fun(Test t, TestRef r, Native in, Native* out);
+Return_Code ut_M_fun(Test t, TestRef r, Native in, Native* out) {
+    Return_Code LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    CHECK_REF(10, LUMI_block0_cleanup, in.n)
+    if (((in.x == 0) && (in.t.x == 0)) && (in.n->x == 0)) {
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+    in.x = 0;
+    in.t = t;
+    in.t.x = 0;
+    in.r = r;
+    CHECK_REF(15, LUMI_block0_cleanup, in.n)
+    in.n->x = 0;
+    cdef_M_Pointer_set_point_to(in.n, in, &Native_dynamic);
+    *out = cdef_M_Pointer_get_pointed_at(in.n, 0);
+    *out = in;
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
 }
 /// @ test-native-b0
 #define HAS_SOME_DEFINE
@@ -7435,34 +7548,26 @@ redefinition of function "error"
 /// @ test-native-ef1
 error raising native function
 /// @ test-native-ef2
-more than one output to native function
+output arguments to native function
 /// @ test-native-ef3
-owner argument to native function
+expected space after "return type", got "new-line"
 /// @ test-native-ef4
-var output to native function
+owner argument to native function
 /// @ test-native-ef5
-argument "s" access should not be "s-var" for non-primitive type "String"
+managed argument to native function
 /// @ test-native-ef6
-managed argument to native function
+owner argument to native function
 /// @ test-native-ef7
-owner argument to native function
-/// @ test-native-ef8
-owner argument to native function
-/// @ test-native-ef9
-managed argument to native function
-/// @ test-native-ef10
-owner argument to native function
-/// @ test-native-ef11
 argument "s" access should not be "s-var" for non-primitive type "String"
-/// @ test-native-ef12
+/// @ test-native-ef8
 output argument in native function call
-/// @ test-native-ef13
+/// @ test-native-ef9
 no '"' around string constant "error"
-/// @ test-native-ef14
+/// @ test-native-ef10
 user output to native function with non struct type "String"
-/// @ test-native-ef15
+/// @ test-native-ef11
 user output to native function with non struct type "Array"
-/// @ test-native-ef16
+/// @ test-native-ef12
 user output to native function with non struct type "Error"
 /// @ test-native-ev0
 only primitive types supported for native variable, got "String"
@@ -7476,6 +7581,14 @@ Only numeric typed native constant supported, got "Bool"
 sequence length is not constant
 /// @ test-native-et0
 no '"' around string constant "error"
+/// @ test-native-et1
+using invalid reference "n"
+/// @ test-native-es0
+unknown keyword "user"
+/// @ test-native-es1
+unknown keyword "func"
+/// @ test-native-es2
+only primitive types supported for native variable, got "String"
 /// @ test-native-eb0
 no '"' around string constant "#define error"
 /// @ test-native-eb1
@@ -10154,7 +10267,7 @@ LUMI_block0_cleanup:
 Return_Code second_M_use(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Native n = 0;
+    Native n;
     x = 0x02;
     external();
 LUMI_block0_cleanup:
@@ -11457,52 +11570,61 @@ uint16_t u16 = 0;
     s64 = (c_long_double < -INT64_MAX)? -INT64_MAX: c_long_double;
     ut_M_j = CLAMPED_ADD_SS(c_char, (CLAMPED_ADD_SU(c_schar, (CLAMPED_ADD_US(c_uchar, (CLAMPED_ADD_SU(c_short, (CLAMPED_ADD_US(c_ushort, (CLAMPED_ADD_SU(c_int, (CLAMPED_ADD_US(c_uint, (CLAMPED_ADD_SU(c_long, (CLAMPED_ADD_UU(c_ulong, (CLAMPED_ADD_US(c_size, (CLAMPED_ADD_SS(c_float, (CLAMPED_ADD_SS(c_double, (CLAMPED_ADD_SS(c_long_double, (c_char), -0x8000000000000000, INT64_MAX)), -0x8000000000000000, INT64_MAX)), -0x8000000000000000, INT64_MAX)), 0, UINT64_MAX)), 0, UINT64_MAX)), -0x8000000000000000, INT64_MAX)), 0, UINT64_MAX)), -0x8000000000000000, INT64_MAX)), 0, UINT32_MAX)), -0x80000000, INT32_MAX)), 0, UINT16_MAX)), -0x8000, INT16_MAX)), -0x010000, UINT16_MAX);
 /// @ test-c-objects-1
-void* p_void = 0;
-    cdef_M_Char* p_char = 0;
-    cdef_M_Uint* p_uint = 0;
-    ut_M_Test* p_test = 0;
-    cdef_M_Int** pp_int = 0;
-    cdef_M_Char*** ppp_char = 0;
+void* p_void = NULL;
+    cdef_M_Char* p_char = NULL;
+    cdef_M_Uint* p_uint = NULL;
+    ut_M_Test* p_test = NULL;
+    cdef_M_Int** pp_int = NULL;
+    cdef_M_Char*** ppp_char = NULL;
     p_void = p_char;
     p_uint = p_void;
     p_char = p_uint;
+    ut_M_b = ((((p_void != NULL) || (p_char != NULL)) || (p_test != NULL)) || (pp_int != NULL)) || (ppp_char != NULL);
 /// @ test-c-objects-2
 cdef_M_Int cint = 0;
-    cdef_M_Int* p_int = 0;
-    cdef_M_Int** pp_int = 0;
+    cdef_M_Int* p_int = NULL;
+    cdef_M_Int** pp_int = NULL;
     cdef_M_Int* arr_int = NULL;
     Seq_Length arr_int_Length = 0;
     ut_M_Test test_Var = {0};
     ut_M_Test* test = NULL;
     ut_M_Test* u_test = NULL;
-    ut_M_Test* p_test = 0;
+    ut_M_Test* p_test = NULL;
     ut_M_Test* arr_test = NULL;
     Seq_Length arr_test_Length = 0;
-    CHECK_REF(5, LUMI_block0_cleanup, arr_int)
-    cdef_M_Pointer_set_from_array(p_int, arr_int, arr_int_Length);
+    p_int = arr_int;
     cdef_M_Pointer_set_point_to(p_int, cint, &cdef_M_Int_dynamic);
     cdef_M_Pointer_set_point_to(pp_int, p_int, &cdef_M_Int*_dynamic);
     p_int = cdef_M_Pointer_get_pointed_at(pp_int, 0);
     cint = cdef_M_Pointer_get_pointed_at(p_int, 0x03);
     test = &test_Var;
     u_test = test;
-    CHECK_REF(14, LUMI_block0_cleanup, arr_test)
-    cdef_M_Pointer_set_from_array(p_test, arr_test, arr_test_Length);
-    cdef_M_Pointer_set_from_ref(p_test, test, &ut_M_Test_dynamic);
+    p_test = arr_test;
+    p_test = test;
     u_test = ((ut_M_Test*)cdef_M_Pointer_get_ref_at(p_test, 0x05));
 /// @ test-c-objects-3
-Char* p_char = 0;
-    CHECK_REF(2, LUMI_block0_cleanup, ut_M_ostr)
-    cdef_M_Pointer_set_from_array(p_char, ut_M_ostr, *ut_M_ostr_Length);
-    CHECK_REF(3, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = cdef_M_copy_to_string(p_char, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
-    CHECK(3, LUMI_block0_cleanup)
-    CHECK_REF(4, LUMI_block0_cleanup, ut_M_ostr)
-    cdef_M_set_null_term_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
+Return_Code ut_M_fun(char* str, Seq_Length str_Max_length, Seq_Length* str_Length, Byte* buff, Seq_Length buff_Max_length, Seq_Length* buff_Length);
+Return_Code ut_M_fun(char* str, Seq_Length str_Max_length, Seq_Length* str_Length, Byte* buff, Seq_Length buff_Max_length, Seq_Length* buff_Length) {
+    Return_Code LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    cdef_M_Char* p_char = NULL;
+    cdef_M_Uchar* p_uchar = NULL;
+    p_char = str;
+    p_uchar = buff;
+    ext(str, buff);
+    CHECK_REF(10, LUMI_block0_cleanup, str)
+    LUMI_err = cdef_M_copy_to_string(p_char, str, str_Max_length, str_Length);
+    CHECK(10, LUMI_block0_cleanup)
+    CHECK_REF(11, LUMI_block0_cleanup, str)
+    cdef_M_set_null_term_length(str, str_Max_length, str_Length);
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
 /// @ test-c-objects-4
-Byte* p_byte = 0;
+cdef_M_Uchar* p_uchar = NULL;
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_buff)
-    LUMI_err = cdef_M_copy_to_buffer(p_byte, 0x04, ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length);
+    LUMI_err = cdef_M_copy_to_buffer(p_uchar, 0x04, ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length);
     CHECK(2, LUMI_block0_cleanup)
 /// @ test-c-objects-e0
 dynamic pointed type "Ta"
@@ -11510,6 +11632,8 @@ dynamic pointed type "Ta"
 cannot assign value with access "user" into value with access "var"
 /// @ test-c-objects-e2
 assigning into non assignable expression
+/// @ test-c-objects-e3
+cannot use "?" on primitive type "Pointer"
 /// @@ test-cleanup-function
 /// @ test-cleanup-function-0
 typedef struct ut_M_Test ut_M_Test;
