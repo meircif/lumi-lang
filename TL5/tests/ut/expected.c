@@ -1,4 +1,5 @@
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 typedef struct ut_M_Ta ut_M_Ta;
 typedef struct ut_M_Ta_Dynamic ut_M_Ta_Dynamic;
 typedef struct ut_M_Tb ut_M_Tb;
@@ -6,18 +7,22 @@ typedef struct ut_M_Tb_Dynamic ut_M_Tb_Dynamic;
 typedef struct ut_M_Tc ut_M_Tc;
 typedef struct ut_M_Tc_Dynamic ut_M_Tc_Dynamic;
 typedef struct ut_M_Data ut_M_Data;
+typedef struct ut_M_Data_Dynamic ut_M_Data_Dynamic;
 struct ut_M_Test {
     uint32_t num;
     ut_M_Test* t;
     Ref_Manager* t_Refman;
     void (*fun)(void);
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 struct ut_M_Ta {
     ut_M_Test _base;
     uint32_t numa;
 };
 struct ut_M_Ta_Dynamic {
-    Dynamic_Del _del;
+    ut_M_Test_Dynamic _base;
     void (*dyn)(ut_M_Ta* self, ut_M_Ta_Dynamic* self_Dynamic);
 };
 struct ut_M_Tb {
@@ -39,8 +44,11 @@ struct ut_M_Data {
     Ref_Manager* item_Refman;
     Generic_Type_Dynamic* item_Dynamic;
 };
+struct ut_M_Data_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_meth(ut_M_Test* self);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Ta_metha(ut_M_Ta* self, ut_M_Ta_Dynamic* self_Dynamic);
 void ut_M_Ta_dyn(ut_M_Ta* self, ut_M_Ta_Dynamic* self_Dynamic);
 void ut_M_Ta_Del(ut_M_Ta* self, ut_M_Ta_Dynamic* self_Dynamic);
@@ -53,7 +61,7 @@ void ut_M_Tc_dyn(ut_M_Tc* self, ut_M_Tc_Dynamic* self_Dynamic);
 void ut_M_Tc_Del(ut_M_Tc* self, ut_M_Tc_Dynamic* self_Dynamic);
 void ut_M_Data_set(ut_M_Data* self, Generic_Type* item, Generic_Type_Dynamic* item_Dynamic);
 void ut_M_Data_get(ut_M_Data* self, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
-void ut_M_Data_Del(ut_M_Data* self);
+void ut_M_Data_Del(ut_M_Data* self, ut_M_Data_Dynamic* self_Dynamic);
 void ut_M_fun0(void);
 void ut_M_fun1(uint32_t x, char* s, Seq_Length s_Max_length, Seq_Length* s_Length, char* o, Seq_Length o_Max_length, Seq_Length* o_Length);
 void ut_M_fun2(char** s, Seq_Length* s_Max_length, Seq_Length** s_Length, Ref_Manager** s_Refman, uint32_t* x);
@@ -65,11 +73,36 @@ void ut_M_fun7(ut_M_Tb* tb, Ref_Manager* tb_Refman, ut_M_Tb_Dynamic* tb_Dynamic,
 void ut_M_fun8(char* s, Seq_Length s_Max_length, Seq_Length* s_Length, Ref_Manager* s_Refman);
 Return_Code ut_M_fune(void);
 Return_Code ut_M_mock(char* str, Seq_Length str_Max_length, Seq_Length* str_Length, Byte* bfr, Seq_Length bfr_Max_length, Seq_Length* bfr_Length, char** so, Seq_Length* so_Max_length, Seq_Length** so_Length, Ref_Manager** so_Refman, uint32_t* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-ut_M_Ta_Dynamic ut_M_Ta_dynamic = {(Dynamic_Del)ut_M_Ta_Del, ut_M_Ta_dyn};
-ut_M_Tb_Dynamic ut_M_Tb_dynamic = {{(Dynamic_Del)ut_M_Tb_Del, (void (*)(ut_M_Ta* self, ut_M_Ta_Dynamic* self_Dynamic))ut_M_Tb_dyn}};
-ut_M_Tc_Dynamic ut_M_Tc_dynamic = {{{(Dynamic_Del)ut_M_Tc_Del, (void (*)(ut_M_Ta* self, ut_M_Ta_Dynamic* self_Dynamic))ut_M_Tc_dyn}}};
-Generic_Type_Dynamic ut_M_Data_dynamic = {(Dynamic_Del)ut_M_Data_Del};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+ut_M_Ta_Dynamic ut_M_Ta_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Ta_Del
+    },
+    ut_M_Ta_dyn
+};
+ut_M_Tb_Dynamic ut_M_Tb_dynamic = {
+    {
+        {
+            (Dynamic_Del)ut_M_Tb_Del
+        },
+        (void (*)(ut_M_Ta* self, ut_M_Ta_Dynamic* self_Dynamic))ut_M_Tb_dyn
+    }
+};
+ut_M_Tc_Dynamic ut_M_Tc_dynamic = {
+    {
+        {
+            {
+                (Dynamic_Del)ut_M_Tc_Del
+            },
+            (void (*)(ut_M_Ta* self, ut_M_Ta_Dynamic* self_Dynamic))ut_M_Tc_dyn
+        }
+    }
+};
+ut_M_Data_Dynamic ut_M_Data_dynamic = {
+    (Dynamic_Del)ut_M_Data_Del
+};
 uint32_t ut_M_i = 0;
 int32_t ut_M_j = 0;
 Byte ut_M_bt = 0;
@@ -112,7 +145,7 @@ void ut_M_Test_meth(ut_M_Test* self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->t_Refman);
 }
@@ -128,7 +161,7 @@ LUMI_block0_cleanup:
 }
 void ut_M_Ta_Del(ut_M_Ta* self, ut_M_Ta_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Test_Del(&(self->_base), &(self_Dynamic->_base));
+    ut_M_Test_Del(&(self->_base), NULL);
 }
 Return_Code ut_M_Tb_new(ut_M_Tb* self, ut_M_Tb_Dynamic* self_Dynamic, uint32_t num) {
     Return_Code LUMI_err = OK;
@@ -177,7 +210,7 @@ void ut_M_Data_get(ut_M_Data* self, Generic_Type** item, Ref_Manager** item_Refm
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Data_Del(ut_M_Data* self) {
+void ut_M_Data_Del(ut_M_Data* self, ut_M_Data_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->item_Refman);
 }
@@ -190,7 +223,7 @@ void ut_M_fun1(uint32_t x, char* s, Seq_Length s_Max_length, Seq_Length* s_Lengt
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(o);
+    String_Del(o, NULL);
     free(o);
 }
 void ut_M_fun2(char** s, Seq_Length* s_Max_length, Seq_Length** s_Length, Ref_Manager** s_Refman, uint32_t* x) {
@@ -229,7 +262,7 @@ void ut_M_fun8(char* s, Seq_Length s_Max_length, Seq_Length* s_Length, Ref_Manag
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(s);
+    String_Del(s, NULL);
     LUMI_owner_dec_ref(s_Refman);
 }
 Return_Code ut_M_fune(void) {
@@ -509,7 +542,7 @@ LUMI_inc_ref(NULL);
     ut_M_t_Refman = NULL;
     ut_M_t = NULL;
 /// @ test-empty-expression-2
-String_Del(*so);
+String_Del(*so, NULL);
     LUMI_owner_dec_ref(*so_Refman);
     *so_Refman = NULL;
     *so_Max_length = 0;
@@ -1306,6 +1339,7 @@ char* s = NULL;
     INIT_NEW_SEQUENCE(3, LUMI_block0_cleanup, bf, Byte, 0x0c);
 /// @ test-slice-expression-18
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     char* s;
     Seq_Length s_Max_length;
@@ -1314,14 +1348,19 @@ struct ut_M_Test {
     Seq_Length b_Max_length;
     Seq_Length* b_Length;
 };
-void ut_M_Test_Del(ut_M_Test* self);
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_fun(void);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    Buffer_Del(self->b);
+    Buffer_Del(self->b, NULL);
     free(self->b);
-    String_Del(self->s);
+    String_Del(self->s, NULL);
     free(self->s);
 }
 void ut_M_fun(void) {
@@ -1334,7 +1373,7 @@ void ut_M_fun(void) {
 LUMI_block0_cleanup:
     (void)0;
     ARRAY_DEL(ut_M_Test, a, 0x06)
-    ut_M_Test_Del(t);
+    ut_M_Test_Del(t, NULL);
 }
 /// @ test-slice-expression-19
 uint32_t* a = NULL;
@@ -1471,7 +1510,7 @@ uint32_t x = 0;
     ut_M_fun5(0x03, &(x));
     ut_M_fun4(x);
 /// @ test-call-expression-6
-ut_M_fun6(0x02, 0x03, &(*io), &(*io));
+ut_M_fun6(0x02, 0x03, &(ut_M_i), &(*io));
 /// @ test-call-expression-7
 uint32_t aux_Int_0 = 0;
     ut_M_fun5(0x04, &(aux_Int_0));
@@ -1485,7 +1524,7 @@ char* aux_String_0 = NULL;
     Seq_Length* aux_String_0_Length = &Lumi_empty_length;
     Ref_Manager* aux_String_0_Refman = NULL;
     ut_M_fun3(0x07, &(aux_String_0), &(aux_String_0_Max_length), &(aux_String_0_Length), &(aux_String_0_Refman));
-    String_Del(*so);
+    String_Del(*so, NULL);
     LUMI_owner_dec_ref(*so_Refman);
     *so_Refman = aux_String_0_Refman;
     *so_Max_length = aux_String_0_Max_length;
@@ -1556,8 +1595,16 @@ Return_Code ut_M_Base_meth(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic, ut_
 void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
 Return_Code ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, ut_M_Base* b, ut_M_Base_Dynamic* b_Dynamic);
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
-ut_M_Base_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del, ut_M_Base_meth};
-ut_M_Test_Dynamic ut_M_Test_dynamic = {{(Dynamic_Del)ut_M_Test_Del, (Return_Code (*)(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic, ut_M_Base* b, ut_M_Base_Dynamic* b_Dynamic))ut_M_Test_meth}};
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del,
+    ut_M_Base_meth
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Test_Del,
+        (Return_Code (*)(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic, ut_M_Base* b, ut_M_Base_Dynamic* b_Dynamic))ut_M_Test_meth
+    }
+};
 Return_Code ut_M_Base_meth(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic, ut_M_Base* b, ut_M_Base_Dynamic* b_Dynamic) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
@@ -1605,7 +1652,10 @@ struct ut_M_Test_Dynamic {
 void ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 Return_Code ut_M_mock(ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** t_Dynamic);
-ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_meth};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del,
+    ut_M_Test_meth
+};
 void ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
@@ -1638,7 +1688,10 @@ struct ut_M_Test_Dynamic {
 };
 Return_Code ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** t_Dynamic);
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
-ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_meth};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del,
+    ut_M_Test_meth
+};
 Return_Code ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** t_Dynamic) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
@@ -1728,13 +1781,13 @@ Return_Code ut_M_fun(char* s, Seq_Length s_Max_length, Seq_Length* s_Length) {
     String_clear(s, s_Max_length, s_Length);
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(aux_String_1);
+    String_Del(aux_String_1, NULL);
     free(aux_String_1);
-    String_Del(aux_String_0);
+    String_Del(aux_String_0, NULL);
     free(aux_String_0);
-    String_Del(strongs);
+    String_Del(strongs, NULL);
     LUMI_owner_dec_ref(strongs_Refman);
-    String_Del(owners);
+    String_Del(owners, NULL);
     free(owners);
     LUMI_var_dec_ref(s_vars_Refman);
     return LUMI_err;
@@ -1817,6 +1870,10 @@ LUMI_block0_cleanup:
     LUMI_dec_ref(s_Refman);
     return LUMI_err;
 }
+/// @ test-call-expression-29
+ut_M_t = NULL;
+    ut_M_t_Refman = NULL;
+    ut_M_fun7(ut_M_tb, ut_M_tb_Refman, ut_M_tb_Dynamic, (void*)&(ut_M_t), &(ut_M_t_Refman), (void*)&(dynamic_Void));
 /// @ test-call-expression-e0
 expected access, got " "
 /// @ test-call-expression-e1
@@ -1869,6 +1926,8 @@ assigning conditional into non-conditional type "String"
 using invalid reference "s"
 /// @ test-call-expression-e25
 adding "->()" without outputs
+/// @ test-call-expression-e26
+using modified reference "io"
 /// @@ test-type-expression
 /// @ test-type-expression-0
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_t_Refman)
@@ -1884,33 +1943,57 @@ unknown type "Error"
 /// @@ test-base-expression
 /// @ test-base-expression-0
 typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Mid ut_M_Mid;
+typedef struct ut_M_Mid_Dynamic ut_M_Mid_Dynamic;
 typedef struct ut_M_Top ut_M_Top;
+typedef struct ut_M_Top_Dynamic ut_M_Top_Dynamic;
 struct ut_M_Base {
     uint32_t x;
+};
+struct ut_M_Base_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Mid {
     ut_M_Base _base;
 };
+struct ut_M_Mid_Dynamic {
+    ut_M_Base_Dynamic _base;
+};
 struct ut_M_Top {
     ut_M_Mid _base;
 };
+struct ut_M_Top_Dynamic {
+    ut_M_Mid_Dynamic _base;
+};
 void ut_M_Base_methb(ut_M_Base* self);
-void ut_M_Base_Del(ut_M_Base* self);
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
 void ut_M_Mid_methm(ut_M_Mid* self);
-void ut_M_Mid_Del(ut_M_Mid* self);
+void ut_M_Mid_Del(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic);
 void ut_M_Top_methb(ut_M_Top* self);
 void ut_M_Top_methm(ut_M_Top* self);
-void ut_M_Top_Del(ut_M_Top* self);
-Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
-Generic_Type_Dynamic ut_M_Mid_dynamic = {(Dynamic_Del)ut_M_Mid_Del};
-Generic_Type_Dynamic ut_M_Top_dynamic = {(Dynamic_Del)ut_M_Top_Del};
+void ut_M_Top_Del(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic);
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del
+};
+ut_M_Mid_Dynamic ut_M_Mid_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Mid_Del
+    }
+};
+ut_M_Top_Dynamic ut_M_Top_dynamic = {
+    {
+        {
+            (Dynamic_Del)ut_M_Top_Del
+        }
+    }
+};
 void ut_M_Base_methb(ut_M_Base* self) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Base_Del(ut_M_Base* self) {
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_Mid_methm(ut_M_Mid* self) {
@@ -1918,9 +2001,9 @@ void ut_M_Mid_methm(ut_M_Mid* self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Mid_Del(ut_M_Mid* self) {
+void ut_M_Mid_Del(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Base_Del(&(self->_base));
+    ut_M_Base_Del(&(self->_base), NULL);
 }
 void ut_M_Top_methb(ut_M_Top* self) {
     unsigned LUMI_loop_depth = 1;
@@ -1933,39 +2016,63 @@ void ut_M_Top_methm(ut_M_Top* self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Top_Del(ut_M_Top* self) {
+void ut_M_Top_Del(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Mid_Del(&(self->_base));
+    ut_M_Mid_Del(&(self->_base), NULL);
 }
 /// @ test-base-expression-1
 typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Mid ut_M_Mid;
+typedef struct ut_M_Mid_Dynamic ut_M_Mid_Dynamic;
 typedef struct ut_M_Top ut_M_Top;
+typedef struct ut_M_Top_Dynamic ut_M_Top_Dynamic;
 struct ut_M_Base {
     uint32_t x;
+};
+struct ut_M_Base_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Mid {
     ut_M_Base _base;
 };
+struct ut_M_Mid_Dynamic {
+    ut_M_Base_Dynamic _base;
+};
 struct ut_M_Top {
     ut_M_Mid _base;
 };
+struct ut_M_Top_Dynamic {
+    ut_M_Mid_Dynamic _base;
+};
 void ut_M_Base_methb(ut_M_Base* self);
-void ut_M_Base_Del(ut_M_Base* self);
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
 void ut_M_Mid_methm(ut_M_Mid* self);
-void ut_M_Mid_Del(ut_M_Mid* self);
+void ut_M_Mid_Del(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic);
 void ut_M_Top_methb(ut_M_Top* self);
 void ut_M_Top_methm(ut_M_Top* self);
-void ut_M_Top_Del(ut_M_Top* self);
-Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
-Generic_Type_Dynamic ut_M_Mid_dynamic = {(Dynamic_Del)ut_M_Mid_Del};
-Generic_Type_Dynamic ut_M_Top_dynamic = {(Dynamic_Del)ut_M_Top_Del};
+void ut_M_Top_Del(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic);
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del
+};
+ut_M_Mid_Dynamic ut_M_Mid_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Mid_Del
+    }
+};
+ut_M_Top_Dynamic ut_M_Top_dynamic = {
+    {
+        {
+            (Dynamic_Del)ut_M_Top_Del
+        }
+    }
+};
 void ut_M_Base_methb(ut_M_Base* self) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Base_Del(ut_M_Base* self) {
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_Mid_methm(ut_M_Mid* self) {
@@ -1973,9 +2080,9 @@ void ut_M_Mid_methm(ut_M_Mid* self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Mid_Del(ut_M_Mid* self) {
+void ut_M_Mid_Del(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Base_Del(&(self->_base));
+    ut_M_Base_Del(&(self->_base), NULL);
 }
 void ut_M_Top_methb(ut_M_Top* self) {
     unsigned LUMI_loop_depth = 1;
@@ -1988,9 +2095,9 @@ void ut_M_Top_methm(ut_M_Top* self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Top_Del(ut_M_Top* self) {
+void ut_M_Top_Del(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Mid_Del(&(self->_base));
+    ut_M_Mid_Del(&(self->_base), NULL);
 }
 /// @ test-base-expression-e0
 "base" used not in method
@@ -2065,7 +2172,7 @@ ut_M_Tb* ttb = NULL;
     INIT_NEW(3, LUMI_block0_cleanup, aux_Tb_0, ut_M_Tb, 1);
     LUMI_err = ut_M_Tb_new(aux_Tb_0, aux_Tb_0_Dynamic, (((uint64_t)ut_M_i + 0x01) > UINT32_MAX)? UINT32_MAX: ((uint64_t)ut_M_i + 0x01));
     CHECK(3, LUMI_block0_cleanup)
-    if (ttb_Dynamic != NULL) ttb_Dynamic->_base._del(ttb, ttb_Dynamic);
+    if (ttb_Dynamic != NULL) ttb_Dynamic->_base._base._del(ttb, ttb_Dynamic);
     free(ttb);
     ttb_Dynamic = aux_Tb_0_Dynamic;
     ttb = aux_Tb_0;
@@ -2102,7 +2209,7 @@ ut_M_Tb* ttb = NULL;
     INIT_NEW(3, LUMI_block0_cleanup, aux_Tb_0, ut_M_Tb, 1);
     LUMI_err = ut_M_Tb_new(aux_Tb_0, aux_Tb_0_Dynamic, (uint64_t)ut_M_i + 0x01);
     CHECK(3, LUMI_block0_cleanup)
-    if (ttb_Dynamic != NULL) ttb_Dynamic->_base._del(ttb, ttb_Dynamic);
+    if (ttb_Dynamic != NULL) ttb_Dynamic->_base._base._del(ttb, ttb_Dynamic);
     free(ttb);
     ttb_Dynamic = aux_Tb_0_Dynamic;
     ttb = aux_Tb_0;
@@ -2167,7 +2274,7 @@ LUMI_inc_ref(ut_M_tc_Refman);
 char* s = NULL;
     Seq_Length s_Max_length = 0;
     Seq_Length* s_Length = &Lumi_empty_length;
-    String_Del(s);
+    String_Del(s, NULL);
     free(s);
     LUMI_var_dec_ref(*so_Refman);
     s_Max_length = *so_Max_length;
@@ -2191,7 +2298,7 @@ ut_M_b = ut_M_b == ut_M_b;
 /// @ test-binary-expression-14
 ut_M_Tc* otc = NULL;
     ut_M_Tc_Dynamic* otc_Dynamic = NULL;
-    if (ut_M_tb_Dynamic != NULL) ut_M_tb_Dynamic->_base._del(ut_M_tb, ut_M_tb_Dynamic);
+    if (ut_M_tb_Dynamic != NULL) ut_M_tb_Dynamic->_base._base._del(ut_M_tb, ut_M_tb_Dynamic);
     LUMI_owner_dec_ref(ut_M_tb_Refman);
     ut_M_tb_Dynamic = &(otc_Dynamic->_base);
     ut_M_tb = &(otc->_base);
@@ -2600,36 +2707,48 @@ char* s1 = NULL;
     aux_String_2_Length = &Lumi_empty_length;
 /// @ test-swap-expression-8
 typedef struct ut_M_MyStruct ut_M_MyStruct;
+typedef struct ut_M_MyStruct_Dynamic ut_M_MyStruct_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_MyStruct {
     uint32_t x;
+};
+struct ut_M_MyStruct_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Test {
     ut_M_MyStruct* f;
 };
-void ut_M_MyStruct_Del(ut_M_MyStruct* self);
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic);
 void ut_M_Test_new(ut_M_Test* self, ut_M_MyStruct* f);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_fun(ut_M_Test* t1, ut_M_Test* t2);
-Generic_Type_Dynamic ut_M_MyStruct_dynamic = {(Dynamic_Del)ut_M_MyStruct_Del};
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_MyStruct_Del(ut_M_MyStruct* self) {
+ut_M_MyStruct_Dynamic ut_M_MyStruct_dynamic = {
+    (Dynamic_Del)ut_M_MyStruct_Del
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_Test_new(ut_M_Test* self, ut_M_MyStruct* f) {
     unsigned LUMI_loop_depth = 1;
-    ut_M_MyStruct_Del(self->f);
+    ut_M_MyStruct_Del(self->f, NULL);
     free(self->f);
     self->f = f;
     f = NULL;
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_MyStruct_Del(f);
+    ut_M_MyStruct_Del(f, NULL);
     free(f);
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_MyStruct_Del(self->f);
+    ut_M_MyStruct_Del(self->f, NULL);
     free(self->f);
 }
 void ut_M_fun(ut_M_Test* t1, ut_M_Test* t2) {
@@ -2641,11 +2760,11 @@ void ut_M_fun(ut_M_Test* t1, ut_M_Test* t2) {
     aux_MyStruct_0 = NULL;
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_MyStruct_Del(aux_MyStruct_0);
+    ut_M_MyStruct_Del(aux_MyStruct_0, NULL);
     free(aux_MyStruct_0);
-    ut_M_Test_Del(t2);
+    ut_M_Test_Del(t2, NULL);
     free(t2);
-    ut_M_Test_Del(t1);
+    ut_M_Test_Del(t1, NULL);
     free(t1);
 }
 /// @ test-swap-expression-9
@@ -2697,7 +2816,7 @@ ut_M_Test* aux_Test_0 = NULL;
     aux_Test_0_Refman = ut_M_d->item_Refman;
     aux_Test_0 = ut_M_d->item;
     ut_M_d->item_Refman = ut_M_t_Refman;
-    ut_M_d->item_Dynamic = &ut_M_Test_dynamic;
+    ut_M_d->item_Dynamic = (Generic_Type_Dynamic*)&ut_M_Test_dynamic;
     ut_M_d->item = ut_M_t;
     ut_M_t_Refman = aux_Test_0_Refman;
     ut_M_t = aux_Test_0;
@@ -2732,7 +2851,7 @@ ut_M_b = (*to) != NULL;
 /// @ test-question-expression-4
 ut_M_t = NULL;
     ut_M_t_Refman = NULL;
-    ut_M_fun7(NULL, NULL, NULL, (void*)&(ut_M_t), &(ut_M_t_Refman), (void*)&(ut_M_t_Dynamic));
+    ut_M_fun7(NULL, NULL, NULL, (void*)&(ut_M_t), &(ut_M_t_Refman), (void*)&(dynamic_Void));
     ut_M_b = ut_M_t != NULL && (ut_M_t_Refman)->value != NULL;
 /// @ test-question-expression-5
 ut_M_Test* tt = NULL;
@@ -2745,22 +2864,28 @@ ut_M_Test* tt = NULL;
     ut_M_b = (tt_Refman)->value != NULL;
 /// @ test-question-expression-6
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     char* s;
     Seq_Length s_Max_length;
     Seq_Length* s_Length;
     Ref_Manager* s_Refman;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_meth(ut_M_Test* self, Bool* res);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 void ut_M_Test_meth(ut_M_Test* self, Bool* res) {
     unsigned LUMI_loop_depth = 1;
     *res = self->s != NULL && (self->s_Refman)->value != NULL;
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->s_Refman);
 }
@@ -2790,7 +2915,7 @@ ut_M_Test* tt = NULL;
 ut_M_Test* tu = NULL;
     ut_M_t = NULL;
     ut_M_t_Refman = NULL;
-    ut_M_fun7(NULL, NULL, NULL, (void*)&(ut_M_t), &(ut_M_t_Refman), (void*)&(ut_M_t_Dynamic));
+    ut_M_fun7(NULL, NULL, NULL, (void*)&(ut_M_t), &(ut_M_t_Refman), (void*)&(dynamic_Void));
     CHECK_REFMAN(2, LUMI_block0_cleanup, ut_M_t_Refman)
     tu = &(ut_M_t->_base._base);
 /// @ test-exclamation-expression-3
@@ -2908,6 +3033,7 @@ using "!" where there is no error
 /// @@ test-int-range
 /// @ test-int-range-0
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t int_def;
     uint8_t u8b;
@@ -2927,9 +3053,14 @@ struct ut_M_Test {
     int32_t rs32;
     int64_t rs64;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_new(ut_M_Test* self);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 void ut_M_Test_new(ut_M_Test* self) {
     unsigned LUMI_loop_depth = 1;
     self->ru16 = 0x05;
@@ -2952,7 +3083,7 @@ void ut_M_Test_new(ut_M_Test* self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 /// @ test-int-range-1
@@ -2966,6 +3097,7 @@ uint8_t u8 = 0;
     int64_t s64 = 0;
 /// @ test-int-range-2
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 enum {
     ut_M_Nums_MIN = 0,
     ut_M_Nums_length
@@ -2974,11 +3106,16 @@ enum { ut_M_MAX = 0x2710 };
 struct ut_M_Test {
     uint32_t x;
 };
-void ut_M_Test_Del(ut_M_Test* self);
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_fun(ut_M_Test* t, uint32_t* x);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 int16_t ut_M_s16 = 0;
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_fun(ut_M_Test* t, uint32_t* x) {
@@ -3047,16 +3184,16 @@ assigning integer with minimum of "-2147483647" into integer with larger minimum
 assigning integer with maximum of "4294967295" into integer with smaller maximum of "2147483647"
 /// @ test-int-range-e9
 too high unsigned integer maximum "18446744073709551616"
-/// @@ test-dynamic
-/// @ test-dynamic-0
+/// @@ test-dynamic-call
+/// @ test-dynamic-call-0
 ut_M_Ta a_Var = {{0}};
     ut_M_Ta* a = NULL;
     ut_M_Ta_Dynamic* a_Dynamic = &ut_M_Ta_dynamic;
     a = &a_Var;
-/// @ test-dynamic-1
+/// @ test-dynamic-call-1
 ut_M_Ta* a = NULL;
     ut_M_Ta_Dynamic* a_Dynamic = NULL;
-/// @ test-dynamic-2
+/// @ test-dynamic-call-2
 ut_M_Ta* nta = NULL;
     ut_M_Ta_Dynamic* nta_Dynamic = NULL;
     ut_M_Ta* aux_Ta_0 = NULL;
@@ -3066,41 +3203,41 @@ ut_M_Ta* nta = NULL;
     nta = aux_Ta_0;
     aux_Ta_0 = NULL;
     aux_Ta_0_Dynamic = NULL;
-/// @ test-dynamic-3
+/// @ test-dynamic-call-3
 ut_M_Ta* a = NULL;
     ut_M_Ta_Dynamic* a_Dynamic = &ut_M_Ta_dynamic;
     INIT_NEW(1, LUMI_block0_cleanup, a, ut_M_Ta, 1);
-/// @ test-dynamic-4
+/// @ test-dynamic-call-4
 ut_M_Ta* a = NULL;
     ut_M_Ta_Dynamic* a_Dynamic = NULL;
     CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_ta_Refman)
     a_Dynamic = ut_M_ta_Dynamic;
     a = ut_M_ta;
-/// @ test-dynamic-5
+/// @ test-dynamic-call-5
 ut_M_Ta* x = NULL;
     ut_M_Ta_Dynamic* x_Dynamic = NULL;
     CHECK_REFMAN(2, LUMI_block0_cleanup, ut_M_ta_Refman)
     x_Dynamic = ut_M_ta_Dynamic;
     x = ut_M_ta;
-/// @ test-dynamic-6
+/// @ test-dynamic-call-6
 LUMI_inc_ref(ut_M_tb_Refman);
     LUMI_dec_ref(ut_M_ta_Refman);
     ut_M_ta_Refman = ut_M_tb_Refman;
     ut_M_ta_Dynamic = &(ut_M_tb_Dynamic->_base);
     ut_M_ta = &(ut_M_tb->_base);
-/// @ test-dynamic-7
+/// @ test-dynamic-call-7
 LUMI_inc_ref(ut_M_tc_Refman);
     LUMI_dec_ref(ut_M_ta_Refman);
     ut_M_ta_Refman = ut_M_tc_Refman;
     ut_M_ta_Dynamic = &(ut_M_tc_Dynamic->_base._base);
     ut_M_ta = &(ut_M_tc->_base._base);
-/// @ test-dynamic-8
+/// @ test-dynamic-call-8
 LUMI_inc_ref(NULL);
     LUMI_dec_ref(ut_M_ta_Refman);
     ut_M_ta_Refman = NULL;
     ut_M_ta_Dynamic = NULL;
     ut_M_ta = NULL;
-/// @ test-dynamic-9
+/// @ test-dynamic-call-9
 ut_M_Ta* aa = NULL;
     Seq_Length aa_Length = 0;
     Ref_Manager* aa_Refman = NULL;
@@ -3111,7 +3248,7 @@ ut_M_Ta* aa = NULL;
     ut_M_ta_Refman = aa_Refman;
     ut_M_ta_Dynamic = &ut_M_Ta_dynamic;
     ut_M_ta = aa + 0x04;
-/// @ test-dynamic-10
+/// @ test-dynamic-call-10
 ut_M_Tc* ca = NULL;
     Seq_Length ca_Length = 0;
     Ref_Manager* ca_Refman = NULL;
@@ -3122,18 +3259,18 @@ ut_M_Tc* ca = NULL;
     ut_M_ta_Refman = ca_Refman;
     ut_M_ta_Dynamic = &(&ut_M_Tc_dynamic->_base._base);
     ut_M_ta = &((ca + 0x04)->_base._base);
-/// @ test-dynamic-11
+/// @ test-dynamic-call-11
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_ta_Refman)
     if (ut_M_ta_Dynamic == NULL) RAISE(1, LUMI_block0_cleanup, empty_object)
     ut_M_ta_Dynamic->dyn(ut_M_ta, ut_M_ta_Dynamic);
-/// @ test-dynamic-12
+/// @ test-dynamic-call-12
 if (ut_M_tb_Dynamic == NULL) RAISE(1, LUMI_block0_cleanup, empty_object)
     ut_M_tb_Dynamic->_base.dyn(&(ut_M_tb->_base), &(ut_M_tb_Dynamic->_base));
-/// @ test-dynamic-13
+/// @ test-dynamic-call-13
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_tc_Refman)
     if (ut_M_tc_Dynamic == NULL) RAISE(1, LUMI_block0_cleanup, empty_object)
     ut_M_tc_Dynamic->_base._base.dyn(&(ut_M_tc->_base._base), &(ut_M_tc_Dynamic->_base._base));
-/// @ test-dynamic-14
+/// @ test-dynamic-call-14
 LUMI_inc_ref(ut_M_tc_Refman);
     LUMI_dec_ref(*tco_Refman);
     *tco_Refman = ut_M_tc_Refman;
@@ -3142,12 +3279,12 @@ LUMI_inc_ref(ut_M_tc_Refman);
     CHECK_REFMAN(2, LUMI_block0_cleanup, *tco_Refman)
     if (*tco_Dynamic == NULL) RAISE(2, LUMI_block0_cleanup, empty_object)
     (*tco_Dynamic)->_base._base.dyn(&((*tco)->_base._base), &((*tco_Dynamic)->_base._base));
-/// @ test-dynamic-15
+/// @ test-dynamic-call-15
 ut_M_ta = NULL;
     ut_M_ta_Refman = NULL;
     ut_M_ta_Dynamic = NULL;
     ut_M_fun7(&(ut_M_tc->_base), ut_M_tc_Refman, &(ut_M_tc_Dynamic->_base), (void*)&(ut_M_ta), &(ut_M_ta_Refman), (void*)&(ut_M_ta_Dynamic));
-/// @ test-dynamic-16
+/// @ test-dynamic-call-16
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
@@ -3160,7 +3297,10 @@ struct ut_M_Test_Dynamic {
 void ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 Return_Code ut_M_mock(ut_M_Test** t, Ref_Manager** t_Refman, ut_M_Test_Dynamic** t_Dynamic);
-ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_meth};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del,
+    ut_M_Test_meth
+};
 void ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
@@ -3179,7 +3319,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-/// @ test-dynamic-17
+/// @ test-dynamic-call-17
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
@@ -3201,8 +3341,16 @@ void ut_M_Base_meth(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
 void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
 void ut_M_Test_fun(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
-ut_M_Base_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del, ut_M_Base_meth};
-ut_M_Test_Dynamic ut_M_Test_dynamic = {{(Dynamic_Del)ut_M_Test_Del, ut_M_Base_meth}};
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del,
+    ut_M_Base_meth
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Test_Del,
+        ut_M_Base_meth
+    }
+};
 void ut_M_Base_meth(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
@@ -3221,12 +3369,12 @@ void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     ut_M_Base_Del(&(self->_base), &(self_Dynamic->_base));
 }
-/// @ test-dynamic-18
+/// @ test-dynamic-call-18
 ut_M_Tb* aux_Tb_0 = NULL;
     Ref_Manager* aux_Tb_0_Refman = NULL;
     ut_M_Tb_Dynamic* aux_Tb_0_Dynamic = NULL;
     ut_M_fun7(NULL, NULL, NULL, &(aux_Tb_0), &(aux_Tb_0_Refman), &(aux_Tb_0_Dynamic));
-/// @ test-dynamic-e0
+/// @ test-dynamic-call-e0
 ignoring empty reference check
 /// @@ test-function-object
 /// @ test-function-object-0
@@ -3287,23 +3435,29 @@ LUMI_block0_cleanup:
 }
 /// @ test-function-object-8
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     void (*fun)(uint32_t x, uint32_t y);
     Return_Code (*afun[0x04])(uint32_t x, uint32_t* y);
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_meth(ut_M_Test* self, Return_Code (*fi)(uint32_t x, uint32_t y), Return_Code (**fo)(uint32_t x, uint32_t y));
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 Return_Code ut_M_fun(uint32_t x, uint32_t y);
 void ut_M_mock(void (*fi)(uint32_t x, uint32_t y), Return_Code (**fo)(uint32_t x, uint32_t y));
 void ut_M_afun(void (** in)(uint32_t x, uint32_t* y), Seq_Length in_Length, Return_Code (*** out)(void), Seq_Length* out_Length);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 void ut_M_Test_meth(ut_M_Test* self, Return_Code (*fi)(uint32_t x, uint32_t y), Return_Code (**fo)(uint32_t x, uint32_t y)) {
     unsigned LUMI_loop_depth = 1;
     *fo = ut_M_fun;
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 Return_Code ut_M_fun(uint32_t x, uint32_t y) {
@@ -3507,12 +3661,12 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         LUMI_inc_ref(f_Refman);
         LUMI_dec_ref(df->item_Refman);
         df->item_Refman = f_Refman;
-        df->item_Dynamic = &FileReadText_dynamic;
+        df->item_Dynamic = (Generic_Type_Dynamic*)&FileReadText_dynamic;
         df->item = f;
     LUMI_block1_cleanup:
         (void)0;
-    ut_M_Data_Del(df);
-    FileReadText_Del(f);
+        ut_M_Data_Del(df, NULL);
+        FileReadText_Del(f, NULL);
         LUMI_var_dec_ref(f_Refman);
     }
     --LUMI_trace_ignore_count;
@@ -3552,12 +3706,12 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         LUMI_err = FileReadBinary_close(f);
         CHECK(11, LUMI_block1_cleanup)
         df = &df_Var;
-        ut_M_Data_set(df, f, &FileReadBinary_dynamic);
+        ut_M_Data_set(df, f, (Generic_Type_Dynamic*)&FileReadBinary_dynamic);
         f = NULL;
     LUMI_block1_cleanup:
         (void)0;
-    ut_M_Data_Del(df);
-    FileReadBinary_Del(f);
+        ut_M_Data_Del(df, NULL);
+        FileReadBinary_Del(f, NULL);
         free(f);
     }
     --LUMI_trace_ignore_count;
@@ -3600,14 +3754,14 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         LUMI_err = FileWriteText_close(f);
         CHECK(11, LUMI_block1_cleanup)
         df = &df_Var;
-        ut_M_Data_set(df, f, &FileWriteText_dynamic);
+        ut_M_Data_set(df, f, (Generic_Type_Dynamic*)&FileWriteText_dynamic);
         f = NULL;
     LUMI_block1_cleanup:
         (void)0;
-    FileWriteText_Del(aux_FileWriteText_0);
+        FileWriteText_Del(aux_FileWriteText_0, NULL);
         free(aux_FileWriteText_0);
-    ut_M_Data_Del(df);
-    FileWriteText_Del(f);
+        ut_M_Data_Del(df, NULL);
+        FileWriteText_Del(f, NULL);
         free(f);
     }
     --LUMI_trace_ignore_count;
@@ -3655,14 +3809,14 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         LUMI_inc_ref(f_Refman);
         LUMI_dec_ref(df->item_Refman);
         df->item_Refman = f_Refman;
-        df->item_Dynamic = &FileWriteBinary_dynamic;
+        df->item_Dynamic = (Generic_Type_Dynamic*)&FileWriteBinary_dynamic;
         df->item = f;
     LUMI_block1_cleanup:
         (void)0;
-    FileWriteBinary_Del(aux_FileWriteBinary_0);
+        FileWriteBinary_Del(aux_FileWriteBinary_0, NULL);
         free(aux_FileWriteBinary_0);
-    ut_M_Data_Del(df);
-    FileWriteBinary_Del(f);
+        ut_M_Data_Del(df, NULL);
+        FileWriteBinary_Del(f, NULL);
         LUMI_owner_dec_ref(f_Refman);
     }
     --LUMI_trace_ignore_count;
@@ -3713,12 +3867,12 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         LUMI_inc_ref(f_Refman);
         LUMI_dec_ref(df->item_Refman);
         df->item_Refman = f_Refman;
-        df->item_Dynamic = &FileReadWriteText_dynamic;
+        df->item_Dynamic = (Generic_Type_Dynamic*)&FileReadWriteText_dynamic;
         df->item = f;
     LUMI_block1_cleanup:
         (void)0;
-    ut_M_Data_Del(df);
-    FileReadWriteText_Del(f);
+        ut_M_Data_Del(df, NULL);
+        FileReadWriteText_Del(f, NULL);
         LUMI_var_dec_ref(f_Refman);
     }
     --LUMI_trace_ignore_count;
@@ -3763,12 +3917,12 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         LUMI_err = FileReadWriteBinary_close(f);
         CHECK(13, LUMI_block1_cleanup)
         df = &df_Var;
-        ut_M_Data_set(df, f, &FileReadWriteBinary_dynamic);
+        ut_M_Data_set(df, f, (Generic_Type_Dynamic*)&FileReadWriteBinary_dynamic);
         f = NULL;
     LUMI_block1_cleanup:
         (void)0;
-    ut_M_Data_Del(df);
-    FileReadWriteBinary_Del(f);
+        ut_M_Data_Del(df, NULL);
+        FileReadWriteBinary_Del(f, NULL);
         free(f);
     }
     --LUMI_trace_ignore_count;
@@ -3781,15 +3935,21 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ test-builtin-file6
 typedef struct ut_M_Data ut_M_Data;
+typedef struct ut_M_Data_Dynamic ut_M_Data_Dynamic;
 struct ut_M_Data {
     Generic_Type* item;
     Ref_Manager* item_Refman;
     Generic_Type_Dynamic* item_Dynamic;
 };
+struct ut_M_Data_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Data_set(ut_M_Data* self, Generic_Type* item, Generic_Type_Dynamic* item_Dynamic);
-void ut_M_Data_Del(ut_M_Data* self);
+void ut_M_Data_Del(ut_M_Data* self, ut_M_Data_Dynamic* self_Dynamic);
 Return_Code ut_M_fun(File* f, FileReadText* frt, FileReadBinary* frb, FileWriteText* fwt, FileWriteBinary* fwb, FileReadWriteText* frwt, FileReadWriteBinary* frwb);
-Generic_Type_Dynamic ut_M_Data_dynamic = {(Dynamic_Del)ut_M_Data_Del};
+ut_M_Data_Dynamic ut_M_Data_dynamic = {
+    (Dynamic_Del)ut_M_Data_Del
+};
 void ut_M_Data_set(ut_M_Data* self, Generic_Type* item, Generic_Type_Dynamic* item_Dynamic) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
@@ -3797,7 +3957,7 @@ LUMI_block0_cleanup:
     if (item_Dynamic != NULL) item_Dynamic->_del(item, item_Dynamic);
     free(item);
 }
-void ut_M_Data_Del(ut_M_Data* self) {
+void ut_M_Data_Del(ut_M_Data* self, ut_M_Data_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->item_Refman);
 }
@@ -3842,15 +4002,15 @@ Return_Code ut_M_fun(File* f, FileReadText* frt, FileReadBinary* frb, FileWriteT
     CHECK(37, LUMI_block0_cleanup)
     LUMI_err = File_close(fo);
     CHECK(38, LUMI_block0_cleanup)
-    ut_M_Data_set(df, fo, &File_dynamic);
+    ut_M_Data_set(df, fo, (Generic_Type_Dynamic*)&File_dynamic);
     fo = NULL;
 LUMI_block0_cleanup:
     (void)0;
-    FileWriteBinary_Del(aux_FileWriteBinary_0);
+    FileWriteBinary_Del(aux_FileWriteBinary_0, NULL);
     free(aux_FileWriteBinary_0);
-    File_Del(fo);
+    File_Del(fo, NULL);
     free(fo);
-    ut_M_Data_Del(df);
+    ut_M_Data_Del(df, NULL);
     return LUMI_err;
 }
 /// @ test-builtin-sys0
@@ -4028,9 +4188,9 @@ USER_MAIN_HEADER {
     aux_String_0_Length = &Lumi_empty_length;
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(aux_String_0);
+    String_Del(aux_String_0, NULL);
     free(aux_String_0);
-    String_Del(ls);
+    String_Del(ls, NULL);
     free(ls);
     return LUMI_err;
 }
@@ -4155,75 +4315,120 @@ cannot move non-conditional global owner "error"
 /// @@ test-struct
 /// @ test-struct-0
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 /// @ test-struct-1
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 /// @ test-struct-2
 typedef struct ut_M_Test1 ut_M_Test1;
+typedef struct ut_M_Test1_Dynamic ut_M_Test1_Dynamic;
 typedef struct ut_M_Test2 ut_M_Test2;
+typedef struct ut_M_Test2_Dynamic ut_M_Test2_Dynamic;
 typedef struct ut_M_Test3 ut_M_Test3;
+typedef struct ut_M_Test3_Dynamic ut_M_Test3_Dynamic;
 struct ut_M_Test1 {
     uint32_t x;
+};
+struct ut_M_Test1_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Test2 {
     uint32_t x;
 };
+struct ut_M_Test2_Dynamic {
+    Dynamic_Del _del;
+};
 struct ut_M_Test3 {
     uint32_t x;
 };
-void ut_M_Test1_Del(ut_M_Test1* self);
-void ut_M_Test2_Del(ut_M_Test2* self);
-void ut_M_Test3_Del(ut_M_Test3* self);
-Generic_Type_Dynamic ut_M_Test1_dynamic = {(Dynamic_Del)ut_M_Test1_Del};
-Generic_Type_Dynamic ut_M_Test2_dynamic = {(Dynamic_Del)ut_M_Test2_Del};
-Generic_Type_Dynamic ut_M_Test3_dynamic = {(Dynamic_Del)ut_M_Test3_Del};
-void ut_M_Test1_Del(ut_M_Test1* self) {
+struct ut_M_Test3_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test1_Del(ut_M_Test1* self, ut_M_Test1_Dynamic* self_Dynamic);
+void ut_M_Test2_Del(ut_M_Test2* self, ut_M_Test2_Dynamic* self_Dynamic);
+void ut_M_Test3_Del(ut_M_Test3* self, ut_M_Test3_Dynamic* self_Dynamic);
+ut_M_Test1_Dynamic ut_M_Test1_dynamic = {
+    (Dynamic_Del)ut_M_Test1_Del
+};
+ut_M_Test2_Dynamic ut_M_Test2_dynamic = {
+    (Dynamic_Del)ut_M_Test2_Del
+};
+ut_M_Test3_Dynamic ut_M_Test3_dynamic = {
+    (Dynamic_Del)ut_M_Test3_Del
+};
+void ut_M_Test1_Del(ut_M_Test1* self, ut_M_Test1_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
-void ut_M_Test2_Del(ut_M_Test2* self) {
+void ut_M_Test2_Del(ut_M_Test2* self, ut_M_Test2_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
-void ut_M_Test3_Del(ut_M_Test3* self) {
+void ut_M_Test3_Del(ut_M_Test3* self, ut_M_Test3_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 /// @ test-struct-3
 typedef struct ut_M_Test1 ut_M_Test1;
+typedef struct ut_M_Test1_Dynamic ut_M_Test1_Dynamic;
 typedef struct ut_M_Test2 ut_M_Test2;
+typedef struct ut_M_Test2_Dynamic ut_M_Test2_Dynamic;
 struct ut_M_Test1 {
     uint32_t x;
+};
+struct ut_M_Test1_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Test2 {
     ut_M_Test1 _base;
     uint32_t y;
 };
-void ut_M_Test1_Del(ut_M_Test1* self);
-void ut_M_Test2_Del(ut_M_Test2* self);
-Generic_Type_Dynamic ut_M_Test1_dynamic = {(Dynamic_Del)ut_M_Test1_Del};
-Generic_Type_Dynamic ut_M_Test2_dynamic = {(Dynamic_Del)ut_M_Test2_Del};
-void ut_M_Test1_Del(ut_M_Test1* self) {
+struct ut_M_Test2_Dynamic {
+    ut_M_Test1_Dynamic _base;
+};
+void ut_M_Test1_Del(ut_M_Test1* self, ut_M_Test1_Dynamic* self_Dynamic);
+void ut_M_Test2_Del(ut_M_Test2* self, ut_M_Test2_Dynamic* self_Dynamic);
+ut_M_Test1_Dynamic ut_M_Test1_dynamic = {
+    (Dynamic_Del)ut_M_Test1_Del
+};
+ut_M_Test2_Dynamic ut_M_Test2_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Test2_Del
+    }
+};
+void ut_M_Test1_Del(ut_M_Test1* self, ut_M_Test1_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
-void ut_M_Test2_Del(ut_M_Test2* self) {
+void ut_M_Test2_Del(ut_M_Test2* self, ut_M_Test2_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Test1_Del(&(self->_base));
+    ut_M_Test1_Del(&(self->_base), NULL);
 }
 /// @ test-struct-4
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     ut_M_Test* to;
     ut_M_Test* ts;
@@ -4231,14 +4436,19 @@ struct ut_M_Test {
     ut_M_Test* tw;
     Ref_Manager* tw_Refman;
 };
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->tw_Refman);
-    SELF_REF_DEL_STR(ut_M_Test, ts);
+    SELF_REF_DEL_STR(ut_M_Test, ts, NULL);
     LUMI_owner_dec_ref(self->ts_Refman);
-    SELF_REF_DEL(ut_M_Test, to);
+    SELF_REF_DEL(ut_M_Test, to, NULL);
     free(self->to);
 }
 /// @ test-struct-e0
@@ -4275,6 +4485,933 @@ using reserved method name "new"
 recursive declaration of type "Error", extended by type "Error"
 /// @ test-struct-e16
 recursive declaration of type "Aerror", extended by type "Berror", extended by type "Aerror"
+/// @@ test-dynamic
+/// @ test-dynamic-0
+typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Some ut_M_Some;
+typedef struct ut_M_Some_Dynamic ut_M_Some_Dynamic;
+struct ut_M_Test {
+    Dynamic_Del _del;
+    void* _self_Dynamic;
+    void (*fun)(void* self, void* self_Dynamic);
+    void (*wf)(void* self, Ref_Manager* self_Refman, void* self_Dynamic);
+};
+struct ut_M_Some {
+    uint8_t x;
+    void* t;
+    ut_M_Test* t_Dynamic;
+};
+struct ut_M_Some_Dynamic {
+    Dynamic_Del _del;
+    ut_M_Test _ut_M_Test;
+};
+void ut_M_Some_fun(ut_M_Some* self, ut_M_Some_Dynamic* self_Dynamic);
+void ut_M_Some_wf(ut_M_Some* self, Ref_Manager* self_Refman, ut_M_Some_Dynamic* self_Dynamic);
+void ut_M_Some_Del(ut_M_Some* self, ut_M_Some_Dynamic* self_Dynamic);
+Return_Code ut_M_fun(void* t, ut_M_Test* t_Dynamic, ut_M_Some** so, void** to, ut_M_Test** to_Dynamic);
+void ut_M_sfun(ut_M_Some* s, Ref_Manager* s_Refman);
+ut_M_Some_Dynamic ut_M_Some_dynamic = {
+    (Dynamic_Del)ut_M_Some_Del,
+    {
+        (Dynamic_Del)ut_M_Some_Del,
+        &ut_M_Some_dynamic,
+        (void (*)(void* self, void* self_Dynamic))ut_M_Some_fun,
+        (void (*)(void* self, Ref_Manager* self_Refman, void* self_Dynamic))ut_M_Some_wf
+    }
+};
+void* ut_M_gt = NULL;
+ut_M_Test* ut_M_gt_Dynamic = NULL;
+void ut_M_Some_fun(ut_M_Some* self, ut_M_Some_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+    self->x = 0x03;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Some_wf(ut_M_Some* self, Ref_Manager* self_Refman, ut_M_Some_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+    LUMI_inc_ref(self_Refman);
+LUMI_block0_cleanup:
+    (void)0;
+    LUMI_dec_ref(self_Refman);
+}
+void ut_M_Some_Del(ut_M_Some* self, ut_M_Some_Dynamic* self_Dynamic) {
+    if (self == NULL) return;
+    if (self->t_Dynamic != NULL) self->t_Dynamic->_del(self->t, self->t_Dynamic);
+    free(self->t);
+}
+Return_Code ut_M_fun(void* t, ut_M_Test* t_Dynamic, ut_M_Some** so, void** to, ut_M_Test** to_Dynamic) {
+    Return_Code LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    void* t2 = NULL;
+    ut_M_Test* t2_Dynamic = NULL;
+    void* aux_Test_0 = NULL;
+    ut_M_Test* aux_Test_0_Dynamic = NULL;
+    ut_M_Some* aux_Some_0 = NULL;
+    *so = NULL;
+    *to_Dynamic = t_Dynamic;
+    *to = t;
+    CHECK_REF(15, LUMI_block0_cleanup, t)
+    if (t_Dynamic == NULL) RAISE(15, LUMI_block0_cleanup, empty_object)
+    t_Dynamic->fun(t, t_Dynamic->_self_Dynamic);
+    CHECK_REF(16, LUMI_block0_cleanup, *so)
+    ut_M_Some_fun(*so, &ut_M_Some_dynamic);
+    *to_Dynamic = NULL_OR_VALUE(*so, &(ut_M_Some_dynamic._ut_M_Test));
+    *to = *so;
+    *to_Dynamic = NULL;
+    *to = NULL;
+    LUMI_err = ut_M_fun(t, t_Dynamic, &(*so), &(*to), &(*to_Dynamic));
+    CHECK(19, LUMI_block0_cleanup)
+    LUMI_err = ut_M_fun(NULL, NULL, &(*so), &(aux_Test_0), &(aux_Test_0_Dynamic));
+    CHECK(20, LUMI_block0_cleanup)
+    LUMI_err = ut_M_fun(*so, NULL_OR_VALUE(*so, &(ut_M_Some_dynamic._ut_M_Test)), &(aux_Some_0), &(t2), &(t2_Dynamic));
+    *to_Dynamic = NULL_OR_VALUE(aux_Some_0, &(ut_M_Some_dynamic._ut_M_Test));
+    *to = aux_Some_0;
+    CHECK(22, LUMI_block0_cleanup)
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+void ut_M_sfun(ut_M_Some* s, Ref_Manager* s_Refman) {
+    unsigned LUMI_loop_depth = 1;
+    void* tc = NULL;
+    ut_M_Test* tc_Dynamic = NULL;
+    void* t = NULL;
+    Ref_Manager* t_Refman = NULL;
+    ut_M_Test* t_Dynamic = NULL;
+    ut_M_Some_wf(s, s_Refman, &ut_M_Some_dynamic);
+    tc_Dynamic = &(ut_M_Some_dynamic._ut_M_Test);
+    tc = s;
+    if (t_Dynamic != NULL) t_Dynamic->_del(t, t_Dynamic);
+    LUMI_owner_dec_ref(t_Refman);
+    t_Refman = s_Refman;
+    t_Dynamic = &(ut_M_Some_dynamic._ut_M_Test);
+    t = s;
+    s = NULL;
+    s_Refman = NULL;
+    t_Dynamic->fun(t, t_Dynamic->_self_Dynamic);
+    t_Dynamic->wf(t, t_Refman, t_Dynamic->_self_Dynamic);
+LUMI_block0_cleanup:
+    (void)0;
+    if (t_Dynamic != NULL) t_Dynamic->_del(t, t_Dynamic);
+    LUMI_owner_dec_ref(t_Refman);
+    ut_M_Some_Del(s, NULL);
+    LUMI_owner_dec_ref(s_Refman);
+}
+/// @ test-dynamic-1
+typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Some ut_M_Some;
+typedef struct ut_M_Some_Dynamic ut_M_Some_Dynamic;
+struct ut_M_Test {
+    Dynamic_Del _del;
+    void* _self_Dynamic;
+    void (*fun)(void* self, void* self_Dynamic);
+    void (*wf)(void* self, Ref_Manager* self_Refman, void* self_Dynamic);
+    void (*another)(void* self, void* self_Dynamic);
+};
+struct ut_M_Some {
+    uint8_t x;
+};
+struct ut_M_Some_Dynamic {
+    Dynamic_Del _del;
+    ut_M_Test _ut_M_Test;
+    void (*fun)(ut_M_Some* self, ut_M_Some_Dynamic* self_Dynamic);
+    void (*wf)(ut_M_Some* self, Ref_Manager* self_Refman, ut_M_Some_Dynamic* self_Dynamic);
+};
+void ut_M_Some_fun(ut_M_Some* self, ut_M_Some_Dynamic* self_Dynamic);
+void ut_M_Some_another(ut_M_Some* self, ut_M_Some_Dynamic* self_Dynamic);
+void ut_M_Some_wf(ut_M_Some* self, Ref_Manager* self_Refman, ut_M_Some_Dynamic* self_Dynamic);
+void ut_M_Some_Del(ut_M_Some* self, ut_M_Some_Dynamic* self_Dynamic);
+Return_Code ut_M_fun(void* t, ut_M_Test* t_Dynamic, ut_M_Some** so, ut_M_Some_Dynamic** so_Dynamic);
+void ut_M_sfun(ut_M_Some* s, Ref_Manager* s_Refman, ut_M_Some_Dynamic* s_Dynamic);
+ut_M_Some_Dynamic ut_M_Some_dynamic = {
+    (Dynamic_Del)ut_M_Some_Del,
+    {
+        (Dynamic_Del)ut_M_Some_Del,
+        &ut_M_Some_dynamic,
+        (void (*)(void* self, void* self_Dynamic))ut_M_Some_fun,
+        (void (*)(void* self, Ref_Manager* self_Refman, void* self_Dynamic))ut_M_Some_wf,
+        (void (*)(void* self, void* self_Dynamic))ut_M_Some_another
+    },
+    ut_M_Some_fun,
+    ut_M_Some_wf
+};
+void ut_M_Some_fun(ut_M_Some* self, ut_M_Some_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+    self->x = 0x04;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Some_another(ut_M_Some* self, ut_M_Some_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Some_wf(ut_M_Some* self, Ref_Manager* self_Refman, ut_M_Some_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+    LUMI_inc_ref(self_Refman);
+LUMI_block0_cleanup:
+    (void)0;
+    LUMI_dec_ref(self_Refman);
+}
+void ut_M_Some_Del(ut_M_Some* self, ut_M_Some_Dynamic* self_Dynamic) {
+    if (self == NULL) return;
+}
+Return_Code ut_M_fun(void* t, ut_M_Test* t_Dynamic, ut_M_Some** so, ut_M_Some_Dynamic** so_Dynamic) {
+    Return_Code LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    void* tu = NULL;
+    ut_M_Test* tu_Dynamic = NULL;
+    ut_M_Some* aux_Some_0 = NULL;
+    ut_M_Some_Dynamic* aux_Some_0_Dynamic = NULL;
+    *so_Dynamic = NULL;
+    *so = NULL;
+    tu_Dynamic = NULL_OR_VALUE(*so, &((*so_Dynamic)->_ut_M_Test));
+    tu = *so;
+    CHECK_REF(15, LUMI_block0_cleanup, *so)
+    if (*so_Dynamic == NULL) RAISE(15, LUMI_block0_cleanup, empty_object)
+    (*so_Dynamic)->fun(*so, *so_Dynamic);
+    CHECK_REF(16, LUMI_block0_cleanup, *so)
+    ut_M_Some_another(*so, *so_Dynamic);
+    LUMI_err = ut_M_fun(*so, NULL_OR_VALUE(*so, &((*so_Dynamic)->_ut_M_Test)), &(aux_Some_0), &(aux_Some_0_Dynamic));
+    tu_Dynamic = NULL_OR_VALUE(aux_Some_0, &(aux_Some_0_Dynamic->_ut_M_Test));
+    tu = aux_Some_0;
+    CHECK(17, LUMI_block0_cleanup)
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+void ut_M_sfun(ut_M_Some* s, Ref_Manager* s_Refman, ut_M_Some_Dynamic* s_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+    void* t = NULL;
+    Ref_Manager* t_Refman = NULL;
+    ut_M_Test* t_Dynamic = NULL;
+    s_Dynamic->wf(s, s_Refman, s_Dynamic);
+    if (t_Dynamic != NULL) t_Dynamic->_del(t, t_Dynamic);
+    LUMI_owner_dec_ref(t_Refman);
+    t_Refman = s_Refman;
+    t_Dynamic = &(s_Dynamic->_ut_M_Test);
+    t = s;
+    s = NULL;
+    s_Refman = NULL;
+    s_Dynamic = NULL;
+    t_Dynamic->fun(t, t_Dynamic->_self_Dynamic);
+    t_Dynamic->another(t, t_Dynamic->_self_Dynamic);
+    t_Dynamic->wf(t, t_Refman, t_Dynamic->_self_Dynamic);
+LUMI_block0_cleanup:
+    (void)0;
+    if (t_Dynamic != NULL) t_Dynamic->_del(t, t_Dynamic);
+    LUMI_owner_dec_ref(t_Refman);
+    if (s_Dynamic != NULL) s_Dynamic->_del(s, s_Dynamic);
+    LUMI_owner_dec_ref(s_Refman);
+}
+/// @ test-dynamic-2
+typedef struct ut_M_Da ut_M_Da;
+typedef struct ut_M_Db ut_M_Db;
+typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
+typedef struct ut_M_Dc ut_M_Dc;
+typedef struct ut_M_Mid ut_M_Mid;
+typedef struct ut_M_Mid_Dynamic ut_M_Mid_Dynamic;
+typedef struct ut_M_Top ut_M_Top;
+typedef struct ut_M_Top_Dynamic ut_M_Top_Dynamic;
+struct ut_M_Da {
+    Dynamic_Del _del;
+    void* _self_Dynamic;
+    void (*fa)(void* self, void* self_Dynamic);
+};
+struct ut_M_Db {
+    Dynamic_Del _del;
+    void* _self_Dynamic;
+    void (*fb)(void* self, void* self_Dynamic);
+};
+struct ut_M_Base {
+    Bool x;
+};
+struct ut_M_Base_Dynamic {
+    Dynamic_Del _del;
+    ut_M_Da _ut_M_Da;
+    ut_M_Db _ut_M_Db;
+};
+struct ut_M_Dc {
+    Dynamic_Del _del;
+    void* _self_Dynamic;
+    void (*fc)(void* self, void* self_Dynamic);
+};
+struct ut_M_Mid {
+    ut_M_Base _base;
+};
+struct ut_M_Mid_Dynamic {
+    ut_M_Base_Dynamic _base;
+    ut_M_Dc _ut_M_Dc;
+};
+struct ut_M_Top {
+    ut_M_Mid _base;
+};
+struct ut_M_Top_Dynamic {
+    ut_M_Mid_Dynamic _base;
+};
+void ut_M_Base_fa(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
+void ut_M_Base_fb(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
+void ut_M_Mid_fa(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic);
+void ut_M_Mid_fc(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic);
+void ut_M_Mid_Del(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic);
+void ut_M_Top_fa(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic);
+void ut_M_Top_Del(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic);
+void ut_M_fun(ut_M_Base* b, ut_M_Mid* m, ut_M_Top* t, void** da, ut_M_Da** da_Dynamic, void** db, ut_M_Db** db_Dynamic, void** dc, ut_M_Dc** dc_Dynamic);
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del,
+    {
+        (Dynamic_Del)ut_M_Base_Del,
+        &ut_M_Base_dynamic,
+        (void (*)(void* self, void* self_Dynamic))ut_M_Base_fa
+    },
+    {
+        (Dynamic_Del)ut_M_Base_Del,
+        &ut_M_Base_dynamic,
+        (void (*)(void* self, void* self_Dynamic))ut_M_Base_fb
+    }
+};
+ut_M_Mid_Dynamic ut_M_Mid_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Mid_Del,
+        {
+            (Dynamic_Del)ut_M_Mid_Del,
+            &ut_M_Mid_dynamic,
+            (void (*)(void* self, void* self_Dynamic))ut_M_Mid_fa
+        },
+        {
+            (Dynamic_Del)ut_M_Mid_Del,
+            &ut_M_Mid_dynamic,
+            (void (*)(void* self, void* self_Dynamic))ut_M_Base_fb
+        }
+    },
+    {
+        (Dynamic_Del)ut_M_Mid_Del,
+        &ut_M_Mid_dynamic,
+        (void (*)(void* self, void* self_Dynamic))ut_M_Mid_fc
+    }
+};
+ut_M_Top_Dynamic ut_M_Top_dynamic = {
+    {
+        {
+            (Dynamic_Del)ut_M_Top_Del,
+            {
+                (Dynamic_Del)ut_M_Top_Del,
+                &ut_M_Top_dynamic,
+                (void (*)(void* self, void* self_Dynamic))ut_M_Top_fa
+            },
+            {
+                (Dynamic_Del)ut_M_Top_Del,
+                &ut_M_Top_dynamic,
+                (void (*)(void* self, void* self_Dynamic))ut_M_Base_fb
+            }
+        },
+        {
+            (Dynamic_Del)ut_M_Top_Del,
+            &ut_M_Top_dynamic,
+            (void (*)(void* self, void* self_Dynamic))ut_M_Mid_fc
+        }
+    }
+};
+void ut_M_Base_fa(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Base_fb(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
+    if (self == NULL) return;
+}
+void ut_M_Mid_fa(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Mid_fc(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Mid_Del(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic) {
+    if (self == NULL) return;
+    ut_M_Base_Del(&(self->_base), NULL);
+}
+void ut_M_Top_fa(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Top_Del(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic) {
+    if (self == NULL) return;
+    ut_M_Mid_Del(&(self->_base), NULL);
+}
+void ut_M_fun(ut_M_Base* b, ut_M_Mid* m, ut_M_Top* t, void** da, ut_M_Da** da_Dynamic, void** db, ut_M_Db** db_Dynamic, void** dc, ut_M_Dc** dc_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+    *da_Dynamic = &(ut_M_Base_dynamic._ut_M_Da);
+    *da = b;
+    *da_Dynamic = &(ut_M_Mid_dynamic._base._ut_M_Da);
+    *da = m;
+    *da_Dynamic = &(ut_M_Top_dynamic._base._base._ut_M_Da);
+    *da = t;
+    *db_Dynamic = &(ut_M_Base_dynamic._ut_M_Db);
+    *db = b;
+    *db_Dynamic = &(ut_M_Mid_dynamic._base._ut_M_Db);
+    *db = &(m->_base);
+    *db_Dynamic = &(ut_M_Top_dynamic._base._base._ut_M_Db);
+    *db = &(t->_base._base);
+    *dc_Dynamic = &(ut_M_Mid_dynamic._ut_M_Dc);
+    *dc = m;
+    *dc_Dynamic = &(ut_M_Top_dynamic._base._ut_M_Dc);
+    *dc = &(t->_base);
+LUMI_block0_cleanup:
+    (void)0;
+}
+/// @ test-dynamic-3
+typedef struct ut_M_Da ut_M_Da;
+typedef struct ut_M_Db ut_M_Db;
+typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
+typedef struct ut_M_Low ut_M_Low;
+typedef struct ut_M_Low_Dynamic ut_M_Low_Dynamic;
+typedef struct ut_M_Dc ut_M_Dc;
+typedef struct ut_M_Mid ut_M_Mid;
+typedef struct ut_M_Mid_Dynamic ut_M_Mid_Dynamic;
+typedef struct ut_M_Top ut_M_Top;
+typedef struct ut_M_Top_Dynamic ut_M_Top_Dynamic;
+struct ut_M_Da {
+    Dynamic_Del _del;
+    void* _self_Dynamic;
+    void (*fa)(void* self, void* self_Dynamic);
+};
+struct ut_M_Db {
+    Dynamic_Del _del;
+    void* _self_Dynamic;
+    void (*fb)(void* self, void* self_Dynamic);
+};
+struct ut_M_Base {
+    Bool x;
+};
+struct ut_M_Base_Dynamic {
+    Dynamic_Del _del;
+    ut_M_Da _ut_M_Da;
+    ut_M_Db _ut_M_Db;
+};
+struct ut_M_Low {
+    ut_M_Base _base;
+};
+struct ut_M_Low_Dynamic {
+    ut_M_Base_Dynamic _base;
+    void (*meth)(ut_M_Low* self, ut_M_Low_Dynamic* self_Dynamic);
+    void (*fa)(ut_M_Low* self, ut_M_Low_Dynamic* self_Dynamic);
+};
+struct ut_M_Dc {
+    Dynamic_Del _del;
+    void* _self_Dynamic;
+    void (*fc)(void* self, void* self_Dynamic);
+};
+struct ut_M_Mid {
+    ut_M_Low _base;
+};
+struct ut_M_Mid_Dynamic {
+    ut_M_Low_Dynamic _base;
+    ut_M_Dc _ut_M_Dc;
+    void (*fc)(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic);
+};
+struct ut_M_Top {
+    ut_M_Mid _base;
+};
+struct ut_M_Top_Dynamic {
+    ut_M_Mid_Dynamic _base;
+};
+void ut_M_Base_fa(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
+void ut_M_Base_fb(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
+void ut_M_Low_meth(ut_M_Low* self, ut_M_Low_Dynamic* self_Dynamic);
+void ut_M_Low_fa(ut_M_Low* self, ut_M_Low_Dynamic* self_Dynamic);
+void ut_M_Low_Del(ut_M_Low* self, ut_M_Low_Dynamic* self_Dynamic);
+void ut_M_Mid_fa(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic);
+void ut_M_Mid_fc(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic);
+void ut_M_Mid_Del(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic);
+void ut_M_Top_fa(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic);
+void ut_M_Top_Del(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic);
+void ut_M_dyn(void* da, ut_M_Da* da_Dynamic, void* db, ut_M_Db* db_Dynamic, void* dc, ut_M_Dc* dc_Dynamic);
+void ut_M_fun(ut_M_Base* b, ut_M_Low* l, ut_M_Low_Dynamic* l_Dynamic, ut_M_Mid* m, ut_M_Mid_Dynamic* m_Dynamic, ut_M_Top* t, ut_M_Top_Dynamic* t_Dynamic, void** da, ut_M_Da** da_Dynamic, void** db, ut_M_Db** db_Dynamic, void** dc, ut_M_Dc** dc_Dynamic);
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del,
+    {
+        (Dynamic_Del)ut_M_Base_Del,
+        &ut_M_Base_dynamic,
+        (void (*)(void* self, void* self_Dynamic))ut_M_Base_fa
+    },
+    {
+        (Dynamic_Del)ut_M_Base_Del,
+        &ut_M_Base_dynamic,
+        (void (*)(void* self, void* self_Dynamic))ut_M_Base_fb
+    }
+};
+ut_M_Low_Dynamic ut_M_Low_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Low_Del,
+        {
+            (Dynamic_Del)ut_M_Low_Del,
+            &ut_M_Low_dynamic,
+            (void (*)(void* self, void* self_Dynamic))ut_M_Low_fa
+        },
+        {
+            (Dynamic_Del)ut_M_Low_Del,
+            &ut_M_Low_dynamic,
+            (void (*)(void* self, void* self_Dynamic))ut_M_Base_fb
+        }
+    },
+    ut_M_Low_meth,
+    ut_M_Low_fa
+};
+ut_M_Mid_Dynamic ut_M_Mid_dynamic = {
+    {
+        {
+            (Dynamic_Del)ut_M_Mid_Del,
+            {
+                (Dynamic_Del)ut_M_Mid_Del,
+                &ut_M_Mid_dynamic,
+                (void (*)(void* self, void* self_Dynamic))ut_M_Mid_fa
+            },
+            {
+                (Dynamic_Del)ut_M_Mid_Del,
+                &ut_M_Mid_dynamic,
+                (void (*)(void* self, void* self_Dynamic))ut_M_Base_fb
+            }
+        },
+        ut_M_Low_meth,
+        (void (*)(ut_M_Low* self, ut_M_Low_Dynamic* self_Dynamic))ut_M_Mid_fa
+    },
+    {
+        (Dynamic_Del)ut_M_Mid_Del,
+        &ut_M_Mid_dynamic,
+        (void (*)(void* self, void* self_Dynamic))ut_M_Mid_fc
+    },
+    ut_M_Mid_fc
+};
+ut_M_Top_Dynamic ut_M_Top_dynamic = {
+    {
+        {
+            {
+                (Dynamic_Del)ut_M_Top_Del,
+                {
+                    (Dynamic_Del)ut_M_Top_Del,
+                    &ut_M_Top_dynamic,
+                    (void (*)(void* self, void* self_Dynamic))ut_M_Top_fa
+                },
+                {
+                    (Dynamic_Del)ut_M_Top_Del,
+                    &ut_M_Top_dynamic,
+                    (void (*)(void* self, void* self_Dynamic))ut_M_Base_fb
+                }
+            },
+            ut_M_Low_meth,
+            (void (*)(ut_M_Low* self, ut_M_Low_Dynamic* self_Dynamic))ut_M_Top_fa
+        },
+        {
+            (Dynamic_Del)ut_M_Top_Del,
+            &ut_M_Top_dynamic,
+            (void (*)(void* self, void* self_Dynamic))ut_M_Mid_fc
+        },
+        ut_M_Mid_fc
+    }
+};
+void ut_M_Base_fa(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Base_fb(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
+    if (self == NULL) return;
+}
+void ut_M_Low_meth(ut_M_Low* self, ut_M_Low_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Low_fa(ut_M_Low* self, ut_M_Low_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Low_Del(ut_M_Low* self, ut_M_Low_Dynamic* self_Dynamic) {
+    if (self == NULL) return;
+    ut_M_Base_Del(&(self->_base), NULL);
+}
+void ut_M_Mid_fa(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Mid_fc(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Mid_Del(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic) {
+    if (self == NULL) return;
+    ut_M_Low_Del(&(self->_base), &(self_Dynamic->_base));
+}
+void ut_M_Top_fa(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Top_Del(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic) {
+    if (self == NULL) return;
+    ut_M_Mid_Del(&(self->_base), &(self_Dynamic->_base));
+}
+void ut_M_dyn(void* da, ut_M_Da* da_Dynamic, void* db, ut_M_Db* db_Dynamic, void* dc, ut_M_Dc* dc_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_fun(ut_M_Base* b, ut_M_Low* l, ut_M_Low_Dynamic* l_Dynamic, ut_M_Mid* m, ut_M_Mid_Dynamic* m_Dynamic, ut_M_Top* t, ut_M_Top_Dynamic* t_Dynamic, void** da, ut_M_Da** da_Dynamic, void** db, ut_M_Db** db_Dynamic, void** dc, ut_M_Dc** dc_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+    *da_Dynamic = &(ut_M_Base_dynamic._ut_M_Da);
+    *da = b;
+    *da_Dynamic = &(l_Dynamic->_base._ut_M_Da);
+    *da = l;
+    *da_Dynamic = &(m_Dynamic->_base._base._ut_M_Da);
+    *da = m;
+    *da_Dynamic = &(t_Dynamic->_base._base._base._ut_M_Da);
+    *da = t;
+    *db_Dynamic = &(ut_M_Base_dynamic._ut_M_Db);
+    *db = b;
+    *db_Dynamic = &(l_Dynamic->_base._ut_M_Db);
+    *db = &(l->_base);
+    *db_Dynamic = &(m_Dynamic->_base._base._ut_M_Db);
+    *db = &(m->_base._base);
+    *db_Dynamic = &(t_Dynamic->_base._base._base._ut_M_Db);
+    *db = &(t->_base._base._base);
+    *dc_Dynamic = &(m_Dynamic->_ut_M_Dc);
+    *dc = m;
+    *dc_Dynamic = &(t_Dynamic->_base._ut_M_Dc);
+    *dc = &(t->_base);
+    ut_M_dyn(t, &(t_Dynamic->_base._base._base._ut_M_Da), &(t->_base._base._base), &(t_Dynamic->_base._base._base._ut_M_Db), &(t->_base), &(t_Dynamic->_base._ut_M_Dc));
+LUMI_block0_cleanup:
+    (void)0;
+}
+/// @ test-dynamic-4
+typedef struct ut_M_Data ut_M_Data;
+typedef struct ut_M_Data_Dynamic ut_M_Data_Dynamic;
+typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_MyStruct ut_M_MyStruct;
+typedef struct ut_M_MyStruct_Dynamic ut_M_MyStruct_Dynamic;
+typedef struct ut_M_MyClass ut_M_MyClass;
+typedef struct ut_M_MyClass_Dynamic ut_M_MyClass_Dynamic;
+struct ut_M_Data {
+    Generic_Type* d;
+    Ref_Manager* d_Refman;
+    Generic_Type_Dynamic* d_Dynamic;
+};
+struct ut_M_Data_Dynamic {
+    Dynamic_Del _del;
+};
+struct ut_M_Test {
+    Dynamic_Del _del;
+    void* _self_Dynamic;
+    void (*fun)(void* self, void* self_Dynamic);
+};
+struct ut_M_MyStruct {
+    Bool x;
+};
+struct ut_M_MyStruct_Dynamic {
+    Dynamic_Del _del;
+    ut_M_Test _ut_M_Test;
+};
+struct ut_M_MyClass {
+    Bool x;
+};
+struct ut_M_MyClass_Dynamic {
+    Dynamic_Del _del;
+    ut_M_Test _ut_M_Test;
+    void (*fun)(ut_M_MyClass* self, ut_M_MyClass_Dynamic* self_Dynamic);
+};
+void ut_M_Data_meth(ut_M_Data* self, Generic_Type* in, Ref_Manager* in_Refman, Generic_Type_Dynamic* in_Dynamic, Generic_Type** out, Ref_Manager** out_Refman, Generic_Type_Dynamic** out_Dynamic);
+void ut_M_Data_Del(ut_M_Data* self, ut_M_Data_Dynamic* self_Dynamic);
+void ut_M_MyStruct_fun(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic);
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic);
+void ut_M_MyClass_fun(ut_M_MyClass* self, ut_M_MyClass_Dynamic* self_Dynamic);
+void ut_M_MyClass_Del(ut_M_MyClass* self, ut_M_MyClass_Dynamic* self_Dynamic);
+void ut_M_fun(ut_M_Data* dt, ut_M_Data* ds, ut_M_Data* dc);
+ut_M_Data_Dynamic ut_M_Data_dynamic = {
+    (Dynamic_Del)ut_M_Data_Del
+};
+ut_M_MyStruct_Dynamic ut_M_MyStruct_dynamic = {
+    (Dynamic_Del)ut_M_MyStruct_Del,
+    {
+        (Dynamic_Del)ut_M_MyStruct_Del,
+        &ut_M_MyStruct_dynamic,
+        (void (*)(void* self, void* self_Dynamic))ut_M_MyStruct_fun
+    }
+};
+ut_M_MyClass_Dynamic ut_M_MyClass_dynamic = {
+    (Dynamic_Del)ut_M_MyClass_Del,
+    {
+        (Dynamic_Del)ut_M_MyClass_Del,
+        &ut_M_MyClass_dynamic,
+        (void (*)(void* self, void* self_Dynamic))ut_M_MyClass_fun
+    },
+    ut_M_MyClass_fun
+};
+void ut_M_Data_meth(ut_M_Data* self, Generic_Type* in, Ref_Manager* in_Refman, Generic_Type_Dynamic* in_Dynamic, Generic_Type** out, Ref_Manager** out_Refman, Generic_Type_Dynamic** out_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+    LUMI_inc_ref(in_Refman);
+LUMI_block0_cleanup:
+    (void)0;
+    LUMI_dec_ref(in_Refman);
+}
+void ut_M_Data_Del(ut_M_Data* self, ut_M_Data_Dynamic* self_Dynamic) {
+    if (self == NULL) return;
+    LUMI_dec_ref(self->d_Refman);
+}
+void ut_M_MyStruct_fun(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic) {
+    if (self == NULL) return;
+}
+void ut_M_MyClass_fun(ut_M_MyClass* self, ut_M_MyClass_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_MyClass_Del(ut_M_MyClass* self, ut_M_MyClass_Dynamic* self_Dynamic) {
+    if (self == NULL) return;
+}
+void ut_M_fun(ut_M_Data* dt, ut_M_Data* ds, ut_M_Data* dc) {
+    unsigned LUMI_loop_depth = 1;
+    void* t = NULL;
+    Ref_Manager* t_Refman = NULL;
+    ut_M_Test* t_Dynamic = NULL;
+    ut_M_MyStruct* aux_MyStruct_0 = NULL;
+    Ref_Manager* aux_MyStruct_0_Refman = NULL;
+    ut_M_MyClass* aux_MyClass_0 = NULL;
+    Ref_Manager* aux_MyClass_0_Refman = NULL;
+    ut_M_MyClass_Dynamic* aux_MyClass_0_Dynamic = NULL;
+    LUMI_inc_ref(dt->d_Refman);
+    LUMI_dec_ref(t_Refman);
+    t_Refman = dt->d_Refman;
+    t_Dynamic = ((ut_M_Test*)(dt->d_Dynamic));
+    t = dt->d;
+    LUMI_inc_ref(t_Refman);
+    LUMI_dec_ref(dt->d_Refman);
+    dt->d_Refman = t_Refman;
+    dt->d_Dynamic = (Generic_Type_Dynamic*)t_Dynamic;
+    dt->d = t;
+    ut_M_Data_meth(dt, t, t_Refman, (void*)t_Dynamic, (void*)&(t), &(t_Refman), (void*)&(t_Dynamic));
+    LUMI_inc_ref(ds->d_Refman);
+    LUMI_dec_ref(t_Refman);
+    t_Refman = ds->d_Refman;
+    t_Dynamic = NULL_OR_VALUE(ds->d, &(ut_M_MyStruct_dynamic._ut_M_Test));
+    t = ds->d;
+    ut_M_Data_meth(ds, NULL, NULL, NULL, (void*)&(aux_MyStruct_0), &(aux_MyStruct_0_Refman), &dynamic_Void);
+    LUMI_inc_ref(aux_MyStruct_0_Refman);
+    LUMI_dec_ref(t_Refman);
+    t_Refman = aux_MyStruct_0_Refman;
+    t_Dynamic = NULL_OR_VALUE(aux_MyStruct_0, &(ut_M_MyStruct_dynamic._ut_M_Test));
+    t = aux_MyStruct_0;
+    LUMI_inc_ref(dc->d_Refman);
+    LUMI_dec_ref(t_Refman);
+    t_Refman = dc->d_Refman;
+    t_Dynamic = NULL_OR_VALUE(dc->d, &(((ut_M_MyClass_Dynamic*)(dc->d_Dynamic))->_ut_M_Test));
+    t = dc->d;
+    ut_M_Data_meth(dc, NULL, NULL, NULL, (void*)&(aux_MyClass_0), &(aux_MyClass_0_Refman), (void*)&(aux_MyClass_0_Dynamic));
+    LUMI_inc_ref(aux_MyClass_0_Refman);
+    LUMI_dec_ref(t_Refman);
+    t_Refman = aux_MyClass_0_Refman;
+    t_Dynamic = NULL_OR_VALUE(aux_MyClass_0, &(aux_MyClass_0_Dynamic->_ut_M_Test));
+    t = aux_MyClass_0;
+LUMI_block0_cleanup:
+    (void)0;
+    LUMI_dec_ref(aux_MyClass_0_Refman);
+    LUMI_dec_ref(aux_MyStruct_0_Refman);
+    LUMI_dec_ref(t_Refman);
+}
+/// @ test-dynamic-5
+typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Some ut_M_Some;
+typedef struct ut_M_Some_Dynamic ut_M_Some_Dynamic;
+struct ut_M_Test {
+    Dynamic_Del _del;
+    void* _self_Dynamic;
+    void (*fun)(void* self, void* self_Dynamic);
+    void (*test)(void* self, void* self_Dynamic);
+};
+struct ut_M_Some {
+    Bool x;
+};
+struct ut_M_Some_Dynamic {
+    Dynamic_Del _del;
+    ut_M_Test _ut_M_Test;
+};
+void ut_M_Some_fun(ut_M_Some* self, ut_M_Some_Dynamic* self_Dynamic);
+void ut_M_Some_test(ut_M_Some* self, ut_M_Some_Dynamic* self_Dynamic);
+void ut_M_Some_Del(ut_M_Some* self, ut_M_Some_Dynamic* self_Dynamic);
+Return_Code second_M_dummy(void);
+ut_M_Some_Dynamic ut_M_Some_dynamic = {
+    (Dynamic_Del)ut_M_Some_Del,
+    {
+        (Dynamic_Del)ut_M_Some_Del,
+        &ut_M_Some_dynamic,
+        (void (*)(void* self, void* self_Dynamic))ut_M_Some_fun,
+        (void (*)(void* self, void* self_Dynamic))ut_M_Some_test
+    }
+};
+Bool second_M_b = 0;
+Line_Count LUMI_file0_line_count[9] = {
+    -1,-1,-1,-1, 0,-1,-1,-1,-1
+};
+File_Coverage LUMI_file_coverage[1] = {
+    {"mock.5.lm", 9, LUMI_file0_line_count}
+};
+void ut_M_Some_fun(ut_M_Some* self, ut_M_Some_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+    ++LUMI_file_coverage[0].line_count[4];
+    self->x = true;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Some_test(ut_M_Some* self, ut_M_Some_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+    self->x = second_M_b;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Some_Del(ut_M_Some* self, ut_M_Some_Dynamic* self_Dynamic) {
+    if (self == NULL) return;
+}
+Return_Code second_M_dummy(void) {
+    Return_Code LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+void new_Mock(Bool* allocate_success) { }
+Return_Code delete_Mock(Ref self) { return OK; }
+USER_MAIN_HEADER {
+    Return_Code LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    Bool LUMI_success = true;
+#define LUMI_FUNC_NAME "global variable initialization"
+#undef LUMI_FUNC_NAME
+    LUMI_success &= LUMI_run_test("dummy", second_M_dummy);
+    LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, 1);
+    return LUMI_success? LUMI_err : FAIL;
+LUMI_block0_cleanup:
+    return LUMI_err;
+}
+TEST_MAIN_FUNC
+/// @ test-dynamic-6
+typedef struct ut_M_Da ut_M_Da;
+typedef struct ut_M_Db ut_M_Db;
+typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
+struct ut_M_Da {
+    Dynamic_Del _del;
+    void* _self_Dynamic;
+    void (*fa)(void* self, void* self_Dynamic);
+};
+struct ut_M_Db {
+    Dynamic_Del _del;
+    void* _self_Dynamic;
+    void (*fb)(void* self, void* self_Dynamic);
+};
+struct ut_M_Test {
+    uint32_t x;
+};
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+    ut_M_Db _ut_M_Db;
+    ut_M_Da _ut_M_Da;
+};
+void ut_M_Test_fb(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+void ut_M_Test_fa(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del,
+    {
+        (Dynamic_Del)ut_M_Test_Del,
+        &ut_M_Test_dynamic,
+        (void (*)(void* self, void* self_Dynamic))ut_M_Test_fb
+    },
+    {
+        (Dynamic_Del)ut_M_Test_Del,
+        &ut_M_Test_dynamic,
+        (void (*)(void* self, void* self_Dynamic))ut_M_Test_fa
+    }
+};
+void ut_M_Test_fb(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Test_fa(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
+    if (self == NULL) return;
+}
+/// @ test-dynamic-e0
+cannot add support for non-dynamic type "Error"
+/// @ test-dynamic-e1
+cannot add support to non-struct type "Error"
+/// @ test-dynamic-e2
+struct "Some" already supports "Test"
+/// @ test-dynamic-e3
+missing implementation of method "fun"
+/// @ test-dynamic-e4
+dynamic type with no dynamic methods "Error"
+/// @ test-dynamic-e5
+dynamic extension not supported yet
+/// @ test-dynamic-e7
+indentation too long, expected 4 got 8
+/// @ test-dynamic-e8
+cannot create variable from type without structure "Test"
+/// @ test-dynamic-e9
+cannot create variable from type without structure "Test"
+/// @ test-dynamic-e10
+array of type without structure "Test"
+/// @ test-dynamic-e11
+dynamic allocation of type without structure "Test"
+/// @ test-dynamic-e12
+dynamic allocation of type without structure "Test"
+/// @ test-dynamic-e12a
+expected space after "Error", got "new-line"
+/// @ test-dynamic-e13
+expected new-line after "Error", got "end-of-file"
+/// @ test-dynamic-e14
+expected space after "Error", got "{"
+/// @ test-dynamic-e15
+expected new-line after "Error", got "{"
+/// @ test-dynamic-de0
+fileds inside dynamics not supported yet
+/// @ test-dynamic-de1
+cannot yet add support to builtin type "String"
+/// @ test-dynamic-de2
+cannot add support to non-struct type "Bool"
+/// @ test-dynamic-de3
+cannot add support to native type "Some"
+/// @ test-dynamic-de4
+dynamic extension not supported yet
 /// @@ test-class
 /// @ test-class-0
 typedef struct ut_M_Base ut_M_Base;
@@ -4329,9 +5466,35 @@ Return_Code ut_M_Top_dyn1(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic);
 void ut_M_Top_dyn3(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic);
 void ut_M_Top_dyn5(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic);
 void ut_M_Top_Del(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic);
-ut_M_Base_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del, ut_M_Base_dyn0, ut_M_Base_dyn1, ut_M_Base_dyn2};
-ut_M_Mid_Dynamic ut_M_Mid_dynamic = {{(Dynamic_Del)ut_M_Mid_Del, (void (*)(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic))ut_M_Mid_dyn0, ut_M_Base_dyn1, ut_M_Base_dyn2}, ut_M_Mid_dyn3, ut_M_Mid_dyn4};
-ut_M_Top_Dynamic ut_M_Top_dynamic = {{{(Dynamic_Del)ut_M_Top_Del, (void (*)(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic))ut_M_Top_dyn0, (Return_Code (*)(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic))ut_M_Top_dyn1, ut_M_Base_dyn2}, (void (*)(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic))ut_M_Top_dyn3, ut_M_Mid_dyn4}, ut_M_Top_dyn5};
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del,
+    ut_M_Base_dyn0,
+    ut_M_Base_dyn1,
+    ut_M_Base_dyn2
+};
+ut_M_Mid_Dynamic ut_M_Mid_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Mid_Del,
+        (void (*)(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic))ut_M_Mid_dyn0,
+        ut_M_Base_dyn1,
+        ut_M_Base_dyn2
+    },
+    ut_M_Mid_dyn3,
+    ut_M_Mid_dyn4
+};
+ut_M_Top_Dynamic ut_M_Top_dynamic = {
+    {
+        {
+            (Dynamic_Del)ut_M_Top_Del,
+            (void (*)(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic))ut_M_Top_dyn0,
+            (Return_Code (*)(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic))ut_M_Top_dyn1,
+            ut_M_Base_dyn2
+        },
+        (void (*)(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic))ut_M_Top_dyn3,
+        ut_M_Mid_dyn4
+    },
+    ut_M_Top_dyn5
+};
 void ut_M_Base_stat(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
@@ -4434,7 +5597,10 @@ struct ut_M_Test_Dynamic {
 };
 void ut_M_Test_fun(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
-ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_fun};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del,
+    ut_M_Test_fun
+};
 void ut_M_Test_fun(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
@@ -4451,16 +5617,14 @@ void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
 /// @ test-class-e0
 expected space after "class", got "("
 /// @ test-class-e1
-class with no dynamic methods "Error"
+dynamic type with no dynamic methods "Error"
 /// @ test-class-e2
 expected "dynamic" or "inst" method type, got "error"
 /// @ test-class-e3
 illegal dynamic in function "meth"
 /// @ test-class-e4
-illegal dynamic in function "meth"
-/// @ test-class-e5
 too many parameters
-/// @ test-class-e6
+/// @ test-class-e5
 non matching error result
 /// @@ test-function
 /// @ test-function-0
@@ -4554,7 +5718,7 @@ Return_Code ut_M_name(char* self, Seq_Length self_Max_length, Seq_Length* self_L
     /* initializing v */
     INIT_NEW_SEQUENCE(8, LUMI_block0_cleanup, n, char, 0x0c);
     INIT_NEW_SEQUENCE(9, LUMI_block0_cleanup, aux_String_0, char, 0x0c);
-    String_Del(o);
+    String_Del(o, NULL);
     free(o);
     o_Max_length = 0x0c;
     o_Length = aux_String_0_Length;
@@ -4574,18 +5738,19 @@ Return_Code ut_M_name(char* self, Seq_Length self_Max_length, Seq_Length* self_L
     pu = aux_Array_0;
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(aux_String_0);
+    String_Del(aux_String_0, NULL);
     free(aux_String_0);
-    String_Del(n);
+    String_Del(n, NULL);
     free(n);
-    String_Del(o);
+    String_Del(o, NULL);
     free(o);
-    String_Del(po);
+    String_Del(po, NULL);
     free(po);
     return LUMI_err;
 }
 /// @ test-function-8
 typedef struct ut_M_Struct ut_M_Struct;
+typedef struct ut_M_Struct_Dynamic ut_M_Struct_Dynamic;
 typedef struct ut_M_Class ut_M_Class;
 typedef struct ut_M_Class_Dynamic ut_M_Class_Dynamic;
 struct ut_M_Struct {
@@ -4597,6 +5762,9 @@ struct ut_M_Struct {
     Seq_Length astr_Value_length;
     Seq_Length* astr_Seq_length;
 };
+struct ut_M_Struct_Dynamic {
+    Dynamic_Del _del;
+};
 struct ut_M_Class {
     ut_M_Class* c;
     ut_M_Class_Dynamic* c_Dynamic;
@@ -4607,19 +5775,24 @@ struct ut_M_Class_Dynamic {
     Dynamic_Del _del;
     void (*meth)(ut_M_Class* self, ut_M_Class_Dynamic* self_Dynamic);
 };
-void ut_M_Struct_Del(ut_M_Struct* self);
+void ut_M_Struct_Del(ut_M_Struct* self, ut_M_Struct_Dynamic* self_Dynamic);
 void ut_M_Class_meth(ut_M_Class* self, ut_M_Class_Dynamic* self_Dynamic);
 void ut_M_Class_Del(ut_M_Class* self, ut_M_Class_Dynamic* self_Dynamic);
 void ut_M_name(ut_M_Struct* ps, ut_M_Class* pc, ut_M_Class_Dynamic* pc_Dynamic, ut_M_Struct* pas, Seq_Length pas_Length, ut_M_Class* pac, Seq_Length pac_Length);
-Generic_Type_Dynamic ut_M_Struct_dynamic = {(Dynamic_Del)ut_M_Struct_Del};
-ut_M_Class_Dynamic ut_M_Class_dynamic = {(Dynamic_Del)ut_M_Class_Del, ut_M_Class_meth};
-void ut_M_Struct_Del(ut_M_Struct* self) {
+ut_M_Struct_Dynamic ut_M_Struct_dynamic = {
+    (Dynamic_Del)ut_M_Struct_Del
+};
+ut_M_Class_Dynamic ut_M_Class_dynamic = {
+    (Dynamic_Del)ut_M_Class_Del,
+    ut_M_Class_meth
+};
+void ut_M_Struct_Del(ut_M_Struct* self, ut_M_Struct_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     free(self->astr_Seq_length);
     free(self->astr);
     ARRAY_DEL(ut_M_Struct, self->as, self->as_Length)
     free(self->as);
-    SELF_REF_DEL(ut_M_Struct, s);
+    SELF_REF_DEL(ut_M_Struct, s, NULL);
     free(self->s);
 }
 void ut_M_Class_meth(ut_M_Class* self, ut_M_Class_Dynamic* self_Dynamic) {
@@ -4660,7 +5833,7 @@ LUMI_block0_cleanup:
     free(as);
     if (c_Dynamic != NULL) c_Dynamic->_del(c, c_Dynamic);
     free(c);
-    ut_M_Struct_Del(s);
+    ut_M_Struct_Del(s, NULL);
     free(s);
     ARRAY_DEL_DYN(ut_M_Class, pac, pac_Length)
     free(pac);
@@ -4668,7 +5841,7 @@ LUMI_block0_cleanup:
     free(pas);
     if (pc_Dynamic != NULL) pc_Dynamic->_del(pc, pc_Dynamic);
     free(pc);
-    ut_M_Struct_Del(ps);
+    ut_M_Struct_Del(ps, NULL);
     free(ps);
 }
 /// @ test-function-9
@@ -4684,7 +5857,10 @@ struct ut_M_Test_Dynamic {
 void ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_name(ut_M_Test** t, ut_M_Test_Dynamic** t_Dynamic);
-ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_meth};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del,
+    ut_M_Test_meth
+};
 void ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
@@ -4718,7 +5894,7 @@ Return_Code ut_M_name(char** so, Seq_Length* so_Max_length, Seq_Length** so_Leng
     Seq_Length aux_String_0_Max_length = 0;
     Seq_Length* aux_String_0_Length = &Lumi_empty_length;
     INIT_NEW_SEQUENCE(2, LUMI_block0_cleanup, aux_String_0, char, 0x0c);
-    String_Del(*so);
+    String_Del(*so, NULL);
     free(*so);
     *so_Max_length = 0x0c;
     *so_Length = aux_String_0_Length;
@@ -4727,7 +5903,7 @@ Return_Code ut_M_name(char** so, Seq_Length* so_Max_length, Seq_Length** so_Leng
     aux_String_0_Length = &Lumi_empty_length;
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(aux_String_0);
+    String_Del(aux_String_0, NULL);
     free(aux_String_0);
     return LUMI_err;
 }
@@ -4756,7 +5932,7 @@ USER_MAIN_HEADER {
     String_clear(s, s_Max_length, s_Length);
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(s);
+    String_Del(s, NULL);
     free(s);
     return LUMI_err;
 }
@@ -4832,6 +6008,7 @@ adding "->()" without outputs
 /// @@ test-members
 /// @ test-members-0
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
     char* str;
@@ -4839,37 +6016,54 @@ struct ut_M_Test {
     Seq_Length* str_Length;
     Ref_Manager* str_Refman;
 };
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->str_Refman);
 }
 /// @ test-members-1
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_name(ut_M_Test* self);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 void ut_M_Test_name(ut_M_Test* self) {
     unsigned LUMI_loop_depth = 1;
     self->x = 0x02;
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 /// @ test-members-2
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_name(ut_M_Test* self);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 void ut_M_Test_name(ut_M_Test* self) {
     unsigned LUMI_loop_depth = 1;
     uint32_t x = 0;
@@ -4877,72 +6071,108 @@ void ut_M_Test_name(ut_M_Test* self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 /// @ test-members-3
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 /// @ test-members-4
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 /// @ test-members-5
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 /// @ test-members-6
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 /// @ test-members-7
 typedef struct ut_M_Test1 ut_M_Test1;
+typedef struct ut_M_Test1_Dynamic ut_M_Test1_Dynamic;
 typedef struct ut_M_Test2 ut_M_Test2;
+typedef struct ut_M_Test2_Dynamic ut_M_Test2_Dynamic;
 struct ut_M_Test1 {
     uint32_t name;
+};
+struct ut_M_Test1_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Test2 {
     uint32_t fun;
 };
+struct ut_M_Test2_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test1_fun(ut_M_Test1* self);
-void ut_M_Test1_Del(ut_M_Test1* self);
+void ut_M_Test1_Del(ut_M_Test1* self, ut_M_Test1_Dynamic* self_Dynamic);
 void ut_M_Test2_name(ut_M_Test2* self);
-void ut_M_Test2_Del(ut_M_Test2* self);
+void ut_M_Test2_Del(ut_M_Test2* self, ut_M_Test2_Dynamic* self_Dynamic);
 void ut_M_fun(void);
-Generic_Type_Dynamic ut_M_Test1_dynamic = {(Dynamic_Del)ut_M_Test1_Del};
-Generic_Type_Dynamic ut_M_Test2_dynamic = {(Dynamic_Del)ut_M_Test2_Del};
+ut_M_Test1_Dynamic ut_M_Test1_dynamic = {
+    (Dynamic_Del)ut_M_Test1_Del
+};
+ut_M_Test2_Dynamic ut_M_Test2_dynamic = {
+    (Dynamic_Del)ut_M_Test2_Del
+};
 uint32_t ut_M_name = 0;
 void ut_M_Test1_fun(ut_M_Test1* self) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test1_Del(ut_M_Test1* self) {
+void ut_M_Test1_Del(ut_M_Test1* self, ut_M_Test1_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_Test2_name(ut_M_Test2* self) {
@@ -4950,7 +6180,7 @@ void ut_M_Test2_name(ut_M_Test2* self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test2_Del(ut_M_Test2* self) {
+void ut_M_Test2_Del(ut_M_Test2* self, ut_M_Test2_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_fun(void) {
@@ -4960,12 +6190,18 @@ LUMI_block0_cleanup:
 }
 /// @ test-members-8
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_fun(ut_M_Test* self);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 void ut_M_Test_fun(ut_M_Test* self) {
     unsigned LUMI_loop_depth = 1;
     if (self->x > 0x03) {
@@ -4996,18 +6232,24 @@ void ut_M_Test_fun(ut_M_Test* self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 /// @ test-members-9
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_fun(ut_M_Test* self);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_Test_fun(ut_M_Test* self) {
@@ -5018,13 +6260,19 @@ LUMI_block0_cleanup:
 }
 /// @ test-members-10
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_fun(ut_M_Test* self, char* s, Seq_Length s_Max_length, Seq_Length* s_Length, uint32_t* x);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_Test_fun(ut_M_Test* self, char* s, Seq_Length s_Max_length, Seq_Length* s_Length, uint32_t* x) {
@@ -5035,13 +6283,19 @@ LUMI_block0_cleanup:
 }
 /// @ test-members-11
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_new(ut_M_Test* self, uint32_t x);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_Test_new(ut_M_Test* self, uint32_t x) {
@@ -5177,7 +6431,7 @@ char* s = NULL;
     Seq_Length s_Max_length = 0;
     Seq_Length* s_Length = &Lumi_empty_length;
     INIT_NEW_SEQUENCE(1, LUMI_block0_cleanup, s, char, 0x0c);
-    String_Del(*so);
+    String_Del(*so, NULL);
     LUMI_owner_dec_ref(*so_Refman);
     *so_Max_length = 0x0c;
     *so_Length = s_Length;
@@ -5273,7 +6527,7 @@ ut_M_Tb* aux_Tb_0 = NULL;
     INIT_NEW(1, LUMI_block0_cleanup, aux_Tb_0, ut_M_Tb, 1);
     LUMI_err = ut_M_Tb_new(aux_Tb_0, aux_Tb_0_Dynamic, ut_M_i);
     CHECK(1, LUMI_block0_cleanup)
-    if (ut_M_tb_Dynamic != NULL) ut_M_tb_Dynamic->_base._del(ut_M_tb, ut_M_tb_Dynamic);
+    if (ut_M_tb_Dynamic != NULL) ut_M_tb_Dynamic->_base._base._del(ut_M_tb, ut_M_tb_Dynamic);
     LUMI_owner_dec_ref(ut_M_tb_Refman);
     ut_M_tb_Dynamic = aux_Tb_0_Dynamic;
     ut_M_tb = aux_Tb_0;
@@ -5296,7 +6550,7 @@ char* aux_String_0 = NULL;
     CHECK_REF_REFMAN(2, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
     if (ut_M_arr[0] <= 0) RAISE(2, LUMI_block0_cleanup, sequence_too_short)
     INIT_NEW_SEQUENCE(2, LUMI_block0_cleanup, aux_Buffer_0, Byte, ut_M_arr[0]);
-    Buffer_Del(ut_M_buff);
+    Buffer_Del(ut_M_buff, NULL);
     free(ut_M_buff);
     ut_M_buff_Max_length = aux_Buffer_0_Max_length;
     ut_M_buff_Length = aux_Buffer_0_Length;
@@ -5440,7 +6694,7 @@ ut_M_Tc* aux_Tc_0 = NULL;
     INIT_NEW(1, LUMI_block0_cleanup, aux_Tc_0, ut_M_Tc, 1);
     LUMI_err = ut_M_Tb_new(&(aux_Tc_0->_base), &(aux_Tc_0_Dynamic->_base), 0x03);
     CHECK(1, LUMI_block0_cleanup)
-    if (ut_M_tb_Dynamic != NULL) ut_M_tb_Dynamic->_base._del(ut_M_tb, ut_M_tb_Dynamic);
+    if (ut_M_tb_Dynamic != NULL) ut_M_tb_Dynamic->_base._base._del(ut_M_tb, ut_M_tb_Dynamic);
     LUMI_owner_dec_ref(ut_M_tb_Refman);
     ut_M_tb_Dynamic = &(aux_Tc_0_Dynamic->_base);
     ut_M_tb = &(aux_Tc_0->_base);
@@ -5508,13 +6762,19 @@ char* sa = NULL;
     aux_Array_1 = NULL;
 /// @ test-initialize-16
 typedef struct ut_M_MyStruct ut_M_MyStruct;
+typedef struct ut_M_MyStruct_Dynamic ut_M_MyStruct_Dynamic;
 struct ut_M_MyStruct {
     uint32_t x;
 };
-void ut_M_MyStruct_Del(ut_M_MyStruct* self);
+struct ut_M_MyStruct_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic);
 void ut_M_get(ut_M_MyStruct** a);
-Generic_Type_Dynamic ut_M_MyStruct_dynamic = {(Dynamic_Del)ut_M_MyStruct_Del};
-void ut_M_MyStruct_Del(ut_M_MyStruct* self) {
+ut_M_MyStruct_Dynamic ut_M_MyStruct_dynamic = {
+    (Dynamic_Del)ut_M_MyStruct_Del
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_get(ut_M_MyStruct** a) {
@@ -5526,9 +6786,9 @@ void ut_M_get(ut_M_MyStruct** a) {
     aux_MyStruct_0 = NULL;
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_MyStruct_Del(aux_MyStruct_0);
+    ut_M_MyStruct_Del(aux_MyStruct_0, NULL);
     free(aux_MyStruct_0);
-    ut_M_MyStruct_Del(b);
+    ut_M_MyStruct_Del(b, NULL);
     free(b);
 }
 /// @ test-initialize-17
@@ -5561,19 +6821,25 @@ ut_M_Test* t1 = NULL;
     INIT_VAR_REFMAN(2, LUMI_block0_cleanup, t2)
 /// @ test-initialize-20
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_new(ut_M_Test* self, uint32_t x);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_fun(void);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 void ut_M_Test_new(ut_M_Test* self, uint32_t x) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_fun(void) {
@@ -5584,31 +6850,45 @@ void ut_M_fun(void) {
     ut_M_Test_new(t, 0x03);
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(t);
+    ut_M_Test_Del(t, NULL);
 }
 /// @ test-initialize-21
 typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Base {
     uint32_t x;
+};
+struct ut_M_Base_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Test {
     ut_M_Base _base;
     uint32_t y;
 };
+struct ut_M_Test_Dynamic {
+    ut_M_Base_Dynamic _base;
+};
 void ut_M_Base_new(ut_M_Base* self);
-void ut_M_Base_Del(ut_M_Base* self);
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
 void ut_M_Test_new(ut_M_Test* self);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Test_Del
+    }
+};
 void ut_M_Base_new(ut_M_Base* self) {
     unsigned LUMI_loop_depth = 1;
     self->x = 0x02;
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Base_Del(ut_M_Base* self) {
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_Test_new(ut_M_Test* self) {
@@ -5618,10 +6898,39 @@ void ut_M_Test_new(ut_M_Test* self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Base_Del(&(self->_base));
+    ut_M_Base_Del(&(self->_base), NULL);
 }
+/// @ test-initialize-22
+if (ut_M_b) {
+        ut_M_Test* nt = NULL;
+        ut_M_Ta* nta = NULL;
+        ut_M_Ta_Dynamic* nta_Dynamic = &ut_M_Ta_dynamic;
+        ut_M_Tb* ntb = NULL;
+        ut_M_Tb_Dynamic* ntb_Dynamic = &ut_M_Tb_dynamic;
+        ut_M_Tc* ntc = NULL;
+        ut_M_Tc_Dynamic* ntc_Dynamic = &ut_M_Tc_dynamic;
+        INIT_NEW(2, LUMI_block1_cleanup, nt, ut_M_Test, 1);
+        INIT_NEW(3, LUMI_block1_cleanup, nta, ut_M_Ta, 1);
+        INIT_NEW(4, LUMI_block1_cleanup, ntb, ut_M_Tb, 1);
+        LUMI_err = ut_M_Tb_new(ntb, ntb_Dynamic, 0x03);
+        CHECK(4, LUMI_block1_cleanup)
+        INIT_NEW(5, LUMI_block1_cleanup, ntc, ut_M_Tc, 1);
+        LUMI_err = ut_M_Tb_new(&(ntc->_base), &(ntc_Dynamic->_base), 0x04);
+        CHECK(5, LUMI_block1_cleanup)
+    LUMI_block1_cleanup:
+        (void)0;
+        if (ntc_Dynamic != NULL) ntc_Dynamic->_base._base._base._del(ntc, ntc_Dynamic);
+        free(ntc);
+        if (ntb_Dynamic != NULL) ntb_Dynamic->_base._base._del(ntb, ntb_Dynamic);
+        free(ntb);
+        if (nta_Dynamic != NULL) nta_Dynamic->_base._del(nta, nta_Dynamic);
+        free(nta);
+        ut_M_Test_Del(nt, NULL);
+        free(nt);
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ test-initialize-e0
 dynamic allocation of primitive type "Int"
 /// @ test-initialize-e1
@@ -5721,7 +7030,7 @@ uint32_t x = 0;
         ut_M_i = 0x01;
     LUMI_block1_cleanup:
         (void)0;
-    ut_M_Test_Del(tt);
+        ut_M_Test_Del(tt, NULL);
         free(tt);
     }
 /// @ test-block-1
@@ -6773,21 +8082,27 @@ LUMI_block0_cleanup:
 }
 /// @ test-testing-m2
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_meth(ut_M_Test* self, uint32_t x);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_meth_Mock(ut_M_Test* self, uint32_t x);
 Bool ut_M_Test_meth_Mock_active = true;
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 void ut_M_Test_meth(ut_M_Test* self, uint32_t x) {
     unsigned LUMI_loop_depth = 1;
     ut_M_Test_meth_Mock(self, x);
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_Test_meth_Mock(ut_M_Test* self, uint32_t x) {
@@ -6810,7 +8125,10 @@ void ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, uint32_t x
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_meth_Mock(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, uint32_t x);
 Bool ut_M_Test_meth_Mock_active = true;
-ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_meth_Mock};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del,
+    ut_M_Test_meth_Mock
+};
 void ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, uint32_t x) {
     unsigned LUMI_loop_depth = 1;
     self_Dynamic->meth(self, self_Dynamic, x);
@@ -6847,21 +8165,27 @@ LUMI_block0_cleanup:
 }
 /// @ test-testing-m5
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_meth(ut_M_Test* self, uint32_t x, uint32_t* y);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_meth_Mock(ut_M_Test* self, uint32_t x, uint32_t* y);
 Bool ut_M_Test_meth_Mock_active = true;
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 void ut_M_Test_meth(ut_M_Test* self, uint32_t x, uint32_t* y) {
     unsigned LUMI_loop_depth = 1;
     ut_M_Test_meth_Mock(self, x, &(*y));
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_Test_meth_Mock(ut_M_Test* self, uint32_t x, uint32_t* y) {
@@ -6889,7 +8213,10 @@ void ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, uint32_t x
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_meth_Mock(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, uint32_t x, uint32_t* y);
 Bool ut_M_Test_meth_Mock_active = true;
-ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_meth_Mock};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del,
+    ut_M_Test_meth_Mock
+};
 void ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, uint32_t x, uint32_t* y) {
     unsigned LUMI_loop_depth = 1;
     self_Dynamic->meth(self, self_Dynamic, x, &(*y));
@@ -6942,21 +8269,27 @@ LUMI_block0_cleanup:
 }
 /// @ test-testing-m8
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_new(ut_M_Test* self, uint32_t x);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_new_Mock(ut_M_Test* self, uint32_t x);
 Bool ut_M_Test_new_Mock_active = true;
 void ut_M_fun(void);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 void ut_M_Test_new(ut_M_Test* self, uint32_t x) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_Test_new_Mock(ut_M_Test* self, uint32_t x) {
@@ -6973,7 +8306,7 @@ void ut_M_fun(void) {
     ut_M_Test_new_Mock(t, 0x02);
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(t);
+    ut_M_Test_Del(t, NULL);
 }
 /// @ test-testing-t0
 void ut_M_fun0(void);
@@ -7182,16 +8515,22 @@ LUMI_block0_cleanup:
 TEST_MAIN_FUNC
 /// @ test-testing-mg0
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     char* s;
     Seq_Length s_Max_length;
     Seq_Length* s_Length;
     Ref_Manager* s_Refman;
 };
-void ut_M_Test_Del(ut_M_Test* self);
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_MockDel(Ref self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     IGNORE_ERRORS( ut_M_Test_MockDel(self) )
     LUMI_dec_ref(self->s_Refman);
@@ -7333,13 +8672,19 @@ using "!" where error is not propagated
 #include <first.h>
 #include <second.h>
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
-void ut_M_Test_Del(ut_M_Test* self);
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_fun(void);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_fun(void) {
@@ -7368,7 +8713,10 @@ struct ut_M_Test_Dynamic {
 void ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_call(void);
-ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_meth};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del,
+    ut_M_Test_meth
+};
 void ut_M_Test_meth(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
@@ -7403,13 +8751,19 @@ LUMI_block0_cleanup:
 }
 /// @ test-native-f3
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
-void ut_M_Test_Del(ut_M_Test* self);
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_call(void);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_call(void) {
@@ -7518,7 +8872,7 @@ Return_Code ut_M_fun(Test t, TestRef r, Native in, Native* out) {
     in.r = r;
     CHECK_REF(15, LUMI_block0_cleanup, in.n)
     in.n->x = 0;
-    cdef_M_Pointer_set_point_to(in.n, in, &Native_dynamic);
+    cdef_M_Pointer_set_point_to(in.n, in, (Generic_Type_Dynamic*)&Native_dynamic);
     *out = cdef_M_Pointer_get_pointed_at(in.n, 0);
     *out = in;
 LUMI_block0_cleanup:
@@ -7596,14 +8950,20 @@ no '"' around string constant "#ifdef error"
 /// @@ test-parameter-type
 /// @ test-parameter-type-0
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     Generic_Type* item;
     Ref_Manager* item_Refman;
     Generic_Type_Dynamic* item_Dynamic;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 Return_Code ut_M_Test_set(ut_M_Test* self, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 Return_Code ut_M_Test_set(ut_M_Test* self, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
@@ -7635,25 +8995,31 @@ Return_Code ut_M_Test_set(ut_M_Test* self, Generic_Type* item, Ref_Manager* item
     self->item = t->item;
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(t);
+    ut_M_Test_Del(t, NULL);
     free(t);
     LUMI_dec_ref(x_Refman);
     LUMI_dec_ref(item_Refman);
     return LUMI_err;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->item_Refman);
 }
 /// @ test-parameter-type-1
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     Generic_Type* item;
     Generic_Type_Dynamic* item_Dynamic;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_get(ut_M_Test* self, Generic_Type** item, Generic_Type_Dynamic** item_Dynamic);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 void ut_M_Test_get(ut_M_Test* self, Generic_Type** item, Generic_Type_Dynamic** item_Dynamic) {
     unsigned LUMI_loop_depth = 1;
     *item_Dynamic = self->item_Dynamic;
@@ -7661,24 +9027,37 @@ void ut_M_Test_get(ut_M_Test* self, Generic_Type** item, Generic_Type_Dynamic** 
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     if (self->item_Dynamic != NULL) self->item_Dynamic->_del(self->item, self->item_Dynamic);
     free(self->item);
 }
 /// @ test-parameter-type-2
 typedef struct ut_M_StructA ut_M_StructA;
+typedef struct ut_M_StructA_Dynamic ut_M_StructA_Dynamic;
 typedef struct ut_M_StructB ut_M_StructB;
+typedef struct ut_M_StructB_Dynamic ut_M_StructB_Dynamic;
 typedef struct ut_M_StructC ut_M_StructC;
+typedef struct ut_M_StructC_Dynamic ut_M_StructC_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_StructA {
     uint32_t x;
+};
+struct ut_M_StructA_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_StructB {
     uint32_t x;
 };
+struct ut_M_StructB_Dynamic {
+    Dynamic_Del _del;
+};
 struct ut_M_StructC {
     uint32_t x;
+};
+struct ut_M_StructC_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Test {
     Generic_Type* first;
@@ -7691,23 +9070,34 @@ struct ut_M_Test {
     Ref_Manager* third_Refman;
     Generic_Type_Dynamic* third_Dynamic;
 };
-void ut_M_StructA_Del(ut_M_StructA* self);
-void ut_M_StructB_Del(ut_M_StructB* self);
-void ut_M_StructC_Del(ut_M_StructC* self);
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_StructA_Del(ut_M_StructA* self, ut_M_StructA_Dynamic* self_Dynamic);
+void ut_M_StructB_Del(ut_M_StructB* self, ut_M_StructB_Dynamic* self_Dynamic);
+void ut_M_StructC_Del(ut_M_StructC* self, ut_M_StructC_Dynamic* self_Dynamic);
 void ut_M_Test_set(ut_M_Test* self, Generic_Type* first, Ref_Manager* first_Refman, Generic_Type_Dynamic* first_Dynamic, Generic_Type* second, Ref_Manager* second_Refman, Generic_Type_Dynamic* second_Dynamic, Generic_Type* third, Ref_Manager* third_Refman, Generic_Type_Dynamic* third_Dynamic);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_use(ut_M_StructA* first, Ref_Manager* first_Refman, ut_M_StructB* second, Ref_Manager* second_Refman, ut_M_StructC* third, Ref_Manager* third_Refman);
-Generic_Type_Dynamic ut_M_StructA_dynamic = {(Dynamic_Del)ut_M_StructA_Del};
-Generic_Type_Dynamic ut_M_StructB_dynamic = {(Dynamic_Del)ut_M_StructB_Del};
-Generic_Type_Dynamic ut_M_StructC_dynamic = {(Dynamic_Del)ut_M_StructC_Del};
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_StructA_Del(ut_M_StructA* self) {
+ut_M_StructA_Dynamic ut_M_StructA_dynamic = {
+    (Dynamic_Del)ut_M_StructA_Del
+};
+ut_M_StructB_Dynamic ut_M_StructB_dynamic = {
+    (Dynamic_Del)ut_M_StructB_Del
+};
+ut_M_StructC_Dynamic ut_M_StructC_dynamic = {
+    (Dynamic_Del)ut_M_StructC_Del
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_StructA_Del(ut_M_StructA* self, ut_M_StructA_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
-void ut_M_StructB_Del(ut_M_StructB* self) {
+void ut_M_StructB_Del(ut_M_StructB* self, ut_M_StructB_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
-void ut_M_StructC_Del(ut_M_StructC* self) {
+void ut_M_StructC_Del(ut_M_StructC* self, ut_M_StructC_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_Test_set(ut_M_Test* self, Generic_Type* first, Ref_Manager* first_Refman, Generic_Type_Dynamic* first_Dynamic, Generic_Type* second, Ref_Manager* second_Refman, Generic_Type_Dynamic* second_Dynamic, Generic_Type* third, Ref_Manager* third_Refman, Generic_Type_Dynamic* third_Dynamic) {
@@ -7736,7 +9126,7 @@ LUMI_block0_cleanup:
     LUMI_dec_ref(second_Refman);
     LUMI_dec_ref(first_Refman);
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->third_Refman);
     LUMI_dec_ref(self->second_Refman);
@@ -7753,52 +9143,66 @@ void ut_M_use(ut_M_StructA* first, Ref_Manager* first_Refman, ut_M_StructB* seco
     LUMI_inc_ref(first_Refman);
     LUMI_dec_ref(t->first_Refman);
     t->first_Refman = first_Refman;
-    t->first_Dynamic = &ut_M_StructA_dynamic;
+    t->first_Dynamic = (Generic_Type_Dynamic*)&ut_M_StructA_dynamic;
     t->first = first;
     LUMI_inc_ref(second_Refman);
     LUMI_dec_ref(t->second_Refman);
     t->second_Refman = second_Refman;
-    t->second_Dynamic = &ut_M_StructB_dynamic;
+    t->second_Dynamic = (Generic_Type_Dynamic*)&ut_M_StructB_dynamic;
     t->second = second;
     LUMI_inc_ref(third_Refman);
     LUMI_dec_ref(t->third_Refman);
     t->third_Refman = third_Refman;
-    t->third_Dynamic = &ut_M_StructC_dynamic;
+    t->third_Dynamic = (Generic_Type_Dynamic*)&ut_M_StructC_dynamic;
     t->third = third;
-    ut_M_Test_set(t, first, first_Refman, &ut_M_StructA_dynamic, second, second_Refman, &ut_M_StructB_dynamic, third, third_Refman, &ut_M_StructC_dynamic);
+    ut_M_Test_set(t, first, first_Refman, (Generic_Type_Dynamic*)&ut_M_StructA_dynamic, second, second_Refman, (Generic_Type_Dynamic*)&ut_M_StructB_dynamic, third, third_Refman, (Generic_Type_Dynamic*)&ut_M_StructC_dynamic);
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(t);
+    ut_M_Test_Del(t, NULL);
     LUMI_dec_ref(third_Refman);
     LUMI_dec_ref(second_Refman);
     LUMI_dec_ref(first_Refman);
 }
 /// @ test-parameter-type-3
 typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Base {
     uint32_t x;
+};
+struct ut_M_Base_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Test {
     ut_M_Base _base;
 };
-void ut_M_Base_Del(ut_M_Base* self);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Base_Del(ut_M_Base* self) {
+struct ut_M_Test_Dynamic {
+    ut_M_Base_Dynamic _base;
+};
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Test_Del
+    }
+};
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Base_Del(&(self->_base));
+    ut_M_Base_Del(&(self->_base), NULL);
 }
 /// @ test-parameter-type-4
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_d, ut_M_d_Refman)
     LUMI_inc_ref(ut_M_t_Refman);
     LUMI_dec_ref(ut_M_d->item_Refman);
     ut_M_d->item_Refman = ut_M_t_Refman;
-    ut_M_d->item_Dynamic = &ut_M_Test_dynamic;
+    ut_M_d->item_Dynamic = (Generic_Type_Dynamic*)&ut_M_Test_dynamic;
     ut_M_d->item = ut_M_t;
 /// @ test-parameter-type-5
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_d, ut_M_d_Refman)
@@ -7808,20 +9212,26 @@ CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_d, ut_M_d_Refman)
     ut_M_t = ut_M_d->item;
 /// @ test-parameter-type-6
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
     void (*fun)(Generic_Type* item, Generic_Type_Dynamic* item_Dynamic, void (*fun)(Generic_Type* item, Generic_Type_Dynamic* item_Dynamic));
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_meth(ut_M_Test* self, void (*fun)(Generic_Type* item, Generic_Type_Dynamic* item_Dynamic, void (*fun)(Generic_Type* item, Generic_Type_Dynamic* item_Dynamic)));
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 void ut_M_Test_meth(ut_M_Test* self, void (*fun)(Generic_Type* item, Generic_Type_Dynamic* item_Dynamic, void (*fun)(Generic_Type* item, Generic_Type_Dynamic* item_Dynamic))) {
     unsigned LUMI_loop_depth = 1;
     void (*funv)(Generic_Type* item, Generic_Type_Dynamic* item_Dynamic, void (*funa)(Generic_Type* item, Generic_Type_Dynamic* item_Dynamic)) = NULL;
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 /// @ test-parameter-type-8
@@ -7847,7 +9257,7 @@ ut_M_Data dr_Var = {0};
 /// @ test-parameter-type-12
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_d_Refman)
     LUMI_var_dec_ref(*to_Refman);
-    ut_M_Data_set(ut_M_d, *to, &ut_M_Test_dynamic);
+    ut_M_Data_set(ut_M_d, *to, (Generic_Type_Dynamic*)&ut_M_Test_dynamic);
     *to = NULL;
     *to_Refman = NULL;
 /// @ test-parameter-type-13
@@ -7870,18 +9280,24 @@ ut_M_Data* dg = NULL;
 /// @ test-parameter-type-16
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_d_Refman)
     LUMI_var_dec_ref(*to_Refman);
-    ut_M_Data_set(ut_M_d, *to, &ut_M_Test_dynamic);
+    ut_M_Data_set(ut_M_d, *to, (Generic_Type_Dynamic*)&ut_M_Test_dynamic);
     *to = NULL;
     *to_Refman = NULL;
 /// @ test-parameter-type-17
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     ut_M_Test* next;
     Ref_Manager* next_Refman;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_meth(ut_M_Test* self, ut_M_Test* next, Ref_Manager* next_Refman, ut_M_Test** out);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 void ut_M_Test_meth(ut_M_Test* self, ut_M_Test* next, Ref_Manager* next_Refman, ut_M_Test** out) {
     unsigned LUMI_loop_depth = 1;
     LUMI_inc_ref(next_Refman);
@@ -7894,7 +9310,7 @@ LUMI_block0_cleanup:
     (void)0;
     LUMI_dec_ref(next_Refman);
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->next_Refman);
 }
@@ -7938,35 +9354,55 @@ ut_M_Data dt_Var = {0};
     tb2 = dt->item;
 /// @ test-parameter-type-19
 typedef struct ut_M_MyStruct ut_M_MyStruct;
+typedef struct ut_M_MyStruct_Dynamic ut_M_MyStruct_Dynamic;
 typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_MyStruct {
     uint32_t x;
+};
+struct ut_M_MyStruct_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Base {
     Generic_Type* item;
     Ref_Manager* item_Refman;
     Generic_Type_Dynamic* item_Dynamic;
 };
+struct ut_M_Base_Dynamic {
+    Dynamic_Del _del;
+};
 struct ut_M_Test {
     ut_M_Base _base;
 };
+struct ut_M_Test_Dynamic {
+    ut_M_Base_Dynamic _base;
+};
 void ut_M_MyStruct_meth(ut_M_MyStruct* self);
-void ut_M_MyStruct_Del(ut_M_MyStruct* self);
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic);
 void ut_M_Base_get(ut_M_Base* self, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
-void ut_M_Base_Del(ut_M_Base* self);
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
 void ut_M_Test_set(ut_M_Test* self, ut_M_MyStruct* f, Ref_Manager* f_Refman);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 Return_Code ut_M_fun(ut_M_Test* test, ut_M_MyStruct* f, Ref_Manager* f_Refman);
-Generic_Type_Dynamic ut_M_MyStruct_dynamic = {(Dynamic_Del)ut_M_MyStruct_Del};
-Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+ut_M_MyStruct_Dynamic ut_M_MyStruct_dynamic = {
+    (Dynamic_Del)ut_M_MyStruct_Del
+};
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Test_Del
+    }
+};
 void ut_M_MyStruct_meth(ut_M_MyStruct* self) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_MyStruct_Del(ut_M_MyStruct* self) {
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_Base_get(ut_M_Base* self, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic) {
@@ -7974,7 +9410,7 @@ void ut_M_Base_get(ut_M_Base* self, Generic_Type** item, Ref_Manager** item_Refm
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Base_Del(ut_M_Base* self) {
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->item_Refman);
 }
@@ -7984,16 +9420,16 @@ void ut_M_Test_set(ut_M_Test* self, ut_M_MyStruct* f, Ref_Manager* f_Refman) {
     LUMI_inc_ref(f_Refman);
     LUMI_dec_ref(self->_base.item_Refman);
     self->_base.item_Refman = f_Refman;
-    self->_base.item_Dynamic = &ut_M_MyStruct_dynamic;
+    self->_base.item_Dynamic = (Generic_Type_Dynamic*)&ut_M_MyStruct_dynamic;
     self->_base.item = f;
     ut_M_Base_get(&(self->_base), (void*)&(f), &(f_Refman), &dynamic_Void);
 LUMI_block0_cleanup:
     (void)0;
     LUMI_dec_ref(f_Refman);
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Base_Del(&(self->_base));
+    ut_M_Base_Del(&(self->_base), NULL);
 }
 Return_Code ut_M_fun(ut_M_Test* test, ut_M_MyStruct* f, Ref_Manager* f_Refman) {
     Return_Code LUMI_err = OK;
@@ -8004,7 +9440,7 @@ Return_Code ut_M_fun(ut_M_Test* test, ut_M_MyStruct* f, Ref_Manager* f_Refman) {
     LUMI_inc_ref(f_Refman);
     LUMI_dec_ref(test->_base.item_Refman);
     test->_base.item_Refman = f_Refman;
-    test->_base.item_Dynamic = &ut_M_MyStruct_dynamic;
+    test->_base.item_Dynamic = (Generic_Type_Dynamic*)&ut_M_MyStruct_dynamic;
     test->_base.item = f;
     ut_M_Test_set(test, f, f_Refman);
     LUMI_inc_ref(test->_base.item_Refman);
@@ -8023,12 +9459,16 @@ LUMI_block0_cleanup:
 }
 /// @ test-parameter-type-20
 typedef struct ut_M_MyStruct ut_M_MyStruct;
+typedef struct ut_M_MyStruct_Dynamic ut_M_MyStruct_Dynamic;
 typedef struct ut_M_Base ut_M_Base;
 typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_MyStruct {
     uint32_t x;
+};
+struct ut_M_MyStruct_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Base {
     Generic_Type* item;
@@ -8047,7 +9487,7 @@ struct ut_M_Test_Dynamic {
     ut_M_Base_Dynamic _base;
 };
 void ut_M_MyStruct_meth(ut_M_MyStruct* self);
-void ut_M_MyStruct_Del(ut_M_MyStruct* self);
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic);
 void ut_M_Base_set(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic);
 void ut_M_Base_get(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
 void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
@@ -8055,15 +9495,27 @@ void ut_M_Test_set(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, Generic_Typ
 void ut_M_Test_get(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 Return_Code ut_M_mock(ut_M_Test* test, Ref_Manager* test_Refman, ut_M_Test_Dynamic* test_Dynamic, ut_M_MyStruct* f, Ref_Manager* f_Refman);
-Generic_Type_Dynamic ut_M_MyStruct_dynamic = {(Dynamic_Del)ut_M_MyStruct_Del};
-ut_M_Base_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del, ut_M_Base_set, ut_M_Base_get};
-ut_M_Test_Dynamic ut_M_Test_dynamic = {{(Dynamic_Del)ut_M_Test_Del, (void (*)(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic))ut_M_Test_set, (void (*)(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic))ut_M_Test_get}};
+ut_M_MyStruct_Dynamic ut_M_MyStruct_dynamic = {
+    (Dynamic_Del)ut_M_MyStruct_Del
+};
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del,
+    ut_M_Base_set,
+    ut_M_Base_get
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Test_Del,
+        (void (*)(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic))ut_M_Test_set,
+        (void (*)(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic))ut_M_Test_get
+    }
+};
 void ut_M_MyStruct_meth(ut_M_MyStruct* self) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_MyStruct_Del(ut_M_MyStruct* self) {
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_Base_set(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic, Generic_Type* item, Ref_Manager* item_Refman, Generic_Type_Dynamic* item_Dynamic) {
@@ -8106,7 +9558,7 @@ Return_Code ut_M_mock(ut_M_Test* test, Ref_Manager* test_Refman, ut_M_Test_Dynam
     LUMI_inc_ref(test_Refman);
     LUMI_inc_ref(f_Refman);
     CHECK_REFMAN(12, LUMI_block0_cleanup, test_Refman)
-    test_Dynamic->_base.set(&(test->_base), &(test_Dynamic->_base), f, f_Refman, &ut_M_MyStruct_dynamic);
+    test_Dynamic->_base.set(&(test->_base), &(test_Dynamic->_base), f, f_Refman, (Generic_Type_Dynamic*)&ut_M_MyStruct_dynamic);
     CHECK_REFMAN(13, LUMI_block0_cleanup, test_Refman)
     test_Dynamic->_base.get(&(test->_base), &(test_Dynamic->_base), (void*)&(f), &(f_Refman), &dynamic_Void);
     CHECK_REFMAN(14, LUMI_block0_cleanup, test_Refman)
@@ -8122,15 +9574,21 @@ LUMI_block0_cleanup:
 }
 /// @ test-parameter-type-21
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     Generic_Type* item;
     Ref_Manager* item_Refman;
     Generic_Type_Dynamic* item_Dynamic;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_meth(ut_M_Test* self, Generic_Type* in, Ref_Manager* in_Refman, Generic_Type_Dynamic* in_Dynamic, Generic_Type** out, Ref_Manager** out_Refman, Generic_Type_Dynamic** out_Dynamic);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->item_Refman);
 }
@@ -8161,6 +9619,36 @@ LUMI_block0_cleanup:
     LUMI_dec_ref(p_Refman);
     LUMI_dec_ref(in_Refman);
 }
+/// @ test-parameter-type-22
+ut_M_Data* db = NULL;
+    CHECK_REF(2, LUMI_block0_cleanup, db)
+    LUMI_inc_ref(ut_M_tb_Refman);
+    LUMI_dec_ref(db->item_Refman);
+    db->item_Refman = ut_M_tb_Refman;
+    db->item_Dynamic = (Generic_Type_Dynamic*)ut_M_tb_Dynamic;
+    db->item = ut_M_tb;
+    CHECK_REF(3, LUMI_block0_cleanup, db)
+    LUMI_inc_ref(NULL);
+    LUMI_dec_ref(db->item_Refman);
+    db->item_Refman = NULL;
+    db->item_Dynamic = NULL;
+    db->item = NULL;
+    CHECK_REF(4, LUMI_block0_cleanup, db)
+    LUMI_inc_ref(db->item_Refman);
+    LUMI_dec_ref(ut_M_ta_Refman);
+    ut_M_ta_Refman = db->item_Refman;
+    ut_M_ta_Dynamic = &(((ut_M_Tb_Dynamic*)(db->item_Dynamic))->_base);
+    ut_M_ta = &(((ut_M_Tb*)(db->item))->_base);
+    LUMI_var_dec_ref(ut_M_tb_Refman);
+    ut_M_Data_set(db, ut_M_tb, (void*)ut_M_tb_Dynamic);
+    ut_M_tb = NULL;
+    ut_M_tb_Refman = NULL;
+    ut_M_tb_Dynamic = NULL;
+    ut_M_Data_set(db, NULL, NULL);
+    ut_M_ta = NULL;
+    ut_M_ta_Refman = NULL;
+    ut_M_ta_Dynamic = NULL;
+    ut_M_Data_get(db, (void*)&(ut_M_ta), &(ut_M_ta_Refman), (void*)&(ut_M_ta_Dynamic));
 /// @ test-parameter-type-eg0
 expected "}" after type parameters, got "new-line"
 /// @ test-parameter-type-eg1
@@ -8210,31 +9698,51 @@ buffer as parameter type is unsupported
 /// @@ test-parameter-inheritance
 /// @ test-parameter-inheritance-0
 typedef struct ut_M_MyStruct ut_M_MyStruct;
+typedef struct ut_M_MyStruct_Dynamic ut_M_MyStruct_Dynamic;
 typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_MyStruct {
     uint32_t x;
+};
+struct ut_M_MyStruct_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Base {
     Generic_Type* item;
     Ref_Manager* item_Refman;
     Generic_Type_Dynamic* item_Dynamic;
 };
+struct ut_M_Base_Dynamic {
+    Dynamic_Del _del;
+};
 struct ut_M_Test {
     ut_M_Base _base;
 };
-void ut_M_MyStruct_Del(ut_M_MyStruct* self);
-void ut_M_Base_Del(ut_M_Base* self);
+struct ut_M_Test_Dynamic {
+    ut_M_Base_Dynamic _base;
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic);
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
 Return_Code ut_M_Test_set(ut_M_Test* self, ut_M_MyStruct* f, Ref_Manager* f_Refman);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_use(ut_M_MyStruct* f, Ref_Manager* f_Refman);
-Generic_Type_Dynamic ut_M_MyStruct_dynamic = {(Dynamic_Del)ut_M_MyStruct_Del};
-Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_MyStruct_Del(ut_M_MyStruct* self) {
+ut_M_MyStruct_Dynamic ut_M_MyStruct_dynamic = {
+    (Dynamic_Del)ut_M_MyStruct_Del
+};
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Test_Del
+    }
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
-void ut_M_Base_Del(ut_M_Base* self) {
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->item_Refman);
 }
@@ -8246,21 +9754,21 @@ Return_Code ut_M_Test_set(ut_M_Test* self, ut_M_MyStruct* f, Ref_Manager* f_Refm
     LUMI_inc_ref(f_Refman);
     LUMI_dec_ref(self->_base.item_Refman);
     self->_base.item_Refman = f_Refman;
-    self->_base.item_Dynamic = &ut_M_MyStruct_dynamic;
+    self->_base.item_Dynamic = (Generic_Type_Dynamic*)&ut_M_MyStruct_dynamic;
     self->_base.item = f;
     INIT_NEW(8, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
     LUMI_err = ut_M_Test_set(aux_Test_0, f, f_Refman);
     CHECK(8, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(aux_Test_0);
+    ut_M_Test_Del(aux_Test_0, NULL);
     free(aux_Test_0);
     LUMI_dec_ref(f_Refman);
     return LUMI_err;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Base_Del(&(self->_base));
+    ut_M_Base_Del(&(self->_base), NULL);
 }
 void ut_M_use(ut_M_MyStruct* f, Ref_Manager* f_Refman) {
     unsigned LUMI_loop_depth = 1;
@@ -8271,40 +9779,60 @@ void ut_M_use(ut_M_MyStruct* f, Ref_Manager* f_Refman) {
     LUMI_inc_ref(f_Refman);
     LUMI_dec_ref(t->_base.item_Refman);
     t->_base.item_Refman = f_Refman;
-    t->_base.item_Dynamic = &ut_M_MyStruct_dynamic;
+    t->_base.item_Dynamic = (Generic_Type_Dynamic*)&ut_M_MyStruct_dynamic;
     t->_base.item = f;
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(t);
+    ut_M_Test_Del(t, NULL);
     LUMI_dec_ref(f_Refman);
 }
 /// @ test-parameter-inheritance-1
 typedef struct ut_M_MyStruct ut_M_MyStruct;
+typedef struct ut_M_MyStruct_Dynamic ut_M_MyStruct_Dynamic;
 typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_MyStruct {
     uint32_t x;
+};
+struct ut_M_MyStruct_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Base {
     Generic_Type* item;
     Ref_Manager* item_Refman;
     Generic_Type_Dynamic* item_Dynamic;
 };
+struct ut_M_Base_Dynamic {
+    Dynamic_Del _del;
+};
 struct ut_M_Test {
     ut_M_Base _base;
 };
-void ut_M_MyStruct_Del(ut_M_MyStruct* self);
-void ut_M_Base_Del(ut_M_Base* self);
+struct ut_M_Test_Dynamic {
+    ut_M_Base_Dynamic _base;
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic);
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
 Return_Code ut_M_Test_set(ut_M_Test* self, Generic_Type* i, Ref_Manager* i_Refman, Generic_Type_Dynamic* i_Dynamic, ut_M_MyStruct* f, Ref_Manager* f_Refman);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_use(ut_M_MyStruct* f, Ref_Manager* f_Refman);
-Generic_Type_Dynamic ut_M_MyStruct_dynamic = {(Dynamic_Del)ut_M_MyStruct_Del};
-Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_MyStruct_Del(ut_M_MyStruct* self) {
+ut_M_MyStruct_Dynamic ut_M_MyStruct_dynamic = {
+    (Dynamic_Del)ut_M_MyStruct_Del
+};
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Test_Del
+    }
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
-void ut_M_Base_Del(ut_M_Base* self) {
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->item_Refman);
 }
@@ -8320,19 +9848,19 @@ Return_Code ut_M_Test_set(ut_M_Test* self, Generic_Type* i, Ref_Manager* i_Refma
     self->_base.item_Dynamic = i_Dynamic;
     self->_base.item = i;
     INIT_NEW(8, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
-    LUMI_err = ut_M_Test_set(aux_Test_0, f, f_Refman, &ut_M_MyStruct_dynamic, f, f_Refman);
+    LUMI_err = ut_M_Test_set(aux_Test_0, f, f_Refman, (Generic_Type_Dynamic*)&ut_M_MyStruct_dynamic, f, f_Refman);
     CHECK(8, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(aux_Test_0);
+    ut_M_Test_Del(aux_Test_0, NULL);
     free(aux_Test_0);
     LUMI_dec_ref(f_Refman);
     LUMI_dec_ref(i_Refman);
     return LUMI_err;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Base_Del(&(self->_base));
+    ut_M_Base_Del(&(self->_base), NULL);
 }
 void ut_M_use(ut_M_MyStruct* f, Ref_Manager* f_Refman) {
     unsigned LUMI_loop_depth = 1;
@@ -8343,52 +9871,94 @@ void ut_M_use(ut_M_MyStruct* f, Ref_Manager* f_Refman) {
     LUMI_inc_ref(f_Refman);
     LUMI_dec_ref(t->_base.item_Refman);
     t->_base.item_Refman = f_Refman;
-    t->_base.item_Dynamic = &ut_M_MyStruct_dynamic;
+    t->_base.item_Dynamic = (Generic_Type_Dynamic*)&ut_M_MyStruct_dynamic;
     t->_base.item = f;
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(t);
+    ut_M_Test_Del(t, NULL);
     LUMI_dec_ref(f_Refman);
 }
 /// @ test-parameter-inheritance-2
 typedef struct ut_M_MyStruct ut_M_MyStruct;
+typedef struct ut_M_MyStruct_Dynamic ut_M_MyStruct_Dynamic;
 typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Mid ut_M_Mid;
+typedef struct ut_M_Mid_Dynamic ut_M_Mid_Dynamic;
 typedef struct ut_M_Top ut_M_Top;
+typedef struct ut_M_Top_Dynamic ut_M_Top_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_MyStruct {
     uint32_t x;
+};
+struct ut_M_MyStruct_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Base {
     Generic_Type* item;
     Ref_Manager* item_Refman;
     Generic_Type_Dynamic* item_Dynamic;
 };
+struct ut_M_Base_Dynamic {
+    Dynamic_Del _del;
+};
 struct ut_M_Mid {
     ut_M_Base _base;
+};
+struct ut_M_Mid_Dynamic {
+    ut_M_Base_Dynamic _base;
 };
 struct ut_M_Top {
     ut_M_Mid _base;
 };
+struct ut_M_Top_Dynamic {
+    ut_M_Mid_Dynamic _base;
+};
 struct ut_M_Test {
     ut_M_Top _base;
 };
-void ut_M_MyStruct_Del(ut_M_MyStruct* self);
+struct ut_M_Test_Dynamic {
+    ut_M_Top_Dynamic _base;
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic);
 void ut_M_Base_set(ut_M_Base* self, Generic_Type* i, Ref_Manager* i_Refman, Generic_Type_Dynamic* i_Dynamic);
-void ut_M_Base_Del(ut_M_Base* self);
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
 void ut_M_Mid_set(ut_M_Mid* self, Generic_Type* i, Ref_Manager* i_Refman, Generic_Type_Dynamic* i_Dynamic);
-void ut_M_Mid_Del(ut_M_Mid* self);
+void ut_M_Mid_Del(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic);
 void ut_M_Top_set(ut_M_Top* self, ut_M_MyStruct* f, Ref_Manager* f_Refman);
-void ut_M_Top_Del(ut_M_Top* self);
+void ut_M_Top_Del(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic);
 Return_Code ut_M_Test_set(ut_M_Test* self, ut_M_MyStruct* f, Ref_Manager* f_Refman);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_use(ut_M_MyStruct* f, Ref_Manager* f_Refman);
-Generic_Type_Dynamic ut_M_MyStruct_dynamic = {(Dynamic_Del)ut_M_MyStruct_Del};
-Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
-Generic_Type_Dynamic ut_M_Mid_dynamic = {(Dynamic_Del)ut_M_Mid_Del};
-Generic_Type_Dynamic ut_M_Top_dynamic = {(Dynamic_Del)ut_M_Top_Del};
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_MyStruct_Del(ut_M_MyStruct* self) {
+ut_M_MyStruct_Dynamic ut_M_MyStruct_dynamic = {
+    (Dynamic_Del)ut_M_MyStruct_Del
+};
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del
+};
+ut_M_Mid_Dynamic ut_M_Mid_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Mid_Del
+    }
+};
+ut_M_Top_Dynamic ut_M_Top_dynamic = {
+    {
+        {
+            (Dynamic_Del)ut_M_Top_Del
+        }
+    }
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    {
+        {
+            {
+                (Dynamic_Del)ut_M_Test_Del
+            }
+        }
+    }
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_Base_set(ut_M_Base* self, Generic_Type* i, Ref_Manager* i_Refman, Generic_Type_Dynamic* i_Dynamic) {
@@ -8398,7 +9968,7 @@ LUMI_block0_cleanup:
     (void)0;
     LUMI_dec_ref(i_Refman);
 }
-void ut_M_Base_Del(ut_M_Base* self) {
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->item_Refman);
 }
@@ -8409,26 +9979,26 @@ LUMI_block0_cleanup:
     (void)0;
     LUMI_dec_ref(i_Refman);
 }
-void ut_M_Mid_Del(ut_M_Mid* self) {
+void ut_M_Mid_Del(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Base_Del(&(self->_base));
+    ut_M_Base_Del(&(self->_base), NULL);
 }
 void ut_M_Top_set(ut_M_Top* self, ut_M_MyStruct* f, Ref_Manager* f_Refman) {
     unsigned LUMI_loop_depth = 1;
     LUMI_inc_ref(f_Refman);
-    ut_M_Mid_set(&(self->_base), f, f_Refman, &ut_M_MyStruct_dynamic);
+    ut_M_Mid_set(&(self->_base), f, f_Refman, (Generic_Type_Dynamic*)&ut_M_MyStruct_dynamic);
     LUMI_inc_ref(f_Refman);
     LUMI_dec_ref(self->_base._base.item_Refman);
     self->_base._base.item_Refman = f_Refman;
-    self->_base._base.item_Dynamic = &ut_M_MyStruct_dynamic;
+    self->_base._base.item_Dynamic = (Generic_Type_Dynamic*)&ut_M_MyStruct_dynamic;
     self->_base._base.item = f;
 LUMI_block0_cleanup:
     (void)0;
     LUMI_dec_ref(f_Refman);
 }
-void ut_M_Top_Del(ut_M_Top* self) {
+void ut_M_Top_Del(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Mid_Del(&(self->_base));
+    ut_M_Mid_Del(&(self->_base), NULL);
 }
 Return_Code ut_M_Test_set(ut_M_Test* self, ut_M_MyStruct* f, Ref_Manager* f_Refman) {
     Return_Code LUMI_err = OK;
@@ -8441,7 +10011,7 @@ Return_Code ut_M_Test_set(ut_M_Test* self, ut_M_MyStruct* f, Ref_Manager* f_Refm
     LUMI_inc_ref(f_Refman);
     LUMI_dec_ref(self->_base._base._base.item_Refman);
     self->_base._base._base.item_Refman = f_Refman;
-    self->_base._base._base.item_Dynamic = &ut_M_MyStruct_dynamic;
+    self->_base._base._base.item_Dynamic = (Generic_Type_Dynamic*)&ut_M_MyStruct_dynamic;
     self->_base._base._base.item = f;
     INIT_NEW(16, LUMI_block0_cleanup, aux_Top_0, ut_M_Top, 1);
     ut_M_Top_set(aux_Top_0, f, f_Refman);
@@ -8449,21 +10019,21 @@ Return_Code ut_M_Test_set(ut_M_Test* self, ut_M_MyStruct* f, Ref_Manager* f_Refm
     LUMI_err = ut_M_Test_set(aux_Test_0, f, f_Refman);
     CHECK(17, LUMI_block0_cleanup)
     INIT_NEW(18, LUMI_block0_cleanup, aux_Top_1, ut_M_Top, 1);
-    ut_M_Mid_set(&(aux_Top_1->_base), f, f_Refman, &ut_M_MyStruct_dynamic);
+    ut_M_Mid_set(&(aux_Top_1->_base), f, f_Refman, (Generic_Type_Dynamic*)&ut_M_MyStruct_dynamic);
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Top_Del(aux_Top_1);
+    ut_M_Top_Del(aux_Top_1, NULL);
     free(aux_Top_1);
-    ut_M_Test_Del(aux_Test_0);
+    ut_M_Test_Del(aux_Test_0, NULL);
     free(aux_Test_0);
-    ut_M_Top_Del(aux_Top_0);
+    ut_M_Top_Del(aux_Top_0, NULL);
     free(aux_Top_0);
     LUMI_dec_ref(f_Refman);
     return LUMI_err;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Top_Del(&(self->_base));
+    ut_M_Top_Del(&(self->_base), NULL);
 }
 void ut_M_use(ut_M_MyStruct* f, Ref_Manager* f_Refman) {
     unsigned LUMI_loop_depth = 1;
@@ -8474,40 +10044,60 @@ void ut_M_use(ut_M_MyStruct* f, Ref_Manager* f_Refman) {
     LUMI_inc_ref(f_Refman);
     LUMI_dec_ref(t->_base._base._base.item_Refman);
     t->_base._base._base.item_Refman = f_Refman;
-    t->_base._base._base.item_Dynamic = &ut_M_MyStruct_dynamic;
+    t->_base._base._base.item_Dynamic = (Generic_Type_Dynamic*)&ut_M_MyStruct_dynamic;
     t->_base._base._base.item = f;
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(t);
+    ut_M_Test_Del(t, NULL);
     LUMI_dec_ref(f_Refman);
 }
 /// @ test-parameter-inheritance-3
 typedef struct ut_M_MyStruct ut_M_MyStruct;
+typedef struct ut_M_MyStruct_Dynamic ut_M_MyStruct_Dynamic;
 typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_MyStruct {
     uint32_t x;
+};
+struct ut_M_MyStruct_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Base {
     Generic_Type* item;
     Ref_Manager* item_Refman;
     Generic_Type_Dynamic* item_Dynamic;
 };
+struct ut_M_Base_Dynamic {
+    Dynamic_Del _del;
+};
 struct ut_M_Test {
     ut_M_Base _base;
 };
-void ut_M_MyStruct_Del(ut_M_MyStruct* self);
-void ut_M_Base_Del(ut_M_Base* self);
+struct ut_M_Test_Dynamic {
+    ut_M_Base_Dynamic _base;
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic);
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
 Return_Code ut_M_Test_set(ut_M_Test* self, Generic_Type* i, Ref_Manager* i_Refman, Generic_Type_Dynamic* i_Dynamic, ut_M_MyStruct* f, Ref_Manager* f_Refman);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_use(ut_M_MyStruct* f, Ref_Manager* f_Refman);
-Generic_Type_Dynamic ut_M_MyStruct_dynamic = {(Dynamic_Del)ut_M_MyStruct_Del};
-Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_MyStruct_Del(ut_M_MyStruct* self) {
+ut_M_MyStruct_Dynamic ut_M_MyStruct_dynamic = {
+    (Dynamic_Del)ut_M_MyStruct_Del
+};
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Test_Del
+    }
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
-void ut_M_Base_Del(ut_M_Base* self) {
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->item_Refman);
 }
@@ -8523,19 +10113,19 @@ Return_Code ut_M_Test_set(ut_M_Test* self, Generic_Type* i, Ref_Manager* i_Refma
     self->_base.item_Dynamic = i_Dynamic;
     self->_base.item = i;
     INIT_NEW(8, LUMI_block0_cleanup, aux_Test_0, ut_M_Test, 1);
-    LUMI_err = ut_M_Test_set(aux_Test_0, f, f_Refman, &ut_M_MyStruct_dynamic, f, f_Refman);
+    LUMI_err = ut_M_Test_set(aux_Test_0, f, f_Refman, (Generic_Type_Dynamic*)&ut_M_MyStruct_dynamic, f, f_Refman);
     CHECK(8, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(aux_Test_0);
+    ut_M_Test_Del(aux_Test_0, NULL);
     free(aux_Test_0);
     LUMI_dec_ref(f_Refman);
     LUMI_dec_ref(i_Refman);
     return LUMI_err;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Base_Del(&(self->_base));
+    ut_M_Base_Del(&(self->_base), NULL);
 }
 void ut_M_use(ut_M_MyStruct* f, Ref_Manager* f_Refman) {
     unsigned LUMI_loop_depth = 1;
@@ -8546,29 +10136,45 @@ void ut_M_use(ut_M_MyStruct* f, Ref_Manager* f_Refman) {
     LUMI_inc_ref(f_Refman);
     LUMI_dec_ref(t->_base.item_Refman);
     t->_base.item_Refman = f_Refman;
-    t->_base.item_Dynamic = &ut_M_MyStruct_dynamic;
+    t->_base.item_Dynamic = (Generic_Type_Dynamic*)&ut_M_MyStruct_dynamic;
     t->_base.item = f;
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(t);
+    ut_M_Test_Del(t, NULL);
     LUMI_dec_ref(f_Refman);
 }
 /// @ test-parameter-inheritance-4
 typedef struct ut_M_StructA ut_M_StructA;
+typedef struct ut_M_StructA_Dynamic ut_M_StructA_Dynamic;
 typedef struct ut_M_StructB ut_M_StructB;
+typedef struct ut_M_StructB_Dynamic ut_M_StructB_Dynamic;
 typedef struct ut_M_StructC ut_M_StructC;
+typedef struct ut_M_StructC_Dynamic ut_M_StructC_Dynamic;
 typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Mid ut_M_Mid;
+typedef struct ut_M_Mid_Dynamic ut_M_Mid_Dynamic;
 typedef struct ut_M_Top ut_M_Top;
+typedef struct ut_M_Top_Dynamic ut_M_Top_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_StructA {
     uint32_t x;
+};
+struct ut_M_StructA_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_StructB {
     uint32_t x;
 };
+struct ut_M_StructB_Dynamic {
+    Dynamic_Del _del;
+};
 struct ut_M_StructC {
     uint32_t x;
+};
+struct ut_M_StructC_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Base {
     Generic_Type* first;
@@ -8578,46 +10184,84 @@ struct ut_M_Base {
     Ref_Manager* second_Refman;
     Generic_Type_Dynamic* second_Dynamic;
 };
+struct ut_M_Base_Dynamic {
+    Dynamic_Del _del;
+};
 struct ut_M_Mid {
     ut_M_Base _base;
     Generic_Type* third;
     Ref_Manager* third_Refman;
     Generic_Type_Dynamic* third_Dynamic;
 };
+struct ut_M_Mid_Dynamic {
+    ut_M_Base_Dynamic _base;
+};
 struct ut_M_Top {
     ut_M_Mid _base;
+};
+struct ut_M_Top_Dynamic {
+    ut_M_Mid_Dynamic _base;
 };
 struct ut_M_Test {
     ut_M_Top _base;
 };
-void ut_M_StructA_Del(ut_M_StructA* self);
-void ut_M_StructB_Del(ut_M_StructB* self);
-void ut_M_StructC_Del(ut_M_StructC* self);
-void ut_M_Base_Del(ut_M_Base* self);
+struct ut_M_Test_Dynamic {
+    ut_M_Top_Dynamic _base;
+};
+void ut_M_StructA_Del(ut_M_StructA* self, ut_M_StructA_Dynamic* self_Dynamic);
+void ut_M_StructB_Del(ut_M_StructB* self, ut_M_StructB_Dynamic* self_Dynamic);
+void ut_M_StructC_Del(ut_M_StructC* self, ut_M_StructC_Dynamic* self_Dynamic);
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
 void ut_M_Mid_set(ut_M_Mid* self, Generic_Type* first, Ref_Manager* first_Refman, Generic_Type_Dynamic* first_Dynamic, ut_M_StructB* second, Ref_Manager* second_Refman, Generic_Type* third, Ref_Manager* third_Refman, Generic_Type_Dynamic* third_Dynamic);
-void ut_M_Mid_Del(ut_M_Mid* self);
+void ut_M_Mid_Del(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic);
 void ut_M_Top_set(ut_M_Top* self, Generic_Type* first, Ref_Manager* first_Refman, Generic_Type_Dynamic* first_Dynamic, ut_M_StructB* second, Ref_Manager* second_Refman, ut_M_StructC* third, Ref_Manager* third_Refman);
-void ut_M_Top_Del(ut_M_Top* self);
+void ut_M_Top_Del(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic);
 void ut_M_Test_set(ut_M_Test* self, ut_M_StructA* first, Ref_Manager* first_Refman, ut_M_StructB* second, Ref_Manager* second_Refman, ut_M_StructC* third, Ref_Manager* third_Refman);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_use(ut_M_StructA* first, Ref_Manager* first_Refman, ut_M_StructB* second, Ref_Manager* second_Refman, ut_M_StructC* third, Ref_Manager* third_Refman);
-Generic_Type_Dynamic ut_M_StructA_dynamic = {(Dynamic_Del)ut_M_StructA_Del};
-Generic_Type_Dynamic ut_M_StructB_dynamic = {(Dynamic_Del)ut_M_StructB_Del};
-Generic_Type_Dynamic ut_M_StructC_dynamic = {(Dynamic_Del)ut_M_StructC_Del};
-Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
-Generic_Type_Dynamic ut_M_Mid_dynamic = {(Dynamic_Del)ut_M_Mid_Del};
-Generic_Type_Dynamic ut_M_Top_dynamic = {(Dynamic_Del)ut_M_Top_Del};
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_StructA_Del(ut_M_StructA* self) {
+ut_M_StructA_Dynamic ut_M_StructA_dynamic = {
+    (Dynamic_Del)ut_M_StructA_Del
+};
+ut_M_StructB_Dynamic ut_M_StructB_dynamic = {
+    (Dynamic_Del)ut_M_StructB_Del
+};
+ut_M_StructC_Dynamic ut_M_StructC_dynamic = {
+    (Dynamic_Del)ut_M_StructC_Del
+};
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del
+};
+ut_M_Mid_Dynamic ut_M_Mid_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Mid_Del
+    }
+};
+ut_M_Top_Dynamic ut_M_Top_dynamic = {
+    {
+        {
+            (Dynamic_Del)ut_M_Top_Del
+        }
+    }
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    {
+        {
+            {
+                (Dynamic_Del)ut_M_Test_Del
+            }
+        }
+    }
+};
+void ut_M_StructA_Del(ut_M_StructA* self, ut_M_StructA_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
-void ut_M_StructB_Del(ut_M_StructB* self) {
+void ut_M_StructB_Del(ut_M_StructB* self, ut_M_StructB_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
-void ut_M_StructC_Del(ut_M_StructC* self) {
+void ut_M_StructC_Del(ut_M_StructC* self, ut_M_StructC_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
-void ut_M_Base_Del(ut_M_Base* self) {
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->second_Refman);
     LUMI_dec_ref(self->first_Refman);
@@ -8635,7 +10279,7 @@ void ut_M_Mid_set(ut_M_Mid* self, Generic_Type* first, Ref_Manager* first_Refman
     LUMI_inc_ref(second_Refman);
     LUMI_dec_ref(self->_base.second_Refman);
     self->_base.second_Refman = second_Refman;
-    self->_base.second_Dynamic = &ut_M_StructB_dynamic;
+    self->_base.second_Dynamic = (Generic_Type_Dynamic*)&ut_M_StructB_dynamic;
     self->_base.second = second;
     LUMI_inc_ref(third_Refman);
     LUMI_dec_ref(self->third_Refman);
@@ -8648,9 +10292,9 @@ LUMI_block0_cleanup:
     LUMI_dec_ref(second_Refman);
     LUMI_dec_ref(first_Refman);
 }
-void ut_M_Mid_Del(ut_M_Mid* self) {
+void ut_M_Mid_Del(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Base_Del(&(self->_base));
+    ut_M_Base_Del(&(self->_base), NULL);
     LUMI_dec_ref(self->third_Refman);
 }
 void ut_M_Top_set(ut_M_Top* self, Generic_Type* first, Ref_Manager* first_Refman, Generic_Type_Dynamic* first_Dynamic, ut_M_StructB* second, Ref_Manager* second_Refman, ut_M_StructC* third, Ref_Manager* third_Refman) {
@@ -8666,12 +10310,12 @@ void ut_M_Top_set(ut_M_Top* self, Generic_Type* first, Ref_Manager* first_Refman
     LUMI_inc_ref(second_Refman);
     LUMI_dec_ref(self->_base._base.second_Refman);
     self->_base._base.second_Refman = second_Refman;
-    self->_base._base.second_Dynamic = &ut_M_StructB_dynamic;
+    self->_base._base.second_Dynamic = (Generic_Type_Dynamic*)&ut_M_StructB_dynamic;
     self->_base._base.second = second;
     LUMI_inc_ref(third_Refman);
     LUMI_dec_ref(self->_base.third_Refman);
     self->_base.third_Refman = third_Refman;
-    self->_base.third_Dynamic = &ut_M_StructC_dynamic;
+    self->_base.third_Dynamic = (Generic_Type_Dynamic*)&ut_M_StructC_dynamic;
     self->_base.third = third;
 LUMI_block0_cleanup:
     (void)0;
@@ -8679,9 +10323,9 @@ LUMI_block0_cleanup:
     LUMI_dec_ref(second_Refman);
     LUMI_dec_ref(first_Refman);
 }
-void ut_M_Top_Del(ut_M_Top* self) {
+void ut_M_Top_Del(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Mid_Del(&(self->_base));
+    ut_M_Mid_Del(&(self->_base), NULL);
 }
 void ut_M_Test_set(ut_M_Test* self, ut_M_StructA* first, Ref_Manager* first_Refman, ut_M_StructB* second, Ref_Manager* second_Refman, ut_M_StructC* third, Ref_Manager* third_Refman) {
     unsigned LUMI_loop_depth = 1;
@@ -8691,17 +10335,17 @@ void ut_M_Test_set(ut_M_Test* self, ut_M_StructA* first, Ref_Manager* first_Refm
     LUMI_inc_ref(first_Refman);
     LUMI_dec_ref(self->_base._base._base.first_Refman);
     self->_base._base._base.first_Refman = first_Refman;
-    self->_base._base._base.first_Dynamic = &ut_M_StructA_dynamic;
+    self->_base._base._base.first_Dynamic = (Generic_Type_Dynamic*)&ut_M_StructA_dynamic;
     self->_base._base._base.first = first;
     LUMI_inc_ref(second_Refman);
     LUMI_dec_ref(self->_base._base._base.second_Refman);
     self->_base._base._base.second_Refman = second_Refman;
-    self->_base._base._base.second_Dynamic = &ut_M_StructB_dynamic;
+    self->_base._base._base.second_Dynamic = (Generic_Type_Dynamic*)&ut_M_StructB_dynamic;
     self->_base._base._base.second = second;
     LUMI_inc_ref(third_Refman);
     LUMI_dec_ref(self->_base._base.third_Refman);
     self->_base._base.third_Refman = third_Refman;
-    self->_base._base.third_Dynamic = &ut_M_StructC_dynamic;
+    self->_base._base.third_Dynamic = (Generic_Type_Dynamic*)&ut_M_StructC_dynamic;
     self->_base._base.third = third;
 LUMI_block0_cleanup:
     (void)0;
@@ -8709,9 +10353,9 @@ LUMI_block0_cleanup:
     LUMI_dec_ref(second_Refman);
     LUMI_dec_ref(first_Refman);
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Top_Del(&(self->_base));
+    ut_M_Top_Del(&(self->_base), NULL);
 }
 void ut_M_use(ut_M_StructA* first, Ref_Manager* first_Refman, ut_M_StructB* second, Ref_Manager* second_Refman, ut_M_StructC* third, Ref_Manager* third_Refman) {
     unsigned LUMI_loop_depth = 1;
@@ -8724,64 +10368,90 @@ void ut_M_use(ut_M_StructA* first, Ref_Manager* first_Refman, ut_M_StructB* seco
     LUMI_inc_ref(first_Refman);
     LUMI_dec_ref(t->_base._base._base.first_Refman);
     t->_base._base._base.first_Refman = first_Refman;
-    t->_base._base._base.first_Dynamic = &ut_M_StructA_dynamic;
+    t->_base._base._base.first_Dynamic = (Generic_Type_Dynamic*)&ut_M_StructA_dynamic;
     t->_base._base._base.first = first;
     LUMI_inc_ref(second_Refman);
     LUMI_dec_ref(t->_base._base._base.second_Refman);
     t->_base._base._base.second_Refman = second_Refman;
-    t->_base._base._base.second_Dynamic = &ut_M_StructB_dynamic;
+    t->_base._base._base.second_Dynamic = (Generic_Type_Dynamic*)&ut_M_StructB_dynamic;
     t->_base._base._base.second = second;
     LUMI_inc_ref(third_Refman);
     LUMI_dec_ref(t->_base._base.third_Refman);
     t->_base._base.third_Refman = third_Refman;
-    t->_base._base.third_Dynamic = &ut_M_StructC_dynamic;
+    t->_base._base.third_Dynamic = (Generic_Type_Dynamic*)&ut_M_StructC_dynamic;
     t->_base._base.third = third;
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(t);
+    ut_M_Test_Del(t, NULL);
     LUMI_dec_ref(third_Refman);
     LUMI_dec_ref(second_Refman);
     LUMI_dec_ref(first_Refman);
 }
 /// @ test-parameter-inheritance-5
 typedef struct ut_M_MyStruct ut_M_MyStruct;
+typedef struct ut_M_MyStruct_Dynamic ut_M_MyStruct_Dynamic;
 typedef struct ut_M_First ut_M_First;
+typedef struct ut_M_First_Dynamic ut_M_First_Dynamic;
 typedef struct ut_M_Second ut_M_Second;
+typedef struct ut_M_Second_Dynamic ut_M_Second_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_MyStruct {
     uint32_t x;
+};
+struct ut_M_MyStruct_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_First {
     Generic_Type* item;
     Ref_Manager* item_Refman;
     Generic_Type_Dynamic* item_Dynamic;
 };
+struct ut_M_First_Dynamic {
+    Dynamic_Del _del;
+};
 struct ut_M_Second {
     Generic_Type* item;
     Ref_Manager* item_Refman;
     Generic_Type_Dynamic* item_Dynamic;
 };
+struct ut_M_Second_Dynamic {
+    Dynamic_Del _del;
+};
 struct ut_M_Test {
     ut_M_First _base;
 };
-void ut_M_MyStruct_Del(ut_M_MyStruct* self);
-void ut_M_First_Del(ut_M_First* self);
-void ut_M_Second_Del(ut_M_Second* self);
+struct ut_M_Test_Dynamic {
+    ut_M_First_Dynamic _base;
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic);
+void ut_M_First_Del(ut_M_First* self, ut_M_First_Dynamic* self_Dynamic);
+void ut_M_Second_Del(ut_M_Second* self, ut_M_Second_Dynamic* self_Dynamic);
 Return_Code ut_M_Test_set(ut_M_Test* self, Generic_Type* g, Ref_Manager* g_Refman, Generic_Type_Dynamic* g_Dynamic, ut_M_Second* sg, Ref_Manager* sg_Refman);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 Return_Code ut_M_use(ut_M_MyStruct* f, Ref_Manager* f_Refman, ut_M_Second* ff, Ref_Manager* ff_Refman);
-Generic_Type_Dynamic ut_M_MyStruct_dynamic = {(Dynamic_Del)ut_M_MyStruct_Del};
-Generic_Type_Dynamic ut_M_First_dynamic = {(Dynamic_Del)ut_M_First_Del};
-Generic_Type_Dynamic ut_M_Second_dynamic = {(Dynamic_Del)ut_M_Second_Del};
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_MyStruct_Del(ut_M_MyStruct* self) {
+ut_M_MyStruct_Dynamic ut_M_MyStruct_dynamic = {
+    (Dynamic_Del)ut_M_MyStruct_Del
+};
+ut_M_First_Dynamic ut_M_First_dynamic = {
+    (Dynamic_Del)ut_M_First_Del
+};
+ut_M_Second_Dynamic ut_M_Second_dynamic = {
+    (Dynamic_Del)ut_M_Second_Del
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Test_Del
+    }
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
-void ut_M_First_Del(ut_M_First* self) {
+void ut_M_First_Del(ut_M_First* self, ut_M_First_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->item_Refman);
 }
-void ut_M_Second_Del(ut_M_Second* self) {
+void ut_M_Second_Del(ut_M_Second* self, ut_M_Second_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->item_Refman);
 }
@@ -8793,7 +10463,7 @@ Return_Code ut_M_Test_set(ut_M_Test* self, Generic_Type* g, Ref_Manager* g_Refma
     LUMI_inc_ref(sg_Refman);
     LUMI_dec_ref(self->_base.item_Refman);
     self->_base.item_Refman = sg_Refman;
-    self->_base.item_Dynamic = &ut_M_Second_dynamic;
+    self->_base.item_Dynamic = (Generic_Type_Dynamic*)&ut_M_Second_dynamic;
     self->_base.item = sg;
     CHECK_REF_REFMAN(10, LUMI_block0_cleanup, self->_base.item, self->_base.item_Refman)
     LUMI_inc_ref(g_Refman);
@@ -8807,9 +10477,9 @@ LUMI_block0_cleanup:
     LUMI_dec_ref(g_Refman);
     return LUMI_err;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_First_Del(&(self->_base));
+    ut_M_First_Del(&(self->_base), NULL);
 }
 Return_Code ut_M_use(ut_M_MyStruct* f, Ref_Manager* f_Refman, ut_M_Second* ff, Ref_Manager* ff_Refman) {
     Return_Code LUMI_err = OK;
@@ -8822,63 +10492,91 @@ Return_Code ut_M_use(ut_M_MyStruct* f, Ref_Manager* f_Refman, ut_M_Second* ff, R
     LUMI_inc_ref(ff_Refman);
     LUMI_dec_ref(t->_base.item_Refman);
     t->_base.item_Refman = ff_Refman;
-    t->_base.item_Dynamic = &ut_M_Second_dynamic;
+    t->_base.item_Dynamic = (Generic_Type_Dynamic*)&ut_M_Second_dynamic;
     t->_base.item = ff;
     CHECK_REF_REFMAN(14, LUMI_block0_cleanup, t->_base.item, t->_base.item_Refman)
     LUMI_inc_ref(f_Refman);
     LUMI_dec_ref(((ut_M_Second*)(t->_base.item))->item_Refman);
     ((ut_M_Second*)(t->_base.item))->item_Refman = f_Refman;
-    ((ut_M_Second*)(t->_base.item))->item_Dynamic = &ut_M_MyStruct_dynamic;
+    ((ut_M_Second*)(t->_base.item))->item_Dynamic = (Generic_Type_Dynamic*)&ut_M_MyStruct_dynamic;
     ((ut_M_Second*)(t->_base.item))->item = f;
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(t);
+    ut_M_Test_Del(t, NULL);
     LUMI_dec_ref(ff_Refman);
     LUMI_dec_ref(f_Refman);
     return LUMI_err;
 }
 /// @ test-parameter-inheritance-6
 typedef struct ut_M_BaseGen ut_M_BaseGen;
+typedef struct ut_M_BaseGen_Dynamic ut_M_BaseGen_Dynamic;
 typedef struct ut_M_TestGen ut_M_TestGen;
+typedef struct ut_M_TestGen_Dynamic ut_M_TestGen_Dynamic;
 typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_BaseGen {
     Generic_Type* item;
     Ref_Manager* item_Refman;
     Generic_Type_Dynamic* item_Dynamic;
 };
+struct ut_M_BaseGen_Dynamic {
+    Dynamic_Del _del;
+};
 struct ut_M_TestGen {
     ut_M_BaseGen _base;
+};
+struct ut_M_TestGen_Dynamic {
+    ut_M_BaseGen_Dynamic _base;
 };
 struct ut_M_Base {
     uint32_t x;
 };
+struct ut_M_Base_Dynamic {
+    Dynamic_Del _del;
+};
 struct ut_M_Test {
     ut_M_Base _base;
 };
-void ut_M_BaseGen_Del(ut_M_BaseGen* self);
-void ut_M_TestGen_Del(ut_M_TestGen* self);
-void ut_M_Base_Del(ut_M_Base* self);
-void ut_M_Test_Del(ut_M_Test* self);
+struct ut_M_Test_Dynamic {
+    ut_M_Base_Dynamic _base;
+};
+void ut_M_BaseGen_Del(ut_M_BaseGen* self, ut_M_BaseGen_Dynamic* self_Dynamic);
+void ut_M_TestGen_Del(ut_M_TestGen* self, ut_M_TestGen_Dynamic* self_Dynamic);
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_test(void);
-Generic_Type_Dynamic ut_M_BaseGen_dynamic = {(Dynamic_Del)ut_M_BaseGen_Del};
-Generic_Type_Dynamic ut_M_TestGen_dynamic = {(Dynamic_Del)ut_M_TestGen_Del};
-Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_BaseGen_Del(ut_M_BaseGen* self) {
+ut_M_BaseGen_Dynamic ut_M_BaseGen_dynamic = {
+    (Dynamic_Del)ut_M_BaseGen_Del
+};
+ut_M_TestGen_Dynamic ut_M_TestGen_dynamic = {
+    {
+        (Dynamic_Del)ut_M_TestGen_Del
+    }
+};
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Test_Del
+    }
+};
+void ut_M_BaseGen_Del(ut_M_BaseGen* self, ut_M_BaseGen_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->item_Refman);
 }
-void ut_M_TestGen_Del(ut_M_TestGen* self) {
+void ut_M_TestGen_Del(ut_M_TestGen* self, ut_M_TestGen_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_BaseGen_Del(&(self->_base));
+    ut_M_BaseGen_Del(&(self->_base), NULL);
 }
-void ut_M_Base_Del(ut_M_Base* self) {
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Base_Del(&(self->_base));
+    ut_M_Base_Del(&(self->_base), NULL);
 }
 void ut_M_test(void) {
     unsigned LUMI_loop_depth = 1;
@@ -8896,16 +10594,26 @@ LUMI_block0_cleanup:
 }
 /// @ test-parameter-inheritance-7
 typedef struct ut_M_MyStruct ut_M_MyStruct;
+typedef struct ut_M_MyStruct_Dynamic ut_M_MyStruct_Dynamic;
 typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Mid ut_M_Mid;
+typedef struct ut_M_Mid_Dynamic ut_M_Mid_Dynamic;
 typedef struct ut_M_Top ut_M_Top;
+typedef struct ut_M_Top_Dynamic ut_M_Top_Dynamic;
 struct ut_M_MyStruct {
     uint32_t x;
+};
+struct ut_M_MyStruct_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Base {
     Generic_Type* first;
     Ref_Manager* first_Refman;
     Generic_Type_Dynamic* first_Dynamic;
+};
+struct ut_M_Base_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Mid {
     ut_M_Base _base;
@@ -8913,33 +10621,53 @@ struct ut_M_Mid {
     Ref_Manager* second_Refman;
     Generic_Type_Dynamic* second_Dynamic;
 };
+struct ut_M_Mid_Dynamic {
+    ut_M_Base_Dynamic _base;
+};
 struct ut_M_Top {
     ut_M_Mid _base;
 };
-void ut_M_MyStruct_Del(ut_M_MyStruct* self);
-void ut_M_Base_Del(ut_M_Base* self);
-void ut_M_Mid_Del(ut_M_Mid* self);
-void ut_M_Top_Del(ut_M_Top* self);
+struct ut_M_Top_Dynamic {
+    ut_M_Mid_Dynamic _base;
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic);
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
+void ut_M_Mid_Del(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic);
+void ut_M_Top_Del(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic);
 void ut_M_fun(ut_M_Top* t);
-Generic_Type_Dynamic ut_M_MyStruct_dynamic = {(Dynamic_Del)ut_M_MyStruct_Del};
-Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
-Generic_Type_Dynamic ut_M_Mid_dynamic = {(Dynamic_Del)ut_M_Mid_Del};
-Generic_Type_Dynamic ut_M_Top_dynamic = {(Dynamic_Del)ut_M_Top_Del};
-void ut_M_MyStruct_Del(ut_M_MyStruct* self) {
+ut_M_MyStruct_Dynamic ut_M_MyStruct_dynamic = {
+    (Dynamic_Del)ut_M_MyStruct_Del
+};
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del
+};
+ut_M_Mid_Dynamic ut_M_Mid_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Mid_Del
+    }
+};
+ut_M_Top_Dynamic ut_M_Top_dynamic = {
+    {
+        {
+            (Dynamic_Del)ut_M_Top_Del
+        }
+    }
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
-void ut_M_Base_Del(ut_M_Base* self) {
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->first_Refman);
 }
-void ut_M_Mid_Del(ut_M_Mid* self) {
+void ut_M_Mid_Del(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Base_Del(&(self->_base));
+    ut_M_Base_Del(&(self->_base), NULL);
     LUMI_dec_ref(self->second_Refman);
 }
-void ut_M_Top_Del(ut_M_Top* self) {
+void ut_M_Top_Del(ut_M_Top* self, ut_M_Top_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Mid_Del(&(self->_base));
+    ut_M_Mid_Del(&(self->_base), NULL);
 }
 void ut_M_fun(ut_M_Top* t) {
     unsigned LUMI_loop_depth = 1;
@@ -9314,14 +11042,20 @@ using "!" where error is not propagated
 /// @@ test-for-each
 /// @ test-for-each-0
 typedef struct ut_M_TestIterator ut_M_TestIterator;
+typedef struct ut_M_TestIterator_Dynamic ut_M_TestIterator_Dynamic;
 struct ut_M_TestIterator {
     uint32_t counter;
 };
+struct ut_M_TestIterator_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_TestIterator_new(ut_M_TestIterator* self, uint32_t count);
 void ut_M_TestIterator_step(ut_M_TestIterator* self, uint32_t* num, Bool* has_data);
-void ut_M_TestIterator_Del(ut_M_TestIterator* self);
+void ut_M_TestIterator_Del(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic);
 Return_Code ut_M_fun(uint32_t* i);
-Generic_Type_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del};
+ut_M_TestIterator_Dynamic ut_M_TestIterator_dynamic = {
+    (Dynamic_Del)ut_M_TestIterator_Del
+};
 void ut_M_TestIterator_new(ut_M_TestIterator* self, uint32_t count) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
@@ -9332,7 +11066,7 @@ void ut_M_TestIterator_step(ut_M_TestIterator* self, uint32_t* num, Bool* has_da
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_TestIterator_Del(ut_M_TestIterator* self) {
+void ut_M_TestIterator_Del(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 Return_Code ut_M_fun(uint32_t* i) {
@@ -9359,21 +11093,27 @@ Return_Code ut_M_fun(uint32_t* i) {
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_TestIterator_Del(aux_TestIterator_0);
+    ut_M_TestIterator_Del(aux_TestIterator_0, NULL);
     free(aux_TestIterator_0);
     return LUMI_err;
 }
 /// @ test-for-each-1
 typedef struct ut_M_TestIterator ut_M_TestIterator;
+typedef struct ut_M_TestIterator_Dynamic ut_M_TestIterator_Dynamic;
 struct ut_M_TestIterator {
     char* value;
     Seq_Length value_Max_length;
     Seq_Length* value_Length;
 };
+struct ut_M_TestIterator_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_TestIterator_step(ut_M_TestIterator* self, char** text, Seq_Length* text_Max_length, Seq_Length** text_Length, Bool* has_data);
-void ut_M_TestIterator_Del(ut_M_TestIterator* self);
+void ut_M_TestIterator_Del(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic);
 void ut_M_fun(ut_M_TestIterator* iter);
-Generic_Type_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del};
+ut_M_TestIterator_Dynamic ut_M_TestIterator_dynamic = {
+    (Dynamic_Del)ut_M_TestIterator_Del
+};
 void ut_M_TestIterator_step(ut_M_TestIterator* self, char** text, Seq_Length* text_Max_length, Seq_Length** text_Length, Bool* has_data) {
     unsigned LUMI_loop_depth = 1;
     *text_Max_length = self->value_Max_length;
@@ -9382,9 +11122,9 @@ void ut_M_TestIterator_step(ut_M_TestIterator* self, char** text, Seq_Length* te
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_TestIterator_Del(ut_M_TestIterator* self) {
+void ut_M_TestIterator_Del(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    String_Del(self->value);
+    String_Del(self->value, NULL);
     free(self->value);
 }
 void ut_M_fun(ut_M_TestIterator* iter) {
@@ -9414,16 +11154,24 @@ LUMI_block0_cleanup:
 }
 /// @ test-for-each-2
 typedef struct ut_M_MyStruct ut_M_MyStruct;
+typedef struct ut_M_MyStruct_Dynamic ut_M_MyStruct_Dynamic;
 typedef struct ut_M_TestIterator ut_M_TestIterator;
+typedef struct ut_M_TestIterator_Dynamic ut_M_TestIterator_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_MyStruct {
     uint32_t x;
 };
+struct ut_M_MyStruct_Dynamic {
+    Dynamic_Del _del;
+};
 struct ut_M_TestIterator {
     Generic_Type* item;
     Ref_Manager* item_Refman;
     Generic_Type_Dynamic* item_Dynamic;
+};
+struct ut_M_TestIterator_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Test {
     uint32_t x;
@@ -9432,16 +11180,23 @@ struct ut_M_Test_Dynamic {
     Dynamic_Del _del;
     void (*fun)(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 };
-void ut_M_MyStruct_Del(ut_M_MyStruct* self);
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic);
 Return_Code ut_M_TestIterator_step(ut_M_TestIterator* self, Generic_Type** item, Generic_Type_Dynamic** item_Dynamic, Bool* has_data);
-void ut_M_TestIterator_Del(ut_M_TestIterator* self);
+void ut_M_TestIterator_Del(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic);
 void ut_M_Test_fun(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 Return_Code ut_M_fun(ut_M_TestIterator* fiter, ut_M_TestIterator* titer);
-Generic_Type_Dynamic ut_M_MyStruct_dynamic = {(Dynamic_Del)ut_M_MyStruct_Del};
-Generic_Type_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del};
-ut_M_Test_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del, ut_M_Test_fun};
-void ut_M_MyStruct_Del(ut_M_MyStruct* self) {
+ut_M_MyStruct_Dynamic ut_M_MyStruct_dynamic = {
+    (Dynamic_Del)ut_M_MyStruct_Del
+};
+ut_M_TestIterator_Dynamic ut_M_TestIterator_dynamic = {
+    (Dynamic_Del)ut_M_TestIterator_Del
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del,
+    ut_M_Test_fun
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 Return_Code ut_M_TestIterator_step(ut_M_TestIterator* self, Generic_Type** item, Generic_Type_Dynamic** item_Dynamic, Bool* has_data) {
@@ -9454,7 +11209,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-void ut_M_TestIterator_Del(ut_M_TestIterator* self) {
+void ut_M_TestIterator_Del(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->item_Refman);
 }
@@ -9508,10 +11263,14 @@ LUMI_block0_cleanup:
 }
 /// @ test-for-each-3
 typedef struct ut_M_MyStruct ut_M_MyStruct;
+typedef struct ut_M_MyStruct_Dynamic ut_M_MyStruct_Dynamic;
 typedef struct ut_M_TestIterator ut_M_TestIterator;
 typedef struct ut_M_TestIterator_Dynamic ut_M_TestIterator_Dynamic;
 struct ut_M_MyStruct {
     uint32_t x;
+};
+struct ut_M_MyStruct_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_TestIterator {
     Generic_Type* item;
@@ -9522,13 +11281,18 @@ struct ut_M_TestIterator_Dynamic {
     Dynamic_Del _del;
     Return_Code (*step)(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic, Generic_Type** item, Generic_Type_Dynamic** item_Dynamic, Bool* has_data);
 };
-void ut_M_MyStruct_Del(ut_M_MyStruct* self);
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic);
 Return_Code ut_M_TestIterator_step(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic, Generic_Type** item, Generic_Type_Dynamic** item_Dynamic, Bool* has_data);
 void ut_M_TestIterator_Del(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic);
 Return_Code ut_M_f_mock(ut_M_TestIterator* iter, ut_M_TestIterator_Dynamic* iter_Dynamic);
-Generic_Type_Dynamic ut_M_MyStruct_dynamic = {(Dynamic_Del)ut_M_MyStruct_Del};
-ut_M_TestIterator_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del, ut_M_TestIterator_step};
-void ut_M_MyStruct_Del(ut_M_MyStruct* self) {
+ut_M_MyStruct_Dynamic ut_M_MyStruct_dynamic = {
+    (Dynamic_Del)ut_M_MyStruct_Del
+};
+ut_M_TestIterator_Dynamic ut_M_TestIterator_dynamic = {
+    (Dynamic_Del)ut_M_TestIterator_Del,
+    ut_M_TestIterator_step
+};
+void ut_M_MyStruct_Del(ut_M_MyStruct* self, ut_M_MyStruct_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 Return_Code ut_M_TestIterator_step(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic, Generic_Type** item, Generic_Type_Dynamic** item_Dynamic, Bool* has_data) {
@@ -9571,15 +11335,21 @@ LUMI_block0_cleanup:
 }
 /// @ test-for-each-4
 typedef struct ut_M_TestIterator ut_M_TestIterator;
+typedef struct ut_M_TestIterator_Dynamic ut_M_TestIterator_Dynamic;
 struct ut_M_TestIterator {
     char* value;
     Seq_Length value_Max_length;
     Seq_Length* value_Length;
 };
+struct ut_M_TestIterator_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_TestIterator_step(ut_M_TestIterator* self, char** text, Seq_Length* text_Max_length, Seq_Length** text_Length, Ref_Manager** text_Refman, Bool* has_data);
-void ut_M_TestIterator_Del(ut_M_TestIterator* self);
+void ut_M_TestIterator_Del(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic);
 void ut_M_fun(ut_M_TestIterator* iter);
-Generic_Type_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del};
+ut_M_TestIterator_Dynamic ut_M_TestIterator_dynamic = {
+    (Dynamic_Del)ut_M_TestIterator_Del
+};
 void ut_M_TestIterator_step(ut_M_TestIterator* self, char** text, Seq_Length* text_Max_length, Seq_Length** text_Length, Ref_Manager** text_Refman, Bool* has_data) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
@@ -9591,7 +11361,7 @@ void ut_M_TestIterator_step(ut_M_TestIterator* self, char** text, Seq_Length* te
     INIT_NEW_SEQUENCE(4, LUMI_block2_cleanup, aux_String_0, char, 0x0c);
     LUMI_err = String_new(aux_String_0, 0x0c, aux_String_0_Length, self->value, *self->value_Length);
     CHECK(4, LUMI_block2_cleanup)
-    String_Del(*text);
+    String_Del(*text, NULL);
     LUMI_owner_dec_ref(*text_Refman);
     *text_Max_length = 0x0c;
     *text_Length = aux_String_0_Length;
@@ -9604,7 +11374,7 @@ LUMI_block2_cleanup:
     if (LUMI_err != OK) {
         LUMI_err = OK;
         LUMI_loop_depth = 1;
-        String_Del(*text);
+        String_Del(*text, NULL);
         LUMI_owner_dec_ref(*text_Refman);
         *text_Refman = NULL;
         *text_Max_length = 0;
@@ -9616,12 +11386,12 @@ LUMI_block2_cleanup:
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(aux_String_0);
+    String_Del(aux_String_0, NULL);
     free(aux_String_0);
 }
-void ut_M_TestIterator_Del(ut_M_TestIterator* self) {
+void ut_M_TestIterator_Del(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    String_Del(self->value);
+    String_Del(self->value, NULL);
     free(self->value);
 }
 void ut_M_fun(ut_M_TestIterator* iter) {
@@ -9640,7 +11410,7 @@ void ut_M_fun(ut_M_TestIterator* iter) {
         LUMI_loop_depth = 3;
         ut_M_TestIterator_step(aux_TestIterator_0, &(t), &(t_Max_length), &(t_Length), &(t_Refman), &(aux_Bool_0));
         if (!(aux_Bool_0)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
-        String_Del(s);
+        String_Del(s, NULL);
         free(s);
         LUMI_var_dec_ref(t_Refman);
         s_Max_length = t_Max_length;
@@ -9651,26 +11421,32 @@ void ut_M_fun(ut_M_TestIterator* iter) {
         t_Length = &Lumi_empty_length;
     LUMI_block1_cleanup:
         (void)0;
-    String_Del(t);
+        String_Del(t, NULL);
         LUMI_owner_dec_ref(t_Refman);
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(s);
+    String_Del(s, NULL);
     free(s);
 }
 /// @ test-for-each-5
 typedef struct ut_M_TestIterator ut_M_TestIterator;
+typedef struct ut_M_TestIterator_Dynamic ut_M_TestIterator_Dynamic;
 struct ut_M_TestIterator {
     char* value;
     Seq_Length value_Max_length;
     Seq_Length* value_Length;
 };
+struct ut_M_TestIterator_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_TestIterator_step(ut_M_TestIterator* self, char** text, Seq_Length* text_Max_length, Seq_Length** text_Length, Bool* has_data);
-void ut_M_TestIterator_Del(ut_M_TestIterator* self);
+void ut_M_TestIterator_Del(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic);
 void ut_M_fun(ut_M_TestIterator* iter);
-Generic_Type_Dynamic ut_M_TestIterator_dynamic = {(Dynamic_Del)ut_M_TestIterator_Del};
+ut_M_TestIterator_Dynamic ut_M_TestIterator_dynamic = {
+    (Dynamic_Del)ut_M_TestIterator_Del
+};
 void ut_M_TestIterator_step(ut_M_TestIterator* self, char** text, Seq_Length* text_Max_length, Seq_Length** text_Length, Bool* has_data) {
     unsigned LUMI_loop_depth = 1;
     *text_Max_length = self->value_Max_length;
@@ -9679,9 +11455,9 @@ void ut_M_TestIterator_step(ut_M_TestIterator* self, char** text, Seq_Length* te
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_TestIterator_Del(ut_M_TestIterator* self) {
+void ut_M_TestIterator_Del(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    String_Del(self->value);
+    String_Del(self->value, NULL);
     free(self->value);
 }
 void ut_M_fun(ut_M_TestIterator* iter) {
@@ -9728,6 +11504,7 @@ typedef struct ut_M_Astruct_Dynamic ut_M_Astruct_Dynamic;
 typedef struct ut_M_Bstruct ut_M_Bstruct;
 typedef struct ut_M_Bstruct_Dynamic ut_M_Bstruct_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Astruct {
     uint32_t x;
 };
@@ -9749,15 +11526,28 @@ struct ut_M_Test {
     ut_M_Bstruct sb;
     Ref_Manager* sb_Refman;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Astruct_meth(ut_M_Astruct* self, ut_M_Astruct_Dynamic* self_Dynamic);
 void ut_M_Astruct_Del(ut_M_Astruct* self, ut_M_Astruct_Dynamic* self_Dynamic);
 void ut_M_Bstruct_meth(ut_M_Bstruct* self, ut_M_Bstruct_Dynamic* self_Dynamic);
 void ut_M_Bstruct_Del(ut_M_Bstruct* self, ut_M_Bstruct_Dynamic* self_Dynamic);
 Return_Code ut_M_Test_test(ut_M_Test* self);
-void ut_M_Test_Del(ut_M_Test* self);
-ut_M_Astruct_Dynamic ut_M_Astruct_dynamic = {(Dynamic_Del)ut_M_Astruct_Del, ut_M_Astruct_meth};
-ut_M_Bstruct_Dynamic ut_M_Bstruct_dynamic = {{(Dynamic_Del)ut_M_Bstruct_Del, (void (*)(ut_M_Astruct* self, ut_M_Astruct_Dynamic* self_Dynamic))ut_M_Bstruct_meth}};
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Astruct_Dynamic ut_M_Astruct_dynamic = {
+    (Dynamic_Del)ut_M_Astruct_Del,
+    ut_M_Astruct_meth
+};
+ut_M_Bstruct_Dynamic ut_M_Bstruct_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Bstruct_Del,
+        (void (*)(ut_M_Astruct* self, ut_M_Astruct_Dynamic* self_Dynamic))ut_M_Bstruct_meth
+    }
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 void ut_M_Astruct_meth(ut_M_Astruct* self, ut_M_Astruct_Dynamic* self_Dynamic) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
@@ -9831,12 +11621,12 @@ Return_Code ut_M_Test_test(ut_M_Test* self) {
     b = &(t->b);
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(t);
+    ut_M_Test_Del(t, NULL);
     LUMI_var_dec_ref(t_Refman);
     LUMI_dec_ref(b_Refman);
     return LUMI_err;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     ut_M_Bstruct_Del(&(self->sb), &ut_M_Bstruct_dynamic);
     LUMI_var_dec_ref(self->sb_Refman);
@@ -9844,9 +11634,14 @@ void ut_M_Test_Del(ut_M_Test* self) {
 }
 /// @ test-complex-fields-1
 typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Base {
     uint32_t x;
+};
+struct ut_M_Base_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Test {
     char s[0x0a];
@@ -9860,12 +11655,19 @@ struct ut_M_Test {
     char aas[0x04 * 0x05 * 0x06];
     Seq_Length aas_Seq_length[0x04 * 0x05];
 };
-void ut_M_Base_Del(ut_M_Base* self);
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
 Return_Code ut_M_Test_test(ut_M_Test* self, Char* c, uint32_t* i, ut_M_Base** b);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Base_Del(ut_M_Base* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 Return_Code ut_M_Test_test(ut_M_Test* self, Char* c, uint32_t* i, ut_M_Base** b) {
@@ -9925,7 +11727,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     ARRAY_DEL(ut_M_Base, self->aab, 0x04 * 0x05 * 0x06)
     ARRAY_DEL(ut_M_Base, self->ab, 0x0c)
@@ -10053,7 +11855,9 @@ non assignable call output
 /// @@ test-module
 /// @ test-module-0
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 typedef struct second_M_Test second_M_Test;
+typedef struct second_M_Test_Dynamic second_M_Test_Dynamic;
 enum {
     ut_M_Enum_VALUE = 0,
     ut_M_Enum_length
@@ -10067,18 +11871,30 @@ enum { second_M_SIZE = 0x0c };
 struct ut_M_Test {
     uint32_t x;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 struct second_M_Test {
     ut_M_Test _base;
 };
+struct second_M_Test_Dynamic {
+    ut_M_Test_Dynamic _base;
+};
 void ut_M_Test_meth(ut_M_Test* self);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void second_M_Test_meth(second_M_Test* self);
-void second_M_Test_Del(second_M_Test* self);
+void second_M_Test_Del(second_M_Test* self, second_M_Test_Dynamic* self_Dynamic);
 Return_Code ut_M_fun(void);
 Return_Code second_M_fun(void);
 Return_Code second_M_dummy(void);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-Generic_Type_Dynamic second_M_Test_dynamic = {(Dynamic_Del)second_M_Test_Del};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+second_M_Test_Dynamic second_M_Test_dynamic = {
+    {
+        (Dynamic_Del)second_M_Test_Del
+    }
+};
 ut_M_Test ut_M_t_Var = {0};
 ut_M_Test* ut_M_t = NULL;
 second_M_Test second_M_t_Var = {{0}};
@@ -10094,7 +11910,7 @@ void ut_M_Test_meth(ut_M_Test* self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void second_M_Test_meth(second_M_Test* self) {
@@ -10102,9 +11918,9 @@ void second_M_Test_meth(second_M_Test* self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void second_M_Test_Del(second_M_Test* self) {
+void second_M_Test_Del(second_M_Test* self, second_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Test_Del(&(self->_base));
+    ut_M_Test_Del(&(self->_base), NULL);
 }
 Return_Code ut_M_fun(void) {
     Return_Code LUMI_err = OK;
@@ -10128,7 +11944,7 @@ Return_Code ut_M_fun(void) {
     INIT_NEW(15, LUMI_block0_cleanup, nt, second_M_Test, 1);
 LUMI_block0_cleanup:
     (void)0;
-    second_M_Test_Del(nt);
+    second_M_Test_Del(nt, NULL);
     free(nt);
     return LUMI_err;
 }
@@ -10147,7 +11963,7 @@ Return_Code second_M_fun(void) {
     INIT_NEW(15, LUMI_block0_cleanup, nt, ut_M_Test, 1);
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(nt);
+    ut_M_Test_Del(nt, NULL);
     free(nt);
     return LUMI_err;
 }
@@ -10181,18 +11997,24 @@ LUMI_block0_cleanup:
 TEST_MAIN_FUNC
 /// @ test-module-1
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_meth(ut_M_Test* self);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_fun(void);
 void ut_M_fun_Mock(void);
 Bool ut_M_fun_Mock_active = true;
 void ut_M_Test_meth_Mock(ut_M_Test* self);
 Bool ut_M_Test_meth_Mock_active = true;
 Return_Code second_M_dummy(void);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 Line_Count LUMI_file0_line_count[8] = {
     -1,-1,-1,-1,-1, 0, 0,-1
 };
@@ -10208,7 +12030,7 @@ void ut_M_Test_meth(ut_M_Test* self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 void ut_M_fun(void) {
@@ -10316,6 +12138,7 @@ unknown Enum "Error" in module "ut"
 /// @@ test-memory-owner
 /// @ test-memory-owner-0
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     char* s;
     Seq_Length s_Max_length;
@@ -10324,13 +12147,18 @@ struct ut_M_Test {
     Seq_Length str_Max_length;
     Seq_Length* str_Length;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 Return_Code ut_M_Test_new(ut_M_Test* self);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_use(char* s, Seq_Length s_Max_length, Seq_Length* s_Length);
 void ut_M_take(char* s, Seq_Length s_Max_length, Seq_Length* s_Length);
 void ut_M_give(char** s, Seq_Length* s_Max_length, Seq_Length** s_Length);
 Return_Code ut_M_fun(char* s, Seq_Length s_Max_length, Seq_Length* s_Length, ut_M_Test* tu, ut_M_Test* to);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 Return_Code ut_M_Test_new(ut_M_Test* self) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
@@ -10338,7 +12166,7 @@ Return_Code ut_M_Test_new(ut_M_Test* self) {
     Seq_Length aux_String_0_Max_length = 0;
     Seq_Length* aux_String_0_Length = &Lumi_empty_length;
     INIT_NEW_SEQUENCE(5, LUMI_block0_cleanup, aux_String_0, char, 0x0c);
-    String_Del(self->str);
+    String_Del(self->str, NULL);
     free(self->str);
     self->str_Max_length = 0x0c;
     self->str_Length = aux_String_0_Length;
@@ -10348,15 +12176,15 @@ Return_Code ut_M_Test_new(ut_M_Test* self) {
     String_clear(self->str, self->str_Max_length, self->str_Length);
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(aux_String_0);
+    String_Del(aux_String_0, NULL);
     free(aux_String_0);
     return LUMI_err;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    String_Del(self->str);
+    String_Del(self->str, NULL);
     free(self->str);
-    String_Del(self->s);
+    String_Del(self->s, NULL);
     free(self->s);
 }
 void ut_M_use(char* s, Seq_Length s_Max_length, Seq_Length* s_Length) {
@@ -10368,7 +12196,7 @@ void ut_M_take(char* s, Seq_Length s_Max_length, Seq_Length* s_Length) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(s);
+    String_Del(s, NULL);
     free(s);
 }
 void ut_M_give(char** s, Seq_Length* s_Max_length, Seq_Length** s_Length) {
@@ -10389,13 +12217,13 @@ Return_Code ut_M_fun(char* s, Seq_Length s_Max_length, Seq_Length* s_Length, ut_
     char* aux_String_1 = NULL;
     Seq_Length aux_String_1_Max_length = 0;
     Seq_Length* aux_String_1_Length = &Lumi_empty_length;
-    String_Del(s);
+    String_Del(s, NULL);
     free(s);
     s_Max_length = 0;
     s_Length = &Lumi_empty_length;
     s = NULL;
     INIT_NEW_SEQUENCE(12, LUMI_block0_cleanup, aux_String_0, char, 0x0c);
-    String_Del(s);
+    String_Del(s, NULL);
     free(s);
     s_Max_length = 0x0c;
     s_Length = aux_String_0_Length;
@@ -10405,7 +12233,7 @@ Return_Code ut_M_fun(char* s, Seq_Length s_Max_length, Seq_Length* s_Length, ut_
     CHECK_REF(13, LUMI_block0_cleanup, s)
     String_clear(s, s_Max_length, s_Length);
     INIT_NEW_SEQUENCE(14, LUMI_block0_cleanup, aux_String_1, char, 0x0c);
-    String_Del(to->s);
+    String_Del(to->s, NULL);
     free(to->s);
     to->s_Max_length = 0x0c;
     to->s_Length = aux_String_1_Length;
@@ -10431,22 +12259,26 @@ Return_Code ut_M_fun(char* s, Seq_Length s_Max_length, Seq_Length* s_Length, ut_
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(aux_String_1);
+    String_Del(aux_String_1, NULL);
     free(aux_String_1);
-    String_Del(aux_String_0);
+    String_Del(aux_String_0, NULL);
     free(aux_String_0);
-    ut_M_Test_Del(to);
+    ut_M_Test_Del(to, NULL);
     free(to);
-    String_Del(s);
+    String_Del(s, NULL);
     free(s);
     return LUMI_err;
 }
 /// @ test-memory-owner-1
 typedef struct ut_M_TestStruct ut_M_TestStruct;
+typedef struct ut_M_TestStruct_Dynamic ut_M_TestStruct_Dynamic;
 typedef struct ut_M_TestClass ut_M_TestClass;
 typedef struct ut_M_TestClass_Dynamic ut_M_TestClass_Dynamic;
 struct ut_M_TestStruct {
     ut_M_TestStruct* next;
+};
+struct ut_M_TestStruct_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_TestClass {
     ut_M_TestClass* next;
@@ -10457,15 +12289,20 @@ struct ut_M_TestClass_Dynamic {
     Dynamic_Del _del;
     void (*fun)(ut_M_TestClass* self, ut_M_TestClass_Dynamic* self_Dynamic);
 };
-void ut_M_TestStruct_Del(ut_M_TestStruct* self);
+void ut_M_TestStruct_Del(ut_M_TestStruct* self, ut_M_TestStruct_Dynamic* self_Dynamic);
 void ut_M_TestClass_fun(ut_M_TestClass* self, ut_M_TestClass_Dynamic* self_Dynamic);
 void ut_M_TestClass_Del(ut_M_TestClass* self, ut_M_TestClass_Dynamic* self_Dynamic);
 Return_Code ut_M_fun(ut_M_TestStruct* t, ut_M_TestClass* c, Ref_Manager* c_Refman, ut_M_TestClass_Dynamic* c_Dynamic, ut_M_TestStruct* tx, Ref_Manager* tx_Refman, ut_M_TestClass* cx, ut_M_TestClass_Dynamic* cx_Dynamic);
-Generic_Type_Dynamic ut_M_TestStruct_dynamic = {(Dynamic_Del)ut_M_TestStruct_Del};
-ut_M_TestClass_Dynamic ut_M_TestClass_dynamic = {(Dynamic_Del)ut_M_TestClass_Del, ut_M_TestClass_fun};
-void ut_M_TestStruct_Del(ut_M_TestStruct* self) {
+ut_M_TestStruct_Dynamic ut_M_TestStruct_dynamic = {
+    (Dynamic_Del)ut_M_TestStruct_Del
+};
+ut_M_TestClass_Dynamic ut_M_TestClass_dynamic = {
+    (Dynamic_Del)ut_M_TestClass_Del,
+    ut_M_TestClass_fun
+};
+void ut_M_TestStruct_Del(ut_M_TestStruct* self, ut_M_TestStruct_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    SELF_REF_DEL(ut_M_TestStruct, next);
+    SELF_REF_DEL(ut_M_TestStruct, next, NULL);
     free(self->next);
 }
 void ut_M_TestClass_fun(ut_M_TestClass* self, ut_M_TestClass_Dynamic* self_Dynamic) {
@@ -10495,7 +12332,7 @@ Return_Code ut_M_fun(ut_M_TestStruct* t, ut_M_TestClass* c, Ref_Manager* c_Refma
     CHECK_REF(11, LUMI_block0_cleanup, t->next)
     aux_TestStruct_0 = t->next;
     t->next = NULL;
-    ut_M_TestStruct_Del(t);
+    ut_M_TestStruct_Del(t, NULL);
     free(t);
     t = aux_TestStruct_0;
     aux_TestStruct_0 = NULL;
@@ -10504,7 +12341,7 @@ Return_Code ut_M_fun(ut_M_TestStruct* t, ut_M_TestClass* c, Ref_Manager* c_Refma
     CHECK_REF(12, LUMI_block0_cleanup, t->next->next->next)
     aux_TestStruct_1 = t->next->next->next;
     t->next->next->next = NULL;
-    ut_M_TestStruct_Del(t);
+    ut_M_TestStruct_Del(t, NULL);
     free(t);
     t = aux_TestStruct_1;
     aux_TestStruct_1 = NULL;
@@ -10512,7 +12349,7 @@ Return_Code ut_M_fun(ut_M_TestStruct* t, ut_M_TestClass* c, Ref_Manager* c_Refma
     CHECK_REF(13, LUMI_block0_cleanup, t->next->next)
     aux_TestStruct_2 = t->next->next->next;
     t->next->next->next = NULL;
-    ut_M_TestStruct_Del(t->next);
+    ut_M_TestStruct_Del(t->next, NULL);
     free(t->next);
     t->next = aux_TestStruct_2;
     aux_TestStruct_2 = NULL;
@@ -10521,7 +12358,7 @@ Return_Code ut_M_fun(ut_M_TestStruct* t, ut_M_TestClass* c, Ref_Manager* c_Refma
     CHECK_REF(14, LUMI_block0_cleanup, t->next)
     aux_TestStruct_3 = t->next->next->next;
     t->next->next->next = NULL;
-    ut_M_TestStruct_Del(t->next->next);
+    ut_M_TestStruct_Del(t->next->next, NULL);
     free(t->next->next);
     t->next->next = aux_TestStruct_3;
     aux_TestStruct_3 = NULL;
@@ -10543,7 +12380,7 @@ Return_Code ut_M_fun(ut_M_TestStruct* t, ut_M_TestClass* c, Ref_Manager* c_Refma
     CHECK_REF(16, LUMI_block0_cleanup, tx->next)
     aux_TestStruct_4 = tx->next;
     tx->next = NULL;
-    ut_M_TestStruct_Del(tx);
+    ut_M_TestStruct_Del(tx, NULL);
     LUMI_owner_dec_ref(tx_Refman);
     tx = aux_TestStruct_4;
     aux_TestStruct_4 = NULL;
@@ -10567,25 +12404,25 @@ LUMI_block0_cleanup:
     (void)0;
     if (aux_TestClass_1_Dynamic != NULL) aux_TestClass_1_Dynamic->_del(aux_TestClass_1, aux_TestClass_1_Dynamic);
     LUMI_owner_dec_ref(aux_TestClass_1_Refman);
-    ut_M_TestStruct_Del(aux_TestStruct_4);
+    ut_M_TestStruct_Del(aux_TestStruct_4, NULL);
     free(aux_TestStruct_4);
     if (aux_TestClass_0_Dynamic != NULL) aux_TestClass_0_Dynamic->_del(aux_TestClass_0, aux_TestClass_0_Dynamic);
     LUMI_owner_dec_ref(aux_TestClass_0_Refman);
-    ut_M_TestStruct_Del(aux_TestStruct_3);
+    ut_M_TestStruct_Del(aux_TestStruct_3, NULL);
     free(aux_TestStruct_3);
-    ut_M_TestStruct_Del(aux_TestStruct_2);
+    ut_M_TestStruct_Del(aux_TestStruct_2, NULL);
     free(aux_TestStruct_2);
-    ut_M_TestStruct_Del(aux_TestStruct_1);
+    ut_M_TestStruct_Del(aux_TestStruct_1, NULL);
     free(aux_TestStruct_1);
-    ut_M_TestStruct_Del(aux_TestStruct_0);
+    ut_M_TestStruct_Del(aux_TestStruct_0, NULL);
     free(aux_TestStruct_0);
     if (cx_Dynamic != NULL) cx_Dynamic->_del(cx, cx_Dynamic);
     free(cx);
-    ut_M_TestStruct_Del(tx);
+    ut_M_TestStruct_Del(tx, NULL);
     LUMI_owner_dec_ref(tx_Refman);
     if (c_Dynamic != NULL) c_Dynamic->_del(c, c_Dynamic);
     LUMI_owner_dec_ref(c_Refman);
-    ut_M_TestStruct_Del(t);
+    ut_M_TestStruct_Del(t, NULL);
     free(t);
     return LUMI_err;
 }
@@ -10643,7 +12480,7 @@ void ut_M_deleting(char** s, Seq_Length* s_Max_length, Seq_Length** s_Length);
 void ut_M_fun(char* s, Seq_Length s_Max_length, Seq_Length* s_Length, char** so, Seq_Length* so_Max_length, Seq_Length** so_Length);
 void ut_M_deleting(char** s, Seq_Length* s_Max_length, Seq_Length** s_Length) {
     unsigned LUMI_loop_depth = 1;
-    String_Del(*s);
+    String_Del(*s, NULL);
     free(*s);
     *s_Max_length = 0;
     *s_Length = &Lumi_empty_length;
@@ -10663,7 +12500,7 @@ void ut_M_deleting(char** s, Seq_Length* s_Max_length, Seq_Length** s_Length, Re
 Return_Code ut_M_fun(void);
 void ut_M_deleting(char** s, Seq_Length* s_Max_length, Seq_Length** s_Length, Ref_Manager** s_Refman) {
     unsigned LUMI_loop_depth = 1;
-    String_Del(*s);
+    String_Del(*s, NULL);
     LUMI_owner_dec_ref(*s_Refman);
     *s_Refman = NULL;
     *s_Max_length = 0;
@@ -10700,9 +12537,9 @@ Return_Code ut_M_fun(void) {
     ut_M_deleting(&(so), &(so_Max_length), &(so_Length), &(so_Refman));
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(aux_String_0);
+    String_Del(aux_String_0, NULL);
     free(aux_String_0);
-    String_Del(so);
+    String_Del(so, NULL);
     LUMI_owner_dec_ref(so_Refman);
     return LUMI_err;
 }
@@ -10711,7 +12548,7 @@ void ut_M_deleting(char** s, Seq_Length* s_Max_length, Seq_Length** s_Length, Re
 Return_Code ut_M_fun(void);
 void ut_M_deleting(char** s, Seq_Length* s_Max_length, Seq_Length** s_Length, Ref_Manager** s_Refman) {
     unsigned LUMI_loop_depth = 1;
-    String_Del(*s);
+    String_Del(*s, NULL);
     LUMI_owner_dec_ref(*s_Refman);
     *s_Refman = NULL;
     *s_Max_length = 0;
@@ -10752,10 +12589,10 @@ Return_Code ut_M_fun(void) {
     String_clear(s, s_Max_length, s_Length);
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(aux_String_0);
+    String_Del(aux_String_0, NULL);
     free(aux_String_0);
     LUMI_dec_ref(s_Refman);
-    String_Del(so);
+    String_Del(so, NULL);
     LUMI_owner_dec_ref(so_Refman);
     return LUMI_err;
 }
@@ -10763,7 +12600,7 @@ LUMI_block0_cleanup:
 char* s = NULL;
     Seq_Length s_Max_length = 0;
     Seq_Length* s_Length = &Lumi_empty_length;
-    String_Del(*so);
+    String_Del(*so, NULL);
     LUMI_owner_dec_ref(*so_Refman);
     *so_Refman = NULL;
     *so_Max_length = 0;
@@ -10776,17 +12613,23 @@ char* s = NULL;
     String_clear(s, s_Max_length, s_Length);
 /// @ test-memory-user-4
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     char* s;
     Seq_Length s_Max_length;
     Seq_Length* s_Length;
     Ref_Manager* s_Refman;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 Return_Code ut_M_Test_get(ut_M_Test* self, char** s, Seq_Length* s_Max_length, Seq_Length** s_Length);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 Return_Code ut_M_fun(ut_M_Test* t);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->s_Refman);
 }
@@ -10829,7 +12672,7 @@ Return_Code ut_M_fun(ut_M_Test* t) {
     String_clear(s, s_Max_length, s_Length);
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(sowner);
+    String_Del(sowner, NULL);
     free(sowner);
     return LUMI_err;
 }
@@ -10845,7 +12688,7 @@ char* s = NULL;
     s_Max_length = ut_M_ostr_Max_length;
     s_Length = ut_M_ostr_Length;
     s = ut_M_ostr;
-    String_Del(ut_M_ostr);
+    String_Del(ut_M_ostr, NULL);
     free(ut_M_ostr);
     ut_M_ostr_Max_length = 0;
     ut_M_ostr_Length = &Lumi_empty_length;
@@ -10996,23 +12839,29 @@ using potentially illegal user reference "{anonymous}"
 /// @@ test-memory-temp
 /// @ test-memory-temp-0
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     char* s;
     Seq_Length s_Max_length;
     Seq_Length* s_Length;
 };
-void ut_M_Test_Del(ut_M_Test* self);
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_fun(ut_M_Test* t);
 void ut_M_use(ut_M_Test* t);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    String_Del(self->s);
+    String_Del(self->s, NULL);
     free(self->s);
 }
 void ut_M_fun(ut_M_Test* t) {
     unsigned LUMI_loop_depth = 1;
-    String_Del(t->s);
+    String_Del(t->s, NULL);
     free(t->s);
     t->s_Max_length = 0;
     t->s_Length = &Lumi_empty_length;
@@ -11032,51 +12881,63 @@ void ut_M_use(ut_M_Test* t) {
     tc = NULL;
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(t);
+    ut_M_Test_Del(t, NULL);
     free(t);
 }
 /// @ test-memory-temp-1
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     char* s;
     Seq_Length s_Max_length;
     Seq_Length* s_Length;
 };
-void ut_M_Test_Del(ut_M_Test* self);
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_fun(ut_M_Test* to);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    String_Del(self->s);
+    String_Del(self->s, NULL);
     free(self->s);
 }
 void ut_M_fun(ut_M_Test* to) {
     unsigned LUMI_loop_depth = 1;
     ut_M_Test* t = NULL;
     t = to;
-    String_Del(t->s);
+    String_Del(t->s, NULL);
     free(t->s);
     t->s_Max_length = 0;
     t->s_Length = &Lumi_empty_length;
     t->s = NULL;
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(to);
+    ut_M_Test_Del(to, NULL);
     free(to);
 }
 /// @ test-memory-temp-2
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     char* s;
     Seq_Length s_Max_length;
     Seq_Length* s_Length;
 };
-void ut_M_Test_Del(ut_M_Test* self);
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_fun(ut_M_Test* to, char* s, Seq_Length s_Max_length, Seq_Length* s_Length, char* s2, Seq_Length s2_Max_length, Seq_Length* s2_Length);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    String_Del(self->s);
+    String_Del(self->s, NULL);
     free(self->s);
 }
 void ut_M_fun(ut_M_Test* to, char* s, Seq_Length s_Max_length, Seq_Length* s_Length, char* s2, Seq_Length s2_Max_length, Seq_Length* s2_Length) {
@@ -11099,13 +12960,13 @@ void ut_M_fun(ut_M_Test* to, char* s, Seq_Length s_Max_length, Seq_Length* s_Len
         char* si = NULL;
         Seq_Length si_Max_length = 0;
         Seq_Length* si_Length = &Lumi_empty_length;
-        String_Del(to->s);
+        String_Del(to->s, NULL);
         free(to->s);
         to->s_Max_length = 0;
         to->s_Length = &Lumi_empty_length;
         to->s = NULL;
         t1 = to;
-        String_Del(t1->s);
+        String_Del(t1->s, NULL);
         free(t1->s);
         t1->s_Max_length = 0;
         t1->s_Length = &Lumi_empty_length;
@@ -11126,13 +12987,13 @@ void ut_M_fun(ut_M_Test* to, char* s, Seq_Length s_Max_length, Seq_Length* s_Len
         char* si = NULL;
         Seq_Length si_Max_length = 0;
         Seq_Length* si_Length = &Lumi_empty_length;
-        String_Del(to->s);
+        String_Del(to->s, NULL);
         free(to->s);
         to->s_Max_length = 0;
         to->s_Length = &Lumi_empty_length;
         to->s = NULL;
         t2 = to;
-        String_Del(t2->s);
+        String_Del(t2->s, NULL);
         free(t2->s);
         t2->s_Max_length = 0;
         t2->s_Length = &Lumi_empty_length;
@@ -11149,13 +13010,13 @@ void ut_M_fun(ut_M_Test* to, char* s, Seq_Length s_Max_length, Seq_Length* s_Len
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-    String_Del(to->s);
+    String_Del(to->s, NULL);
     free(to->s);
     to->s_Max_length = 0;
     to->s_Length = &Lumi_empty_length;
     to->s = NULL;
     t3 = to;
-    String_Del(t3->s);
+    String_Del(t3->s, NULL);
     free(t3->s);
     t3->s_Max_length = 0;
     t3->s_Length = &Lumi_empty_length;
@@ -11163,24 +13024,30 @@ void ut_M_fun(ut_M_Test* to, char* s, Seq_Length s_Max_length, Seq_Length* s_Len
     String_clear(so, so_Max_length, so_Length);
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(s2);
+    String_Del(s2, NULL);
     free(s2);
-    String_Del(s);
+    String_Del(s, NULL);
     free(s);
-    ut_M_Test_Del(to);
+    ut_M_Test_Del(to, NULL);
     free(to);
 }
 /// @ test-memory-temp-3
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     ut_M_Test* next;
 };
-void ut_M_Test_Del(ut_M_Test* self);
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 Return_Code ut_M_fun(ut_M_Test* to);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_Test_Del(ut_M_Test* self) {
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    SELF_REF_DEL(ut_M_Test, next);
+    SELF_REF_DEL(ut_M_Test, next, NULL);
     free(self->next);
 }
 Return_Code ut_M_fun(ut_M_Test* to) {
@@ -11199,7 +13066,7 @@ Return_Code ut_M_fun(ut_M_Test* to) {
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 LUMI_block0_cleanup:
     (void)0;
-    ut_M_Test_Del(to);
+    ut_M_Test_Del(to, NULL);
     free(to);
     return LUMI_err;
 }
@@ -11245,7 +13112,7 @@ Return_Code ut_M_fun(char** s, Seq_Length* s_Max_length, Seq_Length** s_Length) 
     Seq_Length aux_String_0_Max_length = 0;
     Seq_Length* aux_String_0_Length = &Lumi_empty_length;
     INIT_NEW_SEQUENCE(2, LUMI_block0_cleanup, aux_String_0, char, 0x0c);
-    String_Del(*s);
+    String_Del(*s, NULL);
     free(*s);
     *s_Max_length = 0x0c;
     *s_Length = aux_String_0_Length;
@@ -11255,7 +13122,7 @@ Return_Code ut_M_fun(char** s, Seq_Length* s_Max_length, Seq_Length** s_Length) 
     String_clear(*s, *s_Max_length, *s_Length);
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(aux_String_0);
+    String_Del(aux_String_0, NULL);
     free(aux_String_0);
     return LUMI_err;
 }
@@ -11282,16 +13149,25 @@ potentially not returning output "s"
 /// @@ test-memory-constructor
 /// @ test-memory-constructor-0
 typedef struct ut_M_NoConstructor ut_M_NoConstructor;
+typedef struct ut_M_NoConstructor_Dynamic ut_M_NoConstructor_Dynamic;
 typedef struct ut_M_HasConstructor ut_M_HasConstructor;
+typedef struct ut_M_HasConstructor_Dynamic ut_M_HasConstructor_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_NoConstructor {
     char s[0x0c];
     Seq_Length s_Length[1];
+};
+struct ut_M_NoConstructor_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_HasConstructor {
     char* s;
     Seq_Length s_Max_length;
     Seq_Length* s_Length;
+};
+struct ut_M_HasConstructor_Dynamic {
+    Dynamic_Del _del;
 };
 struct ut_M_Test {
     ut_M_NoConstructor vnc;
@@ -11301,15 +13177,24 @@ struct ut_M_Test {
     ut_M_HasConstructor svhc;
     Ref_Manager* svhc_Refman;
 };
-void ut_M_NoConstructor_Del(ut_M_NoConstructor* self);
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_NoConstructor_Del(ut_M_NoConstructor* self, ut_M_NoConstructor_Dynamic* self_Dynamic);
 Return_Code ut_M_HasConstructor_new(ut_M_HasConstructor* self);
-void ut_M_HasConstructor_Del(ut_M_HasConstructor* self);
+void ut_M_HasConstructor_Del(ut_M_HasConstructor* self, ut_M_HasConstructor_Dynamic* self_Dynamic);
 Return_Code ut_M_Test_new(ut_M_Test* self);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_NoConstructor_dynamic = {(Dynamic_Del)ut_M_NoConstructor_Del};
-Generic_Type_Dynamic ut_M_HasConstructor_dynamic = {(Dynamic_Del)ut_M_HasConstructor_Del};
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
-void ut_M_NoConstructor_Del(ut_M_NoConstructor* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_NoConstructor_Dynamic ut_M_NoConstructor_dynamic = {
+    (Dynamic_Del)ut_M_NoConstructor_Del
+};
+ut_M_HasConstructor_Dynamic ut_M_HasConstructor_dynamic = {
+    (Dynamic_Del)ut_M_HasConstructor_Del
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_NoConstructor_Del(ut_M_NoConstructor* self, ut_M_NoConstructor_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 Return_Code ut_M_HasConstructor_new(ut_M_HasConstructor* self) {
@@ -11319,7 +13204,7 @@ Return_Code ut_M_HasConstructor_new(ut_M_HasConstructor* self) {
     Seq_Length aux_String_0_Max_length = 0;
     Seq_Length* aux_String_0_Length = &Lumi_empty_length;
     INIT_NEW_SEQUENCE(6, LUMI_block0_cleanup, aux_String_0, char, 0x0c);
-    String_Del(self->s);
+    String_Del(self->s, NULL);
     free(self->s);
     self->s_Max_length = 0x0c;
     self->s_Length = aux_String_0_Length;
@@ -11328,13 +13213,13 @@ Return_Code ut_M_HasConstructor_new(ut_M_HasConstructor* self) {
     aux_String_0_Length = &Lumi_empty_length;
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(aux_String_0);
+    String_Del(aux_String_0, NULL);
     free(aux_String_0);
     return LUMI_err;
 }
-void ut_M_HasConstructor_Del(ut_M_HasConstructor* self) {
+void ut_M_HasConstructor_Del(ut_M_HasConstructor* self, ut_M_HasConstructor_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    String_Del(self->s);
+    String_Del(self->s, NULL);
     free(self->s);
 }
 Return_Code ut_M_Test_new(ut_M_Test* self) {
@@ -11352,42 +13237,66 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_HasConstructor_Del(&(self->svhc));
+    ut_M_HasConstructor_Del(&(self->svhc), NULL);
     LUMI_var_dec_ref(self->svhc_Refman);
-    ut_M_NoConstructor_Del(&(self->svnc));
+    ut_M_NoConstructor_Del(&(self->svnc), NULL);
     LUMI_var_dec_ref(self->svnc_Refman);
-    ut_M_HasConstructor_Del(&(self->vhc));
-    ut_M_NoConstructor_Del(&(self->vnc));
+    ut_M_HasConstructor_Del(&(self->vhc), NULL);
+    ut_M_NoConstructor_Del(&(self->vnc), NULL);
 }
 /// @ test-memory-constructor-1
 typedef struct ut_M_Base ut_M_Base;
+typedef struct ut_M_Base_Dynamic ut_M_Base_Dynamic;
 typedef struct ut_M_Mid ut_M_Mid;
+typedef struct ut_M_Mid_Dynamic ut_M_Mid_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Base {
     char* s;
     Seq_Length s_Max_length;
     Seq_Length* s_Length;
 };
+struct ut_M_Base_Dynamic {
+    Dynamic_Del _del;
+};
 struct ut_M_Mid {
     ut_M_Base _base;
+};
+struct ut_M_Mid_Dynamic {
+    ut_M_Base_Dynamic _base;
 };
 struct ut_M_Test {
     ut_M_Mid _base;
     ut_M_Base* b;
 };
+struct ut_M_Test_Dynamic {
+    ut_M_Mid_Dynamic _base;
+};
 Return_Code ut_M_Base_new(ut_M_Base* self);
-void ut_M_Base_Del(ut_M_Base* self);
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
 Return_Code ut_M_Mid_new(ut_M_Mid* self);
-void ut_M_Mid_Del(ut_M_Mid* self);
+void ut_M_Mid_Del(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic);
 Return_Code ut_M_Test_new(ut_M_Test* self);
-void ut_M_Test_Del(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_fun1(void);
 void ut_M_fun2(void (*f)(void));
-Generic_Type_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del};
-Generic_Type_Dynamic ut_M_Mid_dynamic = {(Dynamic_Del)ut_M_Mid_Del};
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del
+};
+ut_M_Mid_Dynamic ut_M_Mid_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Mid_Del
+    }
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    {
+        {
+            (Dynamic_Del)ut_M_Test_Del
+        }
+    }
+};
 Return_Code ut_M_Base_new(ut_M_Base* self) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
@@ -11395,7 +13304,7 @@ Return_Code ut_M_Base_new(ut_M_Base* self) {
     Seq_Length aux_String_0_Max_length = 0;
     Seq_Length* aux_String_0_Length = &Lumi_empty_length;
     INIT_NEW_SEQUENCE(6, LUMI_block0_cleanup, aux_String_0, char, 0x0c);
-    String_Del(self->s);
+    String_Del(self->s, NULL);
     free(self->s);
     self->s_Max_length = 0x0c;
     self->s_Length = aux_String_0_Length;
@@ -11404,13 +13313,13 @@ Return_Code ut_M_Base_new(ut_M_Base* self) {
     aux_String_0_Length = &Lumi_empty_length;
 LUMI_block0_cleanup:
     (void)0;
-    String_Del(aux_String_0);
+    String_Del(aux_String_0, NULL);
     free(aux_String_0);
     return LUMI_err;
 }
-void ut_M_Base_Del(ut_M_Base* self) {
+void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    String_Del(self->s);
+    String_Del(self->s, NULL);
     free(self->s);
 }
 Return_Code ut_M_Mid_new(ut_M_Mid* self) {
@@ -11422,9 +13331,9 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-void ut_M_Mid_Del(ut_M_Mid* self) {
+void ut_M_Mid_Del(ut_M_Mid* self, ut_M_Mid_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Base_Del(&(self->_base));
+    ut_M_Base_Del(&(self->_base), NULL);
 }
 Return_Code ut_M_Test_new(ut_M_Test* self) {
     Return_Code LUMI_err = OK;
@@ -11440,10 +13349,10 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    ut_M_Mid_Del(&(self->_base));
-    ut_M_Base_Del(self->b);
+    ut_M_Mid_Del(&(self->_base), NULL);
+    ut_M_Base_Del(self->b, NULL);
     free(self->b);
 }
 void ut_M_fun1(void) {
@@ -11458,6 +13367,7 @@ LUMI_block0_cleanup:
 }
 /// @ test-memory-constructor-2
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint8_t a;
     int8_t b;
@@ -11465,9 +13375,14 @@ struct ut_M_Test {
     int8_t d;
     int8_t e;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_new(ut_M_Test* self);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 void ut_M_Test_new(ut_M_Test* self) {
     unsigned LUMI_loop_depth = 1;
     self->a = 0x01;
@@ -11475,7 +13390,7 @@ void ut_M_Test_new(ut_M_Test* self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 /// @ test-memory-constructor-e0
@@ -11593,8 +13508,8 @@ cdef_M_Int cint = 0;
     ut_M_Test* arr_test = NULL;
     Seq_Length arr_test_Length = 0;
     p_int = arr_int;
-    cdef_M_Pointer_set_point_to(p_int, cint, &cdef_M_Int_dynamic);
-    cdef_M_Pointer_set_point_to(pp_int, p_int, &cdef_M_Int*_dynamic);
+    cdef_M_Pointer_set_point_to(p_int, cint, (Generic_Type_Dynamic*)&cdef_M_Int_dynamic);
+    cdef_M_Pointer_set_point_to(pp_int, p_int, (Generic_Type_Dynamic*)&cdef_M_Int*_dynamic);
     p_int = cdef_M_Pointer_get_pointed_at(pp_int, 0);
     cint = cdef_M_Pointer_get_pointed_at(p_int, 0x03);
     test = &test_Var;
@@ -11637,14 +13552,20 @@ cannot use "?" on primitive type "Pointer"
 /// @@ test-cleanup-function
 /// @ test-cleanup-function-0
 typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     char* s;
     Seq_Length s_Max_length;
     Seq_Length* s_Length;
 };
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
 void ut_M_Test_cleanup(ut_M_Test* self);
-void ut_M_Test_Del(ut_M_Test* self);
-Generic_Type_Dynamic ut_M_Test_dynamic = {(Dynamic_Del)ut_M_Test_Del};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
 void ut_M_Test_cleanup(ut_M_Test* self) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
@@ -11666,10 +13587,10 @@ void ut_M_Test_cleanup(ut_M_Test* self) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_Test_Del(ut_M_Test* self) {
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     ut_M_Test_cleanup(self);
-    String_Del(self->s);
+    String_Del(self->s, NULL);
     free(self->s);
 }
 /// @ test-cleanup-function-1
@@ -11695,8 +13616,16 @@ void ut_M_Base_cleanup(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
 void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
 void ut_M_Test_cleanup(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
-ut_M_Base_Dynamic ut_M_Base_dynamic = {(Dynamic_Del)ut_M_Base_Del, ut_M_Base_meth};
-ut_M_Test_Dynamic ut_M_Test_dynamic = {{(Dynamic_Del)ut_M_Test_Del, ut_M_Base_meth}};
+ut_M_Base_Dynamic ut_M_Base_dynamic = {
+    (Dynamic_Del)ut_M_Base_Del,
+    ut_M_Base_meth
+};
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    {
+        (Dynamic_Del)ut_M_Test_Del,
+        ut_M_Base_meth
+    }
+};
 void ut_M_Base_meth(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:

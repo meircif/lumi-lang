@@ -145,8 +145,7 @@ class FieldExpression(Expression)
             write(user ".")
         else
             write(user "->")
-        for n in self.bases
-            write(user "_base.")
+        self.write-bases(copy self.bases)
         self.variable.write-cname()
 
     func dynamic write-cast()

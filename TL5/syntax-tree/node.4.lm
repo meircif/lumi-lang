@@ -280,6 +280,10 @@ class SyntaxTreeNode
             if curr = '"' and prev != '\\'
                 self.syntax-error(user "'\"' inside string constant", user text)
             prev := curr
+
+    func inst write-bases(copy Int bases)
+        for n in bases
+            write(user "_base.")
     
     func dynamic link-types()
         ; do nothing as default

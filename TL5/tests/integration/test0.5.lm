@@ -351,6 +351,7 @@ func test-many(
 func ! test-call-expression()
     owner String? s
     var Uint32 x
+    var Uint32 y
     test-void()!
     test-params(copy 3, user "text", owner _)!
     test-outs()->(owner s, var x)
@@ -361,10 +362,10 @@ func ! test-call-expression()
             copy 7,
             copy 8)->(
             var x,
-            var x)
+            var y)
     var Uint32 tmp
     test-int(copy test-int2int(copy 9)->(var tmp))
-    x := clamp test-int2int(copy 10) + test-many(copy 11, copy 12)->(var x)
+    x := clamp test-int2int(copy 10) + test-many(copy 11, copy 12)->(var y)
     s := test-int2str(copy 13)!
 
 
@@ -866,6 +867,90 @@ struct IntRangeTest
         self.rs64 := -100000000000
 
 
+struct Base
+    var Bool x
+struct Low(Base)
+class Mid(Low)
+class Top(Mid)
+dynamic Print
+    func user? ! print-name()
+dynamic Db
+    func user fb()
+dynamic Dc
+    func user fc()
+support Print in Base
+    func user? ! print-name()
+        sys.print(user "Base")!
+support Print in Low
+    func user? ! print-name()
+        sys.print(user "Low")!
+support Print in Mid
+    func user? ! print-name()
+        sys.print(user "Mid")!
+support Print in Top
+    func user? ! print-name()
+        sys.print(user "Top")!
+support Db in Base
+    func user fb()
+support Dc in Mid
+    func user fc()
+
+func dyn(user Print da, user Db db, user Dc dc)
+
+func dynamic-base(user Base b, user Low l, user Mid m, user Top t)->(
+        user Print da, user Db db, user Dc dc)
+    da := b
+    da := l
+    da := m
+    da := t
+    db := b
+    db := l
+    db := m
+    db := t
+    dc := m
+    dc := t
+    dyn(user t, user t, user t)
+
+support Print in TestStruct
+    func user? ! print-name()
+        sys.print(user "TestStruct")!
+support Print in TestClass
+    func user? ! print-name()
+        sys.print(user "TestClass")!
+
+func ! dynamic-generic(
+        user Data{Print} dt, user Data{TestStruct} ds, user Data{TestClass} dc)
+    weak Print? t
+    t := dt.item
+    dt.item := t
+    dt.set(weak t)!
+    dt.get()->(weak t)!
+    t := ds.item
+    ds.get()->(weak t)!
+    t := dc.item
+    dc.get()->(weak t)!
+
+func ! print-me(user Print p)
+    sys.print(user " ")!
+    p.print-name()!
+
+func ! test-dynamic()
+    sys.print(user "Supporting Print:")!
+    var Base b
+    print-me(user b)!
+    var Low l
+    print-me(user l)!
+    var Mid m
+    print-me(user m)!
+    var Top t
+    print-me(user t)!
+    var TestStruct s(copy 3, user _)!
+    print-me(user s)!
+    var TestClass c
+    print-me(user c)!
+    sys.print(user "\n")!
+
+
 main!
     test-simple-function()!
     test-ref-count()!
@@ -875,3 +960,4 @@ main!
     test-temp()!
     test-switch()!
     test-cleanup()!
+    test-dynamic()!

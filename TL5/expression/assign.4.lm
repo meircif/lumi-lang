@@ -57,7 +57,7 @@ class AssignExpression(Expression)
             refs.mark-invalid-reference(user target-path)
         if access-is-owner(copy self.target.access) or
                 self.target.access = Access.TEMP
-            refs.check-writing-memory(user self.value)
+            refs.check-writing-owner-memory(user self.value)
             if self.target.access = Access.TEMP and value-path?
                 if not value-path.variable.parent?
                     self.syntax-error(
@@ -69,7 +69,7 @@ class AssignExpression(Expression)
                 else
                     refs.mark-invalid-reference(user value-path)
                 refs.clear-invalid-reference(user target-path)
-                refs.check-writing-memory(user self.target)
+                refs.check-writing-owner-memory(user self.target)
         else
             self.value.check-memory(user refs)
             refs.clear-invalid-reference(user target-path)
@@ -240,23 +240,29 @@ class AssignExpression(Expression)
             self.code-node.write-spaces()
     
     func inst write-assign-dynamic()
+        user TypeData target-type(user self.target.result-type.type-data)
+        user TypeData value-type(user self.value.result-type.type-data)
         self.target.write-dynamic()
         write(user " = ")
-        if not self.value.result-type.type-data.is-dynamic and
-                not self.value.is-generic-cast and
-                self.value.result-type.type-data is-not glob.type-empty
-            write(user "&")
-            self.value.result-type.write-cname()
-            write(user "_dynamic")
-        else-if (self.target.result-type.type-data is glob.type-generic or
+        if not target-type.is-struct and value-type is-not glob.type-empty and
+                not value-type.is-only-dynamic()
+            self.original-value.write-support-name(
+                    user self.target.result-type)
+        else-if (target-type is glob.type-generic or
                 self.target.is-generic-cast) and
-                self.value.result-type.type-data is-not glob.type-generic and
-                not self.value.is-generic-cast
+                value-type is-not glob.type-generic and
+                not self.value.is-generic-cast and
+                value-type is-not glob.type-empty
             write(user "(Generic_Type_Dynamic*)")
-            self.value.write-dynamic-safe()
+            if value-type.is-dynamic
+                self.value.write-dynamic-safe()
+            else
+                write(user "&")
+                self.value.result-type.write-cname()
+                write(user "_dynamic")
         else-if self.value.is-generic-cast and
                 not self.target.is-generic-cast and
-                not (self.target.result-type.type-data is glob.type-generic)
+                target-type is-not glob.type-generic
             self.value.write-dynamic-safe()
         else
             self.value.write-dynamic()
@@ -271,11 +277,7 @@ class AssignExpression(Expression)
             write(user " != NULL) ")
             self.target.write-dynamic-safe()
             write(user "->")
-            do
-                while type-data.base-type?
-                type-data := type-data.base-type.type-data
-                while type-data.is-dynamic
-                write(user "_base.")
+            type-data.write-all-bases()
             write(user "_del(")
         else-if type-data is-not glob.type-array
             type-data.write-cname()
@@ -301,6 +303,8 @@ class AssignExpression(Expression)
         if self.target.result-type.type-data.is-dynamic
             write(user ", ")
             self.target.write-dynamic()
+        else-if type-data is-not glob.type-array
+            write(user ", NULL")
         write(user ");\n")
     
     func dynamic write()

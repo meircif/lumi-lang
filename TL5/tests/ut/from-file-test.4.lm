@@ -8,7 +8,7 @@ owner tl5-compiler.Global tested-compiler
 
 var String{1024} mock-print-text
 var String{4096} mock-input-file-text
-var String{16384} mock-output-file-text
+var String{32768} mock-output-file-text
 var String{16} mock-input-file-name
 var String{2048} common-header
 var String{16384} expected-common-header
@@ -85,6 +85,9 @@ mock File.putc(copy Char ch)
     assert self is tl5-compiler.glob.output-file
     try
         tl5-compiler-tests.mock-output-file-text.append(copy ch)
+    catch
+        var Int last(copy tl5-compiler-tests.mock-output-file-text.length - 2)
+        tl5-compiler-tests.mock-output-file-text[last] := '#'
 
 
 mock File.write(user String text)

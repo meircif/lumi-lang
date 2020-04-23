@@ -87,8 +87,8 @@ struct ReferencePath
 struct ReferenceMemoryList
     var List{ReferencePath} invalid-references
     var List{ReferencePath} added-invalid-references
-    var List{ReferencePath} read-owner-references
-    var List{ReferencePath} written-owner-references
+    var List{ReferencePath} read-references
+    var List{ReferencePath} written-references
     var List{ReferencePath} temp-invalid-references
     var NameMap{SyntaxTreeVariable} user-references
     var NameMap{SyntaxTreeVariable} removed-user-references
@@ -192,24 +192,31 @@ struct ReferenceMemoryList
                 self.invalid-references.remove(user refpath)
                 return
     
-    func check-writing-memory(user Expression expression)
+    func check-writing-owner-memory(user Expression expression)
         user ReferencePath reference-path(
                 user expression.result-type.reference-path)
         if not reference-path?
             return
         reference-path.check-pure-owner(user expression)
         if self.reference-inside(
-                user reference-path, user self.read-owner-references) or
-                self.reference-inside(
-                user reference-path, user self.written-owner-references)
+                user reference-path, user self.read-references)
+            expression.syntax-error-ref(
+                    user "using modified reference", user reference-path)
+        self.check-writing-memory(user expression)
+    
+    func check-writing-memory(user Expression expression)
+        user ReferencePath reference-path(
+                user expression.result-type.reference-path)
+        if self.reference-inside(
+                user reference-path, user self.written-references)
             expression.syntax-error-ref(
                     user "using modified reference", user reference-path)
         expression.check-memory(user self)
-        self.written-owner-references.add(owner reference-path.copy-new())
+        self.written-references.add(owner reference-path.copy-new())
 
     func clear-line-checks()
-        self.read-owner-references.clear()
-        self.written-owner-references.clear()
+        self.read-references.clear()
+        self.written-references.clear()
         do
             while not self.temp-invalid-references.is-empty()
             self.clear-invalid-reference(
@@ -241,11 +248,11 @@ struct ReferenceMemoryList
             node.syntax-error-ref(
                     user "using invalid reference", user reference-path)
         if self.reference-inside(
-                user reference-path, user self.written-owner-references)
+                user reference-path, user self.written-references)
             node.syntax-error-ref(
                     user "using modified reference", user reference-path)
         if reference-path?
-            self.read-owner-references.add(owner reference-path.copy-new())
+            self.read-references.add(owner reference-path.copy-new())
     
     func check-user(user Expression expression)
         user ReferencePath exp-path(user expression.result-type.reference-path)

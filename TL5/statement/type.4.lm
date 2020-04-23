@@ -3,14 +3,16 @@ module tl5-compiler
 
  ~~~ Type node in the syntax tree ~~~
 class TypeData(SyntaxTreeNamespace)
+    var NameMap{SyntaxTreeFunction} dynamic-base-methods
+    var NameMap{TypeData} supported-dynamics
     owner String name
     owner TypeInstance base-type
     owner List{String} parameters
-    owner NameMap{SyntaxTreeFunction} dynamic-base-methods
     owner DeleteGroup delete-group
     user SyntaxTreeFunction constructor
     user SyntaxTreeCleanup cleanup
     var Bool is-primitive
+    var Bool is-struct
     var Bool is-dynamic
     var Bool is-int-like
     var Bool is-native
@@ -18,12 +20,14 @@ class TypeData(SyntaxTreeNamespace)
     var Bool is-delete-mocked
     var Bool ordering
     
-    func inst parse-new(copy Bool is-dynamic)->(owner TypeData new-node)
+    func inst parse-new(copy Bool is-struct, copy Bool is-dynamic)->(
+            owner TypeData new-node)
         new-node := TypeData()
-        new-node.parse(copy is-dynamic)
+        new-node.parse(copy is-struct, copy is-dynamic)
     
-    func inst parse(copy Bool is-dynamic)
+    func inst parse(copy Bool is-struct, copy Bool is-dynamic)
         self.set-location()
+        self.is-struct := is-struct
         self.is-dynamic := is-dynamic
         read-new(user "({")->(owner self.name)
         self.add-type(user self.module)
@@ -42,6 +46,9 @@ class TypeData(SyntaxTreeNamespace)
                         parameters, got")
             read-c()
         if glob.last-char = '('
+            if not self.is-struct
+                self.syntax-error-msg(
+                        user "dynamic extension not supported yet")
             self.base-type := TypeInstance()
             self.base-type.parse(user ")", user self, user _, copy 0)
             if glob.last-char != ')'
@@ -54,10 +61,8 @@ class TypeData(SyntaxTreeNamespace)
         self.parse-block-children(user self, user _)
         self.indentation-spaces := 0
     
-    func inst is-base-dynamic()->(var Bool base-dynamic)
-        base-dynamic := false
-        if self.base-type?
-            base-dynamic := self.base-type.type-data.is-dynamic
+    func inst is-only-dynamic()->(var Bool is-dynamic)
+        is-dynamic := self.is-dynamic and not self.is-struct
     
     func inst is-ref()->(var Bool is-reference)
         is-reference := not self.is-int-like and self is-not glob.type-bool
@@ -149,7 +154,7 @@ class TypeData(SyntaxTreeNamespace)
             bases += 1
         method := _
     
-    func inst order-bases(user List{TypeData} ordered-list)->(
+    func dynamic order-bases(user List{TypeData} ordered-list)->(
             var Bool recursion-error)
         recursion-error := false
         if self.is-ordered
@@ -183,30 +188,15 @@ class TypeData(SyntaxTreeNamespace)
                         print-msg-with-item(
                                 user ", variable of type", user self.name)
                         return
+                
+        ; order supported dynamics that are after this in the syntax tree
+        do
+            user TypeData support-dynamic
+            while self.supported-dynamics.pop()->(user support-dynamic)?
+            assert not support-dynamic.order-bases(user ordered-list)
         
         ordered-list.add(owner glob.root.types.remove(user self))
         self.is-ordered := true
-        
-        ; init `self.dynamic-base-methods` and test override methods
-        if self.is-dynamic
-            self.dynamic-base-methods := NameMap{SyntaxTreeFunction}()
-        for function in self.functions.iter()
-            user SyntaxTreeFunction method
-            var Int bases
-            if self.base-type?
-                self.base-type.type-data.find-meth(user function.name)->(
-                        user method, var bases)
-            if method?
-                function.compare(user method)
-                if function.is-dynamic
-                    function.dynamic-base-method := method.dynamic-base-method
-                    function.dynamic-base-count :=
-                            method.dynamic-base-count + bases + 1
-                    method.delete-group-builder.add-dynamic-override(
-                            user self, user function, user method)
-            else-if function.is-dynamic
-                function.dynamic-base-method := function
-                self.dynamic-base-methods.add(user function.name, user function)
     
     func dynamic link-types()
         if self.base-type?
@@ -218,19 +208,45 @@ class TypeData(SyntaxTreeNamespace)
                         user self.base-type.type-data.name)
             if not self.constructor?
                 self.constructor := self.base-type.type-data.constructor
+        
+        ; test override methods
+        for function in self.functions.iter()
+            user SyntaxTreeFunction method
+            var Int bases
+            if self.base-type?
+                self.base-type.type-data.find-meth(user function.name)->(
+                        user method, var bases)
+            if method?
+                if not function.is-dynamic
+                    function.compare(user method)
+                else-if method.is-dynamic
+                    function.dynamic-base-method := method.dynamic-base-method
+                    function.dynamic-base-count :=
+                            method.dynamic-base-count + bases + 1
+                    method.delete-group-builder.add-dynamic-override(
+                            user self, user function, user method)
+                else
+                    method := _
+            if function.is-dynamic and not method?
+                function.dynamic-base-method := function
+                self.dynamic-base-methods.add(user function.name, user function)
+        
         base()
     
     func dynamic analyze()
         if self.base-type?
             self.base-type.analyze-after-link(user self, copy true)
-        if not self.base-type? and self.variables.is-empty()
+        if self.is-struct and not self.base-type? and self.variables.is-empty()
             self.syntax-error(user "type with no fields", user self.name)
-        if self.is-dynamic and not self.is-base-dynamic()
+        var Bool check-dynamic(copy self.is-dynamic)
+        if self.is-dynamic and self.base-type?
+            check-dynamic := not self.base-type.type-data.is-dynamic
+        if check-dynamic
             var ListIterator{SyntaxTreeFunction} iter(user self.functions)
             do
                 if not iter.has()
                     self.syntax-error(
-                            user "class with no dynamic methods",
+                            user "dynamic type with no dynamic methods",
                             user self.name)
                 while not iter.get().is-dynamic
                 iter.next()
@@ -252,9 +268,30 @@ class TypeData(SyntaxTreeNamespace)
             type-data.collect-delete-group()
             type-data.delete-group.extend(user self.delete-group)
     
+    func inst find-support-type(user TypeData dynamic)->(
+            user TypeData support-type-data, var Int support-bases)
+        user TypeData type-data(user self)
+        var Int bases
+        do
+            if type-data.supported-dynamics.find(user dynamic.name)?
+                support-type-data := type-data
+                support-bases := bases
+            while type-data.base-type?
+            type-data := type-data.base-type.type-data
+            bases += 1
+    
     func dynamic write-cname()
         self.module.write-prefix()
         write-cname(user self.name)
+    
+    func inst write-all-bases()
+        var Int bases
+        user TypeData base-data(user self)
+        do
+            while base-data.base-type?
+            base-data := base-data.base-type.type-data
+            bases += 1
+        self.write-bases(copy bases)
     
     func dynamic write-declaration()
         ; typedef struct `name` `name`;
@@ -264,7 +301,7 @@ class TypeData(SyntaxTreeNamespace)
         write(user " ")
         self.write-cname()
         write(user ";\n")
-        if self.is-dynamic
+        if self.is-struct
             write(user "\ntypedef struct ")
             self.write-cname()
             write(user "_Dynamic ")
@@ -286,74 +323,132 @@ class TypeData(SyntaxTreeNamespace)
             self.write-spaces()
             self.base-type.write-cname()
             write(user " _base;\n")
-        self.write-children(user self.variables)
-        write(user "};\n")
-        if self.is-dynamic
+        if self.is-struct
+            self.write-children(user self.variables)
+            write(user "};\n")
             write(user "\nstruct ")
             self.write-cname()
             write(user "_Dynamic {\n")
-            if self.is-base-dynamic()
-                self.write-spaces()
-                self.base-type.write-cname()
-                write(user "_Dynamic _base;\n")
-            else
-                self.write-spaces()
-                write(user "Dynamic_Del _del;\n")
-            for method in self.dynamic-base-methods.iter()
-                self.write-spaces()
-                method.write-pointer()
-                write(user ";\n")
-            write(user "};\n")
+        self.write-dynamic-fields()
+        write(user "};\n")
         self.indentation-spaces := 0
+
+    func inst write-dynamic-fields()
+        if self.base-type?
+            self.write-spaces()
+            self.base-type.write-cname()
+            write(user "_Dynamic _base;\n")
+        else
+            self.write-spaces()
+            write(user "Dynamic_Del _del;\n")
+        
+        if self.is-only-dynamic()
+            self.write-spaces()
+            write(user "void* _self_Dynamic;\n")
+        
+        for dynamic in self.supported-dynamics.iter()
+            var Bool first-support(copy true)
+            user TypeData base-type(user self)
+            do
+                while base-type.base-type?
+                base-type := base-type.base-type.type-data
+                first-support := not base-type.supported-dynamics.find(
+                        user dynamic.name)?
+                while first-support
+            if first-support
+                self.write-spaces()
+                dynamic.write-cname()
+                write(user " _")
+                dynamic.write-cname()
+                write(user ";\n")
+        
+        for method in self.dynamic-base-methods.iter()
+            self.write-spaces()
+            method.write-pointer()
+            write(user ";\n")
     
     func dynamic write-methods-declaration()
+        if not self.is-struct
+            return
         self.write-functions-declaration()
         self.write-del-header()
         write(user ";\n")
     
     func inst write-del-header()
-        ; void `cname`_Del(`cname`* self[, `cname`_Dynamic* self_Dynamic]);
+        ; void `cname`_Del(`cname`* self, `cname`_Dynamic* self_Dynamic);
         write(user "\nvoid ")
         self.write-cname()
         write(user "_Del(")
         self.write-cname()
         write(user "* self")
-        if self.is-dynamic
-            write(user ", ")
-            self.write-cname()
-            write(user "_Dynamic* self_Dynamic")
+        write(user ", ")
+        self.write-cname()
+        write(user "_Dynamic* self_Dynamic")
         write(user ")")
     
     func dynamic write-global()
+        if not self.is-struct
+            return
+        ; `name`_Dynamic `name`_dynamic = {`dynamic-functions...`};
         write(user "\n")
-        if self.is-dynamic
-            ; `name`_Dynamic `name`_dynamic = {`dynamic-functions...`};
-            self.write-cname()
-            write(user "_Dynamic ")
-            self.write-cname()
-            write(user "_dynamic = ")
-            self.write-dynamic-init(user self)
-        else
-            ; Generic_Type_Dynamic `name`_dynamic = {(Dynamic_Del)`name`_Del};
-            write(user "Generic_Type_Dynamic ")
-            self.write-cname()
-            write(user "_dynamic = {(Dynamic_Del)")
-            self.write-cname()
-            write(user "_Del}")
+        self.write-cname()
+        write(user "_Dynamic ")
+        self.write-cname()
+        write(user "_dynamic = ")
+        self.write-dynamic-init(user self)
         write(user ";\n")
     
+    func inst write-support-init(user TypeData dynamic)
+        ; {`dynamic-functions...`}
+        self.write-spaces()
+        write(user "{\n")
+        self.indentation-spaces += INDENTATION-SPACES
+        self.write-spaces()
+        self.write-del-pointer()
+        write(user ",\n")
+        self.write-spaces()
+        write(user "&")
+        self.write-cname()
+        write(user "_dynamic")
+        for function in dynamic.functions.iter()
+            user SyntaxTreeFunction implementation
+            self.find-meth(user function.name)->(user implementation)
+            write(user ",\n")
+            self.write-spaces()
+            write(user "(")
+            function.arguments.write-pointer(user _)
+            write(user ")")
+            implementation.write-cname()
+        self.indentation-spaces -= INDENTATION-SPACES
+        write(user "\n")
+        self.write-spaces()
+        write(user "}")
+    
+    func inst write-del-pointer()
+        write(user "(Dynamic_Del)")
+        self.write-cname()
+        write(user "_Del")
+    
     func inst write-dynamic-init(user TypeData type-data)
-        write(user "{")
-        if type-data.is-base-dynamic()
+        self.write-spaces()
+        write(user "{\n")
+        self.indentation-spaces += INDENTATION-SPACES
+        if type-data.base-type?
             self.write-dynamic-init(user type-data.base-type.type-data)
         else
-            write(user "(Dynamic_Del)")
-            self.write-cname()
-            write(user "_Del")
+            self.write-spaces()
+            self.write-del-pointer()
+        for dynamic in type-data.supported-dynamics.iter()
+            user TypeData support-type-data
+            if type-data.find-support-type(user dynamic)->(
+                    user support-type-data) = 0
+                write(user ",\n")
+                self.write-support-init(user dynamic)
         for base-method in type-data.dynamic-base-methods.iter()
             user SyntaxTreeFunction method
             self.find-meth(user base-method.name)->(user method)
-            write(user ", ")
+            write(user ",\n")
+            self.write-spaces()
             if method is-not base-method
                 write(user "(")
                 base-method.arguments.write-pointer(user _)
@@ -364,39 +459,48 @@ class TypeData(SyntaxTreeNamespace)
                 write-cname(user method.mocker-function.name)
             else
                 write-cname(user method.name)
+        self.indentation-spaces -= INDENTATION-SPACES
+        write(user "\n")
+        self.write-spaces()
         write(user "}")
     
     func dynamic write-methods-body()
+        if not self.is-struct
+            return
         self.write-children(user self.functions)
         ; void `cname`_Del(`cname`* self[, `cname`_Dynamic* self_Dynamic]) {
         ;     if (self == NULL) return;
-        ;     `base`_Del(&(self->_base)[, &(self_Dynamic->_base))]);
+        ;     `base`_Del(&(self->_base), &(self_Dynamic->_base)));
         ;     ...
         ; }
         self.write-del-header()
         write(user " {\n")
-        write-spaces(copy INDENTATION-SPACES)
+        self.indentation-spaces += INDENTATION-SPACES
+        self.write-spaces()
         write(user "if (self == NULL) return;\n")
         if self.cleanup?
-            write-spaces(copy INDENTATION-SPACES)
+            self.write-spaces()
             self.cleanup.write-cname()
             write(user "(self")
             if self.is-dynamic
                 write(user ", self_Dynamic")
             write(user ");\n")
         if self.base-type?
-            write-spaces(copy INDENTATION-SPACES)
+            self.write-spaces()
             self.base-type.write-cname()
-            write(user "_Del(&(self->_base)")
-            if self.is-dynamic
-                write(user ", &(self_Dynamic->_base)")
+            write(user "_Del(&(self->_base), ")
+            if self.base-type.type-data.is-dynamic
+                write(user "&(self_Dynamic->_base)")
+            else
+                write(user "NULL")
             write(user ");\n")
         if self.is-delete-mocked
-            write-spaces(copy INDENTATION-SPACES)
+            self.write-spaces()
             write(user "IGNORE_ERRORS( ")
             self.write-cname()
             write(user "_MockDel(self) )\n")
         self.write-cleanup(user self)
+        self.indentation-spaces -= INDENTATION-SPACES
         write(user "}\n")
     
     func dynamic write-me(user TypeWriter type-writer)
@@ -423,3 +527,112 @@ class TypeGlobalWriter(TypeWriter)
 class TypeMethodsBodyWriter(TypeWriter)
     func dynamic write(user TypeData type-data)
         type-data.write-methods-body()
+
+
+class SupportDynamic(TypeData)
+    owner String structure-module
+    owner String dynamic-module
+    owner String dynamic-name
+    user TypeData dynamic
+    user TypeData structure
+    
+    func inst parse-new()->(
+            owner SupportDynamic new-node)
+        new-node := SupportDynamic()
+        new-node.parse()
+
+    func inst parse()
+        self.set-location()
+        read-new(user ". {")->(owner self.dynamic-name)
+        if glob.last-char = '.'
+            self.dynamic-module := self.dynamic-name
+            read-new(user " {")->(owner self.dynamic-name)
+        self.expect-space(user self.dynamic-name)
+        self.read-expect(user "in ")
+        read-new(user ".{")->(owner self.name)
+        if glob.last-char = '.'
+            self.structure-module := self.name
+            read-new(user "{")->(owner self.name)
+        self.expect-new-line(user self.name)
+        if self.structure-module?
+            user ModuleMembers module
+            if glob.module-map.find(user self.structure-module)->(user module)?
+                module.type-map.find(user self.name)->(user self.structure)
+        else
+            self.find-type(user self.name)->(user self.structure)
+        if self.structure?
+            self.structure.supported-dynamics.add(user self.name, user self)
+        self.parse-body()
+    
+    func inst order-dynamic(user List{TypeData} ordered-list)
+        self.check-type(user self.dynamic-name, user self.dynamic-module)->(
+                user self.dynamic)
+        if not self.dynamic.is-only-dynamic()
+            self.syntax-error(
+                    user "cannot add support for non-dynamic type",
+                    user self.dynamic-name)
+        assert not self.dynamic.order-bases(user ordered-list)
+    
+    func dynamic order-bases(user List{TypeData} ordered-list)->(
+            var Bool recursion-error)
+        recursion-error := false
+        self.ordering := true
+        self.order-dynamic(user ordered-list)
+        if not self.structure?
+            self.check-type(user self.name, user self.structure-module)->(
+                    user self.structure)
+            assert not self.structure.order-bases(user ordered-list)
+        if self.structure.is-native
+            self.syntax-error(
+                    user "cannot add support to native type",
+                    user self.name)
+        if not self.structure.is-struct
+            self.syntax-error(
+                    user "cannot add support to non-struct type",
+                    user self.name)
+        if glob.global-module.type-map.find(user self.name)?
+            self.syntax-error(
+                    user "cannot yet add support to builtin type",
+                    user self.name)
+        ordered-list.add(owner glob.root.types.remove(user self))
+        self.is-ordered := true
+        
+        do
+            while not self.functions.is-empty()
+            owner SyntaxTreeFunction function
+            self.functions.pop()->(owner function)
+            function.parent-type := self.structure
+            function.is-dynamic := self.structure.is-dynamic
+            function.arguments.parameters.first.item.get-type-instance().type-data :=
+                    self.structure
+            function.register-name()
+            self.structure.functions.add(owner function)
+            
+    func dynamic link-types()
+        if self.structure.supported-dynamics.find(user self.dynamic-name)?
+            self.syntax-error2(
+                    user "struct",
+                    user self.name,
+                    user "already supports",
+                    user self.dynamic-name)
+        self.structure.supported-dynamics.add(
+                user self.dynamic-name, user self.dynamic)
+        for function in self.dynamic.functions.iter()
+            user SyntaxTreeFunction implementation
+            self.structure.find-meth(user function.name)->(user implementation)
+            if not implementation?
+                self.syntax-error(
+                        user "missing implementation of method",
+                        user function.name)
+            implementation.arguments.parameters.first.item.is-dynamic-self :=
+                    true
+        base()
+    
+    func dynamic analyze()
+        ; do nothing
+    
+    func dynamic write-declaration()
+        ; do nothing
+    
+    func dynamic write()
+        ; do nothing
