@@ -14,6 +14,7 @@ and allows adding user defined types in a variety of typing styles. All these
 allow writing code with different trade-off between simplicity, generality and
 performance, and adapting different programming paradigms.
 
+
 Typing Styles of User Defined Types
 -----------------------------------
 All user defined types in Lumi are built based on two basic typing styles:
@@ -23,41 +24,37 @@ All user defined types in Lumi are built based on two basic typing styles:
 
 These can be combined to build more complex typing styles:
 
-3. :ref:`type-system-bind`
-4. :ref:`type-system-parameterized`
-5. :ref:`type-system-embed`
-6. :ref:`type-system-automatic`
+3. :ref:`type-system-extend`
+4. :ref:`type-system-bind`
+5. :ref:`type-system-parameterized`
+6. :ref:`type-system-embed`
+7. :ref:`type-system-automatic`
+
 
 .. _type-system-static:
 
 Static Structures
 -----------------
+Typing style for the :ref:`static structure syntax <syntax-static>`.
+
 This is the most basic, simple and efficient typing style. A static structures
 (or "structure" in short) is simply a record that groups together multiple
 variables of any kind under one type.
 
-It's implemented in C as a simple C structure, and have similar behavior.
+Structures may contain methods. Methods are functions with an implicit first
+parameter named ``self`` that is a reference to an instance of the type.
 
 It is possible to declare constants and global variables inside a structure.
 They are not part of the structure record, but are like normal constants and
 global variables that are named under the type name-space.
 
-Structures may contain methods. Methods are functions with an implicit first
-parameter named ``self`` that is a reference to an instance of the type.
-
-Structures can extend other structures. An extending structure contains all
-members from all base structures, plus its own members. An extending structure
-can override methods of a base structure, other members may not be overridden.
-
-Structures are **static** - therefore their method dispatch is static. This
-means that in case of calling a method with multiple implementations - the
-method matching the static type of the instance is called. Calling a method
-with an explicit type always calls that explicit types method.
 
 .. _type-system-dynamic:
 
 Dynamic Interfaces
 ------------------
+Typing style for the :ref:`dynamic interface syntax <syntax-dynamic>`.
+
 Dynamic interfaces are the basics of dynamic dispatch in Lumi. A dynamic
 interface (or "dynamic" in short) groups together multiple dynamic members that
 will be implemented differently for multiple objectives. Dynamics can be
@@ -66,36 +63,62 @@ without any binding.
 
 Dynamic members are usually methods, but variables and references of any type
 can also be dynamic members - where each implementation initializes them with a
-different value.
+different constant value.
+
+Dynamics are always used as references and cannot be allocated because they
+have no structure. A dynamic references can be set with any type that
+implements the dynamic.
 
 "Implementing" a dynamic means implementing each dynamic method and
-initializing each dynamic variable.
+initializing each dynamic variable with a constant value.
 
-Dynamics are implemented in C as a C structure containing all the dynamic
-members, where dynamic methods are implemented as pointer to functions. Each
-implementation of the dynamic is a global instance of this structure.
+Dynamics standard method dispatch is dynamic. This means that when an
+implementing type is passed to a dynamic reference, any method called on the
+dynamic reference will use the implementing type implementation.
 
 Dynamics may contain constants and global variables, they are not dynamic
 members and behave exactly as global members in :ref:`structures
 <type-system-static>` - they are just global elements under the type
 name-space.
 
-Dynamics may also contain static methods. They also are not dynamic members and
-behave exactly as methods in :ref:`structures <type-system-static>` - they must
-be implemented, and their dispatch is static.
+Dynamics cannot have static fields, but may contain static methods. They are
+also not dynamic members and behave exactly as methods in
+:ref:`structures <type-system-static>` - they must be implemented directly in
+the dynamic, and their dispatch is static.
 
-Dynamics can extend other dynamics. An extending dynamic contains all members
-from all base dynamics, plus its own members.
 
-Dynamics are **dynamic** - therefore their method dispatch is dynamic. This
-means that in case of calling a method with multiple implementations - the
-method matching the dynamic runtime type of the instance is called. Calling a
-method with an explicit type always calls that explicit types method.
+.. _type-system-extend:
+
+Extending Types
+---------------
+Types can be extended by adding functionality to some base types.
+
+:ref:`Structures <type-system-static>` can extend other structures. An
+extending structure contains all members from all base structures, plus its own
+members. An extending structure can override methods of a base structure, other
+members may not be overridden.
+
+Structures method dispatch is **static**. This means that when an extending
+structure is passed to a base structure reference, any method called on the
+base reference will use the base structure implementation even if the extending
+structure overrode that method.
+
+:ref:`Dynamics <type-system-dynamic>` can extend other dynamics. An extending
+dynamic contains all members from all base dynamics, plus its own members.
+
+An extending structure may override any dynamic implementation of its base
+structure. Nevertheless, if an extending structure reference is passed to a
+base structure reference, and then the base structure reference is passed to a
+dynamic reference, any method call on the dynamic reference will use the base
+structure implementation because structure dispatch is static.
+
 
 .. _type-system-bind:
 
 Classes - Binding Dynamic Interfaces and Static Structures
 ----------------------------------------------------------
+Typing style for the :ref:`class syntax <syntax-bind>`.
+
 Sometimes binding together :ref:`static structures <type-system-static>` and
 :ref:`dynamic interfaces <type-system-dynamic>` under a single type is useful,
 mainly to adapt the OOP (object oriented programming) paradigm. A type with
@@ -108,50 +131,61 @@ static structure and an implicit dynamic interface - each with its respected
 members. The compiler then creates the class as a bind between these both
 implicit types.
 
-Class references are implemented using two C pointers: one for the structure,
-and one for the dynamic.
-
 Classes may extended any number of structures, dynamics, and other classes.
 The extending class implicit structure extends all base structures and the
 implicit structures of all base classes. Similarly, the extending class
 implicit dynamic extends all explicit and implicit base dynamics.
 
-Although classes have a dynamic interface, they cannot be implemented for
-another structure as dynamics, because they also have a static structure.
+Classes may also implement dynamics. Any implementation method of the dynamic
+is also dynamic in the class. As opposed to structures, if an extending
+class reference is passed to a base class reference, and then the base class
+reference is passed to a dynamic reference, any method call on the dynamic
+reference will use the the extending class implementation because class
+dispatch is also dynamic.
+
 
 .. _type-system-parameterized:
 
 Parameterized Types
 -------------------
+Typing style for the :ref:`parameterized type syntax <syntax-parameterized>`.
+
 It is possible to declare types with parameters to avoid code duplication of
 generic types. Each parameter can be either **static** or **dynamic**.
 
-Static Parameter
-++++++++++++++++
+
+Static Parameters
++++++++++++++++++
 Static parameters are like templates - for each different usage of any static
 parameter a new type will be automatically generated. Static parameters can be
-type names, or values of any type.
+type names, or constant values of a specific type.
 
-Dynamic Parameter
-+++++++++++++++++
-Dynamic parameters represent a generic type. Dynamic parameters only accept
-type names as value, and can only be used as limited types. The type is
-"limited" because only references from this type can be declared, as the memory
-footprint is unknown.
 
-The major advantage of dynamic parameters is that as oppose to static
+Dynamic Parameters
+++++++++++++++++++
+Dynamic parameters represent a generic type and only accept type names.
+
+The main advantage of dynamic parameters is that - as oppose to static
 parameters - different usage of it will **not** generated a new type.
+
+The disadvantage is that dynamic parameters can only be used as abstract
+references, as the same code handles references of different types with unknown
+structure.
+
 
 .. _type-system-embed:
 
 Embedding a Dynamic Reference in a Static Structures
 ----------------------------------------------------
+Typing style for the :ref:`embedded dynamic reference syntax <syntax-embed>`.
+
 For some memory optimization scenarios, it is better if a dynamic reference
 of a class will be implemented only with one C pointer, and the dynamic
 structure reference will be embedded inside the type static structure (as done
 in C++).
 
 Lumi will support this, but the exact implementation is still under planning.
+
 
 .. _type-system-automatic:
 
