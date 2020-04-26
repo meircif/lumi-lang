@@ -440,7 +440,7 @@ fun4(copy fun5(copy 3)->(var x))
 fun6(
         copy 2,
         copy 3)->(
-        var io,
+        var i,
         var io)
 ; @ c test-call-expression-7
 fun5(copy 4)
@@ -530,6 +530,8 @@ func ! get()->(weak String res)
     get()->(weak s)!
     s!.clear()
     res := s
+; @ c test-call-expression-29
+fun7(weak tb)->(weak t)
 ; @ ec test-call-expression-e0
 function( copy 1)
 ; @ ec test-call-expression-e1
@@ -595,6 +597,8 @@ func fun(weak String in)->(weak String out)
     out := s
 ; @ ec test-call-expression-e25
 fun0()->()
+; @ ec test-call-expression-e26
+fun6(copy i, copy i)->(var io, var io)
 ; @@ test-type-expression
 ; @ c test-type-expression-0
 Test.meth(user t!)
@@ -1281,59 +1285,59 @@ j := i
 ; @ ec test-int-range-e9
 var Uint64 x
 x := wraparound x + 1
-; @@ test-dynamic
-; @ c test-dynamic-0
+; @@ test-dynamic-call
+; @ c test-dynamic-call-0
 var Ta a
-; @ c test-dynamic-1
+; @ c test-dynamic-call-1
 user Ta? a
-; @ c test-dynamic-2
+; @ c test-dynamic-call-2
 owner Ta nta(owner Ta()!)
-; @ c test-dynamic-3
+; @ c test-dynamic-call-3
 new Ta a!
-; @ c test-dynamic-4
+; @ c test-dynamic-call-4
 user Ta? a(user ta!)
-; @ c test-dynamic-5
+; @ c test-dynamic-call-5
 user Ta? x
 x := ta!
-; @ c test-dynamic-6
+; @ c test-dynamic-call-6
 ta := tb
-; @ c test-dynamic-7
+; @ c test-dynamic-call-7
 ta := tc
-; @ c test-dynamic-8
+; @ c test-dynamic-call-8
 ta := _
-; @ c test-dynamic-9
+; @ c test-dynamic-call-9
 strong Array?{Ta} aa
 ta := aa![4]!
-; @ c test-dynamic-10
+; @ c test-dynamic-call-10
 strong Array?{Tc} ca
 ta := ca![4]!
-; @ c test-dynamic-11
+; @ c test-dynamic-call-11
 ta!.dyn()
-; @ c test-dynamic-12
+; @ c test-dynamic-call-12
 tb!.dyn()
-; @ c test-dynamic-13
+; @ c test-dynamic-call-13
 tc!.dyn()
-; @ c test-dynamic-14
+; @ c test-dynamic-call-14
 tco := tc
 tco!.dyn()
-; @ c test-dynamic-15
+; @ c test-dynamic-call-15
 fun7(weak tc)->(weak ta)
-; @ g test-dynamic-16
+; @ g test-dynamic-call-16
 class Test
     var Uint32 x
     func dynamic user meth()
 func ! mock()->(weak Test? t)
     t!.meth()
-; @ g test-dynamic-17
+; @ g test-dynamic-call-17
 class Base
     var Uint32 x
     func dynamic user meth()
 class Test(Base)
     func inst user fun()
         self.meth()
-; @ c test-dynamic-18
+; @ c test-dynamic-call-18
 fun7(weak _)
-; @ eg test-dynamic-e0
+; @ eg test-dynamic-call-e0
 class Test
     var Uint32 x
     func dynamic weak? meth()
@@ -1824,6 +1828,277 @@ struct Aerror(Berror)
     var Uint32 x
 struct Berror(Aerror)
     var Uint32 x
+; @@ test-dynamic
+; @ g test-dynamic-0
+dynamic Test
+    func user fun()
+    func weak wf()
+struct Some
+    var Uint8 x
+    owner Test? t
+    func user fun()
+        self.x := 3
+support Test in Some
+    func weak wf()
+owner Test? gt
+func ! fun(user Test? t)->(user Some? so, user Test? to)
+    so := _
+    to := t
+    t!.fun()
+    so!.fun()
+    to := so
+    to := _
+    fun(user t)->(user so, user to)!
+    fun(user _)->(user so)!
+    user Test? t2
+    fun(user so)->(user to, user t2)!
+func sfun(strong Some s)
+    s.wf()
+    user Test? tc(user s)
+    strong Test t
+    t := s
+    t.fun()
+    t.wf()
+; @ g test-dynamic-1
+dynamic Test
+    func user fun()
+    func weak wf()
+    func user another()
+class Some
+    var Uint8 x
+    func dynamic user fun()
+        self.x := 4
+    func inst user another()
+support Test in Some
+    func weak wf()
+func ! fun(user Test? t)->(user Some? so)
+    so := _
+    user Test? tu(user so)
+    so!.fun()
+    so!.another()
+    fun(user so)->(user tu)!
+func sfun(strong Some s)
+    s.wf()
+    strong Test t
+    t := s
+    t.fun()
+    t.another()
+    t.wf()
+; @ g test-dynamic-2
+struct Base
+    var Bool x
+struct Mid(Base)
+struct Top(Mid)
+dynamic Da
+    func user fa()
+dynamic Db
+    func user fb()
+dynamic Dc
+    func user fc()
+support Da in Base
+    func user fa()
+support Da in Mid
+    func user fa()
+support Da in Top
+    func user fa()
+support Db in Base
+    func user fb()
+support Dc in Mid
+    func user fc()
+func fun(user Base b, user Mid m, user Top t)->(
+        user Da da, user Db db, user Dc dc)
+    da := b
+    da := m
+    da := t
+    db := b
+    db := m
+    db := t
+    dc := m
+    dc := t
+; @ g test-dynamic-3
+struct Base
+    var Bool x
+class Low(Base)
+    func dynamic user meth()
+class Mid(Low)
+class Top(Mid)
+dynamic Da
+    func user fa()
+dynamic Db
+    func user fb()
+dynamic Dc
+    func user fc()
+support Da in Base
+    func user fa()
+support Da in Low
+    func user fa()
+support Da in Mid
+    func user fa()
+support Da in Top
+    func user fa()
+support Db in Base
+    func user fb()
+support Dc in Mid
+    func user fc()
+func dyn(user Da da, user Db db, user Dc dc)
+func fun(user Base b, user Low l, user Mid m, user Top t)->(
+        user Da da, user Db db, user Dc dc)
+    da := b
+    da := l
+    da := m
+    da := t
+    db := b
+    db := l
+    db := m
+    db := t
+    dc := m
+    dc := t
+    dyn(user t, user t, user t)
+; @ g test-dynamic-4
+struct Data{Generic}
+    weak Generic? d
+    func user meth(weak Generic? in)->(weak Generic? out)
+dynamic Test
+    func user fun()
+struct MyStruct
+    var Bool x
+class MyClass
+    var Bool x
+support Test in MyStruct
+    func user fun()
+support Test in MyClass
+    func user fun()
+func fun(user Data{Test} dt, user Data{MyStruct} ds, user Data{MyClass} dc)
+    weak Test? t
+    t := dt.d
+    dt.d := t
+    dt.meth(weak t)->(weak t)
+    t := ds.d
+    ds.meth(weak _)->(weak t)
+    t := dc.d
+    dc.meth(weak _)->(weak t)
+; @ tg test-dynamic-5
+struct Some
+    var Bool x
+    func user fun()
+        self.x := true
+dynamic Test
+    func user fun()
+    func user test()
+; @-
+module second
+var Bool b
+support ut.Test in ut.Some
+    func user test()
+        self.x := b
+test dummy()
+; @ g test-dynamic-6
+support Da in Test
+    func user fa()
+struct Test
+    var Int x
+dynamic Da
+    func user fa()
+dynamic Db
+    func user fb()
+support Db in Test
+    func user fb()
+; @ eg test-dynamic-e0
+class Error
+    var Bool x
+    func dynamic user meth()
+struct Test
+    var Bool x
+support Error in Test
+; @ eg test-dynamic-e1
+dynamic Test
+    func user test()
+dynamic Error
+    func user error()
+support Test in Error
+; @ eg test-dynamic-e2
+struct Some
+    var Bool x
+    func user fun()
+dynamic Test
+    func user fun()
+support Test in Some
+support Test in Some
+; @ eg test-dynamic-e3
+struct Error
+    var Bool x
+dynamic Test
+    func user fun()
+support Test in Error
+; @ eg test-dynamic-e4
+dynamic Error
+; @ eg test-dynamic-e5
+struct Test
+    var Bool x
+dynamic Error(Test)
+    func user fun()
+; @ eg test-dynamic-e7
+dynamic Test
+    func user fun()->(var Bool b)
+        b := false
+; @ eg test-dynamic-e8
+dynamic Test
+    func user fun()
+func fun()
+    var Test t
+; @ eg test-dynamic-e9
+dynamic Test
+    func user fun()
+struct Error
+    var Test t
+; @ eg test-dynamic-e10
+dynamic Test
+    func user fun()
+struct Error
+    weak Array?{Test} a
+; @ eg test-dynamic-e11
+dynamic Test
+    func user fun()
+func ! fun()
+    new Test t!
+; @ eg test-dynamic-e12
+dynamic Test
+    func user fun()
+func ! fun()->(owner Test t)
+    t := Test()!
+; @ eg test-dynamic-e12a
+support Error
+; @ feg test-dynamic-e13
+support Test in Error
+; @ eg test-dynamic-e14
+support Error{Gen} in Test
+; @ eg test-dynamic-e15
+support Test in Error{Gen}
+; @ eg test-dynamic-de0
+dynamic Error
+    var Bool x
+    func user fun()
+; @ eg test-dynamic-de1
+dynamic Test
+    func user fun()
+support Test in String
+    func user fun()
+; @ eg test-dynamic-de2
+dynamic Test
+    func user fun()
+support Test in Bool
+    func user fun()
+; @ eg test-dynamic-de3
+native struct Some
+dynamic Test
+    func user fun()
+support Test in Some
+    func user fun()
+; @ eg test-dynamic-de4
+dynamic Base
+    func user fun()
+dynamic Test(Base)
+    func user test()
 ; @@ test-class
 ; @ g test-class-0
 class Base
@@ -1865,24 +2140,19 @@ class Error
 class Error
     func error f()
 ; @ eg test-class-e3
-struct Base
-    var Uint32 x
-    func user meth()
-class Error(Base)
-    func dynamic user meth()
-; @ eg test-class-e4
+
 class Base
     var Uint32 x
     func dynamic user meth()
 class Error(Base)
     func inst user meth()
-; @ eg test-class-e5
+; @ eg test-class-e4
 class Base
     var Uint32 x
     func dynamic user meth()
 class Error(Base)
     func dynamic user meth(copy Uint32 x)
-; @ eg test-class-e6
+; @ eg test-class-e5
 class Base
     var Uint32 x
     func dynamic user meth()
@@ -2121,6 +2391,7 @@ struct Test
     var Uint32 name
 ; @ eg test-members-e2
 struct Test
+    var Bool x
     func user name()
     func user name()
 ; @ eg test-members-e3
@@ -2342,6 +2613,12 @@ struct Test(Base)
     new()
         base()
         self.y := 3
+; @ c test-initialize-22
+if b
+    new Test nt!
+    new Ta nta!
+    new Tb ntb(copy 3)!
+    new Tc ntc(copy 4)!
 ; @ ec test-initialize-e0
 Uint32()
 ; @ ec test-initialize-e1
@@ -3326,6 +3603,14 @@ func Test.meth(weak Param? in)->(weak Param? out)
     out := p
     self.item := p
     self.meth(weak p)->(weak p)
+; @ c test-parameter-type-22
+user Data?{Tb} db
+db!.item := tb
+db!.item := _
+ta := db!.item
+db.set(owner tb)
+db.set(owner _)
+db.get()->(weak ta)
 ; @ eg test-parameter-type-eg0
 struct Test{First:Second:Third
 ; @ eg test-parameter-type-eg1

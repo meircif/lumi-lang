@@ -205,7 +205,7 @@ typedef struct Error_Messages {
 #define ARRAY_DEL(Type, array, length) if (array != NULL) { \
   Seq_Length LUMI_n = 0; \
   for (; LUMI_n < length; ++LUMI_n) \
-    Type##_Del(array + LUMI_n); \
+    Type##_Del(array + LUMI_n, NULL); \
   }
 
 #define ARRAY_DEL_DYN(Type, array, length) if (array != NULL) { \
@@ -214,16 +214,16 @@ typedef struct Error_Messages {
     Type##_Del(array + LUMI_n, &Type##_dynamic); \
   }
 
-#define SELF_REF_DEL(Type, field) \
+#define SELF_REF_DEL(Type, field, _) \
 while (self->field != NULL) { \
   Type* value = self->field; \
   self->field = value->field; \
   value->field = NULL; \
-  Type##_Del(value); \
+  Type##_Del(value, NULL); \
   free(value); \
 }
 
-#define SELF_REF_DEL_STR(Type, field) \
+#define SELF_REF_DEL_STR(Type, field, _) \
 while (self->field != NULL) { \
   Type* value = self->field; \
   Ref_Manager* value_Refman = self->field##_Refman; \
@@ -231,7 +231,7 @@ while (self->field != NULL) { \
   self->field##_Refman = value->field##_Refman; \
   value->field = NULL; \
   value->field##_Refman = NULL; \
-  Type##_Del(value); \
+  Type##_Del(value, NULL); \
   LUMI_owner_dec_ref(value_Refman); \
 }
 
@@ -292,11 +292,13 @@ while (self->field != NULL) { \
 
 #define SAFE_SUM_LARGER(a, b, c) a > c || b > c - a
 
+#define NULL_OR_VALUE(base, value) base != NULL? value: NULL
 
-#define Buffer_Del(name) do { if (name##_Length != &Lumi_empty_length) { \
+
+#define Buffer_Del(name, _) do { if (name##_Length != &Lumi_empty_length) { \
   free(name##_Length); \
   name##_Length = &Lumi_empty_length; } } while (false)
-#define String_Del(name) Buffer_Del(name)
+#define String_Del(name, _) Buffer_Del(name, _)
 
 
 /* traceback */
@@ -1003,18 +1005,18 @@ void String_has(
 
 /* File */
 
-void File_Del(File* self) {
+void File_Del(File* self, void* _) {
   if (self != NULL && self->fobj != NULL) {
     fclose(self->fobj);
     self->fobj = NULL;
   }
 }
-#define FileReadText_Del(self) File_Del(self)
-#define FileReadBinary_Del(self) File_Del(self)
-#define FileWriteText_Del(self) File_Del(self)
-#define FileWriteBinary_Del(self) File_Del(self)
-#define FileReadWriteText_Del(self) File_Del(self)
-#define FileReadWriteBinary_Del(self) File_Del(self)
+#define FileReadText_Del(self, _) File_Del(self, _)
+#define FileReadBinary_Del(self, _) File_Del(self, _)
+#define FileWriteText_Del(self, _) File_Del(self, _)
+#define FileWriteBinary_Del(self, _) File_Del(self, _)
+#define FileReadWriteText_Del(self, _) File_Del(self, _)
+#define FileReadWriteBinary_Del(self, _) File_Del(self, _)
 
 Generic_Type_Dynamic File_dynamic = { (Dynamic_Del)File_Del };
 #define FileReadText_dynamic File_dynamic

@@ -157,10 +157,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
                     user variable, user parent-type, user data-type)
             if variable.access = Access.VAR
                 return
-        if parent-type?
-            write-spaces(copy INDENTATION-SPACES)
-        else
-            self.write-spaces()
+        self.write-spaces()
         
         if access-has-refman(copy variable.access)
             write(user "LUMI_")
@@ -186,14 +183,14 @@ class SyntaxTreeBranch(SyntaxTreeNode)
             user TypeInstance data-type)
         if variable.type-instance.type-data is glob.type-array and
                 data-type.type-data.is-buffered()
-            write-spaces(copy INDENTATION-SPACES)
+            self.write-spaces()
             write(user "free(")
             if parent-type?
                 write(user "self->")
             write-cname(user variable.name)
             write(user "_Seq_length);\n")
             return
-        write-spaces(copy INDENTATION-SPACES)
+        self.write-spaces()
         if variable.type-instance.type-data is parent-type
             write(user "SELF_REF_DEL")
             if variable.access = Access.STRONG
@@ -204,11 +201,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
             parent-type.write-cname()
             write(user ", ")
             if parent-type.is-dynamic
-                user TypeData base-type(user parent-type)
-                do
-                    while base-type.base-type?
-                    write(user "_base.")
-                    base-type := base-type.base-type.type-data
+                parent-type.write-all-bases()
                 write(user "_, ")
             parent-type := _
         else-if variable.type-instance.type-data.is-dynamic
@@ -221,12 +214,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
                 write(user "self->")
             write-cname(user variable.name)
             write(user "_Dynamic->")
-            user TypeData base-data(user data-type.type-data)
-            do
-                while base-data.base-type?
-                base-data := base-data.base-type.type-data
-                while base-data.is-dynamic
-                write(user "_base.")
+            data-type.type-data.write-all-bases()
             write(user "_del(")
         else-if variable.type-instance.type-data is glob.type-array
             write(user "ARRAY_DEL")
@@ -241,21 +229,20 @@ class SyntaxTreeBranch(SyntaxTreeNode)
         if parent-type?
             write(user "self->")
         write-cname(user variable.name)
+        write(user ", ")
         if variable.type-instance.type-data.is-dynamic
-            write(user ", ")
             if parent-type?
                 write(user "self->")
             write-cname(user variable.name)
-            write(user "_Dynamic")
-        if variable.type-instance.type-data is glob.type-array
-            write(user ", ")
+            write(user "_Dynamic);\n")
+        else-if variable.type-instance.type-data is glob.type-array
             if parent-type?
                 write(user "self->")
             write-cname(user variable.name)
             write(user "_Length")
             write(user ")\n")
         else
-            write(user ");\n")
+            write(user "NULL);\n")
     
     func inst write-var-cleanup(
             user SyntaxTreeVariable variable,
@@ -264,7 +251,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
         if data-type.type-data.is-primitive or
                 data-type.type-data.is-buffered()
             return
-        write-spaces(copy INDENTATION-SPACES)
+        self.write-spaces()
         if variable.type-instance.type-data is glob.type-array
             write(user "ARRAY_DEL")
             if data-type.type-data.is-dynamic
@@ -293,10 +280,13 @@ class SyntaxTreeBranch(SyntaxTreeNode)
             write-cname(user variable.name)
             if parent-type?
                 write(user ")")
+            write(user ", ")
             if data-type.type-data.is-dynamic
-                write(user ", &")
+                write(user "&")
                 data-type.write-cname()
                 write(user "_dynamic")
+            else
+                write(user "NULL")
             write(user ");\n")
 
 

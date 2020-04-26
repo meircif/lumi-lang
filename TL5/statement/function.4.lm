@@ -40,7 +40,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         self.parent-type := parent-type
         if self.parent-type?
             self.indentation-spaces := INDENTATION-SPACES
-            if self.parent-type.is-dynamic
+            if self.parent-type.is-struct and self.parent-type.is-dynamic
                 user String meth-type
                 read-until(user " ", copy false)->(user meth-type)
                 if meth-type.equal(user "dynamic")
@@ -50,6 +50,8 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
                             user "expected \"dynamic\" or \"inst\" method \
                             type, got",
                             user meth-type)
+            else
+                self.is-dynamic := self.parent-type.is-dynamic
             user String access-str
             read-until(user " ?(", copy false)->(user access-str)
             if glob.last-char = '?'
@@ -60,13 +62,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
             self.get-access(user access-str)->(var self.self-access)
         self.parse-header(copy false)
         self.parse-body()
-    
-    func inst parse-body()
-        if self.header-only
-            return
-        self.indentation-spaces += INDENTATION-SPACES
-        self.parse-block()
-        self.indentation-spaces := INDENTATION-SPACES
     
     func inst parse-header(copy Bool is-native)
         read-new(user "!.(")->(owner self.name)
@@ -94,13 +89,6 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
             self.register-name()
         self.parse-arguments(copy is-native)
     
-    func inst add-self-parameter()
-        self.arguments.add-self-parameter(
-                user self.parent-type,
-                copy self.self-access,
-                copy self.self-conditional,
-                user self)
-    
     func inst parse-arguments(copy Bool is-native)
         var DeclarationArgumentFactory argument-factory
         var SyntaxTreeCode dummy-node(user self)
@@ -112,21 +100,37 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
                 copy self.indentation-spaces)
         if self.parent-type?
             self.add-self-parameter()
-        if glob.last-char = ' ' and self.parent-type?
-            read-c()
-            self.header-only := glob.last-char = '_'
-            if self.header-only
+            self.parent-type.is-only-dynamic()->(var self.header-only)
+            if not self.header-only and glob.last-char = ' '
                 read-c()
-            else
-                glob.last-char := ' '
+                self.header-only := glob.last-char = '_'
+                if self.header-only
+                    read-c()
+                else
+                    glob.last-char := ' '
+            
+    func inst parse-body()
+        if self.header-only
+            return
+        self.indentation-spaces += INDENTATION-SPACES
+        self.parse-block()
+        self.indentation-spaces := INDENTATION-SPACES
+            
+    func inst add-self-parameter()
+        self.arguments.add-self-parameter(
+                user self.parent-type,
+                copy self.self-access,
+                copy self.self-conditional,
+                user self)
     
     func dynamic register-name()
         if not is-legal-name(user self.name, copy NameGroup.DEFAULT)
             self.syntax-error(user "illegal function name", user self.name)
         if self.parent-type?
             user SyntaxTreeFunction meth
-            self.parent-type.find-meth(user self.name)->(user meth)
-            if meth?
+            var Int bases
+            self.parent-type.find-meth(user self.name)->(user meth, var bases)
+            if meth? and bases = 0
                 self.syntax-error(user "redefinition of method", user self.name)
             user SyntaxTreeVariable field
             self.parent-type.find-field(user self.name)->(user field)
@@ -627,7 +631,11 @@ class DeclarationArgument(Argument)
         
         else
             ; `type`[*][*] `name`
-            self.variable.type-instance.write-cname()
+            if self.variable.type-instance.type-data.is-primitive or
+                    self.variable.type-instance.type-data.is-struct
+                self.variable.type-instance.write-cname()
+            else
+                write(user "void")
             if not self.variable.type-instance.type-data.is-primitive
                 write(user "*")
             self.write-name-param(user _, user _)
@@ -636,12 +644,21 @@ class DeclarationArgument(Argument)
             ; , Ref_Manager* `name`_Refman
             self.write-name-param(user ", Ref_Manager*", user "_Refman")
         
-        if self.variable.type-instance.type-data.is-dynamic and
-                not self.is-native
+        if self.variable.type-instance.type-data.is-only-dynamic() and
+                self.is-dynamic-self
+            ; , void* `name`_dynamic
+            write(user ", ")
+            self.write-name-param(user "void*", user "_Dynamic")
+        else-if (self.variable.type-instance.type-data.is-dynamic and
+                not self.is-native) or self.is-dynamic-self
             ; , `type`_Dynamic*[*] `name`_Dynamic
             write(user ", ")
             self.variable.type-instance.write-cname()
-            self.write-name-param(user "_Dynamic*", user "_Dynamic")
+            if self.variable.type-instance.type-data.is-struct
+                self.write-name-param(user "_Dynamic*", user "_Dynamic")
+            else
+                self.write-name-param(user "*", user "_Dynamic")
+                
     
     func inst write-name-param(user String prefix, user String suffix)
         ; `prefix`[*] `name``suffix`

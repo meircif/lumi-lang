@@ -92,7 +92,7 @@ class LumiLexer(RegexLexer):
              r'[:><]=)[ \n]', token.Operator),
             (r'[?:.]', token.Operator),
             (r'->', token.Operator),
-            (r'^ *(module|func|const|struct|class|interface|main|enum|'
+            (r'^ *(module|func|const|struct|class|support|main|enum|'
              r'native(?: func| var| const| struct| type| code)?|test|mock|'
              r'alias|for|new|return|raise|assert!?|assert-error!?|try|catch|'
              r'if|else|else-if|loop!?|loop-infinite|while|break|continue|'

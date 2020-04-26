@@ -34,6 +34,9 @@ Members of struct can be accessed using ``.`` operator::
    struct-variable.integer-variable := 3
    struct-variable.string-reference := "some string"
 
+Structures are implemented in C as simple C structures. Structure references
+are implemented as pointers to the C structure.
+
 
 .. _global-members:
 
@@ -197,38 +200,43 @@ Example for the **static** dispatch of structures::
    BaseStruct.method(var extending-struct, copy 4)  ; will call BaseStruct.method
 
 
+.. _syntax-dynamic:
+
 Dynamic Interfaces
 ------------------
 Syntax for the :ref:`dynamic interface typing style <type-system-dynamic>`.
 
-This is not supported yet in :ref:`TL5 <syntax-tl5>`.
-
-Dynamics are declared using the ``dynamic`` keyword::
+Dynamic interfaces (or "dynamics" in short) are declared using the ``dynamic``
+keyword::
 
    dynamic ExampleDynamic
        func dynamic-method(copy Uint32 num)
        func another-method()->(var Uint32 result)
        var Uint32 dynamic-variable
 
-Dynamics are always used as ``user`` access references, as there is nothing to
-"allocate". Because the most common implementations of dynamics are for a
-specific :ref:`structure <syntax-static>`, dynamic references also hold an
-additional reference to a generic structure which is passed to the methods as
-the first ``self`` parameter. ::
+Dynamic variables are not supported in :ref:`TL5 <syntax-tl5>`.
 
-   var ImplementingStructure implementing-structure
-   user ExampleDynamic dynamic-reference(user implementing-structure)
-   dynamic-reference.dynamic-method(copy 4)
+Dynamics are always used as references and cannot be allocated because they
+have no structure::
+   
+   func use-dynamic(user ExampleDynamic example)
+      example.dynamic-method(copy 3)
 
-Using a pure dynamic without the binding can be done with the built-in
-``Dynamic`` type, that only accepts implemented dynamic type names as value::
+Now ``use-dynamic`` function can be called with any item that implements
+``ExampleDynamic``.
 
-   user Dynamic{ExampleDynamic} dynamic-reference(user ExtendingDynamic)
-   dynamic-reference.dynamic-method(copy 4)
+
+Dynamics are implemented in C as a C structure containing all the dynamic
+members, where dynamic methods are implemented as pointer to functions. Each
+implementation of the dynamic is a global instance of this structure. Dynamic
+references are implemented as 2 references: one reference to the
+dynamic structure and another reference to the implementing type instance.
 
 
 Non-Dynamic Members
 +++++++++++++++++++
+This is not supported in :ref:`TL5 <syntax-tl5>`.
+
 Constants and global variables are declared and used exactly as :ref:`global
 members in static structures <global-members>`.
 
@@ -242,49 +250,89 @@ Static methods must be declared using ``static`` prefix::
 
 Extending Dynamics
 ++++++++++++++++++
+This is not supported in :ref:`TL5 <syntax-tl5>`.
+
 Same syntax as structures::
 
    dynamic ExtendingDynamic(BaseDynamic, OtherBaseDynamic)
        func additional-method(copy Uint32 num)
 
 
-Implementing Dynamics
-+++++++++++++++++++++
-The most common implementations of dynamics are for a specific
-:ref:`structure <type-system-static>`. This can be done using the ``implement``
-keyword. All the dynamic members must be implemented. Method implementations
-can use ``self`` and ``global`` keywords to access its own members, and also
-members of the implemented dynamic. ::
+.. _support-structure:
 
-   implement ExampleDynamic for ExampleStructure
-       func dynamic-method(copy Uint32 num)
+Support Dynamics in Structures
+++++++++++++++++++++++++++++++
+A :ref:`structure <syntax-static>` can support a dynamic by implementing all
+its dynamic members and explicitly declare it using the ``support`` keyword.
+some implemented members may be added under the ``support`` line::
+   
+   struct ExampleStructure
+       func method(copy Uint32 num)
            ; implementation...
+
+   support ExampleDynamic in ExampleStructure
        func another-method()->(var Uint32 result)
            ; another implementation...
-       var Uint32 dynamic-variable(copy 4)
 
-A dynamic may implement some or all of its members and its base dynamics
-members. Method implementations can use ``self`` and ``global`` keywords to
-access its own members. ::
+When a :ref:`structure <syntax-static>` supports a dynamic, every structure
+that extends it also supports the dynamic using the base structure
+implementation. The extending structure may override some members of the
+dynamic, but to use these overrides as the implementation of the dynamic
+another ``support`` statement for the extended structure must be added::
+   
+   struct BaseStruct
+       func method(copy Uint32 num)
+           ; base implementation...
+   
+   support ExampleDynamic in BaseStruct
+   
+   struct ExtendingStruct(BaseStruct)
+       func method(copy Uint32 num)
+           ; overriding implementation...
+   
+   support ExampleDynamic in ExtendingStruct
+
+Example for the **dynamic** dispatch of dynamics::
+
+   var ExampleStructure example-struct
+   var ExtendingStruct extending-struct
+   user BaseStruct base-struct(user extending-struct)
+   user ExampleDynamic example-dynamic
+   
+   example-dynamic := example-struct
+   example-dynamic.method(copy 4)  ; will call ExampleStructure.method
+   
+   example-dynamic := extending-struct
+   example-dynamic.method(copy 4)  ; will call ExtendingStruct.method
+   
+   example-dynamic := base-struct
+   example-dynamic.method(copy 4)  ; will call BaseStruct.method
+   ; will not call ExtendingStruct.method becasue structure dispach is static
+
+
+Default Dynamic Member Implementation
++++++++++++++++++++++++++++++++++++++
+This is not supported in :ref:`TL5 <syntax-tl5>`.
+
+A dynamic may give a default implementation to some or all of its members and
+its base dynamics members. Method implementations can use ``self`` and
+``global`` keywords to access its own members. ::
 
    dynamic ExampleDynamic
        func implemented-method(copy Uint32 num) _
        func unimplemented-method()->(var Uint32 result)
        var Uint32 implemented-variable(copy 5)
-      var Uint32 unimplemented-variable
+       var Uint32 unimplemented-variable
 
    func ExampleDynamic.implemented-method(copy Uint32 num) _
        ; implementation...
-
-When a dynamic implements all its and its base dynamics members, it's
-considered as implemented and can be used as a value to ``Dynamic`` references.
 
 
 .. _syntax-bind:
 
 Classes and Binds
 -----------------
-Syntax for the :ref:`class typing style <type-system-static>`.
+Syntax for the :ref:`class typing style <type-system-bind>`.
 
 In :ref:`TL5 <syntax-tl5>` this only partially implemented:
 
@@ -311,6 +359,12 @@ defined under the name-space of the class. ::
        dynamic func dynamic-method(copy Uint32 num)  ; part of the implicit dynamic
        global var Uint32 global-variable  ; defined under the class name-space
 
+Classes can implement dynamics using the :ref:`same syntax as structures
+<support-structure>`.
+
+Class references are implemented using two C pointers: one for the structure,
+and one for the dynamic.
+
 
 Extending Classes
 +++++++++++++++++
@@ -320,11 +374,29 @@ As all types::
        static var Uint32 addition-static-field
        dynamic func addition-dynamic-method(copy Uint32 num)
 
-In :ref:`TL5 <syntax-tl5>` a class may only extend one other type.
+In :ref:`TL5 <syntax-tl5>` a class may only extend one other class or
+structure.
+
+Example for the **dynamic** dispatch of classes::
+
+   var ExtendingClass extending-class
+   user BaseClass base-class(user extending-class)
+   user ExampleDynamic example-dynamic
+   
+   extending-class.method()  ; will call ExtendingClass.method
+   base-class.method()  ; will call ExtendingClass.method
+
+   example-dynamic := extending-struct
+   example-dynamic.method()  ; will call ExtendingStruct.method
+
+   example-dynamic := base-struct
+   example-dynamic.method()  ; will call ExtendingStruct.method
 
 
 Using the Implicit Structure or Dynamic of a Class
 ++++++++++++++++++++++++++++++++++++++++++++++++++
+This is not supported in :ref:`TL5 <syntax-tl5>`.
+
 The implicit structure of a class can be used using the built-in ``Struct``
 type, and the implicit dynamic can be used using the built-in ``Dynamic``
 type. This is not supported in :ref:`TL5 <syntax-tl5>`. ::
@@ -333,19 +405,12 @@ type. This is not supported in :ref:`TL5 <syntax-tl5>`. ::
    user Dynamic{ExampleClass} dynamic-interface-only
 
 
+.. _syntax-parameterized:
+
 Parameterized Types
 -------------------
-Syntax for the :ref:`parameterized type typing style <type-system-static>`.
-
-This is partially supported in :ref:`TL5 <syntax-tl5>`:
-
-* Only dynamic parameters are supported
-* Only the parameter name is needed
-* Some types are not supported as parameter values:
-
-   * any primitive type
-   * String
-   * Array
+Syntax for the :ref:`parameterized type typing style
+<type-system-parameterized>`.
 
 Each type parameter must have a type and a name. For static type names ``Type``
 should be used as the parameter type, and for dynamic parameters ``Generic``
@@ -363,11 +428,23 @@ each parameter ::
 
    var ParametrizedType{8:Uint32:File} specific-variable
 
+This is partially supported in :ref:`TL5 <syntax-tl5>`:
+
+* only dynamic parameters are supported (``Generic`` type)
+* no need to add ``Generic`` - only the parameter name is needed
+* some types are not supported as parameter values:
+
+   * any primitive type
+   * String
+   * Array
+
+
+.. _syntax-embed:
 
 Embedded Dynamic Reference
 --------------------------
 Syntax for the :ref:`embedded dynamic reference typing style
-<type-system-static>`.
+<type-system-embed>`.
 
 This is not supported in :ref:`TL5 <syntax-tl5>`.
 

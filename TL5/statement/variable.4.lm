@@ -36,6 +36,10 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         self.parent-type := parent-type
         self.access := access
         self.is-create := is-create
+        if self.parent-type?
+            if self.parent-type.is-only-dynamic()
+                self.syntax-error-msg(
+                        user "fileds inside dynamics not supported yet")
         self.type-instance := TypeInstance()
         if self.is-create
             self.type-instance.parse(
@@ -129,6 +133,11 @@ class SyntaxTreeVariable(SyntaxTreeCode)
                     user self.type-instance.name)
         if access-is-only-var(copy self.access)
             self.type-instance.check-sequence(user self)
+            if self.type-instance.type-data.is-only-dynamic()
+                self.syntax-error(
+                        user "cannot create variable from type without \
+                        structure",
+                        user self.type-instance.type-data.name)
         if not self.parent? and not self.parent-type?
             if self.access = Access.USER or self.access = Access.TEMP
                 self.syntax-error(
@@ -185,16 +194,19 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             self.write-var()
         
         ; `type` `name`[ = 0];
-        ; `type`* `name`[ = NULL];
+        ; `type|void`* `name`[ = NULL];
         ; Ref_Manager* `name`_Refman[ = NULL];
         if self.type-instance.type-data is glob.type-func
             self.type-instance.arguments.write-pointer(user self.name)
         else
-            self.type-instance.write-cname()
-            if not self.type-instance.type-data.is-primitive and
-                    not (self.parent-type? and
-                    access-is-only-var(copy self.access))
-                write(user "*")
+            if self.type-instance.type-data.is-only-dynamic()
+                write(user "void*")
+            else
+                self.type-instance.write-cname()
+                if not self.type-instance.type-data.is-primitive and
+                        not (self.parent-type? and
+                        access-is-only-var(copy self.access))
+                    write(user "*")
             write(user " ")
             self.write-cname()
         
@@ -365,10 +377,12 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         write(user ";\n")
     
     func inst write-dynamic()
-        ; `type`_Dynamic* `name`_Dynamic[ = `type`_dynamic];
+        ; `type`[_Dynamic]* `name`_Dynamic[ = `type`_dynamic];
         self.write-spaces()
         self.type-instance.write-cname()
-        write(user "_Dynamic* ")
+        if self.type-instance.type-data.is-struct
+            write(user "_Dynamic")
+        write(user "* ")
         self.write-cname()
         write(user "_Dynamic")
         if not self.parent-type?

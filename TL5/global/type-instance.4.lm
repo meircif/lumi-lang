@@ -337,13 +337,18 @@ struct TypeInstance
         if self.type-data is glob.type-array
             if not self.parameters?
                 node.syntax-error-msg(user "missing subtype for array")
-            if self.parameters.first.item.type-data.constructor?
+            user TypeData item-type(user self.parameters.first.item.type-data)
+            if item-type.constructor?
                 node.syntax-error(
                         user "array of type with constructor",
-                        user self.parameters.first.item.type-data.name)
-            if self.parameters.first.item.type-data is glob.type-generic
+                        user item-type.name)
+            if item-type is glob.type-generic
                 node.syntax-error-msg(
                         user "generic arrays not supported")
+            if item-type.is-dynamic and not item-type.is-struct
+                node.syntax-error(
+                        user "array of type without structure",
+                        user item-type.name)
         else-if self.parameters?
             if not self.type-data.parameters?
                 node.syntax-error(
@@ -526,6 +531,8 @@ struct TypeInstance
         do
             while not target.type-data.is-same(
                     user self-type-instance.type-data)
+            while not self-type-instance.type-data.supported-dynamics.find(
+                    user target.type-data.name)?
             if not self-type-instance.type-data.base-type?
                 assert node?
                 node.syntax-error2(

@@ -120,10 +120,19 @@ class SyntaxTreeRoot(GlobalNodes)
             self.variables.add(owner SyntaxTreeConstant.parse-new(user _))
             
         else-if self.equal-and-space(user keyword, user "struct")
-            self.types.add(owner TypeData.parse-new(user _, copy false))
+            self.types.add(owner TypeData.parse-new(
+                    user _, copy true, copy false))
+            
+        else-if self.equal-and-space(user keyword, user "dynamic")
+            self.types.add(owner TypeData.parse-new(
+                    user _, copy false, copy true))
             
         else-if self.equal-and-space(user keyword, user "class")
-            self.types.add(owner TypeData.parse-new(user _, copy true))
+            self.types.add(owner TypeData.parse-new(
+                    user _, copy true, copy true))
+            
+        else-if self.equal-and-space(user keyword, user "support")
+            self.types.add(owner SupportDynamic.parse-new(user _))
             
         else-if self.equal-and-space(user keyword, user "enum")
             self.enums.add(owner EnumData.parse-new(user _))

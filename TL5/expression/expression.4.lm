@@ -369,6 +369,30 @@ class Expression(SyntaxTreeNode)
         else
             self.write()
             write(user prefix)
+        
+    func inst write-support-name(user TypeInstance dynamic)
+        if self.result-type.conditional and dynamic.conditional
+            write(user "NULL_OR_VALUE(")
+            self.write()
+            write(user ", ")
+        write(user "&")
+        user TypeData support-type-data
+        var Int support-bases
+        self.result-type.type-data.find-support-type(user dynamic.type-data)->(
+                user support-type-data, var support-bases)
+        write(user "(")
+        if self.result-type.type-data.is-dynamic
+            self.write-dynamic-safe()
+            write(user "->")
+        else
+            self.result-type.write-cname()
+            write(user "_dynamic.")
+        self.write-bases(copy support-bases)
+        write(user "_")
+        dynamic.write-cname()
+        write(user ")")
+        if self.result-type.conditional and dynamic.conditional
+            write(user ")")
     
     func dynamic write-cast()
         self.write()

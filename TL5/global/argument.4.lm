@@ -7,6 +7,7 @@ class Argument(SyntaxTreeNode)
     var Int access
     var Bool is-output
     var Bool is-native
+    var Bool is-dynamic-self
 
     new()
         self.set-location()
@@ -148,6 +149,7 @@ class FunctionArguments(SyntaxTreeNode)
             user SyntaxTreeBlock parent)
         new DeclarationArgument self-args
         self-args.access := access
+        type-data.is-only-dynamic()->(var self-args.is-dynamic-self)
         self-args.variable := SyntaxTreeVariable(user _)
         self-args.variable.access := self-args.access
         self-args.variable.parent := parent

@@ -70,7 +70,9 @@ class TypeCastExpression(WrapExpression)
     func dynamic write-dynamic-cast()
         write(user "((")
         self.result-type.write-cname()
-        write(user "_Dynamic*)(")
+        if self.result-type.type-data.is-struct
+            write(user "_Dynamic")
+        write(user "*)(")
         self.expression.write-dynamic()
         write(user "))")
     

@@ -522,6 +522,7 @@ struct Global
                 user self.type-base)
         self.add-global-type(user "Generic Type", copy false)->(
                 user self.type-generic)
+        self.type-generic.is-struct := true
         self.type-generic.is-dynamic := true
         self.add-global-type(user "Module Name", copy false)->(
                 user self.type-module)
@@ -1265,6 +1266,7 @@ struct Global
         type-data := new-type
         string-new-copy(user name)->(owner new-type.name)
         new-type.is-primitive := is-primitive
+        new-type.is-struct := not is-primitive
         new-type.is-ordered := true
         type-data.module := module
         module.type-map.add(user new-type.name, user new-type)

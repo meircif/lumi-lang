@@ -45,11 +45,15 @@ class InitExpression(ModuleTypeExpression)
                 user self.aux-variable.variable)
         
         if access-is-owner(copy self.aux-variable.variable.access) and
-                self.aux-variable.variable.is-create and
-                self.result-type.type-data.is-primitive
-            self.syntax-error(
-                    user "dynamic allocation of primitive type",
-                    user self.result-type.type-data.name)
+                self.aux-variable.variable.is-create
+            if self.result-type.type-data.is-only-dynamic()
+                self.syntax-error(
+                        user "dynamic allocation of type without structure",
+                        user self.result-type.type-data.name)
+            if self.result-type.type-data.is-primitive
+                self.syntax-error(
+                        user "dynamic allocation of primitive type",
+                        user self.result-type.type-data.name)
         
         if not self.result-type.type-data.is-primitive and
                 self.aux-variable.variable.is-create
