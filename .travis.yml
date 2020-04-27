@@ -4,9 +4,15 @@ dist: bionic
 
 compiler:
   - gcc
+  - gcc -m32
+  - clang
 
 os:
   - linux
+
+arch:
+  - amd64
+  - arm64
 
 install:
   - sudo apt-get update
