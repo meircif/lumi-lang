@@ -45,7 +45,7 @@ Returncode SyntaxTreeBranch_parse_block_children(SyntaxTreeBranch* self, TypeDat
   }
   CHECK(16, SyntaxTreeBranch_init(self) )
   CHECK(17, SyntaxTreeBranch_parse_children(self, parent_type, parent_block, &((*end))) )
-  if ((*end) != EOF) {
+  if ((*end) != 127) {
     glob->save_input = true;
   }
   return OK;
@@ -74,7 +74,7 @@ Returncode SyntaxTreeBranch_parse_children(SyntaxTreeBranch* self, TypeData* par
           CHECK(35, SyntaxTreeNode_m_syntax_error_indentation(&(self->_base), spaces, self->indentation_spaces) )
         }
         
-        if (!(spaces == self->indentation_spaces && (*end) != EOF)) break;
+        if (!(spaces == self->indentation_spaces && (*end) != 127)) break;
         
         Bool _Bool93;
         CHECK(40, (self)->_base._dtl[5](self, keyword, parent_type, parent_block, &((*end)), &(_Bool93)) )
@@ -83,7 +83,7 @@ Returncode SyntaxTreeBranch_parse_children(SyntaxTreeBranch* self, TypeData* par
         }
       }
       
-      if (!((*end) != EOF)) break;
+      if (!((*end) != 127)) break;
       if (!glob->save_input && (*end) != '\n') {
         CHECK(46, SyntaxTreeNode_m_syntax_error_c(&(self->_base), &(String){35, 34, "expected new-line in line end, got"}, (*end)) )
       }
@@ -123,7 +123,7 @@ Returncode SyntaxTreeBranch_parse_if_comment(SyntaxTreeBranch* self, String* key
         else {
           count = 0;
         }
-        if (!(ch != EOF && count < 3)) break;
+        if (!(ch != 127 && count < 3)) break;
       }
       CHECK(67, read_c(&((*end))) )
     }
@@ -138,7 +138,7 @@ Returncode SyntaxTreeBranch_parse_if_comment(SyntaxTreeBranch* self, String* key
         while (true) {
           Char curr = '\0';
           CHECK(74, read_c(&(curr)) )
-          if (!(curr != EOF && (curr != ']' || prev != ';'))) break;
+          if (!(curr != 127 && (curr != ']' || prev != ';'))) break;
           prev = curr;
         }
         CHECK(77, read_c(&((*end))) )

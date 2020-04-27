@@ -108,6 +108,13 @@ c := '\x0f'
 c := '\x7A'
 ; @ c test-char-expression-5
 c := '\173'
+; @ c test-char-expression-6
+var Int{10:10} c10(copy '\n')
+var Int{15:15} c15(copy '\x0f')
+var Int{39:39} c39(copy '\'')
+var Int{97:97} c97(copy 'a')
+var Int{169:169} c169(copy '\xA9')
+var Int{184:184} c184(copy '\270')
 ; @ fec test-char-expression-e0
 c := '''
 ; @ fec test-char-expression-e1
@@ -130,6 +137,8 @@ c := 'aa'
 c := 'aaa'
 ; @ ec test-char-expression-e10
 c := 'aaaaa'
+; @ ec test-char-expression-e11
+c := '\777'
 ; @@ test-string-expression
 ; @ c test-string-expression-0
 str := "some string"

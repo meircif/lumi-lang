@@ -114,7 +114,7 @@ func read-cont-spaces()
 
 func read-indent(user String ends, copy Bool indent, user String text):(copy Char end, copy Int spaces)
   text.clear()
-  var Char ch(EOF)
+  var Char ch(0x7f)
   var Char q('\0')
   spaces := 0
   do
@@ -126,7 +126,7 @@ func read-indent(user String ends, copy Bool indent, user String text):(copy Cha
         spaces := spaces + 1
         read-c():(copy ch)
       indent := false
-    while ch != EOF
+    while ch != 0x7f
     if q = '\0'
       while ch != '\n'
       while not ends.has(copy ch)

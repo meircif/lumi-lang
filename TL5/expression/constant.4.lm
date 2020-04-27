@@ -98,7 +98,7 @@ class IntExpression(Expression)
 
 ~~~ Constant character expression ~~~
 class CharExpression(TextExpression)
-    var Char value
+    var Int value
     
     func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
             owner Expression expression)
@@ -117,7 +117,7 @@ class CharExpression(TextExpression)
         else-if text.length = 4
             if text[1] != '\\'
                 self.syntax-error(user "illegal character constant", user text)
-            if not self.char-from-escape(copy text[2])->(var self.value)
+            if not self.value-from-escape(copy text[2])->(var self.value)
                 self.syntax-error(user "illegal character constant", user text)
         else-if text.length = 6
             if text[1] != '\\'
@@ -136,6 +136,8 @@ class CharExpression(TextExpression)
             self.syntax-error(user "illegal character constant", user text)
         if text[text.length - 1] != '\''
             self.syntax-error(user "illegal character constant", user text)
+        if self.value > 255
+            self.syntax-error(user "illegal character constant", user text)
         self.set-simple-type(user glob.type-char)
         value := Long()
         value.set(copy self.value)
@@ -143,8 +145,8 @@ class CharExpression(TextExpression)
         self.access := Access.VAR
         self.text := text
         
-    func inst char-from-escape(copy Char escape)->(
-            var Char value, var Bool is-legal)
+    func inst value-from-escape(copy Char escape)->(
+            var Int value, var Bool is-legal)
         user String escapes(user "'\"?\\abfnrtv0")
         user String values(user "\'\"\?\\\a\b\f\n\r\t\v\0")
         for n in escapes.length

@@ -825,7 +825,7 @@ Returncode integration_M_test_const_expression(Int* i, Char* c, String** s, Ref_
     Ref_Manager* aux_String_1_Refman = NULL;
     Ref_Manager* aux_Ref_Manager = NULL;
     *i = (((((((0 + 9630) + -9630) + 07520) + -07520) + 0xfda940) + -0xfda940) + 0xFDA940) + -0xFDA940;
-    *c = (((('a' + '\'') + '\n') + '\x0f') + '\xA9') + '\270';
+    *c = (((('a' % '\'') % '\n') % '\x0f') % '\x5A') % '\107';
     INIT_STRING_CONST(53, aux_String_0, "some string");
     aux_Ref_Manager = *s_Refman;
     *s_Refman = aux_String_0_Refman;

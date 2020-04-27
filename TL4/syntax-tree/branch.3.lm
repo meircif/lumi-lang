@@ -15,7 +15,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       self.m-syntax-error-c(user "expected block in a new line, got", copy end)
     self.init()
     self.parse-children(user parent-type, user parent-block):(copy end)
-    if end != EOF
+    if end != 127
       glob.save-input := true
   
   func inst parse-children(
@@ -35,13 +35,13 @@ class SyntaxTreeBranch(SyntaxTreeNode)
             self.m-syntax-error-indentation(
                 copy spaces, copy self.indentation-spaces)
           
-          while spaces = self.indentation-spaces and end != EOF
+          while spaces = self.indentation-spaces and end != 127
           
           if not self.parse-if-common(
               user keyword, user parent-type, user parent-block):(copy end)
             self.parse-child(user keyword):(copy end)
         
-        while end != EOF
+        while end != 127
         if not glob.save-input and end != '\n'
           self.m-syntax-error-c(
               user "expected new-line in line end, got", copy end)
@@ -63,7 +63,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
           count += 1
         else
           count := 0
-        while ch != EOF and count < 3
+        while ch != 127 and count < 3
       read-c():(copy end)
     else-if keyword.length = 0 and end = '['
       if read-c() != ';'
@@ -72,7 +72,7 @@ class SyntaxTreeBranch(SyntaxTreeNode)
       do
         var Char curr
         read-c():(copy curr)
-        while curr != EOF and (curr != ']' or prev != ';')
+        while curr != 127 and (curr != ']' or prev != ';')
         prev := curr
       read-c():(copy end)
     else

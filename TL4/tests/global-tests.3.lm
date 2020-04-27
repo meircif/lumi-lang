@@ -45,7 +45,7 @@ mock file-getc(user File file):(copy Char ch)
   assert file = glob.input-file
   if mock-input-file-index = mock-input-line-eof-index or
       mock-input-file-index >= mock-input-file-text.length
-    ch := EOF
+    ch := 127
     return
   ch := mock-input-file-text[mock-input-file-index]
   if mock-input-file-index = mock-input-line-reset-index
@@ -243,8 +243,8 @@ func test-from-file(user String name)
     while input-file.getc() = ' '
   
   expected-output-file.getc()
-  if input-file.getc() = EOF
-    if expected-output-file.getc() != EOF
+  if input-file.getc() = 127
+    if expected-output-file.getc() != 127
       file-error(user name, user subname)
     actual-output-file.write(user "/// @\n")
     input-file.close()
@@ -261,13 +261,13 @@ func read-line(user File file, user String line, user String prefix):(
   var Char ch
   do
     file.getc():(copy ch)
-    while ch != EOF and ch != '\n'
+    while ch != 127 and ch != '\n'
     line.append(copy ch)
     if ? prefix and not found-prefix
       if line.equal(user prefix)
         found-prefix := true
         return
-  if ch = EOF and line.length = 0
+  if ch = 127 and line.length = 0
     raise
 
 

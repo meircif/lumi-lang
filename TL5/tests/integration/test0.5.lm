@@ -94,7 +94,7 @@ func ! test-const-expression()->(
         var Func?{()} f)
     i := 0 + 9630 + -9630 + 07520 + -07520 + 0xfda940 + -0xfda940 + 0xFDA940 +
             -0xFDA940
-    c := 'a' + '\'' + '\n' + '\x0f' + '\xA9' + '\270'
+    c := ('a' + '\'' + '\n' + '\x0f' + '\xA9' + '\270') mod 256
     user String? s
     s := "some string"
     s := "some

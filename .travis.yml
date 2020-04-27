@@ -4,7 +4,6 @@ dist: bionic
 
 compiler:
   - gcc
-  - gcc -m32
   - clang
 
 os:

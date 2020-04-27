@@ -152,7 +152,7 @@ static char* _func_name_read_indent = "read-indent";
 #define LUMI_FUNC_NAME _func_name_read_indent
 Returncode read_indent(String* ends, Bool indent, String* text, Char* end, Int* spaces) {
   CHECK(116, String_clear(text));
-  Char ch = EOF;
+  Char ch = 0x7f;
   Char q = '\0';
   (*spaces) = 0;
   while (true) {
@@ -166,7 +166,7 @@ Returncode read_indent(String* ends, Bool indent, String* text, Char* end, Int* 
       }
       indent = false;
     }
-    if (!(ch != EOF)) break;
+    if (!(ch != 0x7f)) break;
     if (q == '\0') {
       if (!(ch != '\n')) break;
       Bool _Bool1;

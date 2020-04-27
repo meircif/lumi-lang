@@ -338,6 +338,19 @@ ut_M_c = '\x0f';
 ut_M_c = '\x7A';
 /// @ test-char-expression-5
 ut_M_c = '\173';
+/// @ test-char-expression-6
+uint8_t c10 = 0;
+    uint8_t c15 = 0;
+    uint8_t c39 = 0;
+    uint8_t c97 = 0;
+    uint8_t c169 = 0;
+    uint8_t c184 = 0;
+    c10 = '\n';
+    c15 = '\x0f';
+    c39 = '\'';
+    c97 = 'a';
+    c169 = '\xA9';
+    c184 = '\270';
 /// @ test-char-expression-e0
 illegal character constant "'''"
 /// @ test-char-expression-e1
@@ -360,6 +373,8 @@ illegal character constant "'aa'"
 illegal character constant "'aaa'"
 /// @ test-char-expression-e10
 illegal character constant "'aaaaa'"
+/// @ test-char-expression-e11
+illegal character constant "'\777'"
 /// @@ test-string-expression
 /// @ test-string-expression-0
 static char aux_String_0[] = {'s','o','m','e',' ','s','t','r','i','n','g','\0',};

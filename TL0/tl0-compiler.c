@@ -44,11 +44,11 @@ Returncode read_name(Char* end, File infile, String* name, Char end1, Char end2)
         if (ch == q) {
           q = '\0';
         }
-        if (not(ch != EOF)) break;
+        if (not(ch != 0x7f)) break;
       }
     }
     else {
-      if (not(not (ch == EOF or ch == end1 or ch == end2 or ch == '\n'))) break;
+      if (not(not (ch == 0x7f or ch == end1 or ch == end2 or ch == '\n'))) break;
       if (ch == '\'' or ch == '"') {
         q = ch;
       }
@@ -361,7 +361,7 @@ Returncode parse_line(Bool* more_lines, File infile, File outfile, Int spaces) {
   char _key_word_buff[80]; String key_word = {80, 0, _key_word_buff};
   Char end;
   read_name(&end, infile, &key_word, ' ', '(');
-  if (end == EOF) {
+  if (end == 0x7f) {
     *more_lines = false;
     return OK;
   }

@@ -266,7 +266,7 @@ func read-ignore(copy Int chars)
 
 func read-indent(user String ends, copy Bool indent): var String text, copy Char end, copy Int out-spaces
   string-clear(user text)
-  var Char ch(EOF)
+  var Char ch(0x7f)
   var Char q('\0')
   var Int spaces(0)
   do
@@ -280,7 +280,7 @@ func read-indent(user String ends, copy Bool indent): var String text, copy Char
       
       indent := false
     
-    while ch != EOF
+    while ch != 0x7f
     if q != '\0'
       if ch = '\\'
         string-append(user text, copy ch)
@@ -1170,7 +1170,7 @@ func parse-func-header(owner Member-path path): owner St-func st-func, copy Char
       parse-param-dec(user param)
     
     else
-      owner St-exp value 
+      owner St-exp value
       parse-exp(user ",)"): owner value, copy glob.end
       param.value := value
     
@@ -2066,7 +2066,7 @@ func parse-line(): copy Bool more-lines
   var Int spaces
   var Char end
   read-indent(user " .([", copy true): var key-word, copy end, copy spaces
-  if end = EOF
+  if end = 0x7f
     out more-lines := false
     return
   
@@ -2142,7 +2142,7 @@ func f-new-substing(user String text, user String ends): owner String substing, 
   var Int index(start)
   var Char ch
   do
-    ch := EOF
+    ch := 0x7f
     while index < text.actual-length
     var Bool has-end
     string-get(user text, copy index): copy ch

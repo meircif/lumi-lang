@@ -303,7 +303,7 @@ static char* _func_name_SyntaxTreeNode_m_syntax_error_c = "SyntaxTreeNode.m-synt
 #define LUMI_FUNC_NAME _func_name_SyntaxTreeNode_m_syntax_error_c
 Returncode SyntaxTreeNode_m_syntax_error_c(SyntaxTreeNode* self, String* text, Char item) {
   String* char_str = &(String){16, 0, (char[16]){0}};
-  if (item == EOF) {
+  if (item == 127) {
     CHECK(149, String_copy(char_str, &(String){4, 3, "EOF"}) )
   }
   else {

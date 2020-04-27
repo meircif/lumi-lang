@@ -145,7 +145,7 @@ class SyntaxTreeNode
   ## Same as `m-syntax-error` but with a character item
   func inst m-syntax-error-c(user String text, copy Char item)
     var String{16} char-str
-    if item = EOF
+    if item = 127
       char-str.copy(user "EOF")
     else-if item = '\n'
       char-str.copy(user "new-line")
