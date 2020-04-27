@@ -14,7 +14,7 @@ func test-code-setup(user String input-text)
   do
     var Char ch
     code-header.getc():(copy ch)
-    while ch != EOF
+    while ch != 127
     mock-input-file-text.append(copy ch)
   code-header.close()
   mock-input-line-reset-index := mock-input-file-text.length
@@ -36,7 +36,7 @@ func test-code(user String input-text, user String expected-output)
   do
     var Char ch
     code-header.getc():(copy ch)
-    while ch != EOF
+    while ch != 127
     expected-header.append(copy ch)
   code-header.close()
   

@@ -33,7 +33,7 @@ func read-until(user String ends, copy Bool indent):(
   
   var Char quote('\0')
   do
-    while ch != EOF
+    while ch != 127
     if quote = '\0'
       while ch != '\n'
       while not ends.has(copy ch)

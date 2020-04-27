@@ -268,7 +268,7 @@ Returncode read_ignore(Int chars) {
 }
 Returncode read_indent(String* ends, Bool indent, String* text, Char* end, Int* out_spaces) {
   CHECK(string_clear(text))
-  Char ch = EOF;
+  Char ch = 0x7f;
   Char q = '\0';
   Int spaces = 0;
   while (true) {
@@ -282,7 +282,7 @@ Returncode read_indent(String* ends, Bool indent, String* text, Char* end, Int* 
       }
       indent = false;
     }
-    if (not(ch != EOF)) break;
+    if (not(ch != 0x7f)) break;
     if (q != '\0') {
       if (ch == '\\') {
         CHECK(string_append(text, ch))
@@ -1172,7 +1172,7 @@ Returncode parse_func_header(Member_path* path, St_func** st_func, Char* end) {
       CHECK(parse_param_dec(param))
     }
     else {
-      St_exp* value ;
+      St_exp* value;
       CHECK(parse_exp(&(String){3, 2, ",)"}, &value, &glob->end))
       param->value = value;
     }
@@ -2068,7 +2068,7 @@ Returncode parse_line(Bool* more_lines) {
   Int spaces;
   Char end;
   CHECK(read_indent(&(String){5, 4, " .(["}, true, key_word, &end, &spaces))
-  if (end == EOF) {
+  if (end == 0x7f) {
     *more_lines = false;
     return OK;
   }
@@ -2144,7 +2144,7 @@ Returncode f_new_substing(String* text, String* ends, String** substing, Int* en
   Int index = start;
   Char ch;
   while (true) {
-    ch = EOF;
+    ch = 0x7f;
     if (not(index < text->actual_length)) break;
     Bool has_end;
     CHECK(string_get(text, index, &ch))

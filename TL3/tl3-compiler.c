@@ -136,7 +136,7 @@ Returncode f_create_global_var_map() {
   CHECK(76, add_glob_var(glob->type_bool, &(String){6, 5, "false"}));
   
   /* Char */
-  CHECK(79, add_glob_var(glob->type_char, &(String){4, 3, "EOF"}));
+  /* add-glob-var(user glob.type-char, user "EOF") */
   
   /* String */
   CHECK(82, add_member(glob->type_string, &(String){7, 6, "length"}, glob->type_int));

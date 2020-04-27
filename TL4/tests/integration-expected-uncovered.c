@@ -1639,7 +1639,7 @@ Returncode integration_M_test_const_expression(Int* i, Char* c, String** s, Ref_
     ++LUMI_file_coverage[0].line_count[50];
     *i = (((((((0 + 9630) + -9630) + 07520) + -07520) + 0xfda940) + -0xfda940) + 0xFDA940) + -0xFDA940;
     ++LUMI_file_coverage[0].line_count[52];
-    *c = (((('a' + '\'') + '\n') + '\x0f') + '\xA9') + '\270';
+    *c = (((('a' % '\'') % '\n') % '\x0f') % '\x5A') % '\107';
     ++LUMI_file_coverage[0].line_count[53];
     INIT_STRING_CONST(53, aux_String_0, "some string");
     aux_Ref_Manager = *s_Refman;

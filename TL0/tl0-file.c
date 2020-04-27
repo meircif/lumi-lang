@@ -34,7 +34,9 @@ Returncode file_close(void* file) {
 }
 
 Returncode file_getc(Char* out_char, void* file) {
-  *out_char = getc((File)file);
+  int ch;
+  ch = getc((File)file);
+  *out_char = ch == EOF? 0x7f: ch;
   return OK;
 }
 

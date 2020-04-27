@@ -42,11 +42,11 @@ func read-name(out Char end, user File infile, out String name, copy Char end1, 
         if ch == q
           q := '\0'
         
-        while ch != EOF
+        while ch != 0x7f
       
     
     else
-      while not (ch == EOF or ch == end1 or ch == end2 or ch == '\n')
+      while not (ch == 0x7f or ch == end1 or ch == end2 or ch == '\n')
       if ch == '\'' or ch == '"'
         q := ch
       
@@ -359,7 +359,7 @@ func parse-line(out Bool more-lines, user File infile, user File outfile, copy I
   var String{80} key-word
   var Char end
   read-name(out end, user infile, out key-word, user ' ', user '(')
-  if end == EOF
+  if end == 0x7f
     out more-lines := false
     return
   

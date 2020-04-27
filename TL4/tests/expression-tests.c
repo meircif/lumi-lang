@@ -38,7 +38,7 @@ Returncode test_code_setup(String* input_text) {
   while (true) {
     Char ch = '\0';
     CHECK(16, File_getc(code_header, &(ch)) )
-    if (!(ch != EOF)) break;
+    if (!(ch != 127)) break;
     CHECK(18, String_append(mock_input_file_text, ch) )
   }
   CHECK(19, File_close(code_header) )
@@ -71,7 +71,7 @@ Returncode test_code(String* input_text, String* expected_output) {
   while (true) {
     Char ch = '\0';
     CHECK(38, File_getc(code_header, &(ch)) )
-    if (!(ch != EOF)) break;
+    if (!(ch != 127)) break;
     CHECK(40, String_append(expected_header, ch) )
   }
   CHECK(41, File_close(code_header) )

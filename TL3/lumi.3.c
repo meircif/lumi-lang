@@ -170,7 +170,9 @@ Returncode File_close(File* file) {
 }
 
 Returncode File_getc(File* file, Char* out_char) {
-  *out_char = getc(file);
+  int ch;
+  ch = getc(file);
+  *out_char = ch == EOF? 0x7f: ch;
   return OK;
 }
 

@@ -152,7 +152,7 @@ static char* _func_name_file_getc = "file-getc";
 Returncode file_getc(File* file, Char* ch) {
   TEST_ASSERT(45, file == glob->input_file)
   if (mock_input_file_index == mock_input_line_eof_index || mock_input_file_index >= mock_input_file_text->length) {
-    (*ch) = EOF;
+    (*ch) = 127;
     return OK;
   }
   if ((mock_input_file_index) < 0 || (mock_input_file_index) >= (mock_input_file_text)->length) RAISE(50)
@@ -532,10 +532,10 @@ Returncode test_from_file(String* name) {
   CHECK(245, File_getc(expected_output_file, &(_Char230)) )
   Char _Char231;
   CHECK(246, File_getc(input_file, &(_Char231)) )
-  if (_Char231 == EOF) {
+  if (_Char231 == 127) {
     Char _Char232;
     CHECK(247, File_getc(expected_output_file, &(_Char232)) )
-    if (_Char232 != EOF) {
+    if (_Char232 != 127) {
       CHECK(248, file_error(name, subname) )
     }
     CHECK(249, File_write(actual_output_file, &(String){7, 6, "/// @\n"}) )
@@ -562,7 +562,7 @@ Returncode read_line(File* file, String* line, String* prefix, Bool* found_prefi
   Char ch = '\0';
   while (true) {
     CHECK(263, File_getc(file, &(ch)) )
-    if (!(ch != EOF && ch != '\n')) break;
+    if (!(ch != 127 && ch != '\n')) break;
     CHECK(265, String_append(line, ch) )
     if (NULL != prefix &&  ! (*found_prefix)) {
       Bool _Bool233;
@@ -573,7 +573,7 @@ Returncode read_line(File* file, String* line, String* prefix, Bool* found_prefi
       }
     }
   }
-  if (ch == EOF && line->length == 0) {
+  if (ch == 127 && line->length == 0) {
     RAISE(271)
   }
   return OK;

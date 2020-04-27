@@ -76,7 +76,7 @@ func f-create-global-var-map()
   add-glob-var(user glob.type-bool, user "false")
   
   # Char
-  add-glob-var(user glob.type-char, user "EOF")
+  # add-glob-var(user glob.type-char, user "EOF")
   
   # String
   add-member(user glob.type-string, user "length", user glob.type-int)

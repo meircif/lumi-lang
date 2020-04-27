@@ -62,7 +62,7 @@ Returncode read_until(String* ends, Bool indent, String** text, Char* end, Int* 
   
   Char quote = '\0';
   while (true) {
-    if (!(ch != EOF)) break;
+    if (!(ch != 127)) break;
     if (quote == '\0') {
       if (!(ch != '\n')) break;
       Bool _Bool7;

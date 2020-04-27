@@ -37,7 +37,7 @@ class St-multi-comment(St-comment)
     do
       var Char curr
       read-c():(copy curr)
-      while curr != EOF and (prev != '#' or curr != ')')
+      while curr != 0x7f and (prev != '#' or curr != ')')
       if prev != '\0'
         text.append(copy prev)
       prev := curr
@@ -86,7 +86,7 @@ class St-node(St)
   func inst parse-line(copy Int spaces):(copy Bool more-lines)
     read-key-word()
     more-lines := false
-    if glob.key-word.end = EOF or glob.key-word.spaces < spaces
+    if glob.key-word.end = 0x7f or glob.key-word.spaces < spaces
       return
     
     more-lines := true

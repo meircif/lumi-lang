@@ -86,7 +86,7 @@ Returncode St_multi_comment_parse(St_multi_comment* self) {
   while (true) {
     Char curr;
     CHECK(39, read_c(&(curr)));
-    if (!(curr != EOF && (prev != '#' || curr != ')'))) break;
+    if (!(curr != 0x7f && (prev != '#' || curr != ')'))) break;
     if (prev != '\0') {
       CHECK(42, String_append(text, prev));
     }
@@ -215,7 +215,7 @@ static char* _func_name_St_node_parse_line = "St-node.parse-line";
 Returncode St_node_parse_line(St_node* self, Int spaces, Bool* more_lines) {
   CHECK(87, read_key_word());
   (*more_lines) = false;
-  if (glob->key_word->end == EOF || glob->key_word->spaces < spaces) {
+  if (glob->key_word->end == 0x7f || glob->key_word->spaces < spaces) {
     return OK;
   }
   
