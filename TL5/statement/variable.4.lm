@@ -241,7 +241,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         self.type-instance.get-array-data-type-depth()->(
                 user data-type, var sequence-depth)
         if data-type.type-data is glob.type-string
-            write(user "char")
+            write(user "Char")
         else-if data-type.type-data is glob.type-buffer
             write(user "Byte")
         else-if data-type.type-data is glob.type-func

@@ -454,6 +454,7 @@ struct Global
 
     func init-int-map()
         self.add-global-int-alias(user "Char", copy 8, user "255")
+        self.int-ranges.first.item.min-value.set(copy 1)
         self.add-global-int-alias(user "Byte", copy 8, user "255")
         self.add-global-int-alias(user "Int", copy 32, user "4294967295")
         self.add-global-int-alias(user "Uint8", copy 8, user "255")
@@ -1147,7 +1148,7 @@ struct Global
                 user "index")
         self.add-builtin-output(
                 user function,
-                copy Access.TEMP,
+                copy Access.VAR,
                 user self.type-generic,
                 user "pointed")
         function.arguments.outputs.last.item.get-type-instance()->(

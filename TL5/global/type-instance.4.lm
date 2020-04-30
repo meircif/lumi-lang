@@ -283,6 +283,15 @@ struct TypeInstance
 
     func link-types(user SyntaxTreeNode node)
         if not self.type-data?
+            if self.module-name?
+                if self.module-name.equal(user "cdef") and
+                        self.name.equal(user "CharP")
+                    string-new-copy(user "Pointer")->(owner self.name)
+                    self.parameters := List{TypeInstance}()
+                    new TypeInstance c-char
+                    string-new-copy(user "cdef")->(owner c-char.module-name)
+                    string-new-copy(user "Char")->(owner c-char.name)
+                    self.parameters.add(owner c-char)
             node.check-type(user self.name, user self.module-name)->(
                     user self.type-data)
             if self.conditional and (not self.type-data.is-ref() or
@@ -409,6 +418,9 @@ struct TypeInstance
                 var bases)
         if bases > 0
             value := UpCastExpression(owner value, copy bases)
+        else-if self.type-data is glob.type-pointer and
+                value.result-type.type-data.is-buffered()
+            value := RefCastExpression(owner value)
     
     func check-assign-to(
             copy Int self-access,

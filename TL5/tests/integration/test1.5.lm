@@ -134,7 +134,7 @@ native type NativeRef
 native var Native external-nvar
 native func external0() "MY_Some_external"
 native func NativeRef external-get-ref(
-        copy cdef.Int i, user String s, user Array{cdef.Int} a)
+        copy cdef.Int i, copy cdef.CharP s, user Array{cdef.Int} a)
 native func cdef.Int external-set-ref(copy NativeRef n)
 native func Native external-get-var()
 native func cdef.Int external-set-var(copy Native n)
@@ -153,7 +153,7 @@ test test-native()
     assert! n.y = 0
     assert! external-nvar.x = 3
     assert! external-nvar.y = 4
-    nr := external-get-ref(copy 3, user s, user a)
+    nr := external-get-ref(copy 3, copy s, user a)
     assert! s[0]! = 'a'
     assert! a[0] = 3
     assert! external-set-ref(copy nr) = 7
@@ -208,11 +208,11 @@ test test-pointer()
     
     var String{16} stra(user "aabbccdd")!
     var String{16} strb(user "---")!
-    var cdef.Pointer{Char} pc
+    var cdef.CharP pc
     pc := stra
     cdef.copy-to-string(copy pc, user strb)!
     assert! strb.equal(user stra)
-    stra[2]! := '\0'
+    pc.get-pointed-at(copy 2) := 0
     cdef.set-null-term-length(user stra)
     assert! stra.equal(user "aa")
     
@@ -638,7 +638,7 @@ test test-builtin-errors()
     assert-error! full-string.concat(user "a"), "sequence too short"
     assert-error! 123.str(user short-str), "sequence too short"
     assert-error! short-str.new(user "aaaaa"), "sequence too short"
-    var cdef.Pointer{Char} charp
+    var cdef.CharP charp
     charp := "aaaaa"
     assert-error! cdef.copy-to-string(copy charp, user short-str),
             "sequence too short"

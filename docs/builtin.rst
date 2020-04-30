@@ -95,15 +95,15 @@ Character
 ---------
 .. class:: Char
 
-   A single UTF-8 character.
+   A single non-null UTF-8 character.
 
    Character literal are surrounded with ``'`` characters: ``'a'``. Special
    characters can be written with ``\`` escape character as in C: ``\' \" \? \a
    \b \f \n \r \t \v \\``.
 
-   In :ref:`TL5 <syntax-tl5>` characters are treated as ``Int{255}``. In the
-   final syntax it may not be possible without explicitly converting characters
-   to and from ``Int{255}`` using ``ord`` and ``chr`` functions.
+   In :ref:`TL5 <syntax-tl5>` characters are treated as ``Int{1:255}``. In the
+   final syntax it may be needed to explicitly convert characters to and from
+   ``Int{1:255}`` using ``ord`` and ``chr`` functions.
 
 
 Byte

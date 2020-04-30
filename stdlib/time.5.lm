@@ -22,20 +22,18 @@ native func Uint64 c-clock() "clock"
 
 native func CtimeT c-time(copy cdef.Pointer{CtimeT} timer) "time"
 
-native func cdef.Pointer{cdef.Char} c-ctime(
-        copy cdef.Pointer{CtimeT} timer) "ctime"
+native func cdef.CharP c-ctime(copy cdef.Pointer{CtimeT} timer) "ctime"
 
 native func Sint64 c-difftime(copy CtimeT time1, copy CtimeT time2) "difftime"
 
-native func cdef.Pointer{cdef.Char} c-asctime(
-        copy cdef.Pointer{StructTm} timeptr) "asctime"
+native func cdef.CharP c-asctime(copy cdef.Pointer{StructTm} timeptr) "asctime"
 
 native func CtimeT c-mktime(copy cdef.Pointer{StructTm} timeptr) "mktime"
 
 native func cdef.Size c-strftime(
-        copy cdef.Pointer{cdef.Char} target,
+        copy cdef.CharP target,
         copy cdef.Size maxsize,
-        copy cdef.Pointer{cdef.Char} format,
+        copy cdef.CharP format,
         copy cdef.Pointer{StructTm} timeptr) "strftime"
 
 native func cdef.Pointer{StructTm} c-gmtime(

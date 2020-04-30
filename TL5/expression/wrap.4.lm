@@ -193,3 +193,13 @@ class CheckExpression(WrapExpression)
             self.expression.write-refman()
         write(user ")\n")
         self.code-node.write-spaces()
+
+
+~~~ Reference cast expression ~~~
+class RefCastExpression(WrapExpression)
+    func dynamic write()
+        write(user "(void*)")
+        self.expression.write-safe()
+        
+    func dynamic write-cast()
+        self.write()

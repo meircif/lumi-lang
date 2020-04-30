@@ -195,7 +195,7 @@ class InitExpression(ModuleTypeExpression)
                     user "INIT_NEW_SEQUENCE", user self.aux-variable)
             write(user ", ")
             if self.result-type.type-data is glob.type-string
-                write(user "char")
+                write(user "Char")
             else
                 write(user "Byte")
             write(user ", ")
@@ -230,7 +230,7 @@ class InitExpression(ModuleTypeExpression)
         self.write-macro-init(user "INIT_NEW_ARRAY", user self.aux-variable)
         write(user ", ")
         if data-type.type-data is glob.type-string
-            write(user "char")
+            write(user "Char")
         else-if data-type.type-data is glob.type-buffer
             write(user "Byte")
         else-if data-type.type-data is glob.type-func

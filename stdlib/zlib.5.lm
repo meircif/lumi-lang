@@ -41,7 +41,7 @@ native const cdef.Int Z-DEFLATED
 native const cdef.Int Z-NULL
 
 
-native func cdef.Pointer{cdef.Char} zlib-version() "zlibVersion"
+native func cdef.CharP zlib-version() "zlibVersion"
 
 func ! version(user String str)
     cdef.copy-to-string(copy zlib-version(), user str)!

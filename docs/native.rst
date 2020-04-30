@@ -41,6 +41,8 @@ C Pointers
 
    var cdef.Pointer{cdef.Int} pointer-to-int
    var cdef.Pointer{cdef.Char} pointer-to-char
+   ; "cdef.CharP" is an alias to "cdef.Pointer{cdef.Char}"
+   var cdef.CharP also-pointer-to-char
    var cdef.Pointer{cdef.Uchar} pointer-to-uchar
    var cdef.Pointer{cdef.Pointer{cdef.Int}} pointer-to-pointer-to-int
    var cdef.Pointer void-pointer

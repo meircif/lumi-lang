@@ -12,7 +12,7 @@ native const Int X-OK
 native const Int F-OK
 
 
-native func Int access(copy cdef.Pointer{cdef.Char} path, copy Int amode)
+native func Int access(copy cdef.CharP path, copy Int amode)
 
 func exists(user String path)->(var Bool exist)
     exist := access(copy path, copy F-OK) <> -1
@@ -26,13 +26,13 @@ native include "dirent.h"
 native struct Dir "DIR"
 
 native struct Dirent "struct dirent"
-    var cdef.Pointer{cdef.Char} d-name
+    var cdef.CharP d-name
 
 native func Int strlen(copy cdef.Pointer{Char} str)
 
 native func Int closedir(copy cdef.Pointer{Dir} dir)
 
-native func cdef.Pointer{Dir} opendir(copy cdef.Pointer{cdef.Char} path)
+native func cdef.Pointer{Dir} opendir(copy cdef.CharP path)
 
 native func cdef.Pointer{Dirent} readdir(copy cdef.Pointer{Dir} dir)
 

@@ -17,8 +17,9 @@ comment
 
 ; Test global variables
 var Uint32 global-int(copy 23)
-owner String global-string(owner String{32}(user "a constant string")!)
 owner Buffer global-buffer(owner Buffer{32}(user `feed1000beef`)!)
+owner String global-string(owner String{32}(user "a constant string")!)
+owner String unicode-string(owner String{32}(user "שָׁלוֹם עוֹלָֽם")!)
 
 var Array{TestEnum.length + LENGTH:Uint32} int-arr
 const Int LENGTH SIZE * 5

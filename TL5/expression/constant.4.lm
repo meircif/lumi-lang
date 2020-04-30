@@ -36,6 +36,17 @@ class TextExpression(Expression)
     
     func dynamic write()
         write(user self.text)
+        
+    func inst value-from-escape(copy Char escape)->(
+            var Int value, var Bool is-legal)
+        user String escapes(user "'\"?\\abfnrtv")
+        user String values(user "\'\"\?\\\a\b\f\n\r\t\v")
+        for n in escapes.length
+            if escape = escapes[n]
+                value := values[n]
+                is-legal := true
+                return
+        is-legal := false
 
 
 ~~~ Constant integer expression ~~~
@@ -136,7 +147,7 @@ class CharExpression(TextExpression)
             self.syntax-error(user "illegal character constant", user text)
         if text[text.length - 1] != '\''
             self.syntax-error(user "illegal character constant", user text)
-        if self.value > 255
+        if self.value < 1 or self.value > 255
             self.syntax-error(user "illegal character constant", user text)
         self.set-simple-type(user glob.type-char)
         value := Long()
@@ -144,17 +155,6 @@ class CharExpression(TextExpression)
         self.result-type.set-int-constant(user self, user value)
         self.access := Access.VAR
         self.text := text
-        
-    func inst value-from-escape(copy Char escape)->(
-            var Int value, var Bool is-legal)
-        user String escapes(user "'\"?\\abfnrtv0")
-        user String values(user "\'\"\?\\\a\b\f\n\r\t\v\0")
-        for n in escapes.length
-            if escape = escapes[n]
-                value := values[n]
-                is-legal := true
-                return
-        is-legal := false
 
 
 class ConstantBufferVariable(SyntaxTreeVariable)
@@ -279,16 +279,31 @@ class BufferExpression(TextExpression)
 
 class ConstantStringVariable(ConstantBufferVariable)
     func dynamic write()
-        self.write-constant(user "char")
+        self.write-constant(user "Char")
+    
+    func inst write-hex-digit(copy Int value)
+        if value > 9
+            write-c(copy 'a' - 10 + value)
+        else
+            write-c(copy '0' + value)
     
     func dynamic write-data()
         var Int index
         for n in self.text.length
             write-c(copy '\'')
-            if self.text[n] = '\''
+            var Char ch(copy self.text[n])
+            if ch = '\''
                 write-c(copy '\\')
-            write-c(copy self.text[n])
-            if self.text[n] = '\\'
+            if ch < 32 or ch > 126
+                var Int value(copy ch)
+                if value < 0
+                    value += 256
+                write(user "\\x")
+                self.write-hex-digit(copy value div 16)
+                self.write-hex-digit(copy value mod 16)
+            else
+                write-c(copy ch)
+            if ch = '\\'
                 n += 1
                 write-c(copy self.text[n])
             write-c(copy '\'')
@@ -324,6 +339,7 @@ class StringExpression(BufferExpression)
                     self.text[index-write] := 'n'
                     index-write += 1
             else
+                self.check-character(copy index-read)
                 self.text[index-write] := self.text[index-read]
                 index-write += 1
         self.text[index-write] := '\\'
@@ -331,6 +347,39 @@ class StringExpression(BufferExpression)
         self.text[index-write] := '0'
         index-write += 1
         self.text.length := index-write
+    
+    func inst check-character(copy Int n)
+        if self.text[n] != '\\' or self.text[n - 1] = '\\' or
+                self.text[n + 1] = '\n'
+            return
+        owner Long long-value
+        var Int value
+        if self.text[n + 1] >= '0' and self.text[n + 1] <= '7'
+            if n > self.text.length - 5
+                self.syntax-error(
+                        user "unfinished escape in string literal",
+                        user self.text[1:self.text.length - 2])
+            if not get-number-value(user self.text[n + 1:3], copy 8)->(
+                    owner long-value)
+                self.syntax-error(
+                        user "illegal character constant", user self.text[n:4])
+        else-if self.text[n + 1] = 'x'
+            if n > self.text.length - 5
+                self.syntax-error(
+                        user "unfinished escape in string literal",
+                        user self.text[1:self.text.length - 2])
+            if not get-number-value(user self.text[n + 2:2], copy 16)->(
+                    owner long-value)
+                self.syntax-error(
+                        user "illegal character constant", user self.text[n:4])
+        else-if not self.value-from-escape(copy self.text[n + 1])->(var value)
+            self.syntax-error(
+                    user "illegal character constant", user self.text[n:2])
+        if long-value?
+            long-value.int()->(var value)
+            if value < 1 or value > 255
+                self.syntax-error(
+                        user "illegal character constant", user self.text[n:4])
 
     func dynamic analyze()
         self.add-aux-variable(owner ConstantStringVariable(

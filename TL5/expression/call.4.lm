@@ -4,8 +4,8 @@ module tl5-compiler
 ~~~ Function call expression ~~~
 class CallExpression(Expression)
     owner FunctionArguments arguments
+    owner SyntaxTreeVariable native-output
     user Expression output
-    var Bool native-output
 
     func inst analyze-declaration(
             user FunctionArguments declaration,
@@ -17,7 +17,13 @@ class CallExpression(Expression)
         user Argument last-output
         if declaration.outputs.last?
             last-output := declaration.outputs.last.item
-            self.native-output := last-output.is-native
+            if last-output.is-native
+                self.native-output := SyntaxTreeVariable(
+                        user self.code-node.parent)
+                self.native-output.access := last-output.access
+                self.native-output.is-aux := true
+                last-output.get-type-instance().copy-new()->(
+                        owner self.native-output.type-instance)
         if not self.is-statement
             result-type.new-replace-params(user actual-params)->(
                     owner self.result-type)
@@ -47,8 +53,9 @@ class CallExpression(Expression)
             self.output := output.value
             self.arguments.outputs.add(owner output)
         else-if self.result-type?
-            if self.native-output
-                self.result-type.reference-path := ReferencePath(user _)
+            if self.native-output?
+                self.result-type.reference-path := ReferencePath(
+                        user self.native-output)
             else
                 self.arguments.get-output()->(user self.output)
                 self.output.result-type.reference-path.copy-new()->(
@@ -57,11 +64,13 @@ class CallExpression(Expression)
 
     func dynamic check-memory(user ReferenceMemoryList refs)
         self.arguments.check-memory(user refs)
+        if self.native-output?
+            refs.add(user self.native-output)
 
     func dynamic write-preactions()
         self.arguments.write-preactions()
         self.write-function-check()
-        if not self.is-statement and not self.native-output
+        if not self.is-statement and not self.native-output?
             self.write-func-call()
             self.code-node.write-spaces()
 
@@ -69,13 +78,13 @@ class CallExpression(Expression)
         ; no check
         
     func dynamic write()
-        if self.is-statement or self.native-output
+        if self.is-statement or self.native-output?
             self.write-func-call()
         else
             self.output.write()
             
     func dynamic write-safe()
-        if self.native-output
+        if self.native-output?
             self.write-func-call()
         else
             self.output.write-safe()
@@ -83,14 +92,14 @@ class CallExpression(Expression)
     func inst write-func-call()
         if self.arguments.has-error
             write(user "LUMI_err = ")
-        else-if self.native-output and not self.is-statement and
+        else-if self.native-output? and not self.is-statement and
                 self.result-type?
             if not self.result-type.type-data.is-primitive
                 write(user "((")
                 self.result-type.write-cname()
                 write(user "*)")
         self.write-function()
-        if self.native-output and not self.is-statement
+        if self.native-output? and not self.is-statement
             self.arguments.write-call()
             if self.result-type?
                 if not self.result-type.type-data.is-primitive
