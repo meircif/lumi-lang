@@ -295,10 +295,8 @@ class ConstantStringVariable(ConstantBufferVariable)
             if ch = '\''
                 write-c(copy '\\')
             if ch < 32 or ch > 126
-                var Int value(copy ch)
-                if value < 0
-                    value += 256
                 write(user "\\x")
+                var Int value(copy (ch + 256) mod 256)
                 self.write-hex-digit(copy value div 16)
                 self.write-hex-digit(copy value mod 16)
             else
