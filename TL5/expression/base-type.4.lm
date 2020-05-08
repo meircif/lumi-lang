@@ -47,9 +47,6 @@ class ModuleTypeExpression(Expression)
     
     func inst analyze-module()
         analyze-expression()->(owner self.module-expression)
-        if not self.module-expression.result-type?
-            self.code-node.syntax-error-msg(
-                    user "expected module, got empty expression")
         if self.module-expression.result-type.type-data is-not glob.type-module
             self.code-node.syntax-error(
                     user "expected module, got",

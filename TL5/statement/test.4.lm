@@ -11,7 +11,7 @@ class SyntaxTreeAssert(SyntaxTreeCode)
         new-node.parse()
     
     func inst parse()
-        self.tested.new(user "", user self)
+        self.tested.new(user "", user self, user self)
     
     func dynamic analyze()
         if self.set-has-error()
@@ -49,7 +49,7 @@ class SyntaxTreeAssertError(SyntaxTreeCode)
     func inst parse()
         self.dummy-block.set-parent(user self.parent)
         self.dummy-block.indentation-spaces -= INDENTATION-SPACES
-        self.tested.new(user ",", user self)
+        self.tested.new(user ",", user self, user self)
         if glob.last-char = ','
             read-c()
             if glob.last-char = '\n'

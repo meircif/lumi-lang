@@ -329,7 +329,8 @@ struct FunctionCall
     user SyntaxTreeFunction function
     
     new(user SyntaxTreeFunction function, user TypeInstance calling-type)
-        calling-type.copy-new()->(owner self.calling-type)
+        if calling-type?
+            calling-type.copy-new()->(owner self.calling-type)
         self.function := function
 
 

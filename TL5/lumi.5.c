@@ -277,9 +277,12 @@ while (self->field != NULL) { \
   name = LUMI_alloc(sizeof(type) * size); \
   if (name == NULL) RAISE(line, cleanup, object_memory)
 
-#define INIT_NEW_ARRAY(line, cleanup, name, type, length, value_size) \
+#define INIT_NEW_LEN_ARRAY(line, cleanup, name, type, length, value_size) \
   name##_Length = length; \
-  INIT_NEW(line, cleanup, name, type, name##_Length * value_size)
+  INIT_NEW_ARRAY(line, cleanup, name, type, name##_Length, value_size)
+
+#define INIT_NEW_ARRAY(line, cleanup, name, type, length, value_size) \
+  INIT_NEW(line, cleanup, name, type, length * value_size)
 
 #define INIT_NEW_SEQUENCE(line, cleanup, name, type, size) \
   name##_Max_length = size; \

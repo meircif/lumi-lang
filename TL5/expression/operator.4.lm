@@ -730,7 +730,7 @@ class BaseAssignOperatorExpression(BinaryExpression)
                     user "assigning into non assignable expression")
         self.analyze-assignment()
         self.safe-operand-write := false
-        self.result-type := _
+        self.set-simple-type(user glob.type-void-expression)
 
     func dynamic analyze-assignment()
         raise
@@ -863,6 +863,7 @@ class SwapOperatorExpression(BinaryExpression)
         if self.left-expression.result-type.reference-path.equals(
                 user self.right-expression.result-type.reference-path)
             self.syntax-error-msg(user "swapping reference with itself")
+        self.set-simple-type(user glob.type-void-expression)
 
 
     func dynamic check-memory(user ReferenceMemoryList refs)

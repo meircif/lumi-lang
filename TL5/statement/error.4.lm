@@ -42,7 +42,8 @@ class SyntaxTreeIfError(SyntaxTreeIf)
     
     func dynamic analyze-condition()
         self.condition.analyze()
-        if self.condition.result-type?
+        if self.condition.result-type.type-data is-not
+                glob.type-void-expression
             self.syntax-error-msg(user "statement has no effect")
         
     func dynamic write()

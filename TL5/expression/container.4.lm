@@ -13,7 +13,7 @@ class BlockExpression(Expression)
 
     ~~~ parsing `(expression)` ~~~
     func inst parse()
-        parse-new-expression(user ")", user self.code-node)->(
+        parse-new-expression(user ")", user self, user self.code-node)->(
                 owner self.expression)
         if glob.last-char != ')'
             self.syntax-error-c(user "expected \")\", got")
@@ -71,7 +71,11 @@ class UnaryExpression(Expression)
         else
             self.expect-space(user self.operator.name)
         Expression.parse-new(
-                user _, user ends, user self.code-node, user self.operator)->(
+                user _,
+                user ends,
+                user self,
+                user self.code-node,
+                user self.operator)->(
                 owner self.right-expression, user next-operator)
 
     func dynamic get-first-operand()->(user Expression operand)
@@ -83,10 +87,6 @@ class UnaryExpression(Expression)
 
     func inst analyze-operand()->(owner Expression operand)
         analyze-expression()->(owner operand)
-        if not operand.result-type?
-            self.syntax-error(
-                    user "void expression given as operand to operator",
-                    user self.operator.name)
 
     func inst test-operand-type(
             user Expression operand,
@@ -252,8 +252,6 @@ class QuestionExpression(Expression)
     func dynamic analyze()
         analyze-expression()->(owner self.tested)
         self.tested.check-no-error()
-        if not self.tested.result-type?
-            self.syntax-error-msg(user "cannot use \"?\" on void expression")
         if not self.tested.result-type.conditional and
                 self.tested.access != Access.WEAK
             self.syntax-error(

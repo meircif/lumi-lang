@@ -148,7 +148,7 @@ class OwnerToStrongCallExpression(WrapExpression)
 
 
 ~~~ An expression that checks whether an expression is usable ~~~
-class CheckExpression(WrapExpression)
+class CheckUsableExpression(WrapExpression)
     var Bool check-conditional
     var Bool check-weak
     
@@ -173,9 +173,6 @@ class CheckExpression(WrapExpression)
         else
             self.expression.check-error-propagated(
                     user "ignoring weak reference check")
-
-    func dynamic check-memory(user ReferenceMemoryList refs)
-        base(user refs)
 
     func dynamic write-preactions()
         base()
@@ -203,3 +200,70 @@ class RefCastExpression(WrapExpression)
         
     func dynamic write-cast()
         self.write()
+
+
+~~~ An expression that checks given array length ~~~
+class CheckArrayLengthExpression(WrapExpression)
+    var Bool exact
+    
+    new(
+            owner Expression expression,
+            user TypeInstance target-type,
+            copy Bool exact)
+        base(owner expression)
+        self.exact := exact
+        self.error-propagated := true
+        self.error-expected := false
+        user TypeInstance target(user target-type)
+        user TypeInstance value(user self.result-type)
+        do
+            if target.length.get-constant-value()? and
+                    not value.length.get-constant-value()?
+                value.length := target.length
+            target := target.parameters.first.item
+            value := value.parameters.first.item
+            while target.type-data is glob.type-array and
+                    value.type-data is glob.type-array
+    
+    func dynamic analyze()
+        self.expression.check-error-propagated(
+                user "ignoring array length check")
+
+    func dynamic write-preactions()
+        base()
+        ; if (...) RAISE(`slice_index`)
+        user TypeInstance target(user self.result-type)
+        user TypeInstance value(user self.expression.result-type)
+        var Int depth
+        var Bool another
+        write(user "if (")
+        do
+            if target.length.get-constant-value()? and
+                    not value.length.get-constant-value()?
+                self.write-length-check(
+                        user target.length, copy depth, copy another)
+                another := true
+            target := target.parameters.first.item
+            value := value.parameters.first.item
+            while target.type-data is glob.type-array and
+                    value.type-data is glob.type-array
+            depth += 1
+        write(user ") ")
+        self.code-node.write-raise(user "slice_index")
+        self.code-node.write-spaces()
+
+    func inst write-length-check(
+            user ExpressionValue length, copy Int depth, copy Bool another)
+        ; [ || ]`array`[_value]_Length [<][!=] `needed-length`
+        if another
+            write(user " || ")
+        self.expression.write()
+        if depth = 0
+            write(user "_Length")
+        else
+            write-array-value-length(copy depth - 1)
+        if self.exact or depth > 0
+            write(user " != ")
+        else
+            write(user " < ")
+        length.write()

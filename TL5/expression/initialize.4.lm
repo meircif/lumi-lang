@@ -225,9 +225,12 @@ class InitExpression(ModuleTypeExpression)
             write(user ";\n")
             self.code-node.write-spaces()
         
-        ; INIT_NEW_ARRAY(`line`, `cleanup`, `aux-variable`, `type`, `length`,
-        ;     `valu-size`);
-        self.write-macro-init(user "INIT_NEW_ARRAY", user self.aux-variable)
+        ; INIT_NEW_[LEN_]ARRAY(`line`, `cleanup`, `aux-variable`, `type`,
+        ;     `length`, `valu-size`);
+        write(user "INIT_NEW_")
+        if not self.result-type.length.get-constant-value()?
+            write(user "LEN_")
+        self.write-macro-init(user "ARRAY", user self.aux-variable)
         write(user ", ")
         if data-type.type-data is glob.type-string
             write(user "Char")

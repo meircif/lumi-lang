@@ -13,6 +13,15 @@ struct IntRange
     var Int bits
     var Bool is-signed
     
+    func parse(user SyntaxTreeNode node, user SyntaxTreeCode code-node)
+        self.min-owner.new(user ":}", user node, user code-node)
+        if glob.last-char = ':'
+            self.min-expression := self.min-owner
+            self.max-owner.new(user "}", user node, user code-node)
+        else
+            self.max-owner.expression := self.min-owner.expression
+        self.max-expression := self.max-owner
+    
     func copy-new()->(owner IntRange other)
         other := IntRange()
         other.min-expression := self.min-expression
@@ -116,8 +125,44 @@ struct IntRange
                 self.bits := 64
         legal := true
     
-    func size-as(user IntRange other)->(var Bool same)
-        same := self.is-signed = other.is-signed and self.bits = other.bits
+    ; func size-as(user IntRange other)->(var Bool same)
+    ;     same := self.is-signed = other.is-signed and self.bits = other.bits
+    
+    func check-assign-from(user IntRange value, user SyntaxTreeNode node)
+        self.set-values(user node)
+        if long-larger(user value.max-value, user self.max-value)
+            assert node?
+            node.syntax-error-long2(
+                    user "assigning integer with maximum of",
+                    user value.max-value,
+                    user "into integer with smaller maximum of",
+                    user self.max-value)
+        if long-larger(user self.min-value, user value.min-value)
+            assert node?
+            node.syntax-error-long2(
+                    user "assigning integer with minimum of",
+                    user value.min-value,
+                    user "into integer with larger minimum of",
+                    user self.min-value)
+    
+    func check-equal(user IntRange other, user SyntaxTreeNode node)->(
+            var Bool same)
+        if not self? or not other?
+            return
+        if not long-equal(user self.min-value, user other.min-value)
+            assert node?
+            node.syntax-error-long2(
+                    user "non matching integer range minimum",
+                    user self.min-value,
+                    user "and",
+                    user other.min-value)
+        if not long-equal(user self.max-value, user other.max-value)
+            assert node?
+            node.syntax-error-long2(
+                    user "non matching integer range maximum",
+                    user self.max-value,
+                    user "and",
+                    user other.max-value)
     
     func write-cname()
         if not self.is-signed

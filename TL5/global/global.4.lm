@@ -113,6 +113,7 @@ struct Global
     user TypeData type-base
     user TypeData type-generic
     user TypeData type-module
+    user TypeData type-void-expression
     user TypeData type-file
     user TypeData type-file-read-text
     user TypeData type-file-read-binary
@@ -527,6 +528,8 @@ struct Global
         self.type-generic.is-dynamic := true
         self.add-global-type(user "Module Name", copy false)->(
                 user self.type-module)
+        self.add-global-type(user "Void Expression", copy false)->(
+                user self.type-void-expression)
 
         ; Bool
         self.add-builtin-global-variable(

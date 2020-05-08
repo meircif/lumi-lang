@@ -22,9 +22,10 @@ class SliceExpression(Expression)
     ~~~ parsing `sequence[index]` or `sequence[index:second-index]` ~~~
     func inst parse(owner Expression sequence)
         self.sequence := sequence
-        parse-new-expression(user ":]", user self.code-node)->(owner self.index)
+        parse-new-expression(user ":]", user self, user self.code-node)->(
+                owner self.index)
         if glob.last-char = ':'
-            parse-new-expression(user "]", user self.code-node)->(
+            parse-new-expression(user "]", user self, user self.code-node)->(
                     owner self.second-index-owner)
             self.second-index := self.second-index-owner
         if glob.last-char != ']'
@@ -42,8 +43,6 @@ class SliceExpression(Expression)
     
     func dynamic analyze()
         analyze-expression()->(owner self.sequence)
-        if not self.sequence.result-type?
-            self.syntax-error-msg(user "cannot slice a void expression")
         self.check-expression-all-errors()->(owner self.sequence)
         if self.sequence.result-type.type-data.is-buffered()
             if not self.second-index?
@@ -171,15 +170,10 @@ class SliceExpression(Expression)
     
     func inst check-index(user Expression index)
         index.check-no-error()
-        if index.result-type?
-            if index.result-type.type-data is-not glob.type-int
-                self.syntax-error(
-                        user "expected integer index for slice, got",
-                        user index.result-type.type-data.name)
-        else
-            self.syntax-error-msg(
-                    user "expected integer index for slice, got void \
-                    expression")
+        if index.result-type.type-data is-not glob.type-int
+            self.syntax-error(
+                    user "expected integer index for slice, got",
+                    user index.result-type.type-data.name)
 
     func dynamic check-memory(user ReferenceMemoryList refs)
         self.sequence.check-memory(user refs)
@@ -261,12 +255,13 @@ class SliceExpression(Expression)
         self.write-index(user self.result-type, copy depth)
         self.code-node.write-spaces()
         
-        ; symbol_Length = second;
-        self.slice-variable.write()
-        write(user "_Length = ")
-        self.second-index.write()
-        write(user ";\n")
-        self.code-node.write-spaces()
+        if not self.result-type.length.get-constant-value()?
+            ; symbol_Length = second;
+            self.slice-variable.write()
+            write(user "_Length = ")
+            self.second-index.write()
+            write(user ";\n")
+            self.code-node.write-spaces()
         if self.sequence.result-type.type-data is glob.type-array
             self.write-length-assigns(user data-type, copy depth, copy 0)
         
@@ -296,19 +291,17 @@ class SliceExpression(Expression)
         self.write-index(user self.sequence.result-type, copy depth)
         self.code-node.write-spaces()
         
-        ; symbol_Max_length = seq_Value_length;
-        self.slice-variable.write()
-        if self.result-type.type-data is glob.type-array
-            write(user "_Length = ")
-        else
-            write(user "_Max_length = ")
-        if self.result-type.length?
-            self.result-type.length.write()
-        else
+        if not self.result-type.length.get-constant-value()?
+            ; symbol_Max_length = seq_Value_length;
+            self.slice-variable.write()
+            if self.result-type.type-data is glob.type-array
+                write(user "_Length = ")
+            else
+                write(user "_Max_length = ")
             self.sequence.write()
             write(user "_Value_length")
-        write(user ";\n")
-        self.code-node.write-spaces()
+            write(user ";\n")
+            self.code-node.write-spaces()
         if self.result-type.type-data is glob.type-array
             self.write-length-assigns(user data-type, copy depth, copy 1)
         else
@@ -343,16 +336,14 @@ class SliceExpression(Expression)
         for n in depth - offset
             ; symbol_Value_[value_]length = seq_Value_[value_]length;
             sequence-type := sequence-type.parameters.first.item
-            self.slice-variable.write()
-            write-array-value-length(copy n)
-            write(user " = ")
-            if sequence-type.length?
-                sequence-type.length.write()
-            else
+            if not sequence-type.length.get-constant-value()?
+                self.slice-variable.write()
+                write-array-value-length(copy n)
+                write(user " = ")
                 self.sequence.write()
                 write-array-value-length(copy n + offset)
-            write(user ";\n")
-            self.code-node.write-spaces()
+                write(user ";\n")
+                self.code-node.write-spaces()
         if data-type.type-data.is-buffered()
             ; symbol_Seq_length = seq_Seq_length + (index)
             ;     [ * seq_Value_[value_]length]...;

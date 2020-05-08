@@ -23,8 +23,12 @@ class ExpressionValue(SyntaxTreeNode)
     var Int access
     var Bool is-statement
     
-    new(user String ends, user SyntaxTreeCode code-node)
-        parse-new-expression(user ends, user code-node)->(owner self.expression)
+    new(
+            user String ends,
+            user SyntaxTreeNode node,
+            user SyntaxTreeCode code-node)
+        parse-new-expression(user ends, user node, user code-node)->(
+                owner self.expression)
     
     func inst parsed()->(var Bool is-parsed)
         is-parsed := self.expression?
@@ -49,13 +53,16 @@ class ExpressionValue(SyntaxTreeNode)
             
     func inst check-errors(copy Bool check-conditional, copy Bool check-weak)
         self.expression.code-node.check-expression-errors(
-                copy check-conditional, copy check-weak)->(
+                copy check-conditional, copy check-weak, copy true)->(
                 owner self.expression)
     
     func dynamic order-constants(user NameMap{SyntaxTreeConstant} ordered-list)
         self.expression.order-constants(user ordered-list)
     
     func inst get-constant-value()->(user Long value)
+        value := _
+        if not self?
+            return
         user IntRange int-range(user self.result-type.int-range)
         if long-equal(user int-range.min-value, user int-range.max-value)
             value := int-range.max-value
@@ -74,9 +81,13 @@ class ExpressionValue(SyntaxTreeNode)
 ~~~ Return in `expression` a new allocated expression parsed from the input
 file until one of the characters in `ends` is reached.
 Return the end character in `end` ~~~
-func parse-new-expression(user String ends, user SyntaxTreeCode code-node)->(
+func parse-new-expression(
+        user String ends,
+        user SyntaxTreeNode node,
+        user SyntaxTreeCode code-node)->(
         owner Expression expression)
-    Expression.parse-new(user _, user ends, user code-node, user _)->(
+    Expression.parse-new(
+            user _, user ends, user node, user code-node, user _)->(
             owner expression)
 
 func analyze-expression()->(owner Expression expression)
@@ -106,6 +117,7 @@ class Expression(SyntaxTreeNode)
     ~~~ Parse any expression ~~~
     func inst parse-new(
             user String ends,
+            user SyntaxTreeNode node,
             user SyntaxTreeCode code-node,
             user Operator curr-operator)->(
             owner Expression expression,
@@ -119,7 +131,8 @@ class Expression(SyntaxTreeNode)
                     user _, user ends, user operator, user code-node)->(
                     owner expression, user operator)
         else
-            self.parse-new-operand(owner text, user ends, user code-node)->(
+            self.parse-new-operand(
+                    owner text, user ends, user node, user code-node)->(
                     owner expression)
             if glob.last-char = ' '
                 self.read-new-value(user ends)->(owner text)
@@ -154,6 +167,7 @@ class Expression(SyntaxTreeNode)
     func inst parse-new-operand(
             owner String text,
             user String ends,
+            user SyntaxTreeNode node,
             user SyntaxTreeCode code-node)->(
             owner Expression expression)
         if text.length = 0
@@ -161,10 +175,11 @@ class Expression(SyntaxTreeNode)
                 BlockExpression.parse-new(user _, user code-node)->(
                         owner expression)
             else
-                code-node.syntax-error-c(user "expected expression, got")
+                node.syntax-error-c(user "expected expression, got")
         else
             self.parse-new-init-operand(
-                    owner text, user ends, user code-node)->(owner expression)
+                    owner text, user ends, user node, user code-node)->(
+                    owner expression)
         
         do
             if glob.last-char = '!'
@@ -172,17 +187,18 @@ class Expression(SyntaxTreeNode)
                 expression.error-expected := true
                 read-c()
                 if glob.last-char = '!'
-                    code-node.syntax-error-msg(user "only one \"!\" needed")
+                    node.syntax-error-msg(user "only one \"!\" needed")
             if glob.last-char = '?'
                 QuestionExpression.parse-new(user _, user code-node)->(
                         owner expression)
-            while self.parse-new-follow-operand(user ends, user code-node)->(
-                    owner expression)
+            while self.parse-new-follow-operand(
+                    user ends, user node, user code-node)->(owner expression)
     
     ~~~ Parse the initialize part of an operand expression ~~~
     func inst parse-new-init-operand(
             owner String text,
             user String ends,
+            user SyntaxTreeNode node,
             user SyntaxTreeCode code-node)->(
             owner Expression expression)
         var Char first(copy text[0])
@@ -204,7 +220,8 @@ class Expression(SyntaxTreeNode)
                     owner expression)
         else-if first >= 'A' and first <= 'Z' and second >= 'a' and
                 second <= 'z'
-            self.parse-type-prefix(owner text, user ends, user code-node)->(
+            self.parse-type-prefix(
+                    owner text, user ends, user node, user code-node)->(
                     owner expression)
         else-if text.length = 1 and first = '_'
             expression := EmptyExpression(user code-node)
@@ -215,20 +232,23 @@ class Expression(SyntaxTreeNode)
     
     ~~~ Parse one following part of an operand ~~~
     func inst parse-new-follow-operand(
-            user String ends, user SyntaxTreeCode code-node)->(
+            user String ends,
+            user SyntaxTreeNode node,
+            user SyntaxTreeCode code-node)->(
             owner Expression expression, var Bool has-more)
         has-more := true
         if glob.last-char = '.'
             owner String text
             self.read-new-value(user ends)->(owner text)
             if text.length = 0
-                code-node.syntax-error-c(user "expected name after \".\", got")
+                node.syntax-error-c(user "expected name after \".\", got")
             var Char first(copy text[0])
             var Char second(copy '\0')
             if text.length > 1
                 second := text[1]
             if first >= 'A' and first <= 'Z' and second >= 'a' and second <= 'z'
-                self.parse-type-prefix(owner text, user ends, user code-node)->(
+                self.parse-type-prefix(
+                        owner text, user ends, user node, user code-node)->(
                         owner expression)
             else
                 expression := FieldExpression(
@@ -246,6 +266,7 @@ class Expression(SyntaxTreeNode)
     func inst parse-type-prefix(
             owner String text,
             user String ends,
+            user SyntaxTreeNode node,
             user SyntaxTreeCode code-node)->(
             owner Expression expression)
         owner String value
@@ -262,11 +283,12 @@ class Expression(SyntaxTreeNode)
         
         new TypeInstance type-instance
         var Int indentation-spaces
-        if code-node.parent?
-            indentation-spaces := code-node.parent.indentation-spaces
+        if code-node?
+            if code-node.parent?
+                indentation-spaces := code-node.parent.indentation-spaces
         type-instance.parse-name(
                 user text,
-                user code-node,
+                user node,
                 user code-node,
                 copy indentation-spaces)
         if not has-member and glob.last-char = '('
@@ -357,10 +379,10 @@ class Expression(SyntaxTreeNode)
             write(user "_Length = &Lumi_empty_length;\n")
     
     func inst write-length(
-            user String prefix, user String empty, copy Bool is-static)
+            user String suffix, user String empty, copy Bool is-static)
         var Bool is-constant-length
         user Long length-value
-        if is-static and self.result-type.length?
+        if is-static
             self.result-type.length.get-constant-value()->(user length-value)
         if self.result-type.type-data is glob.type-empty
             write(user empty)
@@ -368,7 +390,7 @@ class Expression(SyntaxTreeNode)
             write-long(user length-value)
         else
             self.write()
-            write(user prefix)
+            write(user suffix)
         
     func inst write-support-name(user TypeInstance dynamic)
         if self.result-type.conditional and dynamic.conditional

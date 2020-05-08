@@ -122,16 +122,18 @@ class AssignExpression(Expression)
             self.write-sequence-preactions()
     
     func inst write-array-preactions()
-        self.target.write()
-        write(user "_Length = ")
-        if self.value.result-type.type-data.is-buffered()
-            write(user "*(")
-            self.value.write()
-            write(user "_Length)")
-        else
-            self.value.write-length(user "_Length", user "0", copy true)
-        write(user ";\n")
-        self.code-node.write-spaces()
+        user TypeInstance type-instance(user self.target.result-type)
+        if not type-instance.length.get-constant-value()?
+            self.target.write()
+            write(user "_Length = ")
+            if self.value.result-type.type-data.is-buffered()
+                write(user "*(")
+                self.value.write()
+                write(user "_Length)")
+            else
+                self.value.write-length(user "_Length", user "0", copy true)
+            write(user ";\n")
+            self.code-node.write-spaces()
         
         user TypeInstance data-type
         var Int depth
@@ -139,28 +141,29 @@ class AssignExpression(Expression)
                 user data-type, var depth)
         user TypeInstance sequence-type(user self.value.result-type)
         for n in depth
-            self.target.write()
-            write-array-value-length(copy n)
-            write(user " = ")
             if sequence-type?
                 if sequence-type.parameters?
                     sequence-type := sequence-type.parameters.first.item
                 else
                     sequence-type := _
-            user Long length-value
-            if sequence-type?
-                if sequence-type.length?
+            type-instance := type-instance.parameters.first.item
+            if not type-instance.length.get-constant-value()?
+                self.target.write()
+                write-array-value-length(copy n)
+                write(user " = ")
+                user Long length-value
+                if sequence-type?
                     sequence-type.length.get-constant-value()->(
                             user length-value)
-            if self.value.result-type.type-data is glob.type-empty
-                write(user "0")
-            else-if length-value?
-                write-long(user length-value)
-            else
-                self.value.write()
-                write-array-value-length(copy n)
-            write(user ";\n")
-            self.code-node.write-spaces()
+                if self.value.result-type.type-data is glob.type-empty
+                    write(user "0")
+                else-if length-value?
+                    write-long(user length-value)
+                else
+                    self.value.write()
+                    write-array-value-length(copy n)
+                write(user ";\n")
+                self.code-node.write-spaces()
         
         if data-type.type-data.is-buffered()
             self.target.write()
@@ -218,7 +221,6 @@ class AssignExpression(Expression)
                 self.original-value := self.aux-variable
                 self.value := self.aux-variable
             self.write-left-delete()
-            self.code-node.write-spaces()
         
             if self.target.access = Access.STRONG
                 write(user "LUMI_owner_dec_ref(")
@@ -290,6 +292,7 @@ class AssignExpression(Expression)
                 write(user "free(")
                 self.target.write()
                 write(user "_Seq_length);\n")
+                self.code-node.write-spaces()
             else-if not data-type.type-data.is-primitive
                 write(user "ARRAY_DEL(")
                 data-type.write-cname()
@@ -298,6 +301,7 @@ class AssignExpression(Expression)
                 write(user ", ")
                 self.target.write-length(user "_Length", user "0", copy true)
                 write(user ")\n")
+                self.code-node.write-spaces()
             return
         self.target.write()
         if self.target.result-type.type-data.is-dynamic
@@ -306,6 +310,7 @@ class AssignExpression(Expression)
         else-if type-data is-not glob.type-array
             write(user ", NULL")
         write(user ");\n")
+        self.code-node.write-spaces()
     
     func dynamic write()
         ; not called in assignment operator

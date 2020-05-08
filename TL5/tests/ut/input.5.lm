@@ -397,11 +397,84 @@ var Array{12:Uint32} ab
 i := ab[3:4][3]
 ; @ c test-slice-expression-20
 i := str![2]! + buff![2]! + str![1:3]![2] + buff![1:3]![2]
-; ; @ c test-slice-expression-21
-; user Array{4:Uint32} ai
-; i := ai[2]
-; arr := ai
-; ai := arr!
+; @ g test-slice-expression-21
+struct Test
+    var Array{4:Uint32} va
+    weak Array?{4:Uint32} wa
+func ! fun(weak Array{4:Uint32} a4, weak Array{Uint32} ad)->(
+        weak Array{6:Uint32} oa6, weak Array{Uint32} oad)
+    oa6 := ad!
+    oad := a4
+    s-var Array{8:Uint32} a8!
+    oa6 := a8
+    oad := a8
+    var Int i(copy a4![2])
+    i := ad![2]!
+    i := a8[2]
+    fun(weak ad!, weak a4)->(weak oa6, weak oad)!
+    fun(weak a8, weak a8)->(weak oad, weak oa6!)!
+    user Array{2:Uint32} a2
+    a2 := a8
+    a2 := a4!
+    a2 := ad!
+    ; line 20
+; @ g test-slice-expression-22
+func ! fun(owner Array?{4:Uint32} a4, owner Array?{Uint32} ad)->(
+        owner Array?{4:Uint32} oa4, owner Array?{Uint32} oad)
+    oa4 := ad!
+    oad := a4
+    fun(owner a4, owner ad)->(owner oa4, owner oad)!
+    fun(owner ad!, owner a4)->(owner oad, owner oa4!)!
+; @ g test-slice-expression-23
+struct Test
+    var Array{6:Array{7:Array{8:Uint32}}} av
+    weak Array?{6:Array{7:Array{8:Uint32}}} as
+    weak Array?{6:Array{Array{8:Uint32}}} ams
+    weak Array?{Array{7:Array{Uint32}}} amd
+    weak Array?{Array{Array{Uint32}}} ad
+func ! fun(
+        weak Array{6:Array{7:Array{8:Uint32}}} as,
+        weak Array{6:Array{Array{8:Uint32}}} ams,
+        weak Array{Array{7:Array{Uint32}}} amd,
+        weak Array{Array{Array{Uint32}}} ad)->(
+        weak Array{4:Array{7:Array{8:Uint32}}} oas,
+        weak Array{4:Array{Array{8:Uint32}}} oams,
+        weak Array{Array{7:Array{Uint32}}} oamd,
+        weak Array{Array{Array{Uint32}}} oad)
+    oas := as
+    oas := ams!
+    oas := amd!
+    oas := ad!
+    ; line 20
+    oams := as
+    oams := ams
+    oams := amd!
+    oams := ad!
+    oamd := as
+    oamd := ams!
+    oamd := amd
+    oamd := ad!
+    oad := as
+    oad := ams
+    oad := amd
+    oad := ad
+    
+    fun(weak as, weak as, weak as, weak as)->(
+            weak oas, weak oams, weak oamd, weak oad)!
+    fun(weak ams!, weak ams, weak ams!, weak ams)->(
+            weak oad, weak oas!, weak oams!, weak oamd!)!
+    fun(weak amd!, weak amd!, weak amd, weak amd)->(
+            weak oamd, weak oad, weak oas!, weak oams!)!
+    ; line 40
+    fun(weak ad!, weak ad!, weak ad!, weak ad)->(
+            weak oams, weak oamd!, weak oad, weak oas!)!
+; @ c test-slice-expression-24
+new Array{i:Byte} abi!
+new Array{6:Byte} ab6!
+owner Array{6:Byte} ab6o(owner Array{6:Byte}()!)
+user Array{Byte} uab(user abi)
+uab := ab6
+uab := ab6o
 ; @ ec test-slice-expression-e0
 arr[2
 ; @ ec test-slice-expression-e1
@@ -454,6 +527,20 @@ var Int{-10:10} length
 new Array{length:Uint32} a!
 var Int{8:80} x
 arr := a[x:x]
+; @ ec test-slice-expression-e21
+owner Array?{6:Byte} a6
+owner Array?{4:Byte} a4(owner a6)
+; @ ec test-slice-expression-e22
+user Array?{4:Byte} a4
+user Array?{6:Byte} a6(owner a4)
+; @ ec test-slice-expression-e23
+owner Array?{2:Array{6:Byte}} a6
+owner Array?{2:Array{4:Byte}} a4(owner a6)
+; @ eg test-slice-expression-e24
+func fun()->(user Array{Byte} ao)
+    user Array{6:Byte} a
+    fun()->(user a)
+    fun()->(user ao)
 ; @@ test-call-expression
 ; @ c test-call-expression-0
 fun0()
@@ -1007,8 +1094,8 @@ strong Tc t1(strong Tc(copy 1)!)
 strong Tc t2(strong Tc(copy 2)!)
 t1 :=: t2
 ; @ c test-swap-expression-4
-new Array{4:Uint32} a1!
-new Array{6:Uint32} a2!
+new Array{i:Uint32} a1!
+new Array{i:Uint32} a2!
 a1 :=: a2
 ; @ c test-swap-expression-5
 strong Array{Uint32} a1(strong Array{4:Uint32}()!)
@@ -1068,6 +1155,19 @@ valid :=: invalid
 new String{4} valid!
 owner String invalid
 invalid :=: valid
+; @ ec test-swap-expression-e8
+i :=: j
+; @ ec test-swap-expression-e9
+var Uint8 x
+i :=: x
+; @ ec test-swap-expression-e10
+user Array?{6:Bool} a6
+user Array?{Bool} ad
+a6 :=: ad
+; @ ec test-swap-expression-e11
+user Array?{6:Bool} a6
+user Array?{8:Bool} a8
+a6 :=: a8
 ; @@ test-question-expression
 ; @ c test-question-expression-0
 b := ostr?
@@ -1224,6 +1324,9 @@ raise! str!
 var String{23!} s
 ; @ ec test-exclamation-expression-en33
 `beaf`!.clear()
+; @ ec test-exclamation-expression-en34
+strong String? s
+fun3(copy 0)->(strong s!)
 ; @@ test-int-range
 ; @ g test-int-range-0
 struct Test

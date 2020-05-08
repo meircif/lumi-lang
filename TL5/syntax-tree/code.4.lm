@@ -11,12 +11,13 @@ class SyntaxTreeExpression(SyntaxTreeCode)
         new-node.parse()
     
     func inst parse()
-        self.expression.new(user "", user self)
+        self.expression.new(user "", user self, user self)
     
     func dynamic analyze()
         self.expression.is-statement := true
         self.expression.analyze()
-        if self.expression.result-type?
+        if self.expression.result-type.type-data is-not
+                glob.type-void-expression
             self.syntax-error-msg(user "statement has no effect")
 
     func dynamic check-memory(user ReferenceMemoryList refs)
@@ -60,7 +61,7 @@ class SyntaxTreeRaise(SyntaxTreeCode)
     
     func inst parse()
         if glob.last-char = ' '
-            self.error-message.new(user "", user self)
+            self.error-message.new(user "", user self, user self)
     
     func dynamic is-end-point()->(var Bool is-end)
         is-end := true
@@ -107,7 +108,7 @@ class SyntaxTreeWhile(SyntaxTreeCode)
     func inst parse()
         if self.parent.loop-depth = 0
             self.syntax-error-msg(user "\"while\" used not inside loop")
-        self.condition.new(user "", user self)
+        self.condition.new(user "", user self, user self)
     
     func dynamic analyze()
         self.analyze-expression(user self.condition, user glob.type-bool)

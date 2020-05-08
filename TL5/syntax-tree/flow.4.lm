@@ -78,7 +78,7 @@ class SyntaxTreeIf(SyntaxTreeFlowElement)
         new-node.parse()
     
     func inst parse()
-        self.condition.new(user "", user self)
+        self.condition.new(user "", user self, user self)
         self.parse-block()
     
     func inst add-else(owner SyntaxTreeElse else-node)
@@ -173,7 +173,7 @@ class SyntaxTreeLoop(SyntaxTreeFlowElement)
                 self.syntax-error-msg(
                         user "using \"!\" where error is not propagated")
             self.expect-space(user "loop")
-            self.limit.new(user "", user self)
+            self.limit.new(user "", user self, user self)
         self.parse-block()
 
     func dynamic set-loop-finite(copy Bool is-return)

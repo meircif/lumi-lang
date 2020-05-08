@@ -19,7 +19,7 @@ comment
 var Uint32 global-int(copy 23)
 owner Buffer global-buffer(owner Buffer{32}(user `feed1000beef`)!)
 owner String global-string(owner String{32}(user "a constant string")!)
-owner String unicode-string(owner String{32}(user "שָׁלוֹם עוֹלָֽם")!)
+owner String unicode-string(owner String{64}(user "👋 שָׁלוֹם עוֹלָֽם 🌎")!)
 
 var Array{TestEnum.length + LENGTH:Uint32} int-arr
 const Int LENGTH SIZE * 5
@@ -156,6 +156,41 @@ func ! test-slice-expression(
     arrfo := arrf[2:7]!
     arrf[4]!()
     arrfo![4]!()
+
+func ! test-slice-assign(
+        weak Array{6:Array{7:Array{8:Uint32}}} as,
+        weak Array{6:Array{Array{8:Uint32}}} ams,
+        weak Array{Array{7:Array{Uint32}}} amd,
+        weak Array{Array{Array{Uint32}}} ad)->(
+        weak Array{4:Array{7:Array{8:Uint32}}} oas,
+        weak Array{4:Array{Array{8:Uint32}}} oams,
+        weak Array{Array{7:Array{Uint32}}} oamd,
+        weak Array{Array{Array{Uint32}}} oad)
+    oas := as
+    oas := ams!
+    oas := amd!
+    oas := ad!
+    ; line 20
+    oams := as
+    oams := ams
+    oams := amd!
+    oams := ad!
+    oamd := as
+    oamd := ams!
+    oamd := amd
+    oamd := ad!
+    oad := as
+    oad := ams
+    oad := amd
+    oad := ad
+    test-slice-assign(weak as, weak as, weak as, weak as)->(
+            weak oas, weak oams, weak oamd, weak oad)!
+    test-slice-assign(weak ams!, weak ams, weak ams!, weak ams)->(
+            weak oad, weak oas!, weak oams!, weak oamd!)!
+    test-slice-assign(weak amd!, weak amd!, weak amd, weak amd)->(
+            weak oamd, weak oad, weak oas!, weak oams!)!
+    test-slice-assign(weak ad!, weak ad!, weak ad!, weak ad)->(
+            weak oams, weak oamd!, weak oad, weak oas!)!
 
 
 func test-container-expression(copy Sint32 x, copy Sint32 y, user String? s)->(

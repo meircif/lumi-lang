@@ -17,11 +17,8 @@ struct TypeInstance
     
     ~~~ Return a new deep-copy of self ~~~
     func copy-new()->(owner TypeInstance type-instance)
-        if self?
-            type-instance := TypeInstance()
-            self.copy(user type-instance)
-        else
-            type-instance := _
+        type-instance := TypeInstance()
+        self.copy(user type-instance)
                 
     func copy(user TypeInstance other)
         other.type-data := self.type-data
@@ -66,67 +63,59 @@ struct TypeInstance
             user SyntaxTreeCode code-node,
             copy Int indentation-spaces)
         string-new-copy(user name)->(owner self.name)
-        if glob.last-char = '{'
-            if self.name.equal(user "Func")
-                self.arguments := FunctionArguments()
-                read-c()
-                if glob.last-char = ':'
-                    self.arguments.has-error := true
-                    read-c()
-                if glob.last-char != '('
-                    node.syntax-error-c(
-                            user "expected \"(\" inside Function type, got")
-                var DeclarationArgumentFactory argument-factory
-                self.arguments.parse(
-                        user argument-factory,
-                        copy false,
-                        user node,
-                        user code-node,
-                        copy indentation-spaces)
-            else-if self.name.equal(user "Int")
-                self.int-range := IntRange()
-                self.int-range.min-owner.new(user ":}", user code-node)
-                if glob.last-char = ':'
-                    self.int-range.min-expression := self.int-range.min-owner
-                    self.int-range.max-owner.new(user "}", user code-node)
-                else
-                    self.int-range.max-owner.expression :=
-                            self.int-range.min-owner.expression
-                self.int-range.max-expression := self.int-range.max-owner
-            else-if code-node? and (self.name.equal(user "String") or
-                    self.name.equal(user "Buffer"))
-                self.length-owner.new(user "}", user code-node)
-                self.length := self.length-owner
-            else
-                var Bool has-sub-type(copy true)
-                var Bool is-array(copy self.name.equal(user "Array"))
-                if code-node? and is-array
-                    self.length-owner.new(user ":}", user code-node)
-                    self.length := self.length-owner
-                    if glob.last-char != ':' and glob.last-char != '}'
-                        node.syntax-error-c(
-                                user "expected \":\" or \"} after array \
-                                length\", got")
-                    has-sub-type := glob.last-char = ':'
-                if has-sub-type
-                    if not is-array
-                        code-node := _
-                    self.parameters := List{TypeInstance}()
-                    do
-                        new TypeInstance sub-type
-                        sub-type.parse(
-                                user ":}",
-                                user node,
-                                user code-node,
-                                copy indentation-spaces)
-                        self.parameters.add(owner sub-type)
-                        while glob.last-char = ':'
-                        if is-array
-                            node.syntax-error-msg(
-                                    user "more than one subtype for array")
-            if glob.last-char != '}'
-                node.syntax-error-c(user "expected \"}\" after sub-types, got")
+        if glob.last-char != '{'
+            return
+        if self.name.equal(user "Func")
+            self.arguments := FunctionArguments()
             read-c()
+            if glob.last-char = ':'
+                self.arguments.has-error := true
+                read-c()
+            if glob.last-char != '('
+                node.syntax-error-c(
+                        user "expected \"(\" inside Function type, got")
+            var DeclarationArgumentFactory argument-factory
+            self.arguments.parse(
+                    user argument-factory,
+                    copy false,
+                    user node,
+                    user code-node,
+                    copy indentation-spaces)
+        else-if self.name.equal(user "Int")
+            self.int-range := IntRange()
+            self.int-range.parse(user node, user code-node)
+        else-if code-node? and (self.name.equal(user "String") or
+                self.name.equal(user "Buffer"))
+            self.length-owner.new(user "}", user node, user code-node)
+            self.length := self.length-owner
+        else-if self.name.equal(user "Array")
+            self.length-owner.new(user ":}", user node, user code-node)
+            self.length := self.length-owner
+            if glob.last-char = ':'
+                self.parameters := List{TypeInstance}()
+                self.parse-new-sub-type(
+                        user node, user code-node, copy indentation-spaces)
+        else
+            self.parameters := List{TypeInstance}()
+            do
+                self.parse-new-sub-type(
+                        user node, user code-node, copy indentation-spaces)
+                while glob.last-char = ':'
+        if glob.last-char != '}'
+            node.syntax-error-c(user "expected \"}\" after sub-types, got")
+        read-c()
+    
+    func parse-new-sub-type(
+            user SyntaxTreeNode node,
+            user SyntaxTreeCode code-node,
+            copy Int indentation-spaces)
+        new TypeInstance sub-type
+        sub-type.parse(
+                user ":}",
+                user node,
+                user code-node,
+                copy indentation-spaces)
+        self.parameters.add(owner sub-type)
     
     func add-subtype-copy(user TypeData type-data)
         if not self.parameters?
@@ -179,44 +168,23 @@ struct TypeInstance
             self.set-int-range()
         if self.type-data is glob.type-pointer
             self.conditional := true
+        if self.type-data is glob.type-array and not self.parameters? and
+                self.length?
+            if self.length-owner.parsed()
+                node.analyze-expression(user self.length, user glob.type-type)
+                self.parameters := self.length.result-type.parameters
+                self.length.result-type := self.parameters.first.item
+                self.length-owner.expression := _
+            else
+                self.parameters := List{TypeInstance}()
+                self.parameters.add(owner self.length.result-type.copy-new())
+            self.length := _
         if self.arguments?
             self.arguments.link-types()
         if self.parameters?
             for sub-type in self.parameters.iter()
                 sub-type.link-types(user node)
         self.link-parameters(user node)
-    
-    func analyze(user SyntaxTreeNode node)
-        self.link-types(user node)
-        self.analyze-after-link(user node, copy false)
-    
-    func analyze-after-link(user SyntaxTreeNode node, copy Bool constant-length)
-        if self.int-range?
-            self.int-range.set-values(user node)
-        if self.length-owner.parsed()
-            node.analyze-expression(user self.length, user glob.type-int)
-            if constant-length
-                user Long length-value
-                self.length.get-constant-value()->(user length-value)
-                if not length-value?
-                    node.syntax-error-msg(
-                            user "sequence length is not constant")
-                if length-value.sign() <= 0
-                    node.syntax-error-msg(
-                            user "sequence length is not positive")
-            else
-                user IntRange range(user self.length.result-type.int-range)
-                if range.max-value.sign() <= 0
-                    node.syntax-error-long(
-                            user "sequence length never positive with \
-                            maximum value of",
-                            user range.max-value)
-            self.length.check-no-error()
-        if self.arguments?
-            self.arguments.analyze()
-        if self.parameters?
-            for sub-type in self.parameters.iter()
-                sub-type.analyze-after-link(user node, copy constant-length)
     
     func link-parameters(user SyntaxTreeNode node)
         if self.type-data is glob.type-array
@@ -271,6 +239,38 @@ struct TypeInstance
         else-if self.type-data is glob.type-func and not self.arguments?
             node.syntax-error-msg(user "missing arguments in function type")
     
+    func analyze(user SyntaxTreeNode node)
+        self.link-types(user node)
+        self.analyze-after-link(user node, copy false)
+    
+    func analyze-after-link(user SyntaxTreeNode node, copy Bool constant-length)
+        if self.int-range?
+            self.int-range.set-values(user node)
+        if self.length-owner.parsed()
+            node.analyze-expression(user self.length, user glob.type-int)
+            if constant-length
+                user Long length-value
+                self.length.get-constant-value()->(user length-value)
+                if not length-value?
+                    node.syntax-error-msg(
+                            user "sequence length is not constant")
+                if length-value.sign() <= 0
+                    node.syntax-error-msg(
+                            user "sequence length is not positive")
+            else
+                user IntRange range(user self.length.result-type.int-range)
+                if range.max-value.sign() <= 0
+                    node.syntax-error-long(
+                            user "sequence length never positive with \
+                            maximum value of",
+                            user range.max-value)
+            self.length.check-no-error()
+        if self.arguments?
+            self.arguments.analyze()
+        if self.parameters?
+            for sub-type in self.parameters.iter()
+                sub-type.analyze-after-link(user node, copy constant-length)
+    
     func can-be-assigned-to(user TypeInstance target)->(var Bool can)
         can := false
         try
@@ -283,11 +283,20 @@ struct TypeInstance
         if value.access = Access.OWNER and access = Access.STRONG
             value.check-error-propagated(
                     user "ignoring initialization error check")
+        var Bool check-conditional(copy not self.conditional and
+                self.type-data is-not glob.type-ref)
+        var Bool check-weak(copy not access-has-refman(copy access))
+        var Bool check-length
+        self.need-length-check-from(user value.result-type)->(var check-length)
         node.check-expression-errors(
-                copy not self.conditional and
-                self.type-data is-not glob.type-ref,
-                copy access != Access.WEAK)->(
+                copy check-conditional,
+                copy check-weak,
+                copy not check-length)->(
                 owner value)
+        if check-length
+            value := CheckArrayLengthExpression(
+                    owner value, user self, copy access-is-owner(copy access))
+            value.analyze()
         var Int bases
         value.result-type.check-assign-to(
                 copy value.access, user self, copy access, user node)->(
@@ -298,6 +307,20 @@ struct TypeInstance
                 value.result-type.type-data.is-buffered()
             value := RefCastExpression(owner value)
     
+    func need-length-check-from(user TypeInstance value-type)->(
+            var Bool check-length)
+        check-length := false
+        user TypeInstance target(user self)
+        user TypeInstance value(user value-type)
+        do
+            while value.type-data is glob.type-array and value.parameters? and
+                    target.type-data is glob.type-array and target.parameters?
+            check-length := target.length.get-constant-value()? and
+                    not value.length.get-constant-value()?
+            while not check-length
+            target := target.parameters.first.item
+            value := value.parameters.first.item
+    
     func check-assign-to(
             copy Int self-access,
             user TypeInstance target,
@@ -305,9 +328,28 @@ struct TypeInstance
             user SyntaxTreeNode node)->(
             var Int bases)
         bases := 0
-        if not self?
-            assert node?
-            node.syntax-error-msg(user "cannot assign void expression")
+        
+        if self.check-assign-to-before-access-pass(user target, user node)
+            return
+        self.check-assign-to-access(
+                copy self-access, user target, copy target-access, user node)
+        if self.check-assign-to-after-access-pass(
+                user target, copy target-access)
+            return
+        
+        self.check-assign-to-before-type-check(
+                user target, copy target-access, user node)
+        user TypeInstance matched-type
+        owner TypeInstance base-type-instance
+        self.check-assign-to-type-check(user target, user node)->(
+                user matched-type, owner base-type-instance, var bases)
+        self.check-assign-to-after-type-check(
+                user target, user matched-type, user node)
+    
+    func check-assign-to-before-access-pass(
+            user TypeInstance target, user SyntaxTreeNode node)->(
+            var Bool passed)
+        passed := true
         if self.type-data is glob.type-empty and target.type-data.is-ref()
             if not target.conditional
                 assert node?
@@ -319,6 +361,13 @@ struct TypeInstance
             return
         if target.type-data is glob.type-pointer and self.type-data.is-ref()
             return
+        passed := false
+    
+    func check-assign-to-access(
+            copy Int self-access,
+            user TypeInstance target,
+            copy Int target-access,
+            user SyntaxTreeNode node)
         if access-is-owner(copy target-access)
             if not access-is-owner(copy self-access)
                 assert node?
@@ -363,24 +412,11 @@ struct TypeInstance
             node.syntax-error(
                     user "assigning into a weak reference an illegal access",
                     user glob.access-names[self-access])
-        if self.int-range? and target.int-range?
-            target.int-range.set-values(user node)
-            if long-larger(user self.int-range.max-value,
-                    user target.int-range.max-value)
-                assert node?
-                node.syntax-error-long2(
-                        user "assigning integer with maximum of",
-                        user self.int-range.max-value,
-                        user "into integer with smaller maximum of",
-                        user target.int-range.max-value)
-            if long-larger(user target.int-range.min-value,
-                    user self.int-range.min-value)
-                assert node?
-                node.syntax-error-long2(
-                        user "assigning integer with minimum of",
-                        user self.int-range.min-value,
-                        user "into integer with larger minimum of",
-                        user target.int-range.min-value)
+            
+    func check-assign-to-after-access-pass(
+            user TypeInstance target, copy Int target-access)->(
+            var Bool passed)
+        passed := true
         if self.type-data is glob.type-file-read-write-text and
                 (target.type-data is glob.type-file or
                 target.type-data is glob.type-file-read-text or
@@ -397,6 +433,22 @@ struct TypeInstance
                 self.type-data is glob.type-file-write-text or
                 self.type-data is glob.type-file-write-binary)
             return
+        if target.type-data is glob.type-array and target.parameters? and
+                not access-is-owner(copy target-access) and not target.length?
+            if self.type-data is glob.type-string and
+                    target.parameters.first.item.type-data is glob.type-char
+                return
+            if self.type-data is glob.type-buffer and
+                    target.parameters.first.item.type-data is glob.type-byte
+                return
+        passed := false
+
+    func check-assign-to-before-type-check(
+            user TypeInstance target,
+            copy Int target-access,
+            user SyntaxTreeNode node)
+        if target.int-range? and self.int-range?
+            target.int-range.check-assign-from(user self.int-range, user node)
         if self.type-data is glob.type-generic and
                 target.type-data is glob.type-generic
             if not self.name.equal(user target.name)
@@ -406,22 +458,40 @@ struct TypeInstance
                         user self.name,
                         user "into different generic subtype",
                         user target.name)
-        if target.type-data is glob.type-array and target.parameters? and
-                not access-is-owner(copy target-access)
-            if self.type-data is glob.type-string and
-                    target.parameters.first.item.type-data is glob.type-char
-                return
-            if self.type-data is glob.type-buffer and
-                    target.parameters.first.item.type-data is glob.type-byte
-                return
-        user TypeInstance self-type-instance(user self)
-        owner TypeInstance base-type-instance
+        user Long target-length
+        user Long value-length
+        target.length.get-constant-value()->(user target-length)
+        self.length.get-constant-value()->(user value-length)
+        if target-length? and value-length? and
+                self.type-data is glob.type-array
+            if access-is-owner(copy target-access)
+                if not long-equal(user target-length, user value-length)
+                    assert node?
+                    node.syntax-error-long2(
+                            user "cannot assign array owner of length",
+                            user value-length,
+                            user "into array owner of different length",
+                            user target-length)
+            else-if long-larger(user target-length, user value-length)
+                assert node?
+                node.syntax-error-long2(
+                        user "cannot assign array of length",
+                        user value-length,
+                        user "into array of larger length",
+                        user target-length)
+                    
+    func check-assign-to-type-check(
+            user TypeInstance target,
+            user SyntaxTreeNode node)->(
+            user TypeInstance matched-type,
+            owner TypeInstance base-type-instance,
+            var Int bases)
+        matched-type := self
         do
-            while not target.type-data.is-same(
-                    user self-type-instance.type-data)
-            while not self-type-instance.type-data.supported-dynamics.find(
+            while not target.type-data.is-same(user matched-type.type-data)
+            while not matched-type.type-data.supported-dynamics.find(
                     user target.type-data.name)?
-            if not self-type-instance.type-data.base-type?
+            if not matched-type.type-data.base-type?
                 assert node?
                 node.syntax-error2(
                         user "cannot assign",
@@ -429,24 +499,28 @@ struct TypeInstance
                         user "into",
                         user target.type-data.name)
             owner TypeInstance prev-base-type-instance(owner base-type-instance)
-            self-type-instance.type-data.base-type.new-replace-params-extended(
-                    user self-type-instance, copy false)->(
-                    owner base-type-instance)
-            self-type-instance := base-type-instance
+            matched-type.type-data.base-type.new-replace-params-extended(
+                    user matched-type, copy false)->(owner base-type-instance)
+            matched-type := base-type-instance
             bases += 1
-        if self.conditional and not target.conditional
-            assert node?
-            node.syntax-error(
-                    user "assigning conditional into non-conditional type",
-                    user target.type-data.name)
-        
+    
+    func check-assign-to-after-type-check(
+            user TypeInstance target,
+            user TypeInstance matched-type,
+            user SyntaxTreeNode node)
         if self.arguments?
             self.arguments.check-same-as(user target.arguments, copy node?)
         
-        if target.type-data.is-primitive or target.type-data is glob.type-array
-            self-type-instance.check-sub-equal(user target, user node)
+        matched-type.check-sub-assign-to-switch(user target, user node)
+    
+    func check-sub-assign-to-switch(
+            user TypeInstance target, user SyntaxTreeNode node)
+        if self.type-data.is-primitive
+            self.check-sub-equal(user target, user node)
+        else-if self.type-data is glob.type-array
+            self.check-array-sub-assign-to(user target, user node)
         else
-            self-type-instance.check-sub-assign-to(user target, user node)
+            self.check-sub-assign-to(user target, user node)
     
     func check-sub-assign-to(
             user TypeInstance target, user SyntaxTreeNode node)
@@ -462,6 +536,36 @@ struct TypeInstance
                     copy Access.VAR,
                     user node)
             target-iter.next()
+        
+    func check-array-sub-assign-to(
+            user TypeInstance target, user SyntaxTreeNode node)
+        if not target.parameters?
+            return
+        user TypeInstance target-sub-type(user target.parameters.first.item)
+        self.check-has-subytpe(user target-sub-type, user node)
+        user TypeInstance my-sub-type(user self.parameters.first.item)
+        if my-sub-type.type-data is-not target-sub-type.type-data
+            assert node?
+            node.syntax-error2(
+                    user "non matching array subtypes",
+                    user my-sub-type.type-data.name,
+                    user "and",
+                    user target-sub-type.type-data.name)
+        my-sub-type.int-range.check-equal(
+                user target-sub-type.int-range, user node)
+        user Long target-length
+        user Long value-length
+        target-sub-type.length.get-constant-value()->(user target-length)
+        my-sub-type.length.get-constant-value()->(user value-length)
+        if target-length? and value-length?
+            if not long-equal(user target-length, user value-length)
+                assert node?
+                node.syntax-error-long2(
+                        user "non matching sub-array length",
+                        user value-length,
+                        user "and",
+                        user target-length)
+        my-sub-type.check-sub-assign-to-switch(user target-sub-type, user node)
     
     func check-has-subytpe(
             user TypeInstance target-sub-type, user SyntaxTreeNode node)
@@ -472,6 +576,12 @@ struct TypeInstance
                     user self.type-data.name,
                     user "with no parameter into same type with parameter",
                     user target-sub-type.type-data.name)
+        
+    func is-equal(user TypeInstance other)->(var Bool equal)
+        equal := false
+        try
+            self.check-equal(user other, user _)
+            equal := true
     
     func check-equal(user TypeInstance other, user SyntaxTreeNode node)
         if self.type-data is-not other.type-data
@@ -486,25 +596,33 @@ struct TypeInstance
             node.syntax-error(
                     user "conditionals not matching in type",
                     user self.type-data.name)
+        self.int-range.check-equal(user other.int-range, user node)
+        if self.type-data is glob.type-array
+            user Long self-length
+            user Long other-length
+            self.length.get-constant-value()->(user self-length)
+            other.length.get-constant-value()->(user other-length)
+            if self-length? != other-length?
+                assert node?
+                node.syntax-error-msg(user "non matching length dynamic")
+            if self-length? and other-length?
+                if not long-equal(user self-length, user other-length)
+                    assert node?
+                    node.syntax-error-long2(
+                            user "non matching length",
+                            user self-length,
+                            user "and",
+                            user other-length)
         self.check-sub-equal(user other, user node)
     
     func check-sub-equal(user TypeInstance target, user SyntaxTreeNode node)
-        if not target.parameters?
-            return
         var ListIterator{TypeInstance} target-iter(user target.parameters)
-        self.check-has-subytpe(user target-iter.get(), user node)
-        for my-sub-type in self.parameters.iter()
+        var ListIterator{TypeInstance} my-iter(user self.parameters)
+        for my-sub-type in my-iter
             while target-iter.has()
             user TypeInstance target-sub-type
             target-iter.get()->(user target-sub-type)
-            if my-sub-type.type-data is-not target-sub-type.type-data
-                assert node?
-                node.syntax-error2(
-                        user "non matching subtypes",
-                        user my-sub-type.type-data.name,
-                        user "and",
-                        user target-sub-type.type-data.name)
-            my-sub-type.check-sub-equal(user target-sub-type, user node)
+            my-sub-type.check-equal(user target-sub-type, user node)
             target-iter.next()
         
     func check-sequence(user SyntaxTreeNode node)
@@ -539,9 +657,8 @@ struct TypeInstance
             user TypeInstance actual-params, copy Bool replace-bases)->(
             owner TypeInstance type-instance)
         self.copy-new()->(owner type-instance)
-        if type-instance?
-            type-instance.replace-type-parameters(
-                    user actual-params, copy replace-bases)
+        type-instance.replace-type-parameters(
+                user actual-params, copy replace-bases)
     
     func replace-type-parameters(
             user TypeInstance actual-params, copy Bool replace-bases)
