@@ -81,10 +81,15 @@ class SliceExpression(Expression)
                         owner self.make-buffered-value-type())
             else
                 self.set-type-from(user self.sequence)
+                self.result-type.parameters.add(
+                        owner self.result-type.parameters.pop())
+                self.result-type.parameters.pop()
             self.result-type.length := self.result-type.length-owner
             self.result-type.length.expression := self.second-index-owner
             self.result-type.length.update()
             self.result-type.conditional := false
+            self.result-type.parameters.add(
+                    owner self.result-type.length.result-type.copy-new())
             if access-has-refman(copy self.sequence.access)
                 self.access := Access.WEAK
             else

@@ -1320,6 +1320,8 @@ struct Global
         variable-type.new-type-instance()->(owner variable.type-instance)
         if variable-subtype?
             variable.type-instance.add-subtype-copy(user variable-subtype)
+            if variable-type is self.type-array
+                variable.type-instance.add-default-length-type()
         assert not variable-type.is-int-like
         ; if variable-type.is-int-like
         ;     string-new-copy(user variable-type.name)->(
@@ -1482,9 +1484,10 @@ struct Global
         argument-type.new-type-instance()->(
                 owner argument.variable.type-instance)
         if argument-subtype?
-            argument.variable.type-instance.parameters := List{TypeInstance}()
-            argument.variable.type-instance.parameters.add(
-                    owner argument-subtype.new-type-instance())
+            argument.variable.type-instance.add-subtype-copy(
+                    user argument-subtype)
+            if argument-type is self.type-array
+                argument.variable.type-instance.add-default-length-type()
         if not int-name? and argument-type.is-int-like
             int-name := argument-type.name
         if int-name?

@@ -72,11 +72,14 @@ class TypeExpression(ModuleTypeExpression)
     func inst parse(
             owner TypeInstance type-instance,
             owner Expression module-expression)
-        self.set-simple-type(user glob.type-type)
         self.module-expression := module-expression
+        self.access := Access.VAR
+        self.set(owner type-instance)
+    
+    func inst set(owner TypeInstance type-instance)
+        self.set-simple-type(user glob.type-type)
         self.result-type.parameters := List{TypeInstance}()
         self.result-type.parameters.add(owner type-instance)
-        self.access := Access.VAR
     
     func dynamic analyze()
         self.check-no-error()

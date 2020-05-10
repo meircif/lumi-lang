@@ -656,12 +656,19 @@ class DeclarationArgument(Argument)
         
         user TypeInstance type-instance(user self.variable.type-instance)
         if not type-instance.length.get-constant-value()?
-            self.write-name-param(user ", Seq_Length", user "_Length")
+            write(user ", ")
+            type-instance.parameters.first.next.item.write-cname()
+            self.write-name-param(user _, user "_Length")
         for n in depth
             type-instance := type-instance.parameters.first.item
             if not type-instance.length.get-constant-value()?
                 ; , Seq_Length[*] `name`_Value_length
-                self.write-name-param(user ", Seq_Length", user _)
+                write(user ", ")
+                if type-instance.type-data is glob.type-array
+                    type-instance.parameters.first.next.item.write-cname()
+                else
+                    write(user "Seq_Length")
+                self.write-name-param(user _, user _)
                 write-array-value-length(copy n)
         if data-type.type-data.is-buffered()
             ; , Seq_Length*[*] `name`_Seq_length

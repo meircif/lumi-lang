@@ -431,43 +431,57 @@ struct Test
     weak Array?{6:Array{7:Array{8:Uint32}}} as
     weak Array?{6:Array{Array{8:Uint32}}} ams
     weak Array?{Array{7:Array{Uint32}}} amd
+    weak Array?{Int{3:9}:Array{Int{4:10}:Array{Int{5:11}:Uint32}}} ar
     weak Array?{Array{Array{Uint32}}} ad
 func ! fun(
         weak Array{6:Array{7:Array{8:Uint32}}} as,
         weak Array{6:Array{Array{8:Uint32}}} ams,
         weak Array{Array{7:Array{Uint32}}} amd,
+        weak Array{Int{3:9}:Array{Int{4:10}:Array{Int{5:11}:Uint32}}} ar,
         weak Array{Array{Array{Uint32}}} ad)->(
         weak Array{4:Array{7:Array{8:Uint32}}} oas,
         weak Array{4:Array{Array{8:Uint32}}} oams,
         weak Array{Array{7:Array{Uint32}}} oamd,
+        weak Array{Int{3:9}:Array{Int{4:10}:Array{Int{5:11}:Uint32}}} oar,
         weak Array{Array{Array{Uint32}}} oad)
     oas := as
+    ; line 20
     oas := ams!
     oas := amd!
+    oas := ar!
     oas := ad!
-    ; line 20
     oams := as
     oams := ams
     oams := amd!
     oams := ad!
+    oams := ar!
     oamd := as
     oamd := ams!
     oamd := amd
+    oamd := ar!
     oamd := ad!
+    oar := as
+    oar := ams!
+    oar := amd!
+    oar := ar
+    oar := ad!
+    ; line 40
     oad := as
     oad := ams
     oad := amd
+    oad := ar
     oad := ad
-    
-    fun(weak as, weak as, weak as, weak as)->(
-            weak oas, weak oams, weak oamd, weak oad)!
-    fun(weak ams!, weak ams, weak ams!, weak ams)->(
-            weak oad, weak oas!, weak oams!, weak oamd!)!
-    fun(weak amd!, weak amd!, weak amd, weak amd)->(
-            weak oamd, weak oad, weak oas!, weak oams!)!
-    ; line 40
-    fun(weak ad!, weak ad!, weak ad!, weak ad)->(
-            weak oams, weak oamd!, weak oad, weak oas!)!
+    fun(weak as, weak as, weak as, weak as, weak as)->(
+            weak oas, weak oams, weak oamd, weak oar, weak oad)!
+    fun(weak ams!, weak ams, weak ams!, weak ams!, weak ams)->(
+            weak oad, weak oas!, weak oams!, weak oamd!, weak oar!)!
+    fun(weak amd!, weak amd!, weak amd, weak amd!, weak amd)->(
+            weak oar, weak oad, weak oas!, weak oams!, weak oamd!)!
+    fun(weak ar!, weak ar!, weak ar!, weak ar, weak ar)->(
+            weak oamd, weak oar!, weak oad, weak oas!, weak oams!)!
+    fun(weak ad!, weak ad!, weak ad!, weak ad!, weak ad)->(
+            weak oams, weak oamd!, weak oar!, weak oad, weak oas!)!
+    ; line 56
 ; @ c test-slice-expression-24
 new Array{i:Byte} abi!
 new Array{6:Byte} ab6!
@@ -475,6 +489,15 @@ owner Array{6:Byte} ab6o(owner Array{6:Byte}()!)
 user Array{Byte} uab(user abi)
 uab := ab6
 uab := ab6o
+; @ c test-slice-expression-25
+user Array?{Int{3:8}:Byte} a3-8(user _)
+user Array?{6:Byte} a6
+user Array?{Byte} ad
+a3-8 := a6
+a3-8 := ad!
+a6 := a3-8!
+ad := a3-8
+new Array{j:Byte} as!
 ; @ ec test-slice-expression-e0
 arr[2
 ; @ ec test-slice-expression-e1
@@ -541,6 +564,17 @@ func fun()->(user Array{Byte} ao)
     user Array{6:Byte} a
     fun()->(user a)
     fun()->(user ao)
+; @ ec test-slice-expression-e25
+user Array{Sint8:Byte} error
+; @ ec test-slice-expression-e26
+user Array{String:Byte} error
+; @ ec test-slice-expression-e27
+user Array?{Int{10:20}:Byte} al
+user Array?{Int{100:200}:Byte} ah
+al := ah
+; @ ec test-slice-expression-e28
+weak Array?{Int{10:20}:Uint32} a
+a := arr
 ; @@ test-call-expression
 ; @ c test-call-expression-0
 fun0()

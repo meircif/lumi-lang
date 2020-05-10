@@ -173,11 +173,16 @@ struct TypeInstance
             if self.length-owner.parsed()
                 node.analyze-expression(user self.length, user glob.type-type)
                 self.parameters := self.length.result-type.parameters
-                self.length.result-type := self.parameters.first.item
+                self.length.result-type := self
                 self.length-owner.expression := _
+                self.add-default-length-type()
             else
                 self.parameters := List{TypeInstance}()
-                self.parameters.add(owner self.length.result-type.copy-new())
+                user TypeInstance result(user self.length.result-type)
+                self.parameters.add(
+                        owner result.parameters.first.item.copy-new())
+                self.parameters.add(
+                        owner result.parameters.first.next.item.copy-new())
             self.length := _
         if self.arguments?
             self.arguments.link-types()
@@ -185,6 +190,13 @@ struct TypeInstance
             for sub-type in self.parameters.iter()
                 sub-type.link-types(user node)
         self.link-parameters(user node)
+    
+    func add-default-length-type()
+        new TypeInstance uint32
+        uint32.type-data := glob.type-int
+        string-new-copy(user "Uint32")->(owner uint32.name)
+        uint32.set-int-range()
+        self.parameters.add(owner uint32)
     
     func link-parameters(user SyntaxTreeNode node)
         if self.type-data is glob.type-array
@@ -246,20 +258,55 @@ struct TypeInstance
     func analyze-after-link(user SyntaxTreeNode node, copy Bool constant-length)
         if self.int-range?
             self.int-range.set-values(user node)
-        if self.length-owner.parsed()
+        if self.type-data is glob.type-array and self.length?
+            if self.length-owner.parsed()
+                self.length.analyze()
+            owner TypeInstance length-type
+            if self.length.result-type.type-data is glob.type-type and
+                    self.length-owner.parsed()
+                length-type := self.length.result-type.parameters.first.item
+                if length-type.int-range?
+                    if length-type.int-range.min-value.sign() < 0
+                        assert node?
+                        node.syntax-error-long(
+                                user "negative array length minimum",
+                                user length-type.int-range.min-value)
+                self.length.result-type := length-type
+                self.length-owner.expression := _
+                self.length := _
+            else
+                self.length.result-type.copy-new()->(owner length-type)
+                if not self.length.parsed()
+                    self.length := _
+                else-if length-type.int-range?
+                    if length-type.int-range.max-value.sign() > 0 and
+                            length-type.int-range.min-value.sign() < 0
+                        length-type.int-range.min-value := Long()
+                        length-type.int-range.set-sign-and-bits(user node)
+            if length-type.type-data is-not glob.type-int
+                assert node?
+                node.syntax-error(
+                        user "expected integer as array length, got",
+                        user length-type.type-data.name)
+            self.parameters.add(owner length-type)
+        else-if self.length-owner.parsed()
             node.analyze-expression(user self.length, user glob.type-int)
+        if self.length?
             if constant-length
                 user Long length-value
                 self.length.get-constant-value()->(user length-value)
                 if not length-value?
+                    assert node?
                     node.syntax-error-msg(
                             user "sequence length is not constant")
                 if length-value.sign() <= 0
+                    assert node?
                     node.syntax-error-msg(
                             user "sequence length is not positive")
             else
                 user IntRange range(user self.length.result-type.int-range)
                 if range.max-value.sign() <= 0
+                    assert node?
                     node.syntax-error-long(
                             user "sequence length never positive with \
                             maximum value of",
@@ -315,11 +362,16 @@ struct TypeInstance
         do
             while value.type-data is glob.type-array and value.parameters? and
                     target.type-data is glob.type-array and target.parameters?
-            check-length := target.length.get-constant-value()? and
-                    not value.length.get-constant-value()?
+            target.need-range-check-from(user value)->(var check-length)
             while not check-length
             target := target.parameters.first.item
             value := value.parameters.first.item
+    
+    func need-range-check-from(user TypeInstance value-type)->(
+            var Bool check-range)
+        self.parameters.first.next.item.int-range.need-check-from(
+                user value-type.parameters.first.next.item.int-range)->(
+                var check-range)
     
     func check-assign-to(
             copy Int self-access,
@@ -479,6 +531,11 @@ struct TypeInstance
                         user value-length,
                         user "into array of larger length",
                         user target-length)
+        else-if self.type-data is glob.type-array and self.parameters? and
+                target.type-data is glob.type-array and target.parameters?
+            target.parameters.first.next.item.int-range.check-assign-from(
+                    user self.parameters.first.next.item.int-range,
+                    user node)
                     
     func check-assign-to-type-check(
             user TypeInstance target,

@@ -217,9 +217,11 @@ class CheckArrayLengthExpression(WrapExpression)
         user TypeInstance target(user target-type)
         user TypeInstance value(user self.result-type)
         do
-            if target.length.get-constant-value()? and
-                    not value.length.get-constant-value()?
+            if target.need-range-check-from(user value)
                 value.length := target.length
+                value.parameters.remove(user value.parameters.first.next.item)
+                value.parameters.add(
+                        owner target.parameters.first.next.item.copy-new())
             target := target.parameters.first.item
             value := value.parameters.first.item
             while target.type-data is glob.type-array and
@@ -238,10 +240,11 @@ class CheckArrayLengthExpression(WrapExpression)
         var Bool another
         write(user "if (")
         do
-            if target.length.get-constant-value()? and
-                    not value.length.get-constant-value()?
+            if target.need-range-check-from(user value)
                 self.write-length-check(
-                        user target.length, copy depth, copy another)
+                        user target.parameters.first.next.item.int-range,
+                        copy depth,
+                        copy another)
                 another := true
             target := target.parameters.first.item
             value := value.parameters.first.item
@@ -253,17 +256,30 @@ class CheckArrayLengthExpression(WrapExpression)
         self.code-node.write-spaces()
 
     func inst write-length-check(
-            user ExpressionValue length, copy Int depth, copy Bool another)
+            user IntRange length, copy Int depth, copy Bool another)
         ; [ || ]`array`[_value]_Length [<][!=] `needed-length`
+        ; [ || ]`array`[_value]_Length < `needed-min` ||
+        ;     `array`[_value]_Length > `needed-max`
         if another
             write(user " || ")
+        self.write-length(copy depth)
+        if long-equal(user length.min-value, user length.max-value)
+            if self.exact or depth > 0
+                write(user " != ")
+            else
+                write(user " < ")
+            write-long(user length.min-value)
+        else
+            write(user " < ")
+            write-long(user length.min-value)
+            write(user " || ")
+            self.write-length(copy depth)
+            write(user " > ")
+            write-long(user length.max-value)
+
+    func inst write-length(copy Int depth)
         self.expression.write()
         if depth = 0
             write(user "_Length")
         else
             write-array-value-length(copy depth - 1)
-        if self.exact or depth > 0
-            write(user " != ")
-        else
-            write(user " < ")
-        length.write()

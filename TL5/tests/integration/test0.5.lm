@@ -161,36 +161,48 @@ func ! test-slice-assign(
         weak Array{6:Array{7:Array{8:Uint32}}} as,
         weak Array{6:Array{Array{8:Uint32}}} ams,
         weak Array{Array{7:Array{Uint32}}} amd,
+        weak Array{Int{3:9}:Array{Int{4:10}:Array{Int{5:11}:Uint32}}} ar,
         weak Array{Array{Array{Uint32}}} ad)->(
         weak Array{4:Array{7:Array{8:Uint32}}} oas,
         weak Array{4:Array{Array{8:Uint32}}} oams,
         weak Array{Array{7:Array{Uint32}}} oamd,
+        weak Array{Int{3:9}:Array{Int{4:10}:Array{Int{5:11}:Uint32}}} oar,
         weak Array{Array{Array{Uint32}}} oad)
     oas := as
     oas := ams!
     oas := amd!
+    oas := ar!
     oas := ad!
-    ; line 20
     oams := as
     oams := ams
     oams := amd!
     oams := ad!
+    oams := ar!
     oamd := as
     oamd := ams!
     oamd := amd
+    oamd := ar!
     oamd := ad!
+    oar := as
+    oar := ams!
+    oar := amd!
+    oar := ar
+    oar := ad!
     oad := as
     oad := ams
     oad := amd
+    oad := ar
     oad := ad
-    test-slice-assign(weak as, weak as, weak as, weak as)->(
-            weak oas, weak oams, weak oamd, weak oad)!
-    test-slice-assign(weak ams!, weak ams, weak ams!, weak ams)->(
-            weak oad, weak oas!, weak oams!, weak oamd!)!
-    test-slice-assign(weak amd!, weak amd!, weak amd, weak amd)->(
-            weak oamd, weak oad, weak oas!, weak oams!)!
-    test-slice-assign(weak ad!, weak ad!, weak ad!, weak ad)->(
-            weak oams, weak oamd!, weak oad, weak oas!)!
+    test-slice-assign(weak as, weak as, weak as, weak as, weak as)->(
+            weak oas, weak oams, weak oamd, weak oar, weak oad)!
+    test-slice-assign(weak ams!, weak ams, weak ams!, weak ams!, weak ams)->(
+            weak oad, weak oas!, weak oams!, weak oamd!, weak oar!)!
+    test-slice-assign(weak amd!, weak amd!, weak amd, weak amd!, weak amd)->(
+            weak oar, weak oad, weak oas!, weak oams!, weak oamd!)!
+    test-slice-assign(weak ar!, weak ar!, weak ar!, weak ar, weak ar)->(
+            weak oamd, weak oar!, weak oad, weak oas!, weak oams!)!
+    test-slice-assign(weak ad!, weak ad!, weak ad!, weak ad!, weak ad)->(
+            weak oams, weak oamd!, weak oar!, weak oad, weak oas!)!
 
 
 func test-container-expression(copy Sint32 x, copy Sint32 y, user String? s)->(

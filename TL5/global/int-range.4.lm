@@ -127,6 +127,15 @@ struct IntRange
     
     ; func size-as(user IntRange other)->(var Bool same)
     ;     same := self.is-signed = other.is-signed and self.bits = other.bits
+
+    func need-check-from(user IntRange value)->(var Bool need-check)
+        need-check := false
+        try
+            self.check-assign-from(user value, user _)
+        catch
+            need-check := not long-larger(
+                    user value.min-value, user self.max-value) and
+                    not long-larger(user self.min-value, user value.max-value)
     
     func check-assign-from(user IntRange value, user SyntaxTreeNode node)
         self.set-values(user node)

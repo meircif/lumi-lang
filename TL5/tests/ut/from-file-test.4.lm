@@ -210,7 +210,7 @@ func test-compiler-suite(user String suit-name)
 func test-compiler-case(user String suit-name, user String line)
     var String{4096} input
     var String{1024} second-file-input
-    var String{16384} expected
+    var String{32768} expected
     var String{1024} subname(user "start")
     var Char type-char
     var Char ch
