@@ -750,11 +750,6 @@ Return_Code Int_str(
       CLAMPED_MUL_UP_LIMIT(a, b, max, < INT64_MAX)))
 
 
-/* Array */
-
-#define Array_length(self, length, length_out) *(length_out) = length
-
-
 /* Buffer */
 
 #define Buffer_length(self, max_length, length, length_out) \

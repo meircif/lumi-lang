@@ -162,7 +162,7 @@ str := "multi
 str := "line\
          split"
 ; @ c test-string-expression-5
-str := "שָׁלוֹם עוֹלָֽם"
+str := "שָׁלוֹם 👋🏾 עוֹלָֽם 🌎"
 ; @ fec test-string-expression-e0
 str := "aaa
 ; @ fec test-string-expression-e1
@@ -1610,7 +1610,11 @@ b := false
 ; @ ec test-builtin-char0
 c := EOF
 ; @ c test-builtin-array0
-arr!.length()->(var i)
+i := arr!.length
+; @ c test-builtin-array1
+var Array{12:Bool} a
+user Array{12:Bool} ua(user a)
+i := a.length + ua.length
 ; @ c test-builtin-string0
 ostr!.length()->(var i)
 ; @ c test-builtin-string1

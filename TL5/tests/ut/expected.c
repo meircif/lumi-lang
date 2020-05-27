@@ -417,8 +417,9 @@ static Char aux_String_0[] = {'l','i','n','e',' ','s','p','l','i','t','\0',};
     str_Length = aux_String_0_Length;
     str = aux_String_0;
 /// @ test-string-expression-5
-static Char aux_String_0[] = {'\xd7','\xa9','\xd6','\xb8','\xd7','\x81','\xd7','\x9c','\xd7','\x95','\xd6','\xb9','\xd7','\x9d',' ','\xd7','\xa2','\xd7','\x95','\xd6',
-        '\xb9','\xd7','\x9c','\xd6','\xb8','\xd6','\xbd','\xd7','\x9d','\0',};
+static Char aux_String_0[] = {'\xd7','\xa9','\xd6','\xb8','\xd7','\x81','\xd7','\x9c','\xd7','\x95','\xd6','\xb9','\xd7','\x9d',' ','\xf0','\x9f','\x91','\x8b','\xf0',
+        '\x9f','\x8f','\xbe',' ','\xd7','\xa2','\xd7','\x95','\xd6','\xb9','\xd7','\x9c','\xd6','\xb8','\xd6','\xbd','\xd7','\x9d',' ','\xf0',
+        '\x9f','\x8c','\x8e','\0',};
     Seq_Length aux_String_0_Max_length = sizeof(aux_String_0);
     Seq_Length aux_String_0_Length[1] = {sizeof(aux_String_0) - 1};
     str_Max_length = aux_String_0_Max_length;
@@ -4148,7 +4149,13 @@ ut_M_b = false;
 unknown symbol "EOF"
 /// @ test-builtin-array0
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    Array_length(ut_M_arr, ut_M_arr_Length, &(ut_M_i));
+    ut_M_i = ut_M_arr_Length;
+/// @ test-builtin-array1
+Bool a[0x0c] = {0};
+    Bool* ua = NULL;
+    /* initializing a */
+    ua = a;
+    ut_M_i = 0x0c + 0x0c;
 /// @ test-builtin-string0
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     String_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_i));
@@ -8104,10 +8111,8 @@ uint32_t* aux_Array_0 = NULL;
     aux_Array_0 = ut_M_arr;
     do {
         uint32_t n = 0;
-        uint32_t aux_Int_1 = 0;
         LUMI_loop_depth = 3;
-        Array_length(aux_Array_0, aux_Array_0_Length, &(aux_Int_1));
-        if (!(aux_Int_0 < aux_Int_1)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        if (!(aux_Int_0 < aux_Array_0_Length)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
         n = aux_Array_0[aux_Int_0];
         aux_Int_0 += 0x01;
         ut_M_i = n;
@@ -8125,7 +8130,7 @@ Char* aux_Array_0 = NULL;
     uint32_t aux_Array_1_Length = 0;
     Seq_Length aux_Array_1_Value_length = 0;
     Seq_Length* aux_Array_1_Seq_length = NULL;
-    uint32_t aux_Int_2 = 0;
+    uint32_t aux_Int_1 = 0;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_sarr, ut_M_sarr_Refman)
     aux_Array_0_Length = ut_M_sarr_Length;
     aux_Array_0_Value_length = ut_M_sarr_Value_length;
@@ -8135,13 +8140,11 @@ Char* aux_Array_0 = NULL;
         Char* s = NULL;
         Seq_Length s_Max_length = 0;
         Seq_Length* s_Length = &Lumi_empty_length;
-        uint32_t aux_Int_1 = 0;
         Char* aux_String_0 = NULL;
         Seq_Length aux_String_0_Max_length = 0;
         Seq_Length* aux_String_0_Length = &Lumi_empty_length;
         LUMI_loop_depth = 3;
-        Array_length(aux_Array_0, aux_Array_0_Length, &(aux_Int_1));
-        if (!(aux_Int_0 < aux_Int_1)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        if (!(aux_Int_0 < aux_Array_0_Length)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
         aux_String_0 = aux_Array_0 + aux_Int_0 * aux_Array_0_Value_length;
         aux_String_0_Max_length = aux_Array_0_Value_length;
         aux_String_0_Length = aux_Array_0_Seq_length + aux_Int_0;
@@ -8163,20 +8166,18 @@ Char* aux_Array_0 = NULL;
         Byte* bf = NULL;
         Seq_Length bf_Max_length = 0;
         Seq_Length* bf_Length = &Lumi_empty_length;
-        uint32_t aux_Int_3 = 0;
         Byte* aux_Buffer_0 = NULL;
         Seq_Length aux_Buffer_0_Max_length = 0;
         Seq_Length* aux_Buffer_0_Length = &Lumi_empty_length;
         LUMI_loop_depth = 3;
-        Array_length(aux_Array_1, aux_Array_1_Length, &(aux_Int_3));
-        if (!(aux_Int_2 < aux_Int_3)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
-        aux_Buffer_0 = aux_Array_1 + aux_Int_2 * aux_Array_1_Value_length;
+        if (!(aux_Int_1 < aux_Array_1_Length)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
+        aux_Buffer_0 = aux_Array_1 + aux_Int_1 * aux_Array_1_Value_length;
         aux_Buffer_0_Max_length = aux_Array_1_Value_length;
-        aux_Buffer_0_Length = aux_Array_1_Seq_length + aux_Int_2;
+        aux_Buffer_0_Length = aux_Array_1_Seq_length + aux_Int_1;
         bf_Max_length = aux_Buffer_0_Max_length;
         bf_Length = aux_Buffer_0_Length;
         bf = aux_Buffer_0;
-        aux_Int_2 += 0x01;
+        aux_Int_1 += 0x01;
         Buffer_clear(bf, bf_Max_length, bf_Length);
     LUMI_block2_cleanup:
         (void)0;
@@ -8356,7 +8357,7 @@ Char sa[0x03 * 0x04] = {0};
     uint32_t aux_Int_0 = 0;
     Byte* aux_Array_1 = NULL;
     Seq_Length* aux_Array_1_Seq_length = NULL;
-    uint32_t aux_Int_2 = 0;
+    uint32_t aux_Int_1 = 0;
     /* initializing sa */
     aux_Array_0_Seq_length = sa_Seq_length;
     aux_Array_0 = sa;
@@ -8364,13 +8365,11 @@ Char sa[0x03 * 0x04] = {0};
         Char* s = NULL;
         Seq_Length s_Max_length = 0;
         Seq_Length* s_Length = &Lumi_empty_length;
-        uint32_t aux_Int_1 = 0;
         Char* aux_String_0 = NULL;
         Seq_Length aux_String_0_Max_length = 0;
         Seq_Length* aux_String_0_Length = &Lumi_empty_length;
         LUMI_loop_depth = 3;
-        Array_length(aux_Array_0, 0x03, &(aux_Int_1));
-        if (!(aux_Int_0 < aux_Int_1)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        if (!(aux_Int_0 < 0x03)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
         aux_String_0 = aux_Array_0 + aux_Int_0 * 0x04;
         aux_String_0_Length = aux_Array_0_Seq_length + aux_Int_0;
         s_Max_length = 0x04;
@@ -8389,19 +8388,17 @@ Char sa[0x03 * 0x04] = {0};
         Byte* bf = NULL;
         Seq_Length bf_Max_length = 0;
         Seq_Length* bf_Length = &Lumi_empty_length;
-        uint32_t aux_Int_3 = 0;
         Byte* aux_Buffer_0 = NULL;
         Seq_Length aux_Buffer_0_Max_length = 0;
         Seq_Length* aux_Buffer_0_Length = &Lumi_empty_length;
         LUMI_loop_depth = 3;
-        Array_length(aux_Array_1, 0x03, &(aux_Int_3));
-        if (!(aux_Int_2 < aux_Int_3)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
-        aux_Buffer_0 = aux_Array_1 + aux_Int_2 * 0x04;
-        aux_Buffer_0_Length = aux_Array_1_Seq_length + aux_Int_2;
+        if (!(aux_Int_1 < 0x03)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
+        aux_Buffer_0 = aux_Array_1 + aux_Int_1 * 0x04;
+        aux_Buffer_0_Length = aux_Array_1_Seq_length + aux_Int_1;
         bf_Max_length = 0x04;
         bf_Length = aux_Buffer_0_Length;
         bf = aux_Buffer_0;
-        aux_Int_2 += 0x01;
+        aux_Int_1 += 0x01;
         Buffer_clear(bf, 0x04, bf_Length);
     LUMI_block2_cleanup:
         (void)0;
@@ -13290,13 +13287,11 @@ Char* s = NULL;
     aux_Array_0_Seq_length = ut_M_sarr_Seq_length;
     aux_Array_0 = ut_M_sarr;
     do {
-        uint32_t aux_Int_1 = 0;
         Char* aux_String_0 = NULL;
         Seq_Length aux_String_0_Max_length = 0;
         Seq_Length* aux_String_0_Length = &Lumi_empty_length;
         LUMI_loop_depth = 3;
-        Array_length(aux_Array_0, aux_Array_0_Length, &(aux_Int_1));
-        if (!(aux_Int_0 < aux_Int_1)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        if (!(aux_Int_0 < aux_Array_0_Length)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
         aux_String_0 = aux_Array_0 + aux_Int_0 * aux_Array_0_Value_length;
         aux_String_0_Max_length = aux_Array_0_Value_length;
         aux_String_0_Length = aux_Array_0_Seq_length + aux_Int_0;

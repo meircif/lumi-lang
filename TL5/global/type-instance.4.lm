@@ -596,8 +596,6 @@ struct TypeInstance
         
     func check-array-sub-assign-to(
             user TypeInstance target, user SyntaxTreeNode node)
-        if not target.parameters?
-            return
         user TypeInstance target-sub-type(user target.parameters.first.item)
         self.check-has-subytpe(user target-sub-type, user node)
         user TypeInstance my-sub-type(user self.parameters.first.item)

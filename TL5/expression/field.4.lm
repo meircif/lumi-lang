@@ -83,6 +83,11 @@ class FieldExpression(Expression)
                 user function, var self.bases)
         
         if not function?
+            if self.instance.result-type.type-data is glob.type-array
+                if self.name.equal(user "length")
+                    expression := LengthFieldExpression(owner self.instance)
+                    return
+                
             if self.instance.is-mocked-function()
                 if self.name.equal(user "mocked")
                     self.instance.restructure()->(
@@ -168,6 +173,31 @@ class FieldExpression(Expression)
             write(user "_dynamic")
         else
             base.write-dynamic()
+
+
+class LengthFieldExpression(Expression)
+    owner Expression array
+    
+    new(owner Expression array)
+        self.set-location()
+        self.array := array
+        self.array.result-type.parameters.first.next.item.copy-new()->(
+                owner self.result-type)
+        self.check-expression-all-errors()->(owner self.array)
+        self.assignable := false
+    
+    func dynamic analyze()
+        ; do nothing
+
+    func dynamic write-preactions()
+        self.array.write-preactions()
+    
+    func dynamic write()
+        if self.array.result-type.length?
+            self.array.result-type.length.write()
+        else
+            self.array.write()
+            write(user "_Length")
 
 
 class MockFieldExpression(Expression)

@@ -552,8 +552,8 @@ test test-assert-error-message()
     assert-error! Array{l:Uint32}(), "sequence too short"
     weak Array?{Uint32} arr2(weak arr)
     arr := _
-    assert-error! arr.length(), "empty object used"
-    assert-error! arr2.length(), "outdated weak reference used"
+    assert-error! arr.length, "empty object used"
+    assert-error! arr2.length, "outdated weak reference used"
     assert-error! arr[0], "empty object used"
     assert-error! arr2[0], "outdated weak reference used"
     user TopType? top(user _)
@@ -668,7 +668,7 @@ test test-builtin-errors()
     lumi-debug-value := LumiDebug.NOTHING
 
 mock ! sys.println(user Array{Char} text)
-    assert! text.length() > 0
+    assert! text.length > 0
 
 test test-cover-all()
     var covered.MiddleType mid
@@ -685,7 +685,7 @@ test test-constants()
     assert! TestEnum.ANOTHER-VALUE = 1
     assert! TestEnum.VALUE2 = 2
     assert! TestEnum.length = 3
-    assert! int-arr.length() = 63
+    assert! int-arr.length = 63
 
 
 test test-operations()

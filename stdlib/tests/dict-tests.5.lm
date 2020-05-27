@@ -6,7 +6,7 @@ struct StringBox
     owner String value
 
     new!(user Array{Char} chars)
-        new String{chars.length() + 1} value(user chars)!
+        new String{chars.length + 1} value(user chars)!
         self.value := value
 
 

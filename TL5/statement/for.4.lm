@@ -319,6 +319,8 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
         owner Expression max-index
         if is-int-iteration
             max-index := iterator-expression
+        else-if iterator-expression.result-type.type-data is glob.type-array
+            max-index := LengthFieldExpression(owner iterator-expression)
         else
             self.make-method-call(
                     user while-node,

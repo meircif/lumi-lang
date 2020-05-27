@@ -19,7 +19,7 @@ comment
 var Uint32 global-int(copy 23)
 owner Buffer global-buffer(owner Buffer{32}(user `feed1000beef`)!)
 owner String global-string(owner String{32}(user "a constant string")!)
-owner String unicode-string(owner String{64}(user "👋 שָׁלוֹם עוֹלָֽם 🌎")!)
+owner String unicode-string(owner String{64}(user "שָׁלוֹם 👋🏾 עוֹלָֽם 🌎\n")!)
 
 var Array{TestEnum.length + LENGTH:Uint32} int-arr
 const Int LENGTH SIZE * 5
@@ -262,12 +262,12 @@ func ! test-variable(
     TestClass()!.print()!
     assert! String{arr[0]}()!.length() > 0
     assert! Buffer{arr[0]}()!.length() > 0
-    assert! Array{arr[0]:Uint32}()!.length() > 0
-    assert! Array{arr[0]:SimpleStruct}()!.length() > 0
-    assert! Array{arr[0]:SimpleClass}()!.length() > 0
-    assert! Array{arr[0]:String{arr[1]!}}()!.length() > 0
-    assert! Array{arr[0]:Buffer{arr[1]!}}()!.length() > 0
-    assert! Array{arr[0]:Func{()}}()!.length() > 0
+    assert! Array{arr[0]:Uint32}()!.length > 0
+    assert! Array{arr[0]:SimpleStruct}()!.length > 0
+    assert! Array{arr[0]:SimpleClass}()!.length > 0
+    assert! Array{arr[0]:String{arr[1]!}}()!.length > 0
+    assert! Array{arr[0]:Buffer{arr[1]!}}()!.length > 0
+    assert! Array{arr[0]:Func{()}}()!.length > 0
     assert! x = 0
     assert! s?
     assert! b?
@@ -279,22 +279,22 @@ func ! test-variable(
     dv.print()!
     assert! sv.length() > 0
     assert! bv.length() > 0
-    assert! ia.length() > 0
-    assert! ta.length() > 0
-    assert! da.length() > 0
-    assert! sa.length() > 0
-    assert! ba.length() > 0
-    assert! fa.length() > 0
+    assert! ia.length > 0
+    assert! ta.length > 0
+    assert! da.length > 0
+    assert! sa.length > 0
+    assert! ba.length > 0
+    assert! fa.length > 0
     tn.print()!
     dn.print()!
     assert! sn.length() > 0
     assert! bn.length() > 0
-    assert! ian.length() > 0
-    assert! tan.length() > 0
-    assert! dan.length() > 0
-    assert! san.length() > 0
-    assert! ban.length() > 0
-    assert! fan.length() > 0
+    assert! ian.length > 0
+    assert! tan.length > 0
+    assert! dan.length > 0
+    assert! san.length > 0
+    assert! ban.length > 0
+    assert! fan.length > 0
     assert! ix = 0
     assert! si.length() > 0
     assert! bi.length() > 0
@@ -432,7 +432,7 @@ func ! test-code-flow(user Array{Uint32} arr)->(var Uint32 res)
         res := 6
     else
         res := 0
-    loop! arr.length()
+    loop! arr.length
         arr[6]! := 6
         var Uint32 x(copy arr[2]!)
         while x > 3 and arr is _
@@ -464,7 +464,7 @@ func ! use-builtins(
     var Bool b
     i.str(user s)!
     b := true or false
-    a.length()->(var i)
+    i := a.length
     
     s.length()->(var i)
     s.max-length()->(var i)
@@ -478,8 +478,6 @@ func ! use-builtins(
     s.concat-int(copy i)!
     s.find(user s)->(var i)
     s.has(copy c)->(var b)
-    
-    a.length()->(var i)
     
     buff.length()->(var i)
     buff.max-length()->(var i)

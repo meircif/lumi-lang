@@ -107,8 +107,8 @@ struct Global
     user TypeData type-func
     user TypeData type-ref
     user TypeData type-array
-    user TypeData type-string
     user TypeData type-buffer
+    user TypeData type-string
     user TypeData type-type
     user TypeData type-base
     user TypeData type-generic
@@ -545,8 +545,8 @@ struct Global
 
     func init-slice-types()
         self.add-global-type(user "Array", copy false)->(user self.type-array)
-        self.add-global-type(user "String", copy false)->(user self.type-string)
         self.add-global-type(user "Buffer", copy false)->(user self.type-buffer)
+        self.add-global-type(user "String", copy false)->(user self.type-string)
         
         user SyntaxTreeFunction function
         ; Int
@@ -562,21 +562,6 @@ struct Global
                 copy Access.USER,
                 user self.type-string,
                 user "str")
-        
-        ; Array
-        ; self.add-builtin-field(
-        ;     user self.type-array, user "length", user self.type-int, user _)
-        self.add-builtin-method(
-                user self.type-array,
-                user "length",
-                copy false,
-                copy Access.USER)->(
-                user function)
-        self.add-builtin-int-argument(
-                user function,
-                user "Uint32",
-                copy true,
-                user "length")
 
         ; String
         self.add-sequence-methods(
