@@ -373,10 +373,6 @@ class Expression(SyntaxTreeNode)
             self.code-node.write-spaces()
             self.write-dynamic()
             write(user " = NULL;\n")
-        if self.result-type.type-data.is-buffered()
-            self.code-node.write-spaces()
-            self.write()
-            write(user "_Length = &Lumi_empty_length;\n")
     
     func inst write-length(
             user String suffix, user String empty, copy Bool is-static)

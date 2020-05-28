@@ -98,8 +98,6 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
                 self.set-simple-int-item()->(owner item-type-instance)
             else-if self.iterator.result-type.type-data is glob.type-string
                 glob.type-char.new-type-instance()->(owner item-type-instance)
-            else-if self.iterator.result-type.type-data is glob.type-buffer
-                glob.type-byte.new-type-instance()->(owner item-type-instance)
             else-if self.iterator.result-type.type-data is glob.type-array
                 self.iterator.result-type.parameters.first.item.copy-new()->(
                         owner item-type-instance)
@@ -116,7 +114,8 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
         
         user TypeData iterator-type(user self.iterator.result-type.type-data)
         is-int-iteration := iterator-type is glob.type-int
-        is-index-iteration := is-int-iteration or iterator-type.is-sequence()
+        is-index-iteration := is-int-iteration or
+                iterator-type is glob.type-array
         
     func inst set-simple-int-item()->(owner TypeInstance item-type-instance)
         glob.type-int.new-type-instance()->(owner item-type-instance)
@@ -321,12 +320,12 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
             max-index := iterator-expression
         else-if iterator-expression.result-type.type-data is glob.type-array
             max-index := LengthFieldExpression(owner iterator-expression)
-        else
-            self.make-method-call(
-                    user while-node,
-                    owner iterator-expression,
-                    user "length")->(
-                    owner max-index)
+        ; else
+        ;     self.make-method-call(
+        ;             user while-node,
+        ;             owner iterator-expression,
+        ;             user "length")->(
+        ;             owner max-index)
         self.insert-binary-expression(
                 user "<",
                 user while-node,

@@ -145,53 +145,53 @@ c := '\0'
 c := '\x00'
 ; @@ test-string-expression
 ; @ c test-string-expression-0
-str := "some string"
+bfr := "some string"
 ; @ c test-string-expression-1
-str := "\nstring'\t\"with\\\'formatting\n"
+bfr := "\nstring'\t\"with\\\'formatting\n"
 ; @ c test-string-expression-2
-str := "line\
+bfr := "line\
         split\
         string\
         "
 ; @ c test-string-expression-3
-str := "multi
+bfr := "multi
         line
         string
         "
 ; @ c test-string-expression-4
-str := "line\
+bfr := "line\
          split"
 ; @ c test-string-expression-5
-str := "שָׁלוֹם 👋🏾 עוֹלָֽם 🌎"
+bfr := "שָׁלוֹם 👋🏾 עוֹלָֽם 🌎"
 ; @ fec test-string-expression-e0
-str := "aaa
+bfr := "aaa
 ; @ fec test-string-expression-e1
-str := "
+bfr := "
 ; @ ec test-string-expression-e2
 "error"+"string"
 ; @ ec test-string-expression-e3
-str := "indention
+bfr := "indention
     too short"
 ; @ ec test-string-expression-e4
-str := "indention\
+bfr := "indention\
     too short"
 ; @ ec test-string-expression-e5
-str := "\70"
+bfr := "\70"
 ; @ ec test-string-expression-e6
-str := "\xa"
+bfr := "\xa"
 ; @ ec test-string-expression-e7
-str := "aa \787 bb"
+bfr := "aa \787 bb"
 ; @ ec test-string-expression-e8
-str := "aa \x8g bb"
+bfr := "aa \x8g bb"
 ; @ ec test-string-expression-e9
-str := "aa \c bb"
+bfr := "aa \c bb"
 ; @ ec test-string-expression-e10
-str := "aa \777 bb"
+bfr := "aa \777 bb"
 ; @ ec test-string-expression-e11
-str := "aa \x00 bb"
+bfr := "aa \x00 bb"
 ; @ g test-string-expression-large
 func fun()
-    user String s(user "\
+    user Buffer s(user "\
             012345678901234567890123456789012345678901234567890123456789\
             012345678901234567890123456789012345678901234567890123456789\
             012345678901234567890123456789012345678901234567890123456789\
@@ -252,7 +252,7 @@ func fun()
             001122334455667788990011223344556677889900112233445566778899`)
 ; @@ test-empty-expression
 ; @ c test-empty-expression-0
-str := _
+bfr := _
 ; @ c test-empty-expression-1
 t := _
 ; @ c test-empty-expression-2
@@ -287,11 +287,8 @@ t.error
 5.error
 ; @@ test-slice-expression
 ; @ c test-slice-expression-0
-c := ostr![13]!
 bt := buff![13]!
 ; @ c test-slice-expression-1
-user Array?{Char} x
-x := ostr![2:6]!
 user Array?{Byte} y
 y := buff![2:6]!
 ; @ c test-slice-expression-2
@@ -300,7 +297,6 @@ i := arr![13]!
 user Array?{Uint32} x
 x := arr![2:i]!
 ; @ c test-slice-expression-4
-ostr![4]! := c
 buff![4]! := bt
 ; @ c test-slice-expression-5
 arr![4]! := i
@@ -308,21 +304,13 @@ arr![4]! := i
 strong Array?{Test} tarr
 t := tarr![3]!
 ; @ c test-slice-expression-7
-var Array{8:String{5}} vsa
-user String s(user vsa[3])
-user Array{String} sa(user vsa[2:4])
 var Array{8:Buffer{5}} vba
 user Buffer bf(user vba[3])
 user Array{Buffer} ba(user vba[2:4])
 ; @ g test-slice-expression-8
 func ! fun(
-        temp String s,
-        strong Array{String} sa,
         temp Buffer b,
         strong Array{Buffer} ba)
-    var Char c(copy s[5]!)
-    user Array{Char} spart(user s[4:2]!)
-    user String si(user sa[3]!)
     var Byte y(copy b[5]!)
     user Array{Byte} bpart(user b[4:2]!)
     user Buffer bi(user ba[3]!)
@@ -330,9 +318,6 @@ func ! fun(
 strong Array?{String} sa
 sa![3]!.new(user "text")!
 sa := _
-strong Array?{Buffer} ba
-ba![3]!.new(user `beef`)!
-ba := _
 ; @ c test-slice-expression-10
 strong Array?{Array{Uint32}} aai
 arr := aai![3]!
@@ -355,25 +340,20 @@ var Array{8:Array{7:Array{6:Array{5:Uint32}}}} aai
 user Array?{Array{Array{Uint32}}} ua(user aai[3])
 user Array?{Array{Array{Array{Uint32}}}} uaa(user aai[2:4])
 ; @ c test-slice-expression-14
-var Array{8:Array{7:Array{6:String{5}}}} aas
-user Array?{Array{String}} usa(user aas[i]!)
-user Array?{Array{Array{String}}} usaa(user aas[2:4])
 var Array{8:Array{7:Array{6:Buffer{5}}}} aab
 user Array?{Array{Buffer}} uba(user aab[i]!)
 user Array?{Array{Array{Buffer}}} ubaa(user aab[2:4])
 ; @ g test-slice-expression-15
 func fun()
-    var Array{8:Array{7:Array{6:String{5}}}} aas
-    user String s(user aas[4][3][2])
     var Array{8:Array{7:Array{6:Buffer{5}}}} aab
     user Buffer b(user aab[4][3][2])
 ; @ c test-slice-expression-16
-user Array?{Char} x
-x := ostr
+user Array?{Byte} x
+x := ostr!.bytes()
 user Array?{Byte} y
 y := buff
 ; @ c test-slice-expression-17
-new String{12} s!
+new Buffer{12} s!
 sys.print(user s)!
 new Buffer{12} bf!
 ; @ g test-slice-expression-18
@@ -396,7 +376,7 @@ i := aa[xx:xx][yy]
 var Array{12:Uint32} ab
 i := ab[3:4][3]
 ; @ c test-slice-expression-20
-i := str![2]! + buff![2]! + str![1:3]![2] + buff![1:3]![2]
+i := buff![2]! + buff![1:3]![2]
 ; @ g test-slice-expression-21
 struct Test
     var Array{4:Uint32} va
@@ -513,7 +493,7 @@ arr![3:str]!
 ; @ ec test-slice-expression-e6
 arr![i wraparound+= 3]!
 ; @ ec test-slice-expression-e7
-str![2:5]! := so
+bfr![2:5]! := buff
 ; @ ec test-slice-expression-e8
 arr![7:2]! := Array{5:Uint32}()!
 ; @ ec test-slice-expression-e9
@@ -647,10 +627,10 @@ func fun()->(owner Array?{String} astr)
     fun()->(owner astr)
 ; @ g test-call-expression-23
 func ! fun(temp String s)
-    var String{12} vars
-    s-var String{12} s-vars!
-    owner String owners(owner String{12}()!)
-    strong String strongs(strong String{12}()!)
+    var String vars
+    s-var String s-vars!
+    owner String owners(owner String()!)
+    strong String strongs(strong String()!)
     user String users(user s)
     fun(temp s)!
     fun(temp vars)!
@@ -731,7 +711,7 @@ struct Test(Base)
     func user meth(owner Test t)
         base(owner t)
 ; @ ec test-call-expression-e19
-var String{16} text
+var String text
 fun1(copy 3, user str, owner text)
 ; @ ec test-call-expression-e20
 owner Tb? tbo
@@ -1136,12 +1116,12 @@ strong Array{Uint32} a1(strong Array{4:Uint32}()!)
 strong Array{Uint32} a2(strong Array{6:Uint32}()!)
 a1 :=: a2
 ; @ c test-swap-expression-6
-new String{4} s1!
-new String{6} s2!
+new String s1!
+new String s2!
 s1 :=: s2
 ; @ c test-swap-expression-7
-strong String s1(strong String{4}()!)
-strong String s2(strong String{6}()!)
+strong String s1(strong String()!)
+strong String s2(strong String()!)
 s1 :=: s2
 ; @ g test-swap-expression-8
 struct MyStruct
@@ -1170,11 +1150,11 @@ t :=: to
 new Test t1!
 t1 :=: t1
 ; @ ec test-swap-expression-e2
-new String{8} nstr!
+new String nstr!
 ostr :=: nstr
 ; @ ec test-swap-expression-e3
-weak Array{Char} a(weak so!)
-a :=: so![1:2]!
+user Array{Byte} a(user buff!)
+a :=: buff![1:2]!
 ; @ ec test-swap-expression-e4
 ta :=: tc
 ; @ ec test-swap-expression-e5
@@ -1182,11 +1162,11 @@ new Test t1!
 strong Test t2(strong to!)
 t1 :=: t2
 ; @ ec test-swap-expression-e6
-new String{4} valid!
+new String valid!
 owner String invalid
 valid :=: invalid
 ; @ ec test-swap-expression-e7
-new String{4} valid!
+new String valid!
 owner String invalid
 invalid :=: valid
 ; @ ec test-swap-expression-e8
@@ -1243,13 +1223,13 @@ i := tb!.num
 ; @ c test-exclamation-expression-4
 weak Test tt(weak t!)
 ; @ c test-exclamation-expression-5
-new String{str!.length()} s!
+new Buffer{str!.length()} s!
 ; @ ec test-exclamation-expression-e0
 user String s(user str)
 ; @ ec test-exclamation-expression-e1
 user Test? tt(user t)
 ; @ ec test-exclamation-expression-e2
-new String{4} s!
+new Buffer{12} s!
 s := ostr
 ; @ ec test-exclamation-expression-e3
 weak String? s
@@ -1266,23 +1246,23 @@ i := arr[3]!
 ; @ ec test-exclamation-expression-e8
 for _ in str
 ; @ ec test-exclamation-expression-e9
-weak String? s
+weak Buffer? s
 raise! s
 ; @ ec test-exclamation-expression-e10
-new String{str.length()} s!
+new Buffer{str.length()} s!
 ; @ ec test-exclamation-expression-e11
 so := ostr
 ; @ ec test-exclamation-expression-eo0
 raise! str!!
 ; @ ec test-exclamation-expression-en0
-var String{8} s
+var String s
 so := s!
 ; @ ec test-exclamation-expression-en1
 io := (2!) + 3
 ; @ ec test-exclamation-expression-en2
 so! := str
 ; @ ec test-exclamation-expression-en3
-"text"!.clear()
+"text"!.length
 ; @ ec test-exclamation-expression-en4
 var Func{(user Test? self)} fun(copy Test!.meth)
 ; @ ec test-exclamation-expression-en5
@@ -1327,7 +1307,7 @@ for _ in 3!:4
 ; @ ec test-exclamation-expression-en19
 for _ in 3:4!
 ; @ ec test-exclamation-expression-en20
-var String{4} s
+var String s
 for _ in s!
 ; @ ec test-exclamation-expression-en21
 var Array{4:Uint32} a
@@ -1353,11 +1333,11 @@ r := ostr!
 ; @ ec test-exclamation-expression-en30
 raise! "error"!
 ; @ ec test-exclamation-expression-en31
-raise! str!
+raise! bfr!
 ; @ ec test-exclamation-expression-en32
-var String{23!} s
+var String s!
 ; @ ec test-exclamation-expression-en33
-`beaf`!.clear()
+`beaf`!.length
 ; @ ec test-exclamation-expression-en34
 strong String? s
 fun3(copy 0)->(strong s!)
@@ -1620,58 +1600,38 @@ ostr!.length()->(var i)
 ; @ c test-builtin-string1
 ostr!.clear()
 ; @ c test-builtin-string2
-ostr!.equal(user ostr!)->(var b)
-; @ c test-builtin-string3
-ostr!.get(copy i)->(var c)!
-; @ c test-builtin-string4
-ostr!.set(copy i, copy c)!
+ostr!.equal(user ostr!.bytes())->(var b)
 ; @ c test-builtin-string5
 ostr!.append(copy c)!
 ; @ c test-builtin-string6
-var String{12} sv
-sv.new(user ostr!)!
+var String sv
+sv.new(user ostr!.bytes())!
 ; @ c test-builtin-string7
 ostr!.concat(user ostr!)!
 ; @ c test-builtin-string8
 ostr!.concat-int(copy i)!
-; @ c test-builtin-string9
-ostr!.find(user ostr!)->(var i)
 ; @ c test-builtin-string10
 ostr!.has(copy c)->(var b)
-; @ c test-builtin-string11
-String.set(user ostr!, copy 0, copy 'a')!
-; @ c test-builtin-string12
-ostr!.max-length()->(var i)
 ; @ c test-builtin-buffer0
-buff!.length()->(var i)
-; @ c test-builtin-buffer1
-buff!.clear()
+i := buff!.length
 ; @ c test-builtin-buffer2
 buff!.equal(user buff!)->(var b)
 ; @ c test-builtin-buffer3
 buff!.get(copy i)->(var bt)!
 ; @ c test-builtin-buffer4
 buff!.set(copy i, copy bt)!
-; @ c test-builtin-buffer5
-buff!.append(copy bt)!
-; @ c test-builtin-buffer6
-var Buffer{12} bv
-bv.new(user buff!)!
-; @ c test-builtin-buffer7
-buff!.concat(user buff!)!
 ; @ c test-builtin-buffer8
-buff!.find(user buff!)->(var i)
+var Uint64 x
+buff!.find(user buff!)->(var x)
 ; @ c test-builtin-buffer9
 buff!.has(copy bt)->(var b)
 ; @ c test-builtin-buffer10
 Buffer.set(user buff!, copy 0, copy bt)!
-; @ c test-builtin-buffer11
-buff!.max-length()->(var i)
 ; @ c test-builtin-file0
 try
-    s-var FileReadText f(user ostr)
-    f.get()->(var c, var b)
-    f.getline(user ostr)->(var b)
+    s-var FileReadText f(user ostr.bytes())
+    f.get()->(var bt, var b)
+    f.getline(user buff)->(user bfr, var b)
     var Sint64 x
     f.tell()->(var x)
     f.seek-set(copy x)
@@ -1683,7 +1643,7 @@ try
     df.item := f
 ; @ c test-builtin-file1
 try
-    new FileReadBinary f(user ostr)
+    new FileReadBinary f(user ostr.bytes())
     f.get()->(var bt, var b)
     f.read(user buff)->(var i)
     var Sint64 x
@@ -1697,9 +1657,9 @@ try
     df.set(owner f)
 ; @ c test-builtin-file2
 try
-    owner FileWriteText f(owner FileWriteText(user ostr, copy false))
-    f.put(copy c)
-    f.write(user ostr)->(var i)
+    owner FileWriteText f(owner FileWriteText(user ostr.bytes(), copy false))
+    f.put(copy bt)
+    f.write(user buff)->(var i)
     var Sint64 x
     f.tell()->(var x)
     f.seek-set(copy x)
@@ -1711,7 +1671,7 @@ try
     df.set(owner f)
 ; @ c test-builtin-file3
 try
-    strong FileWriteBinary f(strong FileWriteBinary(user ostr, copy true))
+    strong FileWriteBinary f(strong FileWriteBinary(user ostr.bytes(), copy true))
     f.put(copy bt)
     f.write(user buff)->(var i)
     var Sint64 x
@@ -1725,11 +1685,11 @@ try
     df.item := f
 ; @ c test-builtin-file4
 try
-    s-var FileReadWriteText f(user ostr, copy true, copy true)
-    f.get()->(var c, var b)
-    f.getline(user ostr)->(var b)
-    f.put(copy c)
-    f.write(user ostr)->(var i)
+    s-var FileReadWriteText f(user ostr.bytes(), copy true, copy true)
+    f.get()->(var bt, var b)
+    f.getline(user buff)->(user bfr, var b)
+    f.put(copy bt)
+    f.write(user buff)->(var i)
     var Sint64 x
     f.tell()->(var x)
     f.seek-set(copy x)
@@ -1741,7 +1701,7 @@ try
     df.item := f
 ; @ c test-builtin-file5
 try
-    new FileReadWriteBinary f(user ostr, copy false, copy false)
+    new FileReadWriteBinary f(user ostr.bytes(), copy false, copy false)
     f.get()->(var bt, var b)
     f.read(user buff)->(var i)
     f.put(copy bt)
@@ -1775,6 +1735,7 @@ func ! fun(
     f := frwb
     frt := frwt
     frb := frwb
+    ; line 20
     fwt := frwt
     fwb := frwb
     fun(
@@ -1794,13 +1755,14 @@ func ! fun(
     fo.seek-end(copy i)!
     fo.flush()!
     fo.close()!
+    ; line 40
     df.set(owner fo)
 ; @ c test-builtin-sys0
 user Array{String} argv(user sys.argv)
 ; @ c test-builtin-sys1
-sys.print(user ostr!)!
+sys.print(user ostr!.bytes())!
 ; @ c test-builtin-sys2
-sys.println(user ostr!)!
+sys.println(user ostr!.bytes())!
 ; @ c test-builtin-sys3
 sys.getchar()->(var c, var b)!
 ; @ c test-builtin-sys4
@@ -1812,11 +1774,11 @@ sys.system(user ostr!)->(var j)!
 ; @ c test-builtin-sys7
 sys.getenv(user ostr!, user ostr!)->(var b)!
 ; @ c test-builtin-sys8
-sys.stdin.get()->(var c, var b)!
+sys.stdin.get()->(var bt, var b)!
 ; @ c test-builtin-sys9
-sys.stdout.put(copy c)!
+sys.stdout.put(copy bt)!
 ; @ c test-builtin-sys10
-sys.stderr.put(copy c)!
+sys.stderr.put(copy bt)!
 ; @ ec test-builtin-file-e0
 var FileReadText error
 ; @ ec test-builtin-file-e1
@@ -1855,19 +1817,19 @@ var Uint32 x
 
 var Uint32 x
 ; @ g test-general-6
-var String{12} s
-s-var String{12} svs!
-owner String cs(owner String{12}(user "global text")!)
-owner Buffer cb(owner Buffer{12}(user `fade00beaf`)!)
-strong String us(strong String{12}(user s)!)
+var String s
+s-var String svs!
+owner String cs(owner String(user "global text")!)
+; const Buffer cb `fade00beaf`
+strong String us(strong String(user s.bytes())!)
 weak String gs(weak us)
 main!
     var Uint32 x(copy 6)
     x := 7
-    new String{12} ls!
+    new String ls!
     ls :=: cs
 ; @ tg test-general-7
-var String{12} s
+var String s
 func fun()
     s.clear()
 ; @-
@@ -1922,12 +1884,12 @@ temp String? error
 ; @ eg test-general-e16
 weak String error
 ; @ eg test-general-e17
-owner String error(owner String{12}()!)
+owner String error(owner String()!)
 func fun()->(owner String? s)
     s := error
 main!
 ; @ eg test-general-e18
-owner String error(owner String{12}()!)
+owner String error(owner String()!)
 func fun(owner String s)
 main!
     fun(owner error)
@@ -2352,15 +2314,15 @@ func name(copy Func{(copy Uint32 x)->(var Uint32 y)} fun)->(var Func{()} joy)
 func name()
     var Uint32 x
 ; @ g test-function-7
-func ! name(user String self, copy Uint32 px, user Array{Char} pu, owner String po)->(
+func ! name(user String self, copy Uint32 px, user Buffer pu, owner Buffer po)->(
         strong String? oself, var Uint32 ox, weak String? ou, owner String? oo)
     var Uint32 x
-    user String? u
+    user Buffer? u
     user Buffer? b
     owner String? o
-    var String{12} v
-    new String{12} n!
-    o := String{12}()!
+    var String v
+    new String n!
+    o := String()!
     u := "constant string"
     b := `beef`
     pu := po[2:6]!
@@ -2394,7 +2356,7 @@ func name()->(owner Test? t)
 func name(user Array{Array{String}} ai)->(owner Array?{Array{Uint32}} ao)
 ; @ g test-function-11
 func ! name()->(owner String so)
-    so := String{12}()!
+    so := String()!
 ; @ g test-function-m0
 main
     var Uint32 x
@@ -2635,10 +2597,10 @@ func ! name()
     raise! "some error"
 ; @ g test-return-3
 func ! name(user Array{String} arr)
-    raise! arr[3]!
+    raise! arr[3]!.bytes()
 ; @ c test-return-4
 weak String? s
-raise! s!
+raise! s!.bytes()
 ; @ ec test-return-e0
 return()
 ; @ ec test-return-e1
@@ -2649,6 +2611,8 @@ raise! 2
 raise! _
 ; @ ec test-return-e4
 raise
+; @ ec test-return-e5
+raise! arr!
 ; @@ test-code-variables
 ; @ c test-code-variables-0
 var Uint32 x
@@ -2659,31 +2623,31 @@ owner Array?{Uint32} a
 ; @ c test-code-variables-3
 user Test? tt
 ; @ c test-code-variables-4
-var String{12} s
+var Buffer{12} s
 ; @ c test-code-variables-5
 var Array{12:Uint32} a
 ; @ c test-code-variables-6
 var Array{12:Test} a
 ; @ c test-code-variables-7
-var Array{12:String{7}} sa
+var Array{12:Buffer{7}} sa
 ; @ c test-code-variables-8
-new String{12} s!
-so := s!
+new Buffer{12} s!
+buff := s
 ; @ c test-code-variables-9
 var Array{12:Ta} a
 ; @ c test-code-variables-10
 new Array{12:Uint32} a!
 ; @ c test-code-variables-11
-new Array{12:String{7}} sa!
+new Array{12:Buffer{7}} sa!
 ; @ c test-code-variables-12
-var Array{3:Array{4:String{5}}} aa
+var Array{3:Array{4:Buffer{5}}} aa
 ; @ c test-code-variables-13
-new Array{3:Array{4:String{5}}} aa!
+new Array{3:Array{4:Buffer{5}}} aa!
 ; @ g test-code-variables-14
 func ! fun()
-    var String{4} sv
+    var Buffer{4} sv
     if 1 > 2
-        user Array{Char} su(user sv[1:2]!)
+        user Array{Byte} su(user sv[1:2])
 ; @ ec test-code-variables-e0
 var Int
 ; @ ec test-code-variables-e1
@@ -2724,14 +2688,14 @@ new Array{-2:Uint32} a!
 ; @ c test-initialize-0
 tb := Tb(copy i)!
 ; @ c test-initialize-1
-str := String{arr![0]}()!
+str := String()!
 buff := Buffer{arr![0]}()!
 ; @ c test-initialize-2
 owner Array{Uint32} a(owner Array{arr![0]:Uint32}()!)
 ; @ c test-initialize-3
 owner Array{Test} a(owner Array{arr![0]:Test}()!)
 ; @ c test-initialize-4
-owner Array{String} sa(owner Array{arr![0]:String{arr![1]!}}()!)
+owner Array{String} sa(owner Array{arr![0]:String}()!)
 owner Array{Buffer} ba(owner Array{arr![0]:Buffer{arr![1]!}}()!)
 ; @ c test-initialize-5
 var Uint32 x(copy arr![0])
@@ -2739,11 +2703,11 @@ var Uint32 x(copy arr![0])
 user String? s(user ostr)
 user Buffer? bf(user buff)
 ; @ c test-initialize-7
-var String{12} s(user "some string")!
-var Buffer{12} bf(user `fade00beaf`)!
+var String s(user "some string")!
+user Buffer bf(user `fade00beaf`)
 ; @ c test-initialize-8
-new String{i} s(user ostr!)!
-new Buffer{i} bf(user buff!)!
+new String s(user ostr!.bytes())!
+new Buffer{i} bf!
 ; @ c test-initialize-9
 user Test? tt(user tc!)
 ; @ c test-initialize-10
@@ -2757,7 +2721,7 @@ user Tb? tt(user tb)
 ; @ c test-initialize-14
 owner Ta? ota(owner tb)
 ; @ c test-initialize-15
-owner Array{Array{String}} sa(owner Array{arr![0]:Array{arr![1]!:String{arr![2]!}}}()!)
+owner Array{Array{String}} sa(owner Array{arr![0]:Array{arr![1]!:String}}()!)
 owner Array{Array{Buffer}} ba(owner Array{arr![0]:Array{arr![1]!:Buffer{arr![2]!}}}()!)
 ; @ g test-initialize-16
 struct MyStruct
@@ -2797,13 +2761,13 @@ if b
 ; @ ec test-initialize-e0
 Uint32()
 ; @ ec test-initialize-e1
-var String s
+var Array{Bool} a
 ; @ ec test-initialize-e2
-var Array{4:String} sa
+var Array{4:Buffer} sa
 ; @ ec test-initialize-e3
-new String s!
+new Buffer s!
 ; @ ec test-initialize-e4
-String()
+Buffer()
 ; @ ec test-initialize-e5
 user Array a
 ; @ ec test-initialize-e6
@@ -2818,7 +2782,7 @@ struct Test{Generic}
 ; @ ec test-initialize-e10
 var Array{1
 ; @ ec test-initialize-e11
-var String{12
+var Buffer{12
 ; @ ec test-initialize-e12
 var Array{error:Uint32} a
 ; @ ec test-initialize-e13
@@ -2968,17 +2932,17 @@ if b and
     i := 1
 ; @ c test-if-else-5
 if b
-    var String{4} sa
+    var Buffer{4} ba
     if b
-        var String{4} sb
+        var Buffer{4} bb
     else-if b
-        var String{4} sc
+        var Buffer{4} bc
     else
-        var String{4} sd
+        var Buffer{4} bd
 else-if b
-    var String{4} se
+    var Buffer{4} be
 else
-    var String{4} sf
+    var Buffer{4} bf
 ; @ ec test-if-else-e0
 if 3
 ; @ ec test-if-else-e1
@@ -3036,21 +3000,21 @@ loop
         while false
 ; @ c test-loop-5
 loop
-    var String{4} sa
+    var Buffer{4} ba
     while b
     break
     continue
     if b
         return
     loop
-        var String{4} sb
+        var Buffer{4} bb
         while b
         break
         continue
         if b
             return
         loop
-            var String{4} sc
+            var Buffer{4} bc
             while b
             break
             continue
@@ -3116,7 +3080,7 @@ for n in 5
 for n in t!.num:ostr!.length() + 2
     i := wraparound n
 ; @ c test-for-loop-2
-for ch in ostr!
+for ch in ostr!.bytes()
     c := ch
 for y in buff!
     bt := y
@@ -3127,7 +3091,7 @@ for n in arr!
 for s in sarr!
     s.clear()
 for bf in barr!
-    bf.clear()
+    i := bf.length
 ; @ c test-for-loop-5
 var Uint32 n
 for n in 5
@@ -3143,36 +3107,36 @@ for n in 1 +
     i := n
 ; @ c test-for-loop-8
 for n in 6
-    var String{4} sa
+    var Buffer{4} ba
     break
     continue
     if b
         return
-    for ch in ostr!
-        var String{4} sb
+    for ch in buff!
+        var Buffer{4} bb
         break
         continue
         if b
             return
 ; @ c test-for-loop-9
-user String s(user "text")
-for ch in s
+new String s(user "text")!
+for ch in s.bytes()
     c := ch
 user Buffer bf(user `beaf`)
 for y in bf
     bt := y
 ; @ c test-for-loop-10
-var Array{3:String{4}} sa
+var Array{3:String} sa
 for s in sa
     s.clear()
 var Array{3:Buffer{4}} ba
 for bf in ba
-    bf.clear()
+    i := bf.length
 ; @ c test-for-loop-11
 for _ in 2:6
     i := 1
 ; @ c test-for-loop-12
-for _ in ostr!
+for _ in ostr!.bytes()
     i := 1
 for _ in buff!
     i := 1
@@ -3220,11 +3184,11 @@ assert-error! t.num,
         "expected error in new line"
 ; @ c test-testing-a6
 if b
-    var String{4} s
+    var Buffer{4} bf
     assert! b
-    assert-error! s[i:2]
+    assert-error! bf[i:2]
     repeat 3
-        assert-error! s[i:2]
+        assert-error! bf[i:2]
 ; @ g test-testing-m0
 func ! fun()
     fun()!
@@ -3280,7 +3244,7 @@ func ! fun()
     sys.print.mocked(user "really print")!
     sys.print.active := false
     sys.print.active := true
-mock ! sys.print(user Array{Char} text)
+mock ! sys.print(user Buffer text)
 ; @ g test-testing-m8
 struct Test
     var Uint32 x
@@ -3446,9 +3410,9 @@ mock Test.meth()
 test
 ; @ eg test-testing-e32
 struct Test
-    owner String s
+    owner Buffer s
     new!()
-        self.s := String{12}()!
+        self.s := Buffer{12}()!
 mock ! Test.new()
 ; @ eg test-testing-e33
 test ! fun()
@@ -3610,7 +3574,7 @@ func error(copy Uint32 i)
 ; @ eg test-native-ef9
 native func fun()->(copy Uint32 res) error
 ; @ eg test-native-ef10
-native func String? error()
+native func Buffer? error()
 ; @ eg test-native-ef11
 native func Array?{Uint32} error()
 ; @ eg test-native-ef12
@@ -3628,7 +3592,7 @@ native const Int VALUE error
 native const Bool VALUE
 ; @ eg test-native-ec2
 native const Int VALUE
-var String{VALUE} error
+var Buffer{VALUE} error
 ; @ eg test-native-et0
 native type Native error
 ; @ eg test-native-et1
@@ -3869,8 +3833,6 @@ d := dg
 str := d!.item!
 ; @ ec test-parameter-type-ec7
 var Data{Array{Uint32}} error
-; @ ec test-parameter-type-ec8
-var Data{String} error
 ; @ ec test-parameter-type-ec8
 var Data{Buffer} error
 ; @@ test-parameter-inheritance
@@ -4113,17 +4075,17 @@ catch
         i := t!.num
 ; @ c test-try-catch-3
 try
-    var String{4} sa
+    var Buffer{4} sa
     try
-        s-var String{4} sb
+        s-var Buffer{4} sb
     catch
-        s-var String{4} sc
+        s-var Buffer{4} sc
 catch
-    var String{4} sd
+    var Buffer{4} sd
     try
-        s-var String{4} se
+        s-var Buffer{4} se
     catch
-        var String{4} sf
+        var Buffer{4} sf
 ; @ g test-try-catch-4
 func fun(weak String s)
     try
@@ -4167,7 +4129,7 @@ struct TestIterator
     func user step()->(var Uint32 num, var Bool has-data)
 func ! fun()->(var Uint32 i)
     for n in TestIterator(copy 6)!
-        var String{4} s
+        var Buffer{4} s
         i := n
 ; @ g test-for-each-1
 struct TestIterator
@@ -4211,7 +4173,7 @@ func ! f-mock(user TestIterator{MyStruct} iter)
 struct TestIterator
     owner String? value
     func user step()->(strong String? text, var Bool has-data)
-        if-error text := String{12}(user self.value)
+        if-error text := String(user self.value.bytes())
             text := _
 func fun(user TestIterator iter)
     owner String? s
@@ -4303,25 +4265,25 @@ class Bstruct(Astruct)
 struct Base
     var Uint32 x
 struct Test
-    var String{10} s
+    var Buffer{10} s
     var Array{11:Uint32} ai
     var Array{12:Base} ab
-    var Array{7:String{8}} as
+    var Array{7:Buffer{8}} as
     var Array{4:Array{5:Array{6:Uint32}}} aai
     var Array{4:Array{5:Array{6:Base}}} aab
-    var Array{4:Array{5:String{6}}} aas
-    func user ! test()->(var Char c, var Uint32 i, user Base? b)
-        c := self.s[3]!
+    var Array{4:Array{5:Buffer{6}}} aas
+    func user ! test()->(var Byte c, var Uint32 i, user Base? b)
+        c := self.s[3]
         i := self.ai[4]
         b := self.ab[5]
-        c := self.as[4][5]!
+        c := self.as[4][5]
         i := self.aai[1][2][3]
         b := self.aab[1][2][3]
-        c := self.aas[1][2][3]!
+        c := self.aas[1][2][3]
 ; @ eg test-complex-fields-e0
 var Uint32 x
 struct Test
-    var String{x} error
+    var Buffer{x} error
 ; @ eg test-complex-fields-e1
 var Uint32 x
 struct Test
@@ -4561,16 +4523,16 @@ struct Test
     owner String? s
     owner String str
     new!()
-        self.str := String{12}()!
+        self.str := String()!
         self.str.clear()
 func use(user String? s)
 func take(owner String? s)
 func give()->(owner String? s)
 func ! fun(owner String? s, user Test tu, owner Test to)
     s := _
-    s := String{12}()!
+    s := String()!
     s!.clear()
-    to.s := String{12}()!
+    to.s := String()!
     user String? su(user tu.s)
     use(user tu.s)
     take(owner to.s)
@@ -4602,7 +4564,7 @@ struct Test
     owner String s
     new()
 func ! fun(user Test t)
-    t.s := String{12}()!
+    t.s := String()!
 ; @ eg test-memory-owner-e1
 struct Aa
     var Uint32 x
@@ -4658,8 +4620,8 @@ func take(owner String s)
 func fun(owner Test t)->(owner String? s)
     take(owner t.s)
 ; @ ec test-memory-owner-e9
-new String{12} s!
-new String{12} sg!
+new String s!
+new String sg!
 ostr := sg
 sg := s
 ostr!.clear()
@@ -4679,7 +4641,7 @@ func ! fun(owner Test? t)
 struct Test
     owner String s
     new!()
-        self.s := String{4}()!
+        self.s := String()!
 func fun(owner Test t, user Test tu, owner String s, user String su)
     t.s :=: s
     su.clear()
@@ -4689,7 +4651,7 @@ func fun(owner Test t, user Test tu, owner String s, user String su)
 ; @ ec test-memory-owner-e15
 fun8(strong so)
 so!.clear()
-new String{12} s!
+new String s!
 fun8(strong s)
 s.clear()
 ; @ ec test-memory-owner-e16
@@ -4702,13 +4664,13 @@ if b
     tbad := to!
 tbad.meth()
 ; @ ec test-memory-owner-e17
-new String{12} s!
+new String s!
 repeat 12
     s.clear()
     ostr := s
     if b
         continue
-    s := String{12}()!
+    s := String()!
 ; @ eg test-memory-owner-e18
 func fun(owner String? s, owner String? s2)
     fun(owner s, owner s)
@@ -4733,7 +4695,7 @@ func ! fun(owner Test? t)->(var Uint32 x)
 func ! fun(owner String s)->(var Uint32 x)
     for _ in fun(owner s)!:s.length()
 ; @ ec test-memory-owner-e24
-new String{12} s!
+new String s!
 try
     owner String s2(owner s)
     if b
@@ -4757,7 +4719,7 @@ func fun(user String s)->(owner String? so)
 func deleting()->(strong String? s)
     s := _
 func ! fun()
-    strong String? so(strong String{12}()!)
+    strong String? so(strong String()!)
     user String? s(user so)
     s!.clear()
     deleting()->(strong so)
@@ -4765,7 +4727,7 @@ func ! fun()
 func deleting()->(strong String? s)
     s := _
 func ! fun()
-    strong String? so(strong String{12}()!)
+    strong String? so(strong String()!)
     weak String? s(weak so)
     deleting()->(strong so)
     s!.clear()
@@ -4801,8 +4763,8 @@ func ! fun()
         while get()->(user s)?
         s!.clear()
 ; @ ec test-memory-user-e0
-user String? s
-so := _
+user Buffer? s
+buff := _
 c := s![2]!
 ; @ ec test-memory-user-e1
 user String? s
@@ -4865,7 +4827,7 @@ func fun(user String s)
     s.clear()
 ; @ eg test-memory-user-e11
 func deleting()
-    var String{12} s
+    var String s
 func fun(user String s)
     deleting()
     s.clear()
@@ -4876,12 +4838,12 @@ func fun(user String s)
     deleting()
     s.clear()
 ; @ ec test-memory-user-e13
-user Array{Char} a(user ostr!)
-ostr := _
-c := a[2]!
+user Array{Byte} a(user buff!)
+buff := _
+bt := a[2]!
 ; @ eg test-memory-user-e14
 func ! deleting()
-    var Uint32 x(copy String{12}()!.length())
+    var Uint32 x(copy String()!.length())
 func ! fun(user String s)
     deleting()!
     s.clear()
@@ -5026,7 +4988,7 @@ func ! fun(owner Test?{MyStruct} t, user MyStruct f)
     f.meth()
 ; @ eg test-memory-user-e35
 main!
-    owner String? so(owner String{12}()!)
+    owner String? so(owner String()!)
     user String? su(user so)
     so := _
     su!.clear()
@@ -5047,7 +5009,7 @@ so := _
 for _ in 2:str!.length()
 ; @ ec test-memory-user-e41
 so := _
-for _ in str!
+for _ in str!.bytes()
 ; @ ec test-memory-user-e42
 so := _
 if b
@@ -5074,9 +5036,9 @@ try
     str := ostr
 str!.clear()
 ; @ ec test-memory-user-e46
-str := ostr
-for n in str!
-    ostr := _
+bfr := buff
+for n in bfr!
+    buff := _
 ; @@ test-memory-temp
 ; @ g test-memory-temp-0
 struct Test
@@ -5208,7 +5170,7 @@ func ! error()
 ; @@ test-memory-output
 ; @ g test-memory-output-0
 func ! fun()->(owner String s)
-    s := String{12}()!
+    s := String()!
     s.clear()
 ; @ eg test-memory-output-e0
 func fun()->(user String s)
@@ -5242,20 +5204,20 @@ func fun()->(owner String s)
 ; @ eg test-memory-output-e8
 func ! fun()->(owner String s)
     if true
-        s := String{4}()!
+        s := String()!
 ; @ eg test-memory-output-e9
 func ! fun()->(owner String s)
     if false
         return
-    s := String{4}()!
+    s := String()!
 ; @@ test-memory-constructor
 ; @ g test-memory-constructor-0
 struct NoConstructor
-    var String{12} s
+    var String s
 struct HasConstructor
     owner String s
     new!()
-        self.s := String{12}()!
+        self.s := String()!
 struct Test
     var NoConstructor vnc
     var HasConstructor vhc
@@ -5274,7 +5236,7 @@ func fun2(copy Func{()} f)
 struct Base
     owner String s
     new!()
-        self.s := String{12}()!
+        self.s := String()!
 struct Mid(Base)
     new!()
         base()!
@@ -5313,7 +5275,7 @@ struct Error
     owner String s
     new!()
         self.fun()
-        self.s := String{12}()!
+        self.s := String()!
     func user fun()
         self.s.clear()
 ; @ eg test-memory-constructor-e4
@@ -5321,7 +5283,7 @@ struct Error
     owner String s
     new!()
         error(user self)
-        self.s := String{12}()!
+        self.s := String()!
 func error(user Error e)
     e.s.clear()
 ; @ eg test-memory-constructor-e5
@@ -5329,7 +5291,7 @@ struct Error
     owner String s
     new!()
         if false
-            self.s := String{12}()!
+            self.s := String()!
 ; @ eg test-memory-constructor-e6
 struct Error
     owner String s
@@ -5341,19 +5303,19 @@ struct Error
     new!()
         if true
             return
-        self.s := String{12}()!
+        self.s := String()!
 ; @ eg test-memory-constructor-e8
 struct Test
     owner String s
     new!()
-        self.s := String{12}()!
+        self.s := String()!
 struct Error
     var Test t
 ; @ eg test-memory-constructor-e9
 struct Test
     owner String s
     new!()
-        self.s := String{12}()!
+        self.s := String()!
 struct Error
     var Test t
     new()
@@ -5361,14 +5323,14 @@ struct Error
 struct Base
     owner String s
     new!()
-        self.s := String{12}()!
+        self.s := String()!
 struct Test(Base)
     new()
 ; @ eg test-memory-constructor-e11
 struct Test
     owner String s
     new!()
-        self.s := String{12}()!
+        self.s := String()!
 struct Error
     var Test t
     new!()
@@ -5377,7 +5339,7 @@ struct Error
 struct Test
     owner String s
     new!()
-        self.s := String{12}()!
+        self.s := String()!
 struct Error
     var Test t
     new!()
@@ -5507,7 +5469,7 @@ func ! fun(user String? str, user Buffer? buff)
     cdef.set-null-term-length(user str!)
 ; @ c test-c-objects-4
 var cdef.Pointer{cdef.Uchar} p-uchar
-cdef.copy-to-buffer(copy p-uchar, copy 4, user buff!)!
+cdef.copy-to-buffer(copy p-uchar, user buff!)!
 ; @ ec test-c-objects-e0
 var cdef.Pointer{Ta} error
 ; @ ec test-c-objects-e1

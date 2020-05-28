@@ -165,29 +165,11 @@ class ConstantBufferVariable(SyntaxTreeVariable)
         self.text := text
     
     func dynamic write()
-        self.write-constant(user "Byte")
-
-    func inst write-constant(user String type-name)
         self.write-spaces()
-        write(user "static ")
-        write(user type-name)
-        write(user " ")
+        write(user "static Byte ")
         self.write-cname()
         write(user "[] = {")
         self.write-data()
-        write(user "};\n")
-        self.write-spaces()
-        write(user "Seq_Length ")
-        self.write-cname()
-        write(user "_Max_length = sizeof(")
-        self.write-cname()
-        write(user ");\n")
-        self.write-spaces()
-        write(user "Seq_Length ")
-        self.write-cname()
-        write(user "_Length[1] = {sizeof(")
-        self.write-cname()
-        self.write-length-offset()
         write(user "};\n")
     
     func dynamic write-data()
@@ -197,9 +179,6 @@ class ConstantBufferVariable(SyntaxTreeVariable)
             write-c(copy self.text[(2 * n) + 1])
             write-c(copy ',')
             self.write-new-line(copy n)
-        
-    func dynamic write-length-offset()
-        write(user ")")
         
     func inst write-new-line(copy Int index)
         if (index + 1) mod 20 = 0
@@ -215,17 +194,24 @@ class BufferExpression(TextExpression)
     func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
             owner Expression expression)
         new BufferExpression buffer-expression(user code-node)
-        buffer-expression.parse(owner text, user glob.type-buffer)
+        buffer-expression.parse(owner text)
         expression := buffer-expression
     
-    func inst parse(owner String text, user TypeData sequence-type)
+    func inst parse(owner String text)
         self.text := text
-        self.check-and-modify-text()
-        self.set-simple-type(user sequence-type)
+        self.set-simple-type(user glob.type-array)
+        self.result-type.add-subtype-copy(user glob.type-byte)
+        self.result-type.length := self.result-type.length-owner
+        self.result-type.length.expression := IntExpression(
+                user self.code-node,
+                copy self.check-and-modify-text())
+        self.result-type.length.update()
+        self.result-type.parameters.add(
+                owner self.result-type.length.expression.result-type.copy-new())
         self.access := Access.VAR
         self.is-var := true
     
-    func dynamic check-and-modify-text()
+    func dynamic check-and-modify-text()->(var Int length)
         if self.text.length < 2
             self.syntax-error(user "too short buffer constant", user self.text)
         if self.text[0] != '`' or self.text[self.text.length - 1] != '`'
@@ -247,6 +233,7 @@ class BufferExpression(TextExpression)
         self.text.length := index-write
         if self.text.length mod 2 != 0
             self.syntax-error-msg(user "odd buffer data length")
+        length := self.text.length div 2
         
     func inst check-indentation()->(var Int index-read)
         var Int expected(copy self.code-node.parent.indentation-spaces +
@@ -278,9 +265,6 @@ class BufferExpression(TextExpression)
 
 
 class ConstantStringVariable(ConstantBufferVariable)
-    func dynamic write()
-        self.write-constant(user "Char")
-    
     func inst write-hex-digit(copy Int value)
         if value > 9
             write-c(copy 'a' - 10 + value)
@@ -308,19 +292,16 @@ class ConstantStringVariable(ConstantBufferVariable)
             write-c(copy ',')
             self.write-new-line(copy index)
             index += 1
-        
-    func dynamic write-length-offset()
-        write(user ") - 1")
 
 ~~~ Constant string expression ~~~
 class StringExpression(BufferExpression)
     func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
             owner Expression expression)
         new StringExpression string-expression(user code-node)
-        string-expression.parse(owner text, user glob.type-string)
+        string-expression.parse(owner text)
         expression := string-expression
     
-    func dynamic check-and-modify-text()
+    func dynamic check-and-modify-text()->(var Int length)
         self.check-string(user self.text)
         var Int index-write(copy 0)
         for index-read in 1:self.text.length - 1
@@ -345,6 +326,7 @@ class StringExpression(BufferExpression)
         self.text[index-write] := '0'
         index-write += 1
         self.text.length := index-write
+        length := self.text.length
     
     func inst check-character(copy Int n)
         if self.text[n] != '\\' or self.text[n - 1] = '\\' or

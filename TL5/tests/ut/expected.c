@@ -381,12 +381,9 @@ illegal character constant "'\0'"
 illegal character constant "'\x00'"
 /// @@ test-string-expression
 /// @ test-string-expression-0
-static Char aux_String_0[] = {'s','o','m','e',' ','s','t','r','i','n','g','\0',};
-    Seq_Length aux_String_0_Max_length = sizeof(aux_String_0);
-    Seq_Length aux_String_0_Length[1] = {sizeof(aux_String_0) - 1};
-    str_Max_length = aux_String_0_Max_length;
-    str_Length = aux_String_0_Length;
-    str = aux_String_0;
+static Byte aux_Array_0[] = {'s','o','m','e',' ','s','t','r','i','n','g','\0',};
+    bfr_Length = 0x0d;
+    bfr = aux_Array_0;
 /// @ test-string-expression-1
 static Char aux_String_0[] = {'\n','s','t','r','i','n','g','\'','\t','\"','w','i','t','h','\\','\'','f','o','r','m',
         'a','t','t','i','n','g','\n','\0',};
@@ -4166,14 +4163,6 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     String_equal(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_ostr, *ut_M_ostr_Length, &(ut_M_b));
-/// @ test-builtin-string3
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = String_get(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_i, &(ut_M_c));
-    CHECK(1, LUMI_block0_cleanup)
-/// @ test-builtin-string4
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = String_set(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_i, ut_M_c);
-    CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-string5
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = String_append(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_c);
@@ -4194,26 +4183,12 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = String_concat_int(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_i);
     CHECK(1, LUMI_block0_cleanup)
-/// @ test-builtin-string9
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    String_find(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_ostr, *ut_M_ostr_Length, &(ut_M_i));
 /// @ test-builtin-string10
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     String_has(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_c, &(ut_M_b));
-/// @ test-builtin-string11
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = String_set(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, 0, 'a');
-    CHECK(1, LUMI_block0_cleanup)
-/// @ test-builtin-string12
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    String_max_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_i));
 /// @ test-builtin-buffer0
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
     Buffer_length(ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length, &(ut_M_i));
-/// @ test-builtin-buffer1
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    Buffer_clear(ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length);
 /// @ test-builtin-buffer2
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
@@ -4226,22 +4201,6 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
     LUMI_err = Buffer_set(ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length, ut_M_i, ut_M_bt);
     CHECK(1, LUMI_block0_cleanup)
-/// @ test-builtin-buffer5
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    LUMI_err = Buffer_append(ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length, ut_M_bt);
-    CHECK(1, LUMI_block0_cleanup)
-/// @ test-builtin-buffer6
-Byte bv[0x0c] = {0};
-    Seq_Length bv_Length[1] = {0};
-    /* initializing bv */
-    CHECK_REF(2, LUMI_block0_cleanup, ut_M_buff)
-    LUMI_err = Buffer_new(bv, 0x0c, bv_Length, ut_M_buff, *ut_M_buff_Length);
-    CHECK(2, LUMI_block0_cleanup)
-/// @ test-builtin-buffer7
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    LUMI_err = Buffer_concat(ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length, ut_M_buff, *ut_M_buff_Length);
-    CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-buffer8
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
@@ -4253,9 +4212,6 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
     LUMI_err = Buffer_set(ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length, 0, ut_M_bt);
     CHECK(1, LUMI_block0_cleanup)
-/// @ test-builtin-buffer11
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    Buffer_max_length(ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length, &(ut_M_i));
 /// @ test-builtin-file0
 {
         FileReadText f_Var = {0};
@@ -7023,11 +6979,13 @@ expected new-line after "return", got "("
 /// @ test-return-e1
 expected space or new-line after "raise!", got "("
 /// @ test-return-e2
-got "Int" expression, expected "String"
+got "Int" expression, expected "Array"
 /// @ test-return-e3
-got "Empty Symbol" expression, expected "String"
+got "Empty Symbol" expression, expected "Array"
 /// @ test-return-e4
 expected ! after "raise", got "new-line"
+/// @ test-return-e5
+expected Byte array expression, got "Int"
 /// @@ test-code-variables
 /// @ test-code-variables-0
 uint32_t x = 0;
@@ -7554,13 +7512,13 @@ if (ut_M_b) {
 /// @ test-initialize-e0
 dynamic allocation of primitive type "Int"
 /// @ test-initialize-e1
-missing length for sequence
+missing length for array
 /// @ test-initialize-e2
-missing length for sequence
+missing length for array
 /// @ test-initialize-e3
-missing length for sequence
+missing length for array
 /// @ test-initialize-e4
-missing length for sequence
+missing length for array
 /// @ test-initialize-e5
 missing subtype for array
 /// @ test-initialize-e6
@@ -7578,7 +7536,7 @@ expected "}" after sub-types, got "new-line"
 /// @ test-initialize-e12
 unknown symbol "error"
 /// @ test-initialize-e13
-expected integer as array length, got "String"
+expected integer as array length, got "Array"
 /// @ test-initialize-e14
 only "var" access is supported for primitive types, got "user"
 /// @ test-initialize-e15
@@ -9514,7 +9472,7 @@ output argument in native function call
 /// @ test-native-ef9
 no '"' around string literal "error"
 /// @ test-native-ef10
-user output to native function with non struct type "String"
+user output to native function with non struct type "Array"
 /// @ test-native-ef11
 user output to native function with non struct type "Array"
 /// @ test-native-ef12
@@ -10298,9 +10256,7 @@ cannot assign "Test" into "String"
 /// @ test-parameter-type-ec7
 array as parameter type is unsupported
 /// @ test-parameter-type-ec8
-string as parameter type is unsupported
-/// @ test-parameter-type-ec8
-buffer as parameter type is unsupported
+array as parameter type is unsupported
 /// @@ test-parameter-inheritance
 /// @ test-parameter-inheritance-0
 typedef struct ut_M_MyStruct ut_M_MyStruct;

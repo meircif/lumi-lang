@@ -84,8 +84,7 @@ struct TypeInstance
         else-if self.name.equal(user "Int")
             self.int-range := IntRange()
             self.int-range.parse(user node, user code-node)
-        else-if code-node? and (self.name.equal(user "String") or
-                self.name.equal(user "Buffer"))
+        else-if code-node? and self.name.equal(user "Buffer")
             self.length-owner.new(user "}", user node, user code-node)
             self.length := self.length-owner
         else-if self.name.equal(user "Array")
@@ -151,14 +150,26 @@ struct TypeInstance
             if self.module-name?
                 if self.module-name.equal(user "cdef") and
                         self.name.equal(user "CharP")
-                    string-new-copy(user "Pointer")->(owner self.name)
+                    self.type-data := glob.type-pointer
                     self.parameters := List{TypeInstance}()
                     new TypeInstance c-char
                     string-new-copy(user "cdef")->(owner c-char.module-name)
                     string-new-copy(user "Char")->(owner c-char.name)
                     self.parameters.add(owner c-char)
-            node.check-type(user self.name, user self.module-name)->(
-                    user self.type-data)
+            else-if self.name.equal(user "Buffer")
+                self.type-data := glob.type-array
+                if self.length?
+                    self.parameters := List{TypeInstance}()
+                    self.parameters.add(
+                            owner glob.type-byte.new-type-instance())
+                else
+                    self.length := self.length-owner
+                    new TypeExpression length(user _)
+                    length.set(owner glob.type-byte.new-type-instance())
+                    self.length.expression := length
+            if not self.type-data?
+                node.check-type(user self.name, user self.module-name)->(
+                        user self.type-data)
             if self.conditional and (not self.type-data.is-ref() or
                     self.type-data is glob.type-pointer)
                 node.syntax-error(
@@ -237,12 +248,6 @@ struct TypeInstance
                 if sub-type.type-data is glob.type-array
                     node.syntax-error-msg(
                             user "array as parameter type is unsupported")
-                if sub-type.type-data is glob.type-string
-                    node.syntax-error-msg(
-                            user "string as parameter type is unsupported")
-                if sub-type.type-data is glob.type-buffer
-                    node.syntax-error-msg(
-                            user "buffer as parameter type is unsupported")
                 param-iter.next()
             if param-iter.has()
                 node.syntax-error(
@@ -289,8 +294,8 @@ struct TypeInstance
                         user "expected integer as array length, got",
                         user length-type.type-data.name)
             self.parameters.add(owner length-type)
-        else-if self.length-owner.parsed()
-            node.analyze-expression(user self.length, user glob.type-int)
+        ; else-if self.length-owner.parsed()
+        ;     node.analyze-expression(user self.length, user glob.type-int)
         if self.length?
             if constant-length
                 user Long length-value
@@ -351,7 +356,7 @@ struct TypeInstance
         if bases > 0
             value := UpCastExpression(owner value, copy bases)
         else-if self.type-data is glob.type-pointer and
-                value.result-type.type-data.is-buffered()
+                value.result-type.type-data is glob.type-string
             value := RefCastExpression(owner value)
     
     func need-length-check-from(user TypeInstance value-type)->(
@@ -485,14 +490,11 @@ struct TypeInstance
                 self.type-data is glob.type-file-write-text or
                 self.type-data is glob.type-file-write-binary)
             return
-        if target.type-data is glob.type-array and target.parameters? and
-                not access-is-owner(copy target-access) and not target.length?
-            if self.type-data is glob.type-string and
-                    target.parameters.first.item.type-data is glob.type-char
-                return
-            if self.type-data is glob.type-buffer and
-                    target.parameters.first.item.type-data is glob.type-byte
-                return
+        ; if target.type-data is glob.type-array and target.parameters? and
+        ;         not access-is-owner(copy target-access) and not target.length?
+        ;     if self.type-data is glob.type-string and
+        ;             target.parameters.first.item.type-data is glob.type-byte
+        ;         return
         passed := false
 
     func check-assign-to-before-type-check(
@@ -681,14 +683,11 @@ struct TypeInstance
             target-iter.next()
         
     func check-sequence(user SyntaxTreeNode node)
-        if self.type-data.is-sequence() and not self.length?
+        if self.type-data is glob.type-array and not self.length?
             assert node?
-            node.syntax-error-msg(user "missing length for sequence")
-        if self.type-data is glob.type-array
-            if self.parameters.first.item.type-data.is-buffered() and
-                    not self.parameters.first.item.length?
-                assert node?
-                node.syntax-error-msg(user "missing length for sequence")
+            node.syntax-error-msg(user "missing length for array")
+        for sub-type in self.parameters.iter()
+            sub-type.check-sequence(user node)
     
     func get-array-data-type-depth()->(
             user TypeInstance data-type, var Int depth)
@@ -698,7 +697,7 @@ struct TypeInstance
             while data-type.type-data is glob.type-array
             while data-type.parameters?
             data-type := data-type.parameters.first.item
-            while data-type.type-data.is-sequence()
+            while data-type.type-data is glob.type-array
             depth += 1
     
     ~~~ Create a copy of self type-instance with generic parameters replaced by

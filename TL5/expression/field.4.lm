@@ -68,8 +68,7 @@ class FieldExpression(Expression)
             instance-type.reference-path.copy-and-add-field(
                     user self.variable)->(owner self.result-type.reference-path)
             if self.is-complex-field and
-                    access-has-refman(copy self.instance.access) and
-                    not self.variable.type-instance.type-data.is-buffered()
+                    access-has-refman(copy self.instance.access)
                 self.access := Access.S-VAR
             else
                 self.access := self.variable.access
@@ -149,7 +148,7 @@ class FieldExpression(Expression)
 
     func dynamic write-cast()
         var Bool ref(copy self.is-complex-field and
-                not self.result-type.type-data.is-sequence())
+                not self.result-type.type-data is glob.type-array)
         if ref
             write(user "&(")
         self.write()

@@ -421,7 +421,7 @@ class CallArgument(Argument)
                 write(user "(void*)")
             write(user "&(")
         else-if self.is-native and not self.real-type.type-data.is-primitive and
-                not self.real-type.type-data.is-sequence()
+                not self.real-type.type-data is glob.type-array
             write(user "(void*)")
         self.call-value.write-cast()
         if self.is-output
@@ -430,8 +430,6 @@ class CallArgument(Argument)
         if not self.is-native
             if self.real-type.type-data is glob.type-array
                 self.write-array()
-            else-if self.real-type.type-data.is-buffered()
-                self.write-buffered()
         
             if access-has-refman(copy self.access)
                 ; , [&(]`value`_Refman[)]
@@ -483,17 +481,12 @@ class CallArgument(Argument)
     func inst write-array()
         ; , [*][&(]`value`_Length[)]
         user TypeInstance value-type(user self.call-value.result-type)
-        var Bool is-buffered
-        value-type.type-data.is-buffered()->(var is-buffered)
         user TypeInstance type-instance(user self.real-type)
         if not type-instance.length.get-constant-value()?
             write(user ", ")
-            if is-buffered
-                write(user "*")
             if self.is-output
                 write(user "&(")
-            self.call-value.write-length(
-                    user "_Length", user "0", copy not is-buffered)
+            self.call-value.write-length(user "_Length", user "0", copy true)
             if self.is-output
                 write(user ")")
         user TypeInstance data-type
@@ -517,31 +510,6 @@ class CallArgument(Argument)
                     write-array-value-length(copy n)
                 if self.is-output
                     write(user ")")
-        if data-type.type-data.is-buffered()
-            ; , [&(]`value`_Seq_length[)]
-            write(user ", ")
-            if self.is-output
-                write(user "&(")
-            self.call-value.write-length(
-                    user "_Seq_length", user "NULL", copy false)
-            if self.is-output
-                write(user ")")
-    
-    func inst write-buffered()
-        ; , [&(]`value`_Max_length[)], [&(]`value`_Length[)]
-        write(user ", ")
-        if self.is-output
-            write(user "&(")
-        self.call-value.write-length(user "_Max_length", user "0", copy true)
-        if self.is-output
-            write(user ")")
-        write(user ", ")
-        if self.is-output
-            write(user "&(")
-        self.call-value.write-length(
-                user "_Length", user "&Lumi_empty_length", copy false)
-        if self.is-output
-            write(user ")")
     
     func dynamic write-postactions()
         if access-is-owner(copy self.access) and not self.is-output and

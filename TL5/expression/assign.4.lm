@@ -118,20 +118,13 @@ class AssignExpression(Expression)
             self.write-assign-dynamic()
         if self.target.result-type.type-data is glob.type-array
             self.write-array-preactions()
-        else-if self.target.result-type.type-data.is-buffered()
-            self.write-sequence-preactions()
     
     func inst write-array-preactions()
         user TypeInstance type-instance(user self.target.result-type)
         if not type-instance.length.get-constant-value()?
             self.target.write()
             write(user "_Length = ")
-            if self.value.result-type.type-data.is-buffered()
-                write(user "*(")
-                self.value.write()
-                write(user "_Length)")
-            else
-                self.value.write-length(user "_Length", user "0", copy true)
+            self.value.write-length(user "_Length", user "0", copy true)
             write(user ";\n")
             self.code-node.write-spaces()
         
@@ -164,28 +157,6 @@ class AssignExpression(Expression)
                     write-array-value-length(copy n)
                 write(user ";\n")
                 self.code-node.write-spaces()
-        
-        if data-type.type-data.is-buffered()
-            self.target.write()
-            write(user "_Seq_length = ")
-            self.value.write-length(
-                    user "_Seq_length", user "NULL", copy false)
-            write(user ";\n")
-            self.code-node.write-spaces()
-    
-    func inst write-sequence-preactions()
-        self.target.write()
-        write(user "_Max_length = ")
-        self.value.write-length(user "_Max_length", user "0", copy true)
-        write(user ";\n")
-        self.code-node.write-spaces()
-        
-        self.target.write()
-        write(user "_Length = ")
-        self.value.write-length(
-                user "_Length", user "&Lumi_empty_length", copy false)
-        write(user ";\n")
-        self.code-node.write-spaces()
     
     func inst write-assign-refman(copy Bool full-assign)
         if full-assign and not access-is-owner(copy self.target.access)
@@ -288,12 +259,7 @@ class AssignExpression(Expression)
             user TypeInstance data-type
             self.target.result-type.get-array-data-type-depth()->(
                     user data-type)
-            if data-type.type-data.is-buffered()
-                write(user "free(")
-                self.target.write()
-                write(user "_Seq_length);\n")
-                self.code-node.write-spaces()
-            else-if not data-type.type-data.is-primitive
+            if not data-type.type-data.is-primitive
                 write(user "ARRAY_DEL(")
                 data-type.write-cname()
                 write(user ", ")

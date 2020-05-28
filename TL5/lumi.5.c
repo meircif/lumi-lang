@@ -34,8 +34,7 @@
 
 /* builtin type defines */
 
-typedef uint32_t Int;
-typedef unsigned char Char;
+typedef uint32_t Char;
 typedef uint8_t Byte;
 typedef uint8_t Bool;
 
@@ -56,6 +55,11 @@ typedef struct Ref_Manager {
   void* ref;
 } Ref_Manager;
 
+typedef struct String {
+  Byte* bytes;
+  uint32_t length;
+} String;
+
 typedef struct File {
   FILE* fobj;
 } File;
@@ -67,19 +71,19 @@ typedef File FileWriteBinary;
 typedef File FileReadWriteText;
 typedef File FileReadWriteBinary;
 
-typedef uint32_t Seq_Length;
+#define VAR_POINTER(type, name) \
+  type name##_Var; \
+  type* name = &name##_Var;
+#define VAR_REFMAN(type, name) \
+  VAR_POINTER(type, name) \
+  VAR_POINTER(Ref_Manager, name##_Refman)
 
-Char* sys_M_argv = NULL;
-Seq_Length sys_M_argv_Length = 0;
-Seq_Length sys_M_argv_Value_length;
-Seq_Length* sys_M_argv_Seq_length = NULL;
-Ref_Manager* sys_M_argv_Refman = NULL;
-File* sys_M_stdin = NULL;
-Ref_Manager* sys_M_stdin_Refman = NULL;
-File* sys_M_stdout = NULL;
-Ref_Manager* sys_M_stdout_Refman = NULL;
-File* sys_M_stderr = NULL;
-Ref_Manager* sys_M_stderr_Refman = NULL;
+String* sys_M_argv = NULL;
+uint32_t sys_M_argv_Length = 0;
+VAR_POINTER(Ref_Manager, sys_M_argv_Refman)
+VAR_REFMAN(File, sys_M_stdin)
+VAR_REFMAN(File, sys_M_stdout)
+VAR_REFMAN(File, sys_M_stderr)
 
 typedef void* Ref;
 
@@ -111,7 +115,7 @@ typedef struct File_Coverage {
 } File_Coverage;
 
 typedef struct Error_Message {
-  Char* str;
+  Byte* str;
   unsigned length;
 } Error_Message;
 
@@ -122,7 +126,7 @@ typedef struct Error_Messages {
   Error_Message managed_object_memory;
   Error_Message integer_overflow;
   Error_Message slice_index;
-  Error_Message sequence_too_short;
+  Error_Message array_too_short;
   Error_Message file_not_opened;
   Error_Message file_read_failed;
   Error_Message file_write_failed;
@@ -165,7 +169,7 @@ typedef struct Error_Messages {
 
 #define TEST_FAIL(line, cleanup, message_length, message) \
   START_TRACE( \
-      line, cleanup, FAIL, LUMI_assert_format, (Char*)message, message_length)
+      line, cleanup, FAIL, LUMI_assert_format, (Byte*)message, message_length)
 
 #define TEST_ASSERT(line, cleanup, condition) if (!(condition)) \
   TEST_FAIL(line, cleanup, 21, "condition is not true")
@@ -284,30 +288,18 @@ while (self->field != NULL) { \
 #define INIT_NEW_ARRAY(line, cleanup, name, type, length, value_size) \
   INIT_NEW(line, cleanup, name, type, length * value_size)
 
-#define INIT_NEW_SEQUENCE(line, cleanup, name, type, size) \
-  name##_Max_length = size; \
-  INIT_NEW(line, cleanup, name, type, name##_Max_length) \
-  name##_Length = LUMI_alloc(sizeof(Seq_Length)); \
-  if (name##_Length == NULL) { \
-    name##_Length = &Lumi_empty_length; \
-    free(name); name = NULL; \
-    RAISE(line, cleanup, object_memory) }
-
 #define SAFE_SUM_LARGER(a, b, c) a > c || b > c - a
 
 #define NULL_OR_VALUE(base, value) base != NULL? value: NULL
 
 
-#define Buffer_Del(name, _) do { if (name##_Length != &Lumi_empty_length) { \
-  free(name##_Length); \
-  name##_Length = &Lumi_empty_length; } } while (false)
-#define String_Del(name, _) Buffer_Del(name, _)
+#define String_Del(name, _) if (name != NULL) free(name->bytes);
 
 
 /* traceback */
 
 #define CRAISE(message) { \
-  LUMI_C_trace_print(__LINE__, LUMI_FUNC_NAME, (Char*)message); \
+  LUMI_C_trace_print(__LINE__, LUMI_FUNC_NAME, (Byte*)message); \
   return ERR; }
 #define CCHECK(err) { \
   Return_Code LUMI_cerr = err; \
@@ -318,13 +310,11 @@ char* LUMI_assert_format = "Assert failed in %s:%lu %s()\n";
 char* LUMI_traceline_format = "  called from %s:%lu %s()\n";
 FILE* LUMI_trace_stream = NULL;
 size_t LUMI_trace_ignore_count = 0;
-Char* LUMI_expected_error = NULL;
+Byte* LUMI_expected_error = NULL;
 size_t LUMI_expected_error_trace_ignore_count = 0;
 Generic_Type_Dynamic* dynamic_Void = NULL;
 
-Seq_Length Lumi_empty_length = 0;
-
-#define ERROR_MESAGE(message) {(Char*)message, sizeof(message) - 1}
+#define ERROR_MESAGE(message) {(Byte*)message, sizeof(message) - 1}
 
 Error_Messages LUMI_error_messages = {
   ERROR_MESAGE("empty object used"),
@@ -333,7 +323,7 @@ Error_Messages LUMI_error_messages = {
   ERROR_MESAGE("insufficient memory for managed object"),
   ERROR_MESAGE("integer overflow"),
   ERROR_MESAGE("slice index out of bounds"),
-  ERROR_MESAGE("sequence too short"),
+  ERROR_MESAGE("array too short"),
   ERROR_MESAGE("file not opened"),
   ERROR_MESAGE("file read failed"),
   ERROR_MESAGE("file write failed"),
@@ -353,7 +343,7 @@ void LUMI_trace_print(
     char const* filename,
     Line_Count line,
     char const* funcname,
-    Char const* message,
+    Byte const* message,
     unsigned message_length) {
   if (LUMI_trace_ignore_count == 0) {
     if (message != NULL) {
@@ -396,7 +386,7 @@ void LUMI_trace_print(
 }
 
 /* like strnlen */
-size_t cstring_length(Char* cstring, size_t max_length) {
+size_t cstring_length(Byte* cstring, size_t max_length) {
   size_t length = 0;
   while (cstring[length] != '\0' && length < max_length) {
     ++length;
@@ -404,7 +394,7 @@ size_t cstring_length(Char* cstring, size_t max_length) {
   return length;
 }
 
-void LUMI_C_trace_print(Line_Count line, char const* funcname, Char* message) {
+void LUMI_C_trace_print(Line_Count line, char const* funcname, Byte* message) {
   LUMI_trace_print(
       LUMI_raise_format,
       "builtin",
@@ -534,9 +524,9 @@ Bool LUMI_test_coverage(File_Coverage* files_coverage, size_t files_number) {
   unsigned coverage;
   Bool generate_xml = false;
   if (sys_M_argv != NULL && sys_M_argv_Refman->value != NULL &&
-      sys_M_argv_Length > 1 && sys_M_argv_Seq_length[1] > 1) {
-    Char* arg = sys_M_argv + sys_M_argv_Value_length;
-    generate_xml = arg[0] == '-' && arg[1] == 'x';
+      sys_M_argv_Length > 1 && sys_M_argv[1].length > 1) {
+    String* arg = sys_M_argv + 1;
+    generate_xml = arg->bytes[0] == '-' && arg->bytes[1] == 'x';
   }
   printf("testing code coverage... ");
   coverage = calc_coverage(files_coverage, files_number);
@@ -655,12 +645,10 @@ void LUMI_owner_dec_ref(Ref_Manager* ref) {
 /* Int */
 
 #define LUMI_FUNC_NAME "Int.str"
-Return_Code Int_str(
-    uint64_t abs, Bool is_neg,
-    Char* str, Seq_Length str_max_length, Seq_Length* str_length) {
+Return_Code Int_str(uint64_t abs, Bool is_neg, String* str) {
   uint64_t tmp;
-  Char* low;
-  Char* high;
+  Byte* low;
+  Byte* high;
   *str_length = 0;
   high = str;
   if (is_neg) {
@@ -677,7 +665,7 @@ Return_Code Int_str(
     if (str_max_length <= *str_length + 1) {
       *str_length = 0;
       str[0] = '\0';
-      CRAISE(LUMI_error_messages.sequence_too_short.str)
+      CRAISE(LUMI_error_messages.array_too_short.str)
     }
     ++(*str_length);
   } while (tmp > 0);
@@ -765,7 +753,7 @@ Return_Code Buffer_new(
     return OK;
   }
   if (source_length > max_length)
-    CRAISE(LUMI_error_messages.sequence_too_short.str)
+    CRAISE(LUMI_error_messages.array_too_short.str)
   *length = source_length;
   memcpy(self, source, source_length);
   return OK;
@@ -827,7 +815,7 @@ Return_Code Buffer_set(
 #define LUMI_FUNC_NAME "Buffer.append"
 Return_Code Buffer_append(Byte* self, Seq_Length max_length, Seq_Length* length, Byte value) {
   if (*length >= max_length)
-    CRAISE(LUMI_error_messages.sequence_too_short.str)
+    CRAISE(LUMI_error_messages.array_too_short.str)
   self[*length] = value;
   ++(*length);
   return OK;
@@ -838,7 +826,7 @@ Return_Code Buffer_append(Byte* self, Seq_Length max_length, Seq_Length* length,
 Return_Code Buffer_concat_internal(
     void* self, Seq_Length max_length, Seq_Length* length, void* ext, Seq_Length ext_length) {
   if (*length + ext_length > max_length)
-    CRAISE(LUMI_error_messages.sequence_too_short.str)
+    CRAISE(LUMI_error_messages.array_too_short.str)
   memcpy(self, ext, ext_length);
   *length += ext_length;
   return OK;
@@ -889,7 +877,7 @@ void Buffer_has(
 
 #define LUMI_FUNC_NAME "String.new"
 Return_Code String_new(
-    Char* self, Seq_Length max_length, Seq_Length* length, Char* source, Seq_Length source_length) {
+    String* self, Char* source, Seq_Length source_length) {
   CCHECK(Buffer_new(self, max_length - 1, length, source, source_length))
   self[source_length] = '\0';
   return OK;
@@ -947,7 +935,7 @@ Return_Code String_set(
 #define LUMI_FUNC_NAME "String.append"
 Return_Code String_append(Char* self, Seq_Length max_length, Seq_Length* length, Char ch) {
   if (*length + 1 >= max_length)
-    CRAISE(LUMI_error_messages.sequence_too_short.str)
+    CRAISE(LUMI_error_messages.array_too_short.str)
   self[*length] = ch;
   ++(*length);
   self[*length] = '\0';
@@ -1196,7 +1184,7 @@ Return_Code FileReadText_getline_internal(
   }
   while (ch != EOF && ch != '\n') {
     if (*line_length + 1 >= line_max_length)
-      CRAISE(LUMI_error_messages.sequence_too_short.str)
+      CRAISE(LUMI_error_messages.array_too_short.str)
     line[*line_length] = ch;
     ++(*line_length);
     if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {
@@ -1300,49 +1288,29 @@ Return_Code FileWriteBinary_write(
 
 /* system */
 
+#define INIT_REFMAN(name) \
+  name##_Refman->count = 2; \
+  name##_Refman->value = name; \
+  name##_Refman->ref = name;
+
 Return_Code set_sys(int argc, char* argv[]) {
   int arg;
-  sys_M_stdin = LUMI_alloc(sizeof(File));
-  sys_M_stdin_Refman = LUMI_new_ref(sys_M_stdin);
-  sys_M_stdout = LUMI_alloc(sizeof(File));
-  sys_M_stdout_Refman = LUMI_new_ref(sys_M_stdout);
-  sys_M_stderr = LUMI_alloc(sizeof(File));
-  sys_M_stderr_Refman = LUMI_new_ref(sys_M_stderr);
   sys_M_argv_Length = argc;
-  sys_M_argv_Value_length = 0;
-  sys_M_argv_Seq_length = LUMI_alloc(sizeof(Seq_Length) * argc);
-  for (arg = 0; arg < argc; ++arg) {
-    Seq_Length length = cstring_length((Char*)argv[arg], 1024);
-    if (sys_M_argv_Seq_length != NULL) {
-      sys_M_argv_Seq_length[arg] = length;
-    }
-    if (length > sys_M_argv_Value_length) {
-      sys_M_argv_Value_length = length;
-    }
-  }
-  ++sys_M_argv_Value_length;
-  sys_M_argv = LUMI_alloc(sys_M_argv_Value_length * sys_M_argv_Length);
-  sys_M_argv_Refman = LUMI_new_ref(sys_M_argv);
-  if (sys_M_argv == NULL || sys_M_argv_Refman == NULL ||
-    sys_M_argv_Seq_length == NULL ||
-    sys_M_stdin == NULL || sys_M_stdin_Refman == NULL ||
-    sys_M_stdout == NULL || sys_M_stdout_Refman == NULL ||
-    sys_M_stderr == NULL || sys_M_stderr_Refman == NULL) {
+  sys_M_argv = LUMI_alloc(sizeof(String) * argc);
+  if (sys_M_argv == NULL) {
     fprintf(stderr, "insufficient memory\n");
     return ERR;
   }
-  ++sys_M_argv_Refman->count;
-  ++sys_M_stdin_Refman->count;
-  ++sys_M_stdout_Refman->count;
-  ++sys_M_stderr_Refman->count;
+  INIT_REFMAN(sys_M_argv)
+  INIT_REFMAN(sys_M_stdin)
+  INIT_REFMAN(sys_M_stdout)
+  INIT_REFMAN(sys_M_stderr)
   sys_M_stdin->fobj = stdin;
   sys_M_stdout->fobj = stdout;
   sys_M_stderr->fobj = stderr;
   for (arg = 0; arg < argc; ++arg) {
-    strncpy(
-        (char*)sys_M_argv + sys_M_argv_Value_length * arg,
-        argv[arg],
-        sys_M_argv_Length);
+    sys_M_argv[arg].bytes = (Byte*)(argv[arg]);
+    sys_M_argv[arg].length = cstring_length(sys_M_argv[arg].bytes, 65535);
   }
   return OK;
 }
