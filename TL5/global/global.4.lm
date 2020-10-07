@@ -594,90 +594,90 @@ struct Global
                 user "number")
 
         ; Buffer
-        self.add-builtin-method(
-                user self.type-array,
-                user "equal",
-                copy false,
-                copy Access.USER)->(
-                user function)
-        self.add-builtin-buffer-argument(
-                user function,
-                copy false,
-                copy Access.USER,
-                user "other")
-        self.add-builtin-output(
-                user function,
-                copy Access.VAR,
-                user self.type-bool,
-                user "equal")
+        ; self.add-builtin-method(
+        ;         user self.type-array,
+        ;         user "equal",
+        ;         copy false,
+        ;         copy Access.USER)->(
+        ;         user function)
+        ; self.add-builtin-buffer-argument(
+        ;         user function,
+        ;         copy false,
+        ;         copy Access.USER,
+        ;         user "other")
+        ; self.add-builtin-output(
+        ;         user function,
+        ;         copy Access.VAR,
+        ;         user self.type-bool,
+        ;         user "equal")
 
-        self.add-builtin-method(
-                user self.type-array,
-                user "get",
-                copy true,
-                copy Access.USER)->(
-                user function)
-        self.add-builtin-int-argument(
-                user function,
-                user "Uint64",
-                copy false,
-                user "index")
-        self.add-builtin-output(
-                user function,
-                copy Access.VAR,
-                user self.type-byte,
-                user "value")
+        ; self.add-builtin-method(
+        ;         user self.type-array,
+        ;         user "get",
+        ;         copy true,
+        ;         copy Access.USER)->(
+        ;         user function)
+        ; self.add-builtin-int-argument(
+        ;         user function,
+        ;         user "Uint64",
+        ;         copy false,
+        ;         user "index")
+        ; self.add-builtin-output(
+        ;         user function,
+        ;         copy Access.VAR,
+        ;         user self.type-byte,
+        ;         user "value")
 
-        self.add-builtin-method(
-                user self.type-array,
-                user "set",
-                copy true,
-                copy Access.USER)->(
-                user function)
-        self.add-builtin-int-argument(
-                user function,
-                user "Uint64",
-                copy false,
-                user "index")
-        self.add-builtin-parameter(
-                user function,
-                copy Access.COPY,
-                user self.type-byte,
-                user "value")
+        ; self.add-builtin-method(
+        ;         user self.type-array,
+        ;         user "set",
+        ;         copy true,
+        ;         copy Access.USER)->(
+        ;         user function)
+        ; self.add-builtin-int-argument(
+        ;         user function,
+        ;         user "Uint64",
+        ;         copy false,
+        ;         user "index")
+        ; self.add-builtin-parameter(
+        ;         user function,
+        ;         copy Access.COPY,
+        ;         user self.type-byte,
+        ;         user "value")
 
-        self.add-builtin-method(
-                user self.type-array,
-                user "find",
-                copy false,
-                copy Access.USER)->(
-                user function)
-        self.add-builtin-buffer-argument(
-                user function,
-                copy false,
-                copy Access.USER,
-                user "pattern")
-        self.add-builtin-int-argument(
-                user function,
-                user "Uint64",
-                copy true,
-                user "index")
+        ; self.add-builtin-method(
+        ;         user self.type-array,
+        ;         user "find",
+        ;         copy false,
+        ;         copy Access.USER)->(
+        ;         user function)
+        ; self.add-builtin-buffer-argument(
+        ;         user function,
+        ;         copy false,
+        ;         copy Access.USER,
+        ;         user "pattern")
+        ; self.add-builtin-int-argument(
+        ;         user function,
+        ;         user "Uint64",
+        ;         copy true,
+        ;         user "index")
 
-        self.add-builtin-method(
-                user self.type-array,
-                user "has",
-                copy false,
-                copy Access.USER)->(
-                user function)
-        self.add-builtin-parameter(
-                user function,
-                copy Access.COPY,
-                user self.type-byte,
-                user "value")
-        self.add-builtin-output(
-                user function,
-                copy Access.VAR,
-                user self.type-bool,
-                user "found")
+        ; self.add-builtin-method(
+        ;         user self.type-array,
+        ;         user "has",
+        ;         copy false,
+        ;         copy Access.USER)->(
+        ;         user function)
+        ; self.add-builtin-parameter(
+        ;         user function,
+        ;         copy Access.COPY,
+        ;         user self.type-byte,
+        ;         user "value")
+        ; self.add-builtin-output(
+        ;         user function,
+        ;         copy Access.VAR,
+        ;         user self.type-bool,
+        ;         user "found")
     
     func add-sequence-methods(
             user TypeData seq-type, user TypeData value-type)->(
@@ -733,10 +733,10 @@ struct Global
         self.add-builtin-method(
                 user seq-type, user "concat", copy true, copy Access.USER)->(
                 user function)
-        self.add-builtin-parameter(
+        self.add-builtin-buffer-argument(
                 user function,
+                copy false,
                 copy Access.USER,
-                user seq-type,
                 user "other")
 
         self.add-builtin-method(
@@ -815,10 +815,10 @@ struct Global
             self.add-builtin-method(
                     user file-type, user "new", copy true, copy Access.TEMP)->(
                     user function)
-            self.add-builtin-buffer-argument(
+            self.add-builtin-parameter(
                     user function,
-                    copy false,
                     copy Access.USER,
+                    user self.type-string,
                     user "name")
         if is-write
             self.add-builtin-parameter(
@@ -1023,10 +1023,15 @@ struct Global
 
         self.add-builtin-global-function(
                 user sys-module, user "getline", copy true)->(user function)
-        self.add-builtin-parameter(
+        self.add-builtin-buffer-argument(
                 user function,
+                copy false,
                 copy Access.USER,
-                user self.type-string,
+                user "target")
+        self.add-builtin-buffer-argument(
+                user function,
+                copy true,
+                copy Access.USER,
                 user "line")
         self.add-builtin-output(
                 user function,
@@ -1056,7 +1061,7 @@ struct Global
                 user "status")
 
         self.add-builtin-global-function(
-                user sys-module, user "getenv", copy false)->(user function)
+                user sys-module, user "getenv", copy true)->(user function)
         self.add-builtin-parameter(
                 user function,
                 copy Access.USER,
@@ -1218,16 +1223,7 @@ struct Global
                 user "target")
 
         self.add-builtin-global-function(
-                user cdef-module, user "set-null-term-length", copy false)->(
-                user function)
-        self.add-builtin-parameter(
-                user function,
-                copy Access.USER,
-                user self.type-string,
-                user "target")
-
-        self.add-builtin-global-function(
-                user cdef-module, user "copy-to-buffer", copy true)->(
+                user cdef-module, user "copy-to-buffer", copy false)->(
                 user function)
         self.add-builtin-argument(
                 user function,
@@ -1386,12 +1382,12 @@ struct Global
                 user builtin-type,
                 user builtin-type)->(
                 user function)
-        if builtin-type is self.type-array
-            self.add-builtin-buffer-argument(
-                    user function, copy false, copy access, user "self")
-        else
-            self.add-builtin-parameter(
-                    user function, copy access, user builtin-type, user "self")
+        ; if builtin-type is self.type-array
+        ;     self.add-builtin-buffer-argument(
+        ;             user function, copy false, copy access, user "self")
+        ; else
+        self.add-builtin-parameter(
+                user function, copy access, user builtin-type, user "self")
         user Argument self-param(user function.arguments.parameters.first.item)
         self-param.is-native := native-name?
         function.self-access := self-param.access

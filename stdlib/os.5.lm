@@ -15,7 +15,8 @@ native const Int F-OK
 native func Int access(copy cdef.CharP path, copy Int amode)
 
 func exists(user String path)->(var Bool exist)
-    exist := access(copy path, copy F-OK) <> -1
+    var cdef.Pointer pathp(copy path.bytes())
+    exist := access(copy pathp, copy F-OK) <> -1
 
 
 ; dirent.h porting for directory operations.
@@ -37,10 +38,11 @@ native func cdef.Pointer{Dir} opendir(copy cdef.CharP path)
 native func cdef.Pointer{Dirent} readdir(copy cdef.Pointer{Dir} dir)
 
 struct Path
-    owner String path-r
+    var String path-r
 
-    new!(copy Int len)
-        self.path-r := String{len + 1}()!
+    new!(copy cdef.Pointer{Dirent} ent)
+        cdef.copy-to-string(copy ent!.d-name, user self.path-r)!
+        ; self.path-r := String{len + 1}()!
 
 func ! list-dir(user String dir-path)->(owner ds.List?{Path} files)
     var cdef.Pointer{Dir} dir
@@ -48,14 +50,14 @@ func ! list-dir(user String dir-path)->(owner ds.List?{Path} files)
 
     files := ds.List{Path}()!
 
-    dir := opendir(copy dir-path)
+    var cdef.Pointer dir-path-p(copy dir-path.bytes())
+    dir := opendir(copy dir-path-p)
     if not dir?
         raise! "path is not dir"
     loop
         ent := readdir(copy dir)
         while ent?
-        new Path path(copy strlen(copy ent!.d-name))!
-        cdef.copy-to-string(copy ent!.d-name, user path.path-r)!
+        new Path path(copy ent)!
         files!.append(owner path)!
 
     if closedir(copy dir) <> 0

@@ -2,59 +2,51 @@
 module dict-test
 
 
-struct StringBox
-    owner String value
-
-    new!(user Array{Char} chars)
-        new String{chars.length + 1} value(user chars)!
-        self.value := value
-
-
 test dict-is-empty-test()
-    var ds.Dictionary{StringBox} dict
+    var ds.Dictionary{String} dict
     assert! dict.is-empty()
-    dict.put(copy 3, owner StringBox(user "first-value")!)!
+    dict.put(copy 3, owner String(user "first-value")!)!
     assert! not dict.is-empty()
 
 
 test dict-find-test()
-    var ds.Dictionary{StringBox} dict
-    dict.put(copy 3, owner StringBox(user "first-value")!)!
+    var ds.Dictionary{String} dict
+    dict.put(copy 3, owner String(user "first-value")!)!
     assert! dict.find(copy 3)!
     assert! dict.find(copy 3)!
     assert! not dict.find(copy 0)!
 
 
 test dict-get-test()
-    var ds.Dictionary{StringBox} dict
+    var ds.Dictionary{String} dict
     assert! dict.is-empty()
-    dict.put(copy 1, owner StringBox(user "first-value")!)!
-    user StringBox? item
+    dict.put(copy 1, owner String(user "first-value")!)!
+    user String? item
     dict.get(copy 1)->(user item)!
-    assert! item!.value.equal(user "first-value")
+    assert! item!.equal(user "first-value")
 
 
 test dict-get-using-iter-test()
-    var ds.Dictionary{StringBox} dict
+    var ds.Dictionary{String} dict
     assert! dict.is-empty()
-    dict.put(copy 1, owner StringBox(user "first-value")!)!
-    dict.put(copy 2, owner StringBox(user "second-value")!)!
+    dict.put(copy 1, owner String(user "first-value")!)!
+    dict.put(copy 2, owner String(user "second-value")!)!
     
-    user ds.KeyValue?{StringBox} key-value
-    owner ds.DictionaryIterator{StringBox} iter
+    user ds.KeyValue?{String} key-value
+    owner ds.DictionaryIterator{String} iter
     iter := dict.iter()!
     assert! iter.step()->(user key-value)!
     assert! key-value!.key = 1 or key-value!.key = 2
-    assert! key-value!.value.value.equal(user "first-value") or
-            key-value!.value.value.equal(user "second-value")
+    assert! key-value!.value.equal(user "first-value") or
+            key-value!.value.equal(user "second-value")
     assert! iter.step()->(user key-value)!
     assert! key-value!.key = 1 or key-value!.key = 2
-    assert! key-value!.value.value.equal(user "first-value") or
-            key-value!.value.value.equal(user "second-value")
+    assert! key-value!.value.equal(user "first-value") or
+            key-value!.value.equal(user "second-value")
     assert! not iter.step()->(user key-value)!
     
     var Int key
-    owner ds.DictionaryKeyIterator{StringBox} keys-iter
+    owner ds.DictionaryKeyIterator{String} keys-iter
     keys-iter := dict.iter-keys()!
     assert! keys-iter.step()->(var key)!
     assert! key = 1 or key = 2
@@ -62,42 +54,42 @@ test dict-get-using-iter-test()
     assert! key = 1 or key = 2
     assert! not keys-iter.step()->(var key)!
     
-    user StringBox? value
-    owner ds.DictionaryValueIterator{StringBox} values-iter
+    user String? value
+    owner ds.DictionaryValueIterator{String} values-iter
     values-iter := dict.iter-values()!
     assert! values-iter.step()->(user value)!
-    assert! value!.value.equal(user "first-value") or
-            value!.value.equal(user "second-value")
+    assert! value!.equal(user "first-value") or
+            value!.equal(user "second-value")
     assert! values-iter.step()->(user value)!
-    assert! value!.value.equal(user "first-value") or
-            value!.value.equal(user "second-value")
+    assert! value!.equal(user "first-value") or
+            value!.equal(user "second-value")
     assert! not values-iter.step()->(user value)!
 
 
 test dict-get-fail-empty-dict-test()
-    var ds.Dictionary{StringBox} dict
+    var ds.Dictionary{String} dict
     assert! dict.is-empty()
-    user StringBox? item
+    user String? item
     assert-error! dict.get(copy 1)->(user item), "Key not in dictionary"
 
 
 test dict-get-fail-invalid-key-test()
-    var ds.Dictionary{StringBox} dict
+    var ds.Dictionary{String} dict
     assert! dict.is-empty()
-    dict.put(copy 1, owner StringBox(user "first-value")!)!
-    user StringBox? item
+    dict.put(copy 1, owner String(user "first-value")!)!
+    user String? item
     assert-error! dict.get(copy 2)->(user item), "Key not in dictionary"
 
 
 test dict-put-test()
-    var ds.Dictionary{StringBox} dict
+    var ds.Dictionary{String} dict
     assert! dict.is-empty()
-    dict.put(copy 1, owner StringBox(user "first-value")!)!
+    dict.put(copy 1, owner String(user "first-value")!)!
     assert! not dict.is-empty()
 
 
 test dict-put-fail-test()
-    var ds.Dictionary{StringBox} dict
-    dict.put(copy 3, owner StringBox(user "first-value")!)!
-    assert-error! dict.put(copy 3, owner StringBox(user "none")),
+    var ds.Dictionary{String} dict
+    dict.put(copy 3, owner String(user "first-value")!)!
+    assert-error! dict.put(copy 3, owner String(user "none")),
             "Key already in dictionary"

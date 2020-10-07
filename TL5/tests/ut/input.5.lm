@@ -147,7 +147,7 @@ c := '\x00'
 ; @ c test-string-expression-0
 bfr := "some string"
 ; @ c test-string-expression-1
-bfr := "\nstring'\t\"with\\\'formatting\n"
+bfr := "\nstring'\t\"\xd5with\x21\\\'\307formatting\n"
 ; @ c test-string-expression-2
 bfr := "line\
         split\
@@ -1607,29 +1607,16 @@ ostr!.append(copy c)!
 var String sv
 sv.new(user ostr!.bytes())!
 ; @ c test-builtin-string7
-ostr!.concat(user ostr!)!
+ostr!.concat(user buff!)!
 ; @ c test-builtin-string8
 ostr!.concat-int(copy i)!
 ; @ c test-builtin-string10
 ostr!.has(copy c)->(var b)
 ; @ c test-builtin-buffer0
 i := buff!.length
-; @ c test-builtin-buffer2
-buff!.equal(user buff!)->(var b)
-; @ c test-builtin-buffer3
-buff!.get(copy i)->(var bt)!
-; @ c test-builtin-buffer4
-buff!.set(copy i, copy bt)!
-; @ c test-builtin-buffer8
-var Uint64 x
-buff!.find(user buff!)->(var x)
-; @ c test-builtin-buffer9
-buff!.has(copy bt)->(var b)
-; @ c test-builtin-buffer10
-Buffer.set(user buff!, copy 0, copy bt)!
 ; @ c test-builtin-file0
 try
-    s-var FileReadText f(user ostr.bytes())
+    s-var FileReadText f(user ostr)
     f.get()->(var bt, var b)
     f.getline(user buff)->(user bfr, var b)
     var Sint64 x
@@ -1643,7 +1630,7 @@ try
     df.item := f
 ; @ c test-builtin-file1
 try
-    new FileReadBinary f(user ostr.bytes())
+    new FileReadBinary f(user ostr)
     f.get()->(var bt, var b)
     f.read(user buff)->(var i)
     var Sint64 x
@@ -1657,7 +1644,7 @@ try
     df.set(owner f)
 ; @ c test-builtin-file2
 try
-    owner FileWriteText f(owner FileWriteText(user ostr.bytes(), copy false))
+    owner FileWriteText f(owner FileWriteText(user ostr, copy false))
     f.put(copy bt)
     f.write(user buff)->(var i)
     var Sint64 x
@@ -1671,7 +1658,7 @@ try
     df.set(owner f)
 ; @ c test-builtin-file3
 try
-    strong FileWriteBinary f(strong FileWriteBinary(user ostr.bytes(), copy true))
+    strong FileWriteBinary f(strong FileWriteBinary(user ostr, copy true))
     f.put(copy bt)
     f.write(user buff)->(var i)
     var Sint64 x
@@ -1685,7 +1672,7 @@ try
     df.item := f
 ; @ c test-builtin-file4
 try
-    s-var FileReadWriteText f(user ostr.bytes(), copy true, copy true)
+    s-var FileReadWriteText f(user ostr, copy true, copy true)
     f.get()->(var bt, var b)
     f.getline(user buff)->(user bfr, var b)
     f.put(copy bt)
@@ -1701,7 +1688,7 @@ try
     df.item := f
 ; @ c test-builtin-file5
 try
-    new FileReadWriteBinary f(user ostr.bytes(), copy false, copy false)
+    new FileReadWriteBinary f(user ostr, copy false, copy false)
     f.get()->(var bt, var b)
     f.read(user buff)->(var i)
     f.put(copy bt)
@@ -1720,6 +1707,7 @@ struct Data{Generic}
     weak Generic? item
     func user? set(owner Generic? item)
 func ! fun(
+        user String name,
         user File f,
         user FileReadText frt,
         user FileReadBinary frb,
@@ -1739,6 +1727,7 @@ func ! fun(
     fwt := frwt
     fwb := frwb
     fun(
+            user name,
             user frt,
             user frwt,
             user frwb,
@@ -1747,7 +1736,7 @@ func ! fun(
             user frwt,
             user frwb)!
     var Data{File} df
-    owner File fo(owner FileWriteBinary(user "name", copy false)!)
+    owner File fo(owner FileWriteBinary(user name, copy false)!)
     var Sint64 i
     fo.tell()->(var i)!
     fo.seek-set(copy i)!
@@ -1766,7 +1755,7 @@ sys.println(user ostr!.bytes())!
 ; @ c test-builtin-sys3
 sys.getchar()->(var c, var b)!
 ; @ c test-builtin-sys4
-sys.getline(user ostr!)->(var b)!
+sys.getline(user buff!)->(user bfr, var b)!
 ; @ c test-builtin-sys5
 sys.exit(copy j)!
 ; @ c test-builtin-sys6
@@ -5466,10 +5455,9 @@ func ! fun(user String? str, user Buffer? buff)
     ext(copy str, copy buff)
     proxy(copy str, copy buff)
     cdef.copy-to-string(copy p-char, user str!)!
-    cdef.set-null-term-length(user str!)
 ; @ c test-c-objects-4
 var cdef.Pointer{cdef.Uchar} p-uchar
-cdef.copy-to-buffer(copy p-uchar, user buff!)!
+cdef.copy-to-buffer(copy p-uchar, user buff!)
 ; @ ec test-c-objects-e0
 var cdef.Pointer{Ta} error
 ; @ ec test-c-objects-e1

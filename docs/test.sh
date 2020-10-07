@@ -38,7 +38,7 @@ $CCA docs/examples.c -o docs/run-examples
 # run examples
 docs/hello-world
 docs/hello-world-test
-# docs/run-examples
+docs/run-examples
 
 # run sphinx with spell checker
 sphinx-build -W -b spelling ../docs docs/spelling

@@ -13,7 +13,7 @@ extern Native external_nvar;
 
 void MY_Some_external(void);
 
-NativeRef external_get_ref(int i, char* s, int* a);
+NativeRef external_get_ref(int i, unsigned char* s, int* a);
 
 int external_set_ref(NativeRef n);
 

@@ -135,15 +135,16 @@ struct Time
     func user ! asctime(user String target)
         cdef.copy-to-string(copy c-asctime(copy self.c-pointer()), user target)!
     
-    func user strftime(user String target, user String format)->(
+    func user strftime(user Buffer target, user String format)->(
             var Uint32 copied)
         var Ref timeptr(copy self)
+        var cdef.Pointer targetp(copy target)
+        var cdef.Pointer formatp(copy format.bytes())
         copied := clamp c-strftime(
-                copy target,
-                copy target.max-length(),
-                copy format,
+                copy targetp,
+                copy target.length,
+                copy formatp,
                 copy self.c-pointer())
-        cdef.set-null-term-length(user target)
 
 
 func clock()->(var Uint64 ticks)

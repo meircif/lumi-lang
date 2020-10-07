@@ -63,16 +63,16 @@ void ut_M_Data_set(ut_M_Data* self, Generic_Type* item, Generic_Type_Dynamic* it
 void ut_M_Data_get(ut_M_Data* self, Generic_Type** item, Ref_Manager** item_Refman, Generic_Type_Dynamic** item_Dynamic);
 void ut_M_Data_Del(ut_M_Data* self, ut_M_Data_Dynamic* self_Dynamic);
 void ut_M_fun0(void);
-void ut_M_fun1(uint32_t x, Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, Char* o, Seq_Length o_Max_length, Seq_Length* o_Length);
-void ut_M_fun2(Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length, Ref_Manager** s_Refman, uint32_t* x);
-void ut_M_fun3(uint32_t x, Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length, Ref_Manager** s_Refman);
+void ut_M_fun1(uint32_t x, String* s, String* o);
+void ut_M_fun2(String** s, Ref_Manager** s_Refman, uint32_t* x);
+void ut_M_fun3(uint32_t x, String** s, Ref_Manager** s_Refman);
 void ut_M_fun4(uint32_t x);
 void ut_M_fun5(uint32_t x, uint32_t* y);
 void ut_M_fun6(uint32_t x, uint32_t y, uint32_t* n, uint32_t* m);
 void ut_M_fun7(ut_M_Tb* tb, Ref_Manager* tb_Refman, ut_M_Tb_Dynamic* tb_Dynamic, ut_M_Tb** tbo, Ref_Manager** tbo_Refman, ut_M_Tb_Dynamic** tbo_Dynamic);
-void ut_M_fun8(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, Ref_Manager* s_Refman);
+void ut_M_fun8(String* s, Ref_Manager* s_Refman);
 Return_Code ut_M_fune(void);
-Return_Code ut_M_mock(Char* str, Seq_Length str_Max_length, Seq_Length* str_Length, Byte* bfr, Seq_Length bfr_Max_length, Seq_Length* bfr_Length, Char** so, Seq_Length* so_Max_length, Seq_Length** so_Length, Ref_Manager** so_Refman, uint32_t* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic);
+Return_Code ut_M_mock(String* str, Byte* bfr, uint32_t bfr_Length, String** so, Ref_Manager** so_Refman, uint32_t* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic);
 ut_M_Test_Dynamic ut_M_Test_dynamic = {
     (Dynamic_Del)ut_M_Test_Del
 };
@@ -108,12 +108,9 @@ int32_t ut_M_j = 0;
 Byte ut_M_bt = 0;
 Char ut_M_c = 0;
 Bool ut_M_b = 0;
-Char* ut_M_ostr = NULL;
-Seq_Length ut_M_ostr_Max_length = 0;
-Seq_Length* ut_M_ostr_Length = &Lumi_empty_length;
+String* ut_M_ostr = NULL;
 Byte* ut_M_buff = NULL;
-Seq_Length ut_M_buff_Max_length = 0;
-Seq_Length* ut_M_buff_Length = &Lumi_empty_length;
+uint32_t ut_M_buff_Length = 0;
 uint32_t* ut_M_arr = NULL;
 uint32_t ut_M_arr_Length = 0;
 Ref_Manager* ut_M_arr_Refman = NULL;
@@ -130,15 +127,12 @@ Ref_Manager* ut_M_tc_Refman = NULL;
 ut_M_Tc_Dynamic* ut_M_tc_Dynamic = NULL;
 ut_M_Data* ut_M_d = NULL;
 Ref_Manager* ut_M_d_Refman = NULL;
-Char* ut_M_sarr = NULL;
+String* ut_M_sarr = NULL;
 uint32_t ut_M_sarr_Length = 0;
-Seq_Length ut_M_sarr_Value_length = 0;
-Seq_Length* ut_M_sarr_Seq_length = NULL;
 Ref_Manager* ut_M_sarr_Refman = NULL;
 Byte* ut_M_barr = NULL;
 uint32_t ut_M_barr_Length = 0;
-Seq_Length ut_M_barr_Value_length = 0;
-Seq_Length* ut_M_barr_Seq_length = NULL;
+uint32_t ut_M_barr_Value_length = 0;
 Ref_Manager* ut_M_barr_Refman = NULL;
 void ut_M_Test_meth(ut_M_Test* self) {
     unsigned LUMI_loop_depth = 1;
@@ -219,19 +213,19 @@ void ut_M_fun0(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_fun1(uint32_t x, Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, Char* o, Seq_Length o_Max_length, Seq_Length* o_Length) {
+void ut_M_fun1(uint32_t x, String* s, String* o) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
     String_Del(o, NULL);
     free(o);
 }
-void ut_M_fun2(Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length, Ref_Manager** s_Refman, uint32_t* x) {
+void ut_M_fun2(String** s, Ref_Manager** s_Refman, uint32_t* x) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_fun3(uint32_t x, Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length, Ref_Manager** s_Refman) {
+void ut_M_fun3(uint32_t x, String** s, Ref_Manager** s_Refman) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
@@ -258,7 +252,7 @@ LUMI_block0_cleanup:
     (void)0;
     LUMI_dec_ref(tb_Refman);
 }
-void ut_M_fun8(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, Ref_Manager* s_Refman) {
+void ut_M_fun8(String* s, Ref_Manager* s_Refman) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
@@ -272,7 +266,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-Return_Code ut_M_mock(Char* str, Seq_Length str_Max_length, Seq_Length* str_Length, Byte* bfr, Seq_Length bfr_Max_length, Seq_Length* bfr_Length, Char** so, Seq_Length* so_Max_length, Seq_Length** so_Length, Ref_Manager** so_Refman, uint32_t* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic) {
+Return_Code ut_M_mock(String* str, Byte* bfr, uint32_t bfr_Length, String** so, Ref_Manager** so_Refman, uint32_t* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
@@ -382,46 +376,31 @@ illegal character constant "'\x00'"
 /// @@ test-string-expression
 /// @ test-string-expression-0
 static Byte aux_Array_0[] = {'s','o','m','e',' ','s','t','r','i','n','g','\0',};
-    bfr_Length = 0x0d;
+    bfr_Length = 0x0b;
     bfr = aux_Array_0;
 /// @ test-string-expression-1
-static Char aux_String_0[] = {'\n','s','t','r','i','n','g','\'','\t','\"','w','i','t','h','\\','\'','f','o','r','m',
-        'a','t','t','i','n','g','\n','\0',};
-    Seq_Length aux_String_0_Max_length = sizeof(aux_String_0);
-    Seq_Length aux_String_0_Length[1] = {sizeof(aux_String_0) - 1};
-    str_Max_length = aux_String_0_Max_length;
-    str_Length = aux_String_0_Length;
-    str = aux_String_0;
+static Byte aux_Array_0[] = {'\n','s','t','r','i','n','g','\'','\t','\"','\xd5','w','i','t','h','!','\\','\'','\xc7','f',
+        'o','r','m','a','t','t','i','n','g','\n','\0',};
+    bfr_Length = 0x1e;
+    bfr = aux_Array_0;
 /// @ test-string-expression-2
-static Char aux_String_0[] = {'l','i','n','e','s','p','l','i','t','s','t','r','i','n','g','\0',};
-    Seq_Length aux_String_0_Max_length = sizeof(aux_String_0);
-    Seq_Length aux_String_0_Length[1] = {sizeof(aux_String_0) - 1};
-    str_Max_length = aux_String_0_Max_length;
-    str_Length = aux_String_0_Length;
-    str = aux_String_0;
+static Byte aux_Array_0[] = {'l','i','n','e','s','p','l','i','t','s','t','r','i','n','g','\0',};
+    bfr_Length = 0x0f;
+    bfr = aux_Array_0;
 /// @ test-string-expression-3
-static Char aux_String_0[] = {'m','u','l','t','i','\n','l','i','n','e','\n','s','t','r','i','n','g','\n','\0',};
-    Seq_Length aux_String_0_Max_length = sizeof(aux_String_0);
-    Seq_Length aux_String_0_Length[1] = {sizeof(aux_String_0) - 1};
-    str_Max_length = aux_String_0_Max_length;
-    str_Length = aux_String_0_Length;
-    str = aux_String_0;
+static Byte aux_Array_0[] = {'m','u','l','t','i','\n','l','i','n','e','\n','s','t','r','i','n','g','\n','\0',};
+    bfr_Length = 0x12;
+    bfr = aux_Array_0;
 /// @ test-string-expression-4
-static Char aux_String_0[] = {'l','i','n','e',' ','s','p','l','i','t','\0',};
-    Seq_Length aux_String_0_Max_length = sizeof(aux_String_0);
-    Seq_Length aux_String_0_Length[1] = {sizeof(aux_String_0) - 1};
-    str_Max_length = aux_String_0_Max_length;
-    str_Length = aux_String_0_Length;
-    str = aux_String_0;
+static Byte aux_Array_0[] = {'l','i','n','e',' ','s','p','l','i','t','\0',};
+    bfr_Length = 0x0a;
+    bfr = aux_Array_0;
 /// @ test-string-expression-5
-static Char aux_String_0[] = {'\xd7','\xa9','\xd6','\xb8','\xd7','\x81','\xd7','\x9c','\xd7','\x95','\xd6','\xb9','\xd7','\x9d',' ','\xf0','\x9f','\x91','\x8b','\xf0',
+static Byte aux_Array_0[] = {'\xd7','\xa9','\xd6','\xb8','\xd7','\x81','\xd7','\x9c','\xd7','\x95','\xd6','\xb9','\xd7','\x9d',' ','\xf0','\x9f','\x91','\x8b','\xf0',
         '\x9f','\x8f','\xbe',' ','\xd7','\xa2','\xd7','\x95','\xd6','\xb9','\xd7','\x9c','\xd6','\xb8','\xd6','\xbd','\xd7','\x9d',' ','\xf0',
         '\x9f','\x8c','\x8e','\0',};
-    Seq_Length aux_String_0_Max_length = sizeof(aux_String_0);
-    Seq_Length aux_String_0_Length[1] = {sizeof(aux_String_0) - 1};
-    str_Max_length = aux_String_0_Max_length;
-    str_Length = aux_String_0_Length;
-    str = aux_String_0;
+    bfr_Length = 0x2b;
+    bfr = aux_Array_0;
 /// @ test-string-expression-e0
 no '"' around string literal ""aaa"
 /// @ test-string-expression-e1
@@ -450,10 +429,9 @@ illegal character constant "\x00"
 void ut_M_fun(void);
 void ut_M_fun(void) {
     unsigned LUMI_loop_depth = 1;
-    Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
-    static Char aux_String_0[] = {'0','1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9',
+    Byte* s = NULL;
+    uint32_t s_Length = 0;
+    static Byte aux_Array_0[] = {'0','1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9',
         '0','1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9',
         '0','1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9',
         '0','1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9',
@@ -484,36 +462,24 @@ void ut_M_fun(void) {
         '0','1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9',
         '0','1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9',
         '\0',};
-    Seq_Length aux_String_0_Max_length = sizeof(aux_String_0);
-    Seq_Length aux_String_0_Length[1] = {sizeof(aux_String_0) - 1};
-    s_Max_length = aux_String_0_Max_length;
-    s_Length = aux_String_0_Length;
-    s = aux_String_0;
+    s_Length = 0x0258;
+    s = aux_Array_0;
 LUMI_block0_cleanup:
     (void)0;
 }
 /// @@ test-buffer-expression
 /// @ test-buffer-expression-0
-static Byte aux_Buffer_0[] = {0x4a,0x00,0xe2,0xff,0x59,};
-    Seq_Length aux_Buffer_0_Max_length = sizeof(aux_Buffer_0);
-    Seq_Length aux_Buffer_0_Length[1] = {sizeof(aux_Buffer_0)};
-    bfr_Max_length = aux_Buffer_0_Max_length;
-    bfr_Length = aux_Buffer_0_Length;
-    bfr = aux_Buffer_0;
+static Byte aux_Array_0[] = {0x4a,0x00,0xe2,0xff,0x59,};
+    bfr_Length = 0x05;
+    bfr = aux_Array_0;
 /// @ test-buffer-expression-1
-static Byte aux_Buffer_0[] = {0x4a,0x00,0xe2,0xff,0x59,0xa8,};
-    Seq_Length aux_Buffer_0_Max_length = sizeof(aux_Buffer_0);
-    Seq_Length aux_Buffer_0_Length[1] = {sizeof(aux_Buffer_0)};
-    bfr_Max_length = aux_Buffer_0_Max_length;
-    bfr_Length = aux_Buffer_0_Length;
-    bfr = aux_Buffer_0;
+static Byte aux_Array_0[] = {0x4a,0x00,0xe2,0xff,0x59,0xa8,};
+    bfr_Length = 0x06;
+    bfr = aux_Array_0;
 /// @ test-buffer-expression-2
-static Byte aux_Buffer_0[] = {0x4a,0x00,0xe2,0xff,0x59,0xa8,};
-    Seq_Length aux_Buffer_0_Max_length = sizeof(aux_Buffer_0);
-    Seq_Length aux_Buffer_0_Length[1] = {sizeof(aux_Buffer_0)};
-    bfr_Max_length = aux_Buffer_0_Max_length;
-    bfr_Length = aux_Buffer_0_Length;
-    bfr = aux_Buffer_0;
+static Byte aux_Array_0[] = {0x4a,0x00,0xe2,0xff,0x59,0xa8,};
+    bfr_Length = 0x06;
+    bfr = aux_Array_0;
 /// @ test-buffer-expression-e0
 no '`' around buffer constant "`0000"
 /// @ test-buffer-expression-e1
@@ -529,9 +495,8 @@ void ut_M_fun(void);
 void ut_M_fun(void) {
     unsigned LUMI_loop_depth = 1;
     Byte* b = NULL;
-    Seq_Length b_Max_length = 0;
-    Seq_Length* b_Length = &Lumi_empty_length;
-    static Byte aux_Buffer_0[] = {0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,
+    uint32_t b_Length = 0;
+    static Byte aux_Array_0[] = {0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,
         0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,
         0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,
         0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,
@@ -562,19 +527,15 @@ void ut_M_fun(void) {
         0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,
         0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,
         };
-    Seq_Length aux_Buffer_0_Max_length = sizeof(aux_Buffer_0);
-    Seq_Length aux_Buffer_0_Length[1] = {sizeof(aux_Buffer_0)};
-    b_Max_length = aux_Buffer_0_Max_length;
-    b_Length = aux_Buffer_0_Length;
-    b = aux_Buffer_0;
+    b_Length = 0x0258;
+    b = aux_Array_0;
 LUMI_block0_cleanup:
     (void)0;
 }
 /// @@ test-empty-expression
 /// @ test-empty-expression-0
-str_Max_length = 0;
-    str_Length = &Lumi_empty_length;
-    str = NULL;
+bfr_Length = 0;
+    bfr = NULL;
 /// @ test-empty-expression-1
 LUMI_inc_ref(NULL);
     LUMI_dec_ref(ut_M_t_Refman);
@@ -584,8 +545,6 @@ LUMI_inc_ref(NULL);
 String_Del(*so, NULL);
     LUMI_owner_dec_ref(*so_Refman);
     *so_Refman = NULL;
-    *so_Max_length = 0;
-    *so_Length = &Lumi_empty_length;
     *so = NULL;
 /// @ test-empty-expression-3
 ut_M_b = ((void*)ut_M_t == NULL) || ((void*)ut_M_ta != NULL);
@@ -631,29 +590,18 @@ type "Test" has no member "error"
 type "Int" has no member "error"
 /// @@ test-slice-expression
 /// @ test-slice-expression-0
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    if (0x0d >= *(ut_M_ostr_Length)) RAISE(1, LUMI_block0_cleanup, slice_index)
-    ut_M_c = ut_M_ostr[0x0d];
-    CHECK_REF(2, LUMI_block0_cleanup, ut_M_buff)
-    if (0x0d >= *(ut_M_buff_Length)) RAISE(2, LUMI_block0_cleanup, slice_index)
+CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
+    if (0x0d >= ut_M_buff_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
     ut_M_bt = ut_M_buff[0x0d];
 /// @ test-slice-expression-1
-Char* x = NULL;
-    uint32_t x_Length = 0;
-    Byte* y = NULL;
+Byte* y = NULL;
     uint32_t y_Length = 0;
-    Char* aux_Array_0 = NULL;
-    Byte* aux_Array_1 = NULL;
-    CHECK_REF(2, LUMI_block0_cleanup, ut_M_ostr)
-    if (SAFE_SUM_LARGER(0x02, 0x06, *(ut_M_ostr_Length))) RAISE(2, LUMI_block0_cleanup, slice_index)
-    aux_Array_0 = ut_M_ostr + 0x02;
-    x_Length = 0x06;
-    x = aux_Array_0;
-    CHECK_REF(4, LUMI_block0_cleanup, ut_M_buff)
-    if (SAFE_SUM_LARGER(0x02, 0x06, *(ut_M_buff_Length))) RAISE(4, LUMI_block0_cleanup, slice_index)
-    aux_Array_1 = ut_M_buff + 0x02;
+    Byte* aux_Array_0 = NULL;
+    CHECK_REF(2, LUMI_block0_cleanup, ut_M_buff)
+    if (SAFE_SUM_LARGER(0x02, 0x06, ut_M_buff_Length)) RAISE(2, LUMI_block0_cleanup, slice_index)
+    aux_Array_0 = ut_M_buff + 0x02;
     y_Length = 0x06;
-    y = aux_Array_1;
+    y = aux_Array_0;
 /// @ test-slice-expression-2
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
     if (0x0d >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
@@ -670,11 +618,8 @@ uint32_t* x = NULL;
     x_Length = aux_Array_0_Length;
     x = aux_Array_0;
 /// @ test-slice-expression-4
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    if (0x04 >= *(ut_M_ostr_Length)) RAISE(1, LUMI_block0_cleanup, slice_index)
-    ut_M_ostr[0x04] = ut_M_c;
-    CHECK_REF(2, LUMI_block0_cleanup, ut_M_buff)
-    if (0x04 >= *(ut_M_buff_Length)) RAISE(2, LUMI_block0_cleanup, slice_index)
+CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
+    if (0x04 >= ut_M_buff_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
     ut_M_buff[0x04] = ut_M_bt;
 /// @ test-slice-expression-5
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
@@ -691,186 +636,71 @@ ut_M_Test* tarr = NULL;
     ut_M_t_Refman = tarr_Refman;
     ut_M_t = tarr + 0x03;
 /// @ test-slice-expression-7
-Char vsa[0x08 * 0x05] = {0};
-    Seq_Length vsa_Seq_length[0x08] = {0};
-    Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
-    Char* sa = NULL;
-    uint32_t sa_Length = 0;
-    Seq_Length sa_Value_length = 0;
-    Seq_Length* sa_Seq_length = NULL;
-    Byte vba[0x08 * 0x05] = {0};
-    Seq_Length vba_Seq_length[0x08] = {0};
+Byte vba[0x08 * 0x05] = {0};
     Byte* bf = NULL;
-    Seq_Length bf_Max_length = 0;
-    Seq_Length* bf_Length = &Lumi_empty_length;
+    uint32_t bf_Length = 0;
     Byte* ba = NULL;
     uint32_t ba_Length = 0;
-    Seq_Length ba_Value_length = 0;
-    Seq_Length* ba_Seq_length = NULL;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    Char* aux_Array_0 = NULL;
-    Seq_Length* aux_Array_0_Seq_length = NULL;
-    Byte* aux_Buffer_0 = NULL;
-    Seq_Length aux_Buffer_0_Max_length = 0;
-    Seq_Length* aux_Buffer_0_Length = &Lumi_empty_length;
+    uint32_t ba_Value_length = 0;
+    Byte* aux_Array_0 = NULL;
     Byte* aux_Array_1 = NULL;
-    Seq_Length* aux_Array_1_Seq_length = NULL;
-    /* initializing vsa */
-    aux_String_0 = vsa + 0x03 * 0x05;
-    aux_String_0_Length = vsa_Seq_length + 0x03;
-    s_Max_length = 0x05;
-    s_Length = aux_String_0_Length;
-    s = aux_String_0;
-    aux_Array_0 = vsa + 0x02 * 0x05;
-    aux_Array_0_Seq_length = vsa_Seq_length + 0x02;
-    sa_Length = 0x04;
-    sa_Value_length = 0x05;
-    sa_Seq_length = aux_Array_0_Seq_length;
-    sa = aux_Array_0;
     /* initializing vba */
-    aux_Buffer_0 = vba + 0x03 * 0x05;
-    aux_Buffer_0_Length = vba_Seq_length + 0x03;
-    bf_Max_length = 0x05;
-    bf_Length = aux_Buffer_0_Length;
-    bf = aux_Buffer_0;
+    aux_Array_0 = vba + 0x03 * 0x05;
+    bf_Length = 0x05;
+    bf = aux_Array_0;
     aux_Array_1 = vba + 0x02 * 0x05;
-    aux_Array_1_Seq_length = vba_Seq_length + 0x02;
     ba_Length = 0x04;
     ba_Value_length = 0x05;
-    ba_Seq_length = aux_Array_1_Seq_length;
     ba = aux_Array_1;
 /// @ test-slice-expression-8
-Return_Code ut_M_fun(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, Char* sa, uint32_t sa_Length, Seq_Length sa_Value_length, Seq_Length* sa_Seq_length, Ref_Manager* sa_Refman, Byte* b, Seq_Length b_Max_length, Seq_Length* b_Length, Byte* ba, uint32_t ba_Length, Seq_Length ba_Value_length, Seq_Length* ba_Seq_length, Ref_Manager* ba_Refman);
-Return_Code ut_M_fun(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, Char* sa, uint32_t sa_Length, Seq_Length sa_Value_length, Seq_Length* sa_Seq_length, Ref_Manager* sa_Refman, Byte* b, Seq_Length b_Max_length, Seq_Length* b_Length, Byte* ba, uint32_t ba_Length, Seq_Length ba_Value_length, Seq_Length* ba_Seq_length, Ref_Manager* ba_Refman) {
+Return_Code ut_M_fun(Byte* b, uint32_t b_Length, Byte* ba, uint32_t ba_Length, uint32_t ba_Value_length, Ref_Manager* ba_Refman);
+Return_Code ut_M_fun(Byte* b, uint32_t b_Length, Byte* ba, uint32_t ba_Length, uint32_t ba_Value_length, Ref_Manager* ba_Refman) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Char c = 0;
-    Char* spart = NULL;
-    uint32_t spart_Length = 0;
-    Char* si = NULL;
-    Seq_Length si_Max_length = 0;
-    Seq_Length* si_Length = &Lumi_empty_length;
     Byte y = 0;
     Byte* bpart = NULL;
     uint32_t bpart_Length = 0;
     Byte* bi = NULL;
-    Seq_Length bi_Max_length = 0;
-    Seq_Length* bi_Length = &Lumi_empty_length;
-    Char* aux_Array_0 = NULL;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    Ref_Manager* aux_String_0_Refman = NULL;
+    uint32_t bi_Length = 0;
+    Byte* aux_Array_0 = NULL;
     Byte* aux_Array_1 = NULL;
-    Byte* aux_Buffer_0 = NULL;
-    Seq_Length aux_Buffer_0_Max_length = 0;
-    Seq_Length* aux_Buffer_0_Length = &Lumi_empty_length;
-    Ref_Manager* aux_Buffer_0_Refman = NULL;
-    if (0x05 >= *(s_Length)) RAISE(6, LUMI_block0_cleanup, slice_index)
-    c = s[0x05];
-    if (SAFE_SUM_LARGER(0x04, 0x02, *(s_Length))) RAISE(7, LUMI_block0_cleanup, slice_index)
-    aux_Array_0 = s + 0x04;
-    spart_Length = 0x02;
-    spart = aux_Array_0;
-    if (0x03 >= sa_Length) RAISE(8, LUMI_block0_cleanup, slice_index)
-    aux_String_0 = sa + 0x03 * sa_Value_length;
-    aux_String_0_Max_length = sa_Value_length;
-    aux_String_0_Length = sa_Seq_length + 0x03;
-    aux_String_0_Refman = sa_Refman;
-    LUMI_inc_ref(aux_String_0_Refman);
-    CHECK_REFMAN(8, LUMI_block0_cleanup, aux_String_0_Refman)
-    si_Max_length = aux_String_0_Max_length;
-    si_Length = aux_String_0_Length;
-    si = aux_String_0;
-    if (0x05 >= *(b_Length)) RAISE(9, LUMI_block0_cleanup, slice_index)
+    uint32_t aux_Array_1_Length = 0;
+    Ref_Manager* aux_Array_1_Refman = NULL;
+    if (0x05 >= b_Length) RAISE(4, LUMI_block0_cleanup, slice_index)
     y = b[0x05];
-    if (SAFE_SUM_LARGER(0x04, 0x02, *(b_Length))) RAISE(10, LUMI_block0_cleanup, slice_index)
-    aux_Array_1 = b + 0x04;
+    if (SAFE_SUM_LARGER(0x04, 0x02, b_Length)) RAISE(5, LUMI_block0_cleanup, slice_index)
+    aux_Array_0 = b + 0x04;
     bpart_Length = 0x02;
-    bpart = aux_Array_1;
-    if (0x03 >= ba_Length) RAISE(11, LUMI_block0_cleanup, slice_index)
-    aux_Buffer_0 = ba + 0x03 * ba_Value_length;
-    aux_Buffer_0_Max_length = ba_Value_length;
-    aux_Buffer_0_Length = ba_Seq_length + 0x03;
-    aux_Buffer_0_Refman = ba_Refman;
-    LUMI_inc_ref(aux_Buffer_0_Refman);
-    CHECK_REFMAN(11, LUMI_block0_cleanup, aux_Buffer_0_Refman)
-    bi_Max_length = aux_Buffer_0_Max_length;
-    bi_Length = aux_Buffer_0_Length;
-    bi = aux_Buffer_0;
+    bpart = aux_Array_0;
+    if (0x03 >= ba_Length) RAISE(6, LUMI_block0_cleanup, slice_index)
+    aux_Array_1 = ba + 0x03 * ba_Value_length;
+    aux_Array_1_Length = ba_Value_length;
+    aux_Array_1_Refman = ba_Refman;
+    LUMI_inc_ref(aux_Array_1_Refman);
+    CHECK_REFMAN(6, LUMI_block0_cleanup, aux_Array_1_Refman)
+    bi_Length = aux_Array_1_Length;
+    bi = aux_Array_1;
 LUMI_block0_cleanup:
     (void)0;
-    LUMI_dec_ref(aux_Buffer_0_Refman);
-    LUMI_dec_ref(aux_String_0_Refman);
-    free(ba_Seq_length);
+    LUMI_dec_ref(aux_Array_1_Refman);
     LUMI_owner_dec_ref(ba_Refman);
-    free(sa_Seq_length);
-    LUMI_owner_dec_ref(sa_Refman);
     return LUMI_err;
 }
 /// @ test-slice-expression-9
-Char* sa = NULL;
+String* sa = NULL;
     uint32_t sa_Length = 0;
-    Seq_Length sa_Value_length = 0;
-    Seq_Length* sa_Seq_length = NULL;
     Ref_Manager* sa_Refman = NULL;
-    Byte* ba = NULL;
-    uint32_t ba_Length = 0;
-    Seq_Length ba_Value_length = 0;
-    Seq_Length* ba_Seq_length = NULL;
-    Ref_Manager* ba_Refman = NULL;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    Ref_Manager* aux_String_0_Refman = NULL;
-    static Char aux_String_1[] = {'t','e','x','t','\0',};
-    Seq_Length aux_String_1_Max_length = sizeof(aux_String_1);
-    Seq_Length aux_String_1_Length[1] = {sizeof(aux_String_1) - 1};
-    Byte* aux_Buffer_0 = NULL;
-    Seq_Length aux_Buffer_0_Max_length = 0;
-    Seq_Length* aux_Buffer_0_Length = &Lumi_empty_length;
-    Ref_Manager* aux_Buffer_0_Refman = NULL;
-    static Byte aux_Buffer_1[] = {0xbe,0xef,};
-    Seq_Length aux_Buffer_1_Max_length = sizeof(aux_Buffer_1);
-    Seq_Length aux_Buffer_1_Length[1] = {sizeof(aux_Buffer_1)};
+    static Byte aux_Array_0[] = {'t','e','x','t','\0',};
     CHECK_REF(2, LUMI_block0_cleanup, sa)
     if (0x03 >= sa_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
-    aux_String_0 = sa + 0x03 * sa_Value_length;
-    aux_String_0_Max_length = sa_Value_length;
-    aux_String_0_Length = sa_Seq_length + 0x03;
-    aux_String_0_Refman = sa_Refman;
-    LUMI_inc_ref(aux_String_0_Refman);
-    CHECK_REFMAN(2, LUMI_block0_cleanup, aux_String_0_Refman)
-    LUMI_err = String_new(aux_String_0, aux_String_0_Max_length, aux_String_0_Length, aux_String_1, *aux_String_1_Length);
+    CHECK_REFMAN(2, LUMI_block0_cleanup, sa_Refman)
+    LUMI_err = String_new(sa + 0x03, aux_Array_0, 0x04);
     CHECK(2, LUMI_block0_cleanup)
-    free(sa_Seq_length);
+    ARRAY_DEL(String, sa, sa_Length)
     LUMI_owner_dec_ref(sa_Refman);
     sa_Refman = NULL;
     sa_Length = 0;
-    sa_Value_length = 0;
-    sa_Seq_length = NULL;
     sa = NULL;
-    CHECK_REF(5, LUMI_block0_cleanup, ba)
-    if (0x03 >= ba_Length) RAISE(5, LUMI_block0_cleanup, slice_index)
-    aux_Buffer_0 = ba + 0x03 * ba_Value_length;
-    aux_Buffer_0_Max_length = ba_Value_length;
-    aux_Buffer_0_Length = ba_Seq_length + 0x03;
-    aux_Buffer_0_Refman = ba_Refman;
-    LUMI_inc_ref(aux_Buffer_0_Refman);
-    CHECK_REFMAN(5, LUMI_block0_cleanup, aux_Buffer_0_Refman)
-    LUMI_err = Buffer_new(aux_Buffer_0, aux_Buffer_0_Max_length, aux_Buffer_0_Length, aux_Buffer_1, *aux_Buffer_1_Length);
-    CHECK(5, LUMI_block0_cleanup)
-    free(ba_Seq_length);
-    LUMI_owner_dec_ref(ba_Refman);
-    ba_Refman = NULL;
-    ba_Length = 0;
-    ba_Value_length = 0;
-    ba_Seq_length = NULL;
-    ba = NULL;
 /// @ test-slice-expression-10
 uint32_t* aai = NULL;
     uint32_t aai_Length = 0;
@@ -969,77 +799,60 @@ uint32_t* aai = NULL;
     uaa_Value_value_value_length = aux_Array_1_Value_value_value_length;
     uaa = aux_Array_1;
 /// @ test-slice-expression-12
-Char* aas = NULL;
+String* aas = NULL;
     uint32_t aas_Length = 0;
     uint32_t aas_Value_length = 0;
     uint32_t aas_Value_value_length = 0;
-    Seq_Length aas_Value_value_value_length = 0;
-    Seq_Length* aas_Seq_length = NULL;
     Ref_Manager* aas_Refman = NULL;
-    Char* wsa = NULL;
+    String* wsa = NULL;
     uint32_t wsa_Length = 0;
     uint32_t wsa_Value_length = 0;
-    Seq_Length wsa_Value_value_length = 0;
-    Seq_Length* wsa_Seq_length = NULL;
     Ref_Manager* wsa_Refman = NULL;
-    Char* wsaa = NULL;
+    String* wsaa = NULL;
     uint32_t wsaa_Length = 0;
     uint32_t wsaa_Value_length = 0;
     uint32_t wsaa_Value_value_length = 0;
-    Seq_Length wsaa_Value_value_value_length = 0;
-    Seq_Length* wsaa_Seq_length = NULL;
     Ref_Manager* wsaa_Refman = NULL;
     Byte* aab = NULL;
     uint32_t aab_Length = 0;
     uint32_t aab_Value_length = 0;
     uint32_t aab_Value_value_length = 0;
-    Seq_Length aab_Value_value_value_length = 0;
-    Seq_Length* aab_Seq_length = NULL;
+    uint32_t aab_Value_value_value_length = 0;
     Ref_Manager* aab_Refman = NULL;
     Byte* wba = NULL;
     uint32_t wba_Length = 0;
     uint32_t wba_Value_length = 0;
-    Seq_Length wba_Value_value_length = 0;
-    Seq_Length* wba_Seq_length = NULL;
+    uint32_t wba_Value_value_length = 0;
     Ref_Manager* wba_Refman = NULL;
     Byte* wbaa = NULL;
     uint32_t wbaa_Length = 0;
     uint32_t wbaa_Value_length = 0;
     uint32_t wbaa_Value_value_length = 0;
-    Seq_Length wbaa_Value_value_value_length = 0;
-    Seq_Length* wbaa_Seq_length = NULL;
+    uint32_t wbaa_Value_value_value_length = 0;
     Ref_Manager* wbaa_Refman = NULL;
-    Char* aux_Array_0 = NULL;
+    String* aux_Array_0 = NULL;
     uint32_t aux_Array_0_Length = 0;
     uint32_t aux_Array_0_Value_length = 0;
-    Seq_Length aux_Array_0_Value_value_length = 0;
-    Seq_Length* aux_Array_0_Seq_length = NULL;
     Ref_Manager* aux_Array_0_Refman = NULL;
-    Char* aux_Array_1 = NULL;
+    String* aux_Array_1 = NULL;
     uint32_t aux_Array_1_Value_length = 0;
     uint32_t aux_Array_1_Value_value_length = 0;
-    Seq_Length aux_Array_1_Value_value_value_length = 0;
-    Seq_Length* aux_Array_1_Seq_length = NULL;
     Ref_Manager* aux_Array_1_Refman = NULL;
     Byte* aux_Array_2 = NULL;
     uint32_t aux_Array_2_Length = 0;
     uint32_t aux_Array_2_Value_length = 0;
-    Seq_Length aux_Array_2_Value_value_length = 0;
-    Seq_Length* aux_Array_2_Seq_length = NULL;
+    uint32_t aux_Array_2_Value_value_length = 0;
     Ref_Manager* aux_Array_2_Refman = NULL;
     Byte* aux_Array_3 = NULL;
     uint32_t aux_Array_3_Value_length = 0;
     uint32_t aux_Array_3_Value_value_length = 0;
-    Seq_Length aux_Array_3_Value_value_value_length = 0;
-    Seq_Length* aux_Array_3_Seq_length = NULL;
+    uint32_t aux_Array_3_Value_value_value_length = 0;
     Ref_Manager* aux_Array_3_Refman = NULL;
     CHECK_REF(2, LUMI_block0_cleanup, aas)
     if (0x03 >= aas_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
-    aux_Array_0 = aas + 0x03 * aas_Value_length * aas_Value_value_length * aas_Value_value_value_length;
+    aux_Array_0 = aas + 0x03 * aas_Value_length * aas_Value_value_length;
     aux_Array_0_Length = aas_Value_length;
     aux_Array_0_Value_length = aas_Value_value_length;
-    aux_Array_0_Value_value_length = aas_Value_value_value_length;
-    aux_Array_0_Seq_length = aas_Seq_length + 0x03 * aas_Value_length * aas_Value_value_length;
     aux_Array_0_Refman = aas_Refman;
     LUMI_inc_ref(aux_Array_0_Refman);
     LUMI_inc_ref(aux_Array_0_Refman);
@@ -1047,16 +860,12 @@ Char* aas = NULL;
     wsa_Refman = aux_Array_0_Refman;
     wsa_Length = aux_Array_0_Length;
     wsa_Value_length = aux_Array_0_Value_length;
-    wsa_Value_value_length = aux_Array_0_Value_value_length;
-    wsa_Seq_length = aux_Array_0_Seq_length;
     wsa = aux_Array_0;
     CHECK_REF(3, LUMI_block0_cleanup, aas)
     if (SAFE_SUM_LARGER(0x02, 0x04, aas_Length)) RAISE(3, LUMI_block0_cleanup, slice_index)
-    aux_Array_1 = aas + 0x02 * aas_Value_length * aas_Value_value_length * aas_Value_value_value_length;
+    aux_Array_1 = aas + 0x02 * aas_Value_length * aas_Value_value_length;
     aux_Array_1_Value_length = aas_Value_length;
     aux_Array_1_Value_value_length = aas_Value_value_length;
-    aux_Array_1_Value_value_value_length = aas_Value_value_value_length;
-    aux_Array_1_Seq_length = aas_Seq_length + 0x02 * aas_Value_length * aas_Value_value_length;
     aux_Array_1_Refman = aas_Refman;
     LUMI_inc_ref(aux_Array_1_Refman);
     LUMI_inc_ref(aux_Array_1_Refman);
@@ -1065,17 +874,13 @@ Char* aas = NULL;
     wsaa_Length = 0x04;
     wsaa_Value_length = aux_Array_1_Value_length;
     wsaa_Value_value_length = aux_Array_1_Value_value_length;
-    wsaa_Value_value_value_length = aux_Array_1_Value_value_value_length;
-    wsaa_Seq_length = aux_Array_1_Seq_length;
     wsaa = aux_Array_1;
-    free(aas_Seq_length);
+    ARRAY_DEL(String, aas, aas_Length)
     LUMI_owner_dec_ref(aas_Refman);
     aas_Refman = NULL;
     aas_Length = 0;
     aas_Value_length = 0;
     aas_Value_value_length = 0;
-    aas_Value_value_value_length = 0;
-    aas_Seq_length = NULL;
     aas = NULL;
     CHECK_REF(6, LUMI_block0_cleanup, aab)
     if (0x03 >= aab_Length) RAISE(6, LUMI_block0_cleanup, slice_index)
@@ -1083,7 +888,6 @@ Char* aas = NULL;
     aux_Array_2_Length = aab_Value_length;
     aux_Array_2_Value_length = aab_Value_value_length;
     aux_Array_2_Value_value_length = aab_Value_value_value_length;
-    aux_Array_2_Seq_length = aab_Seq_length + 0x03 * aab_Value_length * aab_Value_value_length;
     aux_Array_2_Refman = aab_Refman;
     LUMI_inc_ref(aux_Array_2_Refman);
     LUMI_inc_ref(aux_Array_2_Refman);
@@ -1092,7 +896,6 @@ Char* aas = NULL;
     wba_Length = aux_Array_2_Length;
     wba_Value_length = aux_Array_2_Value_length;
     wba_Value_value_length = aux_Array_2_Value_value_length;
-    wba_Seq_length = aux_Array_2_Seq_length;
     wba = aux_Array_2;
     CHECK_REF(7, LUMI_block0_cleanup, aab)
     if (SAFE_SUM_LARGER(0x02, 0x04, aab_Length)) RAISE(7, LUMI_block0_cleanup, slice_index)
@@ -1100,7 +903,6 @@ Char* aas = NULL;
     aux_Array_3_Value_length = aab_Value_length;
     aux_Array_3_Value_value_length = aab_Value_value_length;
     aux_Array_3_Value_value_value_length = aab_Value_value_value_length;
-    aux_Array_3_Seq_length = aab_Seq_length + 0x02 * aab_Value_length * aab_Value_value_length;
     aux_Array_3_Refman = aab_Refman;
     LUMI_inc_ref(aux_Array_3_Refman);
     LUMI_inc_ref(aux_Array_3_Refman);
@@ -1110,16 +912,13 @@ Char* aas = NULL;
     wbaa_Value_length = aux_Array_3_Value_length;
     wbaa_Value_value_length = aux_Array_3_Value_value_length;
     wbaa_Value_value_value_length = aux_Array_3_Value_value_value_length;
-    wbaa_Seq_length = aux_Array_3_Seq_length;
     wbaa = aux_Array_3;
-    free(aas_Seq_length);
+    ARRAY_DEL(String, aas, aas_Length)
     LUMI_owner_dec_ref(aas_Refman);
     aas_Refman = NULL;
     aas_Length = 0;
     aas_Value_length = 0;
     aas_Value_value_length = 0;
-    aas_Value_value_value_length = 0;
-    aas_Seq_length = NULL;
     aas = NULL;
 /// @ test-slice-expression-13
 uint32_t aai[0x08 * 0x07 * 0x06 * 0x05] = {0};
@@ -1147,155 +946,77 @@ uint32_t aai[0x08 * 0x07 * 0x06 * 0x05] = {0};
     uaa_Value_value_value_length = 0x05;
     uaa = aux_Array_1;
 /// @ test-slice-expression-14
-Char aas[0x08 * 0x07 * 0x06 * 0x05] = {0};
-    Seq_Length aas_Seq_length[0x08 * 0x07 * 0x06] = {0};
-    Char* usa = NULL;
-    uint32_t usa_Length = 0;
-    uint32_t usa_Value_length = 0;
-    Seq_Length usa_Value_value_length = 0;
-    Seq_Length* usa_Seq_length = NULL;
-    Char* usaa = NULL;
-    uint32_t usaa_Length = 0;
-    uint32_t usaa_Value_length = 0;
-    uint32_t usaa_Value_value_length = 0;
-    Seq_Length usaa_Value_value_value_length = 0;
-    Seq_Length* usaa_Seq_length = NULL;
-    Byte aab[0x08 * 0x07 * 0x06 * 0x05] = {0};
-    Seq_Length aab_Seq_length[0x08 * 0x07 * 0x06] = {0};
+Byte aab[0x08 * 0x07 * 0x06 * 0x05] = {0};
     Byte* uba = NULL;
     uint32_t uba_Length = 0;
     uint32_t uba_Value_length = 0;
-    Seq_Length uba_Value_value_length = 0;
-    Seq_Length* uba_Seq_length = NULL;
+    uint32_t uba_Value_value_length = 0;
     Byte* ubaa = NULL;
     uint32_t ubaa_Length = 0;
     uint32_t ubaa_Value_length = 0;
     uint32_t ubaa_Value_value_length = 0;
-    Seq_Length ubaa_Value_value_value_length = 0;
-    Seq_Length* ubaa_Seq_length = NULL;
-    Char* aux_Array_0 = NULL;
-    Seq_Length* aux_Array_0_Seq_length = NULL;
-    Char* aux_Array_1 = NULL;
-    Seq_Length* aux_Array_1_Seq_length = NULL;
-    Byte* aux_Array_2 = NULL;
-    Seq_Length* aux_Array_2_Seq_length = NULL;
-    Byte* aux_Array_3 = NULL;
-    Seq_Length* aux_Array_3_Seq_length = NULL;
-    /* initializing aas */
-    if (ut_M_i >= 0x08) RAISE(2, LUMI_block0_cleanup, slice_index)
-    aux_Array_0 = aas + ut_M_i * 0x07 * 0x06 * 0x05;
-    aux_Array_0_Seq_length = aas_Seq_length + ut_M_i * 0x07 * 0x06;
-    usa_Length = 0x07;
-    usa_Value_length = 0x06;
-    usa_Value_value_length = 0x05;
-    usa_Seq_length = aux_Array_0_Seq_length;
-    usa = aux_Array_0;
-    aux_Array_1 = aas + 0x02 * 0x07 * 0x06 * 0x05;
-    aux_Array_1_Seq_length = aas_Seq_length + 0x02 * 0x07 * 0x06;
-    usaa_Length = 0x04;
-    usaa_Value_length = 0x07;
-    usaa_Value_value_length = 0x06;
-    usaa_Value_value_value_length = 0x05;
-    usaa_Seq_length = aux_Array_1_Seq_length;
-    usaa = aux_Array_1;
+    uint32_t ubaa_Value_value_value_length = 0;
+    Byte* aux_Array_0 = NULL;
+    Byte* aux_Array_1 = NULL;
     /* initializing aab */
-    if (ut_M_i >= 0x08) RAISE(5, LUMI_block0_cleanup, slice_index)
-    aux_Array_2 = aab + ut_M_i * 0x07 * 0x06 * 0x05;
-    aux_Array_2_Seq_length = aab_Seq_length + ut_M_i * 0x07 * 0x06;
+    if (ut_M_i >= 0x08) RAISE(2, LUMI_block0_cleanup, slice_index)
+    aux_Array_0 = aab + ut_M_i * 0x07 * 0x06 * 0x05;
     uba_Length = 0x07;
     uba_Value_length = 0x06;
     uba_Value_value_length = 0x05;
-    uba_Seq_length = aux_Array_2_Seq_length;
-    uba = aux_Array_2;
-    aux_Array_3 = aab + 0x02 * 0x07 * 0x06 * 0x05;
-    aux_Array_3_Seq_length = aab_Seq_length + 0x02 * 0x07 * 0x06;
+    uba = aux_Array_0;
+    aux_Array_1 = aab + 0x02 * 0x07 * 0x06 * 0x05;
     ubaa_Length = 0x04;
     ubaa_Value_length = 0x07;
     ubaa_Value_value_length = 0x06;
     ubaa_Value_value_value_length = 0x05;
-    ubaa_Seq_length = aux_Array_3_Seq_length;
-    ubaa = aux_Array_3;
+    ubaa = aux_Array_1;
 /// @ test-slice-expression-15
 void ut_M_fun(void);
 void ut_M_fun(void) {
     unsigned LUMI_loop_depth = 1;
-    Char aas[0x08 * 0x07 * 0x06 * 0x05] = {0};
-    Seq_Length aas_Seq_length[0x08 * 0x07 * 0x06] = {0};
-    Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
     Byte aab[0x08 * 0x07 * 0x06 * 0x05] = {0};
-    Seq_Length aab_Seq_length[0x08 * 0x07 * 0x06] = {0};
     Byte* b = NULL;
-    Seq_Length b_Max_length = 0;
-    Seq_Length* b_Length = &Lumi_empty_length;
-    Char* aux_Array_0 = NULL;
-    Seq_Length* aux_Array_0_Seq_length = NULL;
-    Char* aux_Array_1 = NULL;
-    Seq_Length* aux_Array_1_Seq_length = NULL;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
+    uint32_t b_Length = 0;
+    Byte* aux_Array_0 = NULL;
+    Byte* aux_Array_1 = NULL;
     Byte* aux_Array_2 = NULL;
-    Seq_Length* aux_Array_2_Seq_length = NULL;
-    Byte* aux_Array_3 = NULL;
-    Seq_Length* aux_Array_3_Seq_length = NULL;
-    Byte* aux_Buffer_0 = NULL;
-    Seq_Length aux_Buffer_0_Max_length = 0;
-    Seq_Length* aux_Buffer_0_Length = &Lumi_empty_length;
-    /* initializing aas */
-    aux_Array_0 = aas + 0x04 * 0x07 * 0x06 * 0x05;
-    aux_Array_0_Seq_length = aas_Seq_length + 0x04 * 0x07 * 0x06;
-    aux_Array_1 = (aux_Array_0) + 0x03 * 0x06 * 0x05;
-    aux_Array_1_Seq_length = aux_Array_0_Seq_length + 0x03 * 0x06;
-    aux_String_0 = (aux_Array_1) + 0x02 * 0x05;
-    aux_String_0_Length = aux_Array_1_Seq_length + 0x02;
-    s_Max_length = 0x05;
-    s_Length = aux_String_0_Length;
-    s = aux_String_0;
     /* initializing aab */
-    aux_Array_2 = aab + 0x04 * 0x07 * 0x06 * 0x05;
-    aux_Array_2_Seq_length = aab_Seq_length + 0x04 * 0x07 * 0x06;
-    aux_Array_3 = (aux_Array_2) + 0x03 * 0x06 * 0x05;
-    aux_Array_3_Seq_length = aux_Array_2_Seq_length + 0x03 * 0x06;
-    aux_Buffer_0 = (aux_Array_3) + 0x02 * 0x05;
-    aux_Buffer_0_Length = aux_Array_3_Seq_length + 0x02;
-    b_Max_length = 0x05;
-    b_Length = aux_Buffer_0_Length;
-    b = aux_Buffer_0;
+    aux_Array_0 = aab + 0x04 * 0x07 * 0x06 * 0x05;
+    aux_Array_1 = (aux_Array_0) + 0x03 * 0x06 * 0x05;
+    aux_Array_2 = (aux_Array_1) + 0x02 * 0x05;
+    b_Length = 0x05;
+    b = aux_Array_2;
 LUMI_block0_cleanup:
     (void)0;
 }
 /// @ test-slice-expression-16
-Char* x = NULL;
+Byte* x = NULL;
     uint32_t x_Length = 0;
     Byte* y = NULL;
     uint32_t y_Length = 0;
-    x_Length = *(ut_M_ostr_Length);
-    x = ut_M_ostr;
-    y_Length = *(ut_M_buff_Length);
+    Byte* aux_Array_0 = NULL;
+    uint32_t aux_Array_0_Length = 0;
+    CHECK_REF(2, LUMI_block0_cleanup, ut_M_ostr)
+    String_bytes(ut_M_ostr, &(aux_Array_0), &(aux_Array_0_Length));
+    x_Length = aux_Array_0_Length;
+    x = aux_Array_0;
+    y_Length = ut_M_buff_Length;
     y = ut_M_buff;
 /// @ test-slice-expression-17
-Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+Byte* s = NULL;
     Byte* bf = NULL;
-    Seq_Length bf_Max_length = 0;
-    Seq_Length* bf_Length = &Lumi_empty_length;
-    INIT_NEW_SEQUENCE(1, LUMI_block0_cleanup, s, Char, 0x0c);
-    LUMI_err = sys_M_print(s, *s_Length);
+    INIT_NEW_ARRAY(1, LUMI_block0_cleanup, s, Byte, 0x0c, 1);
+    LUMI_err = sys_M_print(s, 0x0c);
     CHECK(2, LUMI_block0_cleanup)
-    INIT_NEW_SEQUENCE(3, LUMI_block0_cleanup, bf, Byte, 0x0c);
+    INIT_NEW_ARRAY(3, LUMI_block0_cleanup, bf, Byte, 0x0c, 1);
 /// @ test-slice-expression-18
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
-    Char* s;
-    Seq_Length s_Max_length;
-    Seq_Length* s_Length;
+    String* s;
     Byte* b;
-    Seq_Length b_Max_length;
-    Seq_Length* b_Length;
+    uint32_t b_Length;
 };
 struct ut_M_Test_Dynamic {
     Dynamic_Del _del;
@@ -1307,7 +1028,6 @@ ut_M_Test_Dynamic ut_M_Test_dynamic = {
 };
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    Buffer_Del(self->b, NULL);
     free(self->b);
     String_Del(self->s, NULL);
     free(self->s);
@@ -1347,7 +1067,7 @@ uint32_t* a = NULL;
     uint32_t* aux_Array_5 = NULL;
     uint8_t aux_Array_5_Length = 0;
     uint32_t* aux_Array_6 = NULL;
-    if (ut_M_i <= 0) RAISE(1, LUMI_block0_cleanup, sequence_too_short)
+    if (ut_M_i <= 0) RAISE(1, LUMI_block0_cleanup, array_too_short)
     INIT_NEW_LEN_ARRAY(1, LUMI_block0_cleanup, a, uint32_t, ut_M_i, 1);
     if (x < 0 || x <= 0 || SAFE_SUM_LARGER(x, x, ut_M_i)) RAISE(4, LUMI_block0_cleanup, slice_index)
     aux_Array_0 = a + x;
@@ -1375,19 +1095,13 @@ uint32_t* a = NULL;
     aux_Array_6 = ab + 0x03;
     ut_M_i = (aux_Array_6)[0x03];
 /// @ test-slice-expression-20
-Char* aux_Array_0 = NULL;
-    Byte* aux_Array_1 = NULL;
-    CHECK_REF(1, LUMI_block0_cleanup, str)
-    if (0x02 >= *(str_Length)) RAISE(1, LUMI_block0_cleanup, slice_index)
+Byte* aux_Array_0 = NULL;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    if (0x02 >= *(ut_M_buff_Length)) RAISE(1, LUMI_block0_cleanup, slice_index)
-    CHECK_REF(1, LUMI_block0_cleanup, str)
-    if (SAFE_SUM_LARGER(0x01, 0x03, *(str_Length))) RAISE(1, LUMI_block0_cleanup, slice_index)
-    aux_Array_0 = str + 0x01;
+    if (0x02 >= ut_M_buff_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    if (SAFE_SUM_LARGER(0x01, 0x03, *(ut_M_buff_Length))) RAISE(1, LUMI_block0_cleanup, slice_index)
-    aux_Array_1 = ut_M_buff + 0x01;
-    ut_M_i = (((uint16_t)(str[0x02]) + (ut_M_buff[0x02])) + ((aux_Array_0)[0x02])) + ((aux_Array_1)[0x02]);
+    if (SAFE_SUM_LARGER(0x01, 0x03, ut_M_buff_Length)) RAISE(1, LUMI_block0_cleanup, slice_index)
+    aux_Array_0 = ut_M_buff + 0x01;
+    ut_M_i = (uint16_t)(ut_M_buff[0x02]) + ((aux_Array_0)[0x02]);
 /// @ test-slice-expression-21
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
@@ -1991,7 +1705,7 @@ Byte* abi = NULL;
     Byte* uab = NULL;
     uint32_t uab_Length = 0;
     Byte* aux_Array_0 = NULL;
-    if (ut_M_i <= 0) RAISE(1, LUMI_block0_cleanup, sequence_too_short)
+    if (ut_M_i <= 0) RAISE(1, LUMI_block0_cleanup, array_too_short)
     INIT_NEW_LEN_ARRAY(1, LUMI_block0_cleanup, abi, Byte, ut_M_i, 1);
     INIT_NEW_ARRAY(2, LUMI_block0_cleanup, ab6, Byte, 0x06, 1);
     INIT_NEW_ARRAY(3, LUMI_block0_cleanup, aux_Array_0, Byte, 0x06, 1);
@@ -2022,7 +1736,7 @@ Byte* a3_8 = NULL;
     a6 = a3_8;
     ad_Length = a3_8_Length;
     ad = a3_8;
-    if (ut_M_j <= 0) RAISE(8, LUMI_block0_cleanup, sequence_too_short)
+    if (ut_M_j <= 0) RAISE(8, LUMI_block0_cleanup, array_too_short)
     INIT_NEW_LEN_ARRAY(8, LUMI_block0_cleanup, as, Byte, ut_M_j, 1);
 /// @ test-slice-expression-e0
 expected "]", got "new-line"
@@ -2086,18 +1800,16 @@ ignoring array length check
 /// @ test-call-expression-0
 ut_M_fun0();
 /// @ test-call-expression-1
-ut_M_fun1(0x03, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, NULL, 0, &Lumi_empty_length);
+ut_M_fun1(0x03, ut_M_ostr, NULL);
 /// @ test-call-expression-2
-ut_M_fun2(&(*so), &(*so_Max_length), &(*so_Length), &(*so_Refman), &(*io));
+ut_M_fun2(&(*so), &(*so_Refman), &(*io));
 /// @ test-call-expression-3
 uint32_t x = 0;
-    Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+    String* s = NULL;
     Ref_Manager* s_Refman = NULL;
-    ut_M_fun2(&(s), &(s_Max_length), &(s_Length), &(s_Refman), &(x));
+    ut_M_fun2(&(s), &(s_Refman), &(x));
 /// @ test-call-expression-4
-ut_M_fun3(0, &(*so), &(*so_Max_length), &(*so_Length), &(*so_Refman));
+ut_M_fun3(0, &(*so), &(*so_Refman));
 /// @ test-call-expression-5
 uint32_t x = 0;
     ut_M_fun5(0x03, &(x));
@@ -2112,20 +1824,15 @@ uint32_t aux_Int_0 = 0;
     ut_M_fun5(0x04, &(aux_Int_0));
     *io = aux_Int_0;
 /// @ test-call-expression-9
-Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
+String* aux_String_0 = NULL;
     Ref_Manager* aux_String_0_Refman = NULL;
-    ut_M_fun3(0x07, &(aux_String_0), &(aux_String_0_Max_length), &(aux_String_0_Length), &(aux_String_0_Refman));
+    ut_M_fun3(0x07, &(aux_String_0), &(aux_String_0_Refman));
     String_Del(*so, NULL);
     LUMI_owner_dec_ref(*so_Refman);
     *so_Refman = aux_String_0_Refman;
-    *so_Max_length = aux_String_0_Max_length;
-    *so_Length = aux_String_0_Length;
     *so = aux_String_0;
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
-    aux_String_0_Length = &Lumi_empty_length;
 /// @ test-call-expression-10
 CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_t_Refman)
     ut_M_Test_meth(ut_M_t);
@@ -2154,17 +1861,14 @@ CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     ut_M_Test_meth(ut_M_t->t);
 /// @ test-call-expression-17
 LUMI_var_dec_ref(*so_Refman);
-    ut_M_fun1(0x03, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, *so, *so_Max_length, *so_Length);
+    ut_M_fun1(0x03, ut_M_ostr, *so);
     *so = NULL;
     *so_Refman = NULL;
-    *so_Length = &Lumi_empty_length;
 /// @ test-call-expression-18
-Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
+String* aux_String_0 = NULL;
     Ref_Manager* aux_String_0_Refman = NULL;
     uint32_t aux_Int_0 = 0;
-    ut_M_fun3(0x01, &(aux_String_0), &(aux_String_0_Max_length), &(aux_String_0_Length), &(aux_String_0_Refman));
+    ut_M_fun3(0x01, &(aux_String_0), &(aux_String_0_Refman));
     ut_M_fun5(0x02, &(aux_Int_0));
 /// @ test-call-expression-19
 typedef struct ut_M_Base ut_M_Base;
@@ -2310,68 +2014,51 @@ void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
 /// @ test-call-expression-22
-void ut_M_fun(Char** astr, uint32_t* astr_Length, Seq_Length* astr_Value_length, Seq_Length** astr_Seq_length);
-void ut_M_fun(Char** astr, uint32_t* astr_Length, Seq_Length* astr_Value_length, Seq_Length** astr_Seq_length) {
+void ut_M_fun(String** astr, uint32_t* astr_Length);
+void ut_M_fun(String** astr, uint32_t* astr_Length) {
     unsigned LUMI_loop_depth = 1;
-    ut_M_fun(&(*astr), &(*astr_Length), &(*astr_Value_length), &(*astr_Seq_length));
+    ut_M_fun(&(*astr), &(*astr_Length));
 LUMI_block0_cleanup:
     (void)0;
 }
 /// @ test-call-expression-23
-Return_Code ut_M_fun(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length);
-Return_Code ut_M_fun(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length) {
+Return_Code ut_M_fun(String* s);
+Return_Code ut_M_fun(String* s) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Char vars[0x0c] = {0};
-    Seq_Length vars_Length[1] = {0};
-    Char s_vars[0x0c] = {0};
-    Seq_Length s_vars_Length[1] = {0};
+    String vars_Var = {0};
+    String* vars = NULL;
+    String s_vars_Var = {0};
+    String* s_vars = NULL;
     Ref_Manager* s_vars_Refman = NULL;
-    Char* owners = NULL;
-    Seq_Length owners_Max_length = 0;
-    Seq_Length* owners_Length = &Lumi_empty_length;
-    Char* strongs = NULL;
-    Seq_Length strongs_Max_length = 0;
-    Seq_Length* strongs_Length = &Lumi_empty_length;
+    String* owners = NULL;
+    String* strongs = NULL;
     Ref_Manager* strongs_Refman = NULL;
-    Char* users = NULL;
-    Seq_Length users_Max_length = 0;
-    Seq_Length* users_Length = &Lumi_empty_length;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    Char* aux_String_1 = NULL;
-    Seq_Length aux_String_1_Max_length = 0;
-    Seq_Length* aux_String_1_Length = &Lumi_empty_length;
-    /* initializing vars */
+    String* users = NULL;
+    String* aux_String_0 = NULL;
+    String* aux_String_1 = NULL;
+    vars = &vars_Var;
+    s_vars = &s_vars_Var;
     INIT_VAR_REFMAN(3, LUMI_block0_cleanup, s_vars)
-    INIT_NEW_SEQUENCE(4, LUMI_block0_cleanup, aux_String_0, Char, 0x0c);
-    owners_Max_length = 0x0c;
-    owners_Length = aux_String_0_Length;
+    INIT_NEW(4, LUMI_block0_cleanup, aux_String_0, String, 1);
     owners = aux_String_0;
     aux_String_0 = NULL;
-    aux_String_0_Length = &Lumi_empty_length;
-    INIT_NEW_SEQUENCE(5, LUMI_block0_cleanup, aux_String_1, Char, 0x0c);
-    strongs_Max_length = 0x0c;
-    strongs_Length = aux_String_1_Length;
+    INIT_NEW(5, LUMI_block0_cleanup, aux_String_1, String, 1);
     strongs = aux_String_1;
     aux_String_1 = NULL;
-    aux_String_1_Length = &Lumi_empty_length;
     INIT_NEW_REFMAN(5, LUMI_block0_cleanup, strongs)
-    users_Max_length = s_Max_length;
-    users_Length = s_Length;
     users = s;
-    LUMI_err = ut_M_fun(s, s_Max_length, s_Length);
+    LUMI_err = ut_M_fun(s);
     CHECK(7, LUMI_block0_cleanup)
-    LUMI_err = ut_M_fun(vars, 0x0c, vars_Length);
+    LUMI_err = ut_M_fun(vars);
     CHECK(8, LUMI_block0_cleanup)
-    LUMI_err = ut_M_fun(s_vars, 0x0c, s_vars_Length);
+    LUMI_err = ut_M_fun(s_vars);
     CHECK(9, LUMI_block0_cleanup)
-    LUMI_err = ut_M_fun(owners, owners_Max_length, owners_Length);
+    LUMI_err = ut_M_fun(owners);
     CHECK(10, LUMI_block0_cleanup)
-    LUMI_err = ut_M_fun(strongs, strongs_Max_length, strongs_Length);
+    LUMI_err = ut_M_fun(strongs);
     CHECK(11, LUMI_block0_cleanup)
-    String_clear(s, s_Max_length, s_Length);
+    String_clear(s);
 LUMI_block0_cleanup:
     (void)0;
     String_Del(aux_String_1, NULL);
@@ -2382,37 +2069,30 @@ LUMI_block0_cleanup:
     LUMI_owner_dec_ref(strongs_Refman);
     String_Del(owners, NULL);
     free(owners);
+    String_Del(s_vars, NULL);
     LUMI_var_dec_ref(s_vars_Refman);
+    String_Del(vars, NULL);
     return LUMI_err;
 }
 /// @ test-call-expression-24
-Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+String* s = NULL;
     Ref_Manager* s_Refman = NULL;
-    Char* sw = NULL;
-    Seq_Length sw_Max_length = 0;
-    Seq_Length* sw_Length = &Lumi_empty_length;
+    String* sw = NULL;
     Ref_Manager* sw_Refman = NULL;
     CHECK_REFMAN(3, LUMI_block0_cleanup, sw_Refman)
     LUMI_var_dec_ref(s_Refman);
-    ut_M_fun1(0, sw, sw_Max_length, sw_Length, s, s_Max_length, s_Length);
+    ut_M_fun1(0, sw, s);
     s = NULL;
     s_Refman = NULL;
-    s_Length = &Lumi_empty_length;
 /// @ test-call-expression-25
-Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
+String* aux_String_0 = NULL;
     Ref_Manager* aux_String_0_Refman = NULL;
     aux_String_0 = ut_M_ostr;
     ut_M_ostr = NULL;
-    ut_M_ostr_Length = &Lumi_empty_length;
     INIT_NEW_REFMAN(1, LUMI_block0_cleanup, aux_String_0)
-    ut_M_fun8(aux_String_0, aux_String_0_Max_length, aux_String_0_Length, aux_String_0_Refman);
+    ut_M_fun8(aux_String_0, aux_String_0_Refman);
     aux_String_0 = NULL;
     aux_String_0_Refman = NULL;
-    aux_String_0_Length = &Lumi_empty_length;
 /// @ test-call-expression-26
 LUMI_err = ut_M_fune();
     CHECK(1, LUMI_block0_cleanup)
@@ -2440,23 +2120,19 @@ uint8_t u8 = 0;
     ut_M_fun5(0x04, &(aux_Int_4));
     s64 = aux_Int_4;
 /// @ test-call-expression-28
-Return_Code ut_M_get(Char** res, Seq_Length* res_Max_length, Seq_Length** res_Length, Ref_Manager** res_Refman);
-Return_Code ut_M_get(Char** res, Seq_Length* res_Max_length, Seq_Length** res_Length, Ref_Manager** res_Refman) {
+Return_Code ut_M_get(String** res, Ref_Manager** res_Refman);
+Return_Code ut_M_get(String** res, Ref_Manager** res_Refman) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+    String* s = NULL;
     Ref_Manager* s_Refman = NULL;
-    LUMI_err = ut_M_get(&(s), &(s_Max_length), &(s_Length), &(s_Refman));
+    LUMI_err = ut_M_get(&(s), &(s_Refman));
     CHECK(3, LUMI_block0_cleanup)
     CHECK_REFMAN(4, LUMI_block0_cleanup, s_Refman)
-    String_clear(s, s_Max_length, s_Length);
+    String_clear(s);
     LUMI_inc_ref(s_Refman);
     LUMI_dec_ref(*res_Refman);
     *res_Refman = s_Refman;
-    *res_Max_length = s_Max_length;
-    *res_Length = s_Length;
     *res = s;
 LUMI_block0_cleanup:
     (void)0;
@@ -2869,22 +2545,15 @@ LUMI_inc_ref(ut_M_tc_Refman);
     ut_M_t_Refman = ut_M_tc_Refman;
     ut_M_t = &(ut_M_tc->_base._base._base);
 /// @ test-binary-expression-8
-Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+String* s = NULL;
     String_Del(s, NULL);
     free(s);
     LUMI_var_dec_ref(*so_Refman);
-    s_Max_length = *so_Max_length;
-    s_Length = *so_Length;
     s = *so;
     *so = NULL;
     *so_Refman = NULL;
-    *so_Length = &Lumi_empty_length;
 /// @ test-binary-expression-9
-str_Max_length = *so_Max_length;
-    str_Length = *so_Length;
-    str = *so;
+str = *so;
 /// @ test-binary-expression-10
 ut_M_b = ((void*)ut_M_t == ut_M_ta) || ((void*)ut_M_tc != ut_M_tb);
 /// @ test-binary-expression-11
@@ -3188,9 +2857,9 @@ uint32_t* a1 = NULL;
     uint32_t a2_Length = 0;
     uint32_t* aux_Array_0 = NULL;
     uint32_t aux_Array_0_Length = 0;
-    if (ut_M_i <= 0) RAISE(1, LUMI_block0_cleanup, sequence_too_short)
+    if (ut_M_i <= 0) RAISE(1, LUMI_block0_cleanup, array_too_short)
     INIT_NEW_LEN_ARRAY(1, LUMI_block0_cleanup, a1, uint32_t, ut_M_i, 1);
-    if (ut_M_i <= 0) RAISE(2, LUMI_block0_cleanup, sequence_too_short)
+    if (ut_M_i <= 0) RAISE(2, LUMI_block0_cleanup, array_too_short)
     INIT_NEW_LEN_ARRAY(2, LUMI_block0_cleanup, a2, uint32_t, ut_M_i, 1);
     aux_Array_0_Length = a1_Length;
     aux_Array_0 = a1;
@@ -3233,76 +2902,40 @@ uint32_t* a1 = NULL;
     aux_Array_2 = NULL;
     aux_Array_2_Refman = NULL;
 /// @ test-swap-expression-6
-Char* s1 = NULL;
-    Seq_Length s1_Max_length = 0;
-    Seq_Length* s1_Length = &Lumi_empty_length;
-    Char* s2 = NULL;
-    Seq_Length s2_Max_length = 0;
-    Seq_Length* s2_Length = &Lumi_empty_length;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    INIT_NEW_SEQUENCE(1, LUMI_block0_cleanup, s1, Char, 0x04);
-    INIT_NEW_SEQUENCE(2, LUMI_block0_cleanup, s2, Char, 0x06);
-    aux_String_0_Max_length = 0x04;
-    aux_String_0_Length = s1_Length;
+String* s1 = NULL;
+    String* s2 = NULL;
+    String* aux_String_0 = NULL;
+    INIT_NEW(1, LUMI_block0_cleanup, s1, String, 1);
+    INIT_NEW(2, LUMI_block0_cleanup, s2, String, 1);
     aux_String_0 = s1;
-    s1_Max_length = 0x06;
-    s1_Length = s2_Length;
     s1 = s2;
-    s2_Max_length = 0x04;
-    s2_Length = aux_String_0_Length;
     s2 = aux_String_0;
     aux_String_0 = NULL;
-    aux_String_0_Length = &Lumi_empty_length;
 /// @ test-swap-expression-7
-Char* s1 = NULL;
-    Seq_Length s1_Max_length = 0;
-    Seq_Length* s1_Length = &Lumi_empty_length;
+String* s1 = NULL;
     Ref_Manager* s1_Refman = NULL;
-    Char* s2 = NULL;
-    Seq_Length s2_Max_length = 0;
-    Seq_Length* s2_Length = &Lumi_empty_length;
+    String* s2 = NULL;
     Ref_Manager* s2_Refman = NULL;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    Char* aux_String_1 = NULL;
-    Seq_Length aux_String_1_Max_length = 0;
-    Seq_Length* aux_String_1_Length = &Lumi_empty_length;
-    Char* aux_String_2 = NULL;
-    Seq_Length aux_String_2_Max_length = 0;
-    Seq_Length* aux_String_2_Length = &Lumi_empty_length;
+    String* aux_String_0 = NULL;
+    String* aux_String_1 = NULL;
+    String* aux_String_2 = NULL;
     Ref_Manager* aux_String_2_Refman = NULL;
-    INIT_NEW_SEQUENCE(1, LUMI_block0_cleanup, aux_String_0, Char, 0x04);
-    s1_Max_length = 0x04;
-    s1_Length = aux_String_0_Length;
+    INIT_NEW(1, LUMI_block0_cleanup, aux_String_0, String, 1);
     s1 = aux_String_0;
     aux_String_0 = NULL;
-    aux_String_0_Length = &Lumi_empty_length;
     INIT_NEW_REFMAN(1, LUMI_block0_cleanup, s1)
-    INIT_NEW_SEQUENCE(2, LUMI_block0_cleanup, aux_String_1, Char, 0x06);
-    s2_Max_length = 0x06;
-    s2_Length = aux_String_1_Length;
+    INIT_NEW(2, LUMI_block0_cleanup, aux_String_1, String, 1);
     s2 = aux_String_1;
     aux_String_1 = NULL;
-    aux_String_1_Length = &Lumi_empty_length;
     INIT_NEW_REFMAN(2, LUMI_block0_cleanup, s2)
     aux_String_2_Refman = s1_Refman;
-    aux_String_2_Max_length = s1_Max_length;
-    aux_String_2_Length = s1_Length;
     aux_String_2 = s1;
     s1_Refman = s2_Refman;
-    s1_Max_length = s2_Max_length;
-    s1_Length = s2_Length;
     s1 = s2;
     s2_Refman = aux_String_2_Refman;
-    s2_Max_length = aux_String_2_Max_length;
-    s2_Length = aux_String_2_Length;
     s2 = aux_String_2;
     aux_String_2 = NULL;
     aux_String_2_Refman = NULL;
-    aux_String_2_Length = &Lumi_empty_length;
 /// @ test-swap-expression-8
 typedef struct ut_M_MyStruct ut_M_MyStruct;
 typedef struct ut_M_MyStruct_Dynamic ut_M_MyStruct_Dynamic;
@@ -3477,9 +3110,7 @@ ut_M_Test* tt = NULL;
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
-    Char* s;
-    Seq_Length s_Max_length;
-    Seq_Length* s_Length;
+    String* s;
     Ref_Manager* s_Refman;
 };
 struct ut_M_Test_Dynamic {
@@ -3510,12 +3141,8 @@ cannot use "?" on non conditional or weak reference of type "Test"
 cannot use "?" on primitive type "Int"
 /// @@ test-exclamation-expression
 /// @ test-exclamation-expression-0
-Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+String* s = NULL;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    s_Max_length = ut_M_ostr_Max_length;
-    s_Length = ut_M_ostr_Length;
     s = ut_M_ostr;
 /// @ test-exclamation-expression-1
 ut_M_Test* tt = NULL;
@@ -3546,14 +3173,13 @@ ut_M_Test* tt = NULL;
     tt_Refman = ut_M_t_Refman;
     tt = ut_M_t;
 /// @ test-exclamation-expression-5
-Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+Byte* s = NULL;
+    uint32_t s_Length = 0;
     uint32_t aux_Int_0 = 0;
     CHECK_REF(1, LUMI_block0_cleanup, str)
-    String_length(str, str_Max_length, str_Length, &(aux_Int_0));
-    if (aux_Int_0 <= 0) RAISE(1, LUMI_block0_cleanup, sequence_too_short)
-    INIT_NEW_SEQUENCE(1, LUMI_block0_cleanup, s, Char, aux_Int_0);
+    String_length(str, &(aux_Int_0));
+    if (aux_Int_0 <= 0) RAISE(1, LUMI_block0_cleanup, array_too_short)
+    INIT_NEW_LEN_ARRAY(1, LUMI_block0_cleanup, s, Byte, aux_Int_0, 1);
 /// @ test-exclamation-expression-e0
 ignoring empty reference check
 /// @ test-exclamation-expression-e1
@@ -4133,10 +3759,10 @@ non matching error result
 uint64_t u64 = 0;
     int64_t s64 = 0;
     CHECK_REF(3, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = Int_strU(u64, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
+    LUMI_err = Int_strU(u64, ut_M_ostr);
     CHECK(3, LUMI_block0_cleanup)
     CHECK_REF(4, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = Int_strS(s64, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
+    LUMI_err = Int_strS(s64, ut_M_ostr);
     CHECK(4, LUMI_block0_cleanup)
 /// @ test-builtin-bool0
 ut_M_b = true;
@@ -4155,63 +3781,46 @@ Bool a[0x0c] = {0};
     ut_M_i = 0x0c + 0x0c;
 /// @ test-builtin-string0
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    String_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_i));
+    String_length(ut_M_ostr, &(ut_M_i));
 /// @ test-builtin-string1
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    String_clear(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
+    String_clear(ut_M_ostr);
 /// @ test-builtin-string2
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
+Byte* aux_Array_0 = NULL;
+    uint32_t aux_Array_0_Length = 0;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    String_equal(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_ostr, *ut_M_ostr_Length, &(ut_M_b));
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
+    String_bytes(ut_M_ostr, &(aux_Array_0), &(aux_Array_0_Length));
+    String_equal(ut_M_ostr, aux_Array_0, aux_Array_0_Length, &(ut_M_b));
 /// @ test-builtin-string5
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = String_append(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_c);
+    LUMI_err = String_append(ut_M_ostr, ut_M_c);
     CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-string6
-Char sv[0x0c] = {0};
-    Seq_Length sv_Length[1] = {0};
-    /* initializing sv */
+String sv_Var = {0};
+    String* sv = NULL;
+    Byte* aux_Array_0 = NULL;
+    uint32_t aux_Array_0_Length = 0;
+    sv = &sv_Var;
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = String_new(sv, 0x0c, sv_Length, ut_M_ostr, *ut_M_ostr_Length);
+    String_bytes(ut_M_ostr, &(aux_Array_0), &(aux_Array_0_Length));
+    LUMI_err = String_new(sv, aux_Array_0, aux_Array_0_Length);
     CHECK(2, LUMI_block0_cleanup)
 /// @ test-builtin-string7
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = String_concat(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_ostr, *ut_M_ostr_Length);
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
+    LUMI_err = String_concat(ut_M_ostr, ut_M_buff, ut_M_buff_Length);
     CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-string8
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = String_concat_int(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_i);
+    LUMI_err = String_concat_int(ut_M_ostr, ut_M_i);
     CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-string10
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    String_has(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_c, &(ut_M_b));
+    String_has(ut_M_ostr, ut_M_c, &(ut_M_b));
 /// @ test-builtin-buffer0
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    Buffer_length(ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length, &(ut_M_i));
-/// @ test-builtin-buffer2
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    Buffer_equal(ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length, ut_M_buff, *ut_M_buff_Length, &(ut_M_b));
-/// @ test-builtin-buffer3
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    LUMI_err = Buffer_get(ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length, ut_M_i, &(ut_M_bt));
-    CHECK(1, LUMI_block0_cleanup)
-/// @ test-builtin-buffer4
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    LUMI_err = Buffer_set(ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length, ut_M_i, ut_M_bt);
-    CHECK(1, LUMI_block0_cleanup)
-/// @ test-builtin-buffer8
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    Buffer_find(ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length, ut_M_buff, *ut_M_buff_Length, &(ut_M_i));
-/// @ test-builtin-buffer9
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    Buffer_has(ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length, ut_M_bt, &(ut_M_b));
-/// @ test-builtin-buffer10
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
-    LUMI_err = Buffer_set(ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length, 0, ut_M_bt);
-    CHECK(1, LUMI_block0_cleanup)
+    ut_M_i = ut_M_buff_Length;
 /// @ test-builtin-file0
 {
         FileReadText f_Var = {0};
@@ -4220,16 +3829,20 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         int64_t x = 0;
         ut_M_Data df_Var = {0};
         ut_M_Data* df = NULL;
+        Byte* aux_Array_0 = NULL;
+        uint32_t aux_Array_0_Length = 0;
         ++LUMI_trace_ignore_count;
         CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
         f = &f_Var;
         INIT_VAR_REFMAN(2, LUMI_block1_cleanup, f)
-        LUMI_err = FileReadText_new(f, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
+        LUMI_err = FileReadText_new(f, ut_M_ostr);
         CHECK(2, LUMI_block1_cleanup)
-        LUMI_err = FileReadText_get(f, &(ut_M_c), &(ut_M_b));
+        LUMI_err = FileReadText_get(f, &(ut_M_bt), &(ut_M_b));
         CHECK(3, LUMI_block1_cleanup)
-        CHECK_REF(4, LUMI_block1_cleanup, ut_M_ostr)
-        LUMI_err = FileReadText_getline(f, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_b));
+        CHECK_REF(4, LUMI_block1_cleanup, ut_M_buff)
+        LUMI_err = FileReadText_getline(f, ut_M_buff, ut_M_buff_Length, &(aux_Array_0), &(aux_Array_0_Length), &(ut_M_b));
+        bfr_Length = aux_Array_0_Length;
+        bfr = aux_Array_0;
         CHECK(4, LUMI_block1_cleanup)
         LUMI_err = FileReadText_tell(f, &(x));
         CHECK(6, LUMI_block1_cleanup)
@@ -4272,12 +3885,12 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         ++LUMI_trace_ignore_count;
         CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
         INIT_NEW(2, LUMI_block1_cleanup, f, FileReadBinary, 1);
-        LUMI_err = FileReadBinary_new(f, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length);
+        LUMI_err = FileReadBinary_new(f, ut_M_ostr);
         CHECK(2, LUMI_block1_cleanup)
         LUMI_err = FileReadBinary_get(f, &(ut_M_bt), &(ut_M_b));
         CHECK(3, LUMI_block1_cleanup)
         CHECK_REF(4, LUMI_block1_cleanup, ut_M_buff)
-        LUMI_err = FileReadBinary_read(f, ut_M_buff, *ut_M_buff_Length, &(ut_M_i));
+        LUMI_err = FileReadBinary_read(f, ut_M_buff, ut_M_buff_Length, &(ut_M_i));
         CHECK(4, LUMI_block1_cleanup)
         LUMI_err = FileReadBinary_tell(f, &(x));
         CHECK(6, LUMI_block1_cleanup)
@@ -4318,14 +3931,14 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         ++LUMI_trace_ignore_count;
         CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
         INIT_NEW(2, LUMI_block1_cleanup, aux_FileWriteText_0, FileWriteText, 1);
-        LUMI_err = FileWriteText_new(aux_FileWriteText_0, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, false);
+        LUMI_err = FileWriteText_new(aux_FileWriteText_0, ut_M_ostr, false);
         CHECK(2, LUMI_block1_cleanup)
         f = aux_FileWriteText_0;
         aux_FileWriteText_0 = NULL;
-        LUMI_err = FileWriteText_put(f, ut_M_c);
+        LUMI_err = FileWriteText_put(f, ut_M_bt);
         CHECK(3, LUMI_block1_cleanup)
-        CHECK_REF(4, LUMI_block1_cleanup, ut_M_ostr)
-        LUMI_err = FileWriteText_write(f, ut_M_ostr, *ut_M_ostr_Length, &(ut_M_i));
+        CHECK_REF(4, LUMI_block1_cleanup, ut_M_buff)
+        LUMI_err = FileWriteText_write(f, ut_M_buff, ut_M_buff_Length, &(ut_M_i));
         CHECK(4, LUMI_block1_cleanup)
         LUMI_err = FileWriteText_tell(f, &(x));
         CHECK(6, LUMI_block1_cleanup)
@@ -4369,7 +3982,7 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         ++LUMI_trace_ignore_count;
         CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
         INIT_NEW(2, LUMI_block1_cleanup, aux_FileWriteBinary_0, FileWriteBinary, 1);
-        LUMI_err = FileWriteBinary_new(aux_FileWriteBinary_0, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, true);
+        LUMI_err = FileWriteBinary_new(aux_FileWriteBinary_0, ut_M_ostr, true);
         CHECK(2, LUMI_block1_cleanup)
         f = aux_FileWriteBinary_0;
         aux_FileWriteBinary_0 = NULL;
@@ -4377,7 +3990,7 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         LUMI_err = FileWriteBinary_put(f, ut_M_bt);
         CHECK(3, LUMI_block1_cleanup)
         CHECK_REF(4, LUMI_block1_cleanup, ut_M_buff)
-        LUMI_err = FileWriteBinary_write(f, ut_M_buff, *ut_M_buff_Length, &(ut_M_i));
+        LUMI_err = FileWriteBinary_write(f, ut_M_buff, ut_M_buff_Length, &(ut_M_i));
         CHECK(4, LUMI_block1_cleanup)
         LUMI_err = FileWriteBinary_tell(f, &(x));
         CHECK(6, LUMI_block1_cleanup)
@@ -4421,21 +4034,25 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         int64_t x = 0;
         ut_M_Data df_Var = {0};
         ut_M_Data* df = NULL;
+        Byte* aux_Array_0 = NULL;
+        uint32_t aux_Array_0_Length = 0;
         ++LUMI_trace_ignore_count;
         CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
         f = &f_Var;
         INIT_VAR_REFMAN(2, LUMI_block1_cleanup, f)
-        LUMI_err = FileReadWriteText_new(f, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, true, true);
+        LUMI_err = FileReadWriteText_new(f, ut_M_ostr, true, true);
         CHECK(2, LUMI_block1_cleanup)
-        LUMI_err = FileReadWriteText_get(f, &(ut_M_c), &(ut_M_b));
+        LUMI_err = FileReadWriteText_get(f, &(ut_M_bt), &(ut_M_b));
         CHECK(3, LUMI_block1_cleanup)
-        CHECK_REF(4, LUMI_block1_cleanup, ut_M_ostr)
-        LUMI_err = FileReadWriteText_getline(f, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_b));
+        CHECK_REF(4, LUMI_block1_cleanup, ut_M_buff)
+        LUMI_err = FileReadWriteText_getline(f, ut_M_buff, ut_M_buff_Length, &(aux_Array_0), &(aux_Array_0_Length), &(ut_M_b));
+        bfr_Length = aux_Array_0_Length;
+        bfr = aux_Array_0;
         CHECK(4, LUMI_block1_cleanup)
-        LUMI_err = FileReadWriteText_put(f, ut_M_c);
+        LUMI_err = FileReadWriteText_put(f, ut_M_bt);
         CHECK(5, LUMI_block1_cleanup)
-        CHECK_REF(6, LUMI_block1_cleanup, ut_M_ostr)
-        LUMI_err = FileReadWriteText_write(f, ut_M_ostr, *ut_M_ostr_Length, &(ut_M_i));
+        CHECK_REF(6, LUMI_block1_cleanup, ut_M_buff)
+        LUMI_err = FileReadWriteText_write(f, ut_M_buff, ut_M_buff_Length, &(ut_M_i));
         CHECK(6, LUMI_block1_cleanup)
         LUMI_err = FileReadWriteText_tell(f, &(x));
         CHECK(8, LUMI_block1_cleanup)
@@ -4478,17 +4095,17 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
         ++LUMI_trace_ignore_count;
         CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
         INIT_NEW(2, LUMI_block1_cleanup, f, FileReadWriteBinary, 1);
-        LUMI_err = FileReadWriteBinary_new(f, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, false, false);
+        LUMI_err = FileReadWriteBinary_new(f, ut_M_ostr, false, false);
         CHECK(2, LUMI_block1_cleanup)
         LUMI_err = FileReadWriteBinary_get(f, &(ut_M_bt), &(ut_M_b));
         CHECK(3, LUMI_block1_cleanup)
         CHECK_REF(4, LUMI_block1_cleanup, ut_M_buff)
-        LUMI_err = FileReadWriteBinary_read(f, ut_M_buff, *ut_M_buff_Length, &(ut_M_i));
+        LUMI_err = FileReadWriteBinary_read(f, ut_M_buff, ut_M_buff_Length, &(ut_M_i));
         CHECK(4, LUMI_block1_cleanup)
         LUMI_err = FileReadWriteBinary_put(f, ut_M_bt);
         CHECK(5, LUMI_block1_cleanup)
         CHECK_REF(6, LUMI_block1_cleanup, ut_M_buff)
-        LUMI_err = FileReadWriteBinary_write(f, ut_M_buff, *ut_M_buff_Length, &(ut_M_i));
+        LUMI_err = FileReadWriteBinary_write(f, ut_M_buff, ut_M_buff_Length, &(ut_M_i));
         CHECK(6, LUMI_block1_cleanup)
         LUMI_err = FileReadWriteBinary_tell(f, &(x));
         CHECK(8, LUMI_block1_cleanup)
@@ -4532,7 +4149,7 @@ struct ut_M_Data_Dynamic {
 };
 void ut_M_Data_set(ut_M_Data* self, Generic_Type* item, Generic_Type_Dynamic* item_Dynamic);
 void ut_M_Data_Del(ut_M_Data* self, ut_M_Data_Dynamic* self_Dynamic);
-Return_Code ut_M_fun(File* f, FileReadText* frt, FileReadBinary* frb, FileWriteText* fwt, FileWriteBinary* fwb, FileReadWriteText* frwt, FileReadWriteBinary* frwb);
+Return_Code ut_M_fun(String* name, File* f, FileReadText* frt, FileReadBinary* frb, FileWriteText* fwt, FileWriteBinary* fwb, FileReadWriteText* frwt, FileReadWriteBinary* frwb);
 ut_M_Data_Dynamic ut_M_Data_dynamic = {
     (Dynamic_Del)ut_M_Data_Del
 };
@@ -4547,7 +4164,7 @@ void ut_M_Data_Del(ut_M_Data* self, ut_M_Data_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->item_Refman);
 }
-Return_Code ut_M_fun(File* f, FileReadText* frt, FileReadBinary* frb, FileWriteText* fwt, FileWriteBinary* fwb, FileReadWriteText* frwt, FileReadWriteBinary* frwb) {
+Return_Code ut_M_fun(String* name, File* f, FileReadText* frt, FileReadBinary* frb, FileWriteText* fwt, FileWriteBinary* fwb, FileReadWriteText* frwt, FileReadWriteBinary* frwb) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     ut_M_Data df_Var = {0};
@@ -4555,9 +4172,6 @@ Return_Code ut_M_fun(File* f, FileReadText* frt, FileReadBinary* frb, FileWriteT
     File* fo = NULL;
     int64_t i = 0;
     FileWriteBinary* aux_FileWriteBinary_0 = NULL;
-    static Char aux_String_0[] = {'n','a','m','e','\0',};
-    Seq_Length aux_String_0_Max_length = sizeof(aux_String_0);
-    Seq_Length aux_String_0_Length[1] = {sizeof(aux_String_0) - 1};
     f = frt;
     f = frb;
     f = fwt;
@@ -4568,26 +4182,26 @@ Return_Code ut_M_fun(File* f, FileReadText* frt, FileReadBinary* frb, FileWriteT
     frb = frwb;
     fwt = frwt;
     fwb = frwb;
-    LUMI_err = ut_M_fun(frt, frwt, frwb, frwt, frwb, frwt, frwb);
-    CHECK(22, LUMI_block0_cleanup)
+    LUMI_err = ut_M_fun(name, frt, frwt, frwb, frwt, frwb, frwt, frwb);
+    CHECK(24, LUMI_block0_cleanup)
     df = &df_Var;
-    INIT_NEW(31, LUMI_block0_cleanup, aux_FileWriteBinary_0, FileWriteBinary, 1);
-    LUMI_err = FileWriteBinary_new(aux_FileWriteBinary_0, aux_String_0, aux_String_0_Max_length, aux_String_0_Length, false);
-    CHECK(31, LUMI_block0_cleanup)
+    INIT_NEW(34, LUMI_block0_cleanup, aux_FileWriteBinary_0, FileWriteBinary, 1);
+    LUMI_err = FileWriteBinary_new(aux_FileWriteBinary_0, name, false);
+    CHECK(34, LUMI_block0_cleanup)
     fo = aux_FileWriteBinary_0;
     aux_FileWriteBinary_0 = NULL;
     LUMI_err = File_tell(fo, &(i));
-    CHECK(33, LUMI_block0_cleanup)
-    LUMI_err = File_seek_set(fo, i);
-    CHECK(34, LUMI_block0_cleanup)
-    LUMI_err = File_seek_cur(fo, i);
-    CHECK(35, LUMI_block0_cleanup)
-    LUMI_err = File_seek_end(fo, i);
     CHECK(36, LUMI_block0_cleanup)
-    LUMI_err = File_flush(fo);
+    LUMI_err = File_seek_set(fo, i);
     CHECK(37, LUMI_block0_cleanup)
-    LUMI_err = File_close(fo);
+    LUMI_err = File_seek_cur(fo, i);
     CHECK(38, LUMI_block0_cleanup)
+    LUMI_err = File_seek_end(fo, i);
+    CHECK(39, LUMI_block0_cleanup)
+    LUMI_err = File_flush(fo);
+    CHECK(40, LUMI_block0_cleanup)
+    LUMI_err = File_close(fo);
+    CHECK(41, LUMI_block0_cleanup)
     ut_M_Data_set(df, fo, (Generic_Type_Dynamic*)&File_dynamic);
     fo = NULL;
 LUMI_block0_cleanup:
@@ -4600,48 +4214,55 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 /// @ test-builtin-sys0
-Char* argv = NULL;
+String* argv = NULL;
     uint32_t argv_Length = 0;
-    Seq_Length argv_Value_length = 0;
-    Seq_Length* argv_Seq_length = NULL;
     argv_Length = sys_M_argv_Length;
-    argv_Value_length = sys_M_argv_Value_length;
-    argv_Seq_length = sys_M_argv_Seq_length;
     argv = sys_M_argv;
 /// @ test-builtin-sys1
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = sys_M_print(ut_M_ostr, *ut_M_ostr_Length);
+Byte* aux_Array_0 = NULL;
+    uint32_t aux_Array_0_Length = 0;
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
+    String_bytes(ut_M_ostr, &(aux_Array_0), &(aux_Array_0_Length));
+    LUMI_err = sys_M_print(aux_Array_0, aux_Array_0_Length);
     CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-sys2
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = sys_M_println(ut_M_ostr, *ut_M_ostr_Length);
+Byte* aux_Array_0 = NULL;
+    uint32_t aux_Array_0_Length = 0;
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
+    String_bytes(ut_M_ostr, &(aux_Array_0), &(aux_Array_0_Length));
+    LUMI_err = sys_M_println(aux_Array_0, aux_Array_0_Length);
     CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-sys3
 LUMI_err = sys_M_getchar(&(ut_M_c), &(ut_M_b));
     CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-sys4
-CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = sys_M_getline(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_b));
+Byte* aux_Array_0 = NULL;
+    uint32_t aux_Array_0_Length = 0;
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
+    LUMI_err = sys_M_getline(ut_M_buff, ut_M_buff_Length, &(aux_Array_0), &(aux_Array_0_Length), &(ut_M_b));
+    bfr_Length = aux_Array_0_Length;
+    bfr = aux_Array_0;
     CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-sys5
 LUMI_err = sys_M_exit(ut_M_j);
     CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-sys6
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    LUMI_err = sys_M_system(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_j));
+    LUMI_err = sys_M_system(ut_M_ostr, &(ut_M_j));
     CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-sys7
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    sys_M_getenv(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(ut_M_b));
+    LUMI_err = sys_M_getenv(ut_M_ostr, ut_M_ostr, &(ut_M_b));
+    CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-sys8
-LUMI_err = FileReadText_get(sys_M_stdin, &(ut_M_c), &(ut_M_b));
+LUMI_err = FileReadText_get(sys_M_stdin, &(ut_M_bt), &(ut_M_b));
     CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-sys9
-LUMI_err = FileWriteText_put(sys_M_stdout, ut_M_c);
+LUMI_err = FileWriteText_put(sys_M_stdout, ut_M_bt);
     CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-sys10
-LUMI_err = FileWriteText_put(sys_M_stderr, ut_M_c);
+LUMI_err = FileWriteText_put(sys_M_stderr, ut_M_bt);
     CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-file-e0
 too few parameters
@@ -4651,9 +4272,7 @@ too few parameters
 too few parameters
 /// @@ test-general
 /// @ test-general-0
-Char* ut_M_str = NULL;
-Seq_Length ut_M_str_Max_length = 0;
-Seq_Length* ut_M_str_Length = &Lumi_empty_length;
+String* ut_M_str = NULL;
 /// @ test-general-1
 uint32_t ut_M_x = 0;
 /// @ test-general-2
@@ -4665,24 +4284,15 @@ uint32_t ut_M_x = 0;
 /// @ test-general-5
 uint32_t ut_M_x = 0;
 /// @ test-general-6
-Char ut_M_s[0x0c] = {0};
-Seq_Length ut_M_s_Length[1] = {0};
-Char ut_M_svs[0x0c] = {0};
-Seq_Length ut_M_svs_Length[1] = {0};
+String ut_M_s_Var = {0};
+String* ut_M_s = NULL;
+String ut_M_svs_Var = {0};
+String* ut_M_svs = NULL;
 Ref_Manager* ut_M_svs_Refman = NULL;
-Char* ut_M_cs = NULL;
-Seq_Length ut_M_cs_Max_length = 0;
-Seq_Length* ut_M_cs_Length = &Lumi_empty_length;
-Byte* ut_M_cb = NULL;
-Seq_Length ut_M_cb_Max_length = 0;
-Seq_Length* ut_M_cb_Length = &Lumi_empty_length;
-Char* ut_M_us = NULL;
-Seq_Length ut_M_us_Max_length = 0;
-Seq_Length* ut_M_us_Length = &Lumi_empty_length;
+String* ut_M_cs = NULL;
+String* ut_M_us = NULL;
 Ref_Manager* ut_M_us_Refman = NULL;
-Char* ut_M_gs = NULL;
-Seq_Length ut_M_gs_Max_length = 0;
-Seq_Length* ut_M_gs_Length = &Lumi_empty_length;
+String* ut_M_gs = NULL;
 Ref_Manager* ut_M_gs_Refman = NULL;
 void new_Mock(Bool* allocate_success) { }
 Return_Code delete_Mock(Ref self) { return OK; }
@@ -4690,88 +4300,51 @@ USER_MAIN_HEADER {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     uint32_t x = 0;
-    Char* ls = NULL;
-    Seq_Length ls_Max_length = 0;
-    Seq_Length* ls_Length = &Lumi_empty_length;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    static Char aux_String_1[] = {'g','l','o','b','a','l',' ','t','e','x','t','\0',};
-    Seq_Length aux_String_1_Max_length = sizeof(aux_String_1);
-    Seq_Length aux_String_1_Length[1] = {sizeof(aux_String_1) - 1};
-    Byte* aux_Buffer_0 = NULL;
-    Seq_Length aux_Buffer_0_Max_length = 0;
-    Seq_Length* aux_Buffer_0_Length = &Lumi_empty_length;
-    static Byte aux_Buffer_1[] = {0xfa,0xde,0x00,0xbe,0xaf,};
-    Seq_Length aux_Buffer_1_Max_length = sizeof(aux_Buffer_1);
-    Seq_Length aux_Buffer_1_Length[1] = {sizeof(aux_Buffer_1)};
-    Char* aux_String_2 = NULL;
-    Seq_Length aux_String_2_Max_length = 0;
-    Seq_Length* aux_String_2_Length = &Lumi_empty_length;
+    String* ls = NULL;
+    String* aux_String_0 = NULL;
+    String* aux_String_0 = NULL;
+    static Byte aux_Array_0[] = {'g','l','o','b','a','l',' ','t','e','x','t','\0',};
+    String* aux_String_1 = NULL;
+    Byte* aux_Array_1 = NULL;
+    uint32_t aux_Array_1_Length = 0;
 #define LUMI_FUNC_NAME "global variable initialization"
 #define LUMI_FILE_NAME "mock.5.lm"
-    /* initializing ut_M_s */
+    ut_M_s = &ut_M_s_Var;
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "mock.5.lm"
+    ut_M_svs = &ut_M_svs_Var;
     INIT_VAR_REFMAN(2, LUMI_block0_cleanup, ut_M_svs)
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "mock.5.lm"
-    INIT_NEW_SEQUENCE(3, LUMI_block0_cleanup, aux_String_0, Char, 0x0c);
-    LUMI_err = String_new(aux_String_0, 0x0c, aux_String_0_Length, aux_String_1, *aux_String_1_Length);
+    INIT_NEW(3, LUMI_block0_cleanup, aux_String_0, String, 1);
+    LUMI_err = String_new(aux_String_0, aux_Array_0, 0x0b);
     CHECK(3, LUMI_block0_cleanup)
-    ut_M_cs_Max_length = 0x0c;
-    ut_M_cs_Length = aux_String_0_Length;
     ut_M_cs = aux_String_0;
     aux_String_0 = NULL;
-    aux_String_0_Length = &Lumi_empty_length;
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "mock.5.lm"
-    INIT_NEW_SEQUENCE(4, LUMI_block0_cleanup, aux_Buffer_0, Byte, 0x0c);
-    LUMI_err = Buffer_new(aux_Buffer_0, 0x0c, aux_Buffer_0_Length, aux_Buffer_1, *aux_Buffer_1_Length);
-    CHECK(4, LUMI_block0_cleanup)
-    ut_M_cb_Max_length = 0x0c;
-    ut_M_cb_Length = aux_Buffer_0_Length;
-    ut_M_cb = aux_Buffer_0;
-    aux_Buffer_0 = NULL;
-    aux_Buffer_0_Length = &Lumi_empty_length;
-#undef LUMI_FILE_NAME
-#define LUMI_FILE_NAME "mock.5.lm"
-    INIT_NEW_SEQUENCE(5, LUMI_block0_cleanup, aux_String_2, Char, 0x0c);
-    LUMI_err = String_new(aux_String_2, 0x0c, aux_String_2_Length, ut_M_s, *ut_M_s_Length);
+    String_bytes(ut_M_s, &(aux_Array_1), &(aux_Array_1_Length));
+    INIT_NEW(5, LUMI_block0_cleanup, aux_String_1, String, 1);
+    LUMI_err = String_new(aux_String_1, aux_Array_1, aux_Array_1_Length);
     CHECK(5, LUMI_block0_cleanup)
-    ut_M_us_Max_length = 0x0c;
-    ut_M_us_Length = aux_String_2_Length;
-    ut_M_us = aux_String_2;
-    aux_String_2 = NULL;
-    aux_String_2_Length = &Lumi_empty_length;
+    ut_M_us = aux_String_1;
+    aux_String_1 = NULL;
     INIT_NEW_REFMAN(5, LUMI_block0_cleanup, ut_M_us)
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "mock.5.lm"
     LUMI_inc_ref(ut_M_us_Refman);
     LUMI_dec_ref(ut_M_gs_Refman);
     ut_M_gs_Refman = ut_M_us_Refman;
-    ut_M_gs_Max_length = ut_M_us_Max_length;
-    ut_M_gs_Length = ut_M_us_Length;
     ut_M_gs = ut_M_us;
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
     x = 0x06;
     x = 0x07;
-    INIT_NEW_SEQUENCE(10, LUMI_block0_cleanup, ls, Char, 0x0c);
-    aux_String_0_Max_length = 0x0c;
-    aux_String_0_Length = ls_Length;
+    INIT_NEW(10, LUMI_block0_cleanup, ls, String, 1);
     aux_String_0 = ls;
-    ls_Max_length = ut_M_cs_Max_length;
-    ls_Length = ut_M_cs_Length;
     ls = ut_M_cs;
-    ut_M_cs_Max_length = 0x0c;
-    ut_M_cs_Length = aux_String_0_Length;
     ut_M_cs = aux_String_0;
     aux_String_0 = NULL;
-    aux_String_0_Length = &Lumi_empty_length;
 LUMI_block0_cleanup:
     (void)0;
     String_Del(aux_String_0, NULL);
@@ -4784,8 +4357,8 @@ MAIN_FUNC
 /// @ test-general-7
 void ut_M_fun(void);
 Return_Code second_M_dummy(void);
-Char ut_M_s[0x0c] = {0};
-Seq_Length ut_M_s_Length[1] = {0};
+String ut_M_s_Var = {0};
+String* ut_M_s = NULL;
 Line_Count LUMI_file0_line_count[5] = {
     -1,-1,-1, 0,-1
 };
@@ -4795,7 +4368,7 @@ File_Coverage LUMI_file_coverage[1] = {
 void ut_M_fun(void) {
     unsigned LUMI_loop_depth = 1;
     ++LUMI_file_coverage[0].line_count[3];
-    String_clear(ut_M_s, 0x0c, ut_M_s_Length);
+    String_clear(ut_M_s);
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -4814,7 +4387,7 @@ USER_MAIN_HEADER {
     Bool LUMI_success = true;
 #define LUMI_FUNC_NAME "global variable initialization"
 #define LUMI_FILE_NAME "mock.5.lm"
-    /* initializing ut_M_s */
+    ut_M_s = &ut_M_s_Var;
 #undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
     LUMI_success &= LUMI_run_test("dummy", second_M_dummy);
@@ -6221,22 +5794,22 @@ LUMI_block0_cleanup:
     (void)0;
 }
 /// @ test-function-1
-void ut_M_name(Char* self, Seq_Length self_Max_length, Seq_Length* self_Length, Char* text, Seq_Length text_Max_length, Seq_Length* text_Length, uint32_t num);
-void ut_M_name(Char* self, Seq_Length self_Max_length, Seq_Length* self_Length, Char* text, Seq_Length text_Max_length, Seq_Length* text_Length, uint32_t num) {
+void ut_M_name(String* self, String* text, uint32_t num);
+void ut_M_name(String* self, String* text, uint32_t num) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
 /// @ test-function-2
-void ut_M_name(Char** text, Seq_Length* text_Max_length, Seq_Length** text_Length, uint32_t* num);
-void ut_M_name(Char** text, Seq_Length* text_Max_length, Seq_Length** text_Length, uint32_t* num) {
+void ut_M_name(String** text, uint32_t* num);
+void ut_M_name(String** text, uint32_t* num) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
 /// @ test-function-3
-void ut_M_name(Char param, Char** out, Seq_Length* out_Max_length, Seq_Length** out_Length);
-void ut_M_name(Char param, Char** out, Seq_Length* out_Max_length, Seq_Length** out_Length) {
+void ut_M_name(Char param, String** out);
+void ut_M_name(Char param, String** out) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
@@ -6271,64 +5844,47 @@ LUMI_block0_cleanup:
     (void)0;
 }
 /// @ test-function-7
-Return_Code ut_M_name(Char* self, Seq_Length self_Max_length, Seq_Length* self_Length, uint32_t px, Char* pu, uint32_t pu_Length, Char* po, Seq_Length po_Max_length, Seq_Length* po_Length, Char** oself, Seq_Length* oself_Max_length, Seq_Length** oself_Length, Ref_Manager** oself_Refman, uint32_t* ox, Char** ou, Seq_Length* ou_Max_length, Seq_Length** ou_Length, Ref_Manager** ou_Refman, Char** oo, Seq_Length* oo_Max_length, Seq_Length** oo_Length);
-Return_Code ut_M_name(Char* self, Seq_Length self_Max_length, Seq_Length* self_Length, uint32_t px, Char* pu, uint32_t pu_Length, Char* po, Seq_Length po_Max_length, Seq_Length* po_Length, Char** oself, Seq_Length* oself_Max_length, Seq_Length** oself_Length, Ref_Manager** oself_Refman, uint32_t* ox, Char** ou, Seq_Length* ou_Max_length, Seq_Length** ou_Length, Ref_Manager** ou_Refman, Char** oo, Seq_Length* oo_Max_length, Seq_Length** oo_Length) {
+Return_Code ut_M_name(String* self, uint32_t px, Byte* pu, uint32_t pu_Length, Byte* po, uint32_t po_Length, String** oself, Ref_Manager** oself_Refman, uint32_t* ox, String** ou, Ref_Manager** ou_Refman, String** oo);
+Return_Code ut_M_name(String* self, uint32_t px, Byte* pu, uint32_t pu_Length, Byte* po, uint32_t po_Length, String** oself, Ref_Manager** oself_Refman, uint32_t* ox, String** ou, Ref_Manager** ou_Refman, String** oo) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     uint32_t x = 0;
-    Char* u = NULL;
-    Seq_Length u_Max_length = 0;
-    Seq_Length* u_Length = &Lumi_empty_length;
+    Byte* u = NULL;
+    uint32_t u_Length = 0;
     Byte* b = NULL;
-    Seq_Length b_Max_length = 0;
-    Seq_Length* b_Length = &Lumi_empty_length;
-    Char* o = NULL;
-    Seq_Length o_Max_length = 0;
-    Seq_Length* o_Length = &Lumi_empty_length;
-    Char v[0x0c] = {0};
-    Seq_Length v_Length[1] = {0};
-    Char* n = NULL;
-    Seq_Length n_Max_length = 0;
-    Seq_Length* n_Length = &Lumi_empty_length;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    static Char aux_String_1[] = {'c','o','n','s','t','a','n','t',' ','s','t','r','i','n','g','\0',};
-    Seq_Length aux_String_1_Max_length = sizeof(aux_String_1);
-    Seq_Length aux_String_1_Length[1] = {sizeof(aux_String_1) - 1};
-    static Byte aux_Buffer_0[] = {0xbe,0xef,};
-    Seq_Length aux_Buffer_0_Max_length = sizeof(aux_Buffer_0);
-    Seq_Length aux_Buffer_0_Length[1] = {sizeof(aux_Buffer_0)};
-    Char* aux_Array_0 = NULL;
-    /* initializing v */
-    INIT_NEW_SEQUENCE(8, LUMI_block0_cleanup, n, Char, 0x0c);
-    INIT_NEW_SEQUENCE(9, LUMI_block0_cleanup, aux_String_0, Char, 0x0c);
+    uint32_t b_Length = 0;
+    String* o = NULL;
+    String v_Var = {0};
+    String* v = NULL;
+    String* n = NULL;
+    String* aux_String_0 = NULL;
+    static Byte aux_Array_0[] = {'c','o','n','s','t','a','n','t',' ','s','t','r','i','n','g','\0',};
+    static Byte aux_Array_1[] = {0xbe,0xef,};
+    Byte* aux_Array_2 = NULL;
+    v = &v_Var;
+    INIT_NEW(8, LUMI_block0_cleanup, n, String, 1);
+    INIT_NEW(9, LUMI_block0_cleanup, aux_String_0, String, 1);
     String_Del(o, NULL);
     free(o);
-    o_Max_length = 0x0c;
-    o_Length = aux_String_0_Length;
     o = aux_String_0;
     aux_String_0 = NULL;
-    aux_String_0_Length = &Lumi_empty_length;
-    u_Max_length = aux_String_1_Max_length;
-    u_Length = aux_String_1_Length;
-    u = aux_String_1;
-    b_Max_length = aux_Buffer_0_Max_length;
-    b_Length = aux_Buffer_0_Length;
-    b = aux_Buffer_0;
-    if (SAFE_SUM_LARGER(0x02, 0x06, *(po_Length))) RAISE(12, LUMI_block0_cleanup, slice_index)
-    aux_Array_0 = po + 0x02;
+    u_Length = 0x0f;
+    u = aux_Array_0;
+    b_Length = 0x02;
+    b = aux_Array_1;
+    if (SAFE_SUM_LARGER(0x02, 0x06, po_Length)) RAISE(12, LUMI_block0_cleanup, slice_index)
+    aux_Array_2 = po + 0x02;
     pu_Length = 0x06;
-    pu = aux_Array_0;
+    pu = aux_Array_2;
 LUMI_block0_cleanup:
     (void)0;
     String_Del(aux_String_0, NULL);
     free(aux_String_0);
     String_Del(n, NULL);
     free(n);
+    String_Del(v, NULL);
     String_Del(o, NULL);
     free(o);
-    String_Del(po, NULL);
     free(po);
     return LUMI_err;
 }
@@ -6341,10 +5897,8 @@ struct ut_M_Struct {
     ut_M_Struct* s;
     ut_M_Struct* as;
     uint32_t as_Length;
-    Char* astr;
+    String* astr;
     uint32_t astr_Length;
-    Seq_Length astr_Value_length;
-    Seq_Length* astr_Seq_length;
 };
 struct ut_M_Struct_Dynamic {
     Dynamic_Del _del;
@@ -6372,7 +5926,7 @@ ut_M_Class_Dynamic ut_M_Class_dynamic = {
 };
 void ut_M_Struct_Del(ut_M_Struct* self, ut_M_Struct_Dynamic* self_Dynamic) {
     if (self == NULL) return;
-    free(self->astr_Seq_length);
+    ARRAY_DEL(String, self->astr, self->astr_Length)
     free(self->astr);
     ARRAY_DEL(ut_M_Struct, self->as, self->as_Length)
     free(self->as);
@@ -6402,13 +5956,11 @@ void ut_M_name(ut_M_Struct* ps, ut_M_Class* pc, ut_M_Class_Dynamic* pc_Dynamic, 
     uint32_t ac_Length = 0;
     uint32_t* ai = NULL;
     uint32_t ai_Length = 0;
-    Char* astr = NULL;
+    String* astr = NULL;
     uint32_t astr_Length = 0;
-    Seq_Length astr_Value_length = 0;
-    Seq_Length* astr_Seq_length = NULL;
 LUMI_block0_cleanup:
     (void)0;
-    free(astr_Seq_length);
+    ARRAY_DEL(String, astr, astr_Length)
     free(astr);
     free(ai);
     ARRAY_DEL_DYN(ut_M_Class, ac, ac_Length)
@@ -6463,28 +6015,23 @@ LUMI_block0_cleanup:
     (void)0;
 }
 /// @ test-function-10
-void ut_M_name(Char* ai, uint32_t ai_Length, uint32_t ai_Value_length, Seq_Length ai_Value_value_length, Seq_Length* ai_Seq_length, uint32_t** ao, uint32_t* ao_Length, uint32_t* ao_Value_length);
-void ut_M_name(Char* ai, uint32_t ai_Length, uint32_t ai_Value_length, Seq_Length ai_Value_value_length, Seq_Length* ai_Seq_length, uint32_t** ao, uint32_t* ao_Length, uint32_t* ao_Value_length) {
+void ut_M_name(String* ai, uint32_t ai_Length, uint32_t ai_Value_length, uint32_t** ao, uint32_t* ao_Length, uint32_t* ao_Value_length);
+void ut_M_name(String* ai, uint32_t ai_Length, uint32_t ai_Value_length, uint32_t** ao, uint32_t* ao_Length, uint32_t* ao_Value_length) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
 /// @ test-function-11
-Return_Code ut_M_name(Char** so, Seq_Length* so_Max_length, Seq_Length** so_Length);
-Return_Code ut_M_name(Char** so, Seq_Length* so_Max_length, Seq_Length** so_Length) {
+Return_Code ut_M_name(String** so);
+Return_Code ut_M_name(String** so) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    INIT_NEW_SEQUENCE(2, LUMI_block0_cleanup, aux_String_0, Char, 0x0c);
+    String* aux_String_0 = NULL;
+    INIT_NEW(2, LUMI_block0_cleanup, aux_String_0, String, 1);
     String_Del(*so, NULL);
     free(*so);
-    *so_Max_length = 0x0c;
-    *so_Length = aux_String_0_Length;
     *so = aux_String_0;
     aux_String_0 = NULL;
-    aux_String_0_Length = &Lumi_empty_length;
 LUMI_block0_cleanup:
     (void)0;
     String_Del(aux_String_0, NULL);
@@ -6509,11 +6056,9 @@ Return_Code delete_Mock(Ref self) { return OK; }
 USER_MAIN_HEADER {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+    String* s = NULL;
     CHECK_REF(3, LUMI_block0_cleanup, s)
-    String_clear(s, s_Max_length, s_Length);
+    String_clear(s);
 LUMI_block0_cleanup:
     (void)0;
     String_Del(s, NULL);
@@ -6595,9 +6140,7 @@ typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
     uint32_t x;
-    Char* str;
-    Seq_Length str_Max_length;
-    Seq_Length* str_Length;
+    String* str;
     Ref_Manager* str_Refman;
 };
 struct ut_M_Test_Dynamic {
@@ -6851,7 +6394,7 @@ struct ut_M_Test {
 struct ut_M_Test_Dynamic {
     Dynamic_Del _del;
 };
-void ut_M_Test_fun(ut_M_Test* self, Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, uint32_t* x);
+void ut_M_Test_fun(ut_M_Test* self, String* s, uint32_t* x);
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 ut_M_Test_Dynamic ut_M_Test_dynamic = {
     (Dynamic_Del)ut_M_Test_Del
@@ -6859,9 +6402,9 @@ ut_M_Test_Dynamic ut_M_Test_dynamic = {
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
-void ut_M_Test_fun(ut_M_Test* self, Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, uint32_t* x) {
+void ut_M_Test_fun(ut_M_Test* self, String* s, uint32_t* x) {
     unsigned LUMI_loop_depth = 1;
-    String_length(s, s_Max_length, s_Length, &(*x));
+    String_length(s, &(*x));
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -6942,38 +6485,34 @@ Return_Code ut_M_name(void);
 Return_Code ut_M_name(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    static Char aux_String_0[] = {'s','o','m','e',' ','e','r','r','o','r','\0',};
-    Seq_Length aux_String_0_Max_length = sizeof(aux_String_0);
-    Seq_Length aux_String_0_Length[1] = {sizeof(aux_String_0) - 1};
-    USER_RAISE(2, LUMI_block0_cleanup, aux_String_0, *(aux_String_0_Length))
+    static Byte aux_Array_0[] = {'s','o','m','e',' ','e','r','r','o','r','\0',};
+    USER_RAISE(2, LUMI_block0_cleanup, aux_Array_0, 0x0a)
 LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
 /// @ test-return-3
-Return_Code ut_M_name(Char* arr, uint32_t arr_Length, Seq_Length arr_Value_length, Seq_Length* arr_Seq_length);
-Return_Code ut_M_name(Char* arr, uint32_t arr_Length, Seq_Length arr_Value_length, Seq_Length* arr_Seq_length) {
+Return_Code ut_M_name(String* arr, uint32_t arr_Length);
+Return_Code ut_M_name(String* arr, uint32_t arr_Length) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
+    Byte* aux_Array_0 = NULL;
+    uint32_t aux_Array_0_Length = 0;
     if (0x03 >= arr_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
-    aux_String_0 = arr + 0x03 * arr_Value_length;
-    aux_String_0_Max_length = arr_Value_length;
-    aux_String_0_Length = arr_Seq_length + 0x03;
-    USER_RAISE(2, LUMI_block0_cleanup, aux_String_0, *(aux_String_0_Length))
+    String_bytes(arr + 0x03, &(aux_Array_0), &(aux_Array_0_Length));
+    USER_RAISE(2, LUMI_block0_cleanup, aux_Array_0, aux_Array_0_Length)
 LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
 /// @ test-return-4
-Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+String* s = NULL;
     Ref_Manager* s_Refman = NULL;
-    CHECK_REFMAN(2, LUMI_block0_cleanup, s_Refman)
-    USER_RAISE(2, LUMI_block0_cleanup, s, *(s_Length))
+    Byte* aux_Array_0 = NULL;
+    uint32_t aux_Array_0_Length = 0;
+    CHECK_REF_REFMAN(2, LUMI_block0_cleanup, s, s_Refman)
+    String_bytes(s, &(aux_Array_0), &(aux_Array_0_Length));
+    USER_RAISE(2, LUMI_block0_cleanup, aux_Array_0, aux_Array_0_Length)
 /// @ test-return-e0
 expected new-line after "return", got "("
 /// @ test-return-e1
@@ -6990,17 +6529,14 @@ expected Byte array expression, got "Int"
 /// @ test-code-variables-0
 uint32_t x = 0;
 /// @ test-code-variables-1
-Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+String* s = NULL;
 /// @ test-code-variables-2
 uint32_t* a = NULL;
     uint32_t a_Length = 0;
 /// @ test-code-variables-3
 ut_M_Test* tt = NULL;
 /// @ test-code-variables-4
-Char s[0x0c] = {0};
-    Seq_Length s_Length[1] = {0};
+Byte s[0x0c] = {0};
     /* initializing s */
 /// @ test-code-variables-5
 uint32_t a[0x0c] = {0};
@@ -7009,22 +6545,15 @@ uint32_t a[0x0c] = {0};
 ut_M_Test a[0x0c] = {0};
     /* initializing a */
 /// @ test-code-variables-7
-Char sa[0x0c * 0x07] = {0};
-    Seq_Length sa_Seq_length[0x0c] = {0};
+Byte sa[0x0c * 0x07] = {0};
     /* initializing sa */
 /// @ test-code-variables-8
-Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
-    INIT_NEW_SEQUENCE(1, LUMI_block0_cleanup, s, Char, 0x0c);
-    String_Del(*so, NULL);
-    LUMI_owner_dec_ref(*so_Refman);
-    *so_Max_length = 0x0c;
-    *so_Length = s_Length;
-    *so = s;
+Byte* s = NULL;
+    INIT_NEW_ARRAY(1, LUMI_block0_cleanup, s, Byte, 0x0c, 1);
+    free(ut_M_buff);
+    ut_M_buff_Length = 0x0c;
+    ut_M_buff = s;
     s = NULL;
-    s_Length = &Lumi_empty_length;
-    INIT_NEW_REFMAN(2, LUMI_block0_cleanup, *so)
 /// @ test-code-variables-9
 ut_M_Ta a[0x0c] = {0};
     /* initializing a */
@@ -7032,35 +6561,28 @@ ut_M_Ta a[0x0c] = {0};
 uint32_t* a = NULL;
     INIT_NEW_ARRAY(1, LUMI_block0_cleanup, a, uint32_t, 0x0c, 1);
 /// @ test-code-variables-11
-Char* sa = NULL;
-    Seq_Length* sa_Seq_length = NULL;
+Byte* sa = NULL;
     sa_Value_length = 0x07;
-    INIT_NEW_ARRAY(1, LUMI_block0_cleanup, sa, Char, 0x0c, sa_Value_length);
-    sa_Seq_length = LUMI_alloc(sizeof(Seq_Length) * sa_Length);
+    INIT_NEW_ARRAY(1, LUMI_block0_cleanup, sa, Byte, 0x0c, sa_Value_length);
 /// @ test-code-variables-12
-Char aa[0x03 * 0x04 * 0x05] = {0};
-    Seq_Length aa_Seq_length[0x03 * 0x04] = {0};
+Byte aa[0x03 * 0x04 * 0x05] = {0};
     /* initializing aa */
 /// @ test-code-variables-13
-Char* aa = NULL;
-    Seq_Length* aa_Seq_length = NULL;
+Byte* aa = NULL;
     aa_Value_length = 0x04;
     aa_Value_value_length = 0x05;
-    INIT_NEW_ARRAY(1, LUMI_block0_cleanup, aa, Char, 0x03, aa_Value_length * aa_Value_value_length);
-    aa_Seq_length = LUMI_alloc(sizeof(Seq_Length) * aa_Length * aa_Value_length);
+    INIT_NEW_ARRAY(1, LUMI_block0_cleanup, aa, Byte, 0x03, aa_Value_length * aa_Value_value_length);
 /// @ test-code-variables-14
 Return_Code ut_M_fun(void);
 Return_Code ut_M_fun(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Char sv[0x04] = {0};
-    Seq_Length sv_Length[1] = {0};
+    Byte sv[0x04] = {0};
     /* initializing sv */
     if (0x01 > 0x02) {
-        Char* su = NULL;
+        Byte* su = NULL;
         uint32_t su_Length = 0;
-        Char* aux_Array_0 = NULL;
-        if (SAFE_SUM_LARGER(0x01, 0x02, *(sv_Length))) RAISE(4, LUMI_block1_cleanup, slice_index)
+        Byte* aux_Array_0 = NULL;
         aux_Array_0 = sv + 0x01;
         su_Length = 0x02;
         su = aux_Array_0;
@@ -7113,35 +6635,25 @@ ut_M_Tb* aux_Tb_0 = NULL;
     aux_Tb_0_Dynamic = NULL;
     INIT_NEW_REFMAN(1, LUMI_block0_cleanup, ut_M_tb)
 /// @ test-initialize-1
-Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    Byte* aux_Buffer_0 = NULL;
-    Seq_Length aux_Buffer_0_Max_length = 0;
-    Seq_Length* aux_Buffer_0_Length = &Lumi_empty_length;
-    CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (ut_M_arr[0] <= 0) RAISE(1, LUMI_block0_cleanup, sequence_too_short)
-    INIT_NEW_SEQUENCE(1, LUMI_block0_cleanup, aux_String_0, Char, ut_M_arr[0]);
-    str_Max_length = aux_String_0_Max_length;
-    str_Length = aux_String_0_Length;
+String* aux_String_0 = NULL;
+    Byte* aux_Array_0 = NULL;
+    uint32_t aux_Array_0_Length = 0;
+    INIT_NEW(1, LUMI_block0_cleanup, aux_String_0, String, 1);
     str = aux_String_0;
     CHECK_REF_REFMAN(2, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (ut_M_arr[0] <= 0) RAISE(2, LUMI_block0_cleanup, sequence_too_short)
-    INIT_NEW_SEQUENCE(2, LUMI_block0_cleanup, aux_Buffer_0, Byte, ut_M_arr[0]);
-    Buffer_Del(ut_M_buff, NULL);
+    if (ut_M_arr[0] <= 0) RAISE(2, LUMI_block0_cleanup, array_too_short)
+    INIT_NEW_LEN_ARRAY(2, LUMI_block0_cleanup, aux_Array_0, Byte, ut_M_arr[0], 1);
     free(ut_M_buff);
-    ut_M_buff_Max_length = aux_Buffer_0_Max_length;
-    ut_M_buff_Length = aux_Buffer_0_Length;
-    ut_M_buff = aux_Buffer_0;
-    aux_Buffer_0 = NULL;
-    aux_Buffer_0_Length = &Lumi_empty_length;
+    ut_M_buff_Length = aux_Array_0_Length;
+    ut_M_buff = aux_Array_0;
+    aux_Array_0 = NULL;
 /// @ test-initialize-2
 uint32_t* a = NULL;
     uint32_t a_Length = 0;
     uint32_t* aux_Array_0 = NULL;
     uint32_t aux_Array_0_Length = 0;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (ut_M_arr[0] <= 0) RAISE(1, LUMI_block0_cleanup, sequence_too_short)
+    if (ut_M_arr[0] <= 0) RAISE(1, LUMI_block0_cleanup, array_too_short)
     INIT_NEW_LEN_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, uint32_t, ut_M_arr[0], 1);
     a_Length = aux_Array_0_Length;
     a = aux_Array_0;
@@ -7152,50 +6664,34 @@ ut_M_Test* a = NULL;
     ut_M_Test* aux_Array_0 = NULL;
     uint32_t aux_Array_0_Length = 0;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (ut_M_arr[0] <= 0) RAISE(1, LUMI_block0_cleanup, sequence_too_short)
+    if (ut_M_arr[0] <= 0) RAISE(1, LUMI_block0_cleanup, array_too_short)
     INIT_NEW_LEN_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, ut_M_Test, ut_M_arr[0], 1);
     a_Length = aux_Array_0_Length;
     a = aux_Array_0;
     aux_Array_0 = NULL;
 /// @ test-initialize-4
-Char* sa = NULL;
+String* sa = NULL;
     uint32_t sa_Length = 0;
-    Seq_Length sa_Value_length = 0;
-    Seq_Length* sa_Seq_length = NULL;
     Byte* ba = NULL;
     uint32_t ba_Length = 0;
-    Seq_Length ba_Value_length = 0;
-    Seq_Length* ba_Seq_length = NULL;
-    Char* aux_Array_0 = NULL;
+    uint32_t ba_Value_length = 0;
+    String* aux_Array_0 = NULL;
     uint32_t aux_Array_0_Length = 0;
-    Seq_Length aux_Array_0_Value_length = 0;
-    Seq_Length* aux_Array_0_Seq_length = NULL;
     Byte* aux_Array_1 = NULL;
     uint32_t aux_Array_1_Length = 0;
-    Seq_Length aux_Array_1_Value_length = 0;
-    Seq_Length* aux_Array_1_Seq_length = NULL;
+    uint32_t aux_Array_1_Value_length = 0;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (0x01 >= ut_M_arr_Length) RAISE(1, LUMI_block0_cleanup, slice_index)
-    if (ut_M_arr[0] <= 0) RAISE(1, LUMI_block0_cleanup, sequence_too_short)
-    aux_Array_0_Value_length = ut_M_arr[0x01];
-    INIT_NEW_LEN_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, Char, ut_M_arr[0], aux_Array_0_Value_length);
-    aux_Array_0_Seq_length = LUMI_alloc(sizeof(Seq_Length) * aux_Array_0_Length);
+    if (ut_M_arr[0] <= 0) RAISE(1, LUMI_block0_cleanup, array_too_short)
+    INIT_NEW_LEN_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, String, ut_M_arr[0], 1);
     sa_Length = aux_Array_0_Length;
-    sa_Value_length = aux_Array_0_Value_length;
-    sa_Seq_length = aux_Array_0_Seq_length;
     sa = aux_Array_0;
     aux_Array_0 = NULL;
     CHECK_REF_REFMAN(2, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    CHECK_REF_REFMAN(2, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (0x01 >= ut_M_arr_Length) RAISE(2, LUMI_block0_cleanup, slice_index)
-    if (ut_M_arr[0] <= 0) RAISE(2, LUMI_block0_cleanup, sequence_too_short)
+    if (ut_M_arr[0] <= 0) RAISE(2, LUMI_block0_cleanup, array_too_short)
     aux_Array_1_Value_length = ut_M_arr[0x01];
     INIT_NEW_LEN_ARRAY(2, LUMI_block0_cleanup, aux_Array_1, Byte, ut_M_arr[0], aux_Array_1_Value_length);
-    aux_Array_1_Seq_length = LUMI_alloc(sizeof(Seq_Length) * aux_Array_1_Length);
     ba_Length = aux_Array_1_Length;
     ba_Value_length = aux_Array_1_Value_length;
-    ba_Seq_length = aux_Array_1_Seq_length;
     ba = aux_Array_1;
     aux_Array_1 = NULL;
 /// @ test-initialize-5
@@ -7203,52 +6699,37 @@ uint32_t x = 0;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
     x = ut_M_arr[0];
 /// @ test-initialize-6
-Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+String* s = NULL;
     Byte* bf = NULL;
-    Seq_Length bf_Max_length = 0;
-    Seq_Length* bf_Length = &Lumi_empty_length;
-    s_Max_length = ut_M_ostr_Max_length;
-    s_Length = ut_M_ostr_Length;
+    uint32_t bf_Length = 0;
     s = ut_M_ostr;
-    bf_Max_length = ut_M_buff_Max_length;
     bf_Length = ut_M_buff_Length;
     bf = ut_M_buff;
 /// @ test-initialize-7
-Char s[0x0c] = {0};
-    Seq_Length s_Length[1] = {0};
-    Byte bf[0x0c] = {0};
-    Seq_Length bf_Length[1] = {0};
-    static Char aux_String_0[] = {'s','o','m','e',' ','s','t','r','i','n','g','\0',};
-    Seq_Length aux_String_0_Max_length = sizeof(aux_String_0);
-    Seq_Length aux_String_0_Length[1] = {sizeof(aux_String_0) - 1};
-    static Byte aux_Buffer_0[] = {0xfa,0xde,0x00,0xbe,0xaf,};
-    Seq_Length aux_Buffer_0_Max_length = sizeof(aux_Buffer_0);
-    Seq_Length aux_Buffer_0_Length[1] = {sizeof(aux_Buffer_0)};
-    /* initializing s */
-    LUMI_err = String_new(s, 0x0c, s_Length, aux_String_0, *aux_String_0_Length);
-    CHECK(1, LUMI_block0_cleanup)
-    /* initializing bf */
-    LUMI_err = Buffer_new(bf, 0x0c, bf_Length, aux_Buffer_0, *aux_Buffer_0_Length);
-    CHECK(2, LUMI_block0_cleanup)
-/// @ test-initialize-8
-Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+String s_Var = {0};
+    String* s = NULL;
     Byte* bf = NULL;
-    Seq_Length bf_Max_length = 0;
-    Seq_Length* bf_Length = &Lumi_empty_length;
-    CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    if (ut_M_i <= 0) RAISE(1, LUMI_block0_cleanup, sequence_too_short)
-    INIT_NEW_SEQUENCE(1, LUMI_block0_cleanup, s, Char, ut_M_i);
-    LUMI_err = String_new(s, s_Max_length, s_Length, ut_M_ostr, *ut_M_ostr_Length);
+    uint32_t bf_Length = 0;
+    static Byte aux_Array_0[] = {'s','o','m','e',' ','s','t','r','i','n','g','\0',};
+    static Byte aux_Array_1[] = {0xfa,0xde,0x00,0xbe,0xaf,};
+    s = &s_Var;
+    LUMI_err = String_new(s, aux_Array_0, 0x0b);
     CHECK(1, LUMI_block0_cleanup)
-    CHECK_REF(2, LUMI_block0_cleanup, ut_M_buff)
-    if (ut_M_i <= 0) RAISE(2, LUMI_block0_cleanup, sequence_too_short)
-    INIT_NEW_SEQUENCE(2, LUMI_block0_cleanup, bf, Byte, ut_M_i);
-    LUMI_err = Buffer_new(bf, bf_Max_length, bf_Length, ut_M_buff, *ut_M_buff_Length);
-    CHECK(2, LUMI_block0_cleanup)
+    bf_Length = 0x05;
+    bf = aux_Array_1;
+/// @ test-initialize-8
+String* s = NULL;
+    Byte* bf = NULL;
+    uint32_t bf_Length = 0;
+    Byte* aux_Array_0 = NULL;
+    uint32_t aux_Array_0_Length = 0;
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
+    String_bytes(ut_M_ostr, &(aux_Array_0), &(aux_Array_0_Length));
+    INIT_NEW(1, LUMI_block0_cleanup, s, String, 1);
+    LUMI_err = String_new(s, aux_Array_0, aux_Array_0_Length);
+    CHECK(1, LUMI_block0_cleanup)
+    if (ut_M_i <= 0) RAISE(2, LUMI_block0_cleanup, array_too_short)
+    INIT_NEW_LEN_ARRAY(2, LUMI_block0_cleanup, bf, Byte, ut_M_i, 1);
 /// @ test-initialize-9
 ut_M_Test* tt = NULL;
     CHECK_REFMAN(1, LUMI_block0_cleanup, ut_M_tc_Refman)
@@ -7294,48 +6775,36 @@ ut_M_Ta* ota = NULL;
     ut_M_tb_Refman = NULL;
     ut_M_tb_Dynamic = NULL;
 /// @ test-initialize-15
-Char* sa = NULL;
+String* sa = NULL;
     uint32_t sa_Length = 0;
     uint32_t sa_Value_length = 0;
-    Seq_Length sa_Value_value_length = 0;
-    Seq_Length* sa_Seq_length = NULL;
     Byte* ba = NULL;
     uint32_t ba_Length = 0;
     uint32_t ba_Value_length = 0;
-    Seq_Length ba_Value_value_length = 0;
-    Seq_Length* ba_Seq_length = NULL;
-    Char* aux_Array_0 = NULL;
+    uint32_t ba_Value_value_length = 0;
+    String* aux_Array_0 = NULL;
     uint32_t aux_Array_0_Length = 0;
     uint32_t aux_Array_0_Value_length = 0;
-    Seq_Length aux_Array_0_Value_value_length = 0;
-    Seq_Length* aux_Array_0_Seq_length = NULL;
     Byte* aux_Array_1 = NULL;
     uint32_t aux_Array_1_Length = 0;
     uint32_t aux_Array_1_Value_length = 0;
-    Seq_Length aux_Array_1_Value_value_length = 0;
-    Seq_Length* aux_Array_1_Seq_length = NULL;
+    uint32_t aux_Array_1_Value_value_length = 0;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (ut_M_arr[0] <= 0) RAISE(1, LUMI_block0_cleanup, sequence_too_short)
+    if (ut_M_arr[0] <= 0) RAISE(1, LUMI_block0_cleanup, array_too_short)
     aux_Array_0_Value_length = ut_M_arr[0x01];
-    aux_Array_0_Value_value_length = ut_M_arr[0x02];
-    INIT_NEW_LEN_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, Char, ut_M_arr[0], aux_Array_0_Value_length * aux_Array_0_Value_value_length);
-    aux_Array_0_Seq_length = LUMI_alloc(sizeof(Seq_Length) * aux_Array_0_Length * aux_Array_0_Value_length);
+    INIT_NEW_LEN_ARRAY(1, LUMI_block0_cleanup, aux_Array_0, String, ut_M_arr[0], aux_Array_0_Value_length);
     sa_Length = aux_Array_0_Length;
     sa_Value_length = aux_Array_0_Value_length;
-    sa_Value_value_length = aux_Array_0_Value_value_length;
-    sa_Seq_length = aux_Array_0_Seq_length;
     sa = aux_Array_0;
     aux_Array_0 = NULL;
     CHECK_REF_REFMAN(2, LUMI_block0_cleanup, ut_M_arr, ut_M_arr_Refman)
-    if (ut_M_arr[0] <= 0) RAISE(2, LUMI_block0_cleanup, sequence_too_short)
+    if (ut_M_arr[0] <= 0) RAISE(2, LUMI_block0_cleanup, array_too_short)
     aux_Array_1_Value_length = ut_M_arr[0x01];
     aux_Array_1_Value_value_length = ut_M_arr[0x02];
     INIT_NEW_LEN_ARRAY(2, LUMI_block0_cleanup, aux_Array_1, Byte, ut_M_arr[0], aux_Array_1_Value_length * aux_Array_1_Value_value_length);
-    aux_Array_1_Seq_length = LUMI_alloc(sizeof(Seq_Length) * aux_Array_1_Length * aux_Array_1_Value_length);
     ba_Length = aux_Array_1_Length;
     ba_Value_length = aux_Array_1_Value_length;
     ba_Value_value_length = aux_Array_1_Value_value_length;
-    ba_Seq_length = aux_Array_1_Seq_length;
     ba = aux_Array_1;
     aux_Array_1 = NULL;
 /// @ test-initialize-16
@@ -7710,28 +7179,24 @@ if (ut_M_b && ut_M_b) {
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ test-if-else-5
 if (ut_M_b) {
-        Char sa[0x04] = {0};
-        Seq_Length sa_Length[1] = {0};
-        /* initializing sa */
+        Byte ba[0x04] = {0};
+        /* initializing ba */
         if (ut_M_b) {
-            Char sb[0x04] = {0};
-            Seq_Length sb_Length[1] = {0};
-            /* initializing sb */
+            Byte bb[0x04] = {0};
+            /* initializing bb */
         LUMI_block2_cleanup:
             (void)0;
         }
         else {
             if (ut_M_b) {
-                Char sc[0x04] = {0};
-                Seq_Length sc_Length[1] = {0};
-                /* initializing sc */
+                Byte bc[0x04] = {0};
+                /* initializing bc */
             LUMI_block5_cleanup:
                 (void)0;
             }
             else {
-                Char sd[0x04] = {0};
-                Seq_Length sd_Length[1] = {0};
-                /* initializing sd */
+                Byte bd[0x04] = {0};
+                /* initializing bd */
             LUMI_block7_cleanup:
                 (void)0;
             }
@@ -7745,16 +7210,14 @@ if (ut_M_b) {
     }
     else {
         if (ut_M_b) {
-            Char se[0x04] = {0};
-            Seq_Length se_Length[1] = {0};
-            /* initializing se */
+            Byte be[0x04] = {0};
+            /* initializing be */
         LUMI_block10_cleanup:
             (void)0;
         }
         else {
-            Char sf[0x04] = {0};
-            Seq_Length sf_Length[1] = {0};
-            /* initializing sf */
+            Byte bf[0x04] = {0};
+            /* initializing bf */
         LUMI_block12_cleanup:
             (void)0;
         }
@@ -7836,10 +7299,9 @@ do {
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ test-loop-5
 do {
-        Char sa[0x04] = {0};
-        Seq_Length sa_Length[1] = {0};
+        Byte ba[0x04] = {0};
         LUMI_loop_depth = 3;
-        /* initializing sa */
+        /* initializing ba */
         if (!(ut_M_b)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
         LUMI_loop_depth = 1; goto LUMI_block1_cleanup;
         LUMI_loop_depth = 2; goto LUMI_block1_cleanup;
@@ -7850,10 +7312,9 @@ do {
         }
         if (LUMI_loop_depth < 3) goto LUMI_block1_cleanup;
         do {
-            Char sb[0x04] = {0};
-            Seq_Length sb_Length[1] = {0};
+            Byte bb[0x04] = {0};
             LUMI_loop_depth = 5;
-            /* initializing sb */
+            /* initializing bb */
             if (!(ut_M_b)) { LUMI_loop_depth = 3; goto LUMI_block3_cleanup; }
             LUMI_loop_depth = 3; goto LUMI_block3_cleanup;
             LUMI_loop_depth = 4; goto LUMI_block3_cleanup;
@@ -7864,10 +7325,9 @@ do {
             }
             if (LUMI_loop_depth < 5) goto LUMI_block3_cleanup;
             do {
-                Char sc[0x04] = {0};
-                Seq_Length sc_Length[1] = {0};
+                Byte bc[0x04] = {0};
                 LUMI_loop_depth = 7;
-                /* initializing sc */
+                /* initializing bc */
                 if (!(ut_M_b)) { LUMI_loop_depth = 5; goto LUMI_block5_cleanup; }
                 LUMI_loop_depth = 5; goto LUMI_block5_cleanup;
                 LUMI_loop_depth = 6; goto LUMI_block5_cleanup;
@@ -7907,7 +7367,7 @@ uint16_t aux_Int_0 = 0;
         uint64_t aux_Int_2 = 0;
         ++LUMI_trace_ignore_count;
         CHECK_REF(2, LUMI_block1_cleanup, ut_M_ostr)
-        String_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(aux_Int_0));
+        String_length(ut_M_ostr, &(aux_Int_0));
         aux_Int_2 = (uint64_t)aux_Int_0 + 0x02;
         do {
             LUMI_loop_depth = 3;
@@ -8004,7 +7464,7 @@ uint32_t aux_Int_0 = 0;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     aux_Int_2 = ut_M_t->num;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    String_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(aux_Int_0));
+    String_length(ut_M_ostr, &(aux_Int_0));
     aux_Int_1 = (uint64_t)aux_Int_0 + 0x02;
     do {
         uint64_t n = 0;
@@ -8018,25 +7478,23 @@ uint32_t aux_Int_0 = 0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ test-for-loop-2
-Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
+Byte* aux_Array_0 = NULL;
+    uint32_t aux_Array_0_Length = 0;
+    Byte* aux_Array_1 = NULL;
+    uint32_t aux_Array_1_Length = 0;
     uint32_t aux_Int_0 = 0;
-    Byte* aux_Buffer_0 = NULL;
-    Seq_Length aux_Buffer_0_Max_length = 0;
-    Seq_Length* aux_Buffer_0_Length = &Lumi_empty_length;
-    uint32_t aux_Int_2 = 0;
+    Byte* aux_Array_2 = NULL;
+    uint32_t aux_Array_2_Length = 0;
+    uint32_t aux_Int_1 = 0;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    aux_String_0_Max_length = ut_M_ostr_Max_length;
-    aux_String_0_Length = ut_M_ostr_Length;
-    aux_String_0 = ut_M_ostr;
+    String_bytes(ut_M_ostr, &(aux_Array_0), &(aux_Array_0_Length));
+    aux_Array_1_Length = aux_Array_0_Length;
+    aux_Array_1 = aux_Array_0;
     do {
-        Char ch = 0;
-        uint32_t aux_Int_1 = 0;
+        Byte ch = 0;
         LUMI_loop_depth = 3;
-        String_length(aux_String_0, aux_String_0_Max_length, aux_String_0_Length, &(aux_Int_1));
-        if (!(aux_Int_0 < aux_Int_1)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
-        ch = aux_String_0[aux_Int_0];
+        if (!(aux_Int_0 < aux_Array_1_Length)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        ch = aux_Array_1[aux_Int_0];
         aux_Int_0 += 0x01;
         ut_M_c = ch;
     LUMI_block1_cleanup:
@@ -8044,17 +7502,14 @@ Char* aux_String_0 = NULL;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
     CHECK_REF(3, LUMI_block0_cleanup, ut_M_buff)
-    aux_Buffer_0_Max_length = ut_M_buff_Max_length;
-    aux_Buffer_0_Length = ut_M_buff_Length;
-    aux_Buffer_0 = ut_M_buff;
+    aux_Array_2_Length = ut_M_buff_Length;
+    aux_Array_2 = ut_M_buff;
     do {
         Byte y = 0;
-        uint32_t aux_Int_3 = 0;
         LUMI_loop_depth = 3;
-        Buffer_length(aux_Buffer_0, aux_Buffer_0_Max_length, aux_Buffer_0_Length, &(aux_Int_3));
-        if (!(aux_Int_2 < aux_Int_3)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
-        y = aux_Buffer_0[aux_Int_2];
-        aux_Int_2 += 0x01;
+        if (!(aux_Int_1 < aux_Array_2_Length)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
+        y = aux_Array_2[aux_Int_1];
+        aux_Int_1 += 0x01;
         ut_M_bt = y;
     LUMI_block2_cleanup:
         (void)0;
@@ -8079,38 +7534,23 @@ uint32_t* aux_Array_0 = NULL;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ test-for-loop-4
-Char* aux_Array_0 = NULL;
+String* aux_Array_0 = NULL;
     uint32_t aux_Array_0_Length = 0;
-    Seq_Length aux_Array_0_Value_length = 0;
-    Seq_Length* aux_Array_0_Seq_length = NULL;
     uint32_t aux_Int_0 = 0;
     Byte* aux_Array_1 = NULL;
     uint32_t aux_Array_1_Length = 0;
-    Seq_Length aux_Array_1_Value_length = 0;
-    Seq_Length* aux_Array_1_Seq_length = NULL;
+    uint32_t aux_Array_1_Value_length = 0;
     uint32_t aux_Int_1 = 0;
     CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_sarr, ut_M_sarr_Refman)
     aux_Array_0_Length = ut_M_sarr_Length;
-    aux_Array_0_Value_length = ut_M_sarr_Value_length;
-    aux_Array_0_Seq_length = ut_M_sarr_Seq_length;
     aux_Array_0 = ut_M_sarr;
     do {
-        Char* s = NULL;
-        Seq_Length s_Max_length = 0;
-        Seq_Length* s_Length = &Lumi_empty_length;
-        Char* aux_String_0 = NULL;
-        Seq_Length aux_String_0_Max_length = 0;
-        Seq_Length* aux_String_0_Length = &Lumi_empty_length;
+        String* s = NULL;
         LUMI_loop_depth = 3;
         if (!(aux_Int_0 < aux_Array_0_Length)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
-        aux_String_0 = aux_Array_0 + aux_Int_0 * aux_Array_0_Value_length;
-        aux_String_0_Max_length = aux_Array_0_Value_length;
-        aux_String_0_Length = aux_Array_0_Seq_length + aux_Int_0;
-        s_Max_length = aux_String_0_Max_length;
-        s_Length = aux_String_0_Length;
-        s = aux_String_0;
+        s = aux_Array_0 + aux_Int_0;
         aux_Int_0 += 0x01;
-        String_clear(s, s_Max_length, s_Length);
+        String_clear(s);
     LUMI_block1_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
@@ -8118,25 +7558,20 @@ Char* aux_Array_0 = NULL;
     CHECK_REF_REFMAN(3, LUMI_block0_cleanup, ut_M_barr, ut_M_barr_Refman)
     aux_Array_1_Length = ut_M_barr_Length;
     aux_Array_1_Value_length = ut_M_barr_Value_length;
-    aux_Array_1_Seq_length = ut_M_barr_Seq_length;
     aux_Array_1 = ut_M_barr;
     do {
         Byte* bf = NULL;
-        Seq_Length bf_Max_length = 0;
-        Seq_Length* bf_Length = &Lumi_empty_length;
-        Byte* aux_Buffer_0 = NULL;
-        Seq_Length aux_Buffer_0_Max_length = 0;
-        Seq_Length* aux_Buffer_0_Length = &Lumi_empty_length;
+        uint32_t bf_Length = 0;
+        Byte* aux_Array_2 = NULL;
+        uint32_t aux_Array_2_Length = 0;
         LUMI_loop_depth = 3;
         if (!(aux_Int_1 < aux_Array_1_Length)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
-        aux_Buffer_0 = aux_Array_1 + aux_Int_1 * aux_Array_1_Value_length;
-        aux_Buffer_0_Max_length = aux_Array_1_Value_length;
-        aux_Buffer_0_Length = aux_Array_1_Seq_length + aux_Int_1;
-        bf_Max_length = aux_Buffer_0_Max_length;
-        bf_Length = aux_Buffer_0_Length;
-        bf = aux_Buffer_0;
+        aux_Array_2 = aux_Array_1 + aux_Int_1 * aux_Array_1_Value_length;
+        aux_Array_2_Length = aux_Array_1_Value_length;
+        bf_Length = aux_Array_2_Length;
+        bf = aux_Array_2;
         aux_Int_1 += 0x01;
-        Buffer_clear(bf, bf_Max_length, bf_Length);
+        ut_M_i = bf_Length;
     LUMI_block2_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
@@ -8195,18 +7630,16 @@ uint8_t aux_Int_0 = 0;
 /// @ test-for-loop-8
 uint8_t aux_Int_0 = 0;
     do {
-        Char sa[0x04] = {0};
-        Seq_Length sa_Length[1] = {0};
+        Byte ba[0x04] = {0};
         uint8_t n = 0;
-        Char* aux_String_0 = NULL;
-        Seq_Length aux_String_0_Max_length = 0;
-        Seq_Length* aux_String_0_Length = &Lumi_empty_length;
+        Byte* aux_Array_0 = NULL;
+        uint32_t aux_Array_0_Length = 0;
         uint32_t aux_Int_1 = 0;
         LUMI_loop_depth = 3;
         if (!(aux_Int_0 < 0x06)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
         n = aux_Int_0;
         aux_Int_0 += 0x01;
-        /* initializing sa */
+        /* initializing ba */
         LUMI_loop_depth = 1; goto LUMI_block1_cleanup;
         LUMI_loop_depth = 2; goto LUMI_block1_cleanup;
         if (ut_M_b) {
@@ -8215,21 +7648,17 @@ uint8_t aux_Int_0 = 0;
             (void)0;
         }
         if (LUMI_loop_depth < 3) goto LUMI_block1_cleanup;
-        CHECK_REF(7, LUMI_block1_cleanup, ut_M_ostr)
-        aux_String_0_Max_length = ut_M_ostr_Max_length;
-        aux_String_0_Length = ut_M_ostr_Length;
-        aux_String_0 = ut_M_ostr;
+        CHECK_REF(7, LUMI_block1_cleanup, ut_M_buff)
+        aux_Array_0_Length = ut_M_buff_Length;
+        aux_Array_0 = ut_M_buff;
         do {
-            Char sb[0x04] = {0};
-            Seq_Length sb_Length[1] = {0};
-            Char ch = 0;
-            uint32_t aux_Int_2 = 0;
+            Byte bb[0x04] = {0};
+            Byte ch = 0;
             LUMI_loop_depth = 5;
-            String_length(aux_String_0, aux_String_0_Max_length, aux_String_0_Length, &(aux_Int_2));
-            if (!(aux_Int_1 < aux_Int_2)) { LUMI_loop_depth = 3; goto LUMI_block3_cleanup; }
-            ch = aux_String_0[aux_Int_1];
+            if (!(aux_Int_1 < aux_Array_0_Length)) { LUMI_loop_depth = 3; goto LUMI_block3_cleanup; }
+            ch = aux_Array_0[aux_Int_1];
             aux_Int_1 += 0x01;
-            /* initializing sb */
+            /* initializing bb */
             LUMI_loop_depth = 3; goto LUMI_block3_cleanup;
             LUMI_loop_depth = 4; goto LUMI_block3_cleanup;
             if (ut_M_b) {
@@ -8247,117 +7676,82 @@ uint8_t aux_Int_0 = 0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ test-for-loop-9
-Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+String* s = NULL;
     Byte* bf = NULL;
-    Seq_Length bf_Max_length = 0;
-    Seq_Length* bf_Length = &Lumi_empty_length;
-    static Char aux_String_0[] = {'t','e','x','t','\0',};
-    Seq_Length aux_String_0_Max_length = sizeof(aux_String_0);
-    Seq_Length aux_String_0_Length[1] = {sizeof(aux_String_0) - 1};
-    Char* aux_String_1 = NULL;
-    Seq_Length aux_String_1_Max_length = 0;
-    Seq_Length* aux_String_1_Length = &Lumi_empty_length;
+    uint32_t bf_Length = 0;
+    static Byte aux_Array_0[] = {'t','e','x','t','\0',};
+    Byte* aux_Array_1 = NULL;
+    uint32_t aux_Array_1_Length = 0;
+    Byte* aux_Array_2 = NULL;
+    uint32_t aux_Array_2_Length = 0;
     uint32_t aux_Int_0 = 0;
-    static Byte aux_Buffer_0[] = {0xbe,0xaf,};
-    Seq_Length aux_Buffer_0_Max_length = sizeof(aux_Buffer_0);
-    Seq_Length aux_Buffer_0_Length[1] = {sizeof(aux_Buffer_0)};
-    Byte* aux_Buffer_1 = NULL;
-    Seq_Length aux_Buffer_1_Max_length = 0;
-    Seq_Length* aux_Buffer_1_Length = &Lumi_empty_length;
-    uint32_t aux_Int_2 = 0;
-    s_Max_length = aux_String_0_Max_length;
-    s_Length = aux_String_0_Length;
-    s = aux_String_0;
-    aux_String_1_Max_length = s_Max_length;
-    aux_String_1_Length = s_Length;
-    aux_String_1 = s;
+    static Byte aux_Array_3[] = {0xbe,0xaf,};
+    Byte* aux_Array_4 = NULL;
+    uint32_t aux_Array_4_Length = 0;
+    uint32_t aux_Int_1 = 0;
+    INIT_NEW(1, LUMI_block0_cleanup, s, String, 1);
+    LUMI_err = String_new(s, aux_Array_0, 0x04);
+    CHECK(1, LUMI_block0_cleanup)
+    String_bytes(s, &(aux_Array_1), &(aux_Array_1_Length));
+    aux_Array_2_Length = aux_Array_1_Length;
+    aux_Array_2 = aux_Array_1;
     do {
-        Char ch = 0;
-        uint32_t aux_Int_1 = 0;
+        Byte ch = 0;
         LUMI_loop_depth = 3;
-        String_length(aux_String_1, aux_String_1_Max_length, aux_String_1_Length, &(aux_Int_1));
-        if (!(aux_Int_0 < aux_Int_1)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
-        ch = aux_String_1[aux_Int_0];
+        if (!(aux_Int_0 < aux_Array_2_Length)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        ch = aux_Array_2[aux_Int_0];
         aux_Int_0 += 0x01;
         ut_M_c = ch;
     LUMI_block1_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-    bf_Max_length = aux_Buffer_0_Max_length;
-    bf_Length = aux_Buffer_0_Length;
-    bf = aux_Buffer_0;
-    aux_Buffer_1_Max_length = bf_Max_length;
-    aux_Buffer_1_Length = bf_Length;
-    aux_Buffer_1 = bf;
+    bf_Length = 0x02;
+    bf = aux_Array_3;
+    aux_Array_4_Length = bf_Length;
+    aux_Array_4 = bf;
     do {
         Byte y = 0;
-        uint32_t aux_Int_3 = 0;
         LUMI_loop_depth = 3;
-        Buffer_length(aux_Buffer_1, aux_Buffer_1_Max_length, aux_Buffer_1_Length, &(aux_Int_3));
-        if (!(aux_Int_2 < aux_Int_3)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
-        y = aux_Buffer_1[aux_Int_2];
-        aux_Int_2 += 0x01;
+        if (!(aux_Int_1 < aux_Array_4_Length)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
+        y = aux_Array_4[aux_Int_1];
+        aux_Int_1 += 0x01;
         ut_M_bt = y;
     LUMI_block2_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ test-for-loop-10
-Char sa[0x03 * 0x04] = {0};
-    Seq_Length sa_Seq_length[0x03] = {0};
+String sa[0x03] = {0};
     Byte ba[0x03 * 0x04] = {0};
-    Seq_Length ba_Seq_length[0x03] = {0};
-    Char* aux_Array_0 = NULL;
-    Seq_Length* aux_Array_0_Seq_length = NULL;
+    String* aux_Array_0 = NULL;
     uint32_t aux_Int_0 = 0;
     Byte* aux_Array_1 = NULL;
-    Seq_Length* aux_Array_1_Seq_length = NULL;
     uint32_t aux_Int_1 = 0;
     /* initializing sa */
-    aux_Array_0_Seq_length = sa_Seq_length;
     aux_Array_0 = sa;
     do {
-        Char* s = NULL;
-        Seq_Length s_Max_length = 0;
-        Seq_Length* s_Length = &Lumi_empty_length;
-        Char* aux_String_0 = NULL;
-        Seq_Length aux_String_0_Max_length = 0;
-        Seq_Length* aux_String_0_Length = &Lumi_empty_length;
+        String* s = NULL;
         LUMI_loop_depth = 3;
         if (!(aux_Int_0 < 0x03)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
-        aux_String_0 = aux_Array_0 + aux_Int_0 * 0x04;
-        aux_String_0_Length = aux_Array_0_Seq_length + aux_Int_0;
-        s_Max_length = 0x04;
-        s_Length = aux_String_0_Length;
-        s = aux_String_0;
+        s = aux_Array_0 + aux_Int_0;
         aux_Int_0 += 0x01;
-        String_clear(s, 0x04, s_Length);
+        String_clear(s);
     LUMI_block1_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
     /* initializing ba */
-    aux_Array_1_Seq_length = ba_Seq_length;
     aux_Array_1 = ba;
     do {
         Byte* bf = NULL;
-        Seq_Length bf_Max_length = 0;
-        Seq_Length* bf_Length = &Lumi_empty_length;
-        Byte* aux_Buffer_0 = NULL;
-        Seq_Length aux_Buffer_0_Max_length = 0;
-        Seq_Length* aux_Buffer_0_Length = &Lumi_empty_length;
+        Byte* aux_Array_2 = NULL;
         LUMI_loop_depth = 3;
         if (!(aux_Int_1 < 0x03)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
-        aux_Buffer_0 = aux_Array_1 + aux_Int_1 * 0x04;
-        aux_Buffer_0_Length = aux_Array_1_Seq_length + aux_Int_1;
-        bf_Max_length = 0x04;
-        bf_Length = aux_Buffer_0_Length;
-        bf = aux_Buffer_0;
+        aux_Array_2 = aux_Array_1 + aux_Int_1 * 0x04;
+        bf = aux_Array_2;
         aux_Int_1 += 0x01;
-        Buffer_clear(bf, 0x04, bf_Length);
+        ut_M_i = 0x04;
     LUMI_block2_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
@@ -8375,23 +7769,21 @@ uint8_t aux_Int_0 = 0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ test-for-loop-12
-Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
+Byte* aux_Array_0 = NULL;
+    uint32_t aux_Array_0_Length = 0;
+    Byte* aux_Array_1 = NULL;
+    uint32_t aux_Array_1_Length = 0;
     uint32_t aux_Int_0 = 0;
-    Byte* aux_Buffer_0 = NULL;
-    Seq_Length aux_Buffer_0_Max_length = 0;
-    Seq_Length* aux_Buffer_0_Length = &Lumi_empty_length;
-    uint32_t aux_Int_2 = 0;
+    Byte* aux_Array_2 = NULL;
+    uint32_t aux_Array_2_Length = 0;
+    uint32_t aux_Int_1 = 0;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    aux_String_0_Max_length = ut_M_ostr_Max_length;
-    aux_String_0_Length = ut_M_ostr_Length;
-    aux_String_0 = ut_M_ostr;
+    String_bytes(ut_M_ostr, &(aux_Array_0), &(aux_Array_0_Length));
+    aux_Array_1_Length = aux_Array_0_Length;
+    aux_Array_1 = aux_Array_0;
     do {
-        uint32_t aux_Int_1 = 0;
         LUMI_loop_depth = 3;
-        String_length(aux_String_0, aux_String_0_Max_length, aux_String_0_Length, &(aux_Int_1));
-        if (!(aux_Int_0 < aux_Int_1)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        if (!(aux_Int_0 < aux_Array_1_Length)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
         aux_Int_0 += 0x01;
         ut_M_i = 0x01;
     LUMI_block1_cleanup:
@@ -8399,15 +7791,12 @@ Char* aux_String_0 = NULL;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
     CHECK_REF(3, LUMI_block0_cleanup, ut_M_buff)
-    aux_Buffer_0_Max_length = ut_M_buff_Max_length;
-    aux_Buffer_0_Length = ut_M_buff_Length;
-    aux_Buffer_0 = ut_M_buff;
+    aux_Array_2_Length = ut_M_buff_Length;
+    aux_Array_2 = ut_M_buff;
     do {
-        uint32_t aux_Int_3 = 0;
         LUMI_loop_depth = 3;
-        Buffer_length(aux_Buffer_0, aux_Buffer_0_Max_length, aux_Buffer_0_Length, &(aux_Int_3));
-        if (!(aux_Int_2 < aux_Int_3)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
-        aux_Int_2 += 0x01;
+        if (!(aux_Int_1 < aux_Array_2_Length)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
+        aux_Int_1 += 0x01;
         ut_M_i = 0x01;
     LUMI_block2_cleanup:
         (void)0;
@@ -8417,7 +7806,7 @@ Char* aux_String_0 = NULL;
 uint32_t aux_Int_0 = 0;
     uint32_t aux_Int_1 = 0;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    String_length(ut_M_ostr, ut_M_ostr_Max_length, ut_M_ostr_Length, &(aux_Int_0));
+    String_length(ut_M_ostr, &(aux_Int_0));
     aux_Int_1 = aux_Int_0;
     do {
         LUMI_loop_depth = 3;
@@ -8483,11 +7872,11 @@ CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     LUMI_err = OK;
     LUMI_loop_depth = 1;
 /// @ test-testing-a3
-{Char* LUMI_expected_error_prev;
+{Byte* LUMI_expected_error_prev;
     size_t LUMI_expected_error_trace_ignore_count_prev;
     LUMI_expected_error_prev = LUMI_expected_error;
     LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
-    LUMI_expected_error = (Char*)"expected error";
+    LUMI_expected_error = (Byte*)"expected error";
     LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
     ++LUMI_trace_ignore_count;
     CHECK_REF_REFMAN(1, LUMI_block1_cleanup, ut_M_t, ut_M_t_Refman)
@@ -8507,11 +7896,11 @@ CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     LUMI_err = OK;
     LUMI_loop_depth = 1;
 /// @ test-testing-a4
-{Char* LUMI_expected_error_prev;
+{Byte* LUMI_expected_error_prev;
     size_t LUMI_expected_error_trace_ignore_count_prev;
     LUMI_expected_error_prev = LUMI_expected_error;
     LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
-    LUMI_expected_error = (Char*)"expected error in the function";
+    LUMI_expected_error = (Byte*)"expected error in the function";
     LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
     ++LUMI_trace_ignore_count;
     LUMI_err = ut_M_fune();
@@ -8532,11 +7921,11 @@ CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     LUMI_err = OK;
     LUMI_loop_depth = 1;
 /// @ test-testing-a5
-{Char* LUMI_expected_error_prev;
+{Byte* LUMI_expected_error_prev;
     size_t LUMI_expected_error_trace_ignore_count_prev;
     LUMI_expected_error_prev = LUMI_expected_error;
     LUMI_expected_error_trace_ignore_count_prev = LUMI_expected_error_trace_ignore_count;
-    LUMI_expected_error = (Char*)"expected error in new line";
+    LUMI_expected_error = (Byte*)"expected error in new line";
     LUMI_expected_error_trace_ignore_count = LUMI_trace_ignore_count + 1;
     ++LUMI_trace_ignore_count;
     CHECK_REF_REFMAN(1, LUMI_block1_cleanup, ut_M_t, ut_M_t_Refman)
@@ -8557,15 +7946,14 @@ CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
     LUMI_loop_depth = 1;
 /// @ test-testing-a6
 if (ut_M_b) {
-        Char s[0x04] = {0};
-        Seq_Length s_Length[1] = {0};
-        Char* aux_Array_0 = NULL;
+        Byte bf[0x04] = {0};
+        Byte* aux_Array_0 = NULL;
         uint8_t aux_Int_0 = 0;
-        /* initializing s */
+        /* initializing bf */
         TEST_ASSERT(3, LUMI_block1_cleanup, ut_M_b)
         ++LUMI_trace_ignore_count;
-        if (SAFE_SUM_LARGER(ut_M_i, 0x02, *(s_Length))) RAISE(4, LUMI_block2_cleanup, slice_index)
-        aux_Array_0 = s + ut_M_i;
+        if (SAFE_SUM_LARGER(ut_M_i, 0x02, 0x04)) RAISE(4, LUMI_block2_cleanup, slice_index)
+        aux_Array_0 = bf + ut_M_i;
         --LUMI_trace_ignore_count;
         TEST_FAIL(4, LUMI_block1_cleanup, 16, "error not raised")
         LUMI_block2_cleanup:
@@ -8574,13 +7962,13 @@ if (ut_M_b) {
         LUMI_err = OK;
         LUMI_loop_depth = 1;
         do {
-            Char* aux_Array_1 = NULL;
+            Byte* aux_Array_1 = NULL;
             LUMI_loop_depth = 3;
             if (!(aux_Int_0 < 0x03)) { LUMI_loop_depth = 1; goto LUMI_block3_cleanup; }
             aux_Int_0 += 0x01;
             ++LUMI_trace_ignore_count;
-            if (SAFE_SUM_LARGER(ut_M_i, 0x02, *(s_Length))) RAISE(6, LUMI_block4_cleanup, slice_index)
-            aux_Array_1 = s + ut_M_i;
+            if (SAFE_SUM_LARGER(ut_M_i, 0x02, 0x04)) RAISE(6, LUMI_block4_cleanup, slice_index)
+            aux_Array_1 = bf + ut_M_i;
             --LUMI_trace_ignore_count;
             TEST_FAIL(6, LUMI_block3_cleanup, 16, "error not raised")
             LUMI_block4_cleanup:
@@ -8792,20 +8180,16 @@ LUMI_block0_cleanup:
 }
 /// @ test-testing-m7
 Return_Code ut_M_fun(void);
-Return_Code sys_M_print_Mock(Char* text, uint32_t text_Length);
+Return_Code sys_M_print_Mock(Byte* text, uint32_t text_Length);
 Bool sys_M_print_Mock_active = true;
 Return_Code ut_M_fun(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    static Char aux_String_0[] = {'m','o','c','k',' ','p','r','i','n','t','\0',};
-    Seq_Length aux_String_0_Max_length = sizeof(aux_String_0);
-    Seq_Length aux_String_0_Length[1] = {sizeof(aux_String_0) - 1};
-    static Char aux_String_1[] = {'r','e','a','l','l','y',' ','p','r','i','n','t','\0',};
-    Seq_Length aux_String_1_Max_length = sizeof(aux_String_1);
-    Seq_Length aux_String_1_Length[1] = {sizeof(aux_String_1) - 1};
-    LUMI_err = sys_M_print_Mock(aux_String_0, *aux_String_0_Length);
+    static Byte aux_Array_0[] = {'m','o','c','k',' ','p','r','i','n','t','\0',};
+    static Byte aux_Array_1[] = {'r','e','a','l','l','y',' ','p','r','i','n','t','\0',};
+    LUMI_err = sys_M_print_Mock(aux_Array_0, 0x0a);
     CHECK(2, LUMI_block0_cleanup)
-    LUMI_err = sys_M_print(aux_String_1, *aux_String_1_Length);
+    LUMI_err = sys_M_print(aux_Array_1, 0x0c);
     CHECK(3, LUMI_block0_cleanup)
     sys_M_print_Mock_active = false;
     sys_M_print_Mock_active = true;
@@ -8813,7 +8197,7 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-Return_Code sys_M_print_Mock(Char* text, uint32_t text_Length) {
+Return_Code sys_M_print_Mock(Byte* text, uint32_t text_Length) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     if (!sys_M_print_Mock_active) { return sys_M_print(text, text_Length); }
@@ -8919,14 +8303,12 @@ void ut_M_fun0(void) {
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
     ++LUMI_file_coverage[0].line_count[12];
     {
-        static Char aux_String_0[] = {'t','e','x','t','\0',};
-        Seq_Length aux_String_0_Max_length = sizeof(aux_String_0);
-        Seq_Length aux_String_0_Length[1] = {sizeof(aux_String_0) - 1};
+        static Byte aux_Array_0[] = {'t','e','x','t','\0',};
         ++LUMI_trace_ignore_count;
         ++LUMI_file_coverage[0].line_count[13];
         x = 0;
         ++LUMI_file_coverage[0].line_count[14];
-        LUMI_err = sys_M_print(aux_String_0, *aux_String_0_Length);
+        LUMI_err = sys_M_print(aux_Array_0, 0x04);
         CHECK(14, LUMI_block7_cleanup)
         ++LUMI_file_coverage[0].line_count[15];
         y = 0;
@@ -9071,9 +8453,7 @@ TEST_MAIN_FUNC
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
-    Char* s;
-    Seq_Length s_Max_length;
-    Seq_Length* s_Length;
+    String* s;
     Ref_Manager* s_Refman;
 };
 struct ut_M_Test_Dynamic {
@@ -9282,16 +8662,14 @@ void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
 void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
     uint32_t i = 0;
-    Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+    String* s = NULL;
     uint32_t* a = NULL;
     uint32_t a_Length = 0;
     ut_M_Test* t = NULL;
     ut_M_Test_Dynamic* t_Dynamic = NULL;
-    i = external(0x05, s, a, (void*)t);
-    i = ((uint64_t)0x02 * external(0x05, s, a, (void*)t)) + 0x03;
-    external(0x05, s, a, (void*)t);
+    i = external(0x05, (void*)s, a, (void*)t);
+    i = ((uint64_t)0x02 * external(0x05, (void*)s, a, (void*)t)) + 0x03;
+    external(0x05, (void*)s, a, (void*)t);
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -11358,14 +10736,14 @@ if (ut_M_b) {
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ test-error-handling-5
-void ut_M_fun(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, Ref_Manager* s_Refman, Bool* fail);
-void ut_M_fun(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, Ref_Manager* s_Refman, Bool* fail) {
+void ut_M_fun(String* s, Ref_Manager* s_Refman, Bool* fail);
+void ut_M_fun(String* s, Ref_Manager* s_Refman, Bool* fail) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     LUMI_inc_ref(s_Refman);
     ++LUMI_trace_ignore_count;
     CHECK_REFMAN(2, LUMI_block2_cleanup, s_Refman)
-    String_clear(s, s_Max_length, s_Length);
+    String_clear(s);
 LUMI_block2_cleanup:
     --LUMI_trace_ignore_count;
     if (LUMI_err != OK) {
@@ -11484,13 +10862,11 @@ using "!" where error is not propagated
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ test-try-catch-3
 {
-        Char sa[0x04] = {0};
-        Seq_Length sa_Length[1] = {0};
+        Byte sa[0x04] = {0};
         ++LUMI_trace_ignore_count;
         /* initializing sa */
         {
-            Char sb[0x04] = {0};
-            Seq_Length sb_Length[1] = {0};
+            Byte sb[0x04] = {0};
             Ref_Manager* sb_Refman = NULL;
             ++LUMI_trace_ignore_count;
             INIT_VAR_REFMAN(4, LUMI_block2_cleanup, sb)
@@ -11500,8 +10876,7 @@ using "!" where error is not propagated
         }
         --LUMI_trace_ignore_count;
         if (LUMI_err != OK) {
-            Char sc[0x04] = {0};
-            Seq_Length sc_Length[1] = {0};
+            Byte sc[0x04] = {0};
             Ref_Manager* sc_Refman = NULL;
             LUMI_err = OK;
             LUMI_loop_depth = 1;
@@ -11516,14 +10891,12 @@ using "!" where error is not propagated
     }
     --LUMI_trace_ignore_count;
     if (LUMI_err != OK) {
-        Char sd[0x04] = {0};
-        Seq_Length sd_Length[1] = {0};
+        Byte sd[0x04] = {0};
         LUMI_err = OK;
         LUMI_loop_depth = 1;
         /* initializing sd */
         {
-            Char se[0x04] = {0};
-            Seq_Length se_Length[1] = {0};
+            Byte se[0x04] = {0};
             Ref_Manager* se_Refman = NULL;
             ++LUMI_trace_ignore_count;
             INIT_VAR_REFMAN(10, LUMI_block5_cleanup, se)
@@ -11533,8 +10906,7 @@ using "!" where error is not propagated
         }
         --LUMI_trace_ignore_count;
         if (LUMI_err != OK) {
-            Char sf[0x04] = {0};
-            Seq_Length sf_Length[1] = {0};
+            Byte sf[0x04] = {0};
             LUMI_err = OK;
             LUMI_loop_depth = 1;
             /* initializing sf */
@@ -11547,19 +10919,19 @@ using "!" where error is not propagated
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ test-try-catch-4
-void ut_M_fun(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, Ref_Manager* s_Refman);
-void ut_M_fun(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, Ref_Manager* s_Refman) {
+void ut_M_fun(String* s, Ref_Manager* s_Refman);
+void ut_M_fun(String* s, Ref_Manager* s_Refman) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     LUMI_inc_ref(s_Refman);
     {
         ++LUMI_trace_ignore_count;
         CHECK_REFMAN(3, LUMI_block1_cleanup, s_Refman)
-        String_clear(s, s_Max_length, s_Length);
+        String_clear(s);
         TEST_ASSERT(4, LUMI_block1_cleanup, true)
         ++LUMI_trace_ignore_count;
         CHECK_REFMAN(5, LUMI_block2_cleanup, s_Refman)
-        String_clear(s, s_Max_length, s_Length);
+        String_clear(s);
         --LUMI_trace_ignore_count;
         TEST_FAIL(5, LUMI_block1_cleanup, 16, "error not raised")
         LUMI_block2_cleanup:
@@ -11640,8 +11012,7 @@ Return_Code ut_M_fun(uint32_t* i) {
     ut_M_TestIterator_new(aux_TestIterator_0, 0x06);
     aux_TestIterator_1 = aux_TestIterator_0;
     do {
-        Char s[0x04] = {0};
-        Seq_Length s_Length[1] = {0};
+        Byte s[0x04] = {0};
         uint32_t n = 0;
         Bool aux_Bool_0 = 0;
         LUMI_loop_depth = 3;
@@ -11663,23 +11034,19 @@ LUMI_block0_cleanup:
 typedef struct ut_M_TestIterator ut_M_TestIterator;
 typedef struct ut_M_TestIterator_Dynamic ut_M_TestIterator_Dynamic;
 struct ut_M_TestIterator {
-    Char* value;
-    Seq_Length value_Max_length;
-    Seq_Length* value_Length;
+    String* value;
 };
 struct ut_M_TestIterator_Dynamic {
     Dynamic_Del _del;
 };
-void ut_M_TestIterator_step(ut_M_TestIterator* self, Char** text, Seq_Length* text_Max_length, Seq_Length** text_Length, Bool* has_data);
+void ut_M_TestIterator_step(ut_M_TestIterator* self, String** text, Bool* has_data);
 void ut_M_TestIterator_Del(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic);
 void ut_M_fun(ut_M_TestIterator* iter);
 ut_M_TestIterator_Dynamic ut_M_TestIterator_dynamic = {
     (Dynamic_Del)ut_M_TestIterator_Del
 };
-void ut_M_TestIterator_step(ut_M_TestIterator* self, Char** text, Seq_Length* text_Max_length, Seq_Length** text_Length, Bool* has_data) {
+void ut_M_TestIterator_step(ut_M_TestIterator* self, String** text, Bool* has_data) {
     unsigned LUMI_loop_depth = 1;
-    *text_Max_length = self->value_Max_length;
-    *text_Length = self->value_Length;
     *text = self->value;
 LUMI_block0_cleanup:
     (void)0;
@@ -11691,21 +11058,15 @@ void ut_M_TestIterator_Del(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* s
 }
 void ut_M_fun(ut_M_TestIterator* iter) {
     unsigned LUMI_loop_depth = 1;
-    Char* t = NULL;
-    Seq_Length t_Max_length = 0;
-    Seq_Length* t_Length = &Lumi_empty_length;
-    Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+    String* t = NULL;
+    String* s = NULL;
     ut_M_TestIterator* aux_TestIterator_0 = NULL;
     aux_TestIterator_0 = iter;
     do {
         Bool aux_Bool_0 = 0;
         LUMI_loop_depth = 3;
-        ut_M_TestIterator_step(aux_TestIterator_0, &(t), &(t_Max_length), &(t_Length), &(aux_Bool_0));
+        ut_M_TestIterator_step(aux_TestIterator_0, &(t), &(aux_Bool_0));
         if (!(aux_Bool_0)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
-        s_Max_length = t_Max_length;
-        s_Length = t_Length;
         s = t;
     LUMI_block1_cleanup:
         (void)0;
@@ -11899,37 +11260,33 @@ LUMI_block0_cleanup:
 typedef struct ut_M_TestIterator ut_M_TestIterator;
 typedef struct ut_M_TestIterator_Dynamic ut_M_TestIterator_Dynamic;
 struct ut_M_TestIterator {
-    Char* value;
-    Seq_Length value_Max_length;
-    Seq_Length* value_Length;
+    String* value;
 };
 struct ut_M_TestIterator_Dynamic {
     Dynamic_Del _del;
 };
-void ut_M_TestIterator_step(ut_M_TestIterator* self, Char** text, Seq_Length* text_Max_length, Seq_Length** text_Length, Ref_Manager** text_Refman, Bool* has_data);
+void ut_M_TestIterator_step(ut_M_TestIterator* self, String** text, Ref_Manager** text_Refman, Bool* has_data);
 void ut_M_TestIterator_Del(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic);
 void ut_M_fun(ut_M_TestIterator* iter);
 ut_M_TestIterator_Dynamic ut_M_TestIterator_dynamic = {
     (Dynamic_Del)ut_M_TestIterator_Del
 };
-void ut_M_TestIterator_step(ut_M_TestIterator* self, Char** text, Seq_Length* text_Max_length, Seq_Length** text_Length, Ref_Manager** text_Refman, Bool* has_data) {
+void ut_M_TestIterator_step(ut_M_TestIterator* self, String** text, Ref_Manager** text_Refman, Bool* has_data) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
+    String* aux_String_0 = NULL;
+    Byte* aux_Array_0 = NULL;
+    uint32_t aux_Array_0_Length = 0;
     ++LUMI_trace_ignore_count;
     CHECK_REF(4, LUMI_block2_cleanup, self->value)
-    INIT_NEW_SEQUENCE(4, LUMI_block2_cleanup, aux_String_0, Char, 0x0c);
-    LUMI_err = String_new(aux_String_0, 0x0c, aux_String_0_Length, self->value, *self->value_Length);
+    String_bytes(self->value, &(aux_Array_0), &(aux_Array_0_Length));
+    INIT_NEW(4, LUMI_block2_cleanup, aux_String_0, String, 1);
+    LUMI_err = String_new(aux_String_0, aux_Array_0, aux_Array_0_Length);
     CHECK(4, LUMI_block2_cleanup)
     String_Del(*text, NULL);
     LUMI_owner_dec_ref(*text_Refman);
-    *text_Max_length = 0x0c;
-    *text_Length = aux_String_0_Length;
     *text = aux_String_0;
     aux_String_0 = NULL;
-    aux_String_0_Length = &Lumi_empty_length;
     INIT_NEW_REFMAN(4, LUMI_block2_cleanup, *text)
 LUMI_block2_cleanup:
     --LUMI_trace_ignore_count;
@@ -11939,8 +11296,6 @@ LUMI_block2_cleanup:
         String_Del(*text, NULL);
         LUMI_owner_dec_ref(*text_Refman);
         *text_Refman = NULL;
-        *text_Max_length = 0;
-        *text_Length = &Lumi_empty_length;
         *text = NULL;
     LUMI_block1_cleanup:
         (void)0;
@@ -11958,29 +11313,22 @@ void ut_M_TestIterator_Del(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* s
 }
 void ut_M_fun(ut_M_TestIterator* iter) {
     unsigned LUMI_loop_depth = 1;
-    Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+    String* s = NULL;
     ut_M_TestIterator* aux_TestIterator_0 = NULL;
     aux_TestIterator_0 = iter;
     do {
-        Char* t = NULL;
-        Seq_Length t_Max_length = 0;
-        Seq_Length* t_Length = &Lumi_empty_length;
+        String* t = NULL;
         Ref_Manager* t_Refman = NULL;
         Bool aux_Bool_0 = 0;
         LUMI_loop_depth = 3;
-        ut_M_TestIterator_step(aux_TestIterator_0, &(t), &(t_Max_length), &(t_Length), &(t_Refman), &(aux_Bool_0));
+        ut_M_TestIterator_step(aux_TestIterator_0, &(t), &(t_Refman), &(aux_Bool_0));
         if (!(aux_Bool_0)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
         String_Del(s, NULL);
         free(s);
         LUMI_var_dec_ref(t_Refman);
-        s_Max_length = t_Max_length;
-        s_Length = t_Length;
         s = t;
         t = NULL;
         t_Refman = NULL;
-        t_Length = &Lumi_empty_length;
     LUMI_block1_cleanup:
         (void)0;
         String_Del(t, NULL);
@@ -11996,23 +11344,19 @@ LUMI_block0_cleanup:
 typedef struct ut_M_TestIterator ut_M_TestIterator;
 typedef struct ut_M_TestIterator_Dynamic ut_M_TestIterator_Dynamic;
 struct ut_M_TestIterator {
-    Char* value;
-    Seq_Length value_Max_length;
-    Seq_Length* value_Length;
+    String* value;
 };
 struct ut_M_TestIterator_Dynamic {
     Dynamic_Del _del;
 };
-void ut_M_TestIterator_step(ut_M_TestIterator* self, Char** text, Seq_Length* text_Max_length, Seq_Length** text_Length, Bool* has_data);
+void ut_M_TestIterator_step(ut_M_TestIterator* self, String** text, Bool* has_data);
 void ut_M_TestIterator_Del(ut_M_TestIterator* self, ut_M_TestIterator_Dynamic* self_Dynamic);
 void ut_M_fun(ut_M_TestIterator* iter);
 ut_M_TestIterator_Dynamic ut_M_TestIterator_dynamic = {
     (Dynamic_Del)ut_M_TestIterator_Del
 };
-void ut_M_TestIterator_step(ut_M_TestIterator* self, Char** text, Seq_Length* text_Max_length, Seq_Length** text_Length, Bool* has_data) {
+void ut_M_TestIterator_step(ut_M_TestIterator* self, String** text, Bool* has_data) {
     unsigned LUMI_loop_depth = 1;
-    *text_Max_length = self->value_Max_length;
-    *text_Length = self->value_Length;
     *text = self->value;
 LUMI_block0_cleanup:
     (void)0;
@@ -12028,12 +11372,10 @@ void ut_M_fun(ut_M_TestIterator* iter) {
     ut_M_TestIterator* aux_TestIterator_0 = NULL;
     aux_TestIterator_0 = iter;
     do {
-        Char* aux_String_0 = NULL;
-        Seq_Length aux_String_0_Max_length = 0;
-        Seq_Length* aux_String_0_Length = &Lumi_empty_length;
+        String* aux_String_0 = NULL;
         Bool aux_Bool_0 = 0;
         LUMI_loop_depth = 3;
-        ut_M_TestIterator_step(aux_TestIterator_0, &(aux_String_0), &(aux_String_0_Max_length), &(aux_String_0_Length), &(aux_Bool_0));
+        ut_M_TestIterator_step(aux_TestIterator_0, &(aux_String_0), &(aux_Bool_0));
         if (!(aux_Bool_0)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
         x = 0x01;
     LUMI_block1_cleanup:
@@ -12206,22 +11548,19 @@ struct ut_M_Base_Dynamic {
     Dynamic_Del _del;
 };
 struct ut_M_Test {
-    Char s[0x0a];
-    Seq_Length s_Length[1];
+    Byte s[0x0a];
     uint32_t ai[0x0b];
     ut_M_Base ab[0x0c];
-    Char as[0x07 * 0x08];
-    Seq_Length as_Seq_length[0x07];
+    Byte as[0x07 * 0x08];
     uint32_t aai[0x04 * 0x05 * 0x06];
     ut_M_Base aab[0x04 * 0x05 * 0x06];
-    Char aas[0x04 * 0x05 * 0x06];
-    Seq_Length aas_Seq_length[0x04 * 0x05];
+    Byte aas[0x04 * 0x05 * 0x06];
 };
 struct ut_M_Test_Dynamic {
     Dynamic_Del _del;
 };
 void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic);
-Return_Code ut_M_Test_test(ut_M_Test* self, Char* c, uint32_t* i, ut_M_Base** b);
+Return_Code ut_M_Test_test(ut_M_Test* self, Byte* c, uint32_t* i, ut_M_Base** b);
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 ut_M_Base_Dynamic ut_M_Base_dynamic = {
     (Dynamic_Del)ut_M_Base_Del
@@ -12232,41 +11571,30 @@ ut_M_Test_Dynamic ut_M_Test_dynamic = {
 void ut_M_Base_Del(ut_M_Base* self, ut_M_Base_Dynamic* self_Dynamic) {
     if (self == NULL) return;
 }
-Return_Code ut_M_Test_test(ut_M_Test* self, Char* c, uint32_t* i, ut_M_Base** b) {
+Return_Code ut_M_Test_test(ut_M_Test* self, Byte* c, uint32_t* i, ut_M_Base** b) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    uint32_t* aux_Array_0 = NULL;
+    Byte* aux_Array_0 = NULL;
     uint32_t* aux_Array_1 = NULL;
-    ut_M_Base* aux_Array_2 = NULL;
+    uint32_t* aux_Array_2 = NULL;
     ut_M_Base* aux_Array_3 = NULL;
-    Char* aux_Array_4 = NULL;
-    Seq_Length* aux_Array_4_Seq_length = NULL;
-    Char* aux_String_1 = NULL;
-    Seq_Length aux_String_1_Max_length = 0;
-    Seq_Length* aux_String_1_Length = &Lumi_empty_length;
-    if (0x03 >= *(self->s_Length)) RAISE(12, LUMI_block0_cleanup, slice_index)
+    ut_M_Base* aux_Array_4 = NULL;
+    Byte* aux_Array_5 = NULL;
+    Byte* aux_Array_6 = NULL;
     *c = self->s[0x03];
     *i = self->ai[0x04];
     *b = self->ab + 0x05;
-    aux_String_0 = self->as + 0x04 * 0x08;
-    aux_String_0_Length = self->as_Seq_length + 0x04;
-    if (0x05 >= *(aux_String_0_Length)) RAISE(15, LUMI_block0_cleanup, slice_index)
-    *c = (aux_String_0)[0x05];
-    aux_Array_0 = self->aai + 0x01 * 0x05 * 0x06;
-    aux_Array_1 = (aux_Array_0) + 0x02 * 0x06;
-    *i = (aux_Array_1)[0x03];
-    aux_Array_2 = self->aab + 0x01 * 0x05 * 0x06;
-    aux_Array_3 = (aux_Array_2) + 0x02 * 0x06;
-    *b = (aux_Array_3) + 0x03;
-    aux_Array_4 = self->aas + 0x01 * 0x05 * 0x06;
-    aux_Array_4_Seq_length = self->aas_Seq_length + 0x01 * 0x05;
-    aux_String_1 = (aux_Array_4) + 0x02 * 0x06;
-    aux_String_1_Length = aux_Array_4_Seq_length + 0x02;
-    if (0x03 >= *(aux_String_1_Length)) RAISE(18, LUMI_block0_cleanup, slice_index)
-    *c = (aux_String_1)[0x03];
+    aux_Array_0 = self->as + 0x04 * 0x08;
+    *c = (aux_Array_0)[0x05];
+    aux_Array_1 = self->aai + 0x01 * 0x05 * 0x06;
+    aux_Array_2 = (aux_Array_1) + 0x02 * 0x06;
+    *i = (aux_Array_2)[0x03];
+    aux_Array_3 = self->aab + 0x01 * 0x05 * 0x06;
+    aux_Array_4 = (aux_Array_3) + 0x02 * 0x06;
+    *b = (aux_Array_4) + 0x03;
+    aux_Array_5 = self->aas + 0x01 * 0x05 * 0x06;
+    aux_Array_6 = (aux_Array_5) + 0x02 * 0x06;
+    *c = (aux_Array_6)[0x03];
 LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
@@ -12684,40 +12012,31 @@ unknown Enum "Error" in module "ut"
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
-    Char* s;
-    Seq_Length s_Max_length;
-    Seq_Length* s_Length;
-    Char* str;
-    Seq_Length str_Max_length;
-    Seq_Length* str_Length;
+    String* s;
+    String* str;
 };
 struct ut_M_Test_Dynamic {
     Dynamic_Del _del;
 };
 Return_Code ut_M_Test_new(ut_M_Test* self);
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
-void ut_M_use(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length);
-void ut_M_take(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length);
-void ut_M_give(Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length);
-Return_Code ut_M_fun(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, ut_M_Test* tu, ut_M_Test* to);
+void ut_M_use(String* s);
+void ut_M_take(String* s);
+void ut_M_give(String** s);
+Return_Code ut_M_fun(String* s, ut_M_Test* tu, ut_M_Test* to);
 ut_M_Test_Dynamic ut_M_Test_dynamic = {
     (Dynamic_Del)ut_M_Test_Del
 };
 Return_Code ut_M_Test_new(ut_M_Test* self) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    INIT_NEW_SEQUENCE(5, LUMI_block0_cleanup, aux_String_0, Char, 0x0c);
+    String* aux_String_0 = NULL;
+    INIT_NEW(5, LUMI_block0_cleanup, aux_String_0, String, 1);
     String_Del(self->str, NULL);
     free(self->str);
-    self->str_Max_length = 0x0c;
-    self->str_Length = aux_String_0_Length;
     self->str = aux_String_0;
     aux_String_0 = NULL;
-    aux_String_0_Length = &Lumi_empty_length;
-    String_clear(self->str, self->str_Max_length, self->str_Length);
+    String_clear(self->str);
 LUMI_block0_cleanup:
     (void)0;
     String_Del(aux_String_0, NULL);
@@ -12731,71 +12050,54 @@ void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     String_Del(self->s, NULL);
     free(self->s);
 }
-void ut_M_use(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length) {
+void ut_M_use(String* s) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_take(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length) {
+void ut_M_take(String* s) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
     String_Del(s, NULL);
     free(s);
 }
-void ut_M_give(Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length) {
+void ut_M_give(String** s) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-Return_Code ut_M_fun(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, ut_M_Test* tu, ut_M_Test* to) {
+Return_Code ut_M_fun(String* s, ut_M_Test* tu, ut_M_Test* to) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Char* su = NULL;
-    Seq_Length su_Max_length = 0;
-    Seq_Length* su_Length = &Lumi_empty_length;
+    String* su = NULL;
     uint32_t arr[0x0c] = {0};
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    Char* aux_String_1 = NULL;
-    Seq_Length aux_String_1_Max_length = 0;
-    Seq_Length* aux_String_1_Length = &Lumi_empty_length;
+    String* aux_String_0 = NULL;
+    String* aux_String_1 = NULL;
     String_Del(s, NULL);
     free(s);
-    s_Max_length = 0;
-    s_Length = &Lumi_empty_length;
     s = NULL;
-    INIT_NEW_SEQUENCE(12, LUMI_block0_cleanup, aux_String_0, Char, 0x0c);
+    INIT_NEW(12, LUMI_block0_cleanup, aux_String_0, String, 1);
     String_Del(s, NULL);
     free(s);
-    s_Max_length = 0x0c;
-    s_Length = aux_String_0_Length;
     s = aux_String_0;
     aux_String_0 = NULL;
-    aux_String_0_Length = &Lumi_empty_length;
     CHECK_REF(13, LUMI_block0_cleanup, s)
-    String_clear(s, s_Max_length, s_Length);
-    INIT_NEW_SEQUENCE(14, LUMI_block0_cleanup, aux_String_1, Char, 0x0c);
+    String_clear(s);
+    INIT_NEW(14, LUMI_block0_cleanup, aux_String_1, String, 1);
     String_Del(to->s, NULL);
     free(to->s);
-    to->s_Max_length = 0x0c;
-    to->s_Length = aux_String_1_Length;
     to->s = aux_String_1;
     aux_String_1 = NULL;
-    aux_String_1_Length = &Lumi_empty_length;
-    su_Max_length = tu->s_Max_length;
-    su_Length = tu->s_Length;
     su = tu->s;
-    ut_M_use(tu->s, tu->s_Max_length, tu->s_Length);
-    ut_M_take(to->s, to->s_Max_length, to->s_Length);
+    ut_M_use(tu->s);
+    ut_M_take(to->s);
     to->s = NULL;
-    to->s_Length = &Lumi_empty_length;
     /* initializing arr */
     arr[0x04] = arr[0x08];
     do {
         LUMI_loop_depth = 3;
-        ut_M_give(&(s), &(s_Max_length), &(s_Length));
+        ut_M_give(&(s));
         if (!(s != NULL)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
     LUMI_block1_cleanup:
         (void)0;
@@ -13020,35 +12322,31 @@ using invalid reference "s"
 cannot modify owner field "s" in non-owner reference "{anonymous}.s"
 /// @@ test-memory-user
 /// @ test-memory-user-0
-void ut_M_deleting(Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length);
-void ut_M_fun(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, Char** so, Seq_Length* so_Max_length, Seq_Length** so_Length);
-void ut_M_deleting(Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length) {
+void ut_M_deleting(String** s);
+void ut_M_fun(String* s, String** so);
+void ut_M_deleting(String** s) {
     unsigned LUMI_loop_depth = 1;
     String_Del(*s, NULL);
     free(*s);
-    *s_Max_length = 0;
-    *s_Length = &Lumi_empty_length;
     *s = NULL;
 LUMI_block0_cleanup:
     (void)0;
 }
-void ut_M_fun(Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, Char** so, Seq_Length* so_Max_length, Seq_Length** so_Length) {
+void ut_M_fun(String* s, String** so) {
     unsigned LUMI_loop_depth = 1;
-    String_clear(s, s_Max_length, s_Length);
-    ut_M_deleting(&(*so), &(*so_Max_length), &(*so_Length));
+    String_clear(s);
+    ut_M_deleting(&(*so));
 LUMI_block0_cleanup:
     (void)0;
 }
 /// @ test-memory-user-1
-void ut_M_deleting(Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length, Ref_Manager** s_Refman);
+void ut_M_deleting(String** s, Ref_Manager** s_Refman);
 Return_Code ut_M_fun(void);
-void ut_M_deleting(Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length, Ref_Manager** s_Refman) {
+void ut_M_deleting(String** s, Ref_Manager** s_Refman) {
     unsigned LUMI_loop_depth = 1;
     String_Del(*s, NULL);
     LUMI_owner_dec_ref(*s_Refman);
     *s_Refman = NULL;
-    *s_Max_length = 0;
-    *s_Length = &Lumi_empty_length;
     *s = NULL;
 LUMI_block0_cleanup:
     (void)0;
@@ -13056,29 +12354,18 @@ LUMI_block0_cleanup:
 Return_Code ut_M_fun(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Char* so = NULL;
-    Seq_Length so_Max_length = 0;
-    Seq_Length* so_Length = &Lumi_empty_length;
+    String* so = NULL;
     Ref_Manager* so_Refman = NULL;
-    Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    INIT_NEW_SEQUENCE(4, LUMI_block0_cleanup, aux_String_0, Char, 0x0c);
-    so_Max_length = 0x0c;
-    so_Length = aux_String_0_Length;
+    String* s = NULL;
+    String* aux_String_0 = NULL;
+    INIT_NEW(4, LUMI_block0_cleanup, aux_String_0, String, 1);
     so = aux_String_0;
     aux_String_0 = NULL;
-    aux_String_0_Length = &Lumi_empty_length;
     INIT_NEW_REFMAN(4, LUMI_block0_cleanup, so)
-    s_Max_length = so_Max_length;
-    s_Length = so_Length;
     s = so;
     CHECK_REF(6, LUMI_block0_cleanup, s)
-    String_clear(s, s_Max_length, s_Length);
-    ut_M_deleting(&(so), &(so_Max_length), &(so_Length), &(so_Refman));
+    String_clear(s);
+    ut_M_deleting(&(so), &(so_Refman));
 LUMI_block0_cleanup:
     (void)0;
     String_Del(aux_String_0, NULL);
@@ -13088,15 +12375,13 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 /// @ test-memory-user-2
-void ut_M_deleting(Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length, Ref_Manager** s_Refman);
+void ut_M_deleting(String** s, Ref_Manager** s_Refman);
 Return_Code ut_M_fun(void);
-void ut_M_deleting(Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length, Ref_Manager** s_Refman) {
+void ut_M_deleting(String** s, Ref_Manager** s_Refman) {
     unsigned LUMI_loop_depth = 1;
     String_Del(*s, NULL);
     LUMI_owner_dec_ref(*s_Refman);
     *s_Refman = NULL;
-    *s_Max_length = 0;
-    *s_Length = &Lumi_empty_length;
     *s = NULL;
 LUMI_block0_cleanup:
     (void)0;
@@ -13104,33 +12389,22 @@ LUMI_block0_cleanup:
 Return_Code ut_M_fun(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Char* so = NULL;
-    Seq_Length so_Max_length = 0;
-    Seq_Length* so_Length = &Lumi_empty_length;
+    String* so = NULL;
     Ref_Manager* so_Refman = NULL;
-    Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+    String* s = NULL;
     Ref_Manager* s_Refman = NULL;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    INIT_NEW_SEQUENCE(4, LUMI_block0_cleanup, aux_String_0, Char, 0x0c);
-    so_Max_length = 0x0c;
-    so_Length = aux_String_0_Length;
+    String* aux_String_0 = NULL;
+    INIT_NEW(4, LUMI_block0_cleanup, aux_String_0, String, 1);
     so = aux_String_0;
     aux_String_0 = NULL;
-    aux_String_0_Length = &Lumi_empty_length;
     INIT_NEW_REFMAN(4, LUMI_block0_cleanup, so)
     LUMI_inc_ref(so_Refman);
     LUMI_dec_ref(s_Refman);
     s_Refman = so_Refman;
-    s_Max_length = so_Max_length;
-    s_Length = so_Length;
     s = so;
-    ut_M_deleting(&(so), &(so_Max_length), &(so_Length), &(so_Refman));
+    ut_M_deleting(&(so), &(so_Refman));
     CHECK_REF_REFMAN(7, LUMI_block0_cleanup, s, s_Refman)
-    String_clear(s, s_Max_length, s_Length);
+    String_clear(s);
 LUMI_block0_cleanup:
     (void)0;
     String_Del(aux_String_0, NULL);
@@ -13141,33 +12415,25 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 /// @ test-memory-user-3
-Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
+String* s = NULL;
     String_Del(*so, NULL);
     LUMI_owner_dec_ref(*so_Refman);
     *so_Refman = NULL;
-    *so_Max_length = 0;
-    *so_Length = &Lumi_empty_length;
     *so = NULL;
-    s_Max_length = *so_Max_length;
-    s_Length = *so_Length;
     s = *so;
     CHECK_REF(4, LUMI_block0_cleanup, s)
-    String_clear(s, s_Max_length, s_Length);
+    String_clear(s);
 /// @ test-memory-user-4
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
-    Char* s;
-    Seq_Length s_Max_length;
-    Seq_Length* s_Length;
+    String* s;
     Ref_Manager* s_Refman;
 };
 struct ut_M_Test_Dynamic {
     Dynamic_Del _del;
 };
-Return_Code ut_M_Test_get(ut_M_Test* self, Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length);
+Return_Code ut_M_Test_get(ut_M_Test* self, String** s);
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
 Return_Code ut_M_fun(ut_M_Test* t);
 ut_M_Test_Dynamic ut_M_Test_dynamic = {
@@ -13177,12 +12443,10 @@ void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
     LUMI_dec_ref(self->s_Refman);
 }
-Return_Code ut_M_Test_get(ut_M_Test* self, Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length) {
+Return_Code ut_M_Test_get(ut_M_Test* self, String** s) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     CHECK_REFMAN(5, LUMI_block0_cleanup, self->s_Refman)
-    *s_Max_length = self->s_Max_length;
-    *s_Length = self->s_Length;
     *s = self->s;
 LUMI_block0_cleanup:
     (void)0;
@@ -13191,29 +12455,19 @@ LUMI_block0_cleanup:
 Return_Code ut_M_fun(ut_M_Test* t) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
-    Char* sowner = NULL;
-    Seq_Length sowner_Max_length = 0;
-    Seq_Length* sowner_Length = &Lumi_empty_length;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    sowner_Max_length = 0;
-    sowner_Length = &Lumi_empty_length;
+    String* s = NULL;
+    String* sowner = NULL;
+    String* aux_String_0 = NULL;
     sowner = NULL;
-    LUMI_err = ut_M_Test_get(t, &(s), &(s_Max_length), &(s_Length));
+    LUMI_err = ut_M_Test_get(t, &(s));
     CHECK(9, LUMI_block0_cleanup)
     CHECK_REF(10, LUMI_block0_cleanup, s)
-    String_clear(s, s_Max_length, s_Length);
-    LUMI_err = ut_M_Test_get(t, &(aux_String_0), &(aux_String_0_Max_length), &(aux_String_0_Length));
+    String_clear(s);
+    LUMI_err = ut_M_Test_get(t, &(aux_String_0));
     CHECK(11, LUMI_block0_cleanup)
-    s_Max_length = aux_String_0_Max_length;
-    s_Length = aux_String_0_Length;
     s = aux_String_0;
     CHECK_REF(12, LUMI_block0_cleanup, s)
-    String_clear(s, s_Max_length, s_Length);
+    String_clear(s);
 LUMI_block0_cleanup:
     (void)0;
     String_Del(sowner, NULL);
@@ -13221,53 +12475,33 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 /// @ test-memory-user-5
-Char* s = NULL;
-    Seq_Length s_Max_length = 0;
-    Seq_Length* s_Length = &Lumi_empty_length;
-    Char* aux_Array_0 = NULL;
+String* s = NULL;
+    String* aux_Array_0 = NULL;
     uint32_t aux_Array_0_Length = 0;
-    Seq_Length aux_Array_0_Value_length = 0;
-    Seq_Length* aux_Array_0_Seq_length = NULL;
     uint32_t aux_Int_0 = 0;
-    s_Max_length = ut_M_ostr_Max_length;
-    s_Length = ut_M_ostr_Length;
     s = ut_M_ostr;
     String_Del(ut_M_ostr, NULL);
     free(ut_M_ostr);
-    ut_M_ostr_Max_length = 0;
-    ut_M_ostr_Length = &Lumi_empty_length;
     ut_M_ostr = NULL;
     CHECK_REF_REFMAN(3, LUMI_block0_cleanup, ut_M_sarr, ut_M_sarr_Refman)
     aux_Array_0_Length = ut_M_sarr_Length;
-    aux_Array_0_Value_length = ut_M_sarr_Value_length;
-    aux_Array_0_Seq_length = ut_M_sarr_Seq_length;
     aux_Array_0 = ut_M_sarr;
     do {
-        Char* aux_String_0 = NULL;
-        Seq_Length aux_String_0_Max_length = 0;
-        Seq_Length* aux_String_0_Length = &Lumi_empty_length;
         LUMI_loop_depth = 3;
         if (!(aux_Int_0 < aux_Array_0_Length)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
-        aux_String_0 = aux_Array_0 + aux_Int_0 * aux_Array_0_Value_length;
-        aux_String_0_Max_length = aux_Array_0_Value_length;
-        aux_String_0_Length = aux_Array_0_Seq_length + aux_Int_0;
-        s_Max_length = aux_String_0_Max_length;
-        s_Length = aux_String_0_Length;
-        s = aux_String_0;
+        s = aux_Array_0 + aux_Int_0;
         aux_Int_0 += 0x01;
         CHECK_REF(4, LUMI_block1_cleanup, s)
-        String_clear(s, s_Max_length, s_Length);
+        String_clear(s);
     LUMI_block1_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ test-memory-user-6
-void ut_M_get(Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length);
+void ut_M_get(String** s);
 Return_Code ut_M_fun(void);
-void ut_M_get(Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length) {
+void ut_M_get(String** s) {
     unsigned LUMI_loop_depth = 1;
-    *s_Max_length = 0;
-    *s_Length = &Lumi_empty_length;
     *s = NULL;
 LUMI_block0_cleanup:
     (void)0;
@@ -13276,14 +12510,12 @@ Return_Code ut_M_fun(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     do {
-        Char* s = NULL;
-        Seq_Length s_Max_length = 0;
-        Seq_Length* s_Length = &Lumi_empty_length;
+        String* s = NULL;
         LUMI_loop_depth = 3;
-        ut_M_get(&(s), &(s_Max_length), &(s_Length));
+        ut_M_get(&(s));
         if (!(s != NULL)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
         CHECK_REF(7, LUMI_block1_cleanup, s)
-        String_clear(s, s_Max_length, s_Length);
+        String_clear(s);
     LUMI_block1_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
@@ -13383,9 +12615,7 @@ using potentially illegal user reference "{anonymous}"
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
-    Char* s;
-    Seq_Length s_Max_length;
-    Seq_Length* s_Length;
+    String* s;
 };
 struct ut_M_Test_Dynamic {
     Dynamic_Del _del;
@@ -13405,8 +12635,6 @@ void ut_M_fun(ut_M_Test* t) {
     unsigned LUMI_loop_depth = 1;
     String_Del(t->s, NULL);
     free(t->s);
-    t->s_Max_length = 0;
-    t->s_Length = &Lumi_empty_length;
     t->s = NULL;
 LUMI_block0_cleanup:
     (void)0;
@@ -13430,9 +12658,7 @@ LUMI_block0_cleanup:
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
-    Char* s;
-    Seq_Length s_Max_length;
-    Seq_Length* s_Length;
+    String* s;
 };
 struct ut_M_Test_Dynamic {
     Dynamic_Del _del;
@@ -13453,8 +12679,6 @@ void ut_M_fun(ut_M_Test* to) {
     t = to;
     String_Del(t->s, NULL);
     free(t->s);
-    t->s_Max_length = 0;
-    t->s_Length = &Lumi_empty_length;
     t->s = NULL;
 LUMI_block0_cleanup:
     (void)0;
@@ -13465,15 +12689,13 @@ LUMI_block0_cleanup:
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
-    Char* s;
-    Seq_Length s_Max_length;
-    Seq_Length* s_Length;
+    String* s;
 };
 struct ut_M_Test_Dynamic {
     Dynamic_Del _del;
 };
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
-void ut_M_fun(ut_M_Test* to, Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, Char* s2, Seq_Length s2_Max_length, Seq_Length* s2_Length);
+void ut_M_fun(ut_M_Test* to, String* s, String* s2);
 ut_M_Test_Dynamic ut_M_Test_dynamic = {
     (Dynamic_Del)ut_M_Test_Del
 };
@@ -13482,88 +12704,56 @@ void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     String_Del(self->s, NULL);
     free(self->s);
 }
-void ut_M_fun(ut_M_Test* to, Char* s, Seq_Length s_Max_length, Seq_Length* s_Length, Char* s2, Seq_Length s2_Max_length, Seq_Length* s2_Length) {
+void ut_M_fun(ut_M_Test* to, String* s, String* s2) {
     unsigned LUMI_loop_depth = 1;
-    Char* so = NULL;
-    Seq_Length so_Max_length = 0;
-    Seq_Length* so_Length = &Lumi_empty_length;
-    Char* so2 = NULL;
-    Seq_Length so2_Max_length = 0;
-    Seq_Length* so2_Length = &Lumi_empty_length;
+    String* so = NULL;
+    String* so2 = NULL;
     ut_M_Test* t3 = NULL;
-    so_Max_length = s_Max_length;
-    so_Length = s_Length;
     so = s;
-    so2_Max_length = s2_Max_length;
-    so2_Length = s2_Length;
     so2 = s2;
     if (to->s != NULL) {
         ut_M_Test* t1 = NULL;
-        Char* si = NULL;
-        Seq_Length si_Max_length = 0;
-        Seq_Length* si_Length = &Lumi_empty_length;
+        String* si = NULL;
         String_Del(to->s, NULL);
         free(to->s);
-        to->s_Max_length = 0;
-        to->s_Length = &Lumi_empty_length;
         to->s = NULL;
         t1 = to;
         String_Del(t1->s, NULL);
         free(t1->s);
-        t1->s_Max_length = 0;
-        t1->s_Length = &Lumi_empty_length;
         t1->s = NULL;
-        String_clear(so, so_Max_length, so_Length);
-        so2_Max_length = so_Max_length;
-        so2_Length = so_Length;
+        String_clear(so);
         so2 = so;
-        String_clear(so2, so2_Max_length, so2_Length);
-        si_Max_length = so2_Max_length;
-        si_Length = so2_Length;
+        String_clear(so2);
         si = so2;
     LUMI_block1_cleanup:
         (void)0;
     }
     else {
         ut_M_Test* t2 = NULL;
-        Char* si = NULL;
-        Seq_Length si_Max_length = 0;
-        Seq_Length* si_Length = &Lumi_empty_length;
+        String* si = NULL;
         String_Del(to->s, NULL);
         free(to->s);
-        to->s_Max_length = 0;
-        to->s_Length = &Lumi_empty_length;
         to->s = NULL;
         t2 = to;
         String_Del(t2->s, NULL);
         free(t2->s);
-        t2->s_Max_length = 0;
-        t2->s_Length = &Lumi_empty_length;
         t2->s = NULL;
-        String_clear(so, so_Max_length, so_Length);
-        si_Max_length = so_Max_length;
-        si_Length = so_Length;
+        String_clear(so);
         si = so;
-        so2_Max_length = si_Max_length;
-        so2_Length = si_Length;
         so2 = si;
-        String_clear(so2, so2_Max_length, so2_Length);
+        String_clear(so2);
     LUMI_block3_cleanup:
         (void)0;
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
     String_Del(to->s, NULL);
     free(to->s);
-    to->s_Max_length = 0;
-    to->s_Length = &Lumi_empty_length;
     to->s = NULL;
     t3 = to;
     String_Del(t3->s, NULL);
     free(t3->s);
-    t3->s_Max_length = 0;
-    t3->s_Length = &Lumi_empty_length;
     t3->s = NULL;
-    String_clear(so, so_Max_length, so_Length);
+    String_clear(so);
 LUMI_block0_cleanup:
     (void)0;
     String_Del(s2, NULL);
@@ -13646,22 +12836,17 @@ cannot take temporary owner from global "ostr"
 cannot take temporary owner from global "t"
 /// @@ test-memory-output
 /// @ test-memory-output-0
-Return_Code ut_M_fun(Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length);
-Return_Code ut_M_fun(Char** s, Seq_Length* s_Max_length, Seq_Length** s_Length) {
+Return_Code ut_M_fun(String** s);
+Return_Code ut_M_fun(String** s) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    INIT_NEW_SEQUENCE(2, LUMI_block0_cleanup, aux_String_0, Char, 0x0c);
+    String* aux_String_0 = NULL;
+    INIT_NEW(2, LUMI_block0_cleanup, aux_String_0, String, 1);
     String_Del(*s, NULL);
     free(*s);
-    *s_Max_length = 0x0c;
-    *s_Length = aux_String_0_Length;
     *s = aux_String_0;
     aux_String_0 = NULL;
-    aux_String_0_Length = &Lumi_empty_length;
-    String_clear(*s, *s_Max_length, *s_Length);
+    String_clear(*s);
 LUMI_block0_cleanup:
     (void)0;
     String_Del(aux_String_0, NULL);
@@ -13697,16 +12882,13 @@ typedef struct ut_M_HasConstructor_Dynamic ut_M_HasConstructor_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_NoConstructor {
-    Char s[0x0c];
-    Seq_Length s_Length[1];
+    String s;
 };
 struct ut_M_NoConstructor_Dynamic {
     Dynamic_Del _del;
 };
 struct ut_M_HasConstructor {
-    Char* s;
-    Seq_Length s_Max_length;
-    Seq_Length* s_Length;
+    String* s;
 };
 struct ut_M_HasConstructor_Dynamic {
     Dynamic_Del _del;
@@ -13738,21 +12920,17 @@ ut_M_Test_Dynamic ut_M_Test_dynamic = {
 };
 void ut_M_NoConstructor_Del(ut_M_NoConstructor* self, ut_M_NoConstructor_Dynamic* self_Dynamic) {
     if (self == NULL) return;
+    String_Del(&(self->s), NULL);
 }
 Return_Code ut_M_HasConstructor_new(ut_M_HasConstructor* self) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    INIT_NEW_SEQUENCE(6, LUMI_block0_cleanup, aux_String_0, Char, 0x0c);
+    String* aux_String_0 = NULL;
+    INIT_NEW(6, LUMI_block0_cleanup, aux_String_0, String, 1);
     String_Del(self->s, NULL);
     free(self->s);
-    self->s_Max_length = 0x0c;
-    self->s_Length = aux_String_0_Length;
     self->s = aux_String_0;
     aux_String_0 = NULL;
-    aux_String_0_Length = &Lumi_empty_length;
 LUMI_block0_cleanup:
     (void)0;
     String_Del(aux_String_0, NULL);
@@ -13767,14 +12945,14 @@ void ut_M_HasConstructor_Del(ut_M_HasConstructor* self, ut_M_HasConstructor_Dyna
 Return_Code ut_M_Test_new(ut_M_Test* self) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    String_clear(self->vnc.s, 0x0c, self->vnc.s_Length);
-    String_clear(self->svnc.s, 0x0c, self->svnc.s_Length);
+    String_clear(&(self->vnc.s));
+    String_clear(&(self->svnc.s));
     LUMI_err = ut_M_HasConstructor_new(&(self->vhc));
     CHECK(15, LUMI_block0_cleanup)
-    String_clear(self->vhc.s, self->vhc.s_Max_length, self->vhc.s_Length);
+    String_clear(self->vhc.s);
     LUMI_err = ut_M_HasConstructor_new(&(self->svhc));
     CHECK(17, LUMI_block0_cleanup)
-    String_clear(self->svhc.s, self->svhc.s_Max_length, self->svhc.s_Length);
+    String_clear(self->svhc.s);
 LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
@@ -13796,9 +12974,7 @@ typedef struct ut_M_Mid_Dynamic ut_M_Mid_Dynamic;
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Base {
-    Char* s;
-    Seq_Length s_Max_length;
-    Seq_Length* s_Length;
+    String* s;
 };
 struct ut_M_Base_Dynamic {
     Dynamic_Del _del;
@@ -13842,17 +13018,12 @@ ut_M_Test_Dynamic ut_M_Test_dynamic = {
 Return_Code ut_M_Base_new(ut_M_Base* self) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    Char* aux_String_0 = NULL;
-    Seq_Length aux_String_0_Max_length = 0;
-    Seq_Length* aux_String_0_Length = &Lumi_empty_length;
-    INIT_NEW_SEQUENCE(6, LUMI_block0_cleanup, aux_String_0, Char, 0x0c);
+    String* aux_String_0 = NULL;
+    INIT_NEW(6, LUMI_block0_cleanup, aux_String_0, String, 1);
     String_Del(self->s, NULL);
     free(self->s);
-    self->s_Max_length = 0x0c;
-    self->s_Length = aux_String_0_Length;
     self->s = aux_String_0;
     aux_String_0 = NULL;
-    aux_String_0_Length = &Lumi_empty_length;
 LUMI_block0_cleanup:
     (void)0;
     String_Del(aux_String_0, NULL);
@@ -14062,26 +13233,24 @@ cdef_M_Int cint = 0;
     u_test = ((ut_M_Test*)cdef_M_Pointer_get_ref_at(p_test, 0x05));
 /// @ test-c-objects-3
 void ut_M_proxy(cdef_M_Char* p_char, cdef_M_Uchar* p_uchar);
-Return_Code ut_M_fun(Char* str, Seq_Length str_Max_length, Seq_Length* str_Length, Byte* buff, Seq_Length buff_Max_length, Seq_Length* buff_Length);
+Return_Code ut_M_fun(String* str, Byte* buff, uint32_t buff_Length);
 void ut_M_proxy(cdef_M_Char* p_char, cdef_M_Uchar* p_uchar) {
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
     (void)0;
 }
-Return_Code ut_M_fun(Char* str, Seq_Length str_Max_length, Seq_Length* str_Length, Byte* buff, Seq_Length buff_Max_length, Seq_Length* buff_Length) {
+Return_Code ut_M_fun(String* str, Byte* buff, uint32_t buff_Length) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     cdef_M_Char* p_char = NULL;
     cdef_M_Uchar* p_uchar = NULL;
     p_char = (void*)str;
-    p_uchar = (void*)buff;
-    ext((void*)str, (void*)buff);
-    ut_M_proxy((void*)str, (void*)buff);
+    p_uchar = buff;
+    ext((void*)str, buff);
+    ut_M_proxy((void*)str, buff);
     CHECK_REF(10, LUMI_block0_cleanup, str)
-    LUMI_err = cdef_M_copy_to_string(p_char, str, str_Max_length, str_Length);
+    LUMI_err = cdef_M_copy_to_string(p_char, str);
     CHECK(10, LUMI_block0_cleanup)
-    CHECK_REF(11, LUMI_block0_cleanup, str)
-    cdef_M_set_null_term_length(str, str_Max_length, str_Length);
 LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
@@ -14089,8 +13258,7 @@ LUMI_block0_cleanup:
 /// @ test-c-objects-4
 cdef_M_Uchar* p_uchar = NULL;
     CHECK_REF(2, LUMI_block0_cleanup, ut_M_buff)
-    LUMI_err = cdef_M_copy_to_buffer(p_uchar, 0x04, ut_M_buff, ut_M_buff_Max_length, ut_M_buff_Length);
-    CHECK(2, LUMI_block0_cleanup)
+    cdef_M_copy_to_buffer(p_uchar, ut_M_buff, ut_M_buff_Length);
 /// @ test-c-objects-e0
 dynamic pointed type "Ta"
 /// @ test-c-objects-e1
@@ -14104,9 +13272,7 @@ cannot use "?" on primitive type "Pointer"
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
-    Char* s;
-    Seq_Length s_Max_length;
-    Seq_Length* s_Length;
+    String* s;
 };
 struct ut_M_Test_Dynamic {
     Dynamic_Del _del;
@@ -14122,7 +13288,7 @@ void ut_M_Test_cleanup(ut_M_Test* self) {
     {
         ++LUMI_trace_ignore_count;
         CHECK_REF(5, LUMI_block1_cleanup, self->s)
-        String_clear(self->s, self->s_Max_length, self->s_Length);
+        String_clear(self->s);
     LUMI_block1_cleanup:
         (void)0;
     }

@@ -304,62 +304,85 @@ class StringExpression(BufferExpression)
     func dynamic check-and-modify-text()->(var Int length)
         self.check-string(user self.text)
         var Int index-write(copy 0)
+        var Bool escape
+        length := 0
         for index-read in 1:self.text.length - 1
             if self.text[index-read] = '\n'
                 var Bool skip-new-line
                 if index-read > 0
                     skip-new-line := self.text[index-read - 1] = '\\'
                 self.check-indentation()->(var index-read)
-                if skip-new-line
-                    index-write -= 1
-                else
+                if not skip-new-line
                     self.text[index-write] := '\\'
                     index-write += 1
                     self.text[index-write] := 'n'
                     index-write += 1
+                    length += 1
             else
-                self.check-character(copy index-read)
-                self.text[index-write] := self.text[index-read]
-                index-write += 1
+                self.check-character()->(
+                        var index-read, var index-write, var length)
         self.text[index-write] := '\\'
         index-write += 1
         self.text[index-write] := '0'
         index-write += 1
         self.text.length := index-write
-        length := self.text.length
     
-    func inst check-character(copy Int n)
-        if self.text[n] != '\\' or self.text[n - 1] = '\\' or
-                self.text[n + 1] = '\n'
+    func inst check-character()->(
+            var Int index-read, var Int index-write, var Int length)
+        if self.text[index-read] != '\\'
+            self.text[index-write] := self.text[index-read]
+            index-write += 1
+            length += 1
             return
+        
+        if self.text[index-read + 1] = '\n'
+            return
+            
+        index-read += 1
+        length += 1
         owner Long long-value
         var Int value
-        if self.text[n + 1] >= '0' and self.text[n + 1] <= '7'
-            if n > self.text.length - 5
+        
+        if self.text[index-read] >= '0' and self.text[index-read] <= '7'
+            if index-read > self.text.length - 4
                 self.syntax-error(
                         user "unfinished escape in string literal",
                         user self.text[1:self.text.length - 2])
-            if not get-number-value(user self.text[n + 1:3], copy 8)->(
+            if not get-number-value(user self.text[index-read:3], copy 8)->(
                     owner long-value)
                 self.syntax-error(
-                        user "illegal character constant", user self.text[n:4])
-        else-if self.text[n + 1] = 'x'
-            if n > self.text.length - 5
+                        user "illegal character constant",
+                        user self.text[index-read - 1:4])
+            index-read += 2
+        else-if self.text[index-read] = 'x'
+            if index-read > self.text.length - 4
                 self.syntax-error(
                         user "unfinished escape in string literal",
                         user self.text[1:self.text.length - 2])
-            if not get-number-value(user self.text[n + 2:2], copy 16)->(
+            index-read += 1
+            if not get-number-value(user self.text[index-read:2], copy 16)->(
                     owner long-value)
                 self.syntax-error(
-                        user "illegal character constant", user self.text[n:4])
-        else-if not self.value-from-escape(copy self.text[n + 1])->(var value)
+                        user "illegal character constant",
+                        user self.text[index-read - 2:4])
+            index-read += 1
+        else-if self.value-from-escape(copy self.text[index-read])->(var value)
+            self.text[index-write] := '\\'
+            index-write += 1
+            self.text[index-write] := self.text[index-read]
+            index-write += 1
+            return
+        else
             self.syntax-error(
-                    user "illegal character constant", user self.text[n:2])
-        if long-value?
-            long-value.int()->(var value)
-            if value < 1 or value > 255
-                self.syntax-error(
-                        user "illegal character constant", user self.text[n:4])
+                    user "illegal character constant",
+                    user self.text[index-read - 1:2])
+        long-value.int()->(var value)
+        if value < 1 or value > 255
+            self.syntax-error(
+                    user "illegal character constant",
+                    user self.text[index-read - 3:4])
+        self.text[index-write] := value
+        index-write += 1
 
     func dynamic analyze()
         self.add-aux-variable(owner ConstantStringVariable(

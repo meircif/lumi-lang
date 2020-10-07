@@ -13,7 +13,7 @@ test test-ctime()
     var time.Timer timer
     time-value := 1234
     timer.time()
-    var String{256} result
+    var String result
     timer.ctime(user result)!
     assert! result.equal(user "good")
 
@@ -44,7 +44,7 @@ func set-time(user time.Time tm)
 test test-asctime()
     var time.Time tm
     set-time(user tm)
-    var String{256} result
+    var String result
     tm.asctime(user result)!
     assert! result.equal(user "good")
 
@@ -52,11 +52,12 @@ test test-asctime()
 test test-strftime()
     var time.Time tm
     set-time(user tm)
-    var String{256} result
+    var Buffer{256} result
     var Uint32 length
-    tm.strftime(user result, user "AB")->(var length)
-    assert! result.equal(user "OK")
-    assert! length = result.length()
+    tm.strftime(user result, user String(user "AB")!)->(var length)
+    assert! length = 2
+    assert! result[0] = 'O'
+    assert! result[1] = 'K'
 
 
 test test-mktime()
@@ -65,7 +66,7 @@ test test-mktime()
     var time.Timer timer
     time-value := 2233
     timer.mktime(user tm)
-    var String{256} result
+    var String result
     timer.ctime(user result)!
     assert! result.equal(user "good")
 

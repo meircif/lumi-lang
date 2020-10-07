@@ -134,7 +134,7 @@ native type NativeRef
 native var Native external-nvar
 native func external0() "MY_Some_external"
 native func NativeRef external-get-ref(
-        copy cdef.Int i, copy cdef.CharP s, user Array{cdef.Int} a)
+        copy cdef.Int i, copy cdef.Pointer{cdef.Uchar} s, user Array{cdef.Int} a)
 native func cdef.Int external-set-ref(copy NativeRef n)
 native func Native external-get-var()
 native func cdef.Int external-set-var(copy Native n)
@@ -145,7 +145,8 @@ test test-native()
     assert! EXTERNAL-CONST = 12
     var NativeRef nr
     var Native n
-    var String{4} s(user "bb")!
+    ; var String s(user "bb")!
+    user Buffer buff(user "bb")
     var Array{6:cdef.Int} a
     external0()
     assert! external-int = 7
@@ -153,8 +154,9 @@ test test-native()
     assert! n.y = 0
     assert! external-nvar.x = 3
     assert! external-nvar.y = 4
-    nr := external-get-ref(copy 3, copy s, user a)
-    assert! s[0]! = 'a'
+    nr := external-get-ref(copy 3, copy buff, user a)
+    ; assert! s.bytes()[0] = 'a'
+    assert! buff[0] = 'a'
     assert! a[0] = 3
     assert! external-set-ref(copy nr) = 7
     n := external-get-var()
@@ -206,22 +208,24 @@ test test-pointer()
     assert! ps.get-ref-at(copy 1).num = 2
     assert! ps.get-ref-at(copy 2).num = 3
     
-    var String{16} stra(user "aabbccdd")!
-    var String{16} strb(user "---")!
-    var cdef.CharP pc
-    pc := stra
+    var String stra(user "aabbccdd")!
+    var String strb(user "---")!
+    var cdef.Pointer pc
+    pc := stra.bytes()
     cdef.copy-to-string(copy pc, user strb)!
-    assert! strb.equal(user stra)
-    pc.get-pointed-at(copy 2) := 0
-    cdef.set-null-term-length(user stra)
-    assert! stra.equal(user "aa")
+    assert! strb.equal(user stra.bytes())
     
-    var Buffer{16} buffa(user `fade00beaf`)!
-    var Buffer{16} buffb(user `000000`)!
+    user Buffer buffa(user `fade00beaf`)
+    var Buffer{5} buffb
     var cdef.Pointer{Byte} pbt
     pbt := buffa
-    cdef.copy-to-buffer(copy pbt, copy 5, user buffb)!
-    assert! buffb.equal(user buffa)
+    cdef.copy-to-buffer(copy pbt, user buffb)
+    assert! buffa.length = buffb.length
+    assert! buffb[0] = 0xfa
+    assert! buffb[1] = 0xde
+    assert! buffb[2] = 0x00
+    assert! buffb[3] = 0xbe
+    assert! buffb[4] = 0xaf
 
 
 test test-dynamic-type-parameters()
@@ -549,7 +553,7 @@ test test-assert-error-message()
     strong Array?{Uint32} arr(strong Array{2:Uint32}()!)
     assert-error! arr[6], "slice index out of bounds"
     var Sint8 l(copy -2)
-    assert-error! Array{l:Uint32}(), "sequence too short"
+    assert-error! Array{l:Uint32}(), "array too short"
     weak Array?{Uint32} arr2(weak arr)
     arr := _
     assert-error! arr.length, "empty object used"
@@ -575,13 +579,13 @@ enum LumiDebug
     SUCCESS
 
 test test-builtin-errors()
-    var String{4} strg
+    var String strg(user "aaa")!
     var Buffer{4} buff
-    var String{3} short-str
     user String? empty
     var Uint32 i
     var Char ch
     var Byte bt
+    user Buffer line
     lumi-debug-value := LumiDebug.SUCCESS
     var FileReadText file-read-text(user strg)!
     var FileReadBinary file-read-binary(user strg)!
@@ -590,11 +594,12 @@ test test-builtin-errors()
     lumi-debug-value := LumiDebug.NOTHING
     assert-error! FileReadText(user empty), "empty object used"
     assert-error! file-read-text.get()->(var ch), "file not opened"
-    assert-error! file-read-text.getline(user strg), "file not opened"
+    assert-error! file-read-text.getline(user buff)->(user line),
+            "file not opened"
     assert-error! file-read-binary.get()->(var bt), "file not opened"
     assert-error! file-read-binary.read(user buff), "file not opened"
-    assert-error! file-write-text.put(copy ch), "file not opened"
-    assert-error! file-write-text.write(user strg), "file not opened"
+    assert-error! file-write-text.put(copy bt), "file not opened"
+    assert-error! file-write-text.write(user buff), "file not opened"
     assert-error! file-write-binary.put(copy bt), "file not opened"
     assert-error! file-write-binary.write(user buff), "file not opened"
     assert-error! file-read-text.tell(), "file not opened"
@@ -613,14 +618,13 @@ test test-builtin-errors()
             "open file failed"
     assert-error! file-read-text.close(), "close file failed"
     assert-error! file-read-text.get()->(var ch), "file read failed"
-    assert-error! file-read-text.getline(user strg), "file read failed"
+    assert-error! file-read-text.getline(user buff)->(user line),
+            "file read failed"
     assert-error! file-read-binary.get()->(var bt), "file read failed"
     assert-error! file-read-binary.read(user buff), "file read failed"
-    assert-error! file-write-text.put(copy ch), "file write failed"
-    strg.append(copy 'a')!
-    assert-error! file-write-text.write(user strg), "file write failed"
+    assert-error! file-write-text.put(copy bt), "file write failed"
+    assert-error! file-write-text.write(user buff), "file write failed"
     assert-error! file-write-binary.put(copy bt), "file write failed"
-    buff.append(copy 12)!
     assert-error! file-write-binary.write(user buff), "file write failed"
     assert-error! file-read-text.tell(), "getting file offset failed"
     assert-error! file-read-text.seek-set(copy 0), "setting file offset failed"
@@ -628,46 +632,47 @@ test test-builtin-errors()
     assert-error! file-read-text.seek-end(copy 0), "setting file offset failed"
     assert-error! file-read-text.flush(), "flush file failed"
     lumi-debug-value := LumiDebug.SUCCESS
-    assert-error! sys.getline(user short-str), "sequence too short"
-    lumi-debug-value := LumiDebug.NOTHING
-    
-    var String{4} full-string(user "abc")!
-    assert-error! "aa".get(copy 2), "slice index out of bounds"
-    assert-error! strg.set(copy 3, copy 'a'), "slice index out of bounds"
-    assert-error! full-string.append(copy 'a'), "sequence too short"
-    assert-error! full-string.concat(user "a"), "sequence too short"
-    assert-error! 123.str(user short-str), "sequence too short"
-    assert-error! short-str.new(user "aaaaa"), "sequence too short"
-    var cdef.CharP charp
-    charp := "aaaaa"
-    assert-error! cdef.copy-to-string(copy charp, user short-str),
-            "sequence too short"
-    
-    var Buffer{1} full-buffer
-    full-buffer.append(copy 52)!
-    assert-error! buff.get(copy 4), "slice index out of bounds"
-    assert-error! buff.set(copy 4, copy 55), "slice index out of bounds"
-    assert-error! full-buffer.append(copy 111), "sequence too short"
-    assert-error! full-buffer.concat(user buff), "sequence too short"
-    buff.append(copy 3)!
-    assert-error! full-buffer.new(user buff), "sequence too short"
-    var cdef.Pointer{Byte} bytep
-    bytep := buff
-    assert-error! cdef.copy-to-buffer(copy bytep, copy 2, user full-buffer),
-            "sequence too short"
+    assert-error! sys.getline(user buff)->(user line), "array too short"
     
     lumi-debug-value := LumiDebug.FAIL
-    assert-error! sys.print(user strg), "file write failed"
-    assert-error! sys.println.mocked(user ""), "file write failed"
+    ; assert-error! "aa".get(copy 2), "slice index out of bounds"
+    ; assert-error! strg.set(copy 3, copy 'a'), "slice index out of bounds"
+    assert-error! strg.append(copy 'a'),
+            "insufficient memory for object dynamic allocation"
+    assert-error! strg.concat(user buff),
+            "insufficient memory for object dynamic allocation"
+    assert-error! 123.str(user strg),
+            "insufficient memory for object dynamic allocation"
+    assert-error! strg.new(user "aaaaa"),
+            "insufficient memory for object dynamic allocation"
+    var cdef.Pointer charp
+    charp := "aaaaa"
+    assert-error! cdef.copy-to-string(copy charp, user strg),
+            "insufficient memory for object dynamic allocation"
+    
+    ; var Buffer{1} full-buffer
+    ; full-buffer.append(copy 52)!
+    ; assert-error! buff.get(copy 4), "slice index out of bounds"
+    ; assert-error! buff.set(copy 4, copy 55), "slice index out of bounds"
+    ; assert-error! full-buffer.append(copy 111), "array too short"
+    ; assert-error! full-buffer.concat(user buff), "array too short"
+    ; buff.append(copy 3)!
+    ; assert-error! full-buffer.new(user buff), "array too short"
+    
+    lumi-debug-value := LumiDebug.FAIL
+    assert-error! sys.print(user buff), "file write failed"
+    assert-error! sys.println.mocked(user buff), "file write failed"
     assert-error! sys.getchar()->(var ch), "file read failed"
-    assert-error! sys.getline(user strg), "file read failed"
+    assert-error! sys.getline(user buff)->(user line), "file read failed"
     assert-error! sys.exit(copy 0), "exit failed"
-    assert-error! sys.system(user "aaa"), "command execution failed"
+    assert-error! sys.system(user strg), "command execution failed"
+    assert-error! sys.getenv(user strg, user strg),
+            "insufficient memory for object dynamic allocation"
     lumi-debug-value := LumiDebug.SUCCESS
-    assert-error! sys.getline(user short-str), "sequence too short"
+    assert-error! sys.getline(user buff)->(user line), "array too short"
     lumi-debug-value := LumiDebug.NOTHING
 
-mock ! sys.println(user Array{Char} text)
+mock ! sys.println(user Buffer text)
     assert! text.length > 0
 
 test test-cover-all()
@@ -789,7 +794,7 @@ test test-operations()
 test test-builtins()
     var Uint64 max(copy 0xffffffffffffffff)
     var Sint64 min(copy -0x7fffffffffffffff)
-    var String{32} str
+    var String str
     max.str(user str)!
     assert! str.equal(user "18446744073709551615")
     min.str(user str)!

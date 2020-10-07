@@ -94,9 +94,9 @@ class SyntaxTreeRaise(SyntaxTreeCode)
         write(user ", ")
         if self.error-message.parsed()
             self.error-message.write()
-            write(user ", *(")
-            self.error-message.write()
-            write(user "_Length)")
+            write(user ", ")
+            self.error-message.expression.write-length(
+                    user "_Length", user "0", copy true)
         else
             write(user "NULL, 0")
         write(user ")\n")
