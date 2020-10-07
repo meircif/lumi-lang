@@ -538,7 +538,7 @@ Returncode File_putc(File* file, Ref_Manager* file_Refman, Char in_char) {
     if (file->fobj == NULL) CRAISE("file not opened")
     res = putc(in_char, file->fobj);
   }
-  if (res != in_char) {
+  if (res != (unsigned char)in_char) {
     CRAISE("file write failed")
   }
   return OK;

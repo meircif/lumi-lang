@@ -3,7 +3,7 @@ testing fail-call-empty... Error: empty object used
   Error raised in TL5/tests/integration/error-test.5.lm:32 fail-call-empty()
 testing fail-slice-index... Error: slice index out of bounds
   Error raised in TL5/tests/integration/error-test.5.lm:37 fail-slice-index()
-testing fail-negative-sequence... Error: sequence too short
+testing fail-negative-sequence... Error: array too short
   Error raised in TL5/tests/integration/error-test.5.lm:41 fail-negative-sequence()
 testing fail-member-empty... Error: empty object used
   Error raised in TL5/tests/integration/error-test.5.lm:45 fail-member-empty()

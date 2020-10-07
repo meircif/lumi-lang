@@ -91,7 +91,8 @@ struct ListIterator{Generic}
     user ListNode{Generic} node
     
     func new(user List{Generic} list)
-        self.node := list.first
+        if list?
+            self.node := list.first
     
     func has()->(var Bool has)
         has := self.node?

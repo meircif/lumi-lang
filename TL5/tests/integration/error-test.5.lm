@@ -14,7 +14,7 @@ func f-get-top()->(user TopType? top)
 func ! f-good-function()
     return
 
-func ! f-raise-message(user String msg)
+func ! f-raise-message(user Buffer msg)
     raise! msg
 
 var Uint32 new-fail-countdown

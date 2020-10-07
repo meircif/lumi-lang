@@ -1,9 +1,10 @@
+comment: false
 coverage:
   range: 80..100
   status:
     project:
       default:
         target: 100%
-  ignore:
-    - "TL3/*"
-    - "TL4/tests/*.c"
+ignore:
+  - "TL3/*"
+  - "TL4/tests/*.c"

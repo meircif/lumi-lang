@@ -95,15 +95,11 @@ Character
 ---------
 .. class:: Char
 
-   A single UTF-8 character.
+   A single Unicode code-point, which is the same as `Int{1114111}`.
 
    Character literal are surrounded with ``'`` characters: ``'a'``. Special
    characters can be written with ``\`` escape character as in C: ``\' \" \? \a
    \b \f \n \r \t \v \\``.
-
-   In :ref:`TL5 <syntax-tl5>` characters are treated as ``Int{255}``. In the
-   final syntax it may not be possible without explicitly converting characters
-   to and from ``Int{255}`` using ``ord`` and ``chr`` functions.
 
 
 Byte
@@ -171,21 +167,31 @@ Array
       return (static) length of the array
 
 
+.. _buffer:
+
+Buffer
+------
+
+.. class:: Buffer(length)
+
+   Alias for an :class:`Array` with :class:`Byte` items.
+
+   :param length: length of the buffer and the actual allocation size
+
+   For example: ``Buffer{5}``, ``Buffer{256}``.
+
+   Buffer literals are hexadecimal strings surrounded by ````` characters:
+   ```4a0069ff3487beef2649```.
+
+
 .. _string:
 
 String
 ------
-.. class:: String(max-length)
+.. class:: String
 
-   Sequence of :class:`Char` items with dynamic length. The compiler ensures
+   Holds a legal UTF-8 string with dynamic length. The compiler ensures
    that the last character is a null-terminator (``'\0'``).
-
-   :param max-length: maximum length of the string including the
-      null-terminator, and the actual allocation size
-
-   For example: ``String{5}``, ``String{256}``.
-
-   String references should be declared without a parameter: just ``String``.
 
    String literals are strings surrounded by ``"`` characters: ``"I am a string
    literal"``. Escape :ref:`characters <character>` can be used.
@@ -201,40 +207,24 @@ String
       ; the same as "linebrake"
       s := "line\
               break"
-
-   Accessing a single character can be done using ``string[index]``.
-
-   It is possible to extract a sub-string from a string by slicing:
-   ``string[start-index:sub-string-length]``. This will not copy the string but
-   return an ``Array{Char}`` reference that points to the original string.
    
-   .. note::
-      In both cases if the index or slice can be out of range they are checked
-      at run-time and an error may raise. In such case the ``!`` warning sign
-      must be used if error is to be propagated: ``string[index]!`` or
-      ``string[start-index:sub-string-length]!``
-   
-   String is implicitly converted to ``Array{Char}`` when needed.
+   String is currently not implicitly converted to ``Array{Byte}`` when needed.
 
    .. method:: length()->(var Uint32 length)
 
       returns current (dynamic) string length, not counting the null-terminator
 
-   .. method:: max-length()->(var Uint32 max-length)
-
-      returns maximum (static) string length, including the null-terminator
-
-   .. method:: new(user Array{Char} value)
+   .. method:: new(user Buffer value)
 
       initialize this string with a copy of ``value``
 
-      :raises: if ``value`` is too long to fit this string
+      :raises: if not enough memory
 
    .. method:: clear()
 
       make this string empty
 
-   .. method:: equal(user String other)->(var Bool is-equal)
+   .. method:: equal(user Buffer other)->(var Bool is-equal)
 
       return whether this string is exactly equal to ``other``
 
@@ -256,7 +246,7 @@ String
 
       :raises: if has no room for another character
 
-   .. method:: concat(user Array{Char} other)
+   .. method:: concat(user Buffer other)
 
       concatenate ``other`` to this string end
 
@@ -268,7 +258,7 @@ String
 
       :raises: if has no room for ``number`` string
 
-   .. method:: find(user Array{Char} pattern)->(copy Uint32 index)
+   .. method:: find(user Buffer pattern)->(copy Uint32 index)
 
       return index of first occurrence of ``pattern`` in this string, return
       this string :data:`length` if ``pattern`` not found
@@ -276,95 +266,6 @@ String
    .. method:: has(copy Char character)->(var Bool has)
 
       return whether this string contains ``character``
-
-
-.. _buffer:
-
-Buffer
-------
-
-.. class:: Buffer(max-length)
-
-   Sequence of :class:`Byte` items with dynamic length.
-
-   :param max-length: maximum length of the string and the actual allocation
-      size
-
-   For example: ``Buffer{5}``, ``Buffer{256}``.
-
-   Buffer references should be declared without a parameter: just ``Buffer``.
-
-   Buffer literals are hexadecimal strings surrounded by ````` characters:
-   ```4a0069ff3487beef2649```.
-
-   Accessing a single byte can be done using ``buffer[index]``.
-
-   It is possible to extract a sub-buffer from a buffer by slicing:
-   ``buffer[start-index:sub-buffer-length]``. This will not copy the buffer but
-   return an ``Array{Byte}`` reference that points to the original buffer.
-   
-   .. note::
-      In both cases if the index or slice can be out of range they are checked
-      at run-time and an error may raise. In such case the ``!`` warning sign
-      must be used if error is to be propagated: ``buffer[index]!`` or
-      ``buffer[start-index:sub-buffer-length]!``
-   
-   Buffer is implicitly converted to ``Array{Byte}`` when needed.
-
-   .. method:: length()->(var Uint32 length)
-
-      returns current (dynamic) buffer length
-
-   .. method:: max-length()->(var Uint32 max-length)
-
-      returns maximum (static) buffer length
-
-   .. method:: new(user Array{Byte} value)
-
-      initialize this buffer with a copy of ``value``
-
-      :raises: if ``value`` is too long to fit this buffer
-
-   .. method:: clear()
-
-      make this buffer empty
-
-   .. method:: equal(user Array{Byte} other)->(var Bool is-equal)
-
-      return whether this buffer is exactly equal to ``other``
-
-   .. method:: get(copy Uint32 index)->(var Byte value)
-
-      return byte at place ``index``
-
-      :raises: if ``index`` is out of range
-
-   .. method:: set(copy Uint32 index, copy Byte value)
-
-      set byte at place ``index`` to ``value``
-
-      :raises: if ``index`` is out of range
-
-   .. method:: append(copy Byte byte)
-
-      append ``byte`` to this buffer end
-
-      :raises: if has no room for another byte
-
-   .. method:: concat(user Array{Byte} other)
-
-      concatenate ``other`` to this buffer end
-
-      :raises: if has no room for ``other``
-
-   .. method:: find(user Array{Byte} pattern)->(copy Uint32 index)
-
-      return index of first occurrence of ``pattern`` in this buffer, return
-      this buffer :data:`length` if ``pattern`` not found
-
-   .. method:: has(copy Byte byte)->(var Bool has)
-
-      return whether this buffer contains ``byte``
 
 
 Files

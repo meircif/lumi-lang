@@ -2,7 +2,7 @@ module os-tests
 
 test check-happy()
     owner ds.List{os.Path} files
-    files := os.list-dir(user "/")!
+    files := os.list-dir(user String(user "/")!)!
 
     owner os.Path result
     result := files.pop()!
@@ -13,12 +13,13 @@ test check-happy()
     assert! result.path-r.equal(user "file2")
 
 test ilegal-dir()
-    assert-error! os.list-dir(user "illegal"), "path is not dir"
+    assert-error! os.list-dir(user String(user "illegal")), "path is not dir"
 
 test close-failure()
-    assert-error! os.list-dir(user "cant/close"), "failed to close directory"
+    assert-error! os.list-dir(user String(user "cant/close")),
+            "failed to close directory"
 
 test check-exists()
     var Bool res
-    res := os.exists(user "/some/path")
+    res := os.exists(user String(user "/some/path")!)
     assert! res

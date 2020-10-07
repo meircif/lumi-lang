@@ -22,41 +22,27 @@ class SliceExpression(Expression)
     ~~~ parsing `sequence[index]` or `sequence[index:second-index]` ~~~
     func inst parse(owner Expression sequence)
         self.sequence := sequence
-        parse-new-expression(user ":]", user self.code-node)->(owner self.index)
+        parse-new-expression(user ":]", user self, user self.code-node)->(
+                owner self.index)
         if glob.last-char = ':'
-            parse-new-expression(user "]", user self.code-node)->(
+            parse-new-expression(user "]", user self, user self.code-node)->(
                     owner self.second-index-owner)
             self.second-index := self.second-index-owner
         if glob.last-char != ']'
             self.syntax-error-c(user "expected \"]\", got")
         read-c()
     
-    func inst make-buffered-value-type()->(owner TypeInstance type-instance)
-        if self.sequence.result-type.type-data is glob.type-string
-            glob.type-char.new-type-instance()->(owner type-instance)
-        else
-            glob.type-byte.new-type-instance()->(owner type-instance)
-        string-new-copy(user type-instance.type-data.name)->(
-                owner type-instance.name)
-        type-instance.set-int-range()
-    
     func dynamic analyze()
         analyze-expression()->(owner self.sequence)
-        if not self.sequence.result-type?
-            self.syntax-error-msg(user "cannot slice a void expression")
         self.check-expression-all-errors()->(owner self.sequence)
-        if self.sequence.result-type.type-data.is-buffered()
-            if not self.second-index?
-                self.make-buffered-value-type()->(owner self.result-type)
-        else-if self.sequence.result-type.type-data is glob.type-array
-            if not self.second-index?
-                self.sequence.result-type.parameters.first.item.copy-new()->(
-                        owner self.result-type)
-        else
+        if self.sequence.result-type.type-data is-not glob.type-array
             self.syntax-error(
                     user "cannot slice type",
                     user self.sequence.result-type.type-data.name)
+        
         if not self.second-index?
+            self.sequence.result-type.parameters.first.item.copy-new()->(
+                    owner self.result-type)
             self.assignable := self.result-type.type-data.is-primitive
         
         self.analyze-indices()
@@ -75,17 +61,16 @@ class SliceExpression(Expression)
             analyze-expression()->(owner self.second-index-owner)
             self.second-index := self.second-index-owner
             self.check-index(user self.second-index)
-            if self.sequence.result-type.type-data.is-buffered()
-                glob.type-array.new-type-instance()->(owner self.result-type)
-                self.result-type.parameters := List{TypeInstance}()
-                self.result-type.parameters.add(
-                        owner self.make-buffered-value-type())
-            else
-                self.set-type-from(user self.sequence)
+            self.set-type-from(user self.sequence)
+            self.result-type.parameters.add(
+                    owner self.result-type.parameters.pop())
+            self.result-type.parameters.pop()
             self.result-type.length := self.result-type.length-owner
             self.result-type.length.expression := self.second-index-owner
             self.result-type.length.update()
             self.result-type.conditional := false
+            self.result-type.parameters.add(
+                    owner self.result-type.length.result-type.copy-new())
             if access-has-refman(copy self.sequence.access)
                 self.access := Access.WEAK
             else
@@ -102,7 +87,7 @@ class SliceExpression(Expression)
         else
             self.access := Access.USER
         
-        if self.result-type.type-data.is-sequence()
+        if self.result-type.type-data is glob.type-array
             self.code-node.add-aux-variable(
                     copy self.access, copy false, user self.result-type)->(
                     owner self.slice-variable)
@@ -142,15 +127,13 @@ class SliceExpression(Expression)
         if self.sequence.result-type.length?
             user IntRange int-range(
                     user self.sequence.result-type.length.result-type.int-range)
-            if self.sequence.result-type.type-data is glob.type-array
-                if int-range.min-value.sign() > 0
-                    length-min := int-range.min-value
-                else
-                    length-min := one
+            if int-range.min-value.sign() > 0
+                length-min := int-range.min-value
+            else
+                length-min := one
             length-max := int-range.max-value
         else
-            if self.sequence.result-type.type-data is glob.type-array
-                length-min := one
+            length-min := one
             length-max := max32
         
         owner Long sum-min
@@ -171,15 +154,10 @@ class SliceExpression(Expression)
     
     func inst check-index(user Expression index)
         index.check-no-error()
-        if index.result-type?
-            if index.result-type.type-data is-not glob.type-int
-                self.syntax-error(
-                        user "expected integer index for slice, got",
-                        user index.result-type.type-data.name)
-        else
-            self.syntax-error-msg(
-                    user "expected integer index for slice, got void \
-                    expression")
+        if index.result-type.type-data is-not glob.type-int
+            self.syntax-error(
+                    user "expected integer index for slice, got",
+                    user index.result-type.type-data.name)
 
     func dynamic check-memory(user ReferenceMemoryList refs)
         self.sequence.check-memory(user refs)
@@ -198,7 +176,7 @@ class SliceExpression(Expression)
         
         if self.second-index?
             self.write-preactions-second-index()
-        else-if self.result-type.type-data.is-sequence()
+        else-if self.result-type.type-data is glob.type-array
             self.write-preactions-slice-value()
             
     func inst write-preactions-bounds-check()
@@ -232,16 +210,11 @@ class SliceExpression(Expression)
                 write(user ", ")
             else
                 write(user " >= ")
-            if self.sequence.result-type.type-data is glob.type-array and
-                    self.sequence.result-type.length?
+            if self.sequence.result-type.length?
                 self.sequence.result-type.length.write()
             else
-                if self.sequence.result-type.type-data.is-buffered()
-                    write(user "*(")
                 self.sequence.write()
                 write(user "_Length")
-                if self.sequence.result-type.type-data.is-buffered()
-                    write(user ")")
             if self.second-index?
                 write(user ")")
         write(user ") ")
@@ -261,14 +234,14 @@ class SliceExpression(Expression)
         self.write-index(user self.result-type, copy depth)
         self.code-node.write-spaces()
         
-        ; symbol_Length = second;
-        self.slice-variable.write()
-        write(user "_Length = ")
-        self.second-index.write()
-        write(user ";\n")
-        self.code-node.write-spaces()
-        if self.sequence.result-type.type-data is glob.type-array
-            self.write-length-assigns(user data-type, copy depth, copy 0)
+        if not self.result-type.length.get-constant-value()?
+            ; symbol_Length = second;
+            self.slice-variable.write()
+            write(user "_Length = ")
+            self.second-index.write()
+            write(user ";\n")
+            self.code-node.write-spaces()
+        self.write-length-assigns(user data-type, copy depth, copy 0)
         
         if access-has-refman(copy self.access)
             ; symbol_Refman = seq_Refman;
@@ -296,23 +269,15 @@ class SliceExpression(Expression)
         self.write-index(user self.sequence.result-type, copy depth)
         self.code-node.write-spaces()
         
-        ; symbol_Max_length = seq_Value_length;
-        self.slice-variable.write()
-        if self.result-type.type-data is glob.type-array
+        if not self.result-type.length.get-constant-value()?
+            ; symbol_Length = seq_Value_length;
+            self.slice-variable.write()
             write(user "_Length = ")
-        else
-            write(user "_Max_length = ")
-        if self.result-type.length?
-            self.result-type.length.write()
-        else
             self.sequence.write()
             write(user "_Value_length")
-        write(user ";\n")
-        self.code-node.write-spaces()
-        if self.result-type.type-data is glob.type-array
-            self.write-length-assigns(user data-type, copy depth, copy 1)
-        else
-            self.write-preactions-string-value()
+            write(user ";\n")
+            self.code-node.write-spaces()
+        self.write-length-assigns(user data-type, copy depth, copy 1)
         
         if access-has-refman(copy self.access)
             ; symbol_Refman = [&]seq_Refman;
@@ -327,41 +292,20 @@ class SliceExpression(Expression)
             write(user ");\n")
             self.code-node.write-spaces()
 
-    func inst write-preactions-string-value()
-        ; symbol_Length = seq_Seq_length + index;
-        self.slice-variable.write()
-        write(user "_Length = ")
-        self.sequence.write()
-        write(user "_Seq_length + ")
-        self.index.write()
-        write(user ";\n")
-        self.code-node.write-spaces()
-
     func inst write-length-assigns(
             user TypeInstance data-type, copy Int depth, copy Int offset)
         user TypeInstance sequence-type(user self.result-type)
         for n in depth - offset
             ; symbol_Value_[value_]length = seq_Value_[value_]length;
             sequence-type := sequence-type.parameters.first.item
-            self.slice-variable.write()
-            write-array-value-length(copy n)
-            write(user " = ")
-            if sequence-type.length?
-                sequence-type.length.write()
-            else
+            if not sequence-type.length.get-constant-value()?
+                self.slice-variable.write()
+                write-array-value-length(copy n)
+                write(user " = ")
                 self.sequence.write()
                 write-array-value-length(copy n + offset)
-            write(user ";\n")
-            self.code-node.write-spaces()
-        if data-type.type-data.is-buffered()
-            ; symbol_Seq_length = seq_Seq_length + (index)
-            ;     [ * seq_Value_[value_]length]...;
-            self.slice-variable.write()
-            write(user "_Seq_length = ")
-            self.sequence.write()
-            write(user "_Seq_length")
-            self.write-index(user self.sequence.result-type, copy depth - 1)
-            self.code-node.write-spaces()
+                write(user ";\n")
+                self.code-node.write-spaces()
 
     func inst write-index(user TypeInstance sequence-type, copy Int depth)
         write(user " + ")

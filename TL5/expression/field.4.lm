@@ -21,12 +21,6 @@ class FieldExpression(Expression)
         analyze-expression()->(owner self.instance)
         self.assignable := self.instance.assignable
         user TypeInstance instance-type(user self.instance.result-type)
-        var Bool typed-expression
-        if instance-type?
-            typed-expression := instance-type.type-data?
-        if not typed-expression
-            self.syntax-error(
-                    user "void expression has no member", user self.name)
         user TypeInstance pointed-type
         var Bool after-type(copy instance-type.type-data is glob.type-type)
         var Bool after-base(copy instance-type.type-data is glob.type-base)
@@ -74,8 +68,7 @@ class FieldExpression(Expression)
             instance-type.reference-path.copy-and-add-field(
                     user self.variable)->(owner self.result-type.reference-path)
             if self.is-complex-field and
-                    access-has-refman(copy self.instance.access) and
-                    not self.variable.type-instance.type-data.is-buffered()
+                    access-has-refman(copy self.instance.access)
                 self.access := Access.S-VAR
             else
                 self.access := self.variable.access
@@ -89,6 +82,11 @@ class FieldExpression(Expression)
                 user function, var self.bases)
         
         if not function?
+            if self.instance.result-type.type-data is glob.type-array
+                if self.name.equal(user "length")
+                    expression := LengthFieldExpression(owner self.instance)
+                    return
+                
             if self.instance.is-mocked-function()
                 if self.name.equal(user "mocked")
                     self.instance.restructure()->(
@@ -150,7 +148,7 @@ class FieldExpression(Expression)
 
     func dynamic write-cast()
         var Bool ref(copy self.is-complex-field and
-                not self.result-type.type-data.is-sequence())
+                not self.result-type.type-data is glob.type-array)
         if ref
             write(user "&(")
         self.write()
@@ -174,6 +172,31 @@ class FieldExpression(Expression)
             write(user "_dynamic")
         else
             base.write-dynamic()
+
+
+class LengthFieldExpression(Expression)
+    owner Expression array
+    
+    new(owner Expression array)
+        self.set-location()
+        self.array := array
+        self.array.result-type.parameters.first.next.item.copy-new()->(
+                owner self.result-type)
+        self.check-expression-all-errors()->(owner self.array)
+        self.assignable := false
+    
+    func dynamic analyze()
+        ; do nothing
+
+    func dynamic write-preactions()
+        self.array.write-preactions()
+    
+    func dynamic write()
+        if self.array.result-type.length?
+            self.array.result-type.length.write()
+        else
+            self.array.write()
+            write(user "_Length")
 
 
 class MockFieldExpression(Expression)

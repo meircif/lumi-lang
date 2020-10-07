@@ -36,6 +36,17 @@ class TextExpression(Expression)
     
     func dynamic write()
         write(user self.text)
+        
+    func inst value-from-escape(copy Char escape)->(
+            var Int value, var Bool is-legal)
+        user String escapes(user "'\"?\\abfnrtv")
+        user String values(user "\'\"\?\\\a\b\f\n\r\t\v")
+        for n in escapes.length
+            if escape = escapes[n]
+                value := values[n]
+                is-legal := true
+                return
+        is-legal := false
 
 
 ~~~ Constant integer expression ~~~
@@ -136,7 +147,7 @@ class CharExpression(TextExpression)
             self.syntax-error(user "illegal character constant", user text)
         if text[text.length - 1] != '\''
             self.syntax-error(user "illegal character constant", user text)
-        if self.value > 255
+        if self.value < 1 or self.value > 255
             self.syntax-error(user "illegal character constant", user text)
         self.set-simple-type(user glob.type-char)
         value := Long()
@@ -144,17 +155,6 @@ class CharExpression(TextExpression)
         self.result-type.set-int-constant(user self, user value)
         self.access := Access.VAR
         self.text := text
-        
-    func inst value-from-escape(copy Char escape)->(
-            var Int value, var Bool is-legal)
-        user String escapes(user "'\"?\\abfnrtv0")
-        user String values(user "\'\"\?\\\a\b\f\n\r\t\v\0")
-        for n in escapes.length
-            if escape = escapes[n]
-                value := values[n]
-                is-legal := true
-                return
-        is-legal := false
 
 
 class ConstantBufferVariable(SyntaxTreeVariable)
@@ -165,29 +165,11 @@ class ConstantBufferVariable(SyntaxTreeVariable)
         self.text := text
     
     func dynamic write()
-        self.write-constant(user "Byte")
-
-    func inst write-constant(user String type-name)
         self.write-spaces()
-        write(user "static ")
-        write(user type-name)
-        write(user " ")
+        write(user "static Byte ")
         self.write-cname()
         write(user "[] = {")
         self.write-data()
-        write(user "};\n")
-        self.write-spaces()
-        write(user "Seq_Length ")
-        self.write-cname()
-        write(user "_Max_length = sizeof(")
-        self.write-cname()
-        write(user ");\n")
-        self.write-spaces()
-        write(user "Seq_Length ")
-        self.write-cname()
-        write(user "_Length[1] = {sizeof(")
-        self.write-cname()
-        self.write-length-offset()
         write(user "};\n")
     
     func dynamic write-data()
@@ -197,9 +179,6 @@ class ConstantBufferVariable(SyntaxTreeVariable)
             write-c(copy self.text[(2 * n) + 1])
             write-c(copy ',')
             self.write-new-line(copy n)
-        
-    func dynamic write-length-offset()
-        write(user ")")
         
     func inst write-new-line(copy Int index)
         if (index + 1) mod 20 = 0
@@ -215,17 +194,24 @@ class BufferExpression(TextExpression)
     func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
             owner Expression expression)
         new BufferExpression buffer-expression(user code-node)
-        buffer-expression.parse(owner text, user glob.type-buffer)
+        buffer-expression.parse(owner text)
         expression := buffer-expression
     
-    func inst parse(owner String text, user TypeData sequence-type)
+    func inst parse(owner String text)
         self.text := text
-        self.check-and-modify-text()
-        self.set-simple-type(user sequence-type)
+        self.set-simple-type(user glob.type-array)
+        self.result-type.add-subtype-copy(user glob.type-byte)
+        self.result-type.length := self.result-type.length-owner
+        self.result-type.length.expression := IntExpression(
+                user self.code-node,
+                copy self.check-and-modify-text())
+        self.result-type.length.update()
+        self.result-type.parameters.add(
+                owner self.result-type.length.expression.result-type.copy-new())
         self.access := Access.VAR
         self.is-var := true
     
-    func dynamic check-and-modify-text()
+    func dynamic check-and-modify-text()->(var Int length)
         if self.text.length < 2
             self.syntax-error(user "too short buffer constant", user self.text)
         if self.text[0] != '`' or self.text[self.text.length - 1] != '`'
@@ -247,6 +233,7 @@ class BufferExpression(TextExpression)
         self.text.length := index-write
         if self.text.length mod 2 != 0
             self.syntax-error-msg(user "odd buffer data length")
+        length := self.text.length div 2
         
     func inst check-indentation()->(var Int index-read)
         var Int expected(copy self.code-node.parent.indentation-spaces +
@@ -278,59 +265,124 @@ class BufferExpression(TextExpression)
 
 
 class ConstantStringVariable(ConstantBufferVariable)
-    func dynamic write()
-        self.write-constant(user "char")
+    func inst write-hex-digit(copy Int value)
+        if value > 9
+            write-c(copy 'a' - 10 + value)
+        else
+            write-c(copy '0' + value)
     
     func dynamic write-data()
         var Int index
         for n in self.text.length
             write-c(copy '\'')
-            if self.text[n] = '\''
+            var Char ch(copy self.text[n])
+            if ch = '\''
                 write-c(copy '\\')
-            write-c(copy self.text[n])
-            if self.text[n] = '\\'
+            if ch < 32 or ch > 126
+                write(user "\\x")
+                var Int value(copy (ch + 256) mod 256)
+                self.write-hex-digit(copy value div 16)
+                self.write-hex-digit(copy value mod 16)
+            else
+                write-c(copy ch)
+            if ch = '\\'
                 n += 1
                 write-c(copy self.text[n])
             write-c(copy '\'')
             write-c(copy ',')
             self.write-new-line(copy index)
             index += 1
-        
-    func dynamic write-length-offset()
-        write(user ") - 1")
 
 ~~~ Constant string expression ~~~
 class StringExpression(BufferExpression)
     func inst parse-new(owner String text, user SyntaxTreeCode code-node)->(
             owner Expression expression)
         new StringExpression string-expression(user code-node)
-        string-expression.parse(owner text, user glob.type-string)
+        string-expression.parse(owner text)
         expression := string-expression
     
-    func dynamic check-and-modify-text()
+    func dynamic check-and-modify-text()->(var Int length)
         self.check-string(user self.text)
         var Int index-write(copy 0)
+        var Bool escape
+        length := 0
         for index-read in 1:self.text.length - 1
             if self.text[index-read] = '\n'
                 var Bool skip-new-line
                 if index-read > 0
                     skip-new-line := self.text[index-read - 1] = '\\'
                 self.check-indentation()->(var index-read)
-                if skip-new-line
-                    index-write -= 1
-                else
+                if not skip-new-line
                     self.text[index-write] := '\\'
                     index-write += 1
                     self.text[index-write] := 'n'
                     index-write += 1
+                    length += 1
             else
-                self.text[index-write] := self.text[index-read]
-                index-write += 1
+                self.check-character()->(
+                        var index-read, var index-write, var length)
         self.text[index-write] := '\\'
         index-write += 1
         self.text[index-write] := '0'
         index-write += 1
         self.text.length := index-write
+    
+    func inst check-character()->(
+            var Int index-read, var Int index-write, var Int length)
+        if self.text[index-read] != '\\'
+            self.text[index-write] := self.text[index-read]
+            index-write += 1
+            length += 1
+            return
+        
+        if self.text[index-read + 1] = '\n'
+            return
+            
+        index-read += 1
+        length += 1
+        owner Long long-value
+        var Int value
+        
+        if self.text[index-read] >= '0' and self.text[index-read] <= '7'
+            if index-read > self.text.length - 4
+                self.syntax-error(
+                        user "unfinished escape in string literal",
+                        user self.text[1:self.text.length - 2])
+            if not get-number-value(user self.text[index-read:3], copy 8)->(
+                    owner long-value)
+                self.syntax-error(
+                        user "illegal character constant",
+                        user self.text[index-read - 1:4])
+            index-read += 2
+        else-if self.text[index-read] = 'x'
+            if index-read > self.text.length - 4
+                self.syntax-error(
+                        user "unfinished escape in string literal",
+                        user self.text[1:self.text.length - 2])
+            index-read += 1
+            if not get-number-value(user self.text[index-read:2], copy 16)->(
+                    owner long-value)
+                self.syntax-error(
+                        user "illegal character constant",
+                        user self.text[index-read - 2:4])
+            index-read += 1
+        else-if self.value-from-escape(copy self.text[index-read])->(var value)
+            self.text[index-write] := '\\'
+            index-write += 1
+            self.text[index-write] := self.text[index-read]
+            index-write += 1
+            return
+        else
+            self.syntax-error(
+                    user "illegal character constant",
+                    user self.text[index-read - 1:2])
+        long-value.int()->(var value)
+        if value < 1 or value > 255
+            self.syntax-error(
+                    user "illegal character constant",
+                    user self.text[index-read - 3:4])
+        self.text[index-write] := value
+        index-write += 1
 
     func dynamic analyze()
         self.add-aux-variable(owner ConstantStringVariable(

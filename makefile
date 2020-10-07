@@ -63,6 +63,7 @@ docs-tests: build-dir
 	lumi docs/hello-world.5.lm -o $(BUILDDIR)/hello-world -r
 	lumi -t hello-world docs/hello-world.5.lm docs/hello-world-test.5.lm -o \
 		$(BUILDDIR)/hello-world-test -r
+	lumi docs/examples.5.lm -o $(BUILDDIR)/examples -r
 
 math-tests: build-dir
 	lumi -t math stdlib/math.5.lm stdlib/tests/math-tests.5.lm -o \

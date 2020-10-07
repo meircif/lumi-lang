@@ -21,10 +21,10 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
         read-new(user " ")->(owner self.item-name)
         self.expect-space(user self.item-name)
         self.read-expect(user "in ")
-        self.iterator.new(user ":", user self)
+        self.iterator.new(user ":", user self, user self)
         if glob.last-char = ':'
             self.start.expression := self.iterator.expression
-            self.iterator.new(user "", user self)
+            self.iterator.new(user "", user self, user self)
         self.parse-block()
     
     func dynamic analyze()
@@ -94,14 +94,10 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
             item-type-instance.int-range.set-sign-and-bits(user self)
         else
             self.iterator.analyze()
-            if not self.iterator.result-type?
-                self.syntax-error-msg(user "cannot iterate void expression")
             if self.iterator.result-type.type-data is glob.type-int
                 self.set-simple-int-item()->(owner item-type-instance)
             else-if self.iterator.result-type.type-data is glob.type-string
                 glob.type-char.new-type-instance()->(owner item-type-instance)
-            else-if self.iterator.result-type.type-data is glob.type-buffer
-                glob.type-byte.new-type-instance()->(owner item-type-instance)
             else-if self.iterator.result-type.type-data is glob.type-array
                 self.iterator.result-type.parameters.first.item.copy-new()->(
                         owner item-type-instance)
@@ -118,7 +114,8 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
         
         user TypeData iterator-type(user self.iterator.result-type.type-data)
         is-int-iteration := iterator-type is glob.type-int
-        is-index-iteration := is-int-iteration or iterator-type.is-sequence()
+        is-index-iteration := is-int-iteration or
+                iterator-type is glob.type-array
         
     func inst set-simple-int-item()->(owner TypeInstance item-type-instance)
         glob.type-int.new-type-instance()->(owner item-type-instance)
@@ -283,7 +280,8 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
                 user index-inc-node,
                 user index-inc-node.expression,
                 owner index-aux-expression.copy-new(),
-                owner IntExpression(user index-inc-node, copy 1))
+                owner IntExpression(user index-inc-node, copy 1),
+                user glob.type-void-expression)
         self.block.code-nodes.prepend(owner index-inc-node)
 
     func inst add-item-assign(
@@ -320,18 +318,21 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
         owner Expression max-index
         if is-int-iteration
             max-index := iterator-expression
-        else
-            self.make-method-call(
-                    user while-node,
-                    owner iterator-expression,
-                    user "length")->(
-                    owner max-index)
+        else-if iterator-expression.result-type.type-data is glob.type-array
+            max-index := LengthFieldExpression(owner iterator-expression)
+        ; else
+        ;     self.make-method-call(
+        ;             user while-node,
+        ;             owner iterator-expression,
+        ;             user "length")->(
+        ;             owner max-index)
         self.insert-binary-expression(
                 user "<",
                 user while-node,
                 user while-node.condition,
                 owner index-aux-expression,
-                owner max-index)
+                owner max-index,
+                user glob.type-bool)
     
     func inst insert-step-while-condition(
             user TypeInstance item-type-instance,
@@ -378,14 +379,16 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
                 user expression-node,
                 user expression-node.expression,
                 owner target,
-                owner value)
+                owner value,
+                user glob.type-void-expression)
     
     func inst insert-binary-expression(
             user String operator-name,
             user SyntaxTreeCode code-node,
             user ExpressionValue expression-value,
             owner Expression target,
-            owner Expression value)
+            owner Expression value,
+            user TypeData result-type)
         owner BinaryExpression binary-expression
         glob.operator-map.find(user operator-name).create-binary-expression(
                 user code-node)->(owner binary-expression)
@@ -393,7 +396,9 @@ class SyntaxTreeForLoop(SyntaxTreeLoop)
         value.code-node := code-node
         binary-expression.left-expression := target
         binary-expression.right-expression := value
+        binary-expression.set-simple-type(user result-type)
         expression-value.expression := binary-expression
+        expression-value.update()
 
     func dynamic check-memory(user ReferenceMemoryList refs)
         for code-node in self.code-nodes.iter()
@@ -414,7 +419,7 @@ class SyntaxTreeRepeatLoop(SyntaxTreeForLoop)
         new-node.parse()
 
     func inst parse()
-        self.iterator.new(user "", user self)
+        self.iterator.new(user "", user self, user self)
         self.parse-block()
     
     func dynamic analyze-iterator()->(

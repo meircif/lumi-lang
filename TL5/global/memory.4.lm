@@ -47,9 +47,7 @@ struct ReferencePath
             is-conditional := reference-path.variable.type-instance.conditional
     
     func print()
-        if not self.variable?
-            sys.print(user "{anonymous}")
-        else-if self.variable.is-aux
+        if self.variable.is-aux
             sys.print(user "{anonymous}")
         else
             sys.print(user self.variable.name)
@@ -258,8 +256,6 @@ struct ReferenceMemoryList
         user ReferencePath exp-path(user expression.result-type.reference-path)
         if not exp-path?
             return
-        if not exp-path.variable?
-            return
         if exp-path.field? or exp-path.variable.access != Access.USER
             return
         for variable in self.user-references.iter()
@@ -333,7 +329,8 @@ struct FunctionCall
     user SyntaxTreeFunction function
     
     new(user SyntaxTreeFunction function, user TypeInstance calling-type)
-        calling-type.copy-new()->(owner self.calling-type)
+        if calling-type?
+            calling-type.copy-new()->(owner self.calling-type)
         self.function := function
 
 

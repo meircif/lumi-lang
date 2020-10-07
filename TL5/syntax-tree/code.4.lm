@@ -11,12 +11,13 @@ class SyntaxTreeExpression(SyntaxTreeCode)
         new-node.parse()
     
     func inst parse()
-        self.expression.new(user "", user self)
+        self.expression.new(user "", user self, user self)
     
     func dynamic analyze()
         self.expression.is-statement := true
         self.expression.analyze()
-        if self.expression.result-type?
+        if self.expression.result-type.type-data is-not
+                glob.type-void-expression
             self.syntax-error-msg(user "statement has no effect")
 
     func dynamic check-memory(user ReferenceMemoryList refs)
@@ -60,7 +61,7 @@ class SyntaxTreeRaise(SyntaxTreeCode)
     
     func inst parse()
         if glob.last-char = ' '
-            self.error-message.new(user "", user self)
+            self.error-message.new(user "", user self, user self)
     
     func dynamic is-end-point()->(var Bool is-end)
         is-end := true
@@ -70,7 +71,13 @@ class SyntaxTreeRaise(SyntaxTreeCode)
             self.check-function-has-error()
         if self.error-message.parsed()
             self.analyze-expression(
-                    user self.error-message, user glob.type-string)
+                    user self.error-message, user glob.type-array)
+            user TypeInstance sub-type(
+                    user self.error-message.result-type.parameters.first.item)
+            if sub-type.type-data is-not glob.type-byte
+                self.syntax-error(
+                        user "expected Byte array expression, got",
+                        user sub-type.type-data.name)
             self.error-message.check-errors(copy false, copy true)
 
     func dynamic check-memory(user ReferenceMemoryList refs)
@@ -87,9 +94,9 @@ class SyntaxTreeRaise(SyntaxTreeCode)
         write(user ", ")
         if self.error-message.parsed()
             self.error-message.write()
-            write(user ", *(")
-            self.error-message.write()
-            write(user "_Length)")
+            write(user ", ")
+            self.error-message.expression.write-length(
+                    user "_Length", user "0", copy true)
         else
             write(user "NULL, 0")
         write(user ")\n")
@@ -107,7 +114,7 @@ class SyntaxTreeWhile(SyntaxTreeCode)
     func inst parse()
         if self.parent.loop-depth = 0
             self.syntax-error-msg(user "\"while\" used not inside loop")
-        self.condition.new(user "", user self)
+        self.condition.new(user "", user self, user self)
     
     func dynamic analyze()
         self.analyze-expression(user self.condition, user glob.type-bool)

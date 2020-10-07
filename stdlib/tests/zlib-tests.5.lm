@@ -2,6 +2,6 @@
 module zlib-test
 
 test version-test()
-    var String{64} str
+    var String str
     zlib.version(user str)!
     assert! str.equal(user "mock-version")

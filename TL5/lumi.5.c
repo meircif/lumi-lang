@@ -34,8 +34,7 @@
 
 /* builtin type defines */
 
-typedef uint32_t Int;
-typedef char Char;
+typedef uint32_t Char;
 typedef uint8_t Byte;
 typedef uint8_t Bool;
 
@@ -56,6 +55,11 @@ typedef struct Ref_Manager {
   void* ref;
 } Ref_Manager;
 
+typedef struct String {
+  Byte* bytes;
+  uint32_t length;
+} String;
+
 typedef struct File {
   FILE* fobj;
 } File;
@@ -67,19 +71,19 @@ typedef File FileWriteBinary;
 typedef File FileReadWriteText;
 typedef File FileReadWriteBinary;
 
-typedef uint32_t Seq_Length;
+#define VAR_POINTER(type, name) \
+  type name##_Var; \
+  type* name = &name##_Var;
+#define VAR_REFMAN(type, name) \
+  VAR_POINTER(type, name) \
+  VAR_POINTER(Ref_Manager, name##_Refman)
 
-char* sys_M_argv = NULL;
-Seq_Length sys_M_argv_Length = 0;
-Seq_Length sys_M_argv_Value_length;
-Seq_Length* sys_M_argv_Seq_length = NULL;
-Ref_Manager* sys_M_argv_Refman = NULL;
-File* sys_M_stdin = NULL;
-Ref_Manager* sys_M_stdin_Refman = NULL;
-File* sys_M_stdout = NULL;
-Ref_Manager* sys_M_stdout_Refman = NULL;
-File* sys_M_stderr = NULL;
-Ref_Manager* sys_M_stderr_Refman = NULL;
+String* sys_M_argv = NULL;
+uint32_t sys_M_argv_Length = 0;
+VAR_POINTER(Ref_Manager, sys_M_argv_Refman)
+VAR_REFMAN(File, sys_M_stdin)
+VAR_REFMAN(File, sys_M_stdout)
+VAR_REFMAN(File, sys_M_stderr)
 
 typedef void* Ref;
 
@@ -111,7 +115,7 @@ typedef struct File_Coverage {
 } File_Coverage;
 
 typedef struct Error_Message {
-  char* str;
+  Byte* str;
   unsigned length;
 } Error_Message;
 
@@ -122,7 +126,7 @@ typedef struct Error_Messages {
   Error_Message managed_object_memory;
   Error_Message integer_overflow;
   Error_Message slice_index;
-  Error_Message sequence_too_short;
+  Error_Message array_too_short;
   Error_Message file_not_opened;
   Error_Message file_read_failed;
   Error_Message file_write_failed;
@@ -165,7 +169,7 @@ typedef struct Error_Messages {
 
 #define TEST_FAIL(line, cleanup, message_length, message) \
   START_TRACE( \
-      line, cleanup, FAIL, LUMI_assert_format, message, message_length)
+      line, cleanup, FAIL, LUMI_assert_format, (Byte*)message, message_length)
 
 #define TEST_ASSERT(line, cleanup, condition) if (!(condition)) \
   TEST_FAIL(line, cleanup, 21, "condition is not true")
@@ -203,13 +207,13 @@ typedef struct Error_Messages {
 #define USER_MAIN_HEADER Return_Code LUMI_user_main(void)
 
 #define ARRAY_DEL(Type, array, length) if (array != NULL) { \
-  Seq_Length LUMI_n = 0; \
+  uint32_t LUMI_n = 0; \
   for (; LUMI_n < length; ++LUMI_n) \
     Type##_Del(array + LUMI_n, NULL); \
   }
 
 #define ARRAY_DEL_DYN(Type, array, length) if (array != NULL) { \
-  Seq_Length LUMI_n = 0; \
+  uint32_t LUMI_n = 0; \
   for (; LUMI_n < length; ++LUMI_n) \
     Type##_Del(array + LUMI_n, &Type##_dynamic); \
   }
@@ -277,34 +281,22 @@ while (self->field != NULL) { \
   name = LUMI_alloc(sizeof(type) * size); \
   if (name == NULL) RAISE(line, cleanup, object_memory)
 
-#define INIT_NEW_ARRAY(line, cleanup, name, type, length, value_size) \
+#define INIT_NEW_LEN_ARRAY(line, cleanup, name, type, length, value_size) \
   name##_Length = length; \
-  INIT_NEW(line, cleanup, name, type, name##_Length * value_size)
+  INIT_NEW_ARRAY(line, cleanup, name, type, name##_Length, value_size)
 
-#define INIT_NEW_SEQUENCE(line, cleanup, name, type, size) \
-  name##_Max_length = size; \
-  INIT_NEW(line, cleanup, name, type, name##_Max_length) \
-  name##_Length = LUMI_alloc(sizeof(Seq_Length)); \
-  if (name##_Length == NULL) { \
-    name##_Length = &Lumi_empty_length; \
-    free(name); name = NULL; \
-    RAISE(line, cleanup, object_memory) }
+#define INIT_NEW_ARRAY(line, cleanup, name, type, length, value_size) \
+  INIT_NEW(line, cleanup, name, type, length * value_size)
 
 #define SAFE_SUM_LARGER(a, b, c) a > c || b > c - a
 
 #define NULL_OR_VALUE(base, value) base != NULL? value: NULL
 
 
-#define Buffer_Del(name, _) do { if (name##_Length != &Lumi_empty_length) { \
-  free(name##_Length); \
-  name##_Length = &Lumi_empty_length; } } while (false)
-#define String_Del(name, _) Buffer_Del(name, _)
-
-
 /* traceback */
 
 #define CRAISE(message) { \
-  LUMI_C_trace_print(__LINE__, LUMI_FUNC_NAME, message); \
+  LUMI_C_trace_print(__LINE__, LUMI_FUNC_NAME, (Byte*)message); \
   return ERR; }
 #define CCHECK(err) { \
   Return_Code LUMI_cerr = err; \
@@ -315,13 +307,11 @@ char* LUMI_assert_format = "Assert failed in %s:%lu %s()\n";
 char* LUMI_traceline_format = "  called from %s:%lu %s()\n";
 FILE* LUMI_trace_stream = NULL;
 size_t LUMI_trace_ignore_count = 0;
-char* LUMI_expected_error = NULL;
+Byte* LUMI_expected_error = NULL;
 size_t LUMI_expected_error_trace_ignore_count = 0;
 Generic_Type_Dynamic* dynamic_Void = NULL;
 
-Seq_Length Lumi_empty_length = 0;
-
-#define ERROR_MESAGE(message) {message, sizeof(message) - 1}
+#define ERROR_MESAGE(message) {(Byte*)message, sizeof(message) - 1}
 
 Error_Messages LUMI_error_messages = {
   ERROR_MESAGE("empty object used"),
@@ -330,7 +320,7 @@ Error_Messages LUMI_error_messages = {
   ERROR_MESAGE("insufficient memory for managed object"),
   ERROR_MESAGE("integer overflow"),
   ERROR_MESAGE("slice index out of bounds"),
-  ERROR_MESAGE("sequence too short"),
+  ERROR_MESAGE("array too short"),
   ERROR_MESAGE("file not opened"),
   ERROR_MESAGE("file read failed"),
   ERROR_MESAGE("file write failed"),
@@ -350,8 +340,8 @@ void LUMI_trace_print(
     char const* filename,
     Line_Count line,
     char const* funcname,
-    char const* message,
-    unsigned message_length) {
+    Byte const* message,
+    uint32_t message_length) {
   if (LUMI_trace_ignore_count == 0) {
     if (message != NULL) {
       fprintf(
@@ -365,7 +355,7 @@ void LUMI_trace_print(
   else if (LUMI_expected_error != NULL &&
       LUMI_expected_error_trace_ignore_count == LUMI_trace_ignore_count &&
       format != LUMI_traceline_format) {
-    unsigned n;
+    uint32_t n;
     if (message == NULL) {
       LUMI_expected_error = NULL;
       if (LUMI_trace_ignore_count == 1) {
@@ -393,22 +383,22 @@ void LUMI_trace_print(
 }
 
 /* like strnlen */
-size_t cstring_length(char* cstring, size_t max_length) {
-  size_t length = 0;
-  while (cstring[length] != '\0' && length < max_length) {
+uint32_t cstring_length(Byte* cstring) {
+  uint32_t length = 0;
+  while (cstring[length] != '\0' && length < UINT32_MAX - 1) {
     ++length;
   }
   return length;
 }
 
-void LUMI_C_trace_print(Line_Count line, char const* funcname, char* message) {
+void LUMI_C_trace_print(Line_Count line, char const* funcname, Byte* message) {
   LUMI_trace_print(
       LUMI_raise_format,
       "builtin",
       line,
       funcname,
       message,
-      cstring_length(message, 255));
+      cstring_length(message));
 }
 
 
@@ -531,9 +521,9 @@ Bool LUMI_test_coverage(File_Coverage* files_coverage, size_t files_number) {
   unsigned coverage;
   Bool generate_xml = false;
   if (sys_M_argv != NULL && sys_M_argv_Refman->value != NULL &&
-      sys_M_argv_Length > 1 && sys_M_argv_Seq_length[1] > 1) {
-    char* arg = sys_M_argv + sys_M_argv_Value_length;
-    generate_xml = arg[0] == '-' && arg[1] == 'x';
+      sys_M_argv_Length > 1 && sys_M_argv[1].length > 1) {
+    String* arg = sys_M_argv + 1;
+    generate_xml = arg->bytes[0] == '-' && arg->bytes[1] == 'x';
   }
   printf("testing code coverage... ");
   coverage = calc_coverage(files_coverage, files_number);
@@ -651,48 +641,59 @@ void LUMI_owner_dec_ref(Ref_Manager* ref) {
 
 /* Int */
 
+void String_clear(String* self);
+
 #define LUMI_FUNC_NAME "Int.str"
-Return_Code Int_str(
-    uint64_t abs, Bool is_neg,
-    char* str, Seq_Length str_max_length, Seq_Length* str_length) {
+Return_Code Int_str(uint64_t abs, Bool is_neg, String* str, Bool is_append) {
   uint64_t tmp;
-  char* low;
-  char* high;
-  *str_length = 0;
-  high = str;
-  if (is_neg) {
-    *high = '-';
-    ++high;
-    ++(*str_length);
-  }
-  low = high;
+  uint64_t swaped = 0;
+  uint32_t digits = 1;
+  Byte* bytes = NULL;
   tmp = abs;
-  do {
-    *high = '0' + tmp % 10;
-    ++high;
+  while (tmp > 9) {
+    ++digits;
+    swaped = swaped * 10 + tmp % 10;
     tmp /= 10;
-    if (str_max_length <= *str_length + 1) {
-      *str_length = 0;
-      str[0] = '\0';
-      CRAISE(LUMI_error_messages.sequence_too_short.str)
-    }
-    ++(*str_length);
-  } while (tmp > 0);
-  *high = '\0';
-  for (--high; low < high; ++low, --high) {
-    char swap;
-    swap = *low;
-    *low = *high;
-    *high = swap;
   }
+  if (lumi_debug_value == LUMI_DEBUG_FAIL) {
+    bytes = NULL;
+  } else if (is_append) {
+    bytes = realloc(str->bytes, str->length + digits + is_neg + 1);
+  } else {
+    bytes = malloc(digits + is_neg + 1);
+  }
+  if (bytes == NULL) CRAISE(LUMI_error_messages.object_memory.str)
+  if (!is_append) {
+    String_clear(str);
+  }
+  str->bytes = bytes;
+  if (is_append) {
+    bytes += str->length;
+    str->length += digits + is_neg;
+  }
+  else {
+    str->length = digits + is_neg;
+  }
+  if (is_neg) {
+    *bytes = '-';
+    ++bytes;
+  }
+  *bytes = '0' + tmp;
+  while (digits > 1) {
+    ++bytes;
+    *bytes = '0' + swaped % 10;
+    swaped /= 10;
+    --digits;
+  }
+  bytes[1] = '\0';
   return OK;
 }
 #undef LUMI_FUNC_NAME
 
-#define Int_strU(value, str, str_max_length, str_length) \
-  Int_str(value, false, str, str_max_length, str_length)
-#define Int_strS(value, str, str_max_length, str_length) \
-  Int_str(value < 0? -value: value, value < 0, str, str_max_length, str_length)
+#define Int_strU(value, str) Int_str(value, false, str, false)
+#define Int_strS(value, str) Int_strS_append(value, str, false)
+#define Int_strS_append(value, str, is_append) \
+    Int_str((value) < 0? -(value): (value), (value) < 0, str, is_append)
 
 #define CHECK_MIN_ADD(a, b) ((a < 0) && (b < 0) && (-a > INT64_MAX + b))
 #define CHECK_MAX_ADD(a, b, limit) ((a > 0) && (b > 0) && (a > limit - b))
@@ -747,254 +748,168 @@ Return_Code Int_str(
       CLAMPED_MUL_UP_LIMIT(a, b, max, < INT64_MAX)))
 
 
-/* Array */
-
-#define Array_length(self, length, length_out) *(length_out) = length
-
-
 /* Buffer */
 
-#define Buffer_length(self, max_length, length, length_out) \
-  *(length_out) = *(length)
-  
-#define Buffer_max_length(self, max_length, length, max_length_out) \
-  *(max_length_out) = max_length
+/*#define CHECK_INDEX(index, length) if (index < 0 || index >= *length) \
+    CRAISE(LUMI_error_messages.slice_index.str)*/
 
-#define LUMI_FUNC_NAME "Buffer.new"
-Return_Code Buffer_new(
-    void* self, Seq_Length max_length, Seq_Length* length, void* source, Seq_Length source_length) {
-  if (self == source) {
-    return OK;
+void cdef_M_copy_to_buffer(
+    Byte* source, Byte* target, uint32_t target_length) {
+  if (source != NULL) {
+    memcpy(target, source, target_length);
   }
-  if (source_length > max_length)
-    CRAISE(LUMI_error_messages.sequence_too_short.str)
-  *length = source_length;
-  memcpy(self, source, source_length);
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-
-#define LUMI_FUNC_NAME "cdef.copy-to-buffer"
-Return_Code cdef_M_copy_to_buffer(
-    void* source, Seq_Length source_length, void* self, Seq_Length max_length, Seq_Length* length) {
-  if (source == NULL) {
-    *length = 0;
-    return OK;
-  }
-  CCHECK(Buffer_new(self, max_length, length, source, source_length))
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-
-void Buffer_clear(void* self, Seq_Length max_length, Seq_Length* length) {
-  *length = 0;
-}
-
-void Buffer_equal(
-    void* self, Seq_Length max_length, Seq_Length *length,
-    void* other, Seq_Length other_length,
-    Bool* out_equal) {
-  if (*length != other_length) {
-    *out_equal = false;
-    return;
-  }
-  if (self == other) {
-    *out_equal = true;
-    return;
-  }
-  *out_equal = memcmp(self, other, *length) == 0;
-}
-
-#define CHECK_INDEX(index, length) if (index < 0 || index >= *length) \
-    CRAISE(LUMI_error_messages.slice_index.str)
-
-#define LUMI_FUNC_NAME "Buffer.get"
-Return_Code Buffer_get(
-    Byte* self, Seq_Length max_length, Seq_Length *length, Seq_Length index, Byte* out_value) {
-  CHECK_INDEX(index, length)
-  *out_value = self[index];
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-
-#define LUMI_FUNC_NAME "Buffer.set"
-Return_Code Buffer_set(
-    Byte* self, Seq_Length max_length, Seq_Length *length, Seq_Length index, Byte value) {
-  CHECK_INDEX(index, length)
-  self[index] = value;
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-
-#define LUMI_FUNC_NAME "Buffer.append"
-Return_Code Buffer_append(Byte* self, Seq_Length max_length, Seq_Length* length, Byte value) {
-  if (*length >= max_length)
-    CRAISE(LUMI_error_messages.sequence_too_short.str)
-  self[*length] = value;
-  ++(*length);
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-
-#define LUMI_FUNC_NAME "Buffer.concat"
-Return_Code Buffer_concat_internal(
-    void* self, Seq_Length max_length, Seq_Length* length, void* ext, Seq_Length ext_length) {
-  if (*length + ext_length > max_length)
-    CRAISE(LUMI_error_messages.sequence_too_short.str)
-  memcpy(self, ext, ext_length);
-  *length += ext_length;
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-
-Return_Code Buffer_concat(
-    Byte* self, Seq_Length max_length, Seq_Length* length, Byte* ext, Seq_Length ext_length) {
-  return Buffer_concat_internal(
-      self + (*length), max_length, length, ext, ext_length);
-}
-
-void Buffer_find(
-    Byte* self, Seq_Length max_length, Seq_Length *length,
-    Byte* pattern, Seq_Length pattern_length,
-    Seq_Length* out_index) {
-  Seq_Length n;
-  for (n = 0; n <= *length - pattern_length; ++n) {
-    if (memcmp(self + n, pattern, pattern_length) == 0) {
-      *out_index = n;
-      return;
-    }
-  }
-  *out_index = *length;
-}
-
-void Buffer_has(
-    Byte* self, Seq_Length max_length, Seq_Length *length, Byte value, Bool* found) {
-  Seq_Length n;
-  for (n = 0; n < *length; ++n) {
-    if (self[n] == value) {
-      *found = true;
-      return;
-    }
-  }
-  *found = false;
 }
 
 
 /* String */
 
-#define String_length(self, max_length, length, length_out) \
-  Buffer_length(self, max_length, length, length_out)
-#define String_max_length(self, max_length, length, length_out) \
-  Buffer_max_length(self, max_length, length, length_out)
-#define String_clear(self, max_length, length) \
-  Buffer_clear(self, max_length, length)
+Byte String_empty_string[1] = {'\0'};
+
+void String_Del(String* self, void* _) {
+  if (self == NULL) return;
+  if (self->bytes != String_empty_string) {
+    free(self->bytes);
+  }
+  self->bytes = NULL;
+}
+
+Generic_Type_Dynamic String_dynamic = { (Dynamic_Del)String_Del };
+
+#define String_length(self, length_out) *(length_out) = (self)->length
+
+void String_clear(String* self) {
+  if (self->bytes != String_empty_string) {
+    free(self->bytes);
+  }
+  self->bytes = String_empty_string;
+  self->length = 0;
+}
 
 #define LUMI_FUNC_NAME "String.new"
-Return_Code String_new(
-    char* self, Seq_Length max_length, Seq_Length* length, char* source, Seq_Length source_length) {
-  CCHECK(Buffer_new(self, max_length - 1, length, source, source_length))
-  self[source_length] = '\0';
+Return_Code String_new(String* self, Byte* source, uint32_t source_length) {
+  Byte* new_bytes = NULL;
+  if (source_length == 0) {
+    new_bytes = String_empty_string;
+  } else {
+    if (lumi_debug_value == LUMI_DEBUG_FAIL) {
+      new_bytes = NULL;
+    } else {
+      new_bytes = malloc(source_length + 1);
+    }
+    if (new_bytes == NULL) CRAISE(LUMI_error_messages.object_memory.str)
+    memcpy(new_bytes, source, source_length);
+    new_bytes[source_length] = '\0';
+  }
+  String_clear(self);
+  self->bytes = new_bytes;
+  self->length = source_length;
   return OK;
 }
 #undef LUMI_FUNC_NAME
 
 #define LUMI_FUNC_NAME "cdef.copy-to-string"
-Return_Code cdef_M_copy_to_string(
-    char* source, char* self, Seq_Length max_length, Seq_Length* length) {
-  CCHECK(cdef_M_copy_to_buffer(
-      source, cstring_length(source, max_length), self, max_length - 1, length))
-  self[*length] = '\0';
+Return_Code cdef_M_copy_to_string(char* source, String* self) {
+  CCHECK(String_new(
+      self, (Byte*)source, cstring_length((Byte*)source)))
   return OK;
 }
 #undef LUMI_FUNC_NAME
 
-void cdef_M_set_null_term_length(char* self, Seq_Length max_length, Seq_Length* length) {
-  *length = cstring_length(self, max_length);
-}
-
 void String_equal(
-    char* self, Seq_Length max_length, Seq_Length *length,
-    char* other, Seq_Length other_length,
-    Bool* out_equal) {
-  if (self == other) {
-    *out_equal = *length == other_length;
-    return;
-  }
-  if (*length != other_length) {
+    String* self, Byte* other, uint32_t other_length, Bool* out_equal) {
+  if (self->length != other_length) {
     *out_equal = false;
     return;
   }
-  *out_equal = strncmp(self, other, *length) == 0;
+  if (self->bytes == other) {
+    *out_equal = true;
+    return;
+  }
+  *out_equal = strncmp((char*)(self->bytes), (char*)other, other_length) == 0;
 }
 
 #define LUMI_FUNC_NAME "String.get"
-Return_Code String_get(
-    char* self, Seq_Length max_length, Seq_Length *length, Seq_Length index, Char* out_char) {
-  CHECK_INDEX(index, length)
-  *out_char = self[index];
+Return_Code String_get(String* self, uint32_t index, Char* out_char) {
+  /*CHECK_INDEX(index, length)
+  *out_char = self[index];*/
   return OK;
 }
 #undef LUMI_FUNC_NAME
 
 #define LUMI_FUNC_NAME "String.set"
-Return_Code String_set(
-    char* self, Seq_Length max_length, Seq_Length *length, Seq_Length index, Char ch) {
-  CHECK_INDEX(index, length)
-  self[index] = ch;
+Return_Code String_set(String* self, uint32_t index, Char ch) {
+  /*CHECK_INDEX(index, length)
+  self[index] = ch;*/
   return OK;
 }
 #undef LUMI_FUNC_NAME
 
+void String_bytes(String* self, Byte** bytes, uint32_t* bytes_length) {
+  *bytes = self->bytes;
+  *bytes_length = self->length;
+}
+
 #define LUMI_FUNC_NAME "String.append"
-Return_Code String_append(char* self, Seq_Length max_length, Seq_Length* length, Char ch) {
-  if (*length + 1 >= max_length)
-    CRAISE(LUMI_error_messages.sequence_too_short.str)
-  self[*length] = ch;
-  ++(*length);
-  self[*length] = '\0';
+Return_Code String_append(String* self, Char ch) {
+  Byte *new_bytes;
+  if (ch > 255) CRAISE("appending character values over 255 not suppored yet")
+  if (lumi_debug_value == LUMI_DEBUG_FAIL) {
+    new_bytes = NULL;
+  } else if (self->bytes == String_empty_string) {
+    new_bytes = malloc(2);
+  } else {
+    new_bytes = realloc(self->bytes, self->length + 2);
+  }
+  if (new_bytes == NULL) CRAISE(LUMI_error_messages.object_memory.str)
+  new_bytes[self->length] = ch;
+  ++(self->length);
+  new_bytes[self->length] = '\0';
+  self->bytes = new_bytes;
   return OK;
 }
 #undef LUMI_FUNC_NAME
 
 #define LUMI_FUNC_NAME "String.concat"
-Return_Code String_concat(
-    char* self, Seq_Length max_length, Seq_Length* length, char* ext, Seq_Length ext_length) {
-  CCHECK(Buffer_concat_internal(
-      self + (*length), max_length - 1, length, ext, ext_length))
-  self[*length] = '\0';
+Return_Code String_concat(String* self, Byte* ext, uint32_t ext_length) {
+  Byte *new_bytes;
+  if (lumi_debug_value == LUMI_DEBUG_FAIL) {
+    new_bytes = NULL;
+  } else if (self->bytes == String_empty_string) {
+    new_bytes = malloc(ext_length + 1);
+  } else {
+    new_bytes = realloc(self->bytes, self->length + ext_length + 1);
+  }
+  if (new_bytes == NULL) CRAISE(LUMI_error_messages.object_memory.str)
+  memcpy(new_bytes + self->length, ext, ext_length);
+  self->length += ext_length;
+  new_bytes[self->length] = '\0';
+  self->bytes = new_bytes;
   return OK;
 }
 #undef LUMI_FUNC_NAME
 
-#define LUMI_FUNC_NAME "String.concat-int"
-Return_Code String_concat_int(
-    char* self, Seq_Length max_length, Seq_Length* length, int64_t num) {
-  Seq_Length added_length = 0;
-  CCHECK(Int_strS(num, self + *length, max_length - *length, &added_length))
-  *length += added_length;
-  return OK;
-}
-#undef LUMI_FUNC_NAME
+#define String_concat_int(self, value) \
+  Int_strS_append(value, self, (self)->length > 0)
 
 void String_find(
-    char* self, Seq_Length max_length, Seq_Length *length,
-    char* pattern, Seq_Length pattern_length,
-    Seq_Length* out_index) {
-  Seq_Length n;
+    String* self,
+    Byte* pattern, uint32_t pattern_length,
+    uint32_t* out_index) {
+  /*uint32_t n;
   for (n = 0; n <= *length - pattern_length; ++n) {
-    if (strncmp(self + n, pattern, pattern_length) == 0) {
+    if (strncmp((char*)self + n, (char*)pattern, pattern_length) == 0) {
       *out_index = n;
       return;
     }
   }
-  *out_index = *length;
+  *out_index = *length;*/
 }
 
 void String_has(
-    char* self, Seq_Length max_length, Seq_Length *length, Char ch, Bool* found) {
-  Seq_Length n;
-  for (n = 0; n < *length; ++n) {
-    if (self[n] == ch) {
+    String* self, Char ch, Bool* found) {
+  uint32_t n;
+  for (n = 0; n < self->length; ++n) {
+    if (self->bytes[n] == ch) {
       *found = true;
       return;
     }
@@ -1044,30 +959,28 @@ Return_Code File_close(File* self) {
 #define FileReadWriteBinary_close(self) File_close(self)
 
 #define LUMI_FUNC_NAME "File.new"
-Return_Code File_new(File* self, char* name, char* mode) {
+Return_Code File_new(File* self, String* name, char* mode) {
   if (lumi_debug_value == LUMI_DEBUG_NOTHING) {
     CCHECK(File_close(self))
   }
   if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {
     if (lumi_debug_value != LUMI_DEBUG_FAIL) {
-      self->fobj = fopen(name, mode);
+      self->fobj = fopen((char*)(name->bytes), mode);
     }
     if (self->fobj == NULL) CRAISE("open file failed")
   }
   return OK;
 }
 #undef LUMI_FUNC_NAME
-#define FileReadText_new(self, name, name_max_length, name_length) \
-  File_new(self, name, "r")
-#define FileReadBinary_new(self, name, name_max_length, name_length) \
-  File_new(self, name, "rb")
-#define FileWriteText_new(self, name, name_max_length, name_length, append) \
+#define FileReadText_new(self, name) File_new(self, name, "r")
+#define FileReadBinary_new(self, name) File_new(self, name, "rb")
+#define FileWriteText_new(self, name, append) \
   File_new(self, name, append? "a": "w")
-#define FileWriteBinary_new(self, name, name_max_length, name_length, append) \
+#define FileWriteBinary_new(self, name, append) \
   File_new(self, name, append? "ab": "wb")
-#define FileReadWriteText_new(self, name, name_max_length, name_length, append, exist) \
+#define FileReadWriteText_new(self, name, append, exist) \
   File_new(self, name, append? "a+": exist? "r+": "w+")
-#define FileReadWriteBinary_new(self, name, name_max_length, name_length, append, exist) \
+#define FileReadWriteBinary_new(self, name, append, exist) \
   File_new(self, name, append? "ab+": exist? "rb+": "wb+")
 
 #define CHECK_OPEN(self) \
@@ -1144,7 +1057,7 @@ Return_Code File_flush(File* self) {
 #define FileReadWriteText_flush(self) File_flush(self)
 #define FileReadWriteBinary_flush(self) File_flush(self)
 
-Bool getc_is_not_ok(int get, char* ch) {
+Bool getc_is_not_ok(int get, Byte* ch) {
   if (get == EOF) {
     return true;
   }
@@ -1161,7 +1074,7 @@ Bool getc_is_not_ok(int get, char* ch) {
     is_eof = true; }
 
 #define LUMI_FUNC_NAME "FileReadText.get"
-Return_Code FileReadText_get(FileReadText* self, Char* out_char, Bool* is_eof) {
+Return_Code FileReadText_get(FileReadText* self, Byte* out_char, Bool* is_eof) {
   CHECK_OPEN(self)
   CHECK_READ(self, *is_eof, getc_is_not_ok(getc(self->fobj), out_char))
   return OK;
@@ -1184,27 +1097,27 @@ Return_Code FileReadBinary_get(
 #define LUMI_FUNC_NAME "FileReadText.getline-internal"
 Return_Code FileReadText_getline_internal(
     FileReadText* self,
-    char* line, Seq_Length line_max_length, Seq_Length* line_length,
+    Byte* target, uint32_t target_length,
+    Byte** line, uint32_t* line_length,
     Bool* is_eof,
     int (*char_getter)(FileReadText*)) {
   int ch = EOF;
+  *line = target;
   *line_length = 0;
-  line[0] = '\0';
   if (lumi_debug_value == LUMI_DEBUG_NOTHING) {
     ch = char_getter(self);
   } else if (lumi_debug_value == LUMI_DEBUG_SUCCESS) {
     ch = 'a';
   }
   while (ch != EOF && ch != '\n') {
-    if (*line_length + 1 >= line_max_length)
-      CRAISE(LUMI_error_messages.sequence_too_short.str)
-    line[*line_length] = ch;
+    if (*line_length >= target_length)
+      CRAISE(LUMI_error_messages.array_too_short.str)
+    target[*line_length] = ch;
     ++(*line_length);
     if (lumi_debug_value != LUMI_DEBUG_SUCCESS) {
       ch = getc(self->fobj);
     }
   }
-  line[*line_length] = '\0';
   CHECK_READ(self, *is_eof, ch == EOF)
   return OK;
 }
@@ -1217,11 +1130,12 @@ int getc_char_getter(FileReadText* self) {
 #define LUMI_FUNC_NAME "FileReadText.getline"
 Return_Code FileReadText_getline(
     FileReadText* self,
-    char* line, Seq_Length line_max_length, Seq_Length* line_length,
+    Byte* target, uint32_t target_length,
+    Byte** line, uint32_t* line_length,
     Bool* is_eof) {
   CHECK_OPEN(self)
   CCHECK(FileReadText_getline_internal(
-      self, line, line_max_length, line_length, is_eof, getc_char_getter))
+      self, target, target_length, line, line_length, is_eof, getc_char_getter))
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -1230,7 +1144,9 @@ Return_Code FileReadText_getline(
 
 #define LUMI_FUNC_NAME "FileReadBinary.read"
 Return_Code FileReadBinary_read(
-    FileReadBinary* self, Byte* data, Seq_Length data_length, Seq_Length* bytes_read) {
+    FileReadBinary* self,
+    Byte* data, uint32_t data_length,
+    uint32_t* bytes_read) {
   Bool is_eof;
   *bytes_read = 0;
   CHECK_OPEN(self)
@@ -1267,7 +1183,7 @@ Return_Code FileWriteBinary_put(FileWriteBinary* self, Byte value) {
 
 #define LUMI_FUNC_NAME "FileWriteText.write"
 Return_Code FileWriteText_write(
-    FileWriteText* self, char* text, Seq_Length text_length, Seq_Length* written) {
+    FileWriteText* self, Byte* text, uint32_t text_length, uint32_t* written) {
   *written = 0;
   CHECK_OPEN(self)
   while (*written < text_length) {
@@ -1285,7 +1201,9 @@ Return_Code FileWriteText_write(
 
 #define LUMI_FUNC_NAME "FileWriteBinary.write"
 Return_Code FileWriteBinary_write(
-    FileWriteBinary* self, Byte* data, Seq_Length data_length, Seq_Length* written) {
+    FileWriteBinary* self,
+    Byte* data, uint32_t data_length,
+    uint32_t* written) {
   *written = 0;
   CHECK_OPEN(self)
   if (lumi_debug_value != LUMI_DEBUG_FAIL) {
@@ -1301,53 +1219,36 @@ Return_Code FileWriteBinary_write(
 
 /* system */
 
+#define INIT_REFMAN(name) \
+  name##_Refman->count = 2; \
+  name##_Refman->value = name; \
+  name##_Refman->ref = name;
+
 Return_Code set_sys(int argc, char* argv[]) {
   int arg;
-  sys_M_stdin = LUMI_alloc(sizeof(File));
-  sys_M_stdin_Refman = LUMI_new_ref(sys_M_stdin);
-  sys_M_stdout = LUMI_alloc(sizeof(File));
-  sys_M_stdout_Refman = LUMI_new_ref(sys_M_stdout);
-  sys_M_stderr = LUMI_alloc(sizeof(File));
-  sys_M_stderr_Refman = LUMI_new_ref(sys_M_stderr);
   sys_M_argv_Length = argc;
-  sys_M_argv_Value_length = 0;
-  sys_M_argv_Seq_length = LUMI_alloc(sizeof(Seq_Length) * argc);
-  for (arg = 0; arg < argc; ++arg) {
-    Seq_Length length = cstring_length(argv[arg], 1024);
-    if (sys_M_argv_Seq_length != NULL) {
-      sys_M_argv_Seq_length[arg] = length;
-    }
-    if (length > sys_M_argv_Value_length) {
-      sys_M_argv_Value_length = length;
-    }
-  }
-  ++sys_M_argv_Value_length;
-  sys_M_argv = LUMI_alloc(sys_M_argv_Value_length * sys_M_argv_Length);
-  sys_M_argv_Refman = LUMI_new_ref(sys_M_argv);
-  if (sys_M_argv == NULL || sys_M_argv_Refman == NULL ||
-    sys_M_argv_Seq_length == NULL ||
-    sys_M_stdin == NULL || sys_M_stdin_Refman == NULL ||
-    sys_M_stdout == NULL || sys_M_stdout_Refman == NULL ||
-    sys_M_stderr == NULL || sys_M_stderr_Refman == NULL) {
+  sys_M_argv = LUMI_alloc(sizeof(String) * argc);
+  if (sys_M_argv == NULL) {
     fprintf(stderr, "insufficient memory\n");
     return ERR;
   }
-  ++sys_M_argv_Refman->count;
-  ++sys_M_stdin_Refman->count;
-  ++sys_M_stdout_Refman->count;
-  ++sys_M_stderr_Refman->count;
+  INIT_REFMAN(sys_M_argv)
+  INIT_REFMAN(sys_M_stdin)
+  INIT_REFMAN(sys_M_stdout)
+  INIT_REFMAN(sys_M_stderr)
   sys_M_stdin->fobj = stdin;
   sys_M_stdout->fobj = stdout;
   sys_M_stderr->fobj = stderr;
   for (arg = 0; arg < argc; ++arg) {
-    strncpy(sys_M_argv + sys_M_argv_Value_length * arg, argv[arg], sys_M_argv_Length);
+    sys_M_argv[arg].bytes = (Byte*)(argv[arg]);
+    sys_M_argv[arg].length = cstring_length(sys_M_argv[arg].bytes);
   }
   return OK;
 }
 
 #define LUMI_FUNC_NAME "sys.print"
-Return_Code sys_M_print(char* text, Seq_Length text_length) {
-  Seq_Length n;
+Return_Code sys_M_print(Byte* text, uint32_t text_length) {
+  uint32_t n;
   int ch;
   for (n = 0; n < text_length; ++n) {
     ch = text[n];
@@ -1359,7 +1260,7 @@ Return_Code sys_M_print(char* text, Seq_Length text_length) {
 #undef LUMI_FUNC_NAME
 
 #define LUMI_FUNC_NAME "sys.println"
-Return_Code sys_M_println(char* text, Seq_Length text_length) {
+Return_Code sys_M_println(Byte* text, uint32_t text_length) {
   sys_M_print(text, text_length);
   if (lumi_debug_value == LUMI_DEBUG_FAIL || putchar('\n') != '\n')
     CRAISE(LUMI_error_messages.file_write_failed.str)
@@ -1368,8 +1269,10 @@ Return_Code sys_M_println(char* text, Seq_Length text_length) {
 #undef LUMI_FUNC_NAME
 
 #define LUMI_FUNC_NAME "sys.getchar"
-Return_Code sys_M_getchar(char* out_char, Bool* is_eof) {
-  CHECK_READ(sys_M_stdin, *is_eof, getc_is_not_ok(getchar(), out_char))
+Return_Code sys_M_getchar(Char* out_char, Bool* is_eof) {
+  Byte byte;
+  CHECK_READ(sys_M_stdin, *is_eof, getc_is_not_ok(getchar(), &byte))
+  *out_char = byte;
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -1380,10 +1283,13 @@ int getchar_char_getter(FileReadText* self) {
 
 #define LUMI_FUNC_NAME "sys.getline"
 Return_Code sys_M_getline(
-    char* line, Seq_Length line_max_length, Seq_Length* line_length, Bool* is_eof) {
+    Byte* target, uint32_t target_length,
+    Byte** line, uint32_t* line_length,
+    Bool* is_eof) {
   CCHECK(FileReadText_getline_internal(
       sys_M_stdin,
-      line, line_max_length, line_length,
+      target, target_length,
+      line, line_length,
       is_eof,
       getchar_char_getter))
   return OK;
@@ -1400,12 +1306,10 @@ Return_Code sys_M_exit(int32_t status) {
 #undef LUMI_FUNC_NAME
 
 #define LUMI_FUNC_NAME "sys.system"
-Return_Code sys_M_system(
-    char* command, Seq_Length command_max_length, Seq_Length *command_length,
-    int32_t* status) {
+Return_Code sys_M_system(String* command, int32_t* status) {
   int res = -1;
   if (lumi_debug_value != LUMI_DEBUG_FAIL) {
-    res = system(command);
+    res = system((char*)(command->bytes));
   }
   if (res == -1) CRAISE("command execution failed")
   *status = res;
@@ -1413,18 +1317,26 @@ Return_Code sys_M_system(
 }
 #undef LUMI_FUNC_NAME
 
-Return_Code sys_M_getenv(
-    char* name, Seq_Length name_max_length, Seq_Length *name_length,
-    char* value, Seq_Length value_max_length, Seq_Length* value_length,
-    Bool* exists) {
+#define LUMI_FUNC_NAME "sys.getenv"
+Return_Code sys_M_getenv(String* name, String* value, Bool* exists) {
   char* ret;
-  ret = getenv(name);
-  if (ret == NULL) {
-    *exists = false;
-    return OK;
+  Byte* new_bytes = NULL;
+  uint32_t length;
+  if (lumi_debug_value != LUMI_DEBUG_FAIL) {
+    ret = getenv((char*)(name->bytes));
+    if (ret == NULL) {
+      *exists = false;
+      return OK;
+    }
+    length = cstring_length((Byte*)ret);
+    new_bytes = malloc(length + 1);
   }
-  *value_length = cstring_length(ret, value_max_length);
-  strncpy(value, ret, *value_length);
+  if (new_bytes == NULL) CRAISE(LUMI_error_messages.object_memory.str)
+  memcpy(new_bytes, ret, length + 1);
+  String_clear(value);
+  value->bytes = new_bytes;
+  value->length = length;
   *exists = true;
   return OK;
 }
+#undef LUMI_FUNC_NAME

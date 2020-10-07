@@ -17,14 +17,15 @@ comment
 
 ; Test global variables
 var Uint32 global-int(copy 23)
-owner String global-string(owner String{32}(user "a constant string")!)
-owner Buffer global-buffer(owner Buffer{32}(user `feed1000beef`)!)
+var String global-buffer(user `feed1000beef`)!
+var String global-string(user "a constant string")!
+var String unicode-string(user "שָׁלוֹם 👋🏾 עוֹלָֽם 🌎\n")!
 
 var Array{TestEnum.length + LENGTH:Uint32} int-arr
 const Int LENGTH SIZE * 5
 const Int SIZE 12
 
-owner String large-global-string(owner String{1024}(user "\
+var String large-global-string(user "\
             012345678901234567890123456789012345678901234567890123456789\
             012345678901234567890123456789012345678901234567890123456789\
             012345678901234567890123456789012345678901234567890123456789\
@@ -34,9 +35,9 @@ owner String large-global-string(owner String{1024}(user "\
             012345678901234567890123456789012345678901234567890123456789\
             012345678901234567890123456789012345678901234567890123456789\
             012345678901234567890123456789012345678901234567890123456789\
-            012345678901234567890123456789012345678901234567890123456789")!)
+            012345678901234567890123456789012345678901234567890123456789")!
 
-owner Buffer large-global-buffer(owner Buffer{1024}(user `
+var String large-global-buffer(user `
             001122334455667788990011223344556677889900112233445566778899
             001122334455667788990011223344556677889900112233445566778899
             001122334455667788990011223344556677889900112233445566778899
@@ -56,7 +57,7 @@ owner Buffer large-global-buffer(owner Buffer{1024}(user `
             001122334455667788990011223344556677889900112233445566778899
             001122334455667788990011223344556677889900112233445566778899
             001122334455667788990011223344556677889900112233445566778899
-            001122334455667788990011223344556677889900112233445566778899`)!)
+            001122334455667788990011223344556677889900112233445566778899`)!
 
 
 ; Test Enum
@@ -96,10 +97,10 @@ func ! test-const-expression()->(
             -0xFDA940
     c := ('a' + '\'' + '\n' + '\x0f' + '\xA9' + '\270') mod 256
     user String? s
-    s := "some string"
-    s := "some
-            str\
-            ing"
+    ; s := "some string"
+    ; s := "some
+    ;         str\
+    ;         ing"
     user Buffer? b
     b := `2400fade`
     b := `
@@ -141,7 +142,7 @@ func ! test-slice-expression(
         weak Array?{SimpleStruct} arrto,
         weak Array?{SimpleClass} arrdo,
         weak Array?{Func{()}} arrfo)
-    c := clamp s[2]! + s[4:7]![2] + arrs[3]![2]! + arrs[4:6]![4][1:3]![0]
+    ; c := clamp s[2]! + s[4:7]![2] + arrs[3]![2]! + arrs[4:6]![4][1:3]![0]
     i := clamp arri[i + 3 - arri[2]!]! + arrt[4]!.num + arrt[2:4]![1].num +
             arri[3:3]![1:2][1]
     arrio := arri[2 - i + arri[2:4]![1]:5 * (i - 1)]!
@@ -155,6 +156,53 @@ func ! test-slice-expression(
     arrfo := arrf[2:7]!
     arrf[4]!()
     arrfo![4]!()
+
+func ! test-slice-assign(
+        weak Array{6:Array{7:Array{8:Uint32}}} as,
+        weak Array{6:Array{Array{8:Uint32}}} ams,
+        weak Array{Array{7:Array{Uint32}}} amd,
+        weak Array{Int{3:9}:Array{Int{4:10}:Array{Int{5:11}:Uint32}}} ar,
+        weak Array{Array{Array{Uint32}}} ad)->(
+        weak Array{4:Array{7:Array{8:Uint32}}} oas,
+        weak Array{4:Array{Array{8:Uint32}}} oams,
+        weak Array{Array{7:Array{Uint32}}} oamd,
+        weak Array{Int{3:9}:Array{Int{4:10}:Array{Int{5:11}:Uint32}}} oar,
+        weak Array{Array{Array{Uint32}}} oad)
+    oas := as
+    oas := ams!
+    oas := amd!
+    oas := ar!
+    oas := ad!
+    oams := as
+    oams := ams
+    oams := amd!
+    oams := ad!
+    oams := ar!
+    oamd := as
+    oamd := ams!
+    oamd := amd
+    oamd := ar!
+    oamd := ad!
+    oar := as
+    oar := ams!
+    oar := amd!
+    oar := ar
+    oar := ad!
+    oad := as
+    oad := ams
+    oad := amd
+    oad := ar
+    oad := ad
+    test-slice-assign(weak as, weak as, weak as, weak as, weak as)->(
+            weak oas, weak oams, weak oamd, weak oar, weak oad)!
+    test-slice-assign(weak ams!, weak ams, weak ams!, weak ams!, weak ams)->(
+            weak oad, weak oas!, weak oams!, weak oamd!, weak oar!)!
+    test-slice-assign(weak amd!, weak amd!, weak amd, weak amd!, weak amd)->(
+            weak oar, weak oad, weak oas!, weak oams!, weak oamd!)!
+    test-slice-assign(weak ar!, weak ar!, weak ar!, weak ar, weak ar)->(
+            weak oamd, weak oar!, weak oad, weak oas!, weak oams!)!
+    test-slice-assign(weak ad!, weak ad!, weak ad!, weak ad!, weak ad)->(
+            weak oams, weak oamd!, weak oar!, weak oad, weak oas!)!
 
 
 func test-container-expression(copy Sint32 x, copy Sint32 y, user String? s)->(
@@ -178,48 +226,50 @@ func ! test-variable(
     user TestClass? d
     var TestStruct tv(copy 0, user _)!
     var TestClass dv
-    var String{12} sv
+    var String sv
     var Buffer{12} bv
     var Func?{(copy Uint32 xi, user String si)->(
             var Uint32 xo, user String? so)} f
     var Array{12:Uint32} ia
     var Array{12:SimpleStruct} ta
     var Array{12:SimpleClass} da
-    var Array{12:String{7}} sa
+    var Array{12:String} sa
     var Array{12:Buffer{7}} ba
     var Array{12:Func{()}} fa
     new TestStruct tn(copy 0, user _)!
     new TestClass dn!
-    new String{arr[0]} sn!
+    new String sn!
     new Buffer{arr[0]} bn!
     new Array{arr[0]:Uint32} ian!
     new Array{arr[0]:SimpleStruct} tan!
     new Array{arr[0]:SimpleClass} dan!
-    new Array{arr[0]:String{arr[1]!}} san!
+    new Array{arr[0]:String} san!
     new Array{arr[0]:Buffer{arr[1]!}} ban!
     new Array{arr[0]:Func{()}} fan!
     var Uint32 ix(copy arr[0])
     user String si(user text!)
     user Buffer bi(user data!)
-    var String{12} ibv(user "some string")!
-    var Buffer{12} isv(user `fadebeef`)!
-    new String{i} isn(user text!)!
-    new Buffer{i} ibn(user data!)!
+    var String ibv(user "some string")!
+    ; var Buffer{12} isv(user `fadebeef`)!
+    var Buffer{12} isv
+    new String isn(user text!.bytes())!
+    ; new Buffer{i} ibn(user data!)!
+    new Buffer{i} ibn!
     var Func{:(copy Uint32 n)->(owner String? st)} fi(copy test-int2str)
-    var TestStruct itv(copy i, user text!)!
-    new TestStruct itn(copy i, user text!)!
+    var TestStruct itv(copy i, user text!.bytes())!
+    new TestStruct itn(copy i, user text!.bytes())!
     var TestClass idv()
     new TestClass idn()!
-    TestStruct(copy i, user text!)!.print()!
+    TestStruct(copy i, user text!.bytes())!.print()!
     TestClass()!.print()!
-    assert! String{arr[0]}()!.length() > 0
-    assert! Buffer{arr[0]}()!.length() > 0
-    assert! Array{arr[0]:Uint32}()!.length() > 0
-    assert! Array{arr[0]:SimpleStruct}()!.length() > 0
-    assert! Array{arr[0]:SimpleClass}()!.length() > 0
-    assert! Array{arr[0]:String{arr[1]!}}()!.length() > 0
-    assert! Array{arr[0]:Buffer{arr[1]!}}()!.length() > 0
-    assert! Array{arr[0]:Func{()}}()!.length() > 0
+    assert! String()!.length() > 0
+    assert! Buffer{arr[0]}()!.length > 0
+    assert! Array{arr[0]:Uint32}()!.length > 0
+    assert! Array{arr[0]:SimpleStruct}()!.length > 0
+    assert! Array{arr[0]:SimpleClass}()!.length > 0
+    assert! Array{arr[0]:String}()!.length > 0
+    assert! Array{arr[0]:Buffer{arr[1]!}}()!.length > 0
+    assert! Array{arr[0]:Func{()}}()!.length > 0
     assert! x = 0
     assert! s?
     assert! b?
@@ -230,31 +280,31 @@ func ! test-variable(
     tv.print()!
     dv.print()!
     assert! sv.length() > 0
-    assert! bv.length() > 0
-    assert! ia.length() > 0
-    assert! ta.length() > 0
-    assert! da.length() > 0
-    assert! sa.length() > 0
-    assert! ba.length() > 0
-    assert! fa.length() > 0
+    assert! bv.length > 0
+    assert! ia.length > 0
+    assert! ta.length > 0
+    assert! da.length > 0
+    assert! sa.length > 0
+    assert! ba.length > 0
+    assert! fa.length > 0
     tn.print()!
     dn.print()!
     assert! sn.length() > 0
-    assert! bn.length() > 0
-    assert! ian.length() > 0
-    assert! tan.length() > 0
-    assert! dan.length() > 0
-    assert! san.length() > 0
-    assert! ban.length() > 0
-    assert! fan.length() > 0
+    assert! bn.length > 0
+    assert! ian.length > 0
+    assert! tan.length > 0
+    assert! dan.length > 0
+    assert! san.length > 0
+    assert! ban.length > 0
+    assert! fan.length > 0
     assert! ix = 0
     assert! si.length() > 0
-    assert! bi.length() > 0
+    assert! bi.length > 0
     fi(copy 7)!
-    assert! isv.length() > 0
+    assert! isv.length > 0
     assert! ibv.length() > 0
     assert! isn.length() > 0
-    assert! ibn.length() > 0
+    assert! ibn.length > 0
 
 
 func test-complex-function(
@@ -287,7 +337,7 @@ struct TestStruct
     owner TestStruct? ts
     var Func{:()} fun
     
-    new!(copy Uint32 x, user String? s) _
+    new!(copy Uint32 x, user Buffer? s) _
     
     [; Test
     multiline
@@ -296,15 +346,15 @@ struct TestStruct
     func user get()->(var Uint32 x, user String? s) _
     
     func user ! print()
-        sys.println(user self.text!)!
+        sys.println(user self.text!.bytes())!
         
-func ! TestStruct.new(copy Uint32 x, user String? s)
+func ! TestStruct.new(copy Uint32 x, user Buffer? s)
     self.num := x
     if s?
-        new String{s!.length() + 1} text(user s!)!
+        new String text(user s!)!
         self.text := text
     if x < 0
-        self.ts := TestStruct(copy clamp x + 1, user self.text)!
+        self.ts := TestStruct(copy clamp x + 1, user self.text!.bytes())!
   
 func TestStruct.get()->(var Uint32 x, user String? s)
     x := self.num
@@ -324,7 +374,7 @@ class TestClass
     func dynamic user dynamic-meth() _
     
     func inst user ! print()
-        sys.println(user self.text!)!
+        sys.println(user self.text!.bytes())!
     
 func TestClass.static-meth()
     self.num := 3
@@ -353,7 +403,8 @@ func ! test-call-expression()
     var Uint32 x
     var Uint32 y
     test-void()!
-    test-params(copy 3, user "text", owner _)!
+    ; test-params(copy 3, user "text", owner _)!
+    test-params(copy 3, user _, owner _)!
     test-outs()->(owner s, var x)
     test-int2str(copy 4)->(owner s)!
     test-int(copy 5)
@@ -384,7 +435,7 @@ func ! test-code-flow(user Array{Uint32} arr)->(var Uint32 res)
         res := 6
     else
         res := 0
-    loop! arr.length()
+    loop! arr.length
         arr[6]! := 6
         var Uint32 x(copy arr[2]!)
         while x > 3 and arr is _
@@ -410,44 +461,43 @@ func ! use-builtins(
         temp Buffer buff,
         temp Array{Uint32} a)
     var Uint32 i
+    var Uint64 l
     var Sint64 x
     var Char c
     var Byte y
     var Bool b
     i.str(user s)!
     b := true or false
-    a.length()->(var i)
+    i := a.length
     
     s.length()->(var i)
-    s.max-length()->(var i)
+    ; s.max-length()->(var i)
     s.clear()
-    s.equal(user s)->(var b)
-    s.get(copy i)->(var c)!
-    s.set(copy i, copy c)!
+    s.equal(user buff)->(var b)
+    ; s.get(copy i)->(var c)!
+    ; s.set(copy i, copy c)!
     s.append(copy c)!
-    s.new(user s)!
-    s.concat(user s)!
+    s.new(user buff)!
+    s.concat(user buff)!
     s.concat-int(copy i)!
-    s.find(user s)->(var i)
+    ; s.find(user s)->(var i)
     s.has(copy c)->(var b)
     
-    a.length()->(var i)
-    
-    buff.length()->(var i)
-    buff.max-length()->(var i)
-    buff.clear()
-    buff.equal(user buff)->(var b)
-    buff.get(copy i)->(var y)!
-    buff.set(copy i, copy y)!
-    buff.append(copy y)!
-    buff.new(user buff)!
-    buff.concat(user buff)!
-    buff.find(user buff)->(var i)
-    buff.has(copy y)->(var b)
+    i := buff.length
+    ; buff.max-length()->(var i)
+    ; buff.clear()
+    ; buff.equal(user buff)->(var b)
+    ; buff.get(copy i)->(var y)!
+    ; buff.set(copy i, copy y)!
+    ; buff.append(copy y)!
+    ; buff.new(user buff)!
+    ; buff.concat(user buff)!
+    ; buff.find(user buff)->(var l)
+    ; buff.has(copy y)->(var b)
     
     new FileReadText frt(user s)!
     frt.get()->(var c, var b)!
-    frt.getline(user s)->(var b)!
+    ; frt.getline(user s)->(var b)!
     frt.tell()->(var x)!
     frt.seek-set(copy x)!
     frt.seek-cur(copy x)!
@@ -464,8 +514,8 @@ func ! use-builtins(
     frb.flush()!
     frb.close()!
     new FileWriteText fwt(user s, copy true)!
-    fwt.put(copy c)!
-    fwt.write(user s)->(var i)!
+    fwt.put(copy c mod 256)!
+    fwt.write(user s.bytes())->(var i)!
     fwt.tell()->(var x)!
     fwt.seek-set(copy x)!
     fwt.seek-cur(copy x)!
@@ -483,9 +533,9 @@ func ! use-builtins(
     fwb.close()!
     new FileReadWriteText frwt(user s, copy false, copy true)!
     frwt.get()->(var c, var b)!
-    frwt.getline(user s)->(var b)!
-    frwt.put(copy c)!
-    frwt.write(user s)->(var i)!
+    ; frwt.getline(user s)->(var b)!
+    frwt.put(copy c mod 255)!
+    frwt.write(user s.bytes())->(var i)!
     frwt.tell()->(var x)!
     frwt.seek-set(copy x)!
     frwt.seek-cur(copy x)!
@@ -519,32 +569,32 @@ func ! use-builtins(
     
     var Sint32 e
     user String arg(user sys.argv[1]!)
-    sys.print(user s)!
-    sys.println(user s)!
+    sys.print(user s.bytes())!
+    sys.println(user s.bytes())!
     sys.getchar()->(var c, var b)!
-    sys.getline(user s)->(var b)!
+    ; sys.getline(user s)->(var b)!
     sys.getenv(user s, user s)->(var b)!
     sys.system(user s)->(var e)!
     sys.exit(copy e)!
     sys.stdin.get()->(var c, var b)!
-    sys.stdout.put(copy c)!
-    sys.stderr.put(copy c)!
+    sys.stdout.put(copy c mod 255)!
+    sys.stderr.put(copy c mod 255)!
 
 
 func ! test-ref-count()
-    strong String? s(strong String{32}(user "test string")!)
+    strong String? s(strong String(user "test string")!)
     weak String s-user(weak s!)
-    sys.println(user s!)!
-    sys.println(user s-user!)!
+    sys.println(user s!.bytes())!
+    sys.println(user s-user!.bytes())!
     remove(owner s!)
     if not s?
         sys.println(user "ownership passed")!
     if not s-user?
         sys.println(user "string deleted")!
     new TestStruct ts(copy 0, user "first struct")!
-    sys.println(user ts.text!)!
+    sys.println(user ts.text!.bytes())!
     ts.ts := TestStruct(copy 1, user "second struct")!
-    sys.println(user ts.ts!.text!)!
+    sys.println(user ts.ts!.text!.bytes())!
 
 func remove(owner String s)
     ; remove s
@@ -552,8 +602,8 @@ func remove(owner String s)
 struct Item
     owner String s
     
-    new!(user String s)
-        new String{s.length() + 1} news(user s)!
+    new!(user Buffer s)
+        new String news(user s)!
         self.s := news
 
 struct Data{Generic}
@@ -599,6 +649,16 @@ func ! test-type-parameters(weak Item? s)
     t.item := s
     t.second := dt
     t.third := ts
+    
+    var Data{String} ds
+    weak String? str
+    ds.set(weak str)!
+    ds.get()->(weak str)
+    
+    var Data{File} df
+    weak File? f
+    df.set(weak f)!
+    df.get()->(weak f)
 
 
 func ! try-catch-raise(user TestStruct? t)
@@ -676,12 +736,12 @@ struct ContainerIterator{Generic}
             self.curr := self.curr!.next
 
 func ! test-for-each()
-    var String{16} text
+    var String text
     sys.print(user "chars[ ")!
     for c in "abcdef"
         text.clear()
         text.append(copy c)!
-        sys.print(user text)!
+        sys.print(user text.bytes())!
         sys.print(user " ")!
     sys.println(user "]")!
     
@@ -693,27 +753,27 @@ func ! test-for-each()
     for n in arr
         text.clear()
         n.str(user text)!
-        sys.print(user text)!
+        sys.print(user text.bytes())!
         sys.print(user " ")!
     sys.println(user "]")!
     
     var Array{3:SimpleStruct} tsarr
-    tsarr[0].text := String{4}(user "aaa")!
-    tsarr[1].text := String{4}(user "bbb")!
-    tsarr[2].text := String{4}(user "ccc")!
+    tsarr[0].text := String(user "aaa")!
+    tsarr[1].text := String(user "bbb")!
+    tsarr[2].text := String(user "ccc")!
     sys.print(user "structs[ ")!
     for ts in tsarr
-        sys.print(user ts.text!)!
+        sys.print(user ts.text!.bytes())!
         sys.print(user " ")!
     sys.println(user "]")!
     
-    var Array{3:String{16}} sarr
+    var Array{3:String} sarr
     sarr[0].new(user "ddd")!
     sarr[1].new(user "eee")!
     sarr[2].new(user "fff")!
     sys.print(user "strings[ ")!
     for s in sarr
-        sys.print(user s)!
+        sys.print(user s.bytes())!
         sys.print(user " ")!
     sys.println(user "]")!
     
@@ -724,11 +784,11 @@ func ! test-for-each()
     owner ContainerIterator{Item} iter(owner container.iter()!)
     sys.print(user "values[ ")!
     for sc in iter!
-        sys.print(user sc!.s)!
+        sys.print(user sc!.s.bytes())!
         sys.print(user " ")!
     sys.println(user "]")!
     
-    var Array{3:Array{3:Array{3:String{16}}}} saarr
+    var Array{3:Array{3:Array{3:String}}} saarr
     for n in 3
         for m in 3
             for i in 3
@@ -743,7 +803,7 @@ func ! test-for-each()
         sys.print(user "\n  ")!
         for b in a
             for s in b
-                sys.print(user s)!
+                sys.print(user s.bytes())!
                 sys.print(user " ")!
     sys.println(user "]")!
 
@@ -755,7 +815,7 @@ class ComplexField
 
 struct HasComplexField
     s-var ComplexField x
-    var Array{3:String{6}} as
+    var Array{3:String} as
     func user ! run() _
 
 func ! HasComplexField.run()
@@ -774,7 +834,7 @@ func ! HasComplexField.run()
     self.as[2].new(user "a3")!
     for s in self.as
         sys.print(user " ")!
-        sys.print(user s)!
+        sys.print(user s.bytes())!
 
 func ! test-complex-field()
     s-var HasComplexField y!
@@ -793,19 +853,19 @@ func ! test-temp()
     assert! t.ts!.num = 2
 
 func ! test-switch()
-    strong String s1(strong String{32}(user "first string")!)
-    strong String s2(strong String{32}(user "second string")!)
+    strong String s1(strong String(user "first string")!)
+    strong String s2(strong String(user "second string")!)
     s1 :=: s2
-    sys.println(user s1)!
-    sys.println(user s2)!
+    sys.println(user s1.bytes())!
+    sys.println(user s2.bytes())!
 
 
 class BaseString
     owner String s
     func dynamic user ! print()
-        sys.println(user self.s)!
+        sys.println(user self.s.bytes())!
     new!()
-        self.s := String{16}(user "BaseString")!
+        self.s := String(user "BaseString")!
     cleanup()
         try
             self.print()
@@ -815,7 +875,7 @@ class TestString(BaseString)
         sys.println(user "TestString print")!
         base()!
     new!()
-        self.s := String{16}(user "TestString")!
+        self.s := String(user "TestString")!
     cleanup()
         try
             sys.println(user "TestString cleanup")

@@ -126,10 +126,6 @@ class SyntaxTreeNode
     func inst analyze-expression(
             user ExpressionValue expression, user TypeData expected-type)
         expression.analyze()
-        if not expression.result-type?
-            self.syntax-error(
-                    user "got void expression, expected",
-                    user expected-type.name)
         if expression.result-type.type-data is-not expected-type
             self.syntax-error2(
                     user "got",
@@ -138,19 +134,20 @@ class SyntaxTreeNode
                     user expected-type.name)
     
     func inst check-expression-all-errors()->(owner Expression expression)
-        self.check-expression-errors(copy true, copy true)->(owner expression)
+        self.check-expression-errors(copy true, copy true, copy true)->(
+                owner expression)
     
     func inst check-expression-errors(
-            copy Bool check-conditional, copy Bool check-weak)->(
+            copy Bool check-conditional,
+            copy Bool check-weak,
+            copy Bool check-no-error)->(
             owner Expression expression)
-        if not expression.result-type?
-            return
         if (check-conditional and expression.result-type.conditional) or
                 (check-weak and expression.access = Access.WEAK)
-            expression := CheckExpression(
+            expression := CheckUsableExpression(
                     owner expression, copy check-conditional, copy check-weak)
             expression.analyze()
-        else
+        else-if check-no-error
             expression.check-no-error()
     
     func inst write-line-num()
@@ -271,14 +268,16 @@ class SyntaxTreeNode
     ~~~ Check `text` is a string constant ~~~
     func inst check-string(user String text)
         if text.length < 2
-            self.syntax-error(user "too short string constant", user text)
+            self.syntax-error(user "too short string literal", user text)
         if text[0] != '\"' or text[text.length - 1] != '\"'
-            self.syntax-error(user "no '\"' around string constant", user text)
+            self.syntax-error(user "no '\"' around string literal", user text)
         var Char prev
         for n in 1:text.length - 1
             var Char curr(copy text[n])
             if curr = '"' and prev != '\\'
-                self.syntax-error(user "'\"' inside string constant", user text)
+                self.syntax-error(
+                        user "'\"' inside string literal",
+                        user text[1:text.length - 2])
             prev := curr
 
     func inst write-bases(copy Int bases)

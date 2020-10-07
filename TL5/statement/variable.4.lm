@@ -41,12 +41,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
                 self.syntax-error-msg(
                         user "fileds inside dynamics not supported yet")
         self.type-instance := TypeInstance()
-        if self.is-create
-            self.type-instance.parse(
-                    user " ", user self, user self, copy INDENTATION-SPACES)
-        else
-            self.type-instance.parse(
-                    user " ", user self, user _, copy INDENTATION-SPACES)
+        self.type-instance.parse(
+                user " ", user self, user self, copy INDENTATION-SPACES)
         self.expect-space(user "type")
         read-new(user "!( ")->(owner self.name)
         if glob.last-char = ' ' and not self.is-native
@@ -185,7 +181,7 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         else-if not self.is-native
             write(user "\n")
         
-        if self.type-instance.type-data.is-sequence()
+        if self.type-instance.type-data is glob.type-array
             self.write-sequence()
             return
         
@@ -229,10 +225,6 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             self.write-dynamic()
     
     func inst write-sequence()
-        ; `data-type` `name`[`full length`][ = {0}];
-        ; `data-type`* `name`[ = NULL];
-        ; [void|Return_Code] (*`name`[`full length`])(`arguments`)[ = {0}];
-        ; [void|Return_Code] (**`name`)(`arguments`)[ = NULL];
         var Bool is-new-or-aux-var(
                 copy access-is-only-var(copy self.access) and self.is-create)
         var Bool is-new-var(copy is-new-or-aux-var and not self.is-aux)
@@ -240,11 +232,25 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         var Int sequence-depth
         self.type-instance.get-array-data-type-depth()->(
                 user data-type, var sequence-depth)
-        if data-type.type-data is glob.type-string
-            write(user "char")
-        else-if data-type.type-data is glob.type-buffer
-            write(user "Byte")
-        else-if data-type.type-data is glob.type-func
+        
+        self.write-sequence-var(
+                copy is-new-var, user data-type, copy sequence-depth)
+                
+        if not is-new-var
+            self.write-sequence-lengths(copy sequence-depth)
+            
+        if access-has-refman(copy self.access)
+            self.write-refman()
+    
+    func inst write-sequence-var(
+            copy Bool is-new-var,
+            user TypeInstance data-type,
+            copy Int sequence-depth)
+        ; `data-type` `name`[`full-length`][ = {0}];
+        ; `data-type`* `name`[ = NULL];
+        ; [void|Return_Code] (*`name`[`full-length`])(`arguments`)[ = {0}];
+        ; [void|Return_Code] (**`name`)(`arguments`)[ = NULL];
+        if data-type.type-data is glob.type-func
             data-type.arguments.write-pointer-start()
         else
             data-type.write-cname()
@@ -272,72 +278,33 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             else
                 write(user "NULL")
         write(user ";\n")
-        
-        if not is-new-var
-            ; Seq_Length[*] `name`_Length[ = 0|NULL];
-            ; Seq_Length `name`_Max_length[ = 0];
+
+    func inst write-sequence-lengths(copy Int sequence-depth)
+        user TypeInstance type-instance(user self.type-instance)
+        if not type-instance.length.get-constant-value()? or
+                self.type-instance.type-data is-not glob.type-array
+            ; Seq_Length `name`_Length[ = 0];
             self.write-spaces()
-            write(user "Seq_Length")
+            self.type-instance.parameters.first.next.item.write-cname()
             write(user " ")
             self.write-cname()
-            write(user "_")
-            if self.type-instance.type-data.is-buffered()
-                write(user "Max_length")
-            else
-                write(user "Length")
+            write(user "_Length")
             if not self.parent-type?
                 write(user " = 0")
             write(user ";\n")
-        
-            ; Seq_Length `name`_Value[_value*]_length[ = 0]; ...*
-            for depth in sequence-depth
+    
+        ; Seq_Length `name`_Value[_value*]_length[ = 0]; ...*
+        for depth in sequence-depth
+            type-instance := type-instance.parameters.first.item
+            if not type-instance.length.get-constant-value()?
                 self.write-spaces()
-                write(user "Seq_Length ")
+                type-instance.parameters.first.next.item.write-cname()
+                write(user " ")
                 self.write-cname()
                 write-array-value-length(copy depth)
                 if not self.parent-type?
                     write(user " = 0")
                 write(user ";\n")
-        
-        if data-type.type-data.is-buffered()
-            ; Seq_Length `name`_Length[1][ = {0}];
-            ; Seq_Length* `name`_Length[ = &Lumi_empty_length];
-            ; Seq_Length `name`_Seq_length[`strings`][ = {0}];
-            ; Seq_Length* `name`_Seq_length[ = NULL];
-            self.write-spaces()
-            write(user "Seq_Length")
-            if not is-new-or-aux-var
-                write(user "*")
-            write(user " ")
-            self.write-cname()
-            if sequence-depth > 0
-                write(user "_Seq_length")
-            else
-                write(user "_Length")
-            if is-new-or-aux-var
-                write(user "[")
-                if sequence-depth > 0
-                    sequence-type := self.type-instance
-                    sequence-type.length.write()
-                    for _ in sequence-depth - 1
-                        sequence-type := sequence-type.parameters.first.item
-                        write(user " * ")
-                        sequence-type.length.write()
-                else
-                    write(user "1")
-                write(user "]")
-            if not self.parent-type?
-                write(user " = ")
-                if is-new-or-aux-var
-                    write(user "{0}")
-                else-if sequence-depth = 0
-                    write(user "&Lumi_empty_length")
-                else
-                    write(user "NULL")
-            write(user ";\n")
-            
-        if access-has-refman(copy self.access)
-            self.write-refman()
     
     func inst write-var()
         ; `type` `name`_Var = {...};
@@ -513,7 +480,7 @@ class SyntaxTreeConstant(SyntaxTreeVariable)
             self.syntax-error(user "illegal constant name", user self.name)
         if not self.is-native
             self.expect-space(user self.name)
-            self.value.new(user "", user self)
+            self.value.new(user "", user self, user self)
         self.module.variable-map.add(user self.name, user self)
     
     func dynamic link-types()

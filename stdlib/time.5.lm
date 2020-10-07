@@ -22,20 +22,18 @@ native func Uint64 c-clock() "clock"
 
 native func CtimeT c-time(copy cdef.Pointer{CtimeT} timer) "time"
 
-native func cdef.Pointer{cdef.Char} c-ctime(
-        copy cdef.Pointer{CtimeT} timer) "ctime"
+native func cdef.CharP c-ctime(copy cdef.Pointer{CtimeT} timer) "ctime"
 
 native func Sint64 c-difftime(copy CtimeT time1, copy CtimeT time2) "difftime"
 
-native func cdef.Pointer{cdef.Char} c-asctime(
-        copy cdef.Pointer{StructTm} timeptr) "asctime"
+native func cdef.CharP c-asctime(copy cdef.Pointer{StructTm} timeptr) "asctime"
 
 native func CtimeT c-mktime(copy cdef.Pointer{StructTm} timeptr) "mktime"
 
 native func cdef.Size c-strftime(
-        copy cdef.Pointer{cdef.Char} target,
+        copy cdef.CharP target,
         copy cdef.Size maxsize,
-        copy cdef.Pointer{cdef.Char} format,
+        copy cdef.CharP format,
         copy cdef.Pointer{StructTm} timeptr) "strftime"
 
 native func cdef.Pointer{StructTm} c-gmtime(
@@ -137,15 +135,16 @@ struct Time
     func user ! asctime(user String target)
         cdef.copy-to-string(copy c-asctime(copy self.c-pointer()), user target)!
     
-    func user strftime(user String target, user String format)->(
+    func user strftime(user Buffer target, user String format)->(
             var Uint32 copied)
         var Ref timeptr(copy self)
+        var cdef.Pointer targetp(copy target)
+        var cdef.Pointer formatp(copy format.bytes())
         copied := clamp c-strftime(
-                copy target,
-                copy target.max-length(),
-                copy format,
+                copy targetp,
+                copy target.length,
+                copy formatp,
                 copy self.c-pointer())
-        cdef.set-null-term-length(user target)
 
 
 func clock()->(var Uint64 ticks)

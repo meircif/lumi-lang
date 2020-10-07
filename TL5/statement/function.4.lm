@@ -509,7 +509,7 @@ class DeclarationArgument(Argument)
             self.variable.parent := code-node.parent
         self.variable.type-instance := TypeInstance()
         self.variable.type-instance.parse(
-                user " ", user node, user _, copy indentation-spaces)
+                user " ", user node, user code-node, copy indentation-spaces)
         self.expect-space(user "type")
         read-new(user ",)")->(owner self.variable.name)
         self.variable.check-name()
@@ -563,7 +563,7 @@ class DeclarationArgument(Argument)
                 self.syntax-error-msg(
                         user "managed argument to native function")
             if self.is-output and self.access = Access.USER and
-                    (type-data.is-dynamic or type-data.is-sequence())
+                    (type-data.is-dynamic or type-data is glob.type-array)
                 self.syntax-error(
                         user "user output to native function with non \
                         struct type",
@@ -591,43 +591,7 @@ class DeclarationArgument(Argument)
             return
         
         if self.variable.type-instance.type-data is glob.type-array
-            ; `data-type`*[*] `name`, Seq_Length[*] `name`_Length
-            ; [void|Return_Code] (**[*] `name`)(`arguments`), Seq_Length[*]
-            ;    `name`_Length
-            user TypeInstance data-type
-            var Int depth
-            self.variable.type-instance.get-array-data-type-depth()->(
-                    user data-type, var depth)
-            if data-type.type-data is glob.type-string
-                write(user "char")
-            else-if data-type.type-data is glob.type-buffer
-                write(user "Byte")
-            else-if data-type.type-data is glob.type-func
-                data-type.arguments.write-pointer-start()
-            else
-                data-type.write-cname()
-            self.write-name-param(user "*", user _)
-            if data-type.type-data is glob.type-func
-                write(user ")")
-                data-type.arguments.write()
-            self.write-name-param(user ", Seq_Length", user "_Length")
-            for n in depth
-                ; , Seq_Length[*] `name`_Value_length
-                self.write-name-param(user ", Seq_Length", user _)
-                write-array-value-length(copy n)
-            if data-type.type-data.is-buffered()
-                ; , Seq_Length*[*] `name`_Seq_length
-                self.write-name-param(user ", Seq_Length*", user "_Seq_length")
-        
-        else-if self.variable.type-instance.type-data.is-buffered()
-            ; char*[*] `name`, Seq_Length[*] `name`_Max_length,
-            ;   Seq_Length*[*] `name`_Length
-            if self.variable.type-instance.type-data is glob.type-string
-                self.write-name-param(user "char*", user _)
-            else
-                self.write-name-param(user "Byte*", user _)
-            self.write-name-param(user ", Seq_Length", user "_Max_length")
-            self.write-name-param(user ", Seq_Length*", user "_Length")
+            self.write-array()
         
         else
             ; `type`[*][*] `name`
@@ -658,6 +622,37 @@ class DeclarationArgument(Argument)
                 self.write-name-param(user "_Dynamic*", user "_Dynamic")
             else
                 self.write-name-param(user "*", user "_Dynamic")
+                
+    func inst write-array()
+        ; `data-type`*[*] `name`, Seq_Length[*] `name`_Length
+        ; [void|Return_Code] (**[*] `name`)(`arguments`), Seq_Length[*]
+        ;    `name`_Length
+        user TypeInstance data-type
+        var Int depth
+        self.variable.type-instance.get-array-data-type-depth()->(
+                user data-type, var depth)
+        if data-type.type-data is glob.type-func
+            data-type.arguments.write-pointer-start()
+        else
+            data-type.write-cname()
+        self.write-name-param(user "*", user _)
+        if data-type.type-data is glob.type-func
+            write(user ")")
+            data-type.arguments.write()
+        
+        user TypeInstance type-instance(user self.variable.type-instance)
+        if not type-instance.length.get-constant-value()?
+            write(user ", ")
+            type-instance.parameters.first.next.item.write-cname()
+            self.write-name-param(user _, user "_Length")
+        for n in depth
+            type-instance := type-instance.parameters.first.item
+            if not type-instance.length.get-constant-value()?
+                ; , Seq_Length[*] `name`_Value_length
+                write(user ", ")
+                type-instance.parameters.first.next.item.write-cname()
+                self.write-name-param(user _, user _)
+                write-array-value-length(copy n)
                 
     
     func inst write-name-param(user String prefix, user String suffix)
