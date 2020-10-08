@@ -420,9 +420,6 @@ class CallArgument(Argument)
             if self.is-generic
                 write(user "(void*)")
             write(user "&(")
-        else-if self.is-native and not self.real-type.type-data.is-primitive and
-                not self.real-type.type-data is glob.type-array
-            write(user "(void*)")
         self.call-value.write-cast()
         if self.is-output
             write(user ")")

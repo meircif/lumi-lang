@@ -134,7 +134,7 @@ native type NativeRef
 native var Native external-nvar
 native func external0() "MY_Some_external"
 native func NativeRef external-get-ref(
-        copy cdef.Int i, copy cdef.Pointer{cdef.Uchar} s, user Array{cdef.Int} a)
+        copy cdef.Int i, copy cdef.CharP s, user Array{cdef.Int} a)
 native func cdef.Int external-set-ref(copy NativeRef n)
 native func Native external-get-var()
 native func cdef.Int external-set-var(copy Native n)
@@ -145,8 +145,7 @@ test test-native()
     assert! EXTERNAL-CONST = 12
     var NativeRef nr
     var Native n
-    ; var String s(user "bb")!
-    user Buffer buff(user "bb")
+    var String s(user "bb")!
     var Array{6:cdef.Int} a
     external0()
     assert! external-int = 7
@@ -154,9 +153,8 @@ test test-native()
     assert! n.y = 0
     assert! external-nvar.x = 3
     assert! external-nvar.y = 4
-    nr := external-get-ref(copy 3, copy buff, user a)
-    ; assert! s.bytes()[0] = 'a'
-    assert! buff[0] = 'a'
+    nr := external-get-ref(copy 3, copy s.cdef-pointer(), user a)
+    assert! s.bytes()[0] = 'a'
     assert! a[0] = 3
     assert! external-set-ref(copy nr) = 7
     n := external-get-var()
@@ -210,8 +208,7 @@ test test-pointer()
     
     var String stra(user "aabbccdd")!
     var String strb(user "---")!
-    var cdef.Pointer pc
-    pc := stra.bytes()
+    var cdef.CharP pc(copy stra.cdef-pointer())
     cdef.copy-to-string(copy pc, user strb)!
     assert! strb.equal(user stra.bytes())
     

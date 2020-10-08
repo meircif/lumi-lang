@@ -8,7 +8,7 @@ void MY_Some_external(void) {
   external_int = 7;
 }
 
-NativeRef external_get_ref(int i, unsigned char* s, int* a) {
+NativeRef external_get_ref(int i, char* s, int* a) {
   s[0] = 'a';
   a[0] = i;
   return &external_nvar;

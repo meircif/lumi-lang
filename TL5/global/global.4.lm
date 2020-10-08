@@ -1206,6 +1206,23 @@ struct Global
                 owner argument-type-instance.name)
 
         self.add-builtin-global-function(
+                user cdef-module, user "copy-to-buffer", copy false)->(
+                user function)
+        self.add-builtin-argument(
+                user function,
+                copy false,
+                copy Access.COPY,
+                user self.type-pointer,
+                user self.type-byte,
+                user _,
+                user "pointer")
+        self.add-builtin-buffer-argument(
+                user function,
+                copy false,
+                copy Access.USER,
+                user "target")
+
+        self.add-builtin-global-function(
                 user cdef-module, user "copy-to-string", copy true)->(
                 user function)
         self.add-builtin-argument(
@@ -1222,22 +1239,21 @@ struct Global
                 user self.type-string,
                 user "target")
 
-        self.add-builtin-global-function(
-                user cdef-module, user "copy-to-buffer", copy false)->(
+        self.add-builtin-method-native(
+                user self.type-string,
+                user "cdef-pointer",
+                copy false,
+                user "cdef_M_string_pointer",
+                copy Access.USER)->(
                 user function)
         self.add-builtin-argument(
                 user function,
-                copy false,
+                copy true,
                 copy Access.COPY,
                 user self.type-pointer,
-                user self.type-byte,
+                user self.type-char,
                 user _,
                 user "pointer")
-        self.add-builtin-buffer-argument(
-                user function,
-                copy false,
-                copy Access.USER,
-                user "target")
         
         self.root.modules.add(owner cdef-module)
     
