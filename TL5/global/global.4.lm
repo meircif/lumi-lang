@@ -581,18 +581,6 @@ struct Global
                 copy Access.USER,
                 user "bytes")
 
-        self.add-builtin-method(
-                user self.type-string,
-                user "concat-int",
-                copy true,
-                copy Access.USER)->(
-                user function)
-        self.add-builtin-int-argument(
-                user function,
-                user "Sint64",
-                copy false,
-                user "number")
-
         ; Buffer
         ; self.add-builtin-method(
         ;         user self.type-array,
@@ -709,6 +697,12 @@ struct Global
         self.add-builtin-method(
                 user seq-type, user "clear", copy false, copy Access.USER)->(
                 user function)
+        owner TypeInstance type-buffer
+        type-buffer := self.type-array.new-type-instance()
+        type-buffer.parameters := List{TypeInstance}()
+        type-buffer.parameters.add(owner self.type-byte.new-type-instance())
+        type-buffer.add-default-length-type()
+        function.delete-group.add-deleting(user type-buffer)
 
         self.add-builtin-method(
                 user seq-type, user "equal", copy false, copy Access.USER)->(
@@ -729,6 +723,7 @@ struct Global
                 user function)
         self.add-builtin-parameter(
                 user function, copy Access.COPY, user value-type, user "value")
+        function.delete-group.add-deleting(user type-buffer)
 
         self.add-builtin-method(
                 user seq-type, user "concat", copy true, copy Access.USER)->(
@@ -738,6 +733,20 @@ struct Global
                 copy false,
                 copy Access.USER,
                 user "other")
+        function.delete-group.add-deleting(user type-buffer)
+
+        self.add-builtin-method(
+                user seq-type,
+                user "concat-int",
+                copy true,
+                copy Access.USER)->(
+                user function)
+        self.add-builtin-int-argument(
+                user function,
+                user "Sint64",
+                copy false,
+                user "number")
+        function.delete-group.add-deleting(user type-buffer)
 
         self.add-builtin-method(
                 user seq-type, user "has", copy false, copy Access.USER)->(

@@ -325,9 +325,15 @@ struct TypeInstance
     
     func can-be-assigned-to(user TypeInstance target)->(var Bool can)
         can := false
+        var Int self-access(copy Access.USER)
+        if self.type-data.is-primitive
+            self-access := Access.VAR
+        var Int target-access(copy Access.USER)
+        if target.type-data.is-primitive
+            target-access := Access.VAR
         try
             self.check-assign-to(
-                    copy Access.VAR, user target, copy Access.VAR, user _)
+                    copy self-access, user target, copy target-access, user _)
             can := true
     
     func check-assign-from(copy Int access, user SyntaxTreeNode node)->(

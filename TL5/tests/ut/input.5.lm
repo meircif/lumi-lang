@@ -1612,6 +1612,22 @@ ostr!.concat(user buff!)!
 ostr!.concat-int(copy i)!
 ; @ c test-builtin-string10
 ostr!.has(copy c)->(var b)
+; @ ec test-builtin-string-e0
+bfr := str!.bytes()
+str!.clear()
+bt := bfr![1]!
+; @ ec test-builtin-string-e1
+bfr := str!.bytes()
+str!.append(copy bt)!
+bt := bfr![1]!
+; @ ec test-builtin-string-e2
+bfr := str!.bytes()
+str!.concat(user buff!)!
+bt := bfr![1]!
+; @ ec test-builtin-string-e3
+bfr := str!.bytes()
+str!.concat-int(copy i)!
+bt := bfr![1]!
 ; @ c test-builtin-buffer0
 i := buff!.length
 ; @ c test-builtin-file0

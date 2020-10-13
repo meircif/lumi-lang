@@ -3818,6 +3818,14 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
 /// @ test-builtin-string10
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     String_has(ut_M_ostr, ut_M_c, &(ut_M_b));
+/// @ test-builtin-string-e0
+using potentially illegal user reference "bfr"
+/// @ test-builtin-string-e1
+using potentially illegal user reference "bfr"
+/// @ test-builtin-string-e2
+using potentially illegal user reference "bfr"
+/// @ test-builtin-string-e3
+using potentially illegal user reference "bfr"
 /// @ test-builtin-buffer0
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
     ut_M_i = ut_M_buff_Length;
