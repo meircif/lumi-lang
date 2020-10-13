@@ -4,6 +4,7 @@ module tl5-compiler-tests
 
 var Bool arguments-set
 var String{1024} test-base-dir
+user String test-only
 
 func setup-arguments()
     if arguments-set
@@ -12,6 +13,9 @@ func setup-arguments()
         user String arg(user sys.argv[n])
         if arg.equal(user "--trace")
             flag-trace := true
+        else-if arg.equal(user "-only") and n + 1 < sys.argv.length
+            n += 1
+            test-only := sys.argv[n]
         else-if arg[0] != '-' and test-base-dir.length = 0
             test-base-dir.new(user arg)
     if test-base-dir.length = 0

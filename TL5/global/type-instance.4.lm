@@ -325,9 +325,15 @@ struct TypeInstance
     
     func can-be-assigned-to(user TypeInstance target)->(var Bool can)
         can := false
+        var Int self-access(copy Access.USER)
+        if self.type-data.is-primitive
+            self-access := Access.VAR
+        var Int target-access(copy Access.USER)
+        if target.type-data.is-primitive
+            target-access := Access.VAR
         try
             self.check-assign-to(
-                    copy Access.VAR, user target, copy Access.VAR, user _)
+                    copy self-access, user target, copy target-access, user _)
             can := true
     
     func check-assign-from(copy Int access, user SyntaxTreeNode node)->(
@@ -355,9 +361,6 @@ struct TypeInstance
                 var bases)
         if bases > 0
             value := UpCastExpression(owner value, copy bases)
-        else-if self.type-data is glob.type-pointer and
-                value.result-type.type-data is glob.type-string
-            value := RefCastExpression(owner value)
     
     func need-length-check-from(user TypeInstance value-type)->(
             var Bool check-length)
@@ -416,8 +419,17 @@ struct TypeInstance
             return
         if target.type-data is glob.type-ref and not self.type-data.is-primitive
             return
-        if target.type-data is glob.type-pointer and self.type-data.is-ref()
-            return
+        if target.type-data is glob.type-pointer
+            if self.type-data is glob.type-pointer
+                return
+            if self.type-data.is-ref()
+                if not target.parameters?
+                    return
+                user TypeInstance value(user self)
+                if self.type-data is glob.type-array
+                    value := self.parameters.first.item
+                if value.can-be-assigned-to(user target.parameters.first.item)
+                    return
         passed := false
     
     func check-assign-to-access(
@@ -455,7 +467,8 @@ struct TypeInstance
                                 user "cannot move non-conditional global owner",
                                 user self.reference-path)
         if (not access-is-user(copy target-access) and
-                access-is-user(copy self-access)) or
+                access-is-user(copy self-access) and
+                not target.type-data is glob.type-pointer) or
                 (target-access = Access.S-VAR and self-access = Access.VAR)
             assert node?
             node.syntax-error2(

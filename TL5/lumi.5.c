@@ -807,6 +807,21 @@ Return_Code String_new(String* self, Byte* source, uint32_t source_length) {
 }
 #undef LUMI_FUNC_NAME
 
+void String_bytes(String* self, Byte** bytes, uint32_t* bytes_length) {
+  if (self->bytes == NULL) {
+    self->bytes = String_empty_string;
+  }
+  *bytes = self->bytes;
+  *bytes_length = self->length;
+}
+
+char* cdef_M_string_pointer(String* self) {
+  if (self->bytes == NULL) {
+    self->bytes = String_empty_string;
+  }
+  return (char*)(self->bytes);
+}
+
 #define LUMI_FUNC_NAME "cdef.copy-to-string"
 Return_Code cdef_M_copy_to_string(char* source, String* self) {
   CCHECK(String_new(
@@ -817,6 +832,9 @@ Return_Code cdef_M_copy_to_string(char* source, String* self) {
 
 void String_equal(
     String* self, Byte* other, uint32_t other_length, Bool* out_equal) {
+  if (self->bytes == NULL) {
+    self->bytes = String_empty_string;
+  }
   if (self->length != other_length) {
     *out_equal = false;
     return;
@@ -844,37 +862,12 @@ Return_Code String_set(String* self, uint32_t index, Char ch) {
 }
 #undef LUMI_FUNC_NAME
 
-void String_bytes(String* self, Byte** bytes, uint32_t* bytes_length) {
-  *bytes = self->bytes;
-  *bytes_length = self->length;
-}
-
-#define LUMI_FUNC_NAME "String.append"
-Return_Code String_append(String* self, Char ch) {
-  Byte *new_bytes;
-  if (ch > 255) CRAISE("appending character values over 255 not suppored yet")
-  if (lumi_debug_value == LUMI_DEBUG_FAIL) {
-    new_bytes = NULL;
-  } else if (self->bytes == String_empty_string) {
-    new_bytes = malloc(2);
-  } else {
-    new_bytes = realloc(self->bytes, self->length + 2);
-  }
-  if (new_bytes == NULL) CRAISE(LUMI_error_messages.object_memory.str)
-  new_bytes[self->length] = ch;
-  ++(self->length);
-  new_bytes[self->length] = '\0';
-  self->bytes = new_bytes;
-  return OK;
-}
-#undef LUMI_FUNC_NAME
-
 #define LUMI_FUNC_NAME "String.concat"
 Return_Code String_concat(String* self, Byte* ext, uint32_t ext_length) {
   Byte *new_bytes;
   if (lumi_debug_value == LUMI_DEBUG_FAIL) {
     new_bytes = NULL;
-  } else if (self->bytes == String_empty_string) {
+  } else if (self->length == 0) {
     new_bytes = malloc(ext_length + 1);
   } else {
     new_bytes = realloc(self->bytes, self->length + ext_length + 1);
@@ -884,6 +877,16 @@ Return_Code String_concat(String* self, Byte* ext, uint32_t ext_length) {
   self->length += ext_length;
   new_bytes[self->length] = '\0';
   self->bytes = new_bytes;
+  return OK;
+}
+#undef LUMI_FUNC_NAME
+
+#define LUMI_FUNC_NAME "String.append"
+Return_Code String_append(String* self, Char ch) {
+  Byte tmp;
+  if (ch > 255) CRAISE("appending character values over 255 not suppored yet")
+  tmp = ch;
+  CCHECK(String_concat(self, &tmp, 1))
   return OK;
 }
 #undef LUMI_FUNC_NAME

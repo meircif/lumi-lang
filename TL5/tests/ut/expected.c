@@ -3818,6 +3818,14 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
 /// @ test-builtin-string10
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     String_has(ut_M_ostr, ut_M_c, &(ut_M_b));
+/// @ test-builtin-string-e0
+using potentially illegal user reference "bfr"
+/// @ test-builtin-string-e1
+using potentially illegal user reference "bfr"
+/// @ test-builtin-string-e2
+using potentially illegal user reference "bfr"
+/// @ test-builtin-string-e3
+using potentially illegal user reference "bfr"
 /// @ test-builtin-buffer0
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
     ut_M_i = ut_M_buff_Length;
@@ -8667,9 +8675,9 @@ void ut_M_call(void) {
     uint32_t a_Length = 0;
     ut_M_Test* t = NULL;
     ut_M_Test_Dynamic* t_Dynamic = NULL;
-    i = external(0x05, (void*)s, a, (void*)t);
-    i = ((uint64_t)0x02 * external(0x05, (void*)s, a, (void*)t)) + 0x03;
-    external(0x05, (void*)s, a, (void*)t);
+    i = external(0x05, s, a, t);
+    i = ((uint64_t)0x02 * external(0x05, s, a, t)) + 0x03;
+    external(0x05, s, a, t);
 LUMI_block0_cleanup:
     (void)0;
 }
@@ -13208,6 +13216,7 @@ void* p_void = NULL;
     p_uint = p_void;
     p_char = p_uint;
     ut_M_b = ((((p_void != NULL) || (p_char != NULL)) || (p_test != NULL)) || (pp_int != NULL)) || (ppp_char != NULL);
+    p_void = str;
 /// @ test-c-objects-2
 cdef_M_Int cint = 0;
     cdef_M_Int* p_int = NULL;
@@ -13244,11 +13253,10 @@ Return_Code ut_M_fun(String* str, Byte* buff, uint32_t buff_Length) {
     unsigned LUMI_loop_depth = 1;
     cdef_M_Char* p_char = NULL;
     cdef_M_Uchar* p_uchar = NULL;
-    p_char = (void*)str;
+    p_char = cdef_M_string_pointer(str);
     p_uchar = buff;
-    ext((void*)str, buff);
-    ut_M_proxy((void*)str, buff);
-    CHECK_REF(10, LUMI_block0_cleanup, str)
+    ext(cdef_M_string_pointer(str), buff);
+    ut_M_proxy(cdef_M_string_pointer(str), buff);
     LUMI_err = cdef_M_copy_to_string(p_char, str);
     CHECK(10, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
@@ -13267,6 +13275,8 @@ cannot assign value with access "user" into value with access "var"
 assigning into non assignable expression
 /// @ test-c-objects-e3
 cannot use "?" on primitive type "Pointer"
+/// @ test-c-objects-e4
+cannot assign "String" into "Pointer"
 /// @@ test-cleanup-function
 /// @ test-cleanup-function-0
 typedef struct ut_M_Test ut_M_Test;

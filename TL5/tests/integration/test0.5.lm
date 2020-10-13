@@ -736,15 +736,15 @@ struct ContainerIterator{Generic}
             self.curr := self.curr!.next
 
 func ! test-for-each()
-    var String text
+    var Buffer{1} buff
     sys.print(user "chars[ ")!
     for c in "abcdef"
-        text.clear()
-        text.append(copy c)!
-        sys.print(user text.bytes())!
+        buff[0] := c
+        sys.print(user buff)!
         sys.print(user " ")!
     sys.println(user "]")!
     
+    var String text
     var Array{3:Uint32} arr
     arr[0] := 14
     arr[1] := 15

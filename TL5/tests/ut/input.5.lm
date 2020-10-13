@@ -1612,6 +1612,22 @@ ostr!.concat(user buff!)!
 ostr!.concat-int(copy i)!
 ; @ c test-builtin-string10
 ostr!.has(copy c)->(var b)
+; @ ec test-builtin-string-e0
+bfr := str!.bytes()
+str!.clear()
+bt := bfr![1]!
+; @ ec test-builtin-string-e1
+bfr := str!.bytes()
+str!.append(copy bt)!
+bt := bfr![1]!
+; @ ec test-builtin-string-e2
+bfr := str!.bytes()
+str!.concat(user buff!)!
+bt := bfr![1]!
+; @ ec test-builtin-string-e3
+bfr := str!.bytes()
+str!.concat-int(copy i)!
+bt := bfr![1]!
 ; @ c test-builtin-buffer0
 i := buff!.length
 ; @ c test-builtin-file0
@@ -5426,6 +5442,7 @@ p-void := p-char
 p-uint := p-void
 p-char := p-uint
 b := p-void? or p-char? or p-test? or pp-int? or ppp-char?
+p-void := str
 ; @ c test-c-objects-2
 var cdef.Int cint
 var cdef.Pointer{cdef.Int} p-int
@@ -5447,14 +5464,14 @@ u-test := p-test.get-ref-at(copy 5)
 ; @ g test-c-objects-3
 native func ext(copy cdef.CharP p-char, copy cdef.Pointer{cdef.Uchar} p-uchar)
 func proxy(copy cdef.CharP p-char, copy cdef.Pointer{cdef.Uchar} p-uchar)
-func ! fun(user String? str, user Buffer? buff)
+func ! fun(user String str, user Buffer? buff)
     var cdef.CharP p-char
     var cdef.Pointer{cdef.Uchar} p-uchar
-    p-char := str
+    p-char := str.cdef-pointer()
     p-uchar := buff
-    ext(copy str, copy buff)
-    proxy(copy str, copy buff)
-    cdef.copy-to-string(copy p-char, user str!)!
+    ext(copy str.cdef-pointer(), copy buff)
+    proxy(copy str.cdef-pointer(), copy buff)
+    cdef.copy-to-string(copy p-char, user str)!
 ; @ c test-c-objects-4
 var cdef.Pointer{cdef.Uchar} p-uchar
 cdef.copy-to-buffer(copy p-uchar, user buff!)
@@ -5469,6 +5486,8 @@ var cdef.Pointer{Test} p-test
 tv := p-test.get-pointed-at(copy 0)
 ; @ ec test-c-objects-e3
 var cdef.Pointer?{cdef.Int} error
+; @ ec test-c-objects-e4
+var cdef.Pointer{cdef.Int} ip(copy str)
 ; @@ test-cleanup-function
 ; @ g test-cleanup-function-0
 struct Test
