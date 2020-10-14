@@ -270,38 +270,47 @@ Returncode f_setup_test() {
 /* string assertion */
 
 #if LUMI_STAGE == LUMI_DECLARATIONS
+extern String* actual_slice;
+#elif LUMI_STAGE == LUMI_FUNCTIONS
+String* actual_slice = &(String){16384, 0, (char[16384]){0}};
+#endif
+
+#if LUMI_STAGE == LUMI_DECLARATIONS
 Returncode f_assert_string_slice(String* expected, String* actual, Int start, Int slice_length, Bool is_main);
 #elif LUMI_STAGE == LUMI_FUNCTIONS
 static char* _func_name_f_assert_string_slice = "f-assert-string-slice";
 #define LUMI_FUNC_NAME _func_name_f_assert_string_slice
 Returncode f_assert_string_slice(String* expected, String* actual, Int start, Int slice_length, Bool is_main) {
-  String* actual_slice = &(String){1, 0, ""};
+  /* user String actual-slice("") */
+  CHECK(106, String_clear(actual_slice) )
   if (actual->length >= start + slice_length) {
-    if ((start) < 0 || (slice_length) < 0 || (start) + (slice_length) > (actual)->length) RAISE(105)
-    actual_slice = (&(String){slice_length, slice_length, (actual)->values + (start)});
+    /* actual-slice := actual[start:slice-length] */
+    if ((start) < 0 || (slice_length) < 0 || (start) + (slice_length) > (actual)->length) RAISE(109)
+    CHECK(109, String_copy(actual_slice, (&(String){slice_length, slice_length, (actual)->values + (start)})) )
   }
   else {
     if (actual->length > start) {
-      if ((start) < 0 || (actual->length - start) < 0 || (start) + (actual->length - start) > (actual)->length) RAISE(107)
-      actual_slice = (&(String){actual->length - start, actual->length - start, (actual)->values + (start)});
+      /* actual-slice := actual[start:actual.length - start] */
+      if ((start) < 0 || (actual->length - start) < 0 || (start) + (actual->length - start) > (actual)->length) RAISE(112)
+      CHECK(112, String_copy(actual_slice, (&(String){actual->length - start, actual->length - start, (actual)->values + (start)})) )
     }
   }
   if (is_main) {
-    CHECK(109, File_write(actual_output_file, actual_slice) )
-    CHECK(110, File_write(actual_output_file, &(String){2, 1, "\n"}) )
+    CHECK(114, File_write(actual_output_file, actual_slice) )
+    CHECK(115, File_write(actual_output_file, &(String){2, 1, "\n"}) )
   }
   Bool _Bool210;
-  CHECK(111, String_equal(actual_slice, expected, &(_Bool210)) )
+  CHECK(116, String_equal(actual_slice, expected, &(_Bool210)) )
   if (_Bool210) {
     return OK;
   }
-  CHECK(113, Sys_print_raw(sys, &(String){15, 14, "\n  [expected `"}) )
-  CHECK(114, Sys_print_raw(sys, expected) )
-  CHECK(115, Sys_print_raw(sys, &(String){9, 8, "`, got `"}) )
-  CHECK(116, Sys_print_raw(sys, actual_slice) )
-  CHECK(117, Sys_print_raw(sys, &(String){4, 3, "`] "}) )
-  CHECK(118, write_new_file(&(String){13, 12, "expected.txt"}, expected) )
-  CHECK(119, write_new_file(&(String){11, 10, "actual.txt"}, actual_slice) )
+  CHECK(118, Sys_print_raw(sys, &(String){15, 14, "\n  [expected `"}) )
+  CHECK(119, Sys_print_raw(sys, expected) )
+  CHECK(120, Sys_print_raw(sys, &(String){9, 8, "`, got `"}) )
+  CHECK(121, Sys_print_raw(sys, actual_slice) )
+  CHECK(122, Sys_print_raw(sys, &(String){4, 3, "`] "}) )
+  CHECK(123, write_new_file(&(String){13, 12, "expected.txt"}, expected) )
+  CHECK(124, write_new_file(&(String){11, 10, "actual.txt"}, actual_slice) )
   tests_passed = false;
   return OK;
 }
@@ -315,9 +324,9 @@ static char* _func_name_write_new_file = "write-new-file";
 #define LUMI_FUNC_NAME _func_name_write_new_file
 Returncode write_new_file(String* filename, String* data) {
   File* file = NULL;
-  CHECK(124, file_open_write(filename, &(file)) )
-  CHECK(125, File_write(file, data) )
-  CHECK(126, File_close(file) )
+  CHECK(129, file_open_write(filename, &(file)) )
+  CHECK(130, File_write(file, data) )
+  CHECK(131, File_close(file) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -329,8 +338,8 @@ Returncode f_assert_string(String* expected, String* actual);
 static char* _func_name_f_assert_string = "f-assert-string";
 #define LUMI_FUNC_NAME _func_name_f_assert_string
 Returncode f_assert_string(String* expected, String* actual) {
-  TEST_ASSERT(129, NULL != actual)
-  CHECK(130, f_assert_string_slice(expected, actual, 0, actual->length, false) )
+  TEST_ASSERT(134, NULL != actual)
+  CHECK(135, f_assert_string_slice(expected, actual, 0, actual->length, false) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -345,12 +354,12 @@ static char* _func_name_set_test_file_name = "set-test-file-name";
 Returncode set_test_file_name(String* filename, String* base_name, String* suffix) {
   String* base_dir = &(String){1024, 0, (char[1024]){0}};
   Bool _Bool211;
-  CHECK(137, Sys_getenv(sys, &(String){9, 8, "TEST_DIR"}, base_dir, &(_Bool211)) )
+  CHECK(142, Sys_getenv(sys, &(String){9, 8, "TEST_DIR"}, base_dir, &(_Bool211)) )
   if (_Bool211) {
-    CHECK(138, String_copy(filename, base_dir) )
+    CHECK(143, String_copy(filename, base_dir) )
   }
-  CHECK(139, String_concat(filename, base_name) )
-  CHECK(140, String_concat(filename, suffix) )
+  CHECK(144, String_concat(filename, base_name) )
+  CHECK(145, String_concat(filename, suffix) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -364,26 +373,26 @@ static char* _func_name_test_new_file = "test-new-file";
 #define LUMI_FUNC_NAME _func_name_test_new_file
 Returncode test_new_file(String* base_name, String* name) {
   String* filename = &(String){256, 0, (char[256]){0}};
-  CHECK(145, set_test_file_name(filename, base_name, &(String){6, 5, ".4.lm"}) )
-  CHECK(146, file_open_read(filename, &(input_file)) )
-  CHECK(147, set_test_file_name(filename, base_name, &(String){12, 11, ".expected.c"}) )
-  CHECK(148, file_open_read(filename, &(expected_output_file)) )
-  CHECK(149, set_test_file_name(filename, base_name, &(String){10, 9, ".actual.c"}) )
-  CHECK(150, file_open_write(filename, &(actual_output_file)) )
+  CHECK(150, set_test_file_name(filename, base_name, &(String){6, 5, ".4.lm"}) )
+  CHECK(151, file_open_read(filename, &(input_file)) )
+  CHECK(152, set_test_file_name(filename, base_name, &(String){12, 11, ".expected.c"}) )
+  CHECK(153, file_open_read(filename, &(expected_output_file)) )
+  CHECK(154, set_test_file_name(filename, base_name, &(String){10, 9, ".actual.c"}) )
+  CHECK(155, file_open_write(filename, &(actual_output_file)) )
   
   had_test_error = false;
   String* line = &(String){1024, 0, (char[1024]){0}};
   Bool _Bool212;
-  CHECK(154, read_line(input_file, line, &(String){7, 6, "## @@ "}, &(_Bool212)) )
+  CHECK(159, read_line(input_file, line, &(String){7, 6, "## @@ "}, &(_Bool212)) )
   if (!_Bool212) {
-    CHECK(155, file_error(name, line) )
+    CHECK(160, file_error(name, line) )
   }
   Bool _Bool213;
-  CHECK(156, read_line(expected_output_file, line, &(String){8, 7, "/// @@ "}, &(_Bool213)) )
+  CHECK(161, read_line(expected_output_file, line, &(String){8, 7, "/// @@ "}, &(_Bool213)) )
   if (!_Bool213) {
-    CHECK(157, file_error(name, line) )
+    CHECK(162, file_error(name, line) )
   }
-  CHECK(158, test_from_file(name) )
+  CHECK(163, test_from_file(name) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -398,50 +407,50 @@ static char* _func_name_test_from_file = "test-from-file";
 Returncode test_from_file(String* name) {
   String* line = &(String){1024, 0, (char[1024]){0}};
   String* subname = &(String){1024, 0, (char[1024]){0}};
-  CHECK(163, String_copy(subname, &(String){6, 5, "start"}))
+  CHECK(168, String_copy(subname, &(String){6, 5, "start"}))
   if (had_test_error) {
     while (true) {
       Bool _Bool214;
-      CHECK(166, read_line(input_file, line, &(String){7, 6, "## @@ "}, &(_Bool214)) )
+      CHECK(171, read_line(input_file, line, &(String){7, 6, "## @@ "}, &(_Bool214)) )
       if (!(!_Bool214)) break;
     }
     while (true) {
       Bool _Bool215;
-      CHECK(168, read_line(expected_output_file, line, &(String){8, 7, "/// @@ "}, &(_Bool215)) )
+      CHECK(173, read_line(expected_output_file, line, &(String){8, 7, "/// @@ "}, &(_Bool215)) )
       if (!(!_Bool215)) break;
     }
   }
   had_test_error = true;
   Bool _Bool216;
-  CHECK(170, read_line(input_file, line, NULL, &(_Bool216)) )
+  CHECK(175, read_line(input_file, line, NULL, &(_Bool216)) )
   Bool _Bool217;
-  CHECK(171, String_equal(line, name, &(_Bool217)) )
+  CHECK(176, String_equal(line, name, &(_Bool217)) )
   if (!_Bool217) {
-    CHECK(172, file_error(name, line) )
+    CHECK(177, file_error(name, line) )
   }
   Bool _Bool218;
-  CHECK(173, read_line(expected_output_file, line, NULL, &(_Bool218)) )
+  CHECK(178, read_line(expected_output_file, line, NULL, &(_Bool218)) )
   Bool _Bool219;
-  CHECK(174, String_equal(line, name, &(_Bool219)) )
+  CHECK(179, String_equal(line, name, &(_Bool219)) )
   if (!_Bool219) {
-    CHECK(175, file_error(name, line) )
+    CHECK(180, file_error(name, line) )
   }
-  CHECK(176, File_write(actual_output_file, &(String){8, 7, "/// @@ "}) )
-  CHECK(177, File_write(actual_output_file, name) )
-  CHECK(178, File_write(actual_output_file, &(String){2, 1, "\n"}) )
+  CHECK(181, File_write(actual_output_file, &(String){8, 7, "/// @@ "}) )
+  CHECK(182, File_write(actual_output_file, name) )
+  CHECK(183, File_write(actual_output_file, &(String){2, 1, "\n"}) )
   
   String* input = &(String){4096, 0, (char[4096]){0}};
   String* second_file_input = &(String){1024, 0, (char[1024]){0}};
   String* expected = &(String){16384, 0, (char[16384]){0}};
   Bool _Bool220;
-  CHECK(183, read_line(input_file, line, &(String){6, 5, "## @ "}, &(_Bool220)) )
+  CHECK(188, read_line(input_file, line, &(String){6, 5, "## @ "}, &(_Bool220)) )
   if (!_Bool220) {
-    CHECK(184, file_error(name, line) )
+    CHECK(189, file_error(name, line) )
   }
   Bool _Bool221;
-  CHECK(185, read_line(expected_output_file, line, &(String){7, 6, "/// @ "}, &(_Bool221)) )
+  CHECK(190, read_line(expected_output_file, line, &(String){7, 6, "/// @ "}, &(_Bool221)) )
   if (!_Bool221) {
-    CHECK(186, file_error(name, line) )
+    CHECK(191, file_error(name, line) )
   }
   
   Char type_char = '\0';
@@ -451,101 +460,101 @@ Returncode test_from_file(String* name) {
   tests_passed = true;
   while (true) {
     String* second_input = NULL;
-    CHECK(195, File_getc(input_file, &(type_char)) )
+    CHECK(200, File_getc(input_file, &(type_char)) )
     append_newline = type_char != 'f';
     if (!append_newline) {
-      CHECK(198, File_getc(input_file, &(type_char)) )
+      CHECK(203, File_getc(input_file, &(type_char)) )
     }
     is_error_test = type_char == 'e';
     if (is_error_test) {
-      CHECK(201, File_getc(input_file, &(type_char)) )
+      CHECK(206, File_getc(input_file, &(type_char)) )
     }
     is_test = type_char == 't';
     if (is_test) {
-      CHECK(204, File_getc(input_file, &(type_char)) )
+      CHECK(209, File_getc(input_file, &(type_char)) )
       second_input = second_file_input;
     }
     if (type_char != 'g' && type_char != 'c') {
-      CHECK(207, file_error(name, subname) )
+      CHECK(212, file_error(name, subname) )
     }
     Char _Char222;
-    CHECK(208, File_getc(input_file, &(_Char222)) )
+    CHECK(213, File_getc(input_file, &(_Char222)) )
     if (_Char222 != ' ') {
-      CHECK(209, file_error(name, subname) )
+      CHECK(214, file_error(name, subname) )
     }
     Bool _Bool223;
-    CHECK(210, read_line(input_file, subname, NULL, &(_Bool223)) )
+    CHECK(215, read_line(input_file, subname, NULL, &(_Bool223)) )
     Bool _Bool224;
-    CHECK(211, read_line(expected_output_file, line, NULL, &(_Bool224)) )
+    CHECK(216, read_line(expected_output_file, line, NULL, &(_Bool224)) )
     Bool _Bool225;
-    CHECK(212, String_equal(line, subname, &(_Bool225)) )
+    CHECK(217, String_equal(line, subname, &(_Bool225)) )
     if (!_Bool225) {
-      CHECK(213, file_error(name, subname) )
+      CHECK(218, file_error(name, subname) )
     }
-    CHECK(214, File_write(actual_output_file, &(String){7, 6, "/// @ "}) )
-    CHECK(215, File_write(actual_output_file, subname) )
-    CHECK(216, File_write(actual_output_file, &(String){2, 1, "\n"}) )
+    CHECK(219, File_write(actual_output_file, &(String){7, 6, "/// @ "}) )
+    CHECK(220, File_write(actual_output_file, subname) )
+    CHECK(221, File_write(actual_output_file, &(String){2, 1, "\n"}) )
     
-    CHECK(218, read_data(input_file, input, &(String){5, 4, "## @"}) )
+    CHECK(223, read_data(input_file, input, &(String){5, 4, "## @"}) )
     if (is_test) {
       Char _Char226;
-      CHECK(220, File_getc(input_file, &(_Char226)) )
+      CHECK(225, File_getc(input_file, &(_Char226)) )
       if (_Char226 != '-') {
-        CHECK(221, file_error(name, subname) )
+        CHECK(226, file_error(name, subname) )
       }
       Char _Char227;
-      CHECK(222, File_getc(input_file, &(_Char227)) )
-      CHECK(223, read_data(input_file, second_file_input, &(String){5, 4, "## @"}) )
+      CHECK(227, File_getc(input_file, &(_Char227)) )
+      CHECK(228, read_data(input_file, second_file_input, &(String){5, 4, "## @"}) )
     }
-    CHECK(224, read_data(expected_output_file, expected, &(String){6, 5, "/// @"}) )
+    CHECK(229, read_data(expected_output_file, expected, &(String){6, 5, "/// @"}) )
     if (append_newline) {
-      CHECK(226, String_append(input, '\n') )
+      CHECK(231, String_append(input, '\n') )
       if (is_test) {
-        CHECK(228, String_append(second_file_input, '\n') )
+        CHECK(233, String_append(second_file_input, '\n') )
       }
     }
     if (type_char == 'c') {
       if (is_error_test) {
-        CHECK(231, test_code_error(input, expected) )
+        CHECK(236, test_code_error(input, expected) )
       }
       else {
-        CHECK(233, test_code(input, expected) )
+        CHECK(238, test_code(input, expected) )
       }
     }
     else {
       if (is_error_test) {
-        CHECK(236, test_global_scope_error(input, second_input, expected, is_test) )
+        CHECK(241, test_global_scope_error(input, second_input, expected, is_test) )
       }
       else {
-        CHECK(239, test_global_scope(input, second_input, expected, is_test) )
+        CHECK(244, test_global_scope(input, second_input, expected, is_test) )
       }
     }
     
     Char _Char228;
-    CHECK(242, File_getc(expected_output_file, &(_Char228)) )
+    CHECK(247, File_getc(expected_output_file, &(_Char228)) )
     Char _Char229;
-    CHECK(243, File_getc(input_file, &(_Char229)) )
+    CHECK(248, File_getc(input_file, &(_Char229)) )
     if (!(_Char229 == ' ')) break;
   }
   
   Char _Char230;
-  CHECK(245, File_getc(expected_output_file, &(_Char230)) )
+  CHECK(250, File_getc(expected_output_file, &(_Char230)) )
   Char _Char231;
-  CHECK(246, File_getc(input_file, &(_Char231)) )
+  CHECK(251, File_getc(input_file, &(_Char231)) )
   if (_Char231 == 127) {
     Char _Char232;
-    CHECK(247, File_getc(expected_output_file, &(_Char232)) )
+    CHECK(252, File_getc(expected_output_file, &(_Char232)) )
     if (_Char232 != 127) {
-      CHECK(248, file_error(name, subname) )
+      CHECK(253, file_error(name, subname) )
     }
-    CHECK(249, File_write(actual_output_file, &(String){7, 6, "/// @\n"}) )
-    CHECK(250, File_close(input_file) )
-    CHECK(251, File_close(expected_output_file) )
-    CHECK(252, File_close(actual_output_file) )
+    CHECK(254, File_write(actual_output_file, &(String){7, 6, "/// @\n"}) )
+    CHECK(255, File_close(input_file) )
+    CHECK(256, File_close(expected_output_file) )
+    CHECK(257, File_close(actual_output_file) )
   }
   
   had_test_error = false;
-  TEST_ASSERT(255, tests_passed)
+  TEST_ASSERT(260, tests_passed)
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -557,16 +566,16 @@ Returncode read_line(File* file, String* line, String* prefix, Bool* found_prefi
 static char* _func_name_read_line = "read-line";
 #define LUMI_FUNC_NAME _func_name_read_line
 Returncode read_line(File* file, String* line, String* prefix, Bool* found_prefix) {
-  CHECK(259, String_clear(line) )
+  CHECK(264, String_clear(line) )
   (*found_prefix) = false;
   Char ch = '\0';
   while (true) {
-    CHECK(263, File_getc(file, &(ch)) )
+    CHECK(268, File_getc(file, &(ch)) )
     if (!(ch != 127 && ch != '\n')) break;
-    CHECK(265, String_append(line, ch) )
+    CHECK(270, String_append(line, ch) )
     if (NULL != prefix &&  ! (*found_prefix)) {
       Bool _Bool233;
-      CHECK(267, String_equal(line, prefix, &(_Bool233)) )
+      CHECK(272, String_equal(line, prefix, &(_Bool233)) )
       if (_Bool233) {
         (*found_prefix) = true;
         return OK;
@@ -574,7 +583,7 @@ Returncode read_line(File* file, String* line, String* prefix, Bool* found_prefi
     }
   }
   if (ch == 127 && line->length == 0) {
-    RAISE(271)
+    RAISE(276)
   }
   return OK;
 }
@@ -588,16 +597,16 @@ Returncode read_data(File* file, String* data, String* prefix);
 static char* _func_name_read_data = "read-data";
 #define LUMI_FUNC_NAME _func_name_read_data
 Returncode read_data(File* file, String* data, String* prefix) {
-  CHECK(275, String_clear(data) )
+  CHECK(280, String_clear(data) )
   String* line = &(String){1024, 0, (char[1024]){0}};
   while (true) {
     Bool _Bool234;
-    CHECK(278, read_line(file, line, prefix, &(_Bool234)) )
+    CHECK(283, read_line(file, line, prefix, &(_Bool234)) )
     if (!(!_Bool234)) break;
     if (data->length > 0) {
-      CHECK(280, String_append(data, '\n') )
+      CHECK(285, String_append(data, '\n') )
     }
-    CHECK(281, String_concat(data, line) )
+    CHECK(286, String_concat(data, line) )
   }
   return OK;
 }
@@ -611,14 +620,14 @@ Returncode file_error(String* name, String* subname);
 static char* _func_name_file_error = "file-error";
 #define LUMI_FUNC_NAME _func_name_file_error
 Returncode file_error(String* name, String* subname) {
-  CHECK(285, Sys_print_raw(sys, &(String){23, 22, "file format error in ["}) )
-  CHECK(286, Sys_print_raw(sys, name) )
+  CHECK(290, Sys_print_raw(sys, &(String){23, 22, "file format error in ["}) )
+  CHECK(291, Sys_print_raw(sys, name) )
   if (NULL != subname) {
-    CHECK(288, Sys_print_raw(sys, &(String){6, 5, "] / ["}) )
-    CHECK(289, Sys_print_raw(sys, subname) )
+    CHECK(293, Sys_print_raw(sys, &(String){6, 5, "] / ["}) )
+    CHECK(294, Sys_print_raw(sys, subname) )
   }
-  CHECK(290, Sys_print(sys, &(String){2, 1, "]"}) )
-  RAISE(291)
+  CHECK(295, Sys_print(sys, &(String){2, 1, "]"}) )
+  RAISE(296)
 }
 #undef LUMI_FUNC_NAME
 #endif
@@ -633,29 +642,29 @@ static char* _func_name_test_list = "test-list";
 Returncode test_list() {
   List* list = &(List){NULL, NULL};
   String* _String235;
-  CHECK(297, List_pop(list, (void**)&(_String235)) )
-  TEST_ASSERT(297, !(NULL != _String235))
+  CHECK(302, List_pop(list, (void**)&(_String235)) )
+  TEST_ASSERT(302, !(NULL != _String235))
   String* _String236;
-  CHECK(298, string_new_copy(&(String){7, 6, "value1"}, &(_String236)) )
-  CHECK(298, List_add(list, _String236) )
+  CHECK(303, string_new_copy(&(String){7, 6, "value1"}, &(_String236)) )
+  CHECK(303, List_add(list, _String236) )
   String* _String237;
-  CHECK(299, string_new_copy(&(String){7, 6, "value2"}, &(_String237)) )
-  CHECK(299, List_add(list, _String237) )
+  CHECK(304, string_new_copy(&(String){7, 6, "value2"}, &(_String237)) )
+  CHECK(304, List_add(list, _String237) )
   String* _String238;
-  CHECK(300, string_new_copy(&(String){7, 6, "value3"}, &(_String238)) )
-  CHECK(300, List_add(list, _String238) )
+  CHECK(305, string_new_copy(&(String){7, 6, "value3"}, &(_String238)) )
+  CHECK(305, List_add(list, _String238) )
   String* _String239;
-  CHECK(301, List_pop(list, (void**)&(_String239)) )
-  CHECK(301, f_assert_string(&(String){7, 6, "value1"}, _String239) )
+  CHECK(306, List_pop(list, (void**)&(_String239)) )
+  CHECK(306, f_assert_string(&(String){7, 6, "value1"}, _String239) )
   String* _String240;
-  CHECK(302, List_pop(list, (void**)&(_String240)) )
-  CHECK(302, f_assert_string(&(String){7, 6, "value2"}, _String240) )
+  CHECK(307, List_pop(list, (void**)&(_String240)) )
+  CHECK(307, f_assert_string(&(String){7, 6, "value2"}, _String240) )
   String* _String241;
-  CHECK(303, List_pop(list, (void**)&(_String241)) )
-  CHECK(303, f_assert_string(&(String){7, 6, "value3"}, _String241) )
+  CHECK(308, List_pop(list, (void**)&(_String241)) )
+  CHECK(308, f_assert_string(&(String){7, 6, "value3"}, _String241) )
   String* _String242;
-  CHECK(304, List_pop(list, (void**)&(_String242)) )
-  TEST_ASSERT(304, !(NULL != _String242))
+  CHECK(309, List_pop(list, (void**)&(_String242)) )
+  TEST_ASSERT(309, !(NULL != _String242))
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -671,30 +680,28 @@ static char* _func_name_test_name_map = "test-name-map";
 Returncode test_name_map() {
   NameMap* map = &(NameMap){NULL, NULL};
   String* _String243;
-  CHECK(310, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String243)) )
-  TEST_ASSERT(310, !(NULL != _String243))
-  CHECK(311, NameMap_add(map, &(String){6, 5, "name1"}, &(String){7, 6, "value1"}) )
+  CHECK(315, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String243)) )
+  TEST_ASSERT(315, !(NULL != _String243))
+  CHECK(316, NameMap_add(map, &(String){6, 5, "name1"}, &(String){7, 6, "value1"}) )
   String* _String244;
-  CHECK(312, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String244)) )
-  CHECK(312, f_assert_string(&(String){7, 6, "value1"}, _String244) )
+  CHECK(317, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String244)) )
+  CHECK(317, f_assert_string(&(String){7, 6, "value1"}, _String244) )
   String* _String245;
-  CHECK(313, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String245)) )
-  TEST_ASSERT(313, !(NULL != _String245))
-  CHECK(314, NameMap_add(map, &(String){6, 5, "name2"}, &(String){7, 6, "value2"}) )
+  CHECK(318, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String245)) )
+  TEST_ASSERT(318, !(NULL != _String245))
+  CHECK(319, NameMap_add(map, &(String){6, 5, "name2"}, &(String){7, 6, "value2"}) )
+  /* f-assert-string(user "value1", user map.find(user "name1")) */
   String* _String246;
-  CHECK(315, NameMap_find(map, &(String){6, 5, "name1"}, (void**)&(_String246)) )
-  CHECK(315, f_assert_string(&(String){7, 6, "value1"}, _String246) )
+  CHECK(321, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String246)) )
+  CHECK(321, f_assert_string(&(String){7, 6, "value2"}, _String246) )
+  CHECK(322, NameMap_update_or_add(map, &(String){6, 5, "name3"}, &(String){7, 6, "value3"}) )
   String* _String247;
-  CHECK(316, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String247)) )
-  CHECK(316, f_assert_string(&(String){7, 6, "value2"}, _String247) )
-  CHECK(317, NameMap_update_or_add(map, &(String){6, 5, "name3"}, &(String){7, 6, "value3"}) )
+  CHECK(323, NameMap_find(map, &(String){6, 5, "name3"}, (void**)&(_String247)) )
+  CHECK(323, f_assert_string(&(String){7, 6, "value3"}, _String247) )
+  CHECK(324, NameMap_update_or_add(map, &(String){6, 5, "name2"}, &(String){8, 7, "value2x"}) )
   String* _String248;
-  CHECK(318, NameMap_find(map, &(String){6, 5, "name3"}, (void**)&(_String248)) )
-  CHECK(318, f_assert_string(&(String){7, 6, "value3"}, _String248) )
-  CHECK(319, NameMap_update_or_add(map, &(String){6, 5, "name2"}, &(String){8, 7, "value2x"}) )
-  String* _String249;
-  CHECK(320, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String249)) )
-  CHECK(320, f_assert_string(&(String){8, 7, "value2x"}, _String249) )
+  CHECK(325, NameMap_find(map, &(String){6, 5, "name2"}, (void**)&(_String248)) )
+  CHECK(325, f_assert_string(&(String){8, 7, "value2x"}, _String248) )
   return OK;
 }
 #undef LUMI_FUNC_NAME
@@ -714,67 +721,8 @@ Returncode test_illegal_call() {
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    DeclarationArgument* _DeclarationArgument250;
-    CHECK(326, (arg)->_base._dtl[5](arg, &(_DeclarationArgument250)) );
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) return value
-    _trace_stream = stdout;
-    TEST_FAIL(326)
-  } while (false);
-  _trace_stream = stdout;
-  _trace_stream = NULL;
-  do {
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) break
-    Char _Char251;
-    CHECK(327, (arg)->_base._dtl[6](arg, NULL, 0, &(_Char251)) );
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) return value
-    _trace_stream = stdout;
-    TEST_FAIL(327)
-  } while (false);
-  _trace_stream = stdout;
-  _trace_stream = NULL;
-  do {
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) break
-    TypeInstance* _TypeInstance252;
-    CHECK(328, (arg)->_base._dtl[7](arg, &(_TypeInstance252)) );
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) return value
-    _trace_stream = stdout;
-    TEST_FAIL(328)
-  } while (false);
-  _trace_stream = stdout;
-  _trace_stream = NULL;
-  do {
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) break
-    SyntaxTreeVariable* _SyntaxTreeVariable253;
-    CHECK(329, (arg)->_base._dtl[9](arg, &(_SyntaxTreeVariable253)) );
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) return value
-    _trace_stream = stdout;
-    TEST_FAIL(329)
-  } while (false);
-  _trace_stream = stdout;
-  _trace_stream = NULL;
-  do {
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) break
-    Expression* _Expression254;
-    CHECK(330, (arg)->_base._dtl[10](arg, &(_Expression254)) );
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) return value
-    _trace_stream = stdout;
-    TEST_FAIL(330)
-  } while (false);
-  _trace_stream = stdout;
-  _trace_stream = NULL;
-  do {
-#undef RETURN_ERROR
-#define RETURN_ERROR(value) break
-    CHECK(331, (arg)->_base._dtl[11](arg) );
+    DeclarationArgument* _DeclarationArgument249;
+    CHECK(331, (arg)->_base._dtl[5](arg, &(_DeclarationArgument249)) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
@@ -785,11 +733,70 @@ Returncode test_illegal_call() {
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(332, (arg)->_base._dtl[12](arg) );
+    Char _Char250;
+    CHECK(332, (arg)->_base._dtl[6](arg, NULL, 0, &(_Char250)) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
     TEST_FAIL(332)
+  } while (false);
+  _trace_stream = stdout;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    TypeInstance* _TypeInstance251;
+    CHECK(333, (arg)->_base._dtl[7](arg, &(_TypeInstance251)) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(333)
+  } while (false);
+  _trace_stream = stdout;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    SyntaxTreeVariable* _SyntaxTreeVariable252;
+    CHECK(334, (arg)->_base._dtl[9](arg, &(_SyntaxTreeVariable252)) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(334)
+  } while (false);
+  _trace_stream = stdout;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    Expression* _Expression253;
+    CHECK(335, (arg)->_base._dtl[10](arg, &(_Expression253)) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(335)
+  } while (false);
+  _trace_stream = stdout;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(336, (arg)->_base._dtl[11](arg) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(336)
+  } while (false);
+  _trace_stream = stdout;
+  _trace_stream = NULL;
+  do {
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) break
+    CHECK(337, (arg)->_base._dtl[12](arg) );
+#undef RETURN_ERROR
+#define RETURN_ERROR(value) return value
+    _trace_stream = stdout;
+    TEST_FAIL(337)
   } while (false);
   _trace_stream = stdout;
   ArgumentFactory* factory = &(ArgumentFactory){ArgumentFactory__dtl};
@@ -798,12 +805,12 @@ Returncode test_illegal_call() {
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    Argument* _Argument255;
-    CHECK(334, (factory)->_dtl[0](factory, &(_Argument255)) );
+    Argument* _Argument254;
+    CHECK(339, (factory)->_dtl[0](factory, &(_Argument254)) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
-    TEST_FAIL(334)
+    TEST_FAIL(339)
   } while (false);
   _trace_stream = stdout;
   SyntaxTreeBranch* branch = &(SyntaxTreeBranch){SyntaxTreeBranch__dtl, NULL, 0, 0, NULL};
@@ -812,12 +819,12 @@ Returncode test_illegal_call() {
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    Char _Char256;
-    CHECK(336, (branch)->_base._dtl[6](branch, NULL, &(_Char256)) );
+    Char _Char255;
+    CHECK(341, (branch)->_base._dtl[6](branch, NULL, &(_Char255)) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
-    TEST_FAIL(336)
+    TEST_FAIL(341)
   } while (false);
   _trace_stream = stdout;
   SyntaxTreeNode* node = &(SyntaxTreeNode){SyntaxTreeNode__dtl, NULL, 0};
@@ -826,27 +833,27 @@ Returncode test_illegal_call() {
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(338, (node)->_dtl[4](node) );
+    CHECK(343, (node)->_dtl[4](node) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
-    TEST_FAIL(338)
+    TEST_FAIL(343)
   } while (false);
   _trace_stream = stdout;
-  TypeData* _TypeData257;
-  CHECK(339, (node)->_dtl[0](node, &(_TypeData257)) )
-  TEST_ASSERT(339, !(NULL != _TypeData257))
+  TypeData* _TypeData256;
+  CHECK(344, (node)->_dtl[0](node, &(_TypeData256)) )
+  TEST_ASSERT(344, !(NULL != _TypeData256))
   NodeAction* action = &(NodeAction){NodeAction__dtl};
   action->_dtl = NodeAction__dtl;
   _trace_stream = NULL;
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(341, (action)->_dtl[0](action, NULL) );
+    CHECK(346, (action)->_dtl[0](action, NULL) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
-    TEST_FAIL(341)
+    TEST_FAIL(346)
   } while (false);
   _trace_stream = stdout;
   SyntaxTreeRoot* root = &(SyntaxTreeRoot){SyntaxTreeRoot__dtl, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, false};
@@ -855,11 +862,11 @@ Returncode test_illegal_call() {
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(343, (root)->_base._base._base._base._dtl[1](root) );
+    CHECK(348, (root)->_base._base._base._base._dtl[1](root) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
-    TEST_FAIL(343)
+    TEST_FAIL(348)
   } while (false);
   _trace_stream = stdout;
   TypeWriter* tw = &(TypeWriter){TypeWriter__dtl};
@@ -868,22 +875,22 @@ Returncode test_illegal_call() {
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(345, (tw)->_dtl[0](tw, NULL) );
+    CHECK(350, (tw)->_dtl[0](tw, NULL) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
-    TEST_FAIL(345)
+    TEST_FAIL(350)
   } while (false);
   _trace_stream = stdout;
   _trace_stream = NULL;
   do {
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) break
-    CHECK(346, write_cname(NULL) );
+    CHECK(351, write_cname(NULL) );
 #undef RETURN_ERROR
 #define RETURN_ERROR(value) return value
     _trace_stream = stdout;
-    TEST_FAIL(346)
+    TEST_FAIL(351)
   } while (false);
   _trace_stream = stdout;
   return OK;
