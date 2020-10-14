@@ -16,7 +16,7 @@ if [ -z $CC ]; then
   CC=gcc
 fi
 CCW="$CC --std=c89 -Werror -Wall"
-CCA="$CCW --pedantic -Wno-unused"
+CCA="$CCW --pedantic -Wno-unused -Wno-tautological-overlap-compare"
 if [ $CC == "clang" ]; then
   CCA="$CCA -Wno-self-assign"
 fi

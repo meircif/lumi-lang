@@ -94,17 +94,22 @@ func f-setup-test()
 
 # string assertion
 
+var String{16384} actual-slice
+
 func f-assert-string-slice(
     user String expected,
     user String actual,
     copy Int start,
     copy Int slice-length,
     copy Bool is-main)
-  user String actual-slice("")
+  # user String actual-slice("")
+  actual-slice.clear()
   if actual.length >= start + slice-length
-    actual-slice := actual[start:slice-length]
+    # actual-slice := actual[start:slice-length]
+    actual-slice.copy(user actual[start:slice-length])
   else-if actual.length > start
-    actual-slice := actual[start:actual.length - start]
+    # actual-slice := actual[start:actual.length - start]
+    actual-slice.copy(user actual[start:actual.length - start])
   if is-main
     actual-output-file.write(user actual-slice)
     actual-output-file.write(user "\n")
@@ -312,7 +317,7 @@ test test-name-map()
   f-assert-string(user "value1", user map.find(user "name1"), )
   assert not (? map.find(user "name2"))
   map.add(user "name2", user "value2")
-  f-assert-string(user "value1", user map.find(user "name1"))
+  # f-assert-string(user "value1", user map.find(user "name1"))
   f-assert-string(user "value2", user map.find(user "name2"))
   map.update-or-add(user "name3", user "value3")
   f-assert-string(user "value3", user map.find(user "name3"))
