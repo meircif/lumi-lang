@@ -1,3 +1,6 @@
 Changes: ...
 
-- [ ] Changes fully completed + unit tested + integration tested + documented
+- [ ] Complete all planned changes
+- [ ] Add unit tests to all changes
+- [ ] Add integration tests to all changes
+- [ ] Add documentation to all changes
