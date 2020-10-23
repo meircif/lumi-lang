@@ -341,6 +341,10 @@ struct TypeInstance
         if value.access = Access.OWNER and access = Access.STRONG
             value.check-error-propagated(
                     user "ignoring initialization error check")
+        if self.type-data is glob.type-array and self.parameters? and
+                value.result-type.type-data is glob.type-string
+            if self.parameters.first.item.type-data is glob.type-byte
+                self.func-wrap(user "bytes")->(owner value)
         var Bool check-conditional(copy not self.conditional and
                 self.type-data is-not glob.type-ref)
         var Bool check-weak(copy not access-has-refman(copy access))
@@ -380,6 +384,23 @@ struct TypeInstance
         self.parameters.first.next.item.int-range.need-check-from(
                 user value-type.parameters.first.next.item.int-range)->(
                 var check-range)
+    
+    func func-wrap(user String name)->(owner Expression value)
+        user Expression orig-value(user value)
+        value.error-expected := false
+        new FieldExpression field(
+                user value.code-node,
+                owner value,
+                owner string-new-copy(user name))
+        new FunctionObjectCallExpression call(user field.code-node)
+        call.function-object := field
+        call.arguments := FunctionArguments()
+        value := call
+        value.restructure()->(owner value)
+        value.analyze()
+        value.error-propagated := orig-value.error-propagated
+        value.error-expected := value.error-propagated and
+                not orig-value.error-checked
     
     func check-assign-to(
             copy Int self-access,

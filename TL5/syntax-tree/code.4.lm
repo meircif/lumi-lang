@@ -70,14 +70,12 @@ class SyntaxTreeRaise(SyntaxTreeCode)
         if self.set-has-error()
             self.check-function-has-error()
         if self.error-message.parsed()
-            self.analyze-expression(
-                    user self.error-message, user glob.type-array)
-            user TypeInstance sub-type(
-                    user self.error-message.result-type.parameters.first.item)
-            if sub-type.type-data is-not glob.type-byte
-                self.syntax-error(
-                        user "expected Byte array expression, got",
-                        user sub-type.type-data.name)
+            owner TypeInstance type-buffer(
+                    owner glob.type-instance-buffer.copy-new())
+            type-buffer.conditional := true
+            self.error-message.analyze()
+            type-buffer.check-assign-from(copy Access.USER, user self)->(
+                    owner self.error-message.expression)
             self.error-message.check-errors(copy false, copy true)
 
     func dynamic check-memory(user ReferenceMemoryList refs)

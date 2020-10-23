@@ -349,7 +349,7 @@ func fun()
     user Buffer b(user aab[4][3][2])
 ; @ c test-slice-expression-16
 user Array?{Byte} x
-x := ostr!.bytes()
+x := ostr!
 user Array?{Byte} y
 y := buff
 ; @ c test-slice-expression-17
@@ -1600,34 +1600,52 @@ ostr!.length()->(var i)
 ; @ c test-builtin-string1
 ostr!.clear()
 ; @ c test-builtin-string2
-ostr!.equal(user ostr!.bytes())->(var b)
+ostr!.equal(user buff!)->(var b)
+; @ c test-builtin-string3
+ostr!.bytes()->(user bfr)
+; @ c test-builtin-string4
+bfr := ostr!
+ostr!.equal(user ostr!)->(var b)
 ; @ c test-builtin-string5
 ostr!.append(copy c)!
 ; @ c test-builtin-string6
 var String sv
-sv.new(user ostr!.bytes())!
+sv.new(user buff!)!
 ; @ c test-builtin-string7
 ostr!.concat(user buff!)!
 ; @ c test-builtin-string8
 ostr!.concat-int(copy i)!
-; @ c test-builtin-string10
+; @ c test-builtin-string9
 ostr!.has(copy c)->(var b)
+; @ c test-builtin-string10
+user Buffer{Int{4:20}} bf
+var String s
+bf := str!
+bf := s!
+bfr := s
 ; @ ec test-builtin-string-e0
-bfr := str!.bytes()
+bfr := str!
 str!.clear()
 bt := bfr![1]!
 ; @ ec test-builtin-string-e1
-bfr := str!.bytes()
+bfr := str!
 str!.append(copy bt)!
 bt := bfr![1]!
 ; @ ec test-builtin-string-e2
-bfr := str!.bytes()
+bfr := str!
 str!.concat(user buff!)!
 bt := bfr![1]!
 ; @ ec test-builtin-string-e3
-bfr := str!.bytes()
+bfr := str!
 str!.concat-int(copy i)!
 bt := bfr![1]!
+; @ ec test-builtin-string-e4
+bfr := so!
+so := _
+bt := bfr![1]!
+; @ ec test-builtin-string-e5
+var String s
+bfr := s!
 ; @ c test-builtin-buffer0
 i := buff!.length
 ; @ c test-builtin-file0
@@ -1765,9 +1783,9 @@ func ! fun(
 ; @ c test-builtin-sys0
 user Array{String} argv(user sys.argv)
 ; @ c test-builtin-sys1
-sys.print(user ostr!.bytes())!
+sys.print(user buff!)!
 ; @ c test-builtin-sys2
-sys.println(user ostr!.bytes())!
+sys.println(user buff!)!
 ; @ c test-builtin-sys3
 sys.getchar()->(var c, var b)!
 ; @ c test-builtin-sys4
@@ -1826,7 +1844,7 @@ var String s
 s-var String svs!
 owner String cs(owner String(user "global text")!)
 ; const Buffer cb `fade00beaf`
-strong String us(strong String(user s.bytes())!)
+strong String us(strong String(user s)!)
 weak String gs(weak us)
 main!
     var Uint32 x(copy 6)
@@ -2602,10 +2620,12 @@ func ! name()
     raise! "some error"
 ; @ g test-return-3
 func ! name(user Array{String} arr)
-    raise! arr[3]!.bytes()
+    raise! arr[3]!
 ; @ c test-return-4
-weak String? s
-raise! s!.bytes()
+weak Buffer? s
+raise! s!
+; @ c test-return-5
+raise! _
 ; @ ec test-return-e0
 return()
 ; @ ec test-return-e1
@@ -2613,10 +2633,8 @@ raise!()
 ; @ ec test-return-e2
 raise! 2
 ; @ ec test-return-e3
-raise! _
-; @ ec test-return-e4
 raise
-; @ ec test-return-e5
+; @ ec test-return-e4
 raise! arr!
 ; @@ test-code-variables
 ; @ c test-code-variables-0
@@ -2711,7 +2729,7 @@ user Buffer? bf(user buff)
 var String s(user "some string")!
 user Buffer bf(user `fade00beaf`)
 ; @ c test-initialize-8
-new String s(user ostr!.bytes())!
+new String s(user buff!)!
 new Buffer{i} bf!
 ; @ c test-initialize-9
 user Test? tt(user tc!)
@@ -3085,8 +3103,6 @@ for n in 5
 for n in t!.num:ostr!.length() + 2
     i := wraparound n
 ; @ c test-for-loop-2
-for ch in ostr!.bytes()
-    c := ch
 for y in buff!
     bt := y
 ; @ c test-for-loop-3
@@ -3124,9 +3140,6 @@ for n in 6
         if b
             return
 ; @ c test-for-loop-9
-new String s(user "text")!
-for ch in s.bytes()
-    c := ch
 user Buffer bf(user `beaf`)
 for y in bf
     bt := y
@@ -3141,8 +3154,6 @@ for bf in ba
 for _ in 2:6
     i := 1
 ; @ c test-for-loop-12
-for _ in ostr!.bytes()
-    i := 1
 for _ in buff!
     i := 1
 ; @ c test-for-loop-13
@@ -4178,7 +4189,7 @@ func ! f-mock(user TestIterator{MyStruct} iter)
 struct TestIterator
     owner String? value
     func user step()->(strong String? text, var Bool has-data)
-        if-error text := String(user self.value.bytes())
+        if-error text := String(user self.value)
             text := _
 func fun(user TestIterator iter)
     owner String? s
@@ -5014,7 +5025,7 @@ so := _
 for _ in 2:str!.length()
 ; @ ec test-memory-user-e41
 so := _
-for _ in str!.bytes()
+for _ in bfr!
 ; @ ec test-memory-user-e42
 so := _
 if b
