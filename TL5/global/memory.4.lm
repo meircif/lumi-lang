@@ -129,10 +129,9 @@ struct ReferenceMemoryList
     
     func mark-illegal-type(user TypeInstance type-instance)
         self.mark-specific-illegal-type(user type-instance, user _)
-        if type-instance.type-data.delete-group?
-            self.mark-illegal-types(
-                    user type-instance.type-data.delete-group,
-                    user type-instance)
+        self.mark-illegal-types(
+                user type-instance.type-data.delete-group,
+                user type-instance)
     
     func mark-specific-illegal-type(
             user TypeInstance type-instance-base,

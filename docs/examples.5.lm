@@ -33,14 +33,14 @@ struct Complex
             self.imaginary.str(user imaginary-str)!
         else
             (- self.imaginary).str(user imaginary-str)!
-        out-str.concat(user imaginary-str.bytes())!
+        out-str.concat(user imaginary-str)!
         out-str.append(copy 'i')!
 
 func ! usage-example()
     var Complex complex(copy 5, copy 3)
     var String complex-str
     complex.str(user complex-str)!
-    sys.println(user complex-str.bytes())!
+    sys.println(user complex-str)!
 
 ; Complex end
 

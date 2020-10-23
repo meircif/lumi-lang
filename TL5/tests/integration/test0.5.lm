@@ -252,15 +252,15 @@ func ! test-variable(
     var String ibv(user "some string")!
     ; var Buffer{12} isv(user `fadebeef`)!
     var Buffer{12} isv
-    new String isn(user text!.bytes())!
+    new String isn(user text!)!
     ; new Buffer{i} ibn(user data!)!
     new Buffer{i} ibn!
     var Func{:(copy Uint32 n)->(owner String? st)} fi(copy test-int2str)
-    var TestStruct itv(copy i, user text!.bytes())!
-    new TestStruct itn(copy i, user text!.bytes())!
+    var TestStruct itv(copy i, user text!)!
+    new TestStruct itn(copy i, user text!)!
     var TestClass idv()
     new TestClass idn()!
-    TestStruct(copy i, user text!.bytes())!.print()!
+    TestStruct(copy i, user text!)!.print()!
     TestClass()!.print()!
     assert! String()!.length() > 0
     assert! Buffer{arr[0]}()!.length > 0
@@ -346,7 +346,7 @@ struct TestStruct
     func user get()->(var Uint32 x, user String? s) _
     
     func user ! print()
-        sys.println(user self.text!.bytes())!
+        sys.println(user self.text!)!
         
 func ! TestStruct.new(copy Uint32 x, user Buffer? s)
     self.num := x
@@ -354,7 +354,7 @@ func ! TestStruct.new(copy Uint32 x, user Buffer? s)
         new String text(user s!)!
         self.text := text
     if x < 0
-        self.ts := TestStruct(copy clamp x + 1, user self.text!.bytes())!
+        self.ts := TestStruct(copy clamp x + 1, user self.text!)!
   
 func TestStruct.get()->(var Uint32 x, user String? s)
     x := self.num
@@ -374,7 +374,7 @@ class TestClass
     func dynamic user dynamic-meth() _
     
     func inst user ! print()
-        sys.println(user self.text!.bytes())!
+        sys.println(user self.text!)!
     
 func TestClass.static-meth()
     self.num := 3
@@ -515,7 +515,7 @@ func ! use-builtins(
     frb.close()!
     new FileWriteText fwt(user s, copy true)!
     fwt.put(copy c mod 256)!
-    fwt.write(user s.bytes())->(var i)!
+    fwt.write(user s)->(var i)!
     fwt.tell()->(var x)!
     fwt.seek-set(copy x)!
     fwt.seek-cur(copy x)!
@@ -535,7 +535,7 @@ func ! use-builtins(
     frwt.get()->(var c, var b)!
     ; frwt.getline(user s)->(var b)!
     frwt.put(copy c mod 255)!
-    frwt.write(user s.bytes())->(var i)!
+    frwt.write(user s)->(var i)!
     frwt.tell()->(var x)!
     frwt.seek-set(copy x)!
     frwt.seek-cur(copy x)!
@@ -569,8 +569,8 @@ func ! use-builtins(
     
     var Sint32 e
     user String arg(user sys.argv[1]!)
-    sys.print(user s.bytes())!
-    sys.println(user s.bytes())!
+    sys.print(user s)!
+    sys.println(user s)!
     sys.getchar()->(var c, var b)!
     ; sys.getline(user s)->(var b)!
     sys.getenv(user s, user s)->(var b)!
@@ -584,17 +584,17 @@ func ! use-builtins(
 func ! test-ref-count()
     strong String? s(strong String(user "test string")!)
     weak String s-user(weak s!)
-    sys.println(user s!.bytes())!
-    sys.println(user s-user!.bytes())!
+    sys.println(user s!)!
+    sys.println(user s-user!)!
     remove(owner s!)
     if not s?
         sys.println(user "ownership passed")!
     if not s-user?
         sys.println(user "string deleted")!
     new TestStruct ts(copy 0, user "first struct")!
-    sys.println(user ts.text!.bytes())!
+    sys.println(user ts.text!)!
     ts.ts := TestStruct(copy 1, user "second struct")!
-    sys.println(user ts.ts!.text!.bytes())!
+    sys.println(user ts.ts!.text!)!
 
 func remove(owner String s)
     ; remove s
@@ -753,7 +753,7 @@ func ! test-for-each()
     for n in arr
         text.clear()
         n.str(user text)!
-        sys.print(user text.bytes())!
+        sys.print(user text)!
         sys.print(user " ")!
     sys.println(user "]")!
     
@@ -763,7 +763,7 @@ func ! test-for-each()
     tsarr[2].text := String(user "ccc")!
     sys.print(user "structs[ ")!
     for ts in tsarr
-        sys.print(user ts.text!.bytes())!
+        sys.print(user ts.text!)!
         sys.print(user " ")!
     sys.println(user "]")!
     
@@ -773,7 +773,7 @@ func ! test-for-each()
     sarr[2].new(user "fff")!
     sys.print(user "strings[ ")!
     for s in sarr
-        sys.print(user s.bytes())!
+        sys.print(user s)!
         sys.print(user " ")!
     sys.println(user "]")!
     
@@ -784,7 +784,7 @@ func ! test-for-each()
     owner ContainerIterator{Item} iter(owner container.iter()!)
     sys.print(user "values[ ")!
     for sc in iter!
-        sys.print(user sc!.s.bytes())!
+        sys.print(user sc!.s)!
         sys.print(user " ")!
     sys.println(user "]")!
     
@@ -803,7 +803,7 @@ func ! test-for-each()
         sys.print(user "\n  ")!
         for b in a
             for s in b
-                sys.print(user s.bytes())!
+                sys.print(user s)!
                 sys.print(user " ")!
     sys.println(user "]")!
 
@@ -834,7 +834,7 @@ func ! HasComplexField.run()
     self.as[2].new(user "a3")!
     for s in self.as
         sys.print(user " ")!
-        sys.print(user s.bytes())!
+        sys.print(user s)!
 
 func ! test-complex-field()
     s-var HasComplexField y!
@@ -856,14 +856,14 @@ func ! test-switch()
     strong String s1(strong String(user "first string")!)
     strong String s2(strong String(user "second string")!)
     s1 :=: s2
-    sys.println(user s1.bytes())!
-    sys.println(user s2.bytes())!
+    sys.println(user s1)!
+    sys.println(user s2)!
 
 
 class BaseString
     owner String s
     func dynamic user ! print()
-        sys.println(user self.s.bytes())!
+        sys.println(user self.s)!
     new!()
         self.s := String(user "BaseString")!
     cleanup()

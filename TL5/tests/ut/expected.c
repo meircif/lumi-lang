@@ -3786,12 +3786,29 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     String_clear(ut_M_ostr);
 /// @ test-builtin-string2
+CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
+    String_equal(ut_M_ostr, ut_M_buff, ut_M_buff_Length, &(ut_M_b));
+/// @ test-builtin-string3
 Byte* aux_Array_0 = NULL;
     uint32_t aux_Array_0_Length = 0;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
+    String_bytes(ut_M_ostr, &(aux_Array_0), &(aux_Array_0_Length));
+    bfr_Length = aux_Array_0_Length;
+    bfr = aux_Array_0;
+/// @ test-builtin-string4
+Byte* aux_Array_0 = NULL;
+    uint32_t aux_Array_0_Length = 0;
+    Byte* aux_Array_1 = NULL;
+    uint32_t aux_Array_1_Length = 0;
     CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     String_bytes(ut_M_ostr, &(aux_Array_0), &(aux_Array_0_Length));
-    String_equal(ut_M_ostr, aux_Array_0, aux_Array_0_Length, &(ut_M_b));
+    bfr_Length = aux_Array_0_Length;
+    bfr = aux_Array_0;
+    CHECK_REF(2, LUMI_block0_cleanup, ut_M_ostr)
+    CHECK_REF(2, LUMI_block0_cleanup, ut_M_ostr)
+    String_bytes(ut_M_ostr, &(aux_Array_1), &(aux_Array_1_Length));
+    String_equal(ut_M_ostr, aux_Array_1, aux_Array_1_Length, &(ut_M_b));
 /// @ test-builtin-string5
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = String_append(ut_M_ostr, ut_M_c);
@@ -3799,12 +3816,9 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
 /// @ test-builtin-string6
 String sv_Var = {0};
     String* sv = NULL;
-    Byte* aux_Array_0 = NULL;
-    uint32_t aux_Array_0_Length = 0;
     sv = &sv_Var;
-    CHECK_REF(2, LUMI_block0_cleanup, ut_M_ostr)
-    String_bytes(ut_M_ostr, &(aux_Array_0), &(aux_Array_0_Length));
-    LUMI_err = String_new(sv, aux_Array_0, aux_Array_0_Length);
+    CHECK_REF(2, LUMI_block0_cleanup, ut_M_buff)
+    LUMI_err = String_new(sv, ut_M_buff, ut_M_buff_Length);
     CHECK(2, LUMI_block0_cleanup)
 /// @ test-builtin-string7
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
@@ -3825,6 +3839,8 @@ using potentially illegal user reference "bfr"
 /// @ test-builtin-string-e2
 using potentially illegal user reference "bfr"
 /// @ test-builtin-string-e3
+using potentially illegal user reference "bfr"
+/// @ test-builtin-string-e4
 using potentially illegal user reference "bfr"
 /// @ test-builtin-buffer0
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
@@ -4227,18 +4243,12 @@ String* argv = NULL;
     argv_Length = sys_M_argv_Length;
     argv = sys_M_argv;
 /// @ test-builtin-sys1
-Byte* aux_Array_0 = NULL;
-    uint32_t aux_Array_0_Length = 0;
-    CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    String_bytes(ut_M_ostr, &(aux_Array_0), &(aux_Array_0_Length));
-    LUMI_err = sys_M_print(aux_Array_0, aux_Array_0_Length);
+CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
+    LUMI_err = sys_M_print(ut_M_buff, ut_M_buff_Length);
     CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-sys2
-Byte* aux_Array_0 = NULL;
-    uint32_t aux_Array_0_Length = 0;
-    CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    String_bytes(ut_M_ostr, &(aux_Array_0), &(aux_Array_0_Length));
-    LUMI_err = sys_M_println(aux_Array_0, aux_Array_0_Length);
+CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
+    LUMI_err = sys_M_println(ut_M_buff, ut_M_buff_Length);
     CHECK(1, LUMI_block0_cleanup)
 /// @ test-builtin-sys3
 LUMI_err = sys_M_getchar(&(ut_M_c), &(ut_M_b));
@@ -6514,25 +6524,23 @@ LUMI_block0_cleanup:
     return LUMI_err;
 }
 /// @ test-return-4
-String* s = NULL;
+Byte* s = NULL;
+    uint32_t s_Length = 0;
     Ref_Manager* s_Refman = NULL;
-    Byte* aux_Array_0 = NULL;
-    uint32_t aux_Array_0_Length = 0;
-    CHECK_REF_REFMAN(2, LUMI_block0_cleanup, s, s_Refman)
-    String_bytes(s, &(aux_Array_0), &(aux_Array_0_Length));
-    USER_RAISE(2, LUMI_block0_cleanup, aux_Array_0, aux_Array_0_Length)
+    CHECK_REFMAN(2, LUMI_block0_cleanup, s_Refman)
+    USER_RAISE(2, LUMI_block0_cleanup, s, s_Length)
+/// @ test-return-5
+USER_RAISE(1, LUMI_block0_cleanup, NULL, 0)
 /// @ test-return-e0
 expected new-line after "return", got "("
 /// @ test-return-e1
 expected space or new-line after "raise!", got "("
 /// @ test-return-e2
-got "Int" expression, expected "Array"
+cannot assign "Int" into "Array"
 /// @ test-return-e3
-got "Empty Symbol" expression, expected "Array"
-/// @ test-return-e4
 expected ! after "raise", got "new-line"
-/// @ test-return-e5
-expected Byte array expression, got "Int"
+/// @ test-return-e4
+non matching array subtypes "Int" and "Byte"
 /// @@ test-code-variables
 /// @ test-code-variables-0
 uint32_t x = 0;
@@ -6729,12 +6737,9 @@ String s_Var = {0};
 String* s = NULL;
     Byte* bf = NULL;
     uint32_t bf_Length = 0;
-    Byte* aux_Array_0 = NULL;
-    uint32_t aux_Array_0_Length = 0;
-    CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    String_bytes(ut_M_ostr, &(aux_Array_0), &(aux_Array_0_Length));
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
     INIT_NEW(1, LUMI_block0_cleanup, s, String, 1);
-    LUMI_err = String_new(s, aux_Array_0, aux_Array_0_Length);
+    LUMI_err = String_new(s, ut_M_buff, ut_M_buff_Length);
     CHECK(1, LUMI_block0_cleanup)
     if (ut_M_i <= 0) RAISE(2, LUMI_block0_cleanup, array_too_short)
     INIT_NEW_LEN_ARRAY(2, LUMI_block0_cleanup, bf, Byte, ut_M_i, 1);
@@ -7488,38 +7493,18 @@ uint32_t aux_Int_0 = 0;
 /// @ test-for-loop-2
 Byte* aux_Array_0 = NULL;
     uint32_t aux_Array_0_Length = 0;
-    Byte* aux_Array_1 = NULL;
-    uint32_t aux_Array_1_Length = 0;
     uint32_t aux_Int_0 = 0;
-    Byte* aux_Array_2 = NULL;
-    uint32_t aux_Array_2_Length = 0;
-    uint32_t aux_Int_1 = 0;
-    CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    String_bytes(ut_M_ostr, &(aux_Array_0), &(aux_Array_0_Length));
-    aux_Array_1_Length = aux_Array_0_Length;
-    aux_Array_1 = aux_Array_0;
-    do {
-        Byte ch = 0;
-        LUMI_loop_depth = 3;
-        if (!(aux_Int_0 < aux_Array_1_Length)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
-        ch = aux_Array_1[aux_Int_0];
-        aux_Int_0 += 0x01;
-        ut_M_c = ch;
-    LUMI_block1_cleanup:
-        (void)0;
-    } while (LUMI_loop_depth >= 2);
-    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-    CHECK_REF(3, LUMI_block0_cleanup, ut_M_buff)
-    aux_Array_2_Length = ut_M_buff_Length;
-    aux_Array_2 = ut_M_buff;
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
+    aux_Array_0_Length = ut_M_buff_Length;
+    aux_Array_0 = ut_M_buff;
     do {
         Byte y = 0;
         LUMI_loop_depth = 3;
-        if (!(aux_Int_1 < aux_Array_2_Length)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
-        y = aux_Array_2[aux_Int_1];
-        aux_Int_1 += 0x01;
+        if (!(aux_Int_0 < aux_Array_0_Length)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        y = aux_Array_0[aux_Int_0];
+        aux_Int_0 += 0x01;
         ut_M_bt = y;
-    LUMI_block2_cleanup:
+    LUMI_block1_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
@@ -7684,48 +7669,24 @@ uint8_t aux_Int_0 = 0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
 /// @ test-for-loop-9
-String* s = NULL;
-    Byte* bf = NULL;
+Byte* bf = NULL;
     uint32_t bf_Length = 0;
-    static Byte aux_Array_0[] = {'t','e','x','t','\0',};
+    static Byte aux_Array_0[] = {0xbe,0xaf,};
     Byte* aux_Array_1 = NULL;
     uint32_t aux_Array_1_Length = 0;
-    Byte* aux_Array_2 = NULL;
-    uint32_t aux_Array_2_Length = 0;
     uint32_t aux_Int_0 = 0;
-    static Byte aux_Array_3[] = {0xbe,0xaf,};
-    Byte* aux_Array_4 = NULL;
-    uint32_t aux_Array_4_Length = 0;
-    uint32_t aux_Int_1 = 0;
-    INIT_NEW(1, LUMI_block0_cleanup, s, String, 1);
-    LUMI_err = String_new(s, aux_Array_0, 0x04);
-    CHECK(1, LUMI_block0_cleanup)
-    String_bytes(s, &(aux_Array_1), &(aux_Array_1_Length));
-    aux_Array_2_Length = aux_Array_1_Length;
-    aux_Array_2 = aux_Array_1;
-    do {
-        Byte ch = 0;
-        LUMI_loop_depth = 3;
-        if (!(aux_Int_0 < aux_Array_2_Length)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
-        ch = aux_Array_2[aux_Int_0];
-        aux_Int_0 += 0x01;
-        ut_M_c = ch;
-    LUMI_block1_cleanup:
-        (void)0;
-    } while (LUMI_loop_depth >= 2);
-    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
     bf_Length = 0x02;
-    bf = aux_Array_3;
-    aux_Array_4_Length = bf_Length;
-    aux_Array_4 = bf;
+    bf = aux_Array_0;
+    aux_Array_1_Length = bf_Length;
+    aux_Array_1 = bf;
     do {
         Byte y = 0;
         LUMI_loop_depth = 3;
-        if (!(aux_Int_1 < aux_Array_4_Length)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
-        y = aux_Array_4[aux_Int_1];
-        aux_Int_1 += 0x01;
+        if (!(aux_Int_0 < aux_Array_1_Length)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        y = aux_Array_1[aux_Int_0];
+        aux_Int_0 += 0x01;
         ut_M_bt = y;
-    LUMI_block2_cleanup:
+    LUMI_block1_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
@@ -7779,34 +7740,16 @@ uint8_t aux_Int_0 = 0;
 /// @ test-for-loop-12
 Byte* aux_Array_0 = NULL;
     uint32_t aux_Array_0_Length = 0;
-    Byte* aux_Array_1 = NULL;
-    uint32_t aux_Array_1_Length = 0;
     uint32_t aux_Int_0 = 0;
-    Byte* aux_Array_2 = NULL;
-    uint32_t aux_Array_2_Length = 0;
-    uint32_t aux_Int_1 = 0;
-    CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
-    String_bytes(ut_M_ostr, &(aux_Array_0), &(aux_Array_0_Length));
-    aux_Array_1_Length = aux_Array_0_Length;
-    aux_Array_1 = aux_Array_0;
+    CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
+    aux_Array_0_Length = ut_M_buff_Length;
+    aux_Array_0 = ut_M_buff;
     do {
         LUMI_loop_depth = 3;
-        if (!(aux_Int_0 < aux_Array_1_Length)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
+        if (!(aux_Int_0 < aux_Array_0_Length)) { LUMI_loop_depth = 1; goto LUMI_block1_cleanup; }
         aux_Int_0 += 0x01;
         ut_M_i = 0x01;
     LUMI_block1_cleanup:
-        (void)0;
-    } while (LUMI_loop_depth >= 2);
-    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
-    CHECK_REF(3, LUMI_block0_cleanup, ut_M_buff)
-    aux_Array_2_Length = ut_M_buff_Length;
-    aux_Array_2 = ut_M_buff;
-    do {
-        LUMI_loop_depth = 3;
-        if (!(aux_Int_1 < aux_Array_2_Length)) { LUMI_loop_depth = 1; goto LUMI_block2_cleanup; }
-        aux_Int_1 += 0x01;
-        ut_M_i = 0x01;
-    LUMI_block2_cleanup:
         (void)0;
     } while (LUMI_loop_depth >= 2);
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
@@ -12607,7 +12550,7 @@ using potentially illegal user reference "str"
 /// @ test-memory-user-e40
 using potentially illegal user reference "str"
 /// @ test-memory-user-e41
-using potentially illegal user reference "str"
+using potentially illegal user reference "bfr"
 /// @ test-memory-user-e42
 using potentially illegal user reference "str"
 /// @ test-memory-user-e43
