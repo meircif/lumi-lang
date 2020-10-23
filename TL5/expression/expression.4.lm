@@ -109,6 +109,7 @@ class Expression(SyntaxTreeNode)
     var Bool is-var
     var Bool error-expected
     var Bool error-propagated
+    var Bool error-checked
     
     new(user SyntaxTreeCode code-node)
         self.set-location()
@@ -325,6 +326,7 @@ class Expression(SyntaxTreeNode)
                 self.syntax-error-msg(user error-message)
             self.code-node.check-function-has-error()
             self.error-expected := false
+            self.error-checked := true
         else-if self.error-expected
             self.syntax-error-msg(
                     user "using \"!\" where error is not propagated")

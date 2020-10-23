@@ -3829,9 +3829,33 @@ CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     LUMI_err = String_concat_int(ut_M_ostr, ut_M_i);
     CHECK(1, LUMI_block0_cleanup)
-/// @ test-builtin-string10
+/// @ test-builtin-string9
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_ostr)
     String_has(ut_M_ostr, ut_M_c, &(ut_M_b));
+/// @ test-builtin-string10
+Byte* bf = NULL;
+    uint8_t bf_Length = 0;
+    String s_Var = {0};
+    String* s = NULL;
+    Byte* aux_Array_0 = NULL;
+    uint32_t aux_Array_0_Length = 0;
+    Byte* aux_Array_1 = NULL;
+    uint32_t aux_Array_1_Length = 0;
+    Byte* aux_Array_2 = NULL;
+    uint32_t aux_Array_2_Length = 0;
+    s = &s_Var;
+    CHECK_REF(3, LUMI_block0_cleanup, str)
+    String_bytes(str, &(aux_Array_0), &(aux_Array_0_Length));
+    if (aux_Array_0_Length < 0x04 || aux_Array_0_Length > 0x14) RAISE(3, LUMI_block0_cleanup, slice_index)
+    bf_Length = aux_Array_0_Length;
+    bf = aux_Array_0;
+    String_bytes(s, &(aux_Array_1), &(aux_Array_1_Length));
+    if (aux_Array_1_Length < 0x04 || aux_Array_1_Length > 0x14) RAISE(4, LUMI_block0_cleanup, slice_index)
+    bf_Length = aux_Array_1_Length;
+    bf = aux_Array_1;
+    String_bytes(s, &(aux_Array_2), &(aux_Array_2_Length));
+    bfr_Length = aux_Array_2_Length;
+    bfr = aux_Array_2;
 /// @ test-builtin-string-e0
 using potentially illegal user reference "bfr"
 /// @ test-builtin-string-e1
@@ -3842,6 +3866,8 @@ using potentially illegal user reference "bfr"
 using potentially illegal user reference "bfr"
 /// @ test-builtin-string-e4
 using potentially illegal user reference "bfr"
+/// @ test-builtin-string-e5
+using "!" where there is no error
 /// @ test-builtin-buffer0
 CHECK_REF(1, LUMI_block0_cleanup, ut_M_buff)
     ut_M_i = ut_M_buff_Length;

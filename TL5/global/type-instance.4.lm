@@ -386,6 +386,8 @@ struct TypeInstance
                 var check-range)
     
     func func-wrap(user String name)->(owner Expression value)
+        user Expression orig-value(user value)
+        value.error-expected := false
         new FieldExpression field(
                 user value.code-node,
                 owner value,
@@ -396,6 +398,9 @@ struct TypeInstance
         value := call
         value.restructure()->(owner value)
         value.analyze()
+        value.error-propagated := orig-value.error-propagated
+        value.error-expected := value.error-propagated and
+                not orig-value.error-checked
     
     func check-assign-to(
             copy Int self-access,

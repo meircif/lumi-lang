@@ -1615,8 +1615,14 @@ sv.new(user buff!)!
 ostr!.concat(user buff!)!
 ; @ c test-builtin-string8
 ostr!.concat-int(copy i)!
-; @ c test-builtin-string10
+; @ c test-builtin-string9
 ostr!.has(copy c)->(var b)
+; @ c test-builtin-string10
+user Buffer{Int{4:20}} bf
+var String s
+bf := str!
+bf := s!
+bfr := s
 ; @ ec test-builtin-string-e0
 bfr := str!
 str!.clear()
@@ -1637,6 +1643,9 @@ bt := bfr![1]!
 bfr := so!
 so := _
 bt := bfr![1]!
+; @ ec test-builtin-string-e5
+var String s
+bfr := s!
 ; @ c test-builtin-buffer0
 i := buff!.length
 ; @ c test-builtin-file0
