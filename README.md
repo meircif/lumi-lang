@@ -17,9 +17,14 @@ been worked at.
 
 ## Syntax highlighting
 
-For Lumi syntax highlighting it's recommended to use [Atom](https://atom.io)
-editor with [language-lumi](https://atom.io/packages/language-lumi) package
-installed.
+For Lumi syntax highlighting it's recommended to use one of:
+* [Visual Stusio Code](https://code.visualstudio.com/) editor with
+  [Lumi Language extension](
+  https://marketplace.visualstudio.com/items?itemName=meircif.lumi)
+  installed
+* [Atom](https://atom.io) editor with
+  [language-lumi package](https://atom.io/packages/language-lumi)
+  installed.
 
 ## How can I help?
 Chose your difficulty:

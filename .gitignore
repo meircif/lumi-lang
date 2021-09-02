@@ -17,6 +17,7 @@ docs/_*
 *.vcxproj.user
 *.vcxproj.filters
 .vs/
+.vscode/
 
 # Eclipse files
 /.project
