@@ -39,6 +39,7 @@ Prioritized Goals
 
 Features
 --------
+
 * **Code generating**: Lumi compiler will initially generate **C code**.
   Other "modern machine language" codes may also be generated, such as: Java
   (for Android and other devices), Objective-C/Swift (for Apple devices),
@@ -55,6 +56,6 @@ Features
 * Strict coding conventions - all Lumi code should look the same
 * Built-in support for productivity features:
 
-      * testing and mocking
-      * documentation
-      * profiling
+   * testing and mocking
+   * documentation
+   * profiling

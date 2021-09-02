@@ -17,7 +17,7 @@ For example, the compiler will not allow these assignments::
    
    func compute(Int{0:20} x)->(Int{-10:10} y)
       y := 20  ; error - clearly out of range
-      y := other  ; error - may be out of range
+      y := x  ; error - may be out of range
 
 Assigning a constant or an integer with overlapped range are naturally legal,
 for example::

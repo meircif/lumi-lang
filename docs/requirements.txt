@@ -4,3 +4,4 @@ Pygments>=2.2.0
 pyenchant>=2.0.0
 sphinxcontrib-spelling
 sphinx-autobuild
+docutils<0.17

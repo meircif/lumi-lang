@@ -40,11 +40,11 @@ indentation of exactly 4 spaces::
    func split-arguments1(
        copy Uint32 x, copy Uint32 y)->(var Uint32 z, var Uint32 w)
 
-   func split-arguments0(
+   func split-arguments2(
        copy Uint32 x, copy Uint32 y)->(
        var Uint32 z, var Uint32 w)
 
-   func split-arguments0(
+   func split-arguments3(
        copy Uint32 x,
        copy Uint32 y)->(
        var Uint32 z,
