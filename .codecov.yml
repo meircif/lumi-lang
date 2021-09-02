@@ -8,4 +8,5 @@ coverage:
 ignore:
   - "TL3/*"
   - "TL4/tests/*.c"
-  - "TL4/*"
+  - "TL4/*.c"
+  - "TL4/*/*.c"
