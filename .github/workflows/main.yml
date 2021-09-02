@@ -57,7 +57,9 @@ jobs:
     - name: Run all tests with ${{ matrix.c-compiler }}
       env:
           CC: ${{ matrix.c-compiler }}
-      run: ./test.sh
+      run: |
+        ./test.sh
+        ls .test/TL5/*
       shell: bash
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
