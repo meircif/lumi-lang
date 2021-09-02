@@ -63,3 +63,5 @@ jobs:
       shell: bash
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
+      with:
+        directory: .test
