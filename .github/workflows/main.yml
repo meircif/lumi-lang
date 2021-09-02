@@ -59,3 +59,5 @@ jobs:
           CC: ${{ matrix.c-compiler }}
       run: ./test.sh
       shell: bash
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
