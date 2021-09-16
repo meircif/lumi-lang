@@ -18,7 +18,7 @@ been worked at.
 ## Syntax highlighting
 
 For Lumi syntax highlighting it's recommended to use one of:
-* [Visual Stusio Code](https://code.visualstudio.com/) editor with
+* [Visual Studio Code](https://code.visualstudio.com/) editor with
   [Lumi Language extension](
   https://marketplace.visualstudio.com/items?itemName=meircif.lumi)
   installed
