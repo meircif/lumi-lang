@@ -1,8 +1,41 @@
 ~~~ TL5 compiler - Common stuff ~~~
 module tl5-compiler
 
-
 const Int INDENTATION-SPACES 4
+
+
+~~~ Access values ~~~
+enum Access
+    UNDEFINED
+    VAR
+    COPY
+    OWNER
+    USER
+    TEMP
+    STRONG
+    WEAK
+    S-VAR
+    SHARED
+
+func access-is-owner(copy Int access)->(var Bool is-owner)
+    is-owner := access = Access.OWNER or access = Access.STRONG or
+            access = Access.SHARED
+
+func access-has-refman(copy Int access)->(var Bool is-weak)
+    is-weak := access = Access.STRONG or access = Access.WEAK or
+            access = Access.S-VAR
+
+func access-is-user(copy Int access)->(var Bool is-user)
+    is-user := access = Access.USER or access = Access.WEAK
+
+func access-is-only-var(copy Int access)->(var Bool is-only-var)
+    is-only-var := access = Access.VAR or access = Access.S-VAR
+
+func access-is-var(copy Int access)->(var Bool is-var)
+    is-var := access-is-owner(copy access) or access-is-only-var(copy access)
+
+func access-is-temp(copy Int access)->(var Bool is-temp)
+    is-temp := access-is-var(copy access) or access = Access.TEMP
 
 
 func get-sys-argv()->(user Array{String} argv)

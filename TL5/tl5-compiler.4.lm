@@ -2,7 +2,7 @@
 module tl5-compiler
 
 
-var Global compiler
+var Compiler compiler
 
 
 ~~~ compiler main function!~~~
