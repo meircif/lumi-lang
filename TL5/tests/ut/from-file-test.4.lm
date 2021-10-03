@@ -1,7 +1,7 @@
 ~~~ TL5 compiler tests - Test From File ~~~
 module tl5-compiler-tests
 
-owner tl5-compiler.Global tested-compiler
+owner tl5-compiler.Compiler tested-compiler
 
 
 ; IO mocks
@@ -111,7 +111,7 @@ mock tl5-compiler.SyntaxTreeFunction.write-post-func()
 
 
 func setup-test()
-    tested-compiler := tl5-compiler.Global()
+    tested-compiler := tl5-compiler.Compiler()
     mock-output-file-last := '\0'
     mock-input-file-index := 0
     file-open-error := false
