@@ -42,13 +42,13 @@ cp -r ../TL5 TL5/
 pushd TL5
 ./tl4-compiler tl5-compiler.c TL5/tl5-compiler.4.lm \
   TL5/expression/assign.4.lm TL5/expression/base-type.4.lm \
-  TL5/expression/call.4.lm TL5/expression/constant.4.lm \
-  TL5/expression/container.4.lm TL5/expression/expression.4.lm \
-  TL5/expression/field.4.lm TL5/expression/initialize.4.lm \
-  TL5/expression/operator.4.lm TL5/expression/slice.4.lm \
-  TL5/expression/symbol.4.lm TL5/expression/wrap.4.lm \
-  TL5/global/argument.4.lm TL5/global/common.4.lm TL5/global/file-io.4.lm \
-  TL5/global/global.4.lm TL5/global/header-string.4.lm \
+  TL5/expression/call.4.lm TL5/global/compiler.4.lm \
+  TL5/expression/constant.4.lm TL5/expression/container.4.lm \
+  TL5/expression/expression.4.lm TL5/expression/field.4.lm \
+  TL5/expression/initialize.4.lm TL5/expression/operator.4.lm \
+  TL5/expression/slice.4.lm TL5/expression/symbol.4.lm \
+  TL5/expression/wrap.4.lm TL5/global/argument.4.lm TL5/global/common.4.lm \
+  TL5/global/file-io.4.lm TL5/global/header-string.4.lm \
   TL5/global/int-range.4.lm TL5/global/list.4.lm TL5/global/map.4.lm \
   TL5/global/memory.4.lm TL5/global/type-instance.4.lm \
   TL5/statement/enum.4.lm TL5/statement/error.4.lm TL5/statement/for.4.lm \
