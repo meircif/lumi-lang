@@ -95,7 +95,7 @@ class UpCastExpression(WrapExpression)
             self.expression.write()
         else
             self.expression.write-safe()
-        self.write-post()
+        self.write-post(copy access-is-only-var(copy self.expression.access))
     
     func dynamic write-cast()
         self.write()
@@ -103,7 +103,7 @@ class UpCastExpression(WrapExpression)
     func dynamic write-dynamic()
         self.write-pre()
         self.expression.write-dynamic-safe()
-        self.write-post()
+        self.write-post(copy self.expression.is-complex-field)
     
     func dynamic write-dynamic-cast()
         self.write-dynamic()
@@ -114,8 +114,8 @@ class UpCastExpression(WrapExpression)
     func inst write-pre()
         write(user "&(")
     
-    func inst write-post()
-        if self.expression.is-complex-field
+    func inst write-post(copy Bool first-is-var)
+        if first-is-var
             write(user ".")
         else
             write(user "->")
@@ -190,16 +190,6 @@ class CheckUsableExpression(WrapExpression)
             self.expression.write-refman()
         write(user ")\n")
         self.code-node.write-spaces()
-
-
-; ~~~ Reference cast expression ~~~
-; class RefCastExpression(WrapExpression)
-;     func dynamic write()
-;         write(user "(void*)")
-;         self.expression.write-safe()
-
-;     func dynamic write-cast()
-;         self.write()
 
 
 ~~~ An expression that checks given array length ~~~

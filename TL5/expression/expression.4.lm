@@ -352,18 +352,6 @@ class Expression(SyntaxTreeNode)
         self.write-macro-first-params()
         expression.write()
     
-    func inst write-init-var-ref(user VariableExpression variable)
-        ; `symbol` = &`symbol`_Var; \
-        ; INIT_VAR_REFMAN(`line`, `cleanup`, `symbol`)
-        variable.write()
-        write(user " = &")
-        variable.write()
-        write(user "_Var;\n")
-        if variable.access = Access.S-VAR
-            self.code-node.write-spaces()
-            self.write-macro-init(user "INIT_VAR_REFMAN", user variable)
-            write(user ")\n")
-    
     func inst write-assign-null()
         self.write()
         write(user " = NULL;\n")

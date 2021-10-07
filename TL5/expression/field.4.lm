@@ -138,8 +138,9 @@ class FieldExpression(Expression)
             self.instance.write()
         else
             self.instance.write-safe()
-        if self.instance.is-complex-field or
-                self.instance.result-type.type-data.is-native
+        if self.instance.result-type.type-data.is-native or
+                (access-is-only-var(copy self.instance.access) and
+                self.instance.result-type.type-data is-not glob.type-pointer)
             write(user ".")
         else
             write(user "->")

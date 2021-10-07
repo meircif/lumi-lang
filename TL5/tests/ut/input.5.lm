@@ -2666,7 +2666,10 @@ new Array{12:Buffer{7}} sa!
 var Array{3:Array{4:Buffer{5}}} aa
 ; @ c test-code-variables-13
 new Array{3:Array{4:Buffer{5}}} aa!
-; @ g test-code-variables-14
+; @ c test-code-variables-14
+s-var Test tt!
+t := tt
+; @ g test-code-variables-g0
 func ! fun()
     var Buffer{4} sv
     if 1 > 2

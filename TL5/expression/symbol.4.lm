@@ -75,6 +75,14 @@ class VariableExpression(Expression)
             write(user "*")
         self.variable.write-cname()
 
+    func dynamic write-cast()
+        if not self.variable.is-output and
+                not self.variable.type-instance.type-data.is-primitive and
+                self.variable.type-instance.type-data is-not glob.type-array and
+                access-is-only-var(copy self.variable.access)
+            write(user "&")
+        self.write()
+
     func dynamic write-safe()
         if self.variable.is-output
             self.write-with-brackets()

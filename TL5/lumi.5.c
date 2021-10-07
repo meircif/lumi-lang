@@ -267,7 +267,7 @@ while (self->field != NULL) { \
 }
 
 #define INIT_VAR_REFMAN(line, cleanup, name) \
-  name##_Refman = LUMI_new_ref(name); \
+  name##_Refman = LUMI_new_ref(&name); \
   if (name##_Refman == NULL) { RAISE(line, cleanup, managed_object_memory) }
 
 #define INIT_NEW_REFMAN(line, cleanup, name) \
