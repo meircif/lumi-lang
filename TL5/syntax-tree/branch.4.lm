@@ -264,9 +264,9 @@ class SyntaxTreeBranch(SyntaxTreeNode)
             write(user ")\n")
         else
             data-type.write-cname()
-            write(user "_Del(")
+            write(user "_Del(&")
             if parent-type?
-                write(user "&(self->")
+                write(user "(self->")
             write-cname(user variable.name)
             if parent-type?
                 write(user ")")

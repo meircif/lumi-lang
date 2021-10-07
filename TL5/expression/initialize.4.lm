@@ -141,33 +141,24 @@ class InitExpression(ModuleTypeExpression)
         if self.result-type.type-data is glob.type-array
             self.result-type.length.write-preactions()
         
-        if access-is-only-var(copy self.aux-variable.variable.access)
-            self.write-var-init()
-        else
+        if self.aux-variable.variable.access = Access.S-VAR
+            self.write-s-var-init()
+        else-if self.aux-variable.variable.access != Access.VAR
             self.write-new-init()
         
         if self.constructor?
-            self.code-node.write-spaces()
+            if self.aux-variable.variable.access != Access.VAR
+                self.code-node.write-spaces()
             if self.constructor.arguments.has-error
                 write(user "LUMI_err = ")
                 self.arguments.has-error := true
             self.constructor.write-cname()
             self.code-node.write-call(user self.arguments)
     
-    func inst write-var-init()
-        if not self.result-type.type-data is glob.type-array
-            self.write-init-var-ref(user self.aux-variable)
-            return
-        
-        if self.aux-variable.access = Access.S-VAR
-            ; INIT_VAR_REFMAN(`line`, `cleanup`, `aux-variable`)
-            self.write-macro-init(
-                    user "INIT_VAR_REFMAN", user self.aux-variable)
-            write(user ")\n")
-        else
-            write(user "/* initializing ")
-            self.aux-variable.write()
-            write(user " */\n")
+    func inst write-s-var-init()
+        ; INIT_VAR_REFMAN(`line`, `cleanup`, `aux-variable`)
+        self.write-macro-init(user "INIT_VAR_REFMAN", user self.aux-variable)
+        write(user ")\n")
     
     func inst write-new-init()
         if self.result-type.type-data is glob.type-array
@@ -233,15 +224,17 @@ class InitExpression(ModuleTypeExpression)
         write(user ");\n")
     
     func dynamic write-preactions()
-        self.write-allocation()
-        self.code-node.write-spaces()
+        if self.aux-variable.access != Access.VAR or self.constructor?
+            self.write-allocation()
+            self.code-node.write-spaces()
     
     func dynamic write()
         if self.is-statement
             if not self.result-type.type-data.is-primitive and
                     self.aux-variable.variable.is-create
-                self.code-node.write-spaces()
-                self.write-allocation()
+                if self.aux-variable.access != Access.VAR or self.constructor?
+                    self.code-node.write-spaces()
+                    self.write-allocation()
             else-if self.assign-expression?
                 self.code-node.write-spaces()
                 self.assign-expression.write-preactions()
