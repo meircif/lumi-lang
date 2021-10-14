@@ -522,38 +522,28 @@ class DeclarationArgument(Argument)
     
     func dynamic analyze()
         user TypeData type-data(user self.variable.type-instance.type-data)
-        if type-data.is-primitive
-            if self.is-output and not self.is-native and
-                    self.access != Access.VAR
-                self.syntax-error2(
+        if self.is-output
+            if self.access = Access.TEMP or
+                    (self.access = Access.COPY and not self.is-native) or
+                    (access-is-only-var(copy self.access) and
+                    not type-data.is-primitive)
+                self.syntax-error3(
                         user "output",
                         user self.variable.name,
-                        user "access should be \"var\" for primitive types, \
-                        got",
-                        user glob.access-names[self.access])
-            if not self.is-output and self.access != Access.COPY
-                self.syntax-error2(
-                        user "parameter",
-                        user self.variable.name,
-                        user "access should be \"copy\" for primitive types, \
-                        got",
-                        user glob.access-names[self.access])
-        else-if self.access = Access.COPY or
-                access-is-only-var(copy self.access)
+                        user "access should not be",
+                        user glob.access-names[self.access],
+                        user "for type",
+                        user type-data.name)
+        else-if access-is-only-var(copy self.access) or
+                (not type-data.is-primitive and self.access = Access.COPY)
             self.syntax-error3(
-                    user "argument",
+                    user "parameter",
                     user self.variable.name,
                     user "access should not be",
                     user glob.access-names[self.access],
-                    user "for non-primitive type",
+                    user "for type",
                     user type-data.name)
-        else-if self.is-output and self.access = Access.TEMP
-            self.syntax-error2(
-                    user "output",
-                    user self.variable.name,
-                    user "access should not be \"temp\" for non-primitive \
-                    type",
-                    user type-data.name)
+        
         self.variable.type-instance.analyze-after-link(user self, copy false)
         self.variable.is-analyzed := true
         if self.is-native
@@ -600,7 +590,7 @@ class DeclarationArgument(Argument)
                 self.variable.type-instance.write-cname()
             else
                 write(user "void")
-            if not self.variable.type-instance.type-data.is-primitive
+            if access-is-ref(copy self.access)
                 write(user "*")
             self.write-name-param(user _, user _)
         

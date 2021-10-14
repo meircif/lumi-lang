@@ -535,7 +535,7 @@ owner Array?{6:Byte} a6
 owner Array?{4:Byte} a4(owner a6)
 ; @ ec test-slice-expression-e22
 user Array?{4:Byte} a4
-user Array?{6:Byte} a6(owner a4)
+user Array?{6:Byte} a6(user a4)
 ; @ ec test-slice-expression-e23
 owner Array?{2:Array{6:Byte}} a6
 owner Array?{2:Array{4:Byte}} a4(owner a6)
@@ -667,6 +667,18 @@ func ! get()->(weak String res)
     res := s
 ; @ c test-call-expression-29
 fun7(weak tb)->(weak t)
+; @ g test-call-expression-30
+func ! fun(user Uint32? x, strong Uint32? y)->(weak Uint32? i, owner Uint32? j)
+    new Uint32 z!
+    x!.value := wraparound x!.value + y!.value + i!.value + j!.value
+    i!.value := 4
+    weak Uint32? a
+    strong Uint32? b(strong j!)
+    j := y
+    y := b
+    x := j
+    fun(user x, strong y)->(weak i, owner j)!
+    ; fun(user i!, strong j!)->(weak a, owner b)!
 ; @ ec test-call-expression-e0
 function( copy 1)
 ; @ ec test-call-expression-e1
@@ -2423,7 +2435,7 @@ func name()
 func name()
         var Uint32 x
 ; @ eg test-function-e14
-func name(user Uint32 x)
+func name(var Uint32 x)
 ; @ eg test-function-e15
 func name()->(copy Uint32 x)
 ; @ eg test-function-e16
@@ -2669,6 +2681,8 @@ new Array{3:Array{4:Buffer{5}}} aa!
 ; @ c test-code-variables-14
 s-var Test tt!
 t := tt
+; @ c test-code-variables-15
+owner Uint32? x
 ; @ g test-code-variables-g0
 func ! fun()
     var Buffer{4} sv
@@ -2784,8 +2798,25 @@ if b
     new Ta nta!
     new Tb ntb(copy 3)!
     new Tc ntc(copy 4)!
+; @ c test-initialize-23
+new Uint32 x!
+i := wraparound x.value + 2
+x.value := 3
+fun5(copy x.value)->(var x.value)
+strong Uint32 y(strong x!)
+new Uint32 z(copy 4)!
+x := Uint32()!
+y := Uint32(copy 5)!
+user Uint32? u(user x)
+; line 10
+i := u!.value
+u!.value := i
+weak Uint32 w(weak y)
+i := w!.value
+w!.value := i
 ; @ ec test-initialize-e0
-Uint32()
+new Uint32 x!
+x := Uint32(owner x)!
 ; @ ec test-initialize-e1
 var Array{Bool} a
 ; @ ec test-initialize-e2
@@ -2814,13 +2845,16 @@ var Array{error:Uint32} a
 ; @ ec test-initialize-e13
 var Array{"12":Uint32} a
 ; @ ec test-initialize-e14
-user Uint32 x
+user Uint32? u
+i := u.value
 ; @ ec test-initialize-e15
-new Uint32 x!
+strong Uint32? x
+weak Uint32 w(weak x!)
+i := w.value
 ; @ ec test-initialize-e16
 var Array{4:Uint32} a(copy 1)
 ; @ ec test-initialize-e17
-var Bool x(var 1)
+var Bool x(copy 1)
 ; @ ec test-initialize-e18
 var Uint32 x(var 1, var 2)
 ; @ eg test-initialize-e19

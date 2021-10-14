@@ -170,8 +170,7 @@ struct TypeInstance
             if not self.type-data?
                 node.check-type(user self.name, user self.module-name)->(
                         user self.type-data)
-            if self.conditional and (not self.type-data.is-ref() or
-                    self.type-data is glob.type-pointer)
+            if self.conditional and self.type-data is glob.type-pointer
                 node.syntax-error(
                         user "cannot use \"?\" on primitive type",
                         user self.type-data.name)
