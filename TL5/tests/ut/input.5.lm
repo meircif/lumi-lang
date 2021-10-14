@@ -678,7 +678,7 @@ func ! fun(user Uint32? x, strong Uint32? y)->(weak Uint32? i, owner Uint32? j)
     y := b
     x := j
     fun(user x, strong y)->(weak i, owner j)!
-    ; fun(user i!, strong j!)->(weak a, owner b)!
+    fun(user i!, strong j!)->(weak a, owner b!)!
 ; @ ec test-call-expression-e0
 function( copy 1)
 ; @ ec test-call-expression-e1
@@ -1958,6 +1958,10 @@ struct Test
     owner Test? to
     strong Test? ts
     weak Test? tw
+; @ g test-struct-5
+struct Test
+    owner Uint32? x
+    weak Uint32? y
 ; @ eg test-struct-e0
 struct(
 ; @ eg test-struct-e1

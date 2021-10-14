@@ -2146,6 +2146,9 @@ Return_Code ut_M_fun(uint32_t* x, uint32_t* y, Ref_Manager* y_Refman, uint32_t**
     Ref_Manager* a_Refman = NULL;
     uint32_t* b = NULL;
     Ref_Manager* b_Refman = NULL;
+    uint32_t* aux_Int_0 = NULL;
+    Ref_Manager* aux_Int_0_Refman = NULL;
+    uint32_t* aux_Int_1 = NULL;
     INIT_NEW(2, LUMI_block0_cleanup, z, uint32_t, 1);
     CHECK_REF(3, LUMI_block0_cleanup, x)
     CHECK_REF(3, LUMI_block0_cleanup, y)
@@ -2173,8 +2176,23 @@ Return_Code ut_M_fun(uint32_t* x, uint32_t* y, Ref_Manager* y_Refman, uint32_t**
     y = NULL;
     y_Refman = NULL;
     CHECK(10, LUMI_block0_cleanup)
+    CHECK_REFMAN(11, LUMI_block0_cleanup, *i_Refman)
+    aux_Int_0 = *j;
+    *j = NULL;
+    INIT_NEW_REFMAN(11, LUMI_block0_cleanup, aux_Int_0)
+    LUMI_var_dec_ref(b_Refman);
+    LUMI_err = ut_M_fun(*i, aux_Int_0, aux_Int_0_Refman, &(a), &(a_Refman), &(aux_Int_1));
+    aux_Int_0 = NULL;
+    aux_Int_0_Refman = NULL;
+    LUMI_owner_dec_ref(b_Refman);
+    b = aux_Int_1;
+    aux_Int_1 = NULL;
+    INIT_NEW_REFMAN(11, LUMI_block0_cleanup, b)
+    CHECK(11, LUMI_block0_cleanup)
 LUMI_block0_cleanup:
     (void)0;
+    free(aux_Int_1);
+    LUMI_owner_dec_ref(aux_Int_0_Refman);
     LUMI_owner_dec_ref(b_Refman);
     LUMI_dec_ref(a_Refman);
     free(z);
@@ -4658,6 +4676,26 @@ void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     LUMI_owner_dec_ref(self->ts_Refman);
     SELF_REF_DEL(ut_M_Test, to, NULL);
     free(self->to);
+}
+/// @ test-struct-5
+typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
+struct ut_M_Test {
+    uint32_t* x;
+    uint32_t* y;
+    Ref_Manager* y_Refman;
+};
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
+    if (self == NULL) return;
+    LUMI_dec_ref(self->y_Refman);
+    free(self->x);
 }
 /// @ test-struct-e0
 expected space after "struct", got "("
