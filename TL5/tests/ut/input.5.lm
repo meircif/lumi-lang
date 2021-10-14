@@ -643,7 +643,7 @@ strong String? s
 weak String? sw
 fun1(copy 0, user sw!, owner s)
 ; @ c test-call-expression-25
-fun8(strong ostr)
+fun8(strong ostr!)
 ; @ c test-call-expression-26
 fune()!
 ; @ c test-call-expression-27
@@ -1224,6 +1224,8 @@ i := tb!.num
 weak Test tt(weak t!)
 ; @ c test-exclamation-expression-5
 new Buffer{str!.length()} s!
+; @ c test-exclamation-expression-6
+so := ostr!
 ; @ ec test-exclamation-expression-e0
 user String s(user str)
 ; @ ec test-exclamation-expression-e1
@@ -1252,6 +1254,8 @@ raise! s
 new Buffer{str.length()} s!
 ; @ ec test-exclamation-expression-e11
 so := ostr
+; @ ec test-exclamation-expression-e12
+fun8(strong ostr)
 ; @ ec test-exclamation-expression-eo0
 raise! str!!
 ; @ ec test-exclamation-expression-en0
@@ -4671,7 +4675,7 @@ func fun(owner Test t, user Test tu, owner String s, user String su)
 fun8(strong so)
 so!.clear()
 new String s!
-fun8(strong s)
+fun8(strong s!)
 s.clear()
 ; @ ec test-memory-owner-e16
 new Test tgood!
