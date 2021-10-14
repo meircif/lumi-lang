@@ -294,8 +294,6 @@ struct TypeInstance
                         user "expected integer as array length, got",
                         user length-type.type-data.name)
             self.parameters.add(owner length-type)
-        ; else-if self.length-owner.parsed()
-        ;     node.analyze-expression(user self.length, user glob.type-int)
         if self.length?
             if constant-length
                 user Long length-value
@@ -524,11 +522,6 @@ struct TypeInstance
                 self.type-data is glob.type-file-write-text or
                 self.type-data is glob.type-file-write-binary)
             return
-        ; if target.type-data is glob.type-array and target.parameters? and
-        ;         not access-is-owner(copy target-access) and not target.length?
-        ;     if self.type-data is glob.type-string and
-        ;             target.parameters.first.item.type-data is glob.type-byte
-        ;         return
         passed := false
 
     func check-assign-to-before-type-check(
