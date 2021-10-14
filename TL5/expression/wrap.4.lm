@@ -131,6 +131,9 @@ class OwnerToStrongCallExpression(WrapExpression)
 
     new(owner Expression expression)
         base(owner expression)
+        self.expression.check-error-propagated(
+                user "ignoring initialization error check")
+        self.error-expected := false
         self.owner-expression := self.expression
         self.access := Access.STRONG
         self.code-node.add-aux-variable(

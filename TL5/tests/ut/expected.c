@@ -3213,6 +3213,12 @@ Byte* s = NULL;
     String_length(str, &(aux_Int_0));
     if (aux_Int_0 <= 0) RAISE(1, LUMI_block0_cleanup, array_too_short)
     INIT_NEW_LEN_ARRAY(1, LUMI_block0_cleanup, s, Byte, aux_Int_0, 1);
+/// @ test-exclamation-expression-6
+String_Del(*so, NULL);
+    LUMI_owner_dec_ref(*so_Refman);
+    *so = ut_M_ostr;
+    ut_M_ostr = NULL;
+    INIT_NEW_REFMAN(1, LUMI_block0_cleanup, *so)
 /// @ test-exclamation-expression-e0
 ignoring empty reference check
 /// @ test-exclamation-expression-e1
@@ -3236,6 +3242,8 @@ ignoring weak reference check
 /// @ test-exclamation-expression-e10
 ignoring empty reference check
 /// @ test-exclamation-expression-e11
+ignoring initialization error check
+/// @ test-exclamation-expression-e12
 ignoring initialization error check
 /// @ test-exclamation-expression-eo0
 only one "!" needed
