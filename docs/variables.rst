@@ -91,7 +91,12 @@ References are declared using the wanted memory access keywords:
    weak Array{Uint32} weak-reference-with-initialization(weak some-int-array)
 
 References must be assigned with a value before used.
- 
+
+For primitive type references the pointed value can be accessed using a special
+``value`` named field::
+
+   int-reference.value := 4
+
 
 .. _conditionals:
  
