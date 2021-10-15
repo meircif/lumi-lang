@@ -13,5 +13,6 @@ testing test-cover-all... OK
 testing test-constants... OK
 testing test-operations... OK
 testing test-builtins... OK
+testing test-primitive-ref... OK
 testing code coverage... 100%
 Tests passed

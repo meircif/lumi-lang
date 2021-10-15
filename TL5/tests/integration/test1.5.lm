@@ -796,3 +796,14 @@ test test-builtins()
     assert! str.equal(user "18446744073709551615")
     min.str(user str)!
     assert! str.equal(user "-9223372036854775807")
+
+
+test test-primitive-ref()
+    new Uint32 x(copy 4)!
+    new Uint32 y(copy 5)!
+    user Uint32 i(user x)
+    assert! i.value = 4
+    x.value := 2
+    assert! i.value = 2
+    i := y
+    assert! i.value = 5

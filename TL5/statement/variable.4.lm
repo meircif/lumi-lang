@@ -114,12 +114,6 @@ class SyntaxTreeVariable(SyntaxTreeCode)
         if self.is-analyzed
             return
         self.is-analyzed := true
-        if self.type-instance.type-data.is-primitive and
-                self.access != Access.VAR
-            self.syntax-error(
-                    user "only \"var\" access is supported for primitive \
-                    types, got",
-                    user glob.access-names[self.access])
         if not self.parent?
             self.type-instance.analyze-after-link(
                     user self, copy access-is-only-var(copy self.access))
@@ -207,7 +201,8 @@ class SyntaxTreeVariable(SyntaxTreeCode)
             else-if not self.type-instance.type-data.is-primitive and
                     access-is-only-var(copy self.access)
                 self.write-var()
-            else-if self.type-instance.type-data.is-ref()
+            else-if self.type-instance.type-data.is-ref() or
+                    access-is-ref(copy self.access)
                 write(user " = NULL")
             else
                 write(user " = 0")
@@ -439,8 +434,7 @@ class VariableInit(VariableCreate)
         base(user refs)
     
     func dynamic write()
-        if self.variable.type-instance.type-data.is-primitive and
-                not self.expression-init.arguments.parameters.first?
+        if not self.expression-init.has-initilization()
             return
         if self.parent is glob.root.global-init
             write(user "#define LUMI_FILE_NAME ")

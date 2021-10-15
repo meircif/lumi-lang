@@ -95,7 +95,7 @@ Character
 ---------
 .. class:: Char
 
-   A single Unicode code-point, which is the same as `Int{1114111}`.
+   A single Unicode code-point, which is the same as ``Int{1114111}``.
 
    Character literal are surrounded with ``'`` characters: ``'a'``. Special
    characters can be written with ``\`` escape character as in C: ``\' \" \? \a

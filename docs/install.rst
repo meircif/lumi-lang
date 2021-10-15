@@ -7,7 +7,7 @@ Syntax Highlighting
 -------------------
 For Lumi syntax highlighting it's recommended to use one of:
 
-* `Visual Studio Code`_ editor with `Lumi Language extendsion`_
+* `Visual Studio Code`_ editor with `Lumi Language extension`_
   installed
 * `Atom`_ editor with `language-lumi package`_ installed
 
@@ -95,7 +95,7 @@ It is recommended to add the compiler executable to the system path, for
 example, in Linux move it to ``/usr/local/bin/``.
 
 .. _Visual Studio Code: https://code.visualstudio.com
-.. _Lumi Language extendsion: https://marketplace.visualstudio.com/items?itemName=meircif.lumi
+.. _Lumi Language extension: https://marketplace.visualstudio.com/items?itemName=meircif.lumi
 .. _Atom: https://atom.io
 .. _language-lumi package: https://atom.io/packages/language-lumi
 .. _Lumi repository: https://github.com/meircif/lumi-lang

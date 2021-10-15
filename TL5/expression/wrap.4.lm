@@ -276,3 +276,30 @@ class CheckArrayLengthExpression(WrapExpression)
             write(user "_Length")
         else
             write-array-value-length(copy depth - 1)
+
+
+~~~ A de-reference of an expression ~~~
+class DerefExpression(WrapExpression)
+    new(owner Expression expression)
+        base(owner expression)
+        self.access := Access.VAR
+        self.error-expected := false
+        self.error-propagated := false
+        self.result-type.conditional := false
+        self.check-expression-all-errors()->(owner self.expression)
+
+    func dynamic write()
+        write(user "*")
+        var Bool field
+        if self.expression.result-type.reference-path?
+            field := self.expression.result-type.reference-path.field?
+        if field
+            self.expression.write-with-brackets()
+        else
+            base()
+    
+    func dynamic write-safe()
+        self.write-with-brackets()
+    
+    func dynamic write-cast()
+        self.write()

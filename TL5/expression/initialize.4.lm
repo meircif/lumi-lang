@@ -6,6 +6,7 @@ class InitExpression(ModuleTypeExpression)
     owner VariableExpression aux-variable
     owner Expression assign-value
     owner AssignExpression assign-expression
+    owner Expression assign-target
     user SyntaxTreeFunction constructor
     
     func inst parse-new(
@@ -50,20 +51,16 @@ class InitExpression(ModuleTypeExpression)
                 self.syntax-error(
                         user "dynamic allocation of type without structure",
                         user self.result-type.type-data.name)
-            if self.result-type.type-data.is-primitive
-                self.syntax-error(
-                        user "dynamic allocation of primitive type",
-                        user self.result-type.type-data.name)
         
-        if not self.result-type.type-data.is-primitive and
-                self.aux-variable.variable.is-create
+        if self.aux-variable.variable.is-create
             self.result-type.check-sequence(user self)
             self.constructor := self.result-type.type-data.constructor
             if self.constructor?
                 user Argument first-parameter(
                         user self.constructor.arguments.parameters.first.item)
                 self.add-self-and-check(copy first-parameter.access)
-            else-if self.arguments.parameters.first?
+            else-if self.arguments.parameters.first? and
+                    not self.result-type.type-data.is-primitive
                 if self.result-type.type-data is glob.type-string
                     self.constructor := glob.string-copy-function
                     self.add-self-and-check(copy Access.USER)
@@ -71,9 +68,11 @@ class InitExpression(ModuleTypeExpression)
                     self.syntax-error(
                             user "no constructor for type",
                             user self.result-type.type-data.name)
-            if self.result-type.conditional
+            if self.result-type.conditional and
+                    not (self.result-type.type-data.is-primitive and
+                    self.result-type.type-data.is-ref())
                 self.syntax-error(
-                        user "unexpected ? initializing type",
+                        user "unexpected \"?\" initializing type",
                         user self.result-type.type-data.name)
             var Bool has-error(copy self.access != Access.VAR)
             if not has-error and self.constructor?
@@ -81,37 +80,45 @@ class InitExpression(ModuleTypeExpression)
             if has-error
                 self.check-error-propagated(
                         user "ignoring initialization error check")
-            
-        else-if self.arguments.parameters.first?
+        
+        if self.arguments.parameters.first? and
+                (not self.aux-variable.variable.is-create or
+                self.result-type.type-data.is-primitive)
             if self.arguments.parameters.first.next? or
                     self.arguments.outputs.first?
                 self.syntax-error-msg(
                         user "only one initialization parameter expected")
             user Argument param(user self.arguments.parameters.first.item)
-            param.take-value()->(owner self.assign-value)
-            self.assign-value.restructure()->(owner self.assign-value)
-            self.aux-variable.result-type.set-expected-type()->(
-                    owner self.assign-value.result-type)
-            self.assign-value.analyze()
-            self.assign-expression := AssignExpression(
-                    user self.code-node,
-                    user self.aux-variable,
-                    user self.assign-value,
-                    copy true)
-            self.assign-expression.analyze-value()->(owner self.assign-value)
-            if self.result-type.type-data.is-primitive and
-                    param.access != Access.COPY
-                self.syntax-error(
-                        user "access should be \"copy\" for primitive types, \
-                        got",
-                        user glob.access-names[param.access])
-            else-if not self.result-type.type-data.is-primitive and
-                    self.access != param.access
+            if self.aux-variable.variable.is-create
+                if param.access != Access.COPY
+                    self.syntax-error(
+                            user "access should be \"copy\" for primitive \
+                            types, got",
+                            user glob.access-names[param.access])
+            else-if self.access != param.access
                 self.syntax-error2(
                         user "assigning into access",
                         user glob.access-names[self.access],
                         user "invalid access",
                         user glob.access-names[param.access])
+            param.take-value()->(owner self.assign-value)
+            self.arguments.parameters.clear()
+            self.assign-value.restructure()->(owner self.assign-value)
+            user Expression target(user self.aux-variable)
+            if self.aux-variable.variable.is-create and not
+                    access-is-only-var(copy self.access)
+                self.assign-target := DerefExpression(
+                        owner self.aux-variable.copy-new())
+                target := self.assign-target
+            target.result-type.set-expected-type()->(
+                    owner self.assign-value.result-type)
+            self.assign-value.analyze()
+            self.assign-expression := AssignExpression(
+                    user self.code-node,
+                    user target,
+                    user self.assign-value,
+                    copy true)
+            self.assign-expression.analyze-value()->(owner self.assign-value)
         
         self.check-no-error()
     
@@ -223,19 +230,26 @@ class InitExpression(ModuleTypeExpression)
             write(user "1")
         write(user ");\n")
     
+    func inst has-initilization()->(var Bool has)
+        has := self.aux-variable.access != Access.VAR or self.constructor? or
+                self.assign-expression?
+
     func dynamic write-preactions()
-        if self.aux-variable.access != Access.VAR or self.constructor?
-            self.write-allocation()
+        self.write-allocation()
+        self.code-node.write-spaces()
+        if self.assign-expression?
+            self.assign-expression.write-preactions()
+            self.assign-expression.write()
             self.code-node.write-spaces()
     
     func dynamic write()
         if self.is-statement
-            if not self.result-type.type-data.is-primitive and
-                    self.aux-variable.variable.is-create
-                if self.aux-variable.access != Access.VAR or self.constructor?
-                    self.code-node.write-spaces()
-                    self.write-allocation()
-            else-if self.assign-expression?
+            if not self.assign-expression? or
+                    (self.aux-variable.variable.is-create and
+                    self.aux-variable.access != Access.VAR)
+                self.code-node.write-spaces()
+                self.write-allocation()
+            if self.assign-expression?
                 self.code-node.write-spaces()
                 self.assign-expression.write-preactions()
                 self.assign-expression.write()

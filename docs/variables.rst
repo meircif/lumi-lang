@@ -74,8 +74,7 @@ with each type's default initialization value:
 
 References
 ----------
-References to complex types are declared using the wanted
-memory access keywords:
+References are declared using the wanted memory access keywords:
 
 * ``owner``: simple owner reference
 * ``user``: simple user reference
@@ -92,7 +91,12 @@ memory access keywords:
    weak Array{Uint32} weak-reference-with-initialization(weak some-int-array)
 
 References must be assigned with a value before used.
- 
+
+For primitive type references the pointed value can be accessed using a special
+``value`` named field::
+
+   int-reference.value := 4
+
 
 .. _conditionals:
  
@@ -170,7 +174,7 @@ access references to the global data. ::
 
 Static Allocation
 -----------------
-Static allocation of complex types is done using ``var`` or ``s-var`` keywords::
+Static allocation is done using ``var`` or ``s-var`` keywords::
 
    var String{256} string-static-allocation
    s-var Array{34:Uint32} static-strong-int-array!

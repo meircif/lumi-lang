@@ -2136,6 +2136,69 @@ ut_M_Tb* aux_Tb_0 = NULL;
     LUMI_dec_ref(ut_M_t_Refman);
     ut_M_t_Refman = aux_Tb_0_Refman;
     ut_M_t = &(aux_Tb_0->_base._base);
+/// @ test-call-expression-30
+Return_Code ut_M_fun(uint32_t* x, uint32_t* y, Ref_Manager* y_Refman, uint32_t** i, Ref_Manager** i_Refman, uint32_t** j);
+Return_Code ut_M_fun(uint32_t* x, uint32_t* y, Ref_Manager* y_Refman, uint32_t** i, Ref_Manager** i_Refman, uint32_t** j) {
+    Return_Code LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    uint32_t* z = NULL;
+    uint32_t* a = NULL;
+    Ref_Manager* a_Refman = NULL;
+    uint32_t* b = NULL;
+    Ref_Manager* b_Refman = NULL;
+    uint32_t* aux_Int_0 = NULL;
+    Ref_Manager* aux_Int_0_Refman = NULL;
+    uint32_t* aux_Int_1 = NULL;
+    INIT_NEW(2, LUMI_block0_cleanup, z, uint32_t, 1);
+    CHECK_REF(3, LUMI_block0_cleanup, x)
+    CHECK_REF(3, LUMI_block0_cleanup, y)
+    CHECK_REF_REFMAN(3, LUMI_block0_cleanup, *i, *i_Refman)
+    CHECK_REF(3, LUMI_block0_cleanup, *j)
+    CHECK_REF(3, LUMI_block0_cleanup, x)
+    *x = (((uint64_t)(*x) + (*y)) + (**i)) + (**j);
+    CHECK_REF_REFMAN(4, LUMI_block0_cleanup, *i, *i_Refman)
+    **i = 0x04;
+    b = *j;
+    *j = NULL;
+    INIT_NEW_REFMAN(6, LUMI_block0_cleanup, b)
+    free(*j);
+    LUMI_var_dec_ref(y_Refman);
+    *j = y;
+    y = NULL;
+    y_Refman = NULL;
+    LUMI_owner_dec_ref(y_Refman);
+    y_Refman = b_Refman;
+    y = b;
+    b = NULL;
+    b_Refman = NULL;
+    x = *j;
+    LUMI_err = ut_M_fun(x, y, y_Refman, &(*i), &(*i_Refman), &(*j));
+    y = NULL;
+    y_Refman = NULL;
+    CHECK(10, LUMI_block0_cleanup)
+    CHECK_REFMAN(11, LUMI_block0_cleanup, *i_Refman)
+    aux_Int_0 = *j;
+    *j = NULL;
+    INIT_NEW_REFMAN(11, LUMI_block0_cleanup, aux_Int_0)
+    LUMI_var_dec_ref(b_Refman);
+    LUMI_err = ut_M_fun(*i, aux_Int_0, aux_Int_0_Refman, &(a), &(a_Refman), &(aux_Int_1));
+    aux_Int_0 = NULL;
+    aux_Int_0_Refman = NULL;
+    LUMI_owner_dec_ref(b_Refman);
+    b = aux_Int_1;
+    aux_Int_1 = NULL;
+    INIT_NEW_REFMAN(11, LUMI_block0_cleanup, b)
+    CHECK(11, LUMI_block0_cleanup)
+LUMI_block0_cleanup:
+    (void)0;
+    free(aux_Int_1);
+    LUMI_owner_dec_ref(aux_Int_0_Refman);
+    LUMI_owner_dec_ref(b_Refman);
+    LUMI_dec_ref(a_Refman);
+    free(z);
+    LUMI_owner_dec_ref(y_Refman);
+    return LUMI_err;
+}
 /// @ test-call-expression-e0
 expected access, got " "
 /// @ test-call-expression-e1
@@ -3126,7 +3189,7 @@ cannot use "?" on non conditional or weak reference of type "Int"
 /// @ test-question-expression-e2
 cannot use "?" on non conditional or weak reference of type "Test"
 /// @ test-question-expression-e3
-cannot use "?" on primitive type "Int"
+unexpected "?" initializing type "Int"
 /// @@ test-exclamation-expression
 /// @ test-exclamation-expression-0
 String* s = NULL;
@@ -4321,8 +4384,6 @@ USER_MAIN_HEADER {
     uint32_t aux_Array_1_Length = 0;
 #define LUMI_FUNC_NAME "global variable initialization"
 #define LUMI_FILE_NAME "mock.5.lm"
-#undef LUMI_FILE_NAME
-#define LUMI_FILE_NAME "mock.5.lm"
     INIT_VAR_REFMAN(2, LUMI_block0_cleanup, ut_M_svs)
 #undef LUMI_FILE_NAME
 #define LUMI_FILE_NAME "mock.5.lm"
@@ -4395,8 +4456,6 @@ USER_MAIN_HEADER {
     unsigned LUMI_loop_depth = 1;
     Bool LUMI_success = true;
 #define LUMI_FUNC_NAME "global variable initialization"
-#define LUMI_FILE_NAME "mock.5.lm"
-#undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
     LUMI_success &= LUMI_run_test("dummy", second_M_dummy);
     LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, 1);
@@ -6103,11 +6162,11 @@ expected block in a new line, got "end-of-file"
 /// @ test-function-e13
 indentation too long, expected 4 got 8
 /// @ test-function-e14
-parameter "x" access should be "copy" for primitive types, got "user"
+parameter "x" access should not be "var" for type "Int"
 /// @ test-function-e15
-output "x" access should be "var" for primitive types, got "copy"
+output "x" access should not be "copy" for type "Int"
 /// @ test-function-e16
-argument "s" access should not be "copy" for non-primitive type "String"
+parameter "s" access should not be "copy" for type "String"
 /// @ test-function-e17
 missing subtype for array
 /// @ test-function-e18
@@ -6437,6 +6496,37 @@ void ut_M_Test_new(ut_M_Test* self, uint32_t x) {
 LUMI_block0_cleanup:
     (void)0;
 }
+/// @ test-members-12
+typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
+struct ut_M_Test {
+    uint32_t* x;
+    uint32_t* y;
+    Ref_Manager* y_Refman;
+};
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+Return_Code ut_M_Test_fun(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+Return_Code ut_M_Test_fun(ut_M_Test* self) {
+    Return_Code LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    CHECK_REF_REFMAN(5, LUMI_block0_cleanup, self->y, self->y_Refman)
+    CHECK_REF(5, LUMI_block0_cleanup, self->x)
+    *(self->x) = *(self->y);
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
+    if (self == NULL) return;
+    LUMI_dec_ref(self->y_Refman);
+    free(self->x);
+}
 /// @ test-members-e0
 redefinition of field "name"
 /// @ test-members-e1
@@ -6578,6 +6668,8 @@ ut_M_Test tt = {0};
     LUMI_dec_ref(ut_M_t_Refman);
     ut_M_t_Refman = tt_Refman;
     ut_M_t = &tt;
+/// @ test-code-variables-15
+uint32_t* x = NULL;
 /// @ test-code-variables-g0
 Return_Code ut_M_fun(void);
 Return_Code ut_M_fun(void) {
@@ -6970,8 +7062,50 @@ if (ut_M_b) {
         free(nt);
     }
     if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+/// @ test-initialize-23
+uint32_t* x = NULL;
+    uint32_t* y = NULL;
+    Ref_Manager* y_Refman = NULL;
+    uint32_t* z = NULL;
+    uint32_t* u = NULL;
+    uint32_t* w = NULL;
+    Ref_Manager* w_Refman = NULL;
+    uint32_t* aux_Int_0 = NULL;
+    uint32_t* aux_Int_1 = NULL;
+    INIT_NEW(1, LUMI_block0_cleanup, x, uint32_t, 1);
+    ut_M_i = (uint64_t)(*x) + 0x02;
+    *x = 0x03;
+    ut_M_fun5(*x, &(*x));
+    y = x;
+    x = NULL;
+    INIT_NEW_REFMAN(5, LUMI_block0_cleanup, y)
+    INIT_NEW(6, LUMI_block0_cleanup, z, uint32_t, 1);
+    *z = 0x04;
+    INIT_NEW(7, LUMI_block0_cleanup, aux_Int_0, uint32_t, 1);
+    free(x);
+    x = aux_Int_0;
+    aux_Int_0 = NULL;
+    INIT_NEW(8, LUMI_block0_cleanup, aux_Int_1, uint32_t, 1);
+    *aux_Int_1 = 0x05;
+    LUMI_owner_dec_ref(y_Refman);
+    y = aux_Int_1;
+    aux_Int_1 = NULL;
+    INIT_NEW_REFMAN(8, LUMI_block0_cleanup, y)
+    u = x;
+    CHECK_REF(11, LUMI_block0_cleanup, u)
+    ut_M_i = *u;
+    CHECK_REF(12, LUMI_block0_cleanup, u)
+    *u = ut_M_i;
+    LUMI_inc_ref(y_Refman);
+    LUMI_dec_ref(w_Refman);
+    w_Refman = y_Refman;
+    w = y;
+    CHECK_REFMAN(14, LUMI_block0_cleanup, w_Refman)
+    ut_M_i = *w;
+    CHECK_REFMAN(15, LUMI_block0_cleanup, w_Refman)
+    *w = ut_M_i;
 /// @ test-initialize-e0
-dynamic allocation of primitive type "Int"
+access should be "copy" for primitive types, got "owner"
 /// @ test-initialize-e1
 missing length for array
 /// @ test-initialize-e2
@@ -6999,9 +7133,9 @@ unknown symbol "error"
 /// @ test-initialize-e13
 expected integer as array length, got "Array"
 /// @ test-initialize-e14
-only "var" access is supported for primitive types, got "user"
+ignoring empty reference check
 /// @ test-initialize-e15
-only "var" access is supported for primitive types, got "owner"
+ignoring weak reference check
 /// @ test-initialize-e16
 no constructor for type "Array"
 /// @ test-initialize-e17
@@ -7035,7 +7169,7 @@ using before declaration variable "error"
 /// @ test-initialize-e31
 unknown symbol "error"
 /// @ test-initialize-e32
-unexpected ? initializing type "Test"
+unexpected "?" initializing type "Test"
 /// @ test-initialize-e33
 cannot use "?" on non conditional or weak reference of type "Type Name"
 /// @ test-initialize-e34
@@ -8758,7 +8892,7 @@ managed argument to native function
 /// @ test-native-ef6
 owner argument to native function
 /// @ test-native-ef7
-argument "s" access should not be "s-var" for non-primitive type "String"
+parameter "s" access should not be "s-var" for type "String"
 /// @ test-native-ef8
 output argument in native function call
 /// @ test-native-ef9
@@ -9501,7 +9635,7 @@ expected "}" after type parameters, got "new-line"
 /// @ test-parameter-type-eg1
 declared variable with generic subtype "Generic"
 /// @ test-parameter-type-eg2
-argument "error" access should not be "copy" for non-primitive type "Generic Type"
+parameter "error" access should not be "copy" for type "Generic Type"
 /// @ test-parameter-type-eg3
 cannot assign "String" into "Generic Type"
 /// @ test-parameter-type-eg4
@@ -11738,10 +11872,6 @@ USER_MAIN_HEADER {
     unsigned LUMI_loop_depth = 1;
     Bool LUMI_success = true;
 #define LUMI_FUNC_NAME "global variable initialization"
-#define LUMI_FILE_NAME "mock.5.lm"
-#undef LUMI_FILE_NAME
-#define LUMI_FILE_NAME "path\\second.5.lm"
-#undef LUMI_FILE_NAME
 #undef LUMI_FUNC_NAME
     LUMI_success &= LUMI_run_test("dummy", second_M_dummy);
     LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, 1);
@@ -12689,7 +12819,7 @@ cannot assign value with access "user" into value with access "temp"
 /// @ test-memory-temp-e1
 assigning into an owner a non-owner access "temp"
 /// @ test-memory-temp-e2
-output "s" access should not be "temp" for non-primitive type "String"
+output "s" access should not be "temp" for type "String"
 /// @ test-memory-temp-e3
 using modified reference "s"
 /// @ test-memory-temp-e4
@@ -13028,9 +13158,9 @@ fields cannot have access "user"
 /// @ test-memory-error-e2
 fields cannot have access "temp"
 /// @ test-memory-error-e3
-argument "s" access should not be "var" for non-primitive type "String"
+parameter "s" access should not be "var" for type "String"
 /// @ test-memory-error-e4
-argument "s" access should not be "var" for non-primitive type "String"
+output "s" access should not be "var" for type "String"
 /// @@ test-c-objects
 /// @ test-c-objects-0
 uint16_t u16 = 0;

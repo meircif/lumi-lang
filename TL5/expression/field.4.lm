@@ -43,6 +43,12 @@ class FieldExpression(Expression)
             expression.restructure()->(owner expression, owner arguments)
             return
         
+        if instance-type.type-data.is-primitive and
+                access-is-ref(copy self.instance.access)
+            if self.name.equal(user "value")
+                expression := DerefExpression(owner self.instance)
+                return
+        
         instance-type.type-data.find-field(user self.name)->(
                 user self.variable, var self.bases)
         if not self.variable? and pointed-type?

@@ -37,6 +37,9 @@ func access-is-var(copy Int access)->(var Bool is-var)
 func access-is-temp(copy Int access)->(var Bool is-temp)
     is-temp := access-is-var(copy access) or access = Access.TEMP
 
+func access-is-ref(copy Int access)->(var Bool is-temp)
+    is-temp := not access-is-only-var(copy access) and access != Access.COPY
+
 
 func get-sys-argv()->(user Array{String} argv)
     argv := sys.argv
