@@ -29015,6 +29015,7 @@ LUMI_cleanup:
 #define LUMI_FUNC_NAME "DerefExpression.write"
 Returncode tl5_compiler_M_DerefExpression_write(tl5_compiler_M_DerefExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_DerefExpression_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
+    Bool field = 0;
     String aux_String_0_Var = {0};
     String* aux_String_0 = NULL;
     Ref_Manager* aux_String_0_Refman = NULL;
@@ -29022,8 +29023,26 @@ Returncode tl5_compiler_M_DerefExpression_write(tl5_compiler_M_DerefExpression* 
     INIT_STRING_CONST(292, aux_String_0, "*");
     LUMI_err = tl5_compiler_M_write(aux_String_0, aux_String_0_Refman);
     CHECK(292)
-    LUMI_err = tl5_compiler_M_WrapExpression_write(&(self->_base), self_Refman, &(self_Dynamic->_base));
-    CHECK(293)
+    CHECK_REF(294, self, self_Refman)
+    CHECK_REF(294, self->_base.expression, self->_base.expression_Refman)
+    CHECK_REF(294, self->_base.expression->result_type, self->_base.expression->result_type_Refman)
+    if (self->_base.expression->result_type->reference_path != NULL && self->_base.expression->result_type->reference_path_Refman->value != NULL) {
+        CHECK_REF(295, self, self_Refman)
+        CHECK_REF(295, self->_base.expression, self->_base.expression_Refman)
+        CHECK_REF(295, self->_base.expression->result_type, self->_base.expression->result_type_Refman)
+        CHECK_REF(295, self->_base.expression->result_type->reference_path, self->_base.expression->result_type->reference_path_Refman)
+        field = self->_base.expression->result_type->reference_path->field != NULL && self->_base.expression->result_type->reference_path->field_Refman->value != NULL;
+    }
+    if (field) {
+        CHECK_REF(297, self, self_Refman)
+        if (self->_base.expression_Dynamic == NULL) RAISE(297, empty_object)
+        LUMI_err = self->_base.expression_Dynamic->write_with_brackets(self->_base.expression, self->_base.expression_Refman, self->_base.expression_Dynamic);
+        CHECK(297)
+    }
+    else {
+            LUMI_err = tl5_compiler_M_WrapExpression_write(&(self->_base), self_Refman, &(self_Dynamic->_base));
+            CHECK(299)
+        }
 LUMI_cleanup:
     LUMI_var_dec_ref(aux_String_0_Refman);
     LUMI_dec_ref(self_Refman);
@@ -29037,9 +29056,9 @@ LUMI_cleanup:
 Returncode tl5_compiler_M_DerefExpression_write_safe(tl5_compiler_M_DerefExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_DerefExpression_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
     LUMI_inc_ref(self_Refman);
-    if (self_Dynamic == NULL) RAISE(296, empty_object)
+    if (self_Dynamic == NULL) RAISE(302, empty_object)
     LUMI_err = self_Dynamic->_base._base.write_with_brackets(&(self->_base._base), self_Refman, &(self_Dynamic->_base._base));
-    CHECK(296)
+    CHECK(302)
 LUMI_cleanup:
     LUMI_dec_ref(self_Refman);
     return LUMI_err;
@@ -29052,9 +29071,9 @@ LUMI_cleanup:
 Returncode tl5_compiler_M_DerefExpression_write_cast(tl5_compiler_M_DerefExpression* self, Ref_Manager* self_Refman, tl5_compiler_M_DerefExpression_Dynamic* self_Dynamic) {
     Returncode LUMI_err = OK;
     LUMI_inc_ref(self_Refman);
-    if (self_Dynamic == NULL) RAISE(299, empty_object)
+    if (self_Dynamic == NULL) RAISE(305, empty_object)
     LUMI_err = self_Dynamic->_base._base._base.write(&(self->_base._base._base), self_Refman, &(self_Dynamic->_base._base._base));
-    CHECK(299)
+    CHECK(305)
 LUMI_cleanup:
     LUMI_dec_ref(self_Refman);
     return LUMI_err;

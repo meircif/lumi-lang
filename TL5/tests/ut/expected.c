@@ -4677,26 +4677,6 @@ void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     SELF_REF_DEL(ut_M_Test, to, NULL);
     free(self->to);
 }
-/// @ test-struct-5
-typedef struct ut_M_Test ut_M_Test;
-typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
-struct ut_M_Test {
-    uint32_t* x;
-    uint32_t* y;
-    Ref_Manager* y_Refman;
-};
-struct ut_M_Test_Dynamic {
-    Dynamic_Del _del;
-};
-void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
-ut_M_Test_Dynamic ut_M_Test_dynamic = {
-    (Dynamic_Del)ut_M_Test_Del
-};
-void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
-    if (self == NULL) return;
-    LUMI_dec_ref(self->y_Refman);
-    free(self->x);
-}
 /// @ test-struct-e0
 expected space after "struct", got "("
 /// @ test-struct-e1
@@ -6515,6 +6495,37 @@ void ut_M_Test_new(ut_M_Test* self, uint32_t x) {
     self->x = x;
 LUMI_block0_cleanup:
     (void)0;
+}
+/// @ test-members-12
+typedef struct ut_M_Test ut_M_Test;
+typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
+struct ut_M_Test {
+    uint32_t* x;
+    uint32_t* y;
+    Ref_Manager* y_Refman;
+};
+struct ut_M_Test_Dynamic {
+    Dynamic_Del _del;
+};
+Return_Code ut_M_Test_fun(ut_M_Test* self);
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic);
+ut_M_Test_Dynamic ut_M_Test_dynamic = {
+    (Dynamic_Del)ut_M_Test_Del
+};
+Return_Code ut_M_Test_fun(ut_M_Test* self) {
+    Return_Code LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    CHECK_REF_REFMAN(5, LUMI_block0_cleanup, self->y, self->y_Refman)
+    CHECK_REF(5, LUMI_block0_cleanup, self->x)
+    *(self->x) = *(self->y);
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_err;
+}
+void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
+    if (self == NULL) return;
+    LUMI_dec_ref(self->y_Refman);
+    free(self->x);
 }
 /// @ test-members-e0
 redefinition of field "name"

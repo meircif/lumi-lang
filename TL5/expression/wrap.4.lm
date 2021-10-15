@@ -290,7 +290,13 @@ class DerefExpression(WrapExpression)
 
     func dynamic write()
         write(user "*")
-        base()
+        var Bool field
+        if self.expression.result-type.reference-path?
+            field := self.expression.result-type.reference-path.field?
+        if field
+            self.expression.write-with-brackets()
+        else
+            base()
     
     func dynamic write-safe()
         self.write-with-brackets()
