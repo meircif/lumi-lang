@@ -74,8 +74,7 @@ with each type's default initialization value:
 
 References
 ----------
-References to complex types are declared using the wanted
-memory access keywords:
+References are declared using the wanted memory access keywords:
 
 * ``owner``: simple owner reference
 * ``user``: simple user reference
@@ -170,7 +169,7 @@ access references to the global data. ::
 
 Static Allocation
 -----------------
-Static allocation of complex types is done using ``var`` or ``s-var`` keywords::
+Static allocation is done using ``var`` or ``s-var`` keywords::
 
    var String{256} string-static-allocation
    s-var Array{34:Uint32} static-strong-int-array!

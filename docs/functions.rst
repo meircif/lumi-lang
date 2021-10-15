@@ -55,14 +55,7 @@ indentation of exactly 4 spaces::
 
 Access
 ------
-An "access" defines the memory access of the argument.
-
-In :ref:`TL5 <syntax-tl5>`:
-
-* for primitive types ``copy`` must be used for parameters, and ``var`` for
-  outputs.
-* for complex types one of ``owner``, ``temp``, ``user``, ``strong``, ``weak``
-  must be used depends on the needed :ref:`memory access <references>`
+An "access" defines the memory access of the argument. It can be one of:
 
 ``copy`` parameter:
 
@@ -96,6 +89,9 @@ In :ref:`TL5 <syntax-tl5>`:
 * the parameter is a reflection of an actual reference
 * changes to the reference itself will **also** change the called reference
 * only a writable value can be given
+
+In :ref:`TL5 <syntax-tl5>` ``copy`` and ``var`` are not yet supported for
+complex types.
 
 In the planned final syntax this will be extended, and the access may be
 omitted in a default usage.
