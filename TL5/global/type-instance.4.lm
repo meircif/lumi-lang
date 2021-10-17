@@ -240,9 +240,9 @@ struct TypeInstance
                         node.syntax-error(
                                 user "dynamic pointed type",
                                 user sub-type.type-data.name)
-                else-if sub-type.type-data.is-primitive
+                else-if sub-type.conditional
                     node.syntax-error(
-                            user "unsupported primitive parameter type",
+                            user "conditional parameter type",
                             user sub-type.type-data.name)
                 if sub-type.type-data is glob.type-array
                     node.syntax-error-msg(
@@ -428,7 +428,7 @@ struct TypeInstance
             user TypeInstance target, user SyntaxTreeNode node)->(
             var Bool passed)
         passed := true
-        if self.type-data is glob.type-empty and target.type-data.is-ref()
+        if self.type-data is glob.type-empty
             if not target.conditional
                 assert node?
                 node.syntax-error(

@@ -659,6 +659,11 @@ func ! test-type-parameters(weak Item? s)
     weak File? f
     df.set(weak f)!
     df.get()->(weak f)
+    
+    var Data{Uint32} di
+    weak Uint32? i
+    di.set(weak i)!
+    di.get()->(weak i)
 
 
 func ! try-catch-raise(user TestStruct? t)

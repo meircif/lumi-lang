@@ -470,6 +470,8 @@ class CallArgument(Argument)
                 write(user "&dynamic_Void")
             else-if value-type is glob.type-empty
                 write(user "NULL")
+            else-if value-type.is-primitive
+                write(user "&LUMI_nop_dynamic")
             else
                 write(user "(Generic_Type_Dynamic*)&")
                 self.call-value.result-type.write-cname()

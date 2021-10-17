@@ -549,7 +549,7 @@ String_Del(*so, NULL);
 /// @ test-empty-expression-3
 ut_M_b = ((void*)ut_M_t == NULL) || ((void*)ut_M_ta != NULL);
 /// @ test-empty-expression-e0
-cannot assign "Empty Symbol" into "Int"
+assigning empty into non-conditional type "Int"
 /// @@ test-member-expression
 /// @ test-member-expression-0
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
@@ -7096,13 +7096,14 @@ uint32_t* x = NULL;
     ut_M_i = *u;
     CHECK_REF(12, LUMI_block0_cleanup, u)
     *u = ut_M_i;
+    u = NULL;
     LUMI_inc_ref(y_Refman);
     LUMI_dec_ref(w_Refman);
     w_Refman = y_Refman;
     w = y;
-    CHECK_REFMAN(14, LUMI_block0_cleanup, w_Refman)
-    ut_M_i = *w;
     CHECK_REFMAN(15, LUMI_block0_cleanup, w_Refman)
+    ut_M_i = *w;
+    CHECK_REFMAN(16, LUMI_block0_cleanup, w_Refman)
     *w = ut_M_i;
 /// @ test-initialize-e0
 access should be "copy" for primitive types, got "owner"
@@ -8852,7 +8853,7 @@ Return_Code ut_M_fun(Test t, TestRef r, Native in, Native* out) {
     in.r = r;
     CHECK_REF(15, LUMI_block0_cleanup, in.n)
     in.n->x = 0;
-    cdef_M_Pointer_set_point_to(in.n, in, (Generic_Type_Dynamic*)&Native_dynamic);
+    cdef_M_Pointer_set_point_to(in.n, in, &LUMI_nop_dynamic);
     *out = cdef_M_Pointer_get_pointed_at(in.n, 0);
     *out = in;
 LUMI_block0_cleanup:
@@ -9630,6 +9631,40 @@ ut_M_Data* db = NULL;
     ut_M_ta_Refman = aux_Tb_0_Refman;
     ut_M_ta_Dynamic = &(aux_Tb_0_Dynamic->_base);
     ut_M_ta = &(aux_Tb_0->_base);
+/// @ test-parameter-type-23
+ut_M_Data ds = {0};
+    String* os = NULL;
+    String* ws = NULL;
+    Ref_Manager* ws_Refman = NULL;
+    CHECK_REF_REFMAN(4, LUMI_block0_cleanup, ds.item, ds.item_Refman)
+    String_clear(ds.item);
+    CHECK_REFMAN(5, LUMI_block0_cleanup, ds.item_Refman)
+    str = ds.item;
+    ut_M_Data_set(&ds, os, (Generic_Type_Dynamic*)&String_dynamic);
+    os = NULL;
+    ut_M_Data_get(&ds, (void*)&(ws), &(ws_Refman), &dynamic_Void);
+/// @ test-parameter-type-24
+ut_M_Data di = {0};
+    uint32_t* oi = NULL;
+    uint32_t* wi = NULL;
+    Ref_Manager* wi_Refman = NULL;
+    LUMI_inc_ref(wi_Refman);
+    LUMI_dec_ref(di.item_Refman);
+    di.item_Refman = wi_Refman;
+    di.item_Dynamic = &LUMI_nop_dynamic;
+    di.item = wi;
+    LUMI_inc_ref(di.item_Refman);
+    LUMI_dec_ref(wi_Refman);
+    wi_Refman = di.item_Refman;
+    wi = di.item;
+    ut_M_Data_set(&di, oi, &LUMI_nop_dynamic);
+    oi = NULL;
+    ut_M_Data_get(&di, (void*)&(wi), &(wi_Refman), &dynamic_Void);
+    CHECK_REF_REFMAN(8, LUMI_block0_cleanup, di.item, di.item_Refman)
+    di.item_Dynamic = &LUMI_nop_dynamic;
+    *((uint32_t*)(di.item)) = 0x03;
+    CHECK_REF_REFMAN(9, LUMI_block0_cleanup, di.item, di.item_Refman)
+    ut_M_i = *((uint32_t*)(di.item));
 /// @ test-parameter-type-eg0
 expected "}" after type parameters, got "new-line"
 /// @ test-parameter-type-eg1
@@ -9657,7 +9692,7 @@ too many parameters given for type "Base"
 /// @ test-parameter-type-eg15
 too few parameter given for type "Base"
 /// @ test-parameter-type-ec0
-unsupported primitive parameter type "Int"
+conditional parameter type "Test"
 /// @ test-parameter-type-ec1
 too many parameters given for type "Data"
 /// @ test-parameter-type-ec2
@@ -13233,8 +13268,8 @@ cdef_M_Int cint = 0;
     ut_M_Test* arr_test = NULL;
     uint32_t arr_test_Length = 0;
     p_int = arr_int;
-    cdef_M_Pointer_set_point_to(p_int, cint, (Generic_Type_Dynamic*)&cdef_M_Int_dynamic);
-    cdef_M_Pointer_set_point_to(pp_int, p_int, (Generic_Type_Dynamic*)&cdef_M_Int*_dynamic);
+    cdef_M_Pointer_set_point_to(p_int, cint, &LUMI_nop_dynamic);
+    cdef_M_Pointer_set_point_to(pp_int, p_int, &LUMI_nop_dynamic);
     p_int = cdef_M_Pointer_get_pointed_at(pp_int, 0);
     cint = cdef_M_Pointer_get_pointed_at(p_int, 0x03);
     cdef_M_Pointer_get_pointed_at(p_int, 0x03) = 0x05;

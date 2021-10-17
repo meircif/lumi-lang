@@ -310,6 +310,9 @@ size_t LUMI_trace_ignore_count = 0;
 Byte* LUMI_expected_error = NULL;
 size_t LUMI_expected_error_trace_ignore_count = 0;
 Generic_Type_Dynamic* dynamic_Void = NULL;
+void LUMI_nop_Del(void* _, void* __) {}
+Generic_Type_Dynamic LUMI_nop_dynamic = { LUMI_nop_Del };
+
 
 #define ERROR_MESAGE(message) {(Byte*)message, sizeof(message) - 1}
 
@@ -749,9 +752,6 @@ Return_Code Int_str(uint64_t abs, Bool is_neg, String* str, Bool is_append) {
 
 
 /* Buffer */
-
-/*#define CHECK_INDEX(index, length) if (index < 0 || index >= *length) \
-    CRAISE(LUMI_error_messages.slice_index.str)*/
 
 void cdef_M_copy_to_buffer(
     Byte* source, Byte* target, uint32_t target_length) {

@@ -2821,6 +2821,7 @@ user Uint32? u(user x)
 ; line 10
 i := u!.value
 u!.value := i
+u := _
 weak Uint32 w(weak y)
 i := w!.value
 w!.value := i
@@ -3813,6 +3814,24 @@ ta := db!.item
 db.set(owner tb)
 db.set(owner _)
 db.get()->(weak ta)
+; @ c test-parameter-type-23
+var Data{String} ds
+owner String? os
+weak String? ws
+ds.item!.clear()
+str := ds.item!
+ds.set(owner os)
+ds.get()->(weak ws)
+; @ c test-parameter-type-24
+var Data{Uint32} di
+owner Uint32? oi
+weak Uint32? wi
+di.item := wi
+wi := di.item
+di.set(owner oi)
+di.get()->(weak wi)
+di.item!.value := 3
+i := di.item!.value
 ; @ eg test-parameter-type-eg0
 struct Test{First:Second:Third
 ; @ eg test-parameter-type-eg1
@@ -3879,7 +3898,7 @@ struct Base{Param0:Param1}
     weak Param1 item1
 struct Error(Base{MyStruct})
 ; @ ec test-parameter-type-ec0
-var Data{Uint32} error
+var Data{Test?} error
 ; @ ec test-parameter-type-ec1
 var Data{Test:Test} error
 ; @ ec test-parameter-type-ec2
