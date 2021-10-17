@@ -44760,23 +44760,19 @@ Returncode tl5_compiler_M_TypeInstance_check_assign_to_before_access_pass(tl5_co
     Returncode LUMI_err = OK;
     tl5_compiler_M_TypeInstance* value = NULL;
     Ref_Manager* value_Refman = NULL;
-    Bool aux_Bool_0 = 0;
     String aux_String_0_Var = {0};
     String* aux_String_0 = NULL;
     Ref_Manager* aux_String_0_Refman = NULL;
+    Bool aux_Bool_0 = 0;
     Bool aux_Bool_1 = 0;
-    Bool aux_Bool_2 = 0;
     Ref_Manager* aux_Ref_Manager = NULL;
     LUMI_inc_ref(self_Refman);
     LUMI_inc_ref(target_Refman);
     LUMI_inc_ref(node_Refman);
     *passed = true;
-    CHECK_REF(431, target, target_Refman)
-    LUMI_err = tl5_compiler_M_TypeData_is_ref(target->type_data, target->type_data_Refman, target->type_data_Dynamic, &(aux_Bool_0));
-    CHECK(431)
     CHECK_REF(431, tl5_compiler_M_glob, tl5_compiler_M_glob_Refman)
     CHECK_REF(431, self, self_Refman)
-    if (((void*)self->type_data == tl5_compiler_M_glob->type_empty) && aux_Bool_0) {
+    if ((void*)self->type_data == tl5_compiler_M_glob->type_empty) {
         CHECK_REF(432, target, target_Refman)
         if (! target->conditional) {
             TEST_ASSERT(433, node != NULL && node_Refman->value != NULL)
@@ -44804,9 +44800,9 @@ Returncode tl5_compiler_M_TypeInstance_check_assign_to_before_access_pass(tl5_co
             goto LUMI_cleanup;
         }
         CHECK_REF(443, self, self_Refman)
-        LUMI_err = tl5_compiler_M_TypeData_is_ref(self->type_data, self->type_data_Refman, self->type_data_Dynamic, &(aux_Bool_1));
+        LUMI_err = tl5_compiler_M_TypeData_is_ref(self->type_data, self->type_data_Refman, self->type_data_Dynamic, &(aux_Bool_0));
         CHECK(443)
-        if (aux_Bool_1) {
+        if (aux_Bool_0) {
             CHECK_REF(444, target, target_Refman)
             if (! (target->parameters != NULL && target->parameters_Refman->value != NULL)) {
                 goto LUMI_cleanup;
@@ -44830,9 +44826,9 @@ Returncode tl5_compiler_M_TypeInstance_check_assign_to_before_access_pass(tl5_co
             CHECK_REF(449, target, target_Refman)
             CHECK_REF(449, target->parameters, target->parameters_Refman)
             CHECK_REF(449, target->parameters->first, target->parameters->first_Refman)
-            LUMI_err = tl5_compiler_M_TypeInstance_can_be_assigned_to(value, value_Refman, target->parameters->first->item, target->parameters->first->item_Refman, &(aux_Bool_2));
+            LUMI_err = tl5_compiler_M_TypeInstance_can_be_assigned_to(value, value_Refman, target->parameters->first->item, target->parameters->first->item_Refman, &(aux_Bool_1));
             CHECK(449)
-            if (aux_Bool_2) {
+            if (aux_Bool_1) {
                 goto LUMI_cleanup;
             }
         }

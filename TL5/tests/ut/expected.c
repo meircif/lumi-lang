@@ -549,7 +549,7 @@ String_Del(*so, NULL);
 /// @ test-empty-expression-3
 ut_M_b = ((void*)ut_M_t == NULL) || ((void*)ut_M_ta != NULL);
 /// @ test-empty-expression-e0
-cannot assign "Empty Symbol" into "Int"
+assigning empty into non-conditional type "Int"
 /// @@ test-member-expression
 /// @ test-member-expression-0
 CHECK_REF_REFMAN(1, LUMI_block0_cleanup, ut_M_t, ut_M_t_Refman)
@@ -7096,13 +7096,14 @@ uint32_t* x = NULL;
     ut_M_i = *u;
     CHECK_REF(12, LUMI_block0_cleanup, u)
     *u = ut_M_i;
+    u = NULL;
     LUMI_inc_ref(y_Refman);
     LUMI_dec_ref(w_Refman);
     w_Refman = y_Refman;
     w = y;
-    CHECK_REFMAN(14, LUMI_block0_cleanup, w_Refman)
-    ut_M_i = *w;
     CHECK_REFMAN(15, LUMI_block0_cleanup, w_Refman)
+    ut_M_i = *w;
+    CHECK_REFMAN(16, LUMI_block0_cleanup, w_Refman)
     *w = ut_M_i;
 /// @ test-initialize-e0
 access should be "copy" for primitive types, got "owner"

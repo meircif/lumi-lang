@@ -36,13 +36,6 @@ func factorial(copy Int{20} x)->(var Int{2432902008176640000} res)
         res := res clamp* n
 
 
-struct IntBox
-    var Sint64 value
-
-    func user set(copy Sint64 value)
-        self.value := value
-
-
 class IntIterator
     ~~~ in TL5 a class must contain at least one field. ~~~
     var Uint8 dummy
@@ -50,7 +43,7 @@ class IntIterator
     ~~~ Is called once before any iteration step.
     Iteration continues only if "has" returns true, in such case
     "value" is set to the iteration value. ~~~
-    func dynamic user? step()->(user IntBox? value, var Bool has)
+    func dynamic user? step()->(user Sint64? value, var Bool has)
         value := _
         has := false
 
@@ -58,6 +51,6 @@ class IntIterator
 ~~~ Return the sum of all integers in `iter` ~~~
 func sum(user IntIterator iter)->(var Sint64 res)
     res := 0
-    for box in iter
-        if-error res clamp+= box.value
+    for num in iter
+        if-error res clamp+= num.value
             break

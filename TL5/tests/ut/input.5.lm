@@ -2821,6 +2821,7 @@ user Uint32? u(user x)
 ; line 10
 i := u!.value
 u!.value := i
+u := _
 weak Uint32 w(weak y)
 i := w!.value
 w!.value := i

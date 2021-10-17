@@ -428,7 +428,7 @@ struct TypeInstance
             user TypeInstance target, user SyntaxTreeNode node)->(
             var Bool passed)
         passed := true
-        if self.type-data is glob.type-empty and target.type-data.is-ref()
+        if self.type-data is glob.type-empty
             if not target.conditional
                 assert node?
                 node.syntax-error(

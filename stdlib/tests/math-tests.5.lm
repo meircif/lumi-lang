@@ -42,47 +42,48 @@ test factorial-test()
 
 
 test sum-test()
-    s-var Array{4:math.IntBox} array!
-    var MockIntIterator iter(weak array)
-    array[0]!.set(copy 3)
-    array[1]!.set(copy 0)
-    array[2]!.set(copy -1)
-    array[3]!.set(copy 34)
+    s-var Array{4:Sint64} array!
+    var MockIntIterator iter(weak array)!
+    array[0] := 3
+    array[1] := 0
+    array[2] := -1
+    array[3] := 34
     assert! math.sum(user iter) = 36
-    user math.IntBox? item
-    iter.new(weak array)
+    user Sint64? item
+    iter.new(weak array)!
     iter.step()->(user item)!
     iter.step()->(user item)!
     assert! math.sum(user iter) = 33
     assert! math.sum(user iter) = 0
 
 class MockIntIterator(math.IntIterator)
-    weak Array{math.IntBox} array
+    weak Array{Sint64} array
     var Int index
+    owner Sint64 value
 
-    new(weak Array{math.IntBox} array)
+    new!(weak Array{Sint64} array)
         self.array := array
         self.index := 0
+        self.value := Sint64()!
     
     func dynamic user step()->(
-            user math.IntBox? item, var Bool has-another-item)
-        if-error has-another-item := self.index < self.array.length
-            has-another-item := false
+            user Sint64? item, var Bool has-another-item)
         item := _
-        if has-another-item
-            if-error item := self.array[self.index]
-                has-another-item := false
-            else
-                self.index clamp+= 1
+        if-error self.value.value := self.array[self.index]
+            has-another-item := false
+        else
+            has-another-item := true
+            self.index clamp+= 1
+            item := self.value
 
 
 class FailIterator(math.IntIterator)
-    func dynamic user? step()->(user math.IntBox? value, var Bool has)
+    func dynamic user? step()->(user Sint64? value, var Bool has)
         value := _
         has := true
 
 test abstract-methods()
-    user math.IntBox? item
+    user Sint64? item
     assert! not math.IntIterator.step(user _)->(user item)
     var FailIterator fail-iter
     assert! math.sum(user fail-iter) = 0
