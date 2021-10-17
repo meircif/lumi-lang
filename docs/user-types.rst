@@ -432,11 +432,7 @@ This is partially supported in :ref:`TL5 <syntax-tl5>`:
 
 * only dynamic parameters are supported (``Generic`` type)
 * no need to add ``Generic`` - only the parameter name is needed
-* some types are not supported as parameter values:
-
-   * any primitive type
-   * String
-   * Array
+* Arrays are not supported as parameter values
 
 
 .. _syntax-embed:

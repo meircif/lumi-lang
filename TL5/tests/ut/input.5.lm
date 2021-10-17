@@ -3815,9 +3815,17 @@ db.set(owner tb)
 db.set(owner _)
 db.get()->(weak ta)
 ; @ c test-parameter-type-23
+var Data{String} ds
+owner String? os
+weak String? ws
+ds.item!.clear()
+str := ds.item!
+ds.set(owner os)
+ds.get()->(weak ws)
+; @ c test-parameter-type-24
+var Data{Uint32} di
 owner Uint32? oi
 weak Uint32? wi
-var Data{Uint32} di
 di.item := wi
 wi := di.item
 di.set(owner oi)

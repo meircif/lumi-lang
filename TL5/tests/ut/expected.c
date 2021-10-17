@@ -9632,10 +9632,22 @@ ut_M_Data* db = NULL;
     ut_M_ta_Dynamic = &(aux_Tb_0_Dynamic->_base);
     ut_M_ta = &(aux_Tb_0->_base);
 /// @ test-parameter-type-23
-uint32_t* oi = NULL;
+ut_M_Data ds = {0};
+    String* os = NULL;
+    String* ws = NULL;
+    Ref_Manager* ws_Refman = NULL;
+    CHECK_REF_REFMAN(4, LUMI_block0_cleanup, ds.item, ds.item_Refman)
+    String_clear(ds.item);
+    CHECK_REFMAN(5, LUMI_block0_cleanup, ds.item_Refman)
+    str = ds.item;
+    ut_M_Data_set(&ds, os, (Generic_Type_Dynamic*)&String_dynamic);
+    os = NULL;
+    ut_M_Data_get(&ds, (void*)&(ws), &(ws_Refman), &dynamic_Void);
+/// @ test-parameter-type-24
+ut_M_Data di = {0};
+    uint32_t* oi = NULL;
     uint32_t* wi = NULL;
     Ref_Manager* wi_Refman = NULL;
-    ut_M_Data di = {0};
     LUMI_inc_ref(wi_Refman);
     LUMI_dec_ref(di.item_Refman);
     di.item_Refman = wi_Refman;
