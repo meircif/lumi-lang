@@ -217,7 +217,9 @@ class AssignExpression(Expression)
         user TypeData value-type(user self.value.result-type.type-data)
         self.target.write-dynamic()
         write(user " = ")
-        if not target-type.is-struct and value-type is-not glob.type-empty and
+        if value-type.is-primitive
+            write(user "&LUMI_nop_dynamic")
+        else-if not target-type.is-struct and value-type is-not glob.type-empty and
                 not value-type.is-only-dynamic()
             self.original-value.write-support-name(
                     user self.target.result-type)

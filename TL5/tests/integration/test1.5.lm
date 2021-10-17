@@ -807,3 +807,9 @@ test test-primitive-ref()
     assert! i.value = 2
     i := y
     assert! i.value = 5
+    strong Uint32 z(strong x!)
+    var Data{Uint32} d
+    d.item := z
+    assert! d.item!.value = 2
+    d.item!.value := 3
+    assert! z.value = 3

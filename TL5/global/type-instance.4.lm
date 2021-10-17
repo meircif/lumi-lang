@@ -240,9 +240,9 @@ struct TypeInstance
                         node.syntax-error(
                                 user "dynamic pointed type",
                                 user sub-type.type-data.name)
-                else-if sub-type.type-data.is-primitive
+                else-if sub-type.conditional
                     node.syntax-error(
-                            user "unsupported primitive parameter type",
+                            user "conditional parameter type",
                             user sub-type.type-data.name)
                 if sub-type.type-data is glob.type-array
                     node.syntax-error-msg(
