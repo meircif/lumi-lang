@@ -2199,6 +2199,24 @@ LUMI_block0_cleanup:
     LUMI_owner_dec_ref(y_Refman);
     return LUMI_err;
 }
+/// @ test-call-expression-31
+Return_Code ut_M_fun(uint32_t* x, uint32_t* y, Ref_Manager* y_Refman, uint32_t* z);
+Return_Code ut_M_fun(uint32_t* x, uint32_t* y, Ref_Manager* y_Refman, uint32_t* z) {
+    Return_Code LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    uint32_t i = 0;
+    Ref_Manager* i_Refman = NULL;
+    uint32_t j = 0;
+    LUMI_inc_ref(y_Refman);
+    INIT_VAR_REFMAN(2, LUMI_block0_cleanup, i)
+    LUMI_err = ut_M_fun(&i, &i, i_Refman, &j);
+    CHECK(4, LUMI_block0_cleanup)
+LUMI_block0_cleanup:
+    (void)0;
+    LUMI_var_dec_ref(i_Refman);
+    LUMI_dec_ref(y_Refman);
+    return LUMI_err;
+}
 /// @ test-call-expression-e0
 expected access, got " "
 /// @ test-call-expression-e1
@@ -6503,6 +6521,8 @@ struct ut_M_Test {
     uint32_t* x;
     uint32_t* y;
     Ref_Manager* y_Refman;
+    uint32_t z;
+    Ref_Manager* z_Refman;
 };
 struct ut_M_Test_Dynamic {
     Dynamic_Del _del;
@@ -6515,15 +6535,20 @@ ut_M_Test_Dynamic ut_M_Test_dynamic = {
 Return_Code ut_M_Test_fun(ut_M_Test* self) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    CHECK_REF_REFMAN(5, LUMI_block0_cleanup, self->y, self->y_Refman)
-    CHECK_REF(5, LUMI_block0_cleanup, self->x)
+    CHECK_REF_REFMAN(6, LUMI_block0_cleanup, self->y, self->y_Refman)
+    CHECK_REF(6, LUMI_block0_cleanup, self->x)
     *(self->x) = *(self->y);
+    LUMI_inc_ref(self_Refman);
+    LUMI_dec_ref(self->y_Refman);
+    self->y_Refman = self_Refman;
+    self->y = &(self->z);
 LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
 void ut_M_Test_Del(ut_M_Test* self, ut_M_Test_Dynamic* self_Dynamic) {
     if (self == NULL) return;
+    LUMI_var_dec_ref(self->z_Refman);
     LUMI_dec_ref(self->y_Refman);
     free(self->x);
 }
@@ -7070,6 +7095,8 @@ uint32_t* x = NULL;
     uint32_t* u = NULL;
     uint32_t* w = NULL;
     Ref_Manager* w_Refman = NULL;
+    uint32_t si = 0;
+    Ref_Manager* si_Refman = NULL;
     uint32_t* aux_Int_0 = NULL;
     uint32_t* aux_Int_1 = NULL;
     INIT_NEW(1, LUMI_block0_cleanup, x, uint32_t, 1);
@@ -7105,6 +7132,13 @@ uint32_t* x = NULL;
     ut_M_i = *w;
     CHECK_REFMAN(16, LUMI_block0_cleanup, w_Refman)
     *w = ut_M_i;
+    u = &ut_M_i;
+    INIT_VAR_REFMAN(18, LUMI_block0_cleanup, si)
+    si = 0x06;
+    LUMI_inc_ref(si_Refman);
+    LUMI_dec_ref(w_Refman);
+    w_Refman = si_Refman;
+    w = &si;
 /// @ test-initialize-e0
 access should be "copy" for primitive types, got "owner"
 /// @ test-initialize-e1

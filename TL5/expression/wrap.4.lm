@@ -91,7 +91,7 @@ class UpCastExpression(WrapExpression)
     func dynamic write()
         ; &(`expression`->_base[._base]...)
         self.write-pre()
-        if self.expression.is-complex-field
+        if self.expression.cast-to-ref
             self.expression.write()
         else
             self.expression.write-safe()
@@ -103,7 +103,7 @@ class UpCastExpression(WrapExpression)
     func dynamic write-dynamic()
         self.write-pre()
         self.expression.write-dynamic-safe()
-        self.write-post(copy self.expression.is-complex-field)
+        self.write-post(copy self.expression.cast-to-ref)
     
     func dynamic write-dynamic-cast()
         self.write-dynamic()

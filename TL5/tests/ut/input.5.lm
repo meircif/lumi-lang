@@ -679,6 +679,11 @@ func ! fun(user Uint32? x, strong Uint32? y)->(weak Uint32? i, owner Uint32? j)
     x := j
     fun(user x, strong y)->(weak i, owner j)!
     fun(user i!, strong j!)->(weak a, owner b!)!
+; @ g test-call-expression-31
+func ! fun(user Uint32 x, weak Uint32 y, temp Uint32 z)
+    s-var Uint32 i!
+    var Uint32 j
+    fun(user i, weak i, temp j)!
 ; @ ec test-call-expression-e0
 function( copy 1)
 ; @ ec test-call-expression-e1
@@ -2561,8 +2566,10 @@ func Test.new(copy Uint32 x)
 struct Test
     owner Uint32? x
     weak Uint32? y
+    s-var Uint32 z
     func user ! fun()
         self.x!.value := self.y!.value
+        self.y := self.z
 ; @ eg test-members-e0
 struct Test
     var Uint32 name
@@ -2825,6 +2832,9 @@ u := _
 weak Uint32 w(weak y)
 i := w!.value
 w!.value := i
+u := i
+s-var Uint32 si(copy 6)!
+w := si
 ; @ ec test-initialize-e0
 new Uint32 x!
 x := Uint32(owner x)!
