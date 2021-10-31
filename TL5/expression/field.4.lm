@@ -65,20 +65,20 @@ class FieldExpression(Expression)
                         user "is not a global member of type",
                         user instance-type.type-data.name)
             self.check-expression-all-errors()->(owner self.instance)
-            self.is-complex-field := (self.variable.access = Access.VAR and
-                    not self.variable.type-instance.type-data.is-primitive) or
-                    self.variable.access = Access.S-VAR
+            self.cast-to-ref :=
+                    access-is-only-var(copy self.variable.access) and
+                    not self.variable.type-instance.type-data.is-primitive
             self.variable.analyze()
             self.variable.type-instance.new-replace-params(
                     user instance-type)->(owner self.result-type)
             instance-type.reference-path.copy-and-add-field(
                     user self.variable)->(owner self.result-type.reference-path)
-            if self.is-complex-field and
+            if self.cast-to-ref and
                     access-has-refman(copy self.instance.access)
                 self.access := Access.S-VAR
             else
                 self.access := self.variable.access
-            self.assignable := not self.is-complex-field
+            self.assignable := not self.cast-to-ref
             if self.variable.type-instance.type-data is glob.type-generic
                 expression := TypeCastExpression(owner expression)
             return
@@ -140,7 +140,7 @@ class FieldExpression(Expression)
         self.instance.write-preactions()
 
     func dynamic write()
-        if self.instance.is-complex-field
+        if self.instance.cast-to-ref
             self.instance.write()
         else
             self.instance.write-safe()
@@ -154,7 +154,7 @@ class FieldExpression(Expression)
         self.variable.write-cname()
 
     func dynamic write-cast()
-        var Bool ref(copy self.is-complex-field and
+        var Bool ref(copy self.cast-to-ref and
                 not self.result-type.type-data is glob.type-array)
         if ref
             write(user "&(")
@@ -163,18 +163,18 @@ class FieldExpression(Expression)
             write(user ")")
     
     func dynamic write-refman()
-        if self.is-complex-field
+        if self.cast-to-ref
             self.instance.write-refman()
         else
             base()
     
     func dynamic write-dynamic()
-        if self.is-complex-field
+        if self.cast-to-ref
             write(user "&")
         self.write-dynamic-safe()
     
     func dynamic write-dynamic-safe()
-        if self.is-complex-field
+        if self.cast-to-ref
             self.result-type.write-cname()
             write(user "_dynamic")
         else
@@ -215,6 +215,7 @@ class MockFieldExpression(Expression)
         self.instance := instance
         self.name := name
         self.set-simple-type(user glob.type-bool)
+        self.access := Access.VAR
         self.assignable := true
     
     func dynamic analyze()

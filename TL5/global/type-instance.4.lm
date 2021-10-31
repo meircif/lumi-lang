@@ -356,6 +356,9 @@ struct TypeInstance
             value := CheckArrayLengthExpression(
                     owner value, user self, copy access-is-owner(copy access))
             value.analyze()
+        if self.type-data.is-primitive and access-is-ref(copy access) and
+                access-is-only-var(copy value.access)
+            value.cast-to-ref := true
         var Int bases
         value.result-type.check-assign-to(
                 copy value.access, user self, copy access, user node)->(

@@ -105,7 +105,7 @@ class Expression(SyntaxTreeNode)
     var Bool assignable
     var Bool is-statement
     var Bool is-generic-cast
-    var Bool is-complex-field
+    var Bool cast-to-ref
     var Bool is-var
     var Bool error-expected
     var Bool error-propagated

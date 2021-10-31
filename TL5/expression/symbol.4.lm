@@ -76,10 +76,11 @@ class VariableExpression(Expression)
         self.variable.write-cname()
 
     func dynamic write-cast()
-        if not self.variable.is-output and
+        if (not self.variable.is-output and
                 not self.variable.type-instance.type-data.is-primitive and
                 self.variable.type-instance.type-data is-not glob.type-array and
-                access-is-only-var(copy self.variable.access)
+                access-is-only-var(copy self.variable.access)) or
+                self.cast-to-ref
             write(user "&")
         self.write()
 
@@ -177,7 +178,7 @@ class FunctionExpression(Expression)
             arguments.parameters.prepend(owner self-param)
             
             if self.function.is-dynamic and not self.after-base and
-                    not self-instance.is-complex-field
+                    not self-instance.cast-to-ref
                 if self.ignore-mock
                     self.syntax-error(
                             user "accessing mock function field in dynamic \

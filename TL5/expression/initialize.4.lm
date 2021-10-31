@@ -113,6 +113,8 @@ class InitExpression(ModuleTypeExpression)
             target.result-type.set-expected-type()->(
                     owner self.assign-value.result-type)
             self.assign-value.analyze()
+            if self.aux-variable.variable.is-create
+                self.assign-value.access := Access.COPY
             self.assign-expression := AssignExpression(
                     user self.code-node,
                     user target,
