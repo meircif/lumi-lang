@@ -27,7 +27,7 @@ For Lumi syntax highlighting it's recommended to use one of:
   installed.
 
 ## How can I help?
-Chose your difficulty:
+Choose your difficulty:
 ### easy
 Review the [docs](http://lumi-lang.readthedocs.io/en/latest/) and notify me on
 any problem, question or suggestion you have about the concepts or the syntax
