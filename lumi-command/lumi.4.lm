@@ -22,7 +22,6 @@ module lumi
 
 
 const Int MAX-COMMNAD-SIZE 2048
-user String usage(user "Usage: lumi [options] file...")
 
 
 struct Input
@@ -36,19 +35,20 @@ func error-if(copy Bool is-error, user String error-msg)
 
 
 func help()
-    sys.println(user usage)
-    sys.println(user "Options:
-              -h \t\t   print help
-              -o <file> \t   output file name
-              -t <module> \t   compile test program for <module>
-              -c \t\t   only create C file(s)
-              -l<version> \t   only run C compiler for TL<version>
+    sys.println(user "Usage: lumi [options] file...
+            Options:
+              -h/--help        print this help
+              --version        print lumi command version
+              -o <file>        output file name
+              -t <module>      compile test program for <module>
+              -c               only create C file(s)
+              -l<version>      only run C compiler for TL<version>
               -e <argument>    extra argument for C compilation
               -p <lumipath>    path of lumi-lang repository
-              -r \t\t   run the compiled program
+              -r               run the compiled program
               -ra <arguments>  run the compiled program with given arguments
-              -v \t\t   print executed commands
-              -d \t\t   only print commands without execution")
+              -v/--verbose     print executed commands
+              -d/--debug       only print commands without execution")
     sys.exit(copy 0)
 
 
@@ -109,7 +109,7 @@ struct Lumi
     func check-opt-param-error(
             copy Bool is-error, user String option, user String param)
         if is-error
-            sys.print(user "error: missing ")
+            sys.print(user "lumi: error: missing ")
             sys.print(user param)
             sys.print(user " after \"-")
             sys.print(user option)
@@ -118,7 +118,7 @@ struct Lumi
 
     func check-param(user String value)
         if value.has(copy '"')
-            sys.print(user "error: illegal \" character in parameter '")
+            sys.print(user "lumi: error: illegal \" character in parameter '")
             sys.print(user value)
             sys.println(user "'")
             sys.exit(copy 1)
@@ -148,7 +148,6 @@ struct Lumi
         self.command.append(copy self.path-separator)
 
     func read-input()
-        error-if(copy sys.argv.length < 2, user usage)
         var Int input-files-num
         user String first-input
         user String last-input
@@ -157,10 +156,10 @@ struct Lumi
             user String arg(user sys.argv[index])
             if arg[0] = '-'
                 if arg.length < 2
-                    sys.println(user "warning: unknown flag \"-\"")
+                    sys.println(user "lumi: warning: unknown flag \"-\"")
                 else
                     var Char op(copy arg[1])
-                    if op = 'h'
+                    if op = 'h' or arg.equal(user "--help")
                         help()
                     else-if op = 'o'
                         self.get-opt-param(user "o", user "file name")->(
@@ -172,11 +171,11 @@ struct Lumi
                     else-if op = 'e'
                         self.concat-file-name(
                                 user self.external-files,
-                                user self.get-any-opt-param(user "e", user "argument")->(
-                                var index))
+                                user self.get-any-opt-param(
+                                user "e", user "argument")->(var index))
                     else-if op = 'p'
-                        self.lumi-path.clear(
-                                user self.get-opt-param(user "p", user "path")->(var index))
+                        self.lumi-path.clear(user self.get-opt-param(
+                                user "p", user "path")->(var index))
                     else-if op = 'c'
                         self.running-c := false
                     else-if op = 'l' and arg.length > 2
@@ -186,15 +185,19 @@ struct Lumi
                         self.running-program := true
                         if arg.length > 2
                             if arg[2] = 'a'
-                                self.get-any-opt-param(user "ra", user "arguments")->(
+                                self.get-any-opt-param(
+                                        user "ra", user "arguments")->(
                                         var index, user self.execute-arguments)
-                    else-if op = 'v'
+                    else-if op = 'v' or arg.equal(user "--verbose")
                         self.verbose := true
-                    else-if op = 'd'
+                    else-if op = 'd' or arg.equal(user "--debug")
                         self.verbose := true
                         self.execute := false
+                    else-if arg.equal(user "--version")
+                        sys.println(user "lumi version 5.1.0")
+                        sys.exit(copy 0)
                     else
-                        sys.print(user "warning: unknown flag \"")
+                        sys.print(user "lumi: warning: unknown flag \"")
                         sys.print(user arg)
                         sys.println(user "\"")
             else
@@ -205,33 +208,45 @@ struct Lumi
                 self.concat-file-name(user self.input-files, user arg)
                 input-files-num += 1
 
-        error-if(copy input-files-num = 0, user "error: no input files")
+        error-if(copy input-files-num = 0, user "lumi: error: no input files")
         error-if(
                 copy self.running-program and not self.running-c,
-                user "error: cannot run program when C compilation is turned off by \
-                \"-c\" flag")
+                user "lumi: error: cannot run program when C compilation is \
+                turned off by \"-c\" flag")
 
         if self.running-lumi
-            error-if(
-                    copy first-input.length < 6,
-                    user "error: Lumi file name too short")
-            self.version := first-input[first-input.length - 4]
+            var Bool legal-name(copy first-input.length >= 6)
+            if legal-name
+                self.version := first-input[first-input.length - 4]
+                legal-name :=
+                        first-input[first-input.length - 5] = '.' and
+                        first-input[first-input.length - 3] = '.' and
+                        first-input[first-input.length - 2] = 'l' and
+                        first-input[first-input.length - 1] = 'm' and
+                        self.version >= '0' and
+                        self.version <= '9'
+            if not legal-name
+                sys.print(user "lumi: error: Illegal input Lumi file name \"")
+                sys.print(user first-input)
+                sys.println(user "\", expected [name].[version digit].lm")
+                sys.exit(copy 1)
+            
         if self.version < '0' or self.version > '5'
-            sys.print(user "error: unsupported version TL")
+            sys.print(user "lumi: error: unsupported version TL")
             var String{2} version-string
             version-string.append(copy self.version)
             sys.println(user version-string)
             sys.exit(copy 1)
         error-if(
                 copy self.version < '2' and input-files-num > 1,
-                user "error: multiple files not supported before TL2")
+                user "lumi: error: multiple files not supported before TL2")
         error-if(
                 copy self.version >= '2' and self.version <= '3' and
                 self.explicit-output and not self.running-c,
-                user "error: cannot specify C output file in TL2 & TL3")
+                user "lumi: error: cannot specify C output file in TL2 & TL3")
         error-if(
                 copy self.version < '4' and self.mut?,
-                user "error: testing not supported before TL4")
+                user "lumi: error: testing not supported before TL4")
         if self.version <= '2'
             self.main-input := last-input
         else
@@ -242,7 +257,8 @@ struct Lumi
             if self.running-lumi
                 suffix-length := 5
             self.implicit-output := String{self.main-input.length}(
-                    user self.main-input[0:self.main-input.length - suffix-length])
+                    user self.main-input[0:self.main-input.length -
+                    suffix-length])
             self.output := self.implicit-output
 
 
@@ -267,13 +283,16 @@ struct Lumi
             if self.lumi-path.text.length = 0
                 self.lumi-path.getenv(user "LUMIPATH")
             if self.lumi-path.text.length > 0
-                var Char last(copy self.lumi-path.text[self.lumi-path.text.length - 1])
+                var Char last(
+                        copy self.lumi-path.text[self.lumi-path.text.length -
+                        1])
                 if last = '\\'
                     self.path-separator := '\\'
                 self.lumi-path-ends-with-separator := last = self.path-separator
         self.command.concat(user " -g")
         if self.running-lumi
-            if self.version >= '2' and self.version <= '3' and self.explicit-output
+            if self.version >= '2' and self.version <= '3' and
+                    self.explicit-output
                 self.command.concat(user " \"")
                 self.command.concat(
                         user self.main-input[0:self.main-input.length - 5])

@@ -106,31 +106,44 @@ func fail-test(user String input, user String error-msg)
     assert-string(user mock-output, user error-msg)
 
 
-test test-usage()
-    test-setup(user "")
+func print-test(user String input, user String print-output)
+    test-setup(user input)
     assert-error lumi-object.read-input(), "mock exit"
-    assert mock-exit-result = 1
-    assert-string(user mock-output, user "Usage: lumi [options] file...\n")
+    assert mock-exit-result = 0
+    assert-string(user mock-output, user print-output)
+
+
+test test-no-input()
+    fail-test(user "", user "lumi: error: no input files\n")
+
+
+user String help-text(user "Usage: lumi [options] file...
+            Options:
+              -h/--help        print this help
+              --version        print lumi command version
+              -o <file>        output file name
+              -t <module>      compile test program for <module>
+              -c               only create C file(s)
+              -l<version>      only run C compiler for TL<version>
+              -e <argument>    extra argument for C compilation
+              -p <lumipath>    path of lumi-lang repository
+              -r               run the compiled program
+              -ra <arguments>  run the compiled program with given arguments
+              -v/--verbose     print executed commands
+              -d/--debug       only print commands without execution
+            ")
 
 
 test test-help()
-    test-setup(user "-h")
-    assert-error lumi-object.read-input(), "mock exit"
-    assert mock-exit-result = 0
-    assert-string(user mock-output, user "Usage: lumi [options] file...
-            Options:
-              -h \t\t   print help
-              -o <file> \t   output file name
-              -t <module> \t   compile test program for <module>
-              -c \t\t   only create C file(s)
-              -l<version> \t   only run C compiler for TL<version>
-              -e <argument>    extra argument for C compilation
-              -p <lumipath>    path of lumi-lang repository
-              -r \t\t   run the compiled program
-              -ra <arguments>  run the compiled program with given arguments
-              -v \t\t   print executed commands
-              -d \t\t   only print commands without execution
-            ")
+    print-test(user "-h", user help-text)
+
+
+test test-help-whole()
+    print-test(user "--help", user help-text)
+
+
+test test-version()
+    print-test(user "--version", user "lumi version 5.1.0\n")
 
 
 test test-implicit-output()
@@ -207,7 +220,8 @@ test test-tl5()
 test test-test()
     success-test(
             user "-t mut input.4.lm another.4.lm -o output",
-            user "tl4-compiler -t \"mut\" \"output.c\" \"input.4.lm\" \"another.4.lm\"
+            user "tl4-compiler -t \"mut\" \"output.c\" \"input.4.lm\" \
+            \"another.4.lm\"
             mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
             -o \"output\"
             ")
@@ -230,7 +244,8 @@ test test-only-lumi-explicit()
 test test-only-c-implicit()
     success-test(
             user "-l4 input.c",
-            user "mock-cc -g \"input.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
+            user "mock-cc -g \"input.c\" lumi-lang/TL4/lumi.4.c \
+            -Ilumi-lang/TL4/ \
             -o \"input\"
             ")
 
@@ -238,8 +253,8 @@ test test-only-c-implicit()
 test test-only-c-explicit()
     success-test(
             user "-l4 input.c -o output",
-            user "mock-cc -g \"input.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
-            -o \"output\"
+            user "mock-cc -g \"input.c\" lumi-lang/TL4/lumi.4.c \
+            -Ilumi-lang/TL4/ -o \"output\"
             ")
 
 
@@ -256,8 +271,8 @@ test test-multiple-external()
     success-test(
             user "input.4.lm another.4.lm -e external.c -e ext.c -o output",
             user "tl4-compiler \"output.c\" \"input.4.lm\" \"another.4.lm\"
-            mock-cc -g \"output.c\" \"external.c\" \"ext.c\" lumi-lang/TL4/lumi.4.c \
-            -Ilumi-lang/TL4/ -o \"output\"
+            mock-cc -g \"output.c\" \"external.c\" \"ext.c\" \
+            lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ -o \"output\"
             ")
 
 
@@ -269,7 +284,8 @@ test test-default-cc()
     assert-string(
             user mock-system,
             user "tl4-compiler \"output.c\" \"input.4.lm\"
-            gcc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ -o \"output\"
+            gcc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ -o \
+            \"output\"
             ")
 
 
@@ -305,7 +321,8 @@ test test-lumipath-add-separator()
     assert-string(
             user mock-system,
             user "tl4-compiler \"output.c\" \"input.4.lm\"
-            mock-cc -g \"output.c\" no-sep/TL4/lumi.4.c -Ino-sep/TL4/ -o \"output\"
+            mock-cc -g \"output.c\" no-sep/TL4/lumi.4.c -Ino-sep/TL4/ -o \
+            \"output\"
             ")
 
 
@@ -360,8 +377,8 @@ test test-run-program-with-arguments()
     success-test(
             user "input.4.lm -o path/output -ra '-x input'",
             user "tl4-compiler \"path/output.c\" \"input.4.lm\"
-            mock-cc -g \"path/output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
-            -o \"path/output\"
+            mock-cc -g \"path/output.c\" lumi-lang/TL4/lumi.4.c \
+            -Ilumi-lang/TL4/ -o \"path/output\"
             \"path/output\" -x input
             ")
 
@@ -377,8 +394,31 @@ test test-verbose()
     assert-string(user mock-system, user expected-output)
 
 
+test test-verbose-whole()
+    test-setup(user "--verbose input.4.lm -o output")
+    lumi-object.run()
+    user String expected-output(user "tl4-compiler \"output.c\" \"input.4.lm\"
+            mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
+            -o \"output\"
+            ")
+    assert-string(user mock-output, user expected-output)
+    assert-string(user mock-system, user expected-output)
+
+
 test test-dry-run()
     test-setup(user "input.4.lm -o output -d")
+    lumi-object.run()
+    assert-string(
+            user mock-output,
+            user "tl4-compiler \"output.c\" \"input.4.lm\"
+            mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
+            -o \"output\"
+            ")
+    assert-string(user mock-system, user "")
+
+
+test test-dry-run-whole()
+    test-setup(user "input.4.lm -o output --debug")
     lumi-object.run()
     assert-string(
             user mock-output,
@@ -405,22 +445,26 @@ test test-c-error()
     assert-string(user mock-output, user "C compiler failed\n")
 
 
-test test-no-input()
-    fail-test(user "-o output", user "error: no input files\n")
+test test-no-input-files()
+    fail-test(user "-o output", user "lumi: error: no input files\n")
 
 
 test test-input-errors()
-    fail-test(user "-o output", user "error: no input files\n")
+    fail-test(user "-o output", user "lumi: error: no input files\n")
     fail-test(
             user "err\"or.4.lm",
-            user "error: illegal \" character in parameter 'err\"or.4.lm'\n")
-    fail-test(user "e.lm", user "error: Lumi file name too short\n")
+            user "lumi: error: illegal \" character in parameter \
+            'err\"or.4.lm'\n")
+    fail-test(
+            user "e.lm",
+            user "lumi: error: Illegal input Lumi file name \"e.lm\", \
+            expected [name].[version digit].lm\n")
 
 
 func flag-with-parameter-error-tests(user String flag, user String parameter)
     var String{64} input(user "input.4.lm -")
     input.concat(user flag)
-    var String{256} missing-error(user "error: missing ")
+    var String{256} missing-error(user "lumi: error: missing ")
     missing-error.concat(user parameter)
     missing-error.concat(user " after \"-")
     missing-error.concat(user flag)
@@ -431,7 +475,8 @@ func flag-with-parameter-error-tests(user String flag, user String parameter)
     input.length -= 3
     input.concat(user " err\"or")
     fail-test(
-            user input, user "error: illegal \" character in parameter 'err\"or'\n")
+            user input,
+            user "lumi: error: illegal \" character in parameter \'err\"or'\n")
 
 
 test test-output-errors()
@@ -445,7 +490,7 @@ test test-test-errors()
 test test-external-errors()
     fail-test(
             user "input.4.lm -e",
-            user "error: missing argument after \"-e\" flag\n")
+            user "lumi: error: missing argument after \"-e\" flag\n")
 
 
 test test-lumipath-errors()
@@ -455,8 +500,8 @@ test test-lumipath-errors()
 test test-unknow-flags()
     test-setup(user "input.4.lm - -x -o output")
     lumi-object.run()
-    assert-string(user mock-output, user "warning: unknown flag \"-\"
-            warning: unknown flag \"-x\"
+    assert-string(user mock-output, user "lumi: warning: unknown flag \"-\"
+            lumi: warning: unknown flag \"-x\"
             ")
     assert-string(
             user mock-system,
@@ -468,35 +513,35 @@ test test-unknow-flags()
 
 test test-version-errors()
     fail-test(
-            user "input.6.lm", user "error: unsupported version TL6\n")
+            user "input.6.lm", user "lumi: error: unsupported version TL6\n")
     fail-test(
             user "input.0.lm another.0.lm",
-            user "error: multiple files not supported before TL2\n")
+            user "lumi: error: multiple files not supported before TL2\n")
     fail-test(
             user "input.1.lm another.1.lm",
-            user "error: multiple files not supported before TL2\n")
+            user "lumi: error: multiple files not supported before TL2\n")
     fail-test(
             user "-c input.2.lm -o output.c",
-            user "error: cannot specify C output file in TL2 & TL3\n")
+            user "lumi: error: cannot specify C output file in TL2 & TL3\n")
     fail-test(
             user "-c input.3.lm -o output.c",
-            user "error: cannot specify C output file in TL2 & TL3\n")
+            user "lumi: error: cannot specify C output file in TL2 & TL3\n")
     fail-test(
             user "-t mut input.0.lm",
-            user "error: testing not supported before TL4\n")
+            user "lumi: error: testing not supported before TL4\n")
     fail-test(
             user "-t mut input.3.lm",
-            user "error: testing not supported before TL4\n")
+            user "lumi: error: testing not supported before TL4\n")
 
 
 test test-run-program-errors()
     fail-test(
             user "-c input.4.lm -r",
-            user "error: cannot run program when C compilation is turned off by \
-            \"-c\" flag\n")
+            user "lumi: error: cannot run program when C compilation is \
+            turned off by \"-c\" flag\n")
     fail-test(
             user "input.4.lm -o output -ra",
-            user "error: missing arguments after \"-ra\" flag\n")
+            user "lumi: error: missing arguments after \"-ra\" flag\n")
 
 
 test incremental-string-getenv()
