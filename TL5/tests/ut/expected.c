@@ -269,6 +269,7 @@ LUMI_block0_cleanup:
 Return_Code ut_M_mock(String* str, Byte* bfr, uint32_t bfr_Length, String** so, Ref_Manager** so_Refman, uint32_t* io, ut_M_Test** to, Ref_Manager** to_Refman, ut_M_Tc** tco, Ref_Manager** tco_Refman, ut_M_Tc_Dynamic** tco_Dynamic) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
+    /* ---< code marker >--- */
 LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
@@ -4389,18 +4390,15 @@ String* ut_M_gs = NULL;
 Ref_Manager* ut_M_gs_Refman = NULL;
 void new_Mock(Bool* allocate_success) { }
 Return_Code delete_Mock(Ref self) { return OK; }
-USER_MAIN_HEADER {
+#define LUMI_FUNC_NAME "global variable initialization"
+Return_Code LUMI_init(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
-    uint32_t x = 0;
-    String* ls = NULL;
-    String* aux_String_0 = NULL;
     String* aux_String_0 = NULL;
     static Byte aux_Array_0[] = {'g','l','o','b','a','l',' ','t','e','x','t','\0',};
     String* aux_String_1 = NULL;
     Byte* aux_Array_1 = NULL;
     uint32_t aux_Array_1_Length = 0;
-#define LUMI_FUNC_NAME "global variable initialization"
 #define LUMI_FILE_NAME "mock.5.lm"
     INIT_VAR_REFMAN(2, LUMI_block0_cleanup, ut_M_svs)
 #undef LUMI_FILE_NAME
@@ -4426,7 +4424,22 @@ USER_MAIN_HEADER {
     ut_M_gs_Refman = ut_M_us_Refman;
     ut_M_gs = ut_M_us;
 #undef LUMI_FILE_NAME
+LUMI_block0_cleanup:
+    (void)0;
+    String_Del(aux_String_1, NULL);
+    free(aux_String_1);
+    String_Del(aux_String_0, NULL);
+    free(aux_String_0);
+    return LUMI_err;
+}
 #undef LUMI_FUNC_NAME
+LUMI_INIT_FUNC(LUMI_init)
+Return_Code LUMI_user_main(void) {
+    Return_Code LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    uint32_t x = 0;
+    String* ls = NULL;
+    String* aux_String_0 = NULL;
     x = 0x06;
     x = 0x07;
     INIT_NEW(10, LUMI_block0_cleanup, ls, String, 1);
@@ -4469,12 +4482,10 @@ LUMI_block0_cleanup:
 }
 void new_Mock(Bool* allocate_success) { }
 Return_Code delete_Mock(Ref self) { return OK; }
-USER_MAIN_HEADER {
+Return_Code LUMI_user_main(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     Bool LUMI_success = true;
-#define LUMI_FUNC_NAME "global variable initialization"
-#undef LUMI_FUNC_NAME
     LUMI_success &= LUMI_run_test("dummy", second_M_dummy);
     LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, 1);
     return LUMI_success? LUMI_err : FAIL;
@@ -4507,7 +4518,7 @@ LUMI_block0_cleanup:
 }
 void new_Mock(Bool* allocate_success) { }
 Return_Code delete_Mock(Ref self) { return OK; }
-USER_MAIN_HEADER {
+Return_Code LUMI_user_main(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     Bool LUMI_success = true;
@@ -5549,12 +5560,10 @@ LUMI_block0_cleanup:
 }
 void new_Mock(Bool* allocate_success) { }
 Return_Code delete_Mock(Ref self) { return OK; }
-USER_MAIN_HEADER {
+Return_Code LUMI_user_main(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     Bool LUMI_success = true;
-#define LUMI_FUNC_NAME "global variable initialization"
-#undef LUMI_FUNC_NAME
     LUMI_success &= LUMI_run_test("dummy", second_M_dummy);
     LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, 1);
     return LUMI_success? LUMI_err : FAIL;
@@ -6124,7 +6133,7 @@ LUMI_block0_cleanup:
 /// @ test-function-m0
 void new_Mock(Bool* allocate_success) { }
 Return_Code delete_Mock(Ref self) { return OK; }
-USER_MAIN_HEADER {
+Return_Code LUMI_user_main(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     uint32_t x = 0;
@@ -6136,7 +6145,7 @@ MAIN_FUNC
 /// @ test-function-m1
 void new_Mock(Bool* allocate_success) { }
 Return_Code delete_Mock(Ref self) { return OK; }
-USER_MAIN_HEADER {
+Return_Code LUMI_user_main(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     String* s = NULL;
@@ -8476,7 +8485,7 @@ LUMI_block0_cleanup:
 }
 void new_Mock(Bool* allocate_success) { }
 Return_Code delete_Mock(Ref self) { return OK; }
-USER_MAIN_HEADER {
+Return_Code LUMI_user_main(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     Bool LUMI_success = true;
@@ -8520,7 +8529,7 @@ LUMI_block0_cleanup:
 }
 void new_Mock(Bool* allocate_success) { }
 Return_Code delete_Mock(Ref self) { return OK; }
-USER_MAIN_HEADER {
+Return_Code LUMI_user_main(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     Bool LUMI_success = true;
@@ -8569,7 +8578,7 @@ LUMI_block0_cleanup:
     (void)0;
 }
 void new_Mock(Bool* allocate_success) { }
-USER_MAIN_HEADER {
+Return_Code LUMI_user_main(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
@@ -8586,7 +8595,7 @@ LUMI_block0_cleanup:
     (void)0;
 }
 Return_Code delete_Mock(Ref self) { return OK; }
-USER_MAIN_HEADER {
+Return_Code LUMI_user_main(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
 LUMI_block0_cleanup:
@@ -11936,12 +11945,10 @@ LUMI_block0_cleanup:
 }
 void new_Mock(Bool* allocate_success) { }
 Return_Code delete_Mock(Ref self) { return OK; }
-USER_MAIN_HEADER {
+Return_Code LUMI_user_main(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     Bool LUMI_success = true;
-#define LUMI_FUNC_NAME "global variable initialization"
-#undef LUMI_FUNC_NAME
     LUMI_success &= LUMI_run_test("dummy", second_M_dummy);
     LUMI_success &= LUMI_test_coverage(LUMI_file_coverage, 1);
     return LUMI_success? LUMI_err : FAIL;
@@ -12013,7 +12020,7 @@ LUMI_block0_cleanup:
 }
 void new_Mock(Bool* allocate_success) { }
 Return_Code delete_Mock(Ref self) { return OK; }
-USER_MAIN_HEADER {
+Return_Code LUMI_user_main(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     Bool LUMI_success = true;
@@ -12052,7 +12059,7 @@ LUMI_block0_cleanup:
 }
 void new_Mock(Bool* allocate_success) { }
 Return_Code delete_Mock(Ref self) { return OK; }
-USER_MAIN_HEADER {
+Return_Code LUMI_user_main(void) {
     Return_Code LUMI_err = OK;
     unsigned LUMI_loop_depth = 1;
     Bool LUMI_success = true;

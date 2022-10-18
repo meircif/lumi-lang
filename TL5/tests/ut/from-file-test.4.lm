@@ -120,6 +120,21 @@ func setup-test()
     mock-input-file-text.clear()
 
 
+user String code-marker(user "/* ---< code marker >--- */")
+
+
+func concat-indentation(user String target)
+    for n in tl5-compiler.INDENTATION-SPACES
+        target.append(copy ' ')
+
+
+func concat-marker(user String target)
+    concat-indentation(user target)
+    target.concat(user "native \"")
+    target.concat(user code-marker)
+    target.concat(user "\"\n")
+
+
 test test-compiler()
     setup-arguments()
     var String{256} filename
@@ -148,6 +163,8 @@ test test-compiler()
     compiler-tests-passed := true
     Sys.print.active := false
     sys.print(user "\n  test common header... ")
+    var Int original-length(copy common-header.length)
+    concat-marker(user common-header)
     try
         test-global-scope(
                 user common-header,
@@ -158,7 +175,8 @@ test test-compiler()
     catch
         compiler-tests-passed := false
     expected-common-header.append(copy '\n')
-    common-header-length := mock-output-file-text.length - 53
+    common-header.length := original-length
+    mock-output-file-text.find(user code-marker)->(var common-header-length)
 
     do
         read-line(user input-file, user line, user _)

@@ -427,6 +427,9 @@ class VariableInit(VariableCreate)
                 (self.variable.type-instance.type-data.is-native and
                 not self.variable.type-instance.type-data.variables.first?))
             self.variable.is-initialized := false
+        if self.parent is glob.root.global-init and
+                self.expression-init.has-initilization()
+            glob.root.global-init.used := true
 
     func dynamic check-memory(user ReferenceMemoryList refs)
         self.expression-init.check-memory(user refs)
