@@ -21,14 +21,15 @@ The ``lumi`` command:
 
 Command Help
 ------------
-Running ``lumi -h`` will print help
+Running ``lumi -h`` or ``lumi --help`` will print help:
 
 .. code-block:: none
 
    >>> lumi -h
    Usage: lumi [options] file...
    Options:
-     -h               print help
+     -h/--help        print this help
+     --version        print lumi command version
      -o <file>        output file name
      -t <module>      compile test program for <module>
      -c               only create C file(s)
@@ -37,8 +38,8 @@ Running ``lumi -h`` will print help
      -p <lumipath>    path of lumi-lang repository
      -r               run the compiled program
      -ra <arguments>  run the compiled program with given arguments
-     -v               print executed commands
-     -d               only print commands without execution
+     -v/--verbose     print executed commands
+     -d/--debug       only print commands without execution
 
 .. _lumi-command-usage:
 
@@ -131,9 +132,10 @@ Will run ``hello first-arg "second arg"``.
 
 Verbose and Debug
 -----------------
-Adding ``-v`` (verbose) option will also print the executed commands.
+Adding ``-v`` or ``--verbose`` option will also print the executed commands.
 
-Adding ``-d`` (debug) option will only print the commands without execution.
+Adding ``-d`` or ``--debug`` option will only print the commands without
+execution.
 
 Old Version Limitations
 -----------------------
