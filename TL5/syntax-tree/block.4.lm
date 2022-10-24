@@ -147,7 +147,8 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
         user SyntaxTreeTry new-try
         
         if self.has-end-point()
-            self.syntax-error-msg(user "unreachable code")
+            if not keyword.equal(user "native")
+                self.syntax-error-msg(user "unreachable code")
     
         if self.equal-and-new-line(user keyword, user "block")
             self.code-nodes.add(

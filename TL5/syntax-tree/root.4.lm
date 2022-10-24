@@ -258,7 +258,8 @@ class SyntaxTreeRoot(GlobalNodes)
     3. function declarations
     4. global variables
     5. function bodies
-    6. main function
+    6. init function
+    7. main function
     ~~~
     func dynamic write()
         try
@@ -319,7 +320,10 @@ class SyntaxTreeRoot(GlobalNodes)
                 write(user "\n\nvoid new_Mock(Bool* allocate_success) { }")
             if not glob.is-delete-mocked
                 write(user "\n\nReturn_Code delete_Mock(Ref self) \
-                        { return OK; }")
+                        { return OK; }\n")
+        
+        write-global(user "\n\n/* lumi initialization function */\n")
+        self.global-init.write()
                 
         if glob.tested-module?
             write-global(user "\n\n/* main test function */\n")
@@ -380,15 +384,13 @@ class SyntaxTreeRoot(GlobalNodes)
         write(user "\n};\n")
     
     func inst write-test-main()
-        write(user "\nUSER_MAIN_HEADER {\n")
+        write(user "\nReturn_Code LUMI_user_main(void) {\n")
         write-spaces(copy INDENTATION-SPACES)
         write(user "Return_Code LUMI_err = OK;\n")
         write-spaces(copy INDENTATION-SPACES)
         write(user "unsigned LUMI_loop_depth = 1;\n")
         write-spaces(copy INDENTATION-SPACES)
         write(user "Bool LUMI_success = true;\n")
-        self.global-init.write()
-        write(user "\n")
         for test-function in glob.test-functions.iter()
             ; LUMI_success &= LUMI_run_test("`test-func.name`", `test-func`);
             write-spaces(copy INDENTATION-SPACES)
@@ -446,37 +448,34 @@ class SyntaxTreeMainFunction(SyntaxTreeFunction)
         self.parse-body()
     
     func dynamic write()
-        ; USER_MAIN_HEADER {
-        ;     `block...`
-        ; }
-        ; MAIN_FUNC
-        write(user "\nUSER_MAIN_HEADER")
         self.arguments.has-error := true
-        self.write-block()
-        self.write-post-func()
+        base()
         write(user "\nMAIN_FUNC\n")
     
-    func dynamic write-block-body()
-        glob.root.global-init.write()
-        self.write-pre-func()
-        write(user "\n")
-        base()
+    func dynamic write-cname()
+        write(user "LUMI_user_main")
 
 
 class GlobalInit(SyntaxTreeFunction)
+    var Bool used
+
     new()
         base()
         self.indentation-spaces := INDENTATION-SPACES
     
     func dynamic write()
-        if not self.code-nodes.first?
+        if not self.used
             return
-        self.write-setup()
-        self.write-children(user self.variables)
-        write(user "#define LUMI_FUNC_NAME \"global variable \
-                initialization\"\n")
-        self.write-block-body()
+        self.arguments.has-error := true
+        write(user "\n#define LUMI_FUNC_NAME \"global variable \
+                initialization\"")
+        self.write-header()
+        self.write-block()
         write(user "#undef LUMI_FUNC_NAME\n")
+        write(user "\nLUMI_INIT_FUNC(LUMI_init)\n")
+    
+    func dynamic write-cname()
+        write(user "LUMI_init")
 
 
 struct LineCount

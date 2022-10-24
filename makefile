@@ -125,9 +125,12 @@ tl5-install: tl5-compiler.c tl5-compiler
 	sudo install $(BUILDDIR)/tl5-compiler $(INSTALLDIR)
 	rm -f $(BUILDDIR)/tl5-compiler
 
-tl5-tests: build-dir
+tl5-ut: build-dir
 	lumi -t tl5-compiler TL5/tl5-compiler.4.lm TL5/*/*.4.lm TL5/tests/ut/*.4.lm \
 		-o $(BUILDDIR)/tl5-compiler-tests -r -ra TL5/tests/ut/
+
+tl5-run-ut: build-dir
+	$(BUILDDIR)/tl5-compiler-tests TL5/tests/ut/
 
 tl5-single-test: build-dir
 	lumi TL5/tests/integration/test0.5.lm -o $(BUILDDIR)/single -r

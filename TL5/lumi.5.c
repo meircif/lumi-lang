@@ -1,5 +1,20 @@
 #ifdef _MSC_VER
-#define _CRT_SECURE_NO_WARNINGS
+  #define _CRT_SECURE_NO_WARNINGS
+  #pragma section(".CRT$XCU",read)
+  #define INITIALIZER2_(f,p) \
+    static void f(void); \
+    __declspec(allocate(".CRT$XCU")) void (*f##_)(void) = f; \
+    __pragma(comment(linker,"/include:" p #f "_")) \
+    static void f(void)
+  #ifdef _WIN64
+    #define INITIALIZER(f) INITIALIZER2_(f,"")
+  #else
+    #define INITIALIZER(f) INITIALIZER2_(f,"_")
+  #endif
+#else
+  #define INITIALIZER(f) \
+    static void f(void) __attribute__((constructor)); \
+    static void f(void)
 #endif
 
 #include <stdio.h>
@@ -8,28 +23,28 @@
 #include <stdint.h>
 
 #ifndef UINT8_MAX
-#define UINT8_MAX 0xff
+  #define UINT8_MAX 0xff
 #endif
 #ifndef INT8_MAX
-#define INT8_MAX 0x7f
+  #define INT8_MAX 0x7f
 #endif
 #ifndef UINT16_MAX
-#define UINT16_MAX 0xffff
+  #define UINT16_MAX 0xffff
 #endif
 #ifndef INT16_MAX
-#define INT16_MAX 0x7fff
+  #define INT16_MAX 0x7fff
 #endif
 #ifndef UINT32_MAX
-#define UINT32_MAX 0xffffffff
+  #define UINT32_MAX 0xffffffff
 #endif
 #ifndef INT32_MAX
-#define INT32_MAX 0x7fffffff
+  #define INT32_MAX 0x7fffffff
 #endif
 #ifndef UINT64_MAX
-#define UINT64_MAX 0xffffffffffffffff
+  #define UINT64_MAX 0xffffffffffffffff
 #endif
 #ifndef INT64_MAX
-#define INT64_MAX 0x7fffffffffffffff
+  #define INT64_MAX 0x7fffffffffffffff
 #endif
 
 /* builtin type defines */
@@ -204,7 +219,6 @@ typedef struct Error_Messages {
 
 #define MAIN_FUNC MAIN_PROXY(LUMI_main)
 #define TEST_MAIN_FUNC MAIN_PROXY(LUMI_test_main)
-#define USER_MAIN_HEADER Return_Code LUMI_user_main(void)
 
 #define ARRAY_DEL(Type, array, length) if (array != NULL) { \
   uint32_t LUMI_n = 0; \
@@ -402,6 +416,19 @@ void LUMI_C_trace_print(Line_Count line, char const* funcname, Byte* message) {
       funcname,
       message,
       cstring_length(message));
+}
+
+
+/* initialize */
+
+#define LUMI_INIT_FUNC(init_func) INITIALIZER(LUMI_initialization) { \
+  Return_Code err; \
+  LUMI_trace_stream = stderr; \
+  err = init_func(); \
+  if (err != OK) { \
+    fprintf(stderr, "  called from lumi initialization\n"); \
+    exit(err); \
+  } \
 }
 
 
