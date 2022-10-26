@@ -22,7 +22,7 @@ struct NativeText
 
 
 ~~~ Native include declaration in the syntax tree ~~~
-class NativeInclude(SyntaxTreeFunction)
+class NativeInclude(SyntaxTreeNode)
     owner NativeText path
 
     func inst parse-new()->(owner NativeInclude new-node)
@@ -30,6 +30,7 @@ class NativeInclude(SyntaxTreeFunction)
         new-node.parse()
     
     func inst parse()
+        self.set-location()
         NativeText.parse-new(user _, user self)->(owner self.path)
     
     func dynamic write()
@@ -38,14 +39,15 @@ class NativeInclude(SyntaxTreeFunction)
         write(user ">\n")
 
 
-~~~ Native function declaration in the syntax tree ~~~
-class NativeFunction(SyntaxTreeFunction)
+~~~ Native export function declaration in the syntax tree ~~~
+class NativeExport(SyntaxTreeFunction)
     owner TypeInstance return-type
     owner NativeText cname
     
-    func inst parse-new()->(owner NativeFunction new-node)
-        new-node := NativeFunction()
+    func inst parse-new()->(owner NativeExport new-node)
+        new-node := NativeExport()
         new-node.parse()
+        new-node.parse-body()
     
     func inst parse()
         self.return-type := TypeInstance()
@@ -84,6 +86,20 @@ class NativeFunction(SyntaxTreeFunction)
             self.arguments.outputs.add(owner output)
         base()
     
+    func dynamic write-declaration()
+        self.write-declaration-header(
+                copy self.module.name.equal(user glob.main-module))
+    
+    func dynamic write-cname()
+        self.cname.write(user self.name)
+
+
+~~~ Native function declaration in the syntax tree ~~~
+class NativeFunction(NativeExport)
+    func inst parse-new()->(owner NativeFunction new-node)
+        new-node := NativeFunction()
+        new-node.parse()
+    
     func dynamic check-memory(user ReferenceMemoryList global-refs)
         ; do nothing
     
@@ -92,9 +108,6 @@ class NativeFunction(SyntaxTreeFunction)
     
     func dynamic write()
         ; do nothing
-    
-    func dynamic write-cname()
-        self.cname.write(user self.name)
 
 
 ~~~ Native variable declaration in the syntax tree ~~~

@@ -132,6 +132,9 @@ tl5-ut: build-dir
 tl5-run-ut: build-dir
 	$(BUILDDIR)/tl5-compiler-tests TL5/tests/ut/
 
+tl5-run-ut-trace: build-dir
+	$(BUILDDIR)/tl5-compiler-tests TL5/tests/ut/ --trace
+
 tl5-single-test: build-dir
 	lumi TL5/tests/integration/test0.5.lm -o $(BUILDDIR)/single -r
 

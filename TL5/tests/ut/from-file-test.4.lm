@@ -103,7 +103,7 @@ mock tl5-compiler.write-global(user String text)
 
 
 mock tl5-compiler.SyntaxTreeFunction.write-pre-func()
-    ; do nothing
+    tl5-compiler.write(user "\n")
 
 
 mock tl5-compiler.SyntaxTreeFunction.write-post-func()
@@ -170,7 +170,7 @@ test test-compiler()
                 user common-header,
                 user "",
                 user expected-common-header,
-                copy false)
+                copy ' ')
         sys.print(user "OK")
     catch
         compiler-tests-passed := false
@@ -234,7 +234,7 @@ func test-compiler-case(user String suit-name, user String line)
     var Char ch
     var Bool is-error-test
     var Bool append-newline
-    var Bool is-test
+    var Char flag(copy ' ')
     var Bool is-code-test
     user String second-input
     input-file.getc.mocked()->(var type-char)
@@ -244,8 +244,8 @@ func test-compiler-case(user String suit-name, user String line)
     is-error-test := type-char = 'e'
     if is-error-test
         input-file.getc.mocked()->(var type-char)
-    is-test := type-char = 't'
-    if is-test
+    if type-char = 't' or type-char = 'l'
+        flag := type-char
         input-file.getc.mocked()->(var type-char)
         second-input := second-file-input
     if type-char != 'g' and type-char != 'c'
@@ -264,7 +264,7 @@ func test-compiler-case(user String suit-name, user String line)
     actual-output-file.write.mocked(user "\n")
     
     read-data(user input-file, user input, user "; @")
-    if is-test
+    if flag != ' '
         input-file.getc.mocked()->(var ch)
         if ch != '-'
             file-error(user suit-name, user subname)
@@ -273,7 +273,7 @@ func test-compiler-case(user String suit-name, user String line)
     read-data(user expected-output-file, user expected, user "/// @")
     if append-newline
         input.append(copy '\n')
-        if is-test
+        if flag != ' '
             second-file-input.append(copy '\n')
     try
         run-test(
@@ -282,7 +282,7 @@ func test-compiler-case(user String suit-name, user String line)
                 user expected,
                 copy is-code-test,
                 copy is-error-test,
-                copy is-test)
+                copy flag)
     catch
         suit-passed := false
         compiler-tests-passed := false
@@ -296,7 +296,7 @@ func test-compiler-case(user String suit-name, user String line)
                     user expected,
                     copy is-code-test,
                     copy is-error-test,
-                    copy is-test)
+                    copy flag)
     
     case-name := _
 
@@ -307,7 +307,7 @@ func run-test(
         user String expected,
         copy Bool is-code-test,
         copy Bool is-error-test,
-        copy Bool is-test)
+        copy Char flag)
     if is-code-test
         if is-error-test
             test-code-error(user input, user expected)
@@ -316,10 +316,10 @@ func run-test(
     else
         if is-error-test
             test-global-scope-error(
-                    user input, user second-input, user expected, copy is-test)
+                    user input, user second-input, user expected, copy flag)
         else
             test-global-scope(
-                    user input, user second-input, user expected, copy is-test)
+                    user input, user second-input, user expected, copy flag)
 
 
 func read-line(user File file, user String line, user String prefix)->(

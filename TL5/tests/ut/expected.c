@@ -8692,9 +8692,9 @@ using "!" where error is not propagated
 /// @ test-testing-e36
 using "!" where error is not propagated
 /// @@ test-native
-/// @ test-native-i0
+/// @ test-native-include0
 #include <native.h>
-/// @ test-native-i1
+/// @ test-native-include1
 #include <first.h>
 #include <second.h>
 typedef struct ut_M_Test ut_M_Test;
@@ -8718,7 +8718,7 @@ void ut_M_fun(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ test-native-f0
+/// @ test-native-func0
 void ut_M_call(void);
 void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
@@ -8726,7 +8726,7 @@ void ut_M_call(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ test-native-f1
+/// @ test-native-func1
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
@@ -8765,7 +8765,7 @@ void ut_M_call(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ test-native-f2
+/// @ test-native-func2
 void ut_M_call(void);
 void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
@@ -8773,7 +8773,7 @@ void ut_M_call(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ test-native-f3
+/// @ test-native-func3
 typedef struct ut_M_Test ut_M_Test;
 typedef struct ut_M_Test_Dynamic ut_M_Test_Dynamic;
 struct ut_M_Test {
@@ -8798,7 +8798,7 @@ void ut_M_call(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ test-native-v0
+/// @ test-native-var0
 void ut_M_use(void);
 void ut_M_use(void) {
     unsigned LUMI_loop_depth = 1;
@@ -8806,7 +8806,7 @@ void ut_M_use(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ test-native-v1
+/// @ test-native-var1
 void ut_M_use(void);
 void ut_M_use(void) {
     unsigned LUMI_loop_depth = 1;
@@ -8814,7 +8814,7 @@ void ut_M_use(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ test-native-c0
+/// @ test-native-const0
 void ut_M_get(uint32_t* x);
 void ut_M_get(uint32_t* x) {
     unsigned LUMI_loop_depth = 1;
@@ -8822,7 +8822,7 @@ void ut_M_get(uint32_t* x) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ test-native-c1
+/// @ test-native-const1
 void ut_M_get(uint32_t* x);
 void ut_M_get(uint32_t* x) {
     unsigned LUMI_loop_depth = 1;
@@ -8830,7 +8830,7 @@ void ut_M_get(uint32_t* x) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ test-native-t0
+/// @ test-native-type0
 void ut_M_get(Native* n);
 void ut_M_call(void);
 void ut_M_get(Native* n) {
@@ -8848,7 +8848,7 @@ void ut_M_call(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ test-native-t1
+/// @ test-native-type1
 void ut_M_call(void);
 void ut_M_call(void) {
     unsigned LUMI_loop_depth = 1;
@@ -8858,7 +8858,7 @@ void ut_M_call(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ test-native-s0
+/// @ test-native-struct0
 void ut_M_fun(c_native_type_t in, c_native_type_t* out);
 void ut_M_fun(c_native_type_t in, c_native_type_t* out) {
     unsigned LUMI_loop_depth = 1;
@@ -8879,7 +8879,7 @@ void ut_M_fun(c_native_type_t in, c_native_type_t* out) {
 LUMI_block0_cleanup:
     (void)0;
 }
-/// @ test-native-s1
+/// @ test-native-struct1
 Return_Code ut_M_fun(Test t, TestRef r, Native in, Native* out);
 Return_Code ut_M_fun(Test t, TestRef r, Native in, Native* out) {
     Return_Code LUMI_err = OK;
@@ -8903,73 +8903,102 @@ LUMI_block0_cleanup:
     (void)0;
     return LUMI_err;
 }
-/// @ test-native-b0
+/// @ test-native-code0
 #define HAS_SOME_DEFINE
 uint32_t ut_M_x = 0;
 uint32_t ut_M_y = 0;
-/// @ test-native-b1
+/// @ test-native-code1
 #ifdef __UNIX__
     *io = 0x03;
     #else
     *io = 0x04;
     #endif
+/// @ test-native-export0
+NOT_EXPORTED void ut_M_local(void);
+EXPORTED void func(void);
+NOT_EXPORTED void second_M_local(void);
+NOT_EXPORTED void second_func(void);
+void ut_M_local(void) {
+    unsigned LUMI_loop_depth = 1;
+    second_func();
+LUMI_block0_cleanup:
+    (void)0;
+}
+void func(void) {
+    unsigned LUMI_loop_depth = 1;
+    func();
+LUMI_block0_cleanup:
+    (void)0;
+}
+void second_M_local(void) {
+    unsigned LUMI_loop_depth = 1;
+    func();
+LUMI_block0_cleanup:
+    (void)0;
+}
+void second_func(void) {
+    unsigned LUMI_loop_depth = 1;
+    second_func();
+LUMI_block0_cleanup:
+    (void)0;
+}
 /// @ test-native-e0
 expected space after "native", got "("
 /// @ test-native-e1
 expected space after "native", got "new-line"
 /// @ test-native-e2
 unknown "native" keyword "error"
-/// @ test-native-ei0
+/// @ test-native-include-e0
 no '"' around string literal "native.h"
-/// @ test-native-ef0
+/// @ test-native-func-e0
 redefinition of function "error"
-/// @ test-native-ef1
+/// @ test-native-func-e1
 error raising native function
-/// @ test-native-ef2
+/// @ test-native-func-e2
 output arguments to native function
-/// @ test-native-ef3
+/// @ test-native-func-e3
 expected space after "return type", got "new-line"
-/// @ test-native-ef4
+/// @ test-native-func-e4
 owner argument to native function
-/// @ test-native-ef5
+/// @ test-native-func-e5
 managed argument to native function
-/// @ test-native-ef6
+/// @ test-native-func-e6
 owner argument to native function
-/// @ test-native-ef7
+/// @ test-native-func-e7
 parameter "s" access should not be "s-var" for type "String"
-/// @ test-native-ef8
+/// @ test-native-func-e8
 output argument in native function call
-/// @ test-native-ef9
+/// @ test-native-func-e9
 no '"' around string literal "error"
-/// @ test-native-ef10
+/// @ test-native-func-e10
 user output to native function with non struct type "Array"
-/// @ test-native-ef11
+/// @ test-native-func-e11
 user output to native function with non struct type "Array"
-/// @ test-native-ef12
+/// @ test-native-func-e12
 user output to native function with non struct type "Error"
-/// @ test-native-ev0
+/// @ test-native-var-e0
 only primitive types supported for native variable, got "String"
-/// @ test-native-ev1
+/// @ test-native-var-e1
 no '"' around string literal "error"
-/// @ test-native-ec0
+/// @ test-native-const-e0
 no '"' around string literal "error"
-/// @ test-native-ec1
+/// @ test-native-const-e1
 Only numeric typed native constant supported, got "Bool"
-/// @ test-native-ec2
+/// @ test-native-const-e2
 sequence length is not constant
-/// @ test-native-et0
+/// @ test-native-type-e0
 no '"' around string literal "error"
-/// @ test-native-et1
+/// @ test-native-type-e1
 using invalid reference "n"
-/// @ test-native-es0
+/// @ test-native-struct-e0
 unknown keyword "user"
-/// @ test-native-es1
+/// @ test-native-struct-e1
 unknown keyword "func"
-/// @ test-native-es2
+/// @ test-native-struct-e2
 only primitive types supported for native variable, got "String"
-/// @ test-native-eb0
+/// @ test-native-code-e0
 no '"' around string literal "#define error"
-/// @ test-native-eb1
+/// @ test-native-code-e1
 no '"' around string literal "#ifdef error"
 /// @@ test-parameter-type
 /// @ test-parameter-type-0

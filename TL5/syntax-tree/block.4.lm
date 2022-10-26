@@ -270,8 +270,8 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
         if not self.previous-if?
             self.syntax-error-msg(user "\"else-if\" without a previous \"if\"")
         owner SyntaxTreeCoverage coverage-node
-        if glob.tested-module?
-            if glob.current-module.name.equal(user glob.tested-module)
+        if glob.ut-generation
+            if glob.current-module.name.equal(user glob.main-module)
                 coverage-node := SyntaxTreeCoverage(user _)
                 coverage-node.line-number := owner-if.line-number
         new-if := owner-if

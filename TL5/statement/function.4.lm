@@ -338,9 +338,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     
     func inst write-header()
         if self.arguments.has-error
-            write(user "\nReturn_Code ")
+            write(user "Return_Code ")
         else
-            write(user "\nvoid ")
+            write(user "void ")
         self.write-cname()
         self.arguments.write()
     
@@ -397,9 +397,17 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         self.arguments.write-pointer(user self.name)
     
     func dynamic write-declaration()
-        ; Return_Code `Type`_`name`(`args`);
         if self.external-body and not self.header-only
             return
+        self.write-declaration-header(copy false)
+    
+    func inst write-declaration-header(copy Bool export)
+        ; [export] Return_Code `Type`_`name`(`args`);
+        write(user "\n")
+        if glob.library-generation
+            if not export
+                write(user "NOT_")
+            write(user "EXPORTED ")
         self.write-header()
         write(user ";\n")
     
@@ -411,7 +419,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
             write(user self.parent-type.name)
             write(user ".")
         write(user self.name)
-        write(user "\"")
+        write(user "\"\n")
     
     func inst write-post-func()
         write(user "#undef LUMI_FILE_NAME\n")
