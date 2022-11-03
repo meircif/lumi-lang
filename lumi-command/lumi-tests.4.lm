@@ -123,8 +123,9 @@ user String help-text(user "Usage: lumi [options] file...
               --version        print lumi command version
               -o <file>        output file name
               -t <module>      compile test program for <module>
+              -l <module>      compile shared library exporting <module>
               -c               only create C file(s)
-              -l<version>      only run C compiler for TL<version>
+              -TL<version>     only run C compiler for TL<version>
               -e <argument>    extra argument for C compilation
               -p <lumipath>    path of lumi-lang repository
               -r               run the compiled program
@@ -219,11 +220,29 @@ test test-tl5()
 
 test test-test()
     success-test(
-            user "-t mut input.4.lm another.4.lm -o output",
-            user "tl4-compiler -t \"mut\" \"output.c\" \"input.4.lm\" \
+            user "-t module input.4.lm another.4.lm -o output",
+            user "tl4-compiler -t \"module\" \"output.c\" \"input.4.lm\" \
             \"another.4.lm\"
             mock-cc -g \"output.c\" lumi-lang/TL4/lumi.4.c -Ilumi-lang/TL4/ \
             -o \"output\"
+            ")
+
+
+test test-lib()
+    success-test(
+            user "-l module input.5.lm another.5.lm -o liboutput.so",
+            user "tl5-compiler -l \"module\" \"liboutput.so.c\" \"input.5.lm\" \
+            \"another.5.lm\"
+            mock-cc -g -shared -fpic \"liboutput.so.c\" -o \"liboutput.so\"
+            ")
+
+
+test test-lib-implicit()
+    success-test(
+            user "-l module input.5.lm another.5.lm",
+            user "tl5-compiler -l \"module\" \"input.c\" \"input.5.lm\" \
+            \"another.5.lm\"
+            mock-cc -g -shared -fpic \"input.c\" -o \"libinput.so\"
             ")
 
 
@@ -243,7 +262,7 @@ test test-only-lumi-explicit()
 
 test test-only-c-implicit()
     success-test(
-            user "-l4 input.c",
+            user "-TL4 input.c",
             user "mock-cc -g \"input.c\" lumi-lang/TL4/lumi.4.c \
             -Ilumi-lang/TL4/ \
             -o \"input\"
@@ -252,9 +271,16 @@ test test-only-c-implicit()
 
 test test-only-c-explicit()
     success-test(
-            user "-l4 input.c -o output",
+            user "-TL4 input.c -o output",
             user "mock-cc -g \"input.c\" lumi-lang/TL4/lumi.4.c \
             -Ilumi-lang/TL4/ -o \"output\"
+            ")
+
+
+test test-only-c-lib()
+    success-test(
+            user "-l module -TL5 input.c -o liboutput.so",
+            user "mock-cc -g -shared -fpic \"input.c\" -o \"liboutput.so\"
             ")
 
 
@@ -527,11 +553,26 @@ test test-version-errors()
             user "-c input.3.lm -o output.c",
             user "lumi: error: cannot specify C output file in TL2 & TL3\n")
     fail-test(
-            user "-t mut input.0.lm",
+            user "-t module input.0.lm",
             user "lumi: error: testing not supported before TL4\n")
     fail-test(
-            user "-t mut input.3.lm",
+            user "-t module input.3.lm",
             user "lumi: error: testing not supported before TL4\n")
+    fail-test(
+            user "-l module input.0.lm",
+            user "lumi: error: shared library compilation not supported \
+            before TL5\n")
+    fail-test(
+            user "-l module input.4.lm",
+            user "lumi: error: shared library compilation not supported \
+            before TL5\n")
+    fail-test(
+            user "-t module -l module input.5.lm",
+            user "lumi: error: cannot generate testing and shared library \
+            compilation together\n")
+    fail-test(
+            user "-l module input.5.lm -r",
+            user "lumi: error: cannot run a shared library\n")
 
 
 test test-run-program-errors()
