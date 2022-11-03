@@ -114,7 +114,7 @@ diff TL5/tests/integration/error-output.txt TL5/test-error-output.txt
 
 # run tl5-compiler lib integration test
 TL5/tl5-compiler -l integration TL5/test-lib.c TL5/tests/integration/test0.5.lm
-${CCA% -static} -shared -fPIC TL5/test-lib.c -o TL5/libtest.so
+${CCA/-static} -shared -fPIC TL5/test-lib.c -o TL5/libtest.so
 if ! [[ $CC == *32* ]] && ! [[ $CC == *arm* ]]; then
   python TL5/tests/integration/test-lib.py TL5/libtest.so > \
   TL5/test-lib-output.txt
