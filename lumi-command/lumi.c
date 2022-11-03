@@ -1370,7 +1370,7 @@ Returncode lumi_M_Lumi_run_c(lumi_M_Lumi* self, Ref_Manager* self_Refman) {
     CHECK_REF(316, self, self_Refman)
     if (self->lib_module != NULL && self->lib_module_Refman->value != NULL) {
         CHECK_REF(317, self, self_Refman)
-        INIT_STRING_CONST(317, aux_String_4, " -shared -fpic");
+        INIT_STRING_CONST(317, aux_String_4, " -shared -fPIC");
         LUMI_err = lumi_M_IncrementalString_concat(&(self->command), self_Refman, aux_String_4, aux_String_4_Refman);
         CHECK(317)
     }

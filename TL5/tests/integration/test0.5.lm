@@ -1017,7 +1017,8 @@ func ! test-dynamic()
 
 
 native export cdef.Int inc(copy cdef.Int x)
-    return x clamp+ 1
+    var Int{-10000:10000} y(copy clamp x)
+    return y + 1
 
 native export cdef.CharP get-string()
     return global-string.cdef-pointer()

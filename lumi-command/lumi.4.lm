@@ -314,7 +314,7 @@ struct Lumi
                 self.lumi-path-ends-with-separator := last = self.path-separator
         self.command.concat(user " -g")
         if self.lib-module?
-            self.command.concat(user " -shared -fpic")
+            self.command.concat(user " -shared -fPIC")
         if self.running-lumi
             if self.version >= '2' and self.version <= '3' and
                     self.explicit-output

@@ -233,7 +233,7 @@ test test-lib()
             user "-l module input.5.lm another.5.lm -o liboutput.so",
             user "tl5-compiler -l \"module\" \"liboutput.so.c\" \"input.5.lm\" \
             \"another.5.lm\"
-            mock-cc -g -shared -fpic \"liboutput.so.c\" -o \"liboutput.so\"
+            mock-cc -g -shared -fPIC \"liboutput.so.c\" -o \"liboutput.so\"
             ")
 
 
@@ -242,7 +242,7 @@ test test-lib-implicit()
             user "-l module input.5.lm another.5.lm",
             user "tl5-compiler -l \"module\" \"input.c\" \"input.5.lm\" \
             \"another.5.lm\"
-            mock-cc -g -shared -fpic \"input.c\" -o \"libinput.so\"
+            mock-cc -g -shared -fPIC \"input.c\" -o \"libinput.so\"
             ")
 
 
@@ -280,7 +280,7 @@ test test-only-c-explicit()
 test test-only-c-lib()
     success-test(
             user "-l module -TL5 input.c -o liboutput.so",
-            user "mock-cc -g -shared -fpic \"input.c\" -o \"liboutput.so\"
+            user "mock-cc -g -shared -fPIC \"input.c\" -o \"liboutput.so\"
             ")
 
 
