@@ -197,13 +197,13 @@ class SyntaxTreeBlock(SyntaxTreeBranch)
             self.code-nodes.add(
                     owner SyntaxTreeContinue.parse-new(user _, user self))
             
-        else-if self.equal-and-new-line(user keyword, user "return")
-            self.code-nodes.add(owner SyntaxTreeReturn(user self))
+        else-if keyword.equal(user "return")
+            self.expect-space-or-new-line(user keyword)
+            self.code-nodes.add(
+                    owner SyntaxTreeReturn.parse-new(user _, user self))
             
         else-if self.equal-and-raise(user keyword, user "raise")
-            if glob.last-char != ' ' and glob.last-char != '\n'
-                self.syntax-error-c(
-                        user "expected space or new-line after \"raise!\", got")
+            self.expect-space-or-new-line(user "raise!")
             self.code-nodes.add(
                     owner SyntaxTreeRaise.parse-new(user _, user self))
             

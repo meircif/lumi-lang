@@ -6644,7 +6644,7 @@ Byte* s = NULL;
 /// @ test-return-5
 USER_RAISE(1, LUMI_block0_cleanup, NULL, 0)
 /// @ test-return-e0
-expected new-line after "return", got "("
+expected space or new-line after "return", got "("
 /// @ test-return-e1
 expected space or new-line after "raise!", got "("
 /// @ test-return-e2
@@ -6653,6 +6653,8 @@ cannot assign "Int" into "Array"
 expected ! after "raise", got "new-line"
 /// @ test-return-e4
 non matching array subtypes "Int" and "Byte"
+/// @ test-return-e5
+return with value is supported only in native export function with declared return type
 /// @@ test-code-variables
 /// @ test-code-variables-0
 uint32_t x = 0;
@@ -8942,6 +8944,71 @@ void second_func(void) {
 LUMI_block0_cleanup:
     (void)0;
 }
+/// @ test-native-export1
+void ut_M_local(uint64_t n, String* s);
+cdef_M_Int func(cdef_M_Uint n, cdef_M_Char* s);
+cdef_M_Char* second_func(void);
+void ut_M_local(uint64_t n, String* s) {
+    unsigned LUMI_loop_depth = 1;
+LUMI_block0_cleanup:
+    (void)0;
+}
+cdef_M_Int func(cdef_M_Uint n, cdef_M_Char* s) {
+    Return_Code LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    cdef_M_Int LUMI_return;
+    String str = {0};
+    ++LUMI_trace_ignore_count;
+    LUMI_err = cdef_M_copy_to_string(s, &str);
+    CHECK(4, LUMI_block2_cleanup)
+LUMI_block2_cleanup:
+    --LUMI_trace_ignore_count;
+    if (LUMI_err != OK) {
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+        LUMI_return = -0x01;
+        LUMI_loop_depth = 0; goto LUMI_block1_cleanup;
+    LUMI_block1_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+    ut_M_local(n, &str);
+    LUMI_return = 0;
+    LUMI_loop_depth = 0; goto LUMI_block0_cleanup;
+LUMI_block0_cleanup:
+    (void)0;
+    String_Del(&str, NULL);
+    return LUMI_return;
+}
+cdef_M_Char* second_func(void) {
+    Return_Code LUMI_err = OK;
+    unsigned LUMI_loop_depth = 1;
+    cdef_M_Char* LUMI_return;
+    {
+        String* s = NULL;
+        ++LUMI_trace_ignore_count;
+        INIT_NEW(10, LUMI_block1_cleanup, s, String, 1);
+        LUMI_return = cdef_M_string_pointer(s);
+        LUMI_loop_depth = 0; goto LUMI_block1_cleanup;
+    LUMI_block1_cleanup:
+        (void)0;
+        String_Del(s, NULL);
+        free(s);
+    }
+    --LUMI_trace_ignore_count;
+    if (LUMI_err != OK) {
+        LUMI_err = OK;
+        LUMI_loop_depth = 1;
+    LUMI_block2_cleanup:
+        (void)0;
+    }
+    if (LUMI_loop_depth < 1) goto LUMI_block0_cleanup;
+    LUMI_return = NULL;
+    LUMI_loop_depth = 0; goto LUMI_block0_cleanup;
+LUMI_block0_cleanup:
+    (void)0;
+    return LUMI_return;
+}
 /// @ test-native-e0
 expected space after "native", got "("
 /// @ test-native-e1
@@ -9000,6 +9067,40 @@ only primitive types supported for native variable, got "String"
 no '"' around string literal "#define error"
 /// @ test-native-code-e1
 no '"' around string literal "#ifdef error"
+/// @ test-native-export-e0
+redefinition of function "error"
+/// @ test-native-export-e1
+error raising native function
+/// @ test-native-export-e2
+output arguments to native function
+/// @ test-native-export-e3
+expected space after "return type", got "new-line"
+/// @ test-native-export-e4
+owner argument to native function
+/// @ test-native-export-e5
+managed argument to native function
+/// @ test-native-export-e6
+owner argument to native function
+/// @ test-native-export-e7
+parameter "s" access should not be "s-var" for type "String"
+/// @ test-native-export-e8
+output argument in native function call
+/// @ test-native-export-e9
+no '"' around string literal "error"
+/// @ test-native-export-e10
+user output to native function with non struct type "Array"
+/// @ test-native-export-e11
+user output to native function with non struct type "Array"
+/// @ test-native-export-e12
+user output to native function with non struct type "Error"
+/// @ test-native-export-e13
+no "return" statement at the end of native export function with return type "func"
+/// @ test-native-export-e14
+assigning empty into non-conditional type "Int"
+/// @ test-native-export-e15
+assigning integer with minimum of "-1" into integer with larger minimum of "0"
+/// @ test-native-export-e16
+error raised inside function not declared as error raising "func"
 /// @@ test-parameter-type
 /// @ test-parameter-type-0
 typedef struct ut_M_Test ut_M_Test;

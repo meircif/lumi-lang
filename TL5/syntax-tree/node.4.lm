@@ -27,6 +27,13 @@ class SyntaxTreeNode
     func inst expect-new-line(user String after)
         self.expect-char(copy '\n', user "new-line", user after)
 
+    func inst expect-space-or-new-line(user String after)
+        if glob.last-char != ' ' and glob.last-char != '\n'
+            self.print-syntax-error-header()
+            print-msg-with-item(
+                    user "expected space or new-line after", user after)
+            self.syntax-error-c-footer(user ", got")
+
     func inst expect-char(
             copy Char expected, user String char-name, user String after)
         if glob.last-char != expected

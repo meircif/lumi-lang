@@ -31,10 +31,22 @@ class SyntaxTreeExpression(SyntaxTreeCode)
 
 ~~~ Return statement in the syntax tree ~~~
 class SyntaxTreeReturn(SyntaxTreeCode)
+    var ExpressionValue return-value
+    
+    func inst parse-new(user SyntaxTreeBlock parent)->(
+            owner SyntaxTreeReturn new-node)
+        new-node := SyntaxTreeReturn(user parent)
+        new-node.parse()
+    
+    func inst parse()
+        if glob.last-char = ' '
+            self.return-value.new(user "", user self, user self)
+
     func dynamic is-end-point()->(var Bool is-end)
         is-end := true
 
     func dynamic check-memory(user ReferenceMemoryList refs)
+        self.return-value.check-memory(user refs)
         user SyntaxTreeFunction function
         self.get-function()->(user function)
         function.check-outputs-memory(user refs)
@@ -42,9 +54,27 @@ class SyntaxTreeReturn(SyntaxTreeCode)
             function.check-field-initialized(user refs)
     
     func dynamic analyze()
+        if self.return-value.parsed()
+            user SyntaxTreeFunction function
+            self.get-function()->(user function)
+            if not function.native-return
+                self.syntax-error-msg(
+                        user "return with value is supported only in native \
+                        export function with declared return type")
+            self.return-value.analyze()
+            var Int access
+            function.arguments.get-result-type()->(
+                    var access).check-assign-from(copy access, user self)->(
+                    owner self.return-value.expression)
+            self.return-value.check-errors(copy false, copy true)
         self.set-loop-finite(copy true)
     
     func dynamic write()
+        if self.return-value.parsed()
+            self.write-spaces()
+            write(user "LUMI_return = ")
+            self.return-value.write()
+            write(user ";\n")
         self.write-spaces()
         self.write-loop-jump(copy 0)
         write(user "\n")

@@ -61,7 +61,7 @@ Get and set pointer from array, string and buffer::
    user String string
    user Buffer buffer
    pointer-to-int := int-array
-   pointer-to-char := string
+   pointer-to-char := string.cdef-pointer()
    pointer-to-uchar := buffer
    value := pointer-to-int.get-pointed-at(copy 3)
    cdef.copy-to-string(copy pointer-to-char, user string)!

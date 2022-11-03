@@ -24,6 +24,7 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
     var Bool header-only
     var Bool external-body
     var Bool err-aux-var
+    var Bool native-return
 
     new()
         self.set-location()
@@ -337,12 +338,20 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         self.write-post-func()
     
     func inst write-header()
+        owner Argument output
         if self.arguments.has-error
-            write(user "Return_Code ")
+            write(user "Return_Code")
+        else-if self.native-return
+            var Int access
+            self.arguments.get-result-type()->(var access).write-cname()
+            self.arguments.outputs.pop()->(owner output)
         else
-            write(user "void ")
+            write(user "void")
+        write(user " ")
         self.write-cname()
         self.arguments.write()
+        if self.native-return
+            self.arguments.outputs.add(owner output)
     
     func inst write-block()
         ; `previous-text` {
@@ -358,6 +367,11 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
             write(user "Return_Code LUMI_err = OK;\n")
         write-spaces(copy INDENTATION-SPACES)
         write(user "unsigned LUMI_loop_depth = 1;\n")
+        if self.native-return
+            write-spaces(copy INDENTATION-SPACES)
+            var Int access
+            self.arguments.get-result-type()->(var access).write-cname()
+            write(user " LUMI_return;\n")
         self.write-block-setup()
         self.write-setup()
         self.write-block-body()
@@ -366,6 +380,9 @@ class SyntaxTreeFunction(SyntaxTreeBlock)
         if self.arguments.has-error
             write-spaces(copy INDENTATION-SPACES)
             write(user "return LUMI_err;\n")
+        else-if self.native-return
+            write-spaces(copy INDENTATION-SPACES)
+            write(user "return LUMI_return;\n")
         self.write-block-end()
     
     func inst write-setup()

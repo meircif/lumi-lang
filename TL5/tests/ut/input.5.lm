@@ -2665,6 +2665,8 @@ raise! 2
 raise
 ; @ ec test-return-e4
 raise! arr!
+; @ ec test-return-e5
+return 0
 ; @@ test-code-variables
 ; @ c test-code-variables-0
 var Uint32 x
@@ -3627,6 +3629,19 @@ func local()
     ut.func()
 native export func() "second_func"
     func()
+; @ g test-native-export1
+func local(copy Uint64 n, user String s)
+native export cdef.Int func(copy cdef.Uint n, copy cdef.CharP s)
+    var String str
+    if-error cdef.copy-to-string(copy s, user str)
+        return -1
+    local(copy n, user str)
+    return 0
+native export cdef.CharP another() "second_func"
+    try
+        new String s
+        return s.cdef-pointer()
+    return _
 ; @ eg test-native-e0
 native()
 ; @ eg test-native-e1
@@ -3699,6 +3714,50 @@ native struct Native
 native code #define error
 ; @ ec test-native-code-e1
 native #ifdef error
+; @ eg test-native-export-e0
+func error()
+native export error()
+; @ eg test-native-export-e1
+native export Int ! error()
+; @ eg test-native-export-e2
+native export error()->(copy Uint32 x)
+; @ eg test-native-export-e3
+native export Uint32
+; @ eg test-native-export-e4
+native export error(owner String s)
+; @ eg test-native-export-e5
+native export error(weak String s)
+; @ eg test-native-export-e6
+native export error(strong String s)
+; @ eg test-native-export-e7
+native export error(s-var String s)
+; @ eg test-native-export-e8
+native export Uint32 fun()
+    return 0
+func error(copy Uint32 i)
+    fun()->(copy i)
+; @ eg test-native-export-e9
+native export fun()->(copy Uint32 res) error
+; @ eg test-native-export-e10
+native export Buffer? error()
+; @ eg test-native-export-e11
+native export Array?{Uint32} error()
+; @ eg test-native-export-e12
+class Error
+    var Uint32 x
+    func dynamic user meth()
+native export Error? error()
+; @ eg test-native-export-e13
+native export cdef.Int func()
+; @ eg test-native-export-e14
+native export cdef.Int func()
+    return _
+; @ eg test-native-export-e15
+native export cdef.Uint func()
+    return -1
+; @ eg test-native-export-e16
+native export func()
+    raise!
 ; @@ test-parameter-type
 ; @ g test-parameter-type-0
 struct Test{Generic}
