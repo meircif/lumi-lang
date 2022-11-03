@@ -142,6 +142,11 @@ tl5-single-test-output: build-dir
 	lumi TL5/tests/integration/test0.5.lm -o $(BUILDDIR)/single -r > \
 		TL5/tests/integration/single-output.txt
 
+tl5-lib-test: build-dir
+	lumi -l integration TL5/tests/integration/test0.5.lm \
+	-o $(BUILDDIR)/libtest.so
+	python TL5/tests/integration/test-lib.py $(BUILDDIR)/libtest.so
+
 tl5-multiple-test: build-dir
 	lumi -t covered TL5/tests/integration/test*.5.lm -e \
 		TL5/tests/integration/external.c -e -ITL5/tests/integration -o \

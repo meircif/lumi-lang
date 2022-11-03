@@ -112,6 +112,12 @@ $CCA TL5/test-error.c -o TL5/test-error
 ! TL5/test-error > TL5/test-error-output.txt
 diff TL5/tests/integration/error-output.txt TL5/test-error-output.txt
 
+# run tl5-compiler lib integration test
+TL5/tl5-compiler -l integration TL5/test-lib.c TL5/tests/integration/test0.5.lm
+$CCA -shared -fpic TL5/test-lib.c -o TL5/libtest.so
+python TL5/tests/integration/test-lib.py TL5/libtest.so > \
+TL5/test-lib-output.txt
+diff TL5/tests/integration/single-output.txt TL5/test-lib-output.txt
 
 # TL5 teardown
 if [ ! -z "$CLEAR_TEST" ]; then
