@@ -1,4 +1,4 @@
-~~~ Builds executables from Lumi files
+~~~ Builds binaries from Lumi files
 
 lumi [input files]
 
@@ -8,6 +8,7 @@ lumi -c input.4.lm
 lumi -c input.4.lm -o output.c
 lumi input.4.lm -e external.c -o output
 lumi -t module input.4.lm -o output
+lumi -l module input.4.lm -o output
 lumi -l4 input.c -o output
 
 Gets input files as "<name>.<TL-version>.lm",
@@ -15,6 +16,9 @@ generates "<name>.c" files using TL<version> compiler.
 Then compiles the last one to "<name>" executable using "CC" environment
 variable, or "gcc" if not specified.
 (TL0 and TL1 only supports one file)
+
+If "-t" is given compiles a unit-test executable.
+If "-l" is given compiles a shared library.
 
 Supports TL0, TL1, TL2, TL3, TL4 & TL5.
 ~~~
@@ -41,8 +45,9 @@ func help()
               --version        print lumi command version
               -o <file>        output file name
               -t <module>      compile test program for <module>
+              -l <module>      compile shared library exporting <module>
               -c               only create C file(s)
-              -l<version>      only run C compiler for TL<version>
+              -TL<version>     only run C compiler for TL<version>
               -e <argument>    extra argument for C compilation
               -p <lumipath>    path of lumi-lang repository
               -r               run the compiled program
@@ -61,7 +66,8 @@ struct Lumi
     var Bool execute
     owner String implicit-output
     user String output
-    user String mut
+    user String ut-module
+    user String lib-module
     user String execute-arguments
     var Char version
     user String main-input
@@ -167,7 +173,10 @@ struct Lumi
                         self.explicit-output := true
                     else-if op = 't'
                         self.get-opt-param(user "t", user "module name")->(
-                                var index, user self.mut)
+                                var index, user self.ut-module)
+                    else-if op = 'l'
+                        self.get-opt-param(user "l", user "module name")->(
+                                var index, user self.lib-module)
                     else-if op = 'e'
                         self.concat-file-name(
                                 user self.external-files,
@@ -178,9 +187,9 @@ struct Lumi
                                 user "p", user "path")->(var index))
                     else-if op = 'c'
                         self.running-c := false
-                    else-if op = 'l' and arg.length > 2
+                    else-if op = 'T' and arg.length = 4
                         self.running-lumi := false
-                        self.version := arg[2]
+                        self.version := arg[3]
                     else-if op = 'r'
                         self.running-program := true
                         if arg.length > 2
@@ -245,8 +254,19 @@ struct Lumi
                 self.explicit-output and not self.running-c,
                 user "lumi: error: cannot specify C output file in TL2 & TL3")
         error-if(
-                copy self.version < '4' and self.mut?,
+                copy self.version < '4' and self.ut-module?,
                 user "lumi: error: testing not supported before TL4")
+        error-if(
+                copy self.version < '5' and self.lib-module?,
+                user "lumi: error: shared library compilation not supported \
+                before TL5")
+        error-if(
+                copy self.running-program and self.lib-module?,
+                user "lumi: error: cannot run a shared library")
+        error-if(
+                copy self.ut-module? and self.lib-module?,
+                user "lumi: error: cannot generate testing and shared library \
+                compilation together")
         if self.version <= '2'
             self.main-input := last-input
         else
@@ -266,10 +286,13 @@ struct Lumi
         self.command.clear(user "tl")
         self.command.append(copy self.version)
         self.command.concat(user "-compiler")
+        if self.ut-module?
+            self.command.concat(user " -t")
+            self.concat-file-name(user self.command, user self.ut-module)
+        else-if self.lib-module?
+            self.command.concat(user " -l")
+            self.concat-file-name(user self.command, user self.lib-module)
         if self.version >= '4'
-            if self.mut?
-                self.command.concat(user " -t")
-                self.concat-file-name(user self.command, user self.mut)
             self.concat-lumi-output()
         self.command.concat(user self.input-files.text)
         if self.version <= '1'
@@ -290,6 +313,8 @@ struct Lumi
                     self.path-separator := '\\'
                 self.lumi-path-ends-with-separator := last = self.path-separator
         self.command.concat(user " -g")
+        if self.lib-module?
+            self.command.concat(user " -shared -fPIC")
         if self.running-lumi
             if self.version >= '2' and self.version <= '3' and
                     self.explicit-output
@@ -317,7 +342,12 @@ struct Lumi
             self.concat-tl-path()
             self.command.append(copy ' ')
         self.command.concat(user "-o")
-        self.concat-file-name(user self.command, user self.output)
+        if self.lib-module? and not self.explicit-output
+            self.command.concat(user " \"lib")
+            self.command.concat(user self.output)
+            self.command.concat(user ".so\"")
+        else
+            self.concat-file-name(user self.command, user self.output)
         self.run-command(user "C compiler failed")
 
     func run-program()

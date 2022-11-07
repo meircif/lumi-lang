@@ -170,7 +170,8 @@ test test-mocked-functions()
     tl5-compiler.get-sys-argv.mocked()
     user String expected(user "
             #define LUMI_FILE_NAME \"mock.5.lm\"
-            #define LUMI_FUNC_NAME \"MockType.mock-func\"#undef LUMI_FILE_NAME
+            #define LUMI_FUNC_NAME \"MockType.mock-func\"
+            #undef LUMI_FILE_NAME
             #undef LUMI_FUNC_NAME
             mock text")
     assert-string-slice(

@@ -1,14 +1,17 @@
 .. _native:
 
-Calling C Code
-==============
+Interacting with Other Languages
+================================
 Lumi allows calling C code directly. This is useful for using an external C
-library, or using already written C code.
+library, or using already written C code within Lumi code.
 
 .. warning::
 
    Calling C code cannot be guaranteed to be safe as the C code can mangle with
    the Lumi memory management.
+
+It is also possible to call Lumi functions from other languages by compiling
+Lumi to a shared library that :ref:`exports C style functions <native_export>`.
 
 
 The ``cdef`` Module
@@ -61,7 +64,7 @@ Get and set pointer from array, string and buffer::
    user String string
    user Buffer buffer
    pointer-to-int := int-array
-   pointer-to-char := string
+   pointer-to-char := string.cdef-pointer()
    pointer-to-uchar := buffer
    value := pointer-to-int.get-pointed-at(copy 3)
    cdef.copy-to-string(copy pointer-to-char, user string)!
@@ -74,6 +77,8 @@ Pointer to complex types::
    pointer-to-struct := reference
    reference := pointer-to-struct.get-ref-at(copy 0)
 
+
+.. _native_func:
 
 Calling C Functions
 -------------------
@@ -88,15 +93,16 @@ To call a C function from Lumi it must first be declared using the
    ; allow calling a C function with header:
    ; "void CfunctionName(int number, char* text)"
    native func name-used-in-lumi(
-       copy cdef.Int number,
-       copy cdef.Pointer{cdef.Char} text) "CfunctionName"
-   ; Lumi name can be different that the C name
+           copy cdef.Int number,
+           copy cdef.Pointer{cdef.Char} text) "CfunctionName"
+   ; Lumi name can be different than the C name
 
 These functions can now be called from Lumi code using their Lumi name.
 
 Native functions Have some limitation compared to normal Lumi functions:
 
-* have no output arguments, only input parameters
+* have no output arguments, only input parameters and an optional single
+  return type
 * all parameters must be primitives, with ``copy`` access
 * cannot be called with output arguments:
   ``native-function()->(copy output-argument)`` is illegal, may use
@@ -206,7 +212,7 @@ Native types are treated as abstract unknown values, the only way to use their
 content is by other C functions.
 
 
-Writing C code directly
+Writing C Code Directly
 ------------------------
 It is possible to write C code directly using ``native code`` in global scope,
 or just ``native`` inside a function ::
@@ -229,3 +235,37 @@ C Wrapper Code
 It's recommended to wrap native C declarations with pure Lumi declarations that
 takes care for correct usage of the C declarations, and to present a simple and
 safe pure Lumi interface.
+
+
+.. _native_export:
+
+Exporting C style Functions in a Shared Library
+-----------------------------------------------
+Functions that are meant to be exported when compiling Lumi code to a shared
+library must be declared using ``native export`` statement::
+
+   ; exporting a function with C header:
+   ; "int some_exported_function(int number)"
+   native export cdef.Int some-exported-function(copy cdef.Int number)
+       ; function body...
+       return 0
+   ; "-" characters in the Lumi function name are replaced with "_" in C
+   
+   ; exporting a function with C header:
+   ; "void CfunctionName(int number, char* text)"
+   native export name-used-in-lumi(
+           copy cdef.Int number,
+           copy cdef.Pointer{cdef.Char} text) "CfunctionName"
+       ; function body...
+   ; Lumi name can be different than the C name
+
+These export functions have the same rules and limitation
+as :ref:`native functions <native_func>`.
+
+To return a value from the body of a native export functions that has a return
+type ``return <value>`` statement can be used.
+
+These functions are exported as C style functions and can be used from any
+program using the same mechanic C functions are called from a shared library.
+Only functions declared with ``native export`` and that are inside the exported
+module will be accessible in the compiled shared library.

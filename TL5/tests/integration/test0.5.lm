@@ -1016,7 +1016,14 @@ func ! test-dynamic()
     sys.print(user "\n")!
 
 
-main!
+native export cdef.Int inc(copy cdef.Int x)
+    var Int{-10000:10000} y(copy clamp x)
+    return y + 1
+
+native export cdef.CharP get-string()
+    return global-string.cdef-pointer()
+
+func ! test()
     test-simple-function()!
     test-ref-count()!
     test-error-handling(user _)!
@@ -1026,3 +1033,13 @@ main!
     test-switch()!
     test-cleanup()!
     test-dynamic()!
+
+native export cdef.Uint test-all()
+    try
+        test()
+        return 1
+    return 0
+
+
+main!
+    test()!

@@ -22,7 +22,7 @@ struct NativeText
 
 
 ~~~ Native include declaration in the syntax tree ~~~
-class NativeInclude(SyntaxTreeFunction)
+class NativeInclude(SyntaxTreeNode)
     owner NativeText path
 
     func inst parse-new()->(owner NativeInclude new-node)
@@ -30,6 +30,7 @@ class NativeInclude(SyntaxTreeFunction)
         new-node.parse()
     
     func inst parse()
+        self.set-location()
         NativeText.parse-new(user _, user self)->(owner self.path)
     
     func dynamic write()
@@ -38,14 +39,15 @@ class NativeInclude(SyntaxTreeFunction)
         write(user ">\n")
 
 
-~~~ Native function declaration in the syntax tree ~~~
-class NativeFunction(SyntaxTreeFunction)
+~~~ Native export function declaration in the syntax tree ~~~
+class NativeExport(SyntaxTreeFunction)
     owner TypeInstance return-type
     owner NativeText cname
     
-    func inst parse-new()->(owner NativeFunction new-node)
-        new-node := NativeFunction()
+    func inst parse-new()->(owner NativeExport new-node)
+        new-node := NativeExport()
         new-node.parse()
+        new-node.parse-body()
     
     func inst parse()
         self.return-type := TypeInstance()
@@ -66,7 +68,8 @@ class NativeFunction(SyntaxTreeFunction)
         glob.current-module.function-map.add(user self.name, user self)
     
     func dynamic analyze()
-        if self.return-type?
+        var Bool has-return-type(copy self.return-type?)
+        if has-return-type
             self.return-type.analyze(user self)
             new DeclarationArgument output
             output.parent-node := self
@@ -80,9 +83,36 @@ class NativeFunction(SyntaxTreeFunction)
             output.variable.access := output.access
             output.variable.is-output := output.is-output
             output.variable.type-instance := self.return-type
-            string-new-copy(user "native-return")->(owner output.variable.name)
+            string-new-copy(user "native output")->(owner output.variable.name)
             self.arguments.outputs.add(owner output)
+            self.native-return := true
         base()
+        if has-return-type
+            self.analyze-return-type()
+    
+    func dynamic analyze-return-type()
+        if not self.has-end-point()
+            self.syntax-error(
+                    user "no \"return\" statement at the end of native export \
+                    function with return type", user self.name)
+
+    
+    func dynamic write-declaration()
+        self.write-declaration-header(
+                copy self.module.name.equal(user glob.main-module))
+    
+    func dynamic write-cname()
+        self.cname.write(user self.name)
+
+
+~~~ Native function declaration in the syntax tree ~~~
+class NativeFunction(NativeExport)
+    func inst parse-new()->(owner NativeFunction new-node)
+        new-node := NativeFunction()
+        new-node.parse()
+    
+    func dynamic analyze-return-type()
+        ; do nothing
     
     func dynamic check-memory(user ReferenceMemoryList global-refs)
         ; do nothing
@@ -92,9 +122,6 @@ class NativeFunction(SyntaxTreeFunction)
     
     func dynamic write()
         ; do nothing
-    
-    func dynamic write-cname()
-        self.cname.write(user self.name)
 
 
 ~~~ Native variable declaration in the syntax tree ~~~

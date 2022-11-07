@@ -2665,6 +2665,8 @@ raise! 2
 raise
 ; @ ec test-return-e4
 raise! arr!
+; @ ec test-return-e5
+return 0
 ; @@ test-code-variables
 ; @ c test-code-variables-0
 var Uint32 x
@@ -3497,19 +3499,19 @@ assert-error! t!.num
 ; @ ec test-testing-e36
 assert-error! t!
 ; @@ test-native
-; @ g test-native-i0
+; @ g test-native-include0
 native include "native.h"
-; @ g test-native-i1
+; @ g test-native-include1
 struct Test
     var Uint32 x
 native include "first.h"
 func fun()
 native include "second.h"
-; @ g test-native-f0
+; @ g test-native-func0
 native func external()
 func call()
     external()
-; @ g test-native-f1
+; @ g test-native-func1
 class Test
     var Uint32 x
     func dynamic user meth()
@@ -3523,11 +3525,11 @@ func call()
     i := external(copy 5, user s, user a, user t)
     i := wraparound (2 * external(copy 5, user s, user a, user t)) + 3
     external(copy 5, user s, user a, user t)
-; @ g test-native-f2
+; @ g test-native-func2
 native func external() "SOME_External_func"
 func call()
     external()
-; @ g test-native-f3
+; @ g test-native-func3
 struct Test
     var Uint32 x
 native func Test? external()
@@ -3535,24 +3537,24 @@ func call()
     user Test? t
     t := external()
     external()
-; @ g test-native-v0
+; @ g test-native-var0
 native var Uint32 x
 func use()
     x := 2
-; @ g test-native-v1
+; @ g test-native-var1
 native var Uint32 x "SOME_External_var"
 func use()
     x := 2
-; @ g test-native-c0
+; @ g test-native-const0
 native const Int VALUE
 native const Byte BYTE
 func get()->(var Uint32 x)
     x := wraparound VALUE + BYTE
-; @ g test-native-c1
+; @ g test-native-const1
 native const Int VALUE "SOME_External_const"
 func get()->(var Uint32 x)
     x := VALUE
-; @ g test-native-t0
+; @ g test-native-type0
 native type Native
 native var Native native-var
 native func Native get-native()
@@ -3564,7 +3566,7 @@ func call()
     set-native(copy native-var)
     get()->(var n)
     set-native(copy n)
-; @ g test-native-t1
+; @ g test-native-type1
 native type Native "SOME_External_type"
 native func Native get-native() "SOME_External_get_func"
 native func set-native(copy Native n) "SOME_External_set_func"
@@ -3572,7 +3574,7 @@ func call()
     var Native n
     n := get-native()
     set-native(copy n)
-; @ g test-native-s0
+; @ g test-native-struct0
 native struct Native "c_native_type_t"
     var cdef.Int x "c_x_field"
     var cdef.Uint y "c_y_field"
@@ -3587,7 +3589,7 @@ func fun(copy Native in)->(var Native out)
     var Native def
     out := def
     ext(copy def)
-; @ g test-native-s1
+; @ g test-native-struct1
 native struct Test
     var cdef.Int x
 native type TestRef
@@ -3606,88 +3608,156 @@ func ! fun(copy Test t, copy TestRef r, copy Native in)->(var Native out)
     in.n.set-point-to(var in)
     out := in.n.get-pointed-at(copy 0)
     out := in
-; @ g test-native-b0
+; @ g test-native-code0
 var Uint32 x
 native code "#define HAS_SOME_DEFINE"
 var Uint32 y
-; @ c test-native-b1
+; @ c test-native-code1
 native "#ifdef __UNIX__"
 io := 3
 native "#else"
 io := 4
 native "#endif"
+; @ lg test-native-export0
+func local()
+    second.func()
+native export func()
+    func()
+; @-
+module second
+func local()
+    ut.func()
+native export func() "second_func"
+    func()
+; @ g test-native-export1
+func local(copy Uint64 n, user String s)
+native export cdef.Int func(copy cdef.Uint n, copy cdef.CharP s)
+    var String str
+    if-error cdef.copy-to-string(copy s, user str)
+        return -1
+    local(copy n, user str)
+    return 0
+native export cdef.CharP another() "second_func"
+    try
+        new String s
+        return s.cdef-pointer()
+    return _
 ; @ eg test-native-e0
 native()
 ; @ eg test-native-e1
 native error
 ; @ eg test-native-e2
 native error #
-; @ eg test-native-ei0
+; @ eg test-native-include-e0
 native include native.h
-; @ eg test-native-ef0
+; @ eg test-native-func-e0
 native func error()
 native func error()
-; @ eg test-native-ef1
+; @ eg test-native-func-e1
 native func Int ! error()
-; @ eg test-native-ef2
+; @ eg test-native-func-e2
 native func error()->(copy Uint32 x)
-; @ eg test-native-ef3
+; @ eg test-native-func-e3
 native func Uint32
-; @ eg test-native-ef4
+; @ eg test-native-func-e4
 native func error(owner String s)
-; @ eg test-native-ef5
+; @ eg test-native-func-e5
 native func error(weak String s)
-; @ eg test-native-ef6
+; @ eg test-native-func-e6
 native func error(strong String s)
-; @ eg test-native-ef7
+; @ eg test-native-func-e7
 native func error(s-var String s)
-; @ eg test-native-ef8
+; @ eg test-native-func-e8
 native func Uint32 fun()
 func error(copy Uint32 i)
     fun()->(copy i)
-; @ eg test-native-ef9
+; @ eg test-native-func-e9
 native func fun()->(copy Uint32 res) error
-; @ eg test-native-ef10
+; @ eg test-native-func-e10
 native func Buffer? error()
-; @ eg test-native-ef11
+; @ eg test-native-func-e11
 native func Array?{Uint32} error()
-; @ eg test-native-ef12
+; @ eg test-native-func-e12
 class Error
     var Uint32 x
     func dynamic user meth()
 native func Error? error()
-; @ eg test-native-ev0
+; @ eg test-native-var-e0
 native var String s
-; @ eg test-native-ev1
+; @ eg test-native-var-e1
 native var Uint32 x error
-; @ eg test-native-ec0
+; @ eg test-native-const-e0
 native const Int VALUE error
-; @ eg test-native-ec1
+; @ eg test-native-const-e1
 native const Bool VALUE
-; @ eg test-native-ec2
+; @ eg test-native-const-e2
 native const Int VALUE
 var Buffer{VALUE} error
-; @ eg test-native-et0
+; @ eg test-native-type-e0
 native type Native error
-; @ eg test-native-et1
+; @ eg test-native-type-e1
 native type Native
 native func Native external(copy Native in)
 func error()
     var Native n
     n := external(copy n)
-; @ eg test-native-es0
+; @ eg test-native-struct-e0
 native struct Native
     user String error
-; @ eg test-native-es1
+; @ eg test-native-struct-e1
 native struct Native
     func error()
-; @ eg test-native-es2
+; @ eg test-native-struct-e2
 native struct Native
     var String error
-; @ eg test-native-eb0
+; @ eg test-native-code-e0
 native code #define error
-; @ ec test-native-eb1
+; @ ec test-native-code-e1
 native #ifdef error
+; @ eg test-native-export-e0
+func error()
+native export error()
+; @ eg test-native-export-e1
+native export Int ! error()
+; @ eg test-native-export-e2
+native export error()->(copy Uint32 x)
+; @ eg test-native-export-e3
+native export Uint32
+; @ eg test-native-export-e4
+native export error(owner String s)
+; @ eg test-native-export-e5
+native export error(weak String s)
+; @ eg test-native-export-e6
+native export error(strong String s)
+; @ eg test-native-export-e7
+native export error(s-var String s)
+; @ eg test-native-export-e8
+native export Uint32 fun()
+    return 0
+func error(copy Uint32 i)
+    fun()->(copy i)
+; @ eg test-native-export-e9
+native export fun()->(copy Uint32 res) error
+; @ eg test-native-export-e10
+native export Buffer? error()
+; @ eg test-native-export-e11
+native export Array?{Uint32} error()
+; @ eg test-native-export-e12
+class Error
+    var Uint32 x
+    func dynamic user meth()
+native export Error? error()
+; @ eg test-native-export-e13
+native export cdef.Int func()
+; @ eg test-native-export-e14
+native export cdef.Int func()
+    return _
+; @ eg test-native-export-e15
+native export cdef.Uint func()
+    return -1
+; @ eg test-native-export-e16
+native export func()
+    raise!
 ; @@ test-parameter-type
 ; @ g test-parameter-type-0
 struct Test{Generic}

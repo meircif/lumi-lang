@@ -50,9 +50,13 @@ struct Compiler
     var Int input-file-index
     var Int line-number
 
+    ~~~ compiler arguments ~~~
+    var Bool ut-generation
+    var Bool library-generation
+    owner String main-module
+
     ~~~ test functions list ~~~
     var NameMap{SyntaxTreeTestFunction} test-functions
-    owner String tested-module
     var Bool is-new-mocked
     var Bool is-delete-mocked
 
@@ -88,7 +92,7 @@ struct Compiler
     user TypeData type-file-read-write-binary
     user TypeData type-pointer
     user TypeData type-c-char
-    
+
     owner TypeInstance type-instance-buffer
 
     ~~~ referenced built-in functions ~~~

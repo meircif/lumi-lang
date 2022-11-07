@@ -90,8 +90,8 @@ class SyntaxTreeBranch(SyntaxTreeNode)
             var Bool is-parsed)
         is-parsed := glob.last-char = ' '
         
-        if parent-block? and glob.tested-module?
-            if glob.current-module.name.equal(user glob.tested-module) and
+        if parent-block? and glob.ut-generation
+            if glob.current-module.name.equal(user glob.main-module) and
                     not keyword.equal(user "else") and
                     not keyword.equal(user "else-if")
                 parent-block.code-nodes.add(

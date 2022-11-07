@@ -10,31 +10,36 @@ mock tl5-compiler.get-sys-argv()->(user Array{String} argv)
     argv := tl5-compiler-tests.mock-argv
 
 
-func write-syntax-tree(copy Bool is-test)
+func write-syntax-tree(copy Char flag)
+    var Int first-file-index
     mock-argv[0].new(user "tl4-compiler")
-    mock-argv[1].new(user "mock.c")
-    mock-argv[2].new(user "mock.5.lm")
-    if is-test
+    if flag != ' '
         mock-argv.length := 6
-        mock-argv[3].new(user "-t")
-        mock-argv[4].new(user "ut")
+        mock-argv[1].new(user "-")
+        mock-argv[1].append(copy flag)
+        mock-argv[2].new(user "ut")
         mock-argv[5].new(user "path\\second.5.lm")
+        first-file-index := 3
     else
         mock-argv.length := 3
-    tl5-compiler.glob.root.is-library := true
+        first-file-index := 1
+    mock-argv[first-file-index].new(user "mock.c")
+    mock-argv[first-file-index + 1].new(user "mock.5.lm")
+
+    tl5-compiler.glob.root.mainless := true
     tl5-compiler.glob.root.parse()
     tl5-compiler.glob.root.analyze()
     tl5-compiler.glob.root.write()
 
 
-func write-syntax-tree-success(copy Bool is-test)
+func write-syntax-tree-success(copy Char flag)
     if crush-run
-        write-syntax-tree(copy is-test)
+        write-syntax-tree(copy flag)
         raise "not crushing in the second run"
     sys-exit := false
     Sys.print.active := true
     try
-        write-syntax-tree(copy is-test)
+        write-syntax-tree(copy flag)
         Sys.print.active := false
     catch
         Sys.print.active := false
@@ -50,31 +55,35 @@ func test-global-scope(
         user String input-text,
         user String second-file-input-text,
         user String expected-output,
-        copy Bool is-test)
+        copy Char flag)
     setup-test()
     set-mock-file-text(user input-text, user second-file-input-text)
-    write-syntax-tree-success(copy is-test)
-    if mock-output-file-text[0] != '\n'
-        sys.print(user mock-output-file-text)
-    assert mock-output-file-text[0] = '\n'
-    assert mock-output-file-text[mock-output-file-text.length - 1] = '\n'
+    write-syntax-tree-success(copy flag)
+    var Int slice-start
+    var Int slice-length(copy mock-output-file-text.length)
+    if mock-output-file-text.length > 0
+        if mock-output-file-text[0] = '\n'
+            slice-start := 1
+            slice-length -= 1
+        if mock-output-file-text[mock-output-file-text.length - 1] = '\n'
+            slice-length -= 1
     assert-string-slice(
             user expected-output,
             user mock-output-file-text,
-            copy 1,
-            copy mock-output-file-text.length - 2,
+            copy slice-start,
+            copy slice-length,
             copy true)
 
 
-func try-write-syntax-tree(copy Bool is-test)->(var Bool has-error)
+func try-write-syntax-tree(copy Char flag)->(var Bool has-error)
     if crush-run
-        write-syntax-tree(copy is-test)
+        write-syntax-tree(copy flag)
         raise
     has-error := true
     sys-exit := false
     Sys.print.active := true
     try
-        write-syntax-tree(copy is-test)
+        write-syntax-tree(copy flag)
         has-error := false
         Sys.print.active := false
         print-case-error()
@@ -117,13 +126,13 @@ func test-global-scope-error(
         user String input-text,
         user String second-file-input-text,
         user String expected-error,
-        copy Bool is-test)
+        copy Char flag)
     setup-test()
     set-mock-file-text(user input-text, user second-file-input-text)
-    assert try-write-syntax-tree(copy is-test)
+    assert try-write-syntax-tree(copy flag)
     Sys.print.active := false
     user String expected-header
-    if is-test
+    if flag != ' '
         expected-header := "Code error in path\\second.5.lm["
     else
         expected-header := "Code error in mock.5.lm["
@@ -147,7 +156,7 @@ func test-code(
         user String input-text, user String expected-output, copy Bool is-main)
     test-code-setup(user input-text)
     concat-marker(user mock-input-file-text)
-    write-syntax-tree-success(copy false)
+    write-syntax-tree-success(copy ' ')
     var Int code-length(copy mock-output-file-text.find(user code-marker) -
             common-header-length - tl5-compiler.INDENTATION-SPACES - 1)
     assert-string-slice(
@@ -160,25 +169,33 @@ func test-code(
 
 func test-code-error(user String input-text, user String expected-error)
     test-code-setup(user input-text)
-    assert try-write-syntax-tree(copy false)
+    assert try-write-syntax-tree(copy ' ')
     Sys.print.active := false
     test-error-message(user "Code error in mock.5.lm[", user expected-error)
 
 
-test test-illegal-usage()
+func run-illegal-usage()
     setup-test()
-    mock-argv.length := 2
     Sys.print.active := true
     assert-error tl5-compiler.glob.root.parse(), "Sys.exit"
     Sys.print.active := false
     assert-string-slice(
-            user "usage: tl5-compiler [-t TESTED-MODULE] OUTPUT-C-FILE-NAME \
+            user "usage: tl5-compiler [-t|-l MODULE] OUTPUT-C-FILE-NAME \
             INPUT-TL5-FILES...\n",
             user mock-print-text,
             copy 0,
             copy mock-print-text.length,
             copy false)
-            
+
+
+test test-illegal-usage()
+    mock-argv.length := 2
+    run-illegal-usage()
+
+    mock-argv.length := 4
+    mock-argv[1].new(user "-t")
+    run-illegal-usage()
+
 
 test test-open-file-fail()
     setup-test()
@@ -187,7 +204,7 @@ test test-open-file-fail()
     mock-argv[1].new(user "mock.c")
     mock-argv[2].new(user "mock.5.lm")
     mock-argv.length := 3
-    tl5-compiler.glob.root.is-library := true
+    tl5-compiler.glob.root.mainless := true
     
     file-open-error := true
     Sys.print.active := true
@@ -226,10 +243,11 @@ func test-analyze-error(user String expected-error)
 
 func test-no-run-func(copy Bool testing, user String expected-error)
     setup-test()
-    tl5-compiler.glob.root.is-library := false
+    tl5-compiler.glob.root.mainless := false
     if testing
+        tl5-compiler.glob.ut-generation := true
         tl5-compiler.string-new-copy(user "ut")->(
-                owner tl5-compiler.glob.tested-module)
+                owner tl5-compiler.glob.main-module)
     test-analyze-error(user expected-error)
 
 test test-no-main()
@@ -243,14 +261,14 @@ test test-no-test-func()
 
 func test-cover-error(copy Bool has-module, user String expected-error)
     setup-test()
-    tl5-compiler.glob.root.is-library := true
+    tl5-compiler.glob.root.mainless := true
     tl5-compiler.string-new-copy(user "error")->(
-            owner tl5-compiler.glob.tested-module)
+            owner tl5-compiler.glob.main-module)
     tl5-compiler.glob.test-functions.add(user _, user _)
     var tl5-compiler.ModuleMembers dummy-module(user _)
     if has-module
         tl5-compiler.glob.module-map.add(
-                user tl5-compiler.glob.tested-module, user dummy-module)
+                user tl5-compiler.glob.main-module, user dummy-module)
     tl5-compiler.glob.root.line-counts := Array{1:tl5-compiler.LineCount}()
     test-analyze-error(user expected-error)
 

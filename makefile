@@ -132,12 +132,20 @@ tl5-ut: build-dir
 tl5-run-ut: build-dir
 	$(BUILDDIR)/tl5-compiler-tests TL5/tests/ut/
 
+tl5-run-ut-trace: build-dir
+	$(BUILDDIR)/tl5-compiler-tests TL5/tests/ut/ --trace
+
 tl5-single-test: build-dir
 	lumi TL5/tests/integration/test0.5.lm -o $(BUILDDIR)/single -r
 
 tl5-single-test-output: build-dir
 	lumi TL5/tests/integration/test0.5.lm -o $(BUILDDIR)/single -r > \
 		TL5/tests/integration/single-output.txt
+
+tl5-lib-test: build-dir
+	lumi -l integration TL5/tests/integration/test0.5.lm \
+	-o $(BUILDDIR)/libtest.so
+	python TL5/tests/integration/test-lib.py $(BUILDDIR)/libtest.so
 
 tl5-multiple-test: build-dir
 	lumi -t covered TL5/tests/integration/test*.5.lm -e \

@@ -20,65 +20,64 @@ class SyntaxTreeRoot(GlobalNodes)
     var GlobalInit global-init
     owner Array{LineCount} line-counts
     var Int covered-files
-    var Bool is-library
+    var Bool mainless
     
     new()
         base()
         self.global-init.new()
     
+    func inst print-usage-and-exit()
+        sys.print(user "usage: tl5-compiler [-t|-l MODULE]")
+        sys.print(user " OUTPUT-C-FILE-NAME INPUT-TL5-FILES...\n")
+        sys.exit(copy 1)
+    
     func inst parse()
-        var Int first-file-index
-        var Int arg-test-index(copy -1)
-        var Int input-files-number
+        var Int output-file-index(copy 1)
         user Array{String} sys-argv
         get-sys-argv()->(user sys-argv)
-        for n in 1:sys-argv.length
-            user String arg(user sys-argv[n])
-            if arg-test-index = n - 1
-                string-new-copy(user arg)->(owner glob.tested-module)
-            else-if arg.equal(user "-t") or arg.equal(user "--test")
-                arg-test-index := n
-            else-if first-file-index = 0
-                first-file-index := n
-            else
-                input-files-number += 1
+        if sys-argv.length < 3
+            self.print-usage-and-exit()
+        var Int input-files-number(copy sys-argv.length - 2)
+        glob.ut-generation := sys-argv[1].equal(user "-t") or
+                sys-argv[1].equal(user "--test")
+        glob.library-generation := sys-argv[1].equal(user "-l") or
+                sys-argv[1].equal(user "--shared")
+        if glob.ut-generation or glob.library-generation
+            if sys-argv.length < 5
+                self.print-usage-and-exit()
+            string-new-copy(user sys-argv[2])->(owner glob.main-module)
+            output-file-index += 2
+            input-files-number -= 2
         
-        if input-files-number = 0 or arg-test-index = sys-argv.length - 1
-            sys.print(user "usage: tl5-compiler [-t TESTED-MODULE]")
-            sys.print(user " OUTPUT-C-FILE-NAME INPUT-TL5-FILES...\n")
-            sys.exit(copy 1)
-        
-        if glob.tested-module?
+        if glob.ut-generation
             self.line-counts := Array{input-files-number:LineCount}()
         
-        self.output-file-name := sys-argv[first-file-index]
-        input-files-number := 0
-        for n in first-file-index + 1:sys-argv.length
-            if n > (arg-test-index + 1) or n < arg-test-index
-                glob.input-file-name := sys-argv[n]
-                glob.input-file-index := input-files-number
-                input-files-number += 1
-                glob.line-number := 1
-                glob.current-module := _
-                glob.file-ended := false
-                try
-                    file-open-read(user glob.input-file-name)->(
-                            owner glob.input-file)
-                catch
-                    sys.print(user "could not read file \"")
-                    sys.print(user glob.input-file-name)
-                    sys.print(user "\"\n")
-                    sys.exit(copy 1)
-                
-                self.parse-children(user _, user _)
-                
-                if glob.input-buffer.length > 0 or glob.input-spaces > 0
-                    self.set-location()
-                    self.syntax-error-msg(user "no new-line before file end")
-                
-                file-close(owner glob.input-file)
-                if self.line-counts?
-                    self.line-counts[glob.input-file-index].build-values()
+        self.output-file-name := sys-argv[output-file-index]
+        
+        for n in input-files-number
+            glob.input-file-name := sys-argv[output-file-index + 1 + n]
+            glob.input-file-index := n
+            glob.line-number := 1
+            glob.current-module := _
+            glob.file-ended := false
+            try
+                file-open-read(user glob.input-file-name)->(
+                        owner glob.input-file)
+            catch
+                sys.print(user "could not read file \"")
+                sys.print(user glob.input-file-name)
+                sys.print(user "\"\n")
+                sys.exit(copy 1)
+            
+            self.parse-children(user _, user _)
+            
+            if glob.input-buffer.length > 0 or glob.input-spaces > 0
+                self.set-location()
+                self.syntax-error-msg(user "no new-line before file end")
+            
+            file-close(owner glob.input-file)
+            if self.line-counts?
+                self.line-counts[glob.input-file-index].build-values()
         
         glob.current-module := _
         self.line-number := 0
@@ -163,6 +162,9 @@ class SyntaxTreeRoot(GlobalNodes)
         
         else-if keyword.equal(user "func")
             self.functions.add(owner NativeFunction.parse-new(user _))
+        
+        else-if keyword.equal(user "export")
+            self.functions.add(owner NativeExport.parse-new(user _))
             
         else-if keyword.equal(user "var")
             self.variables.add(owner NativeVariable.parse-new(user _, user _))
@@ -213,11 +215,12 @@ class SyntaxTreeRoot(GlobalNodes)
         self.types := ordered-list
 
     func inst analyze-main()
-        if glob.tested-module?
+        if glob.ut-generation
             if not glob.test-functions.first?
                 sys.print(user "General code error: no test functions\n")
                 sys.exit(copy 1)
-        else-if not self.main-function? and not self.is-library
+        else-if not glob.library-generation and not self.main-function? and
+                not self.mainless
             sys.print(user "General code error: no main function\n")
             sys.exit(copy 1)
         if self.main-function?
@@ -233,9 +236,9 @@ class SyntaxTreeRoot(GlobalNodes)
         self.check-children-memory(user self.types, user _)
     
     func inst analyze-cover()
-        if not glob.module-map.find(user glob.tested-module)?
+        if not glob.module-map.find(user glob.main-module)?
             sys.print(user "General code error: unknown tested module \"")
-            sys.print(user glob.tested-module)
+            sys.print(user glob.main-module)
             sys.print(user "\"\n")
             sys.exit(copy 1)
         var Int covered-index
@@ -248,7 +251,7 @@ class SyntaxTreeRoot(GlobalNodes)
         if self.covered-files = 0
             sys.print(
                     user "General code error: no code to test under module \"")
-            sys.print(user glob.tested-module)
+            sys.print(user glob.main-module)
             sys.print(user "\"\n")
             sys.exit(copy 1)
     
@@ -315,7 +318,7 @@ class SyntaxTreeRoot(GlobalNodes)
         write-global(user "\n\n/* global functions body */\n")
         self.write-children(user self.functions)
         
-        if glob.tested-module? or self.main-function?
+        if glob.ut-generation or self.main-function?
             if not glob.is-new-mocked
                 write(user "\n\nvoid new_Mock(Bool* allocate_success) { }")
             if not glob.is-delete-mocked
@@ -325,7 +328,7 @@ class SyntaxTreeRoot(GlobalNodes)
         write-global(user "\n\n/* lumi initialization function */\n")
         self.global-init.write()
                 
-        if glob.tested-module?
+        if glob.ut-generation
             write-global(user "\n\n/* main test function */\n")
             self.write-test-main()
         else-if self.main-function?
@@ -468,7 +471,7 @@ class GlobalInit(SyntaxTreeFunction)
             return
         self.arguments.has-error := true
         write(user "\n#define LUMI_FUNC_NAME \"global variable \
-                initialization\"")
+                initialization\"\n")
         self.write-header()
         self.write-block()
         write(user "#undef LUMI_FUNC_NAME\n")

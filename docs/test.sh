@@ -29,8 +29,8 @@ $CCA ../TL5/tl5-compiler.c ../TL4/lumi.4.c -I../TL4 -o docs/tl5-compiler
 # compile examples
 docs/tl5-compiler docs/hello-world.c ../docs/hello-world.5.lm
 $CCA docs/hello-world.c -o docs/hello-world
-docs/tl5-compiler docs/hello-world-test.c ../docs/hello-world.5.lm \
-  ../docs/hello-world-test.5.lm -t hello-world
+docs/tl5-compiler -t hello-world docs/hello-world-test.c \
+  ../docs/hello-world.5.lm ../docs/hello-world-test.5.lm
 $CCA docs/hello-world-test.c -o docs/hello-world-test
 docs/tl5-compiler docs/examples.c ../docs/examples.5.lm
 $CCA docs/examples.c -o docs/run-examples
