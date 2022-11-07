@@ -87,9 +87,11 @@ scheme.
 
 Compiling a Shared Library
 --------------------------
-Lumi compiler allows generating code for a shared library exporting functions
-from a specific Lumi module. This feature can be used in ``lumi`` command
-with ``-l <exported module name>``. For example::
+Lumi compiler allows generating code for a shared library :ref:`exporting
+C styled functions <native_export>` from a specific Lumi module.
+This feature can be used in ``lumi`` command
+with ``-l <exported module name>``, and only functions from the given module
+will be exported to the shared library. For example::
 
    lumi -l hello hello.5.lm
 

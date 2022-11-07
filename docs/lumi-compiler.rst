@@ -16,8 +16,8 @@ more Lumi files. For example ::
 will generate ``hello.c`` C file from ``hello.5.lm`` and ``other.5.lm`` Lumi
 files.
 
-Compile Testing Code
---------------------
+Compiling Testing Code
+----------------------
 To generate C code that tests a specific Lumi module ``-t <tested module name>``
 should be used. For example::
 
@@ -25,6 +25,18 @@ should be used. For example::
 
 will generate ``hello-tests.c`` C file from ``hello.5.lm`` and
 ``hello-tests.5.lm`` Lumi files, with C code that tests the ``hello`` module.
+
+Compiling Shared Library Code
+-----------------------------
+To generate C code that can be compiled to a shared library :ref:`exporting
+C styled functions <native_export>` from a specific Lumi
+module ``-l <exported module name>`` should be used. For example::
+
+   tl5-compiler -l hello hello-lib.c hello.5.lm other.5.lm
+
+will generate ``hello-lib.c`` C file from ``hello.5.lm`` and
+``other.5.lm`` Lumi files, with C code that can be compiled to a shared library
+exporting functions from the ``hello`` module.
 
 Building an Executable
 ----------------------

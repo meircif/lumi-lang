@@ -93,12 +93,13 @@ class LumiLexer(RegexLexer):
             (r'[?:.]', token.Operator),
             (r'->', token.Operator),
             (r'^ *(module|func|const|struct|class|support|main|enum|'
-             r'native(?: func| var| const| struct| type| code)?|test|mock|'
-             r'alias|for|new|return|raise|assert!?|assert-error!?|try|catch|'
-             r'if|else|else-if|loop!?|loop-infinite|while|break|continue|'
-             r'switch|case|default|fallthrough|copy|user|owner|var|s-var|'
-             r'strong|weak|shared|static|dynamic|global|implement|if-ok|'
-             r'if-error|else-if-ok|else-if-error|repeat)[ \n]',
+             r'native(?: func| export| var| const| struct| type| code)?|'
+             r'test|mock|alias|new|return|raise|assert!?|assert-error!?|'
+             r'try|catch|if|else|else-if|for|loop!?|loop-infinite|'
+             r'while|break|continue|switch|case|default|fallthrough|'
+             r'copy|user|owner|var|s-var|strong|weak|shared|'
+             r'static|dynamic|global|implement|'
+             r'if-ok|if-error|else-if-ok|else-if-error|repeat)[ \n]',
              token.Keyword),
             (r'\b(copy|user|temp|owner|var|s-var|strong|weak|shared|func|'
              r'static|dynamic|for|in) ', token.Keyword),

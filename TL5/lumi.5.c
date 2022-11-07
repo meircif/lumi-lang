@@ -25,10 +25,7 @@
 #endif
 
 #if defined(_WIN32) || defined(__CYGWIN__)
-  #ifndef WIN_EXPORT
-  #define WIN_EXPORT
-  #endif
-  #ifdef WIN_EXPORT
+  #ifndef WIN_IMPORT
     #ifdef __GNUC__
       #define EXPORTED __attribute__ ((dllexport))
     #else
